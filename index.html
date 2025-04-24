@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Formidable</title>
+    <link rel="stylesheet" href="assets/layout.css" />
+    <link rel="stylesheet" href="assets/forms.css" />
+    <link rel="stylesheet" href="assets/theme.css" />
+    <link rel="stylesheet" href="assets/dark-theme.css" />
+  </head>
+  <body>
+    <!-- Setup Form Editor Context -->
+    <div id="setup-container">
+      <div id="setup-sidebar">
+        <h3>Forms</h3>
+        <div id="setup-list"></div>
+      </div>
+      <div id="setup-splitter">
+        <div id="setup-resizeHandle" title="Drag to Resize"></div>
+      </div>
+      <div id="setup-workspace">
+        <section id="workspace-content">
+          <p>Select a setup YAML to begin editing Markdown.</p>
+        </section>
+      </div>
+    </div>
+
+    <!-- Markdown Document Editor Context -->
+    <div id="markdown-container" style="display: none;">
+      <div id="markdown-sidebar">
+        <h3>Markdown Files</h3>
+        <button id="add-markdown">+ Add New</button>
+        <div id="markdown-list"></div>
+      </div>
+      <div id="markdown-splitter">
+        <div id="markdown-resizeHandle" title="Drag to Resize"></div>
+      </div>
+      <div id="markdown-workspace">
+        <section id="markdown-content">
+          <p>Select or create a markdown file to begin.</p>
+        </section>
+      </div>
+    </div>
+
+    <!-- Shared Status Bar -->
+    <div id="status-bar">Ready.</div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button id="settings-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-row">
+          <label for="context-toggle">Context Mode</label>
+          <label class="switch">
+            <input type="checkbox" id="context-toggle" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <label for="theme-toggle">Dark Mode</label>
+          <label class="switch">
+            <input type="checkbox" id="theme-toggle" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-resizer"></div>
+    </div>
+
+    <div id="modalBackdrop" class="modal-backdrop"></div>
+
+    <script type="module" src="renderer.js"></script>
+  </body>
+</html>

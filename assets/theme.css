@@ -1,0 +1,108 @@
+/* ───── Base Theme: Light (default) ───── */
+
+body {
+  background-color: #ffffff;
+  color: #222;
+}
+
+/* Sidebar and Panels */
+#setup-sidebar,
+#markdown-sidebar {
+  background-color: #f0f0f0;
+  border-right: 1px solid #ccc;
+}
+
+#setup-workspace,
+#markdown-workspace {
+  background-color: #ffffff;
+  color: #222;
+}
+
+#workspace-content,
+#markdown-content {
+  background-color: #ffffff;
+  color: #222;
+}
+
+/* Setup List + Markdown File List Items */
+.setup-item,
+.markdown-item {
+  background-color: #e0e0e0;
+  margin-bottom: 5px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.setup-item:hover,
+.markdown-item:hover {
+  background-color: #d0d0d0;
+}
+
+/* Status Bar */
+#status-bar {
+  background-color: #f4f4f4;
+  border-top: 1px solid #ccc;
+  color: #333;
+}
+
+/* Buttons */
+button {
+  background-color: #e0e0e0;
+  border: 1px solid #bbb;
+  color: #222;
+}
+
+button:hover {
+  background-color: #d5d5d5;
+}
+
+/* Modal Dialogs */
+.modal {
+  background-color: #ffffff;
+  border-color: #555;
+  color: #222;
+}
+
+.modal-actions button:hover {
+  background-color: #f0f0f0;
+}
+
+/* Modal Backdrop */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Toggle Sliders */
+.slider {
+  background-color: #ccc;
+}
+
+.slider:before {
+  background-color: #ffffff;
+}
+
+input:checked + .slider {
+  background-color: #4caf50;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+
+/* Splitter Handle */
+#resizeHandle,
+#markdown-resizeHandle {
+  background-color: #888;
+  border: 1px solid #555;
+}

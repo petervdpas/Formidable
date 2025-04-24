@@ -1,0 +1,101 @@
+/* ───── Dark Theme ───── */
+
+.dark-mode body,
+.dark-mode #setup-container,
+.dark-mode #markdown-container,
+.dark-mode #setup-sidebar,
+.dark-mode #markdown-sidebar,
+.dark-mode #setup-workspace,
+.dark-mode #workspace-content,
+.dark-mode #markdown-workspace,
+.dark-mode #markdown-content,
+.dark-mode #status-bar {
+  background-color: #121212;
+  color: #eee;
+}
+
+/* Sidebar */
+.dark-mode #setup-sidebar,
+.dark-mode #markdown-sidebar {
+  border-right: 1px solid #444;
+}
+
+/* Setup List + Markdown List */
+.dark-mode .setup-item,
+.dark-mode .markdown-item {
+  background-color: #2a2a2a;
+}
+
+.dark-mode .setup-item:hover,
+.dark-mode .markdown-item:hover {
+  background-color: #3a3a3a;
+}
+
+/* Status Bar */
+.dark-mode #status-bar {
+  background-color: #1e1e1e;
+  border-top: 1px solid #444;
+  color: #ccc;
+}
+
+/* Buttons */
+.dark-mode button {
+  background-color: #333;
+  color: #eee;
+  border: 1px solid #666;
+}
+
+.dark-mode button:hover {
+  background-color: #444;
+}
+
+/* Modal Dialogs */
+.dark-mode .modal {
+  background-color: #2a2a2a;
+  border-color: #555;
+  color: #eee;
+}
+
+.dark-mode .modal-actions button:hover {
+  background-color: #444;
+}
+
+/* Modal Backdrop */
+.dark-mode .modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Toggle Sliders */
+.dark-mode .slider {
+  background-color: #444;
+}
+
+.dark-mode .slider:before {
+  background-color: #ccc;
+}
+
+.dark-mode input:checked + .slider {
+  background-color: #88d88c;
+}
+
+/* Scrollbars */
+.dark-mode ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 5px;
+}
+
+.dark-mode ::-webkit-scrollbar-track {
+  background: #222;
+}
+
+/* Splitter Handles */
+.dark-mode #setup-resizeHandle,
+.dark-mode #markdown-resizeHandle {
+  background-color: #666;
+  border-color: #444;
+}

@@ -1,0 +1,16 @@
+name: Basic Form
+markdown_dir: ./markdowns/basic
+fields:
+  - key: title
+    type: text
+    label: Title
+    default: ""
+  - key: published
+    type: boolean
+    label: Published
+    default: false
+  - key: category
+    type: dropdown
+    label: Category
+    options: [News, Tutorial, Opinion]
+    default: News

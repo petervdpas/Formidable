@@ -1,0 +1,102 @@
+/* ───── Form Layout ───── */
+
+form,
+fieldset {
+  border: 1px solid #888;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+legend {
+  font-weight: bold;
+  padding: 0 6px;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.form-row input[type="text"],
+.form-row select {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Optional narrower width for specific inputs */
+.field-default {
+  min-width: 100px;
+}
+
+/* Remove Field Button */
+.form-row button.remove-field {
+  padding: 4px 8px;
+  font-size: 14px;
+  background-color: #d66;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.form-row button.remove-field:hover {
+  background-color: #b44;
+}
+
+/* Add Field Button */
+#add-field {
+  margin-top: 10px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: #2196f3;
+  color: white;
+  cursor: pointer;
+}
+
+#add-field:hover {
+  background-color: #0b7dda;
+}
+
+/* Save Button Group */
+.button-group {
+  margin-top: 20px;
+}
+
+.button-group button {
+  padding: 8px 16px;
+  font-weight: bold;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.button-group button:hover {
+  background-color: #3b9740;
+}
+
+/* ───── Two Column Layout Support ───── */
+
+.form-row.two-column {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.form-row.two-column > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row.two-column label {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
