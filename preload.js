@@ -2,6 +2,8 @@
 
 const { contextBridge, ipcRenderer } = require("electron");
 
+// No logger here! Only simple console.log if needed manually.
+
 contextBridge.exposeInMainWorld("api", {
   getSetupList: () => ipcRenderer.invoke("get-setup-list"),
   loadSetupYaml: (name) => ipcRenderer.invoke("load-setup-yaml", name),

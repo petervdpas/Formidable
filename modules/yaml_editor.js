@@ -1,14 +1,21 @@
+// yaml_editor.js
+
+import { log, warn } from "./logger.js"; // <-- ADD centralized logger
+
 export function initYamlEditor(containerId, onSaveCallback) {
   const container = document.getElementById(containerId);
   if (!container) {
-    console.warn("YAML editor container not found:", containerId);
+    warn("[YamlEditor] YAML editor container not found:", containerId);
     return;
   }
+
+  log("[YamlEditor] Initialized editor in container:", containerId);
 
   let currentData = null;
 
   function renderEditor(data) {
     currentData = structuredClone(data);
+    log("[YamlEditor] Rendering editor for:", currentData.name || "Unnamed Setup");
 
     container.innerHTML = `
       <fieldset>
@@ -56,15 +63,9 @@ export function initYamlEditor(containerId, onSaveCallback) {
           <div>
             <label>Type</label>
             <select class="field-type">
-              <option value="text" ${
-                field.type === "text" ? "selected" : ""
-              }>Text</option>
-              <option value="boolean" ${
-                field.type === "boolean" ? "selected" : ""
-              }>Boolean</option>
-              <option value="dropdown" ${
-                field.type === "dropdown" ? "selected" : ""
-              }>Dropdown</option>
+              <option value="text" ${field.type === "text" ? "selected" : ""}>Text</option>
+              <option value="boolean" ${field.type === "boolean" ? "selected" : ""}>Boolean</option>
+              <option value="dropdown" ${field.type === "dropdown" ? "selected" : ""}>Dropdown</option>
             </select>
           </div>
         </div>
@@ -76,9 +77,7 @@ export function initYamlEditor(containerId, onSaveCallback) {
           </div>
           <div>
             <label>Default</label>
-            <input type="text" class="field-default" value="${
-              field.default || ""
-            }" />
+            <input type="text" class="field-default" value="${field.default || ""}" />
           </div>
         </div>
   
@@ -100,6 +99,8 @@ export function initYamlEditor(containerId, onSaveCallback) {
   }
 
   function wireEvents() {
+    log("[YamlEditor] Wiring form events...");
+
     container.querySelectorAll(".field-type").forEach((el) => {
       el.addEventListener("change", (e) => {
         const block = e.target.closest(".field-block");
@@ -111,17 +112,21 @@ export function initYamlEditor(containerId, onSaveCallback) {
     container.querySelectorAll(".remove-field").forEach((el) =>
       el.addEventListener("click", (e) => {
         const idx = e.target.closest(".field-block").dataset.idx;
+        log("[YamlEditor] Removing field at index:", idx);
         currentData.fields.splice(idx, 1);
         renderEditor(currentData);
       })
     );
 
     container.querySelector("#add-field").addEventListener("click", () => {
+      log("[YamlEditor] Adding new field...");
       currentData.fields.push({ key: "", type: "text", label: "" });
       renderEditor(currentData);
     });
 
     container.querySelector("#save-yaml").addEventListener("click", () => {
+      log("[YamlEditor] Saving YAML...");
+
       const name = container.querySelector("#yaml-name").value.trim();
       const dir = container.querySelector("#markdown-dir").value.trim();
       const fields = [];
@@ -147,6 +152,7 @@ export function initYamlEditor(containerId, onSaveCallback) {
         });
 
       const updated = { name, markdown_dir: dir, fields };
+      log("[YamlEditor] Calling save callback with updated data:", updated);
       onSaveCallback?.(updated);
     });
   }

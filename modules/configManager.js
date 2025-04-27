@@ -1,5 +1,8 @@
+// configManager.js
+
 const fs = require("fs");
 const path = require("path");
+const { log, warn, error } = require("./nodeLogger"); // <--- use centralized logger
 
 const configDir = path.join(__dirname, "..", "config");
 const configPath = path.join(configDir, "user.json");
@@ -14,11 +17,16 @@ const defaultConfig = {
   font_size: 14,
 };
 
-// Ensure config dir and file exist
+log("[ConfigManager] Config directory:", configDir);
+log("[ConfigManager] Config file path:", configPath);
+
+// Ensure config dir and user.json exist
 function ensureConfigFile() {
   if (!fs.existsSync(configDir)) {
     fs.mkdirSync(configDir, { recursive: true });
-    console.log("Created config directory:", configDir);
+    log("[ConfigManager] Created config directory:", configDir);
+  } else {
+    log("[ConfigManager] Config directory already exists.");
   }
 
   if (!fs.existsSync(configPath)) {
@@ -27,44 +35,62 @@ function ensureConfigFile() {
       JSON.stringify(defaultConfig, null, 2),
       "utf-8"
     );
-    console.log("Created user.json with default settings");
+    log("[ConfigManager] Created user.json with default settings.");
+  } else {
+    log("[ConfigManager] Config file already exists.");
   }
 }
 
-// Load config
+// Load full user config
 function loadUserConfig() {
   ensureConfigFile();
-  const raw = fs.readFileSync(configPath, "utf-8");
-  let config = JSON.parse(raw);
+  try {
+    const raw = fs.readFileSync(configPath, "utf-8");
+    let config = JSON.parse(raw);
 
-  // --- Auto-repair: Fill missing fields from defaultConfig ---
-  let updated = false;
-
-  for (const key in defaultConfig) {
-    if (!(key in config)) {
-      config[key] = defaultConfig[key];
-      updated = true;
+    // --- Auto-repair missing fields ---
+    let updated = false;
+    for (const key in defaultConfig) {
+      if (!(key in config)) {
+        config[key] = defaultConfig[key];
+        updated = true;
+      }
     }
-  }
 
-  if (updated) {
-    saveUserConfig(config);
-    console.log("Auto-repaired user config: missing fields added.");
-  }
+    if (updated) {
+      saveUserConfig(config);
+      log("[ConfigManager] Auto-repaired user config: missing fields added.");
+    } else {
+      log("[ConfigManager] User config loaded successfully.");
+    }
 
-  return config;
+    return config;
+  } catch (err) {
+    error("[ConfigManager] Failed to load user config:", err);
+    return { ...defaultConfig }; // Return default config fallback
+  }
 }
 
-// Save config
+// Save full config
 function saveUserConfig(config) {
-  fs.writeFileSync(configPath, JSON.stringify(config, null, 2), "utf-8");
+  try {
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2), "utf-8");
+    log("[ConfigManager] Saved user config.");
+  } catch (err) {
+    error("[ConfigManager] Failed to save user config:", err);
+  }
 }
 
-// Optional: merge partial update into current config
+// Merge a partial update into current config
 function updateUserConfig(partial) {
-  const current = loadUserConfig();
-  const updated = { ...current, ...partial };
-  saveUserConfig(updated);
+  try {
+    const current = loadUserConfig();
+    const updated = { ...current, ...partial };
+    saveUserConfig(updated);
+    log("[ConfigManager] Updated user config with partial changes:", partial);
+  } catch (err) {
+    error("[ConfigManager] Failed to update user config:", err);
+  }
 }
 
 module.exports = {
