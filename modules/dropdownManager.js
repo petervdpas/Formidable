@@ -1,3 +1,5 @@
+// dropdownManager.js
+
 export function createDropdown({ containerId, labelText, options = [], onChange, selectedValue = "" }) {
     const container = document.getElementById(containerId);
     if (!container) {
@@ -47,5 +49,14 @@ export function createDropdown({ containerId, labelText, options = [], onChange,
           onChange(value);
         }
       },
+      updateOptions: (newOptions) => {
+        select.innerHTML = ""; // clear old
+        newOptions.forEach(opt => {
+          const option = document.createElement("option");
+          option.value = opt.value;
+          option.textContent = opt.label;
+          select.appendChild(option);
+        });
+      }
     };
   }

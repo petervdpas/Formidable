@@ -133,22 +133,20 @@ window.addEventListener("DOMContentLoaded", async () => {
       value: name,
       label: name.replace(/\.yaml$/, ""),
     }));
-
-    createDropdown({
-      containerId: "template-selector",
-      labelText: "Template",
-      options,
-      onChange: templateDropdown.onChange,
-    });
-
+  
+    // 👉 instead of creating a new dropdown, just update it!
+    templateDropdown.updateOptions(options);
+  
     const config = await window.configAPI.loadUserConfig();
     const lastSelected = config.last_selected_template;
-
+  
     if (lastSelected) {
       try {
         const yamlData = await window.api.loadSetupYaml(lastSelected);
         selectedTemplate = yamlData;
         markdownFormManager.loadTemplate(selectedTemplate);
+        templateDropdown.setSelected(lastSelected); // ✅ also set the selected one
+        await markdownListManager.loadMarkdownFiles(); // ✅ refresh markdown files
         updateStatus(`Selected template: ${selectedTemplate.name}`);
       } catch (err) {
         console.warn("Failed to auto-load last template:", err.message);

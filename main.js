@@ -92,7 +92,10 @@ ipcMain.handle("save-markdown", async (event, directory, filename, data) => {
 
 ipcMain.handle("list-markdown-files", async (event, directory) => {
   try {
-    const dirPath = path.resolve(directory);
+    const dirPath = path.isAbsolute(directory)
+    ? directory
+    : path.join(__dirname, directory);
+
     if (!fs.existsSync(dirPath)) return [];
     const files = fs.readdirSync(dirPath);
     return files.filter(file => file.endsWith(".md"));
