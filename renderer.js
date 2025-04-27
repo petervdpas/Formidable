@@ -26,10 +26,13 @@ window.addEventListener("DOMContentLoaded", async () => {
   const setupContainer = document.getElementById("setup-container");
   const markdownContainer = document.getElementById("markdown-container");
 
-  const yamlEditor = initYamlEditor("workspace-content", async (updatedYaml) => {
-    updateStatus(`Saving "${updatedYaml.name}"...`);
-    log("[YamlEditor] Save triggered:", updatedYaml);
-  });
+  const yamlEditor = initYamlEditor(
+    "workspace-content",
+    async (updatedYaml) => {
+      updateStatus(`Saving "${updatedYaml.name}"...`);
+      log("[YamlEditor] Save triggered:", updatedYaml);
+    }
+  );
 
   const settings = setupModal("settings-modal", {
     closeBtn: "settings-close",
@@ -45,21 +48,22 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   window.openSettingsModal = settings.show;
 
-  const config = await window.configAPI.loadUserConfig();
-  if (config.theme === "dark") {
-    document.body.classList.add("dark-mode");
-  }
-
   let setupSplitterInitialized = false;
   let markdownSplitterInitialized = false;
   window.currentSelectedTemplate = null;
 
   const markdownFormManager = initMarkdownFormManager("markdown-content");
-  const markdownListManager = initMarkdownListManager(() => window.currentSelectedTemplate);
+  const markdownListManager = initMarkdownListManager(
+    () => window.currentSelectedTemplate
+  );
 
-  markdownFormManager.setReloadMarkdownList(() => markdownListManager.loadMarkdownFiles());
+  markdownFormManager.setReloadMarkdownList(() =>
+    markdownListManager.loadMarkdownFiles()
+  );
   markdownFormManager.connectNewButton("add-markdown", async () => {
-    const selectedValue = document.querySelector("#template-selector select")?.value;
+    const selectedValue = document.querySelector(
+      "#template-selector select"
+    )?.value;
     if (!selectedValue) return null;
     return await window.api.loadSetupYaml(selectedValue);
   });
@@ -109,18 +113,56 @@ window.addEventListener("DOMContentLoaded", async () => {
       log("[SelectTemplate] Loaded YAML:", yamlData);
 
       window.currentSelectedTemplate = yamlData;
+
       if (updateDropdown) {
         templateDropdown.setSelected(name);
       }
 
       await window.configAPI.updateUserConfig({ last_selected_template: name });
-      await markdownFormManager.loadTemplate(window.currentSelectedTemplate);
-      await markdownListManager.loadMarkdownFiles();
+
+      await window.api.ensureMarkdownDir(
+        window.currentSelectedTemplate.markdown_dir
+      ); // << ensure dir
+
+      await markdownFormManager.loadTemplate(window.currentSelectedTemplate); // << load form
+      await markdownListManager.loadMarkdownFiles(); // << load files
+
       updateStatus(`Selected template: ${window.currentSelectedTemplate.name}`);
       log("[SelectTemplate] Finished loading template:", name);
     } catch (err) {
       error("[SelectTemplate] Error:", err);
       updateStatus("Error selecting template.");
+    }
+  }
+
+  async function loadSetupSidebar() {
+    const selectedSetup = config.recent_setups?.[0] || null;
+    const setupFiles = await window.api.getSetupList();
+    setupListEl.innerHTML = "";
+
+    setupFiles.forEach((name) => {
+      const item = document.createElement("div");
+      item.className = "setup-item";
+      item.textContent = name;
+      if (name === selectedSetup) {
+        item.style.fontWeight = "bold";
+      }
+      item.addEventListener("click", async () => {
+        const data = await window.api.loadSetupYaml(name);
+        yamlEditor.render(data);
+        await window.configAPI.updateUserConfig({ recent_setups: [name] });
+        updateStatus(`Loaded setup: ${name}`);
+      });
+      setupListEl.appendChild(item);
+    });
+
+    if (selectedSetup) {
+      try {
+        const autoData = await window.api.loadSetupYaml(selectedSetup);
+        yamlEditor.render(autoData);
+      } catch (err) {
+        warn("[SetupList] Failed to autoload:", err.message);
+      }
     }
   }
 
@@ -151,50 +193,49 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     if (config.last_selected_template) {
       log("[LoadTemplates] Autoloading:", config.last_selected_template);
-      await selectTemplate(config.last_selected_template, { updateDropdown: false });
+      await selectTemplate(config.last_selected_template, {
+        updateDropdown: false,
+      });
+
+      if (
+        config.context_mode === "markdown" &&
+        window.currentSelectedTemplate
+      ) {
+        log("[LoadTemplates] Loading markdown files after autoload.");
+        await window.api.ensureMarkdownDir(
+          window.currentSelectedTemplate.markdown_dir
+        );
+        await markdownListManager.loadMarkdownFiles(); // <<== MISSING!
+      }
     }
+  }
+
+  const config = await window.configAPI.loadUserConfig();
+  if (config.theme === "dark") {
+    document.body.classList.add("dark-mode");
   }
 
   await loadTemplateOptions();
+  await loadSetupSidebar();
+
   setContextView(config.context_mode);
 
-  if (config.context_mode === "markdown" && window.currentSelectedTemplate) {
-    await markdownListManager.loadMarkdownFiles();
-  }
-
-  const selectedSetup = config.recent_setups?.[0] || null;
-  const setupFiles = await window.api.getSetupList();
-  setupListEl.innerHTML = "";
-
-  setupFiles.forEach((name) => {
-    const item = document.createElement("div");
-    item.className = "setup-item";
-    item.textContent = name;
-    if (name === selectedSetup) {
-      item.style.fontWeight = "bold";
-    }
-    item.addEventListener("click", async () => {
-      const data = await window.api.loadSetupYaml(name);
-      yamlEditor.render(data);
-      await window.configAPI.updateUserConfig({ recent_setups: [name] });
-      updateStatus(`Loaded setup: ${name}`);
-    });
-    setupListEl.appendChild(item);
-  });
-
-  if (selectedSetup) {
-    try {
-      const autoData = await window.api.loadSetupYaml(selectedSetup);
-      yamlEditor.render(autoData);
-    } catch (err) {
-      warn("[SetupList] Failed to autoload:", err.message);
+  // 🧹 Clean handling: if in markdown mode, always reload markdown list
+  if (config.context_mode === "markdown") {
+    if (window.currentSelectedTemplate) {
+      log("[Startup] Context is markdown — loading markdown files...");
+      await markdownListManager.loadMarkdownFiles();
+    } else {
+      warn("[Startup] Markdown context, but no selected template.");
     }
   }
 
   themeToggle.addEventListener("change", async (e) => {
     const isDark = e.target.checked;
     document.body.classList.toggle("dark-mode", isDark);
-    await window.configAPI.updateUserConfig({ theme: isDark ? "dark" : "light" });
+    await window.configAPI.updateUserConfig({
+      theme: isDark ? "dark" : "light",
+    });
     updateStatus(`Theme set to ${isDark ? "Dark" : "Light"}`);
   });
 
@@ -207,6 +248,8 @@ window.addEventListener("DOMContentLoaded", async () => {
       await markdownListManager.loadMarkdownFiles();
     }
 
-    updateStatus(`Context set to ${mode === "markdown" ? "Markdown" : "Setup"}`);
+    updateStatus(
+      `Context set to ${mode === "markdown" ? "Markdown" : "Setup"}`
+    );
   });
 });
