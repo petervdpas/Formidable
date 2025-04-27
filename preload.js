@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld("api", {
   loadSetupYaml: (name) => ipcRenderer.invoke("load-setup-yaml", name),
   ensureMarkdownDir: (dir) => ipcRenderer.invoke("ensure-markdown-dir", dir),
   saveMarkdown: (directory, filename, data) => ipcRenderer.invoke("save-markdown", directory, filename, data),
+  listMarkdownFiles: (directory) => ipcRenderer.invoke("list-markdown-files", directory),
 });
 
 contextBridge.exposeInMainWorld("configAPI", {

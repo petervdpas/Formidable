@@ -6,6 +6,7 @@ import { initYamlEditor } from "./modules/yaml_editor.js";
 import { createDropdown } from "./modules/dropdownManager.js";
 import { initStatusManager, updateStatus } from "./modules/statusManager.js";
 import { initMarkdownFormManager } from "./modules/markdownFormManager.js";
+import { initMarkdownListManager } from "./modules/markdownListManager.js";
 
 window.addEventListener("DOMContentLoaded", async () => {
   // Auto-apply .btn class to all <button> elements without a class
@@ -56,6 +57,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   let selectedTemplate = null;
 
   const markdownFormManager = initMarkdownFormManager("markdown-content");
+  const markdownListManager = initMarkdownListManager(() => selectedTemplate);
+  markdownFormManager.setReloadMarkdownList(markdownListManager.loadMarkdownFiles);
 
   markdownFormManager.connectNewButton("add-markdown", async () => {
     const selectedValue = document.querySelector(
@@ -65,6 +68,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     const yamlData = await window.api.loadSetupYaml(selectedValue);
     return yamlData;
   });
+
 
   function initSplitters(mode) {
     if (mode === "setup" && !setupSplitterInitialized) {
@@ -118,6 +122,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       });
 
       markdownFormManager.loadTemplate(selectedTemplate);
+      await markdownListManager.loadMarkdownFiles();
       updateStatus(`Selected template: ${selectedTemplate.name}`);
     },
   });

@@ -90,6 +90,18 @@ ipcMain.handle("save-markdown", async (event, directory, filename, data) => {
   }
 });
 
+ipcMain.handle("list-markdown-files", async (event, directory) => {
+  try {
+    const dirPath = path.resolve(directory);
+    if (!fs.existsSync(dirPath)) return [];
+    const files = fs.readdirSync(dirPath);
+    return files.filter(file => file.endsWith(".md"));
+  } catch (err) {
+    console.error("Failed to list markdown files:", err);
+    return [];
+  }
+});
+
 // Helper
 function generateMarkdown(data) {
   let md = "";

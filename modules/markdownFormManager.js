@@ -10,7 +10,8 @@ export function initMarkdownFormManager(containerId) {
   }
 
   let currentTemplate = null;
-  let currentData = {};
+  let reloadMarkdownList = null;
+  let currentData = {}; // <-- what's this for?
 
   function clearForm() {
     container.innerHTML = "";
@@ -91,26 +92,31 @@ export function initMarkdownFormManager(containerId) {
       updateStatus("No template or markdown directory selected.");
       return;
     }
-  
+
     const markdownData = getFormData();
-  
+
     const filenameInput = container.querySelector("#markdown-filename");
     let filename = filenameInput?.value.trim();
-  
+
     if (!filename) {
       updateStatus("Please enter a filename before saving.");
       return;
     }
-  
+
     const saveResult = await window.api.saveMarkdown(
       currentTemplate.markdown_dir,
       filename + ".md",
       markdownData
     );
-  
+
     if (saveResult.success) {
       console.log("Saved to:", saveResult.path);
       updateStatus(`Saved markdown: ${saveResult.path}`);
+
+      // 👉 Reload markdown list here!
+      if (typeof reloadMarkdownList === "function") {
+        reloadMarkdownList();
+      }
     } else {
       console.error("Failed:", saveResult.error);
       updateStatus(`Failed to save: ${saveResult.error}`);
@@ -154,11 +160,16 @@ export function initMarkdownFormManager(containerId) {
     }
   }
 
+  function setReloadMarkdownList(fn) {
+    reloadMarkdownList = fn;
+  }
+
   return {
     loadTemplate,
     getFormData,
     handleSave,
     clearForm,
     connectNewButton,
+    setReloadMarkdownList,
   };
 }
