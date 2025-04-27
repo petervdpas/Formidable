@@ -51,6 +51,20 @@ export function initMarkdownFormManager(containerId) {
       container.appendChild(fieldDiv);
     });
 
+    const filenameDiv = document.createElement("div");
+    filenameDiv.className = "form-row";
+
+    const filenameLabel = document.createElement("label");
+    filenameLabel.textContent = "Filename (without extension)";
+    filenameDiv.appendChild(filenameLabel);
+
+    const filenameInput = document.createElement("input");
+    filenameInput.type = "text";
+    filenameInput.id = "markdown-filename"; // important ID
+    filenameDiv.appendChild(filenameInput);
+
+    container.appendChild(filenameDiv);
+
     const saveBtn = document.createElement("button");
     saveBtn.textContent = "Save Markdown";
     saveBtn.className = "btn btn-default btn-info";
@@ -80,20 +94,19 @@ export function initMarkdownFormManager(containerId) {
   
     const markdownData = getFormData();
   
-    // Try to auto-suggest filename
-    let defaultFilename = "new-document";
-    if (markdownData.title && markdownData.title.trim() !== "") {
-      // Remove spaces and unsafe characters for filesystem
-      defaultFilename = markdownData.title.trim().replace(/[^a-z0-9_\-]/gi, "_");
-    }
+    const filenameInput = container.querySelector("#markdown-filename");
+    let filename = filenameInput?.value.trim();
   
-    const filename = prompt("Enter filename (without extension):", defaultFilename);
     if (!filename) {
-      updateStatus("Save canceled.");
+      updateStatus("Please enter a filename before saving.");
       return;
     }
   
-    const saveResult = await window.api.saveMarkdown(currentTemplate.markdown_dir, filename + ".md", markdownData);
+    const saveResult = await window.api.saveMarkdown(
+      currentTemplate.markdown_dir,
+      filename + ".md",
+      markdownData
+    );
   
     if (saveResult.success) {
       console.log("Saved to:", saveResult.path);
@@ -116,17 +129,29 @@ export function initMarkdownFormManager(containerId) {
       console.warn(`Button not found: ${buttonId}`);
       return;
     }
-  
+
     btn.addEventListener("click", async () => {
       const selected = await getTemplateCallback();
       if (!selected) {
         updateStatus("Please select a template first.");
         return;
       }
-      await loadTemplate(selected);  // ⬅️ await this!
-      focusFirstField();              // ⬅️ nice touch: focus!
+      await loadTemplate(selected); // ⬅️ await this!
+      focusTitleField();
       updateStatus("Ready to create a new markdown document.");
     });
+  }
+
+  function focusTitleField() {
+    const titleInput = container.querySelector('input[name="title"]');
+    if (titleInput) {
+      titleInput.focus();
+    } else {
+      const firstInput = container.querySelector("input, select, textarea");
+      if (firstInput) {
+        firstInput.focus();
+      }
+    }
   }
 
   return {
