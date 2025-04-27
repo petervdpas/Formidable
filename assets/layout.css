@@ -187,3 +187,80 @@ body {
 input:checked + .slider:before {
   transform: translateX(20px);
 }
+
+/* ───── Base Button Styling ───── */
+button, .btn {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 6px 12px;
+  border: 1px solid;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Default Button */
+.btn-default {
+  background-color: #e0e0e0;
+  border-color: #bbb;
+  color: #222;
+}
+
+.btn-default:hover {
+  background-color: #d5d5d5;
+}
+
+/* Info Button */
+.btn-info {
+  background-color: #cce5ff;
+  border-color: #66b0ff;
+  color: #004085;
+}
+
+.btn-info:hover {
+  background-color: #b8dbff;
+}
+
+/* Warning Button */
+.btn-warn {
+  background-color: #fff3cd;
+  border-color: #ffca2c;
+  color: #856404;
+}
+
+.btn-warn:hover {
+  background-color: #ffe69c;
+}
+
+/* Error / Danger Button */
+.btn-error {
+  background-color: #f8d7da;
+  border-color: #f5c2c7;
+  color: #842029;
+}
+
+.btn-error:hover {
+  background-color: #f1b0b7;
+}
+
+#template-selector {
+  margin-bottom: 16px;
+}
+
+#template-selector label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: bold;
+}
+
+#template-dropdown {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#new-markdown-wrapper {
+  margin-top: 20px;
+  text-align: center;
+}

@@ -9,6 +9,7 @@ const defaultConfig = {
   last_opened_markdown: {
     "basic.yaml": "",
   },
+  selected_template: "basic.yaml",
   theme: "light",
   font_size: 14,
 };
@@ -34,7 +35,24 @@ function ensureConfigFile() {
 function loadUserConfig() {
   ensureConfigFile();
   const raw = fs.readFileSync(configPath, "utf-8");
-  return JSON.parse(raw);
+  let config = JSON.parse(raw);
+
+  // --- Auto-repair: Fill missing fields from defaultConfig ---
+  let updated = false;
+
+  for (const key in defaultConfig) {
+    if (!(key in config)) {
+      config[key] = defaultConfig[key];
+      updated = true;
+    }
+  }
+
+  if (updated) {
+    saveUserConfig(config);
+    console.log("Auto-repaired user config: missing fields added.");
+  }
+
+  return config;
 }
 
 // Save config

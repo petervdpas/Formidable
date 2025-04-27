@@ -1,3 +1,5 @@
+// main.js
+
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const fs = require("fs");
@@ -60,3 +62,43 @@ ipcMain.handle("save-user-config", (event, cfg) => {
 ipcMain.handle("update-user-config", (event, partial) => {
   return configManager.updateUserConfig(partial);
 });
+
+ipcMain.handle("ensure-markdown-dir", async (event, dir) => {
+  const fullPath = path.resolve(dir); // Adjust based on your app's working directory rules
+  if (!fs.existsSync(fullPath)) {
+    fs.mkdirSync(fullPath, { recursive: true });
+    console.log("Created markdown directory:", fullPath);
+  }
+  return true; // optional, just to satisfy invoke
+});
+
+ipcMain.handle("save-markdown", async (event, directory, filename, data) => {
+  try {
+    const dirPath = path.resolve(directory);
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+    const filePath = path.join(dirPath, filename);
+
+    const markdownContent = generateMarkdown(data);
+
+    fs.writeFileSync(filePath, markdownContent, "utf-8");
+    return { success: true, path: filePath };
+  } catch (err) {
+    console.error("Failed to save markdown:", err);
+    return { success: false, error: err.message };
+  }
+});
+
+// Helper
+function generateMarkdown(data) {
+  let md = "";
+  for (const [key, value] of Object.entries(data)) {
+    if (typeof value === "boolean") {
+      md += `- [${value ? "x" : " "}] ${key}\n`;
+    } else {
+      md += `**${key}:** ${value}\n\n`;
+    }
+  }
+  return md;
+}

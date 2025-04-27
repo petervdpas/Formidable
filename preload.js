@@ -1,8 +1,12 @@
+// preload.js
+
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("api", {
   getSetupList: () => ipcRenderer.invoke("get-setup-list"),
   loadSetupYaml: (name) => ipcRenderer.invoke("load-setup-yaml", name),
+  ensureMarkdownDir: (dir) => ipcRenderer.invoke("ensure-markdown-dir", dir),
+  saveMarkdown: (directory, filename, data) => ipcRenderer.invoke("save-markdown", directory, filename, data),
 });
 
 contextBridge.exposeInMainWorld("configAPI", {

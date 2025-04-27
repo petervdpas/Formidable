@@ -5,7 +5,8 @@
   "last_opened_markdown": {
     "basic.yaml": ""
   },
-  "theme": "light",
+  "theme": "dark",
   "font_size": 14,
-  "context_mode": "markdown"
+  "context_mode": "markdown",
+  "selected_template": "basic.yaml"
 }
