@@ -88,5 +88,5 @@ function loadSetupYaml(name) {
 module.exports = {
   ensureSetupEnvironment,
   getSetupYamlList,
-  loadSetupYaml
+  loadSetupYaml,
 };

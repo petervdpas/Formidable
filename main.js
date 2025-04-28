@@ -8,6 +8,7 @@ const { log, warn, error } = require("./modules/nodeLogger"); // <-- use central
 
 const { buildAppMenu } = require("./modules/appMenu");
 const fileManager = require("./modules/fileManager");
+const fileTransformer = require("./modules/fileTransformer.js");
 const metaManager = require("./modules/metaManager");
 const markdownManager = require("./modules/markdownManager");
 const configManager = require("./modules/configManager");
@@ -151,6 +152,13 @@ ipcMain.handle("load-markdown", async (event, directory, filename) => {
 });
 
 ipcMain.handle("save-markdown", async (event, directory, filename, data) => {
-  return markdownManager.saveMarkdownMarkdown(directory, filename, data);
+  return markdownManager.saveMarkdown(directory, filename, data);
 });
 
+ipcMain.handle("parse-markdown-to-fields", (event, markdownContent) => {
+  return fileTransformer.parseMarkdownToFields(markdownContent);
+});
+
+ipcMain.handle("generate-markdown-from-fields", (event, fieldsObject) => {
+  return fileTransformer.generateMarkdownFromFields(fieldsObject);
+});

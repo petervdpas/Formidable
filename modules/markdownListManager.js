@@ -61,7 +61,8 @@ export function initMarkdownListManager(selectedTemplateGetter) {
             const filePath = selectedTemplate.markdown_dir;
             const fileContent = await window.api.loadMarkdownFile({ dir: filePath, filename: file });
 
-            await window.markdownFormManager.loadMarkdownData(fileContent, file);
+            const parsedFields = await window.api.parseMarkdownToFields(fileContent);
+            await window.formManager.loadFormData(parsedFields, file);
 
             updateStatus(`Loaded: ${file}`);
           } catch (err) {

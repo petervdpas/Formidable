@@ -2,7 +2,9 @@
 
 const { contextBridge, ipcRenderer } = require("electron");
 
-// Just list your API methods here:
+// No fileTransformer here
+
+// API methods as usual
 const apiMethods = [
   "get-setup-list",
   "load-setup-yaml",
@@ -14,9 +16,10 @@ const apiMethods = [
   "save-meta",
   "load-markdown",
   "save-markdown",
+  "parse-markdown-to-fields",
+  "generate-markdown-from-fields",
 ];
 
-// Build the API object dynamically:
 const api = {};
 
 for (const method of apiMethods) {
@@ -25,10 +28,9 @@ for (const method of apiMethods) {
   };
 }
 
-// Expose the API into the browser context
 contextBridge.exposeInMainWorld("api", api);
 
-// Same for configAPI separately if you want
+// Config API
 const configMethods = [
   "load-user-config",
   "save-user-config",
@@ -45,7 +47,6 @@ for (const method of configMethods) {
 
 contextBridge.exposeInMainWorld("configAPI", configAPI);
 
-// Helper: Convert "load-user-config" -> "loadUserConfig"
 function camelCase(str) {
   return str.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
 }

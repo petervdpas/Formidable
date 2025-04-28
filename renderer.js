@@ -5,7 +5,7 @@ import { setupSplitter } from "./modules/splitter.js";
 import { initYamlEditor } from "./modules/yaml_editor.js";
 import { createDropdown } from "./modules/dropdownManager.js";
 import { initStatusManager, updateStatus } from "./modules/statusManager.js";
-import { initMarkdownFormManager } from "./modules/markdownFormManager.js";
+import { initFormManager } from "./modules/formManager.js";
 import { initMarkdownListManager } from "./modules/markdownListManager.js";
 import { log, warn, error } from "./modules/logger.js"; // <- ADD THIS
 
@@ -52,16 +52,16 @@ window.addEventListener("DOMContentLoaded", async () => {
   let markdownSplitterInitialized = false;
   window.currentSelectedTemplate = null;
 
-  const markdownFormManager = initMarkdownFormManager("markdown-content");
-  window.markdownFormManager = markdownFormManager;
+  const formManager = initFormManager("markdown-content");
+  window.formManager = formManager;
   const markdownListManager = initMarkdownListManager(
     () => window.currentSelectedTemplate
   );
 
-  markdownFormManager.setReloadMarkdownList(() =>
+  formManager.setReloadMarkdownList(() =>
     markdownListManager.loadMarkdownFiles()
   );
-  markdownFormManager.connectNewButton("add-markdown", async () => {
+  formManager.connectNewButton("add-markdown", async () => {
     const selectedValue = document.querySelector(
       "#template-selector select"
     )?.value;
@@ -125,7 +125,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         window.currentSelectedTemplate.markdown_dir
       ); // << ensure dir
 
-      await markdownFormManager.loadTemplate(window.currentSelectedTemplate); // << load form
+      await formManager.loadTemplate(window.currentSelectedTemplate); // << load form
       await markdownListManager.loadMarkdownFiles(); // << load files
 
       updateStatus(`Selected template: ${window.currentSelectedTemplate.name}`);
