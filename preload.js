@@ -9,6 +9,7 @@ const apiMethods = [
   "ensure-markdown-dir",
   "save-markdown",
   "list-markdown-files",
+  "load-markdown-meta",
   "load-markdown-file",
 ];
 

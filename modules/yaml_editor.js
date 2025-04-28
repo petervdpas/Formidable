@@ -1,4 +1,4 @@
-// yaml_editor.js
+// modules/yaml_editor.js
 
 import { log, warn } from "./logger.js"; // <-- ADD centralized logger
 

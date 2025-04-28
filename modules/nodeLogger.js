@@ -1,4 +1,4 @@
-// nodeLogger.js
+// modules/nodeLogger.js
 
 let loggingEnabled = true;
 

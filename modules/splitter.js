@@ -1,4 +1,4 @@
-// splitter.js
+// modules/splitter.js
 
 export function setupSplitter({ splitter, left, right, container, min = 150 }) {
   let isDragging = false;

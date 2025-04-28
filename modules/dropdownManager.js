@@ -1,4 +1,4 @@
-// dropdownManager.js
+// modules/dropdownManager.js
 
 import { log, warn, error } from "./logger.js"; // <-- ADD THIS
 

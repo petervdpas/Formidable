@@ -1,4 +1,4 @@
-// appMenu.js
+// modules/appMenu.js
 
 const { Menu, shell, BrowserWindow } = require("electron");
 const path = require("path");

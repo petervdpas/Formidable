@@ -1,4 +1,4 @@
-// statusManager.js
+// modules/statusManager.js
 
 import { log, warn } from "./logger.js"; // <-- Add centralized logger
 

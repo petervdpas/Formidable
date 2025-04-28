@@ -1,4 +1,4 @@
-// markdownFormManager.js
+// modules/markdownFormManager.js
 
 import { updateStatus } from "./statusManager.js";
 import { log, warn, error } from "./logger.js";
@@ -14,9 +14,8 @@ export function initMarkdownFormManager(containerId) {
 
   let currentTemplate = null;
   let reloadMarkdownList = null;
-  let currentData = {};
-  let fields = [];          // <-- NEW
-  let fieldElements = {};   // <-- NEW
+  let fieldElements = {};
+  let fields = [];
 
   function clearForm() {
     log("[MarkdownFormManager] Clearing form...");
@@ -24,11 +23,11 @@ export function initMarkdownFormManager(containerId) {
   }
 
   function renderForm(template) {
-    log("[MarkdownFormManager] Rendering form for template:", template.name || "Unnamed Template");
+    log("[MarkdownFormManager] Rendering form for:", template.name || "Unnamed Template");
     clearForm();
 
-    fields = template.fields;        // <-- Track fields
-    fieldElements = {};              // <-- Track input elements
+    fields = template.fields;
+    fieldElements = {};
 
     template.fields.forEach((field) => {
       const fieldDiv = document.createElement("div");
@@ -58,7 +57,7 @@ export function initMarkdownFormManager(containerId) {
       }
 
       input.name = field.key;
-      fieldElements[field.key] = input; // <-- Track inputs by field.key
+      fieldElements[field.key] = input;
 
       fieldDiv.appendChild(input);
       container.appendChild(fieldDiv);
@@ -82,6 +81,7 @@ export function initMarkdownFormManager(containerId) {
     saveBtn.textContent = "Save Markdown";
     saveBtn.className = "btn btn-default btn-info";
     saveBtn.addEventListener("click", handleSave);
+
     container.appendChild(saveBtn);
 
     log("[MarkdownFormManager] Form rendered.");
@@ -91,11 +91,7 @@ export function initMarkdownFormManager(containerId) {
     const data = {};
     container.querySelectorAll("input, select").forEach((el) => {
       if (el.name) {
-        if (el.type === "checkbox") {
-          data[el.name] = el.checked;
-        } else {
-          data[el.name] = el.value;
-        }
+        data[el.name] = el.type === "checkbox" ? el.checked : el.value;
       }
     });
     log("[MarkdownFormManager] Collected form data:", data);
@@ -103,79 +99,98 @@ export function initMarkdownFormManager(containerId) {
   }
 
   async function handleSave() {
-    log("[MarkdownFormManager] Handle save triggered.");
+    log("[MarkdownFormManager] Save triggered.");
 
     if (!currentTemplate || !currentTemplate.markdown_dir) {
-      warn("[MarkdownFormManager] No current template or markdown_dir selected.");
+      warn("[MarkdownFormManager] No template or markdown_dir selected.");
       updateStatus("No template or markdown directory selected.");
       return;
     }
 
-    const markdownData = getFormData();
+    const formData = getFormData();
     const filenameInput = container.querySelector("#markdown-filename");
-    let filename = filenameInput?.value.trim();
+    const filename = filenameInput?.value.trim();
 
     if (!filename) {
       warn("[MarkdownFormManager] Save aborted: No filename provided.");
-      updateStatus("Please enter a filename before saving.");
+      updateStatus("Please enter a filename.");
       return;
     }
 
-    log("[MarkdownFormManager] Saving markdown file:", filename + ".md");
+    log("[MarkdownFormManager] Saving:", filename + ".md");
 
     const saveResult = await window.api.saveMarkdown(
       currentTemplate.markdown_dir,
       filename + ".md",
-      markdownData
+      formData
     );
 
     if (saveResult.success) {
-      log("[MarkdownFormManager] Successfully saved:", saveResult.path);
-      updateStatus(`Saved markdown: ${saveResult.path}`);
-
-      if (typeof reloadMarkdownList === "function") {
-        log("[MarkdownFormManager] Reloading markdown list...");
-        reloadMarkdownList();
-      }
+      updateStatus(`Saved: ${saveResult.path}`);
+      if (reloadMarkdownList) reloadMarkdownList();
     } else {
-      error("[MarkdownFormManager] Failed to save markdown:", saveResult.error);
+      error("[MarkdownFormManager] Save failed:", saveResult.error);
       updateStatus(`Failed to save: ${saveResult.error}`);
     }
   }
 
   async function loadTemplate(templateYaml) {
-    log("[MarkdownFormManager] Loading template:", templateYaml.name || "Unnamed Template");
+    log("[MarkdownFormManager] Loading template:", templateYaml.name);
     currentTemplate = templateYaml;
-    currentData = {};
     renderForm(templateYaml);
+  }
+
+  async function loadFormData(data, filename) {
+    if (!data) {
+      warn("[MarkdownFormManager] No data provided for loading.");
+      return;
+    }
+    log("[MarkdownFormManager] Loading metadata for:", filename);
+    populateFormFields(data, filename);
   }
 
   async function loadMarkdownData(markdownString, filename) {
     const parsedData = parseMarkdownToFields(markdownString);
     if (!parsedData) {
-      warn("[MarkdownFormManager] Failed to parse markdown.");
+      warn("[MarkdownFormManager] Failed to parse markdown fallback.");
       return;
     }
+    log("[MarkdownFormManager] Parsed fallback markdown for:", filename);
+  
+    populateFormFields(parsedData, filename);
+  
+    // === NEW: auto-create meta.json ===
+    if (currentTemplate && currentTemplate.markdown_dir) {
+      log("[MarkdownFormManager] Saving auto-generated metadata...");
+  
+      try {
+        await window.api.saveMarkdown(
+          currentTemplate.markdown_dir,
+          filename,
+          parsedData
+        );
+        log("[MarkdownFormManager] Auto-created .meta.json from parsed markdown.");
+      } catch (err) {
+        warn("[MarkdownFormManager] Failed to auto-save parsed metadata:", err);
+      }
+    }
+  }
 
-    log("[MarkdownFormManager] Parsed markdown data:", parsedData);
-
+  function populateFormFields(data, filename) {
     fields.forEach((field) => {
       const el = fieldElements[field.key];
       if (!el) return;
-
       if (field.type === "boolean") {
-        el.checked = parsedData[field.key] === true;
+        el.checked = data[field.key] === true;
       } else {
-        el.value = parsedData[field.key] ?? "";
+        el.value = data[field.key] ?? "";
       }
     });
 
-    if (filename) {
-      const filenameInput = container.querySelector("#markdown-filename");
-      if (filenameInput) {
-        filenameInput.value = filename.replace(/\.md$/, "");
-        log("[MarkdownFormManager] Set filename field to:", filename);
-      }
+    const filenameInput = container.querySelector("#markdown-filename");
+    if (filenameInput) {
+      filenameInput.value = filename.replace(/\.md$/, "");
+      log("[MarkdownFormManager] Set filename field:", filename);
     }
   }
 
@@ -186,42 +201,34 @@ export function initMarkdownFormManager(containerId) {
       return;
     }
 
-    log("[MarkdownFormManager] Connecting button:", buttonId);
+    log("[MarkdownFormManager] Connecting new button:", buttonId);
 
     btn.addEventListener("click", async () => {
-      log("[MarkdownFormManager] New document button clicked.");
       const selected = await getTemplateCallback();
       if (!selected) {
-        warn("[MarkdownFormManager] No template selected after new button click.");
+        warn("[MarkdownFormManager] No template after button click.");
         updateStatus("Please select a template first.");
         return;
       }
       await loadTemplate(selected);
-      focusTitleField();
+      focusFirstInput();
       updateStatus("Ready to create a new markdown document.");
     });
   }
 
-  function focusTitleField() {
-    log("[MarkdownFormManager] Focusing title field...");
-    const titleInput = container.querySelector('input[name="title"]');
-    if (titleInput) {
-      titleInput.focus();
-      log("[MarkdownFormManager] Focused title input.");
+  function focusFirstInput() {
+    const firstInput = container.querySelector('input[name="title"], input, select, textarea');
+    if (firstInput) {
+      firstInput.focus();
+      log("[MarkdownFormManager] Focused input.");
     } else {
-      const firstInput = container.querySelector("input, select, textarea");
-      if (firstInput) {
-        firstInput.focus();
-        log("[MarkdownFormManager] Focused first available input.");
-      } else {
-        warn("[MarkdownFormManager] No input field found to focus.");
-      }
+      warn("[MarkdownFormManager] No input to focus.");
     }
   }
 
   function setReloadMarkdownList(fn) {
     reloadMarkdownList = fn;
-    log("[MarkdownFormManager] Reload markdown list function set.");
+    log("[MarkdownFormManager] Set reload markdown list function.");
   }
 
   function parseMarkdownToFields(markdown) {
@@ -229,16 +236,16 @@ export function initMarkdownFormManager(containerId) {
     const result = {};
 
     for (const line of lines) {
-      const matchCheckbox = line.match(/- \[(x| )\] (.+)/i);
-      if (matchCheckbox) {
-        const [, checked, key] = matchCheckbox;
+      const checkbox = line.match(/- \[(x| )\] (.+)/i);
+      if (checkbox) {
+        const [, checked, key] = checkbox;
         result[key.trim()] = checked.toLowerCase() === "x";
         continue;
       }
 
-      const matchText = line.match(/\*\*(.+):\*\* (.+)/);
-      if (matchText) {
-        const [, key, value] = matchText;
+      const textField = line.match(/\*\*(.+):\*\* (.+)/);
+      if (textField) {
+        const [, key, value] = textField;
         result[key.trim()] = value.trim();
       }
     }
@@ -248,7 +255,8 @@ export function initMarkdownFormManager(containerId) {
 
   return {
     loadTemplate,
-    loadMarkdownData,    // <-- Expose this
+    loadFormData,
+    loadMarkdownData,
     getFormData,
     handleSave,
     clearForm,

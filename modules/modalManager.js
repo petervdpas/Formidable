@@ -1,4 +1,4 @@
-// modalManager.js
+// modules/modalManager.js
 
 export function setupModal(
     modalId,

@@ -9,6 +9,7 @@ const { log, warn, error } = require("./modules/nodeLogger"); // <-- use central
 const { buildAppMenu } = require("./modules/appMenu");
 const fileManager = require("./modules/fileManager");
 const configManager = require("./modules/configManager");
+const sfr = require("./modules/sfr");
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -110,6 +111,8 @@ ipcMain.handle("save-markdown", async (event, directory, filename, data) => {
     const markdownContent = generateMarkdown(data);
 
     fs.writeFileSync(filePath, markdownContent, "utf-8");
+    sfr.saveMetadata(dirPath, filename, data);  // <-- use SFR module
+
     log("[IPC] Saved markdown file:", filePath);
 
     return { success: true, path: filePath };
@@ -151,6 +154,10 @@ ipcMain.handle("load-markdown-file", async (event, { dir, filename }) => {
     console.error("[Main] Failed to load markdown file:", err);
     throw err;
   }
+});
+
+ipcMain.handle("load-markdown-meta", async (event, { dir, filename }) => {
+  return sfr.loadMetadata(dir, filename);
 });
 
 // ========== Helper ==========

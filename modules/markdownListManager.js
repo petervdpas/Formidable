@@ -1,4 +1,4 @@
-// markdownListManager.js
+// modules/markdownListManager.js
 
 import { updateStatus } from "./statusManager.js";
 import { log, warn, error } from "./logger.js"; // <-- ADD THIS LINE
