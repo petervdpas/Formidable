@@ -3,7 +3,7 @@
 import { renderForm } from "./formInputManager.js";
 import { getFormData, populateFormFields } from "./formOutputManager.js";
 import { updateStatus } from "./statusManager.js"; // ✅ keep
-import { log, warn, error } from "./logger.js";      // ✅ keep
+import { log, warn, error } from "./logger.js"; // ✅ keep
 
 export function initFormManager(containerId) {
   const container = document.getElementById(containerId);
@@ -22,6 +22,15 @@ export function initFormManager(containerId) {
     log("[FormManager] Loading template:", templateYaml.name);
     currentTemplate = templateYaml;
     fieldElements = renderForm(container, templateYaml);
+
+    // 💾 Add Save Button
+    const saveBtn = document.createElement("button");
+    saveBtn.textContent = "Save Input";
+    saveBtn.className = "btn btn-default btn-info";
+    saveBtn.addEventListener("click", async () => {
+      await saveForm();
+    });
+    container.appendChild(saveBtn);
   }
 
   async function loadFormData(metaData, filename) {
@@ -58,7 +67,11 @@ export function initFormManager(containerId) {
     }
 
     const markdownDir = currentTemplate.markdown_dir;
-    const saveResult = await window.api.saveMeta(markdownDir, filename + ".md", formData); // 🛠 FIXED: use window.api
+    const saveResult = await window.api.saveMeta(
+      markdownDir,
+      filename + ".md",
+      formData
+    ); // 🛠 FIXED: use window.api
 
     if (saveResult.success) {
       updateStatus(`Saved metadata: ${saveResult.path}`);
@@ -80,9 +93,9 @@ export function initFormManager(containerId) {
       warn(`[FormManager] Button not found: ${buttonId}`);
       return;
     }
-  
+
     log("[FormManager] Connecting new button:", buttonId);
-  
+
     btn.addEventListener("click", async () => {
       const selected = await getTemplateCallback();
       if (!selected) {
@@ -95,9 +108,11 @@ export function initFormManager(containerId) {
       updateStatus("Ready to create a new markdown document.");
     });
   }
-  
+
   function focusFirstInput() {
-    const firstInput = container.querySelector('input[name="title"], input, select, textarea');
+    const firstInput = container.querySelector(
+      'input[name="title"], input, select, textarea'
+    );
     if (firstInput) {
       firstInput.focus();
       log("[FormManager] Focused first input.");

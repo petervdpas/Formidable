@@ -243,6 +243,14 @@ button, .btn {
   background-color: #f1b0b7;
 }
 
+.btn-add-item {
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
 #template-selector {
   margin-bottom: 16px;
 }
