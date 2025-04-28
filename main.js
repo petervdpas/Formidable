@@ -3,7 +3,6 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const fs = require("fs");
-const fsp = require("fs").promises;
 
 const { log, warn, error } = require("./modules/nodeLogger"); // <-- use centralized logger
 
@@ -146,7 +145,7 @@ ipcMain.handle("list-markdown-files", async (event, directory) => {
 ipcMain.handle("load-markdown-file", async (event, { dir, filename }) => {
   try {
     const fullPath = path.join(dir, filename);
-    const content = await fsp.readFile(fullPath, "utf-8");  // <-- the fix: await + utf-8
+    const content = await fs.promises.readFile(fullPath, "utf-8");  // <-- the fix: await + utf-8
     return content;
   } catch (err) {
     console.error("[Main] Failed to load markdown file:", err);

@@ -10,9 +10,9 @@ contextBridge.exposeInMainWorld("api", {
   ensureMarkdownDir: (dir) => ipcRenderer.invoke("ensure-markdown-dir", dir),
   saveMarkdown: (directory, filename, data) => ipcRenderer.invoke("save-markdown", directory, filename, data),
   listMarkdownFiles: (directory) => ipcRenderer.invoke("list-markdown-files", directory),
-  loadMarkdownFile: (dir, filename) => {
-    return ipcRenderer.invoke("load-markdown-file", { dir, filename });
-  },
+  loadMarkdownFile: (args) => {
+    return ipcRenderer.invoke("load-markdown-file", args);
+  }
 });
 
 contextBridge.exposeInMainWorld("configAPI", {

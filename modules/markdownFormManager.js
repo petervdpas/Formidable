@@ -150,7 +150,7 @@ export function initMarkdownFormManager(containerId) {
     renderForm(templateYaml);
   }
 
-  async function loadMarkdownData(markdownString) {
+  async function loadMarkdownData(markdownString, filename) {
     const parsedData = parseMarkdownToFields(markdownString);
     if (!parsedData) {
       warn("[MarkdownFormManager] Failed to parse markdown.");
@@ -169,6 +169,14 @@ export function initMarkdownFormManager(containerId) {
         el.value = parsedData[field.key] ?? "";
       }
     });
+
+    if (filename) {
+      const filenameInput = container.querySelector("#markdown-filename");
+      if (filenameInput) {
+        filenameInput.value = filename.replace(/\.md$/, "");
+        log("[MarkdownFormManager] Set filename field to:", filename);
+      }
+    }
   }
 
   function connectNewButton(buttonId, getTemplateCallback) {
