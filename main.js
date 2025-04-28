@@ -8,6 +8,8 @@ const { log, warn, error } = require("./modules/nodeLogger"); // <-- use central
 
 const { buildAppMenu } = require("./modules/appMenu");
 const fileManager = require("./modules/fileManager");
+const metaManager = require("./modules/metaManager");
+const markdownManager = require("./modules/markdownManager");
 const configManager = require("./modules/configManager");
 const sfr = require("./modules/sfr");
 
@@ -98,30 +100,6 @@ ipcMain.handle("ensure-markdown-dir", async (event, dir) => {
   }
 });
 
-// Save markdown file
-ipcMain.handle("save-markdown", async (event, directory, filename, data) => {
-  try {
-    const dirPath = path.resolve(directory);
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
-      log("[IPC] Created directory for saving markdown:", dirPath);
-    }
-
-    const filePath = path.join(dirPath, filename);
-    const markdownContent = generateMarkdown(data);
-
-    fs.writeFileSync(filePath, markdownContent, "utf-8");
-    sfr.saveMetadata(dirPath, filename, data);  // <-- use SFR module
-
-    log("[IPC] Saved markdown file:", filePath);
-
-    return { success: true, path: filePath };
-  } catch (err) {
-    error("[IPC] Failed to save markdown:", err);
-    return { success: false, error: err.message };
-  }
-});
-
 // List markdown files
 ipcMain.handle("list-markdown-files", async (event, directory) => {
   try {
@@ -160,16 +138,19 @@ ipcMain.handle("load-markdown-meta", async (event, { dir, filename }) => {
   return sfr.loadMetadata(dir, filename);
 });
 
-// ========== Helper ==========
+ipcMain.handle("load-meta", async (event, directory, filename) => {
+  return metaManager.loadMeta(directory, filename);
+});
 
-function generateMarkdown(data) {
-  let md = "";
-  for (const [key, value] of Object.entries(data)) {
-    if (typeof value === "boolean") {
-      md += `- [${value ? "x" : " "}] ${key}\n`;
-    } else {
-      md += `**${key}:** ${value}\n\n`;
-    }
-  }
-  return md;
-}
+ipcMain.handle("save-meta", async (event, directory, filename, data) => {
+  return metaManager.saveMeta(directory, filename, data);
+});
+
+ipcMain.handle("load-markdown", async (event, directory, filename) => {
+  return markdownManager.loadMarkdown(directory, filename);
+});
+
+ipcMain.handle("save-markdown", async (event, directory, filename, data) => {
+  return markdownManager.saveMarkdownMarkdown(directory, filename, data);
+});
+

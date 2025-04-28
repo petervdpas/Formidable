@@ -7,10 +7,13 @@ const apiMethods = [
   "get-setup-list",
   "load-setup-yaml",
   "ensure-markdown-dir",
-  "save-markdown",
   "list-markdown-files",
   "load-markdown-meta",
   "load-markdown-file",
+  "load-meta",
+  "save-meta",
+  "load-markdown",
+  "save-markdown",
 ];
 
 // Build the API object dynamically:

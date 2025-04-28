@@ -1,7 +1,7 @@
 // modules/markdownListManager.js
 
 import { updateStatus } from "./statusManager.js";
-import { log, warn, error } from "./logger.js"; // <-- ADD THIS LINE
+import { log, warn, error } from "./logger.js";
 
 export function initMarkdownListManager(selectedTemplateGetter) {
   const sidebar = document.getElementById("markdown-list");
@@ -43,34 +43,33 @@ export function initMarkdownListManager(selectedTemplateGetter) {
       }
 
       files.forEach((file) => {
-        
         log("[MarkdownList] Adding file:", file);
         const item = document.createElement("div");
         item.className = "markdown-item";
         item.textContent = file.replace(/\.md$/, "");
-      
+
         item.addEventListener("click", async () => {
           try {
             log("[MarkdownList] Loading markdown file:", file);
-        
+
             const selectedTemplate = await selectedTemplateGetter();
             if (!selectedTemplate) {
               warn("[MarkdownList] No template selected when clicking file.");
               return;
             }
-        
+
             const filePath = selectedTemplate.markdown_dir;
             const fileContent = await window.api.loadMarkdownFile({ dir: filePath, filename: file });
-        
+
             await window.markdownFormManager.loadMarkdownData(fileContent, file);
-        
+
             updateStatus(`Loaded: ${file}`);
           } catch (err) {
             error("[MarkdownList] Failed to load markdown:", err);
             updateStatus("Error loading markdown file.");
           }
         });
-      
+
         sidebar.appendChild(item);
       });
 

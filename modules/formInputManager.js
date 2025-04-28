@@ -1,12 +1,14 @@
-// modules/markdownFormManager.js
+// modules/formInputManager.js
 
 import { updateStatus } from "./statusManager.js";
 import { log, warn, error } from "./logger.js";
+import { saveMeta, loadMeta } from "./metaManager.js";
+import { saveMarkdown, loadMarkdown } from "./markdownManager.js";
 
 export function initMarkdownFormManager(containerId) {
   const container = document.getElementById(containerId);
   if (!container) {
-    error("[MarkdownFormManager] Markdown form container not found:", containerId);
+    error("[MarkdownFormManager] Container not found:", containerId);
     return;
   }
 
@@ -78,7 +80,7 @@ export function initMarkdownFormManager(containerId) {
     container.appendChild(filenameDiv);
 
     const saveBtn = document.createElement("button");
-    saveBtn.textContent = "Save Markdown";
+    saveBtn.textContent = "Save Metadata";
     saveBtn.className = "btn btn-default btn-info";
     saveBtn.addEventListener("click", handleSave);
 
@@ -117,20 +119,16 @@ export function initMarkdownFormManager(containerId) {
       return;
     }
 
-    log("[MarkdownFormManager] Saving:", filename + ".md");
+    const markdownDir = currentTemplate.markdown_dir;
 
-    const saveResult = await window.api.saveMarkdown(
-      currentTemplate.markdown_dir,
-      filename + ".md",
-      formData
-    );
+    const metaResult = await saveMeta(markdownDir, filename + ".md", formData);
 
-    if (saveResult.success) {
-      updateStatus(`Saved: ${saveResult.path}`);
+    if (metaResult.success) {
+      updateStatus(`Saved metadata: ${metaResult.path}`);
       if (reloadMarkdownList) reloadMarkdownList();
     } else {
-      error("[MarkdownFormManager] Save failed:", saveResult.error);
-      updateStatus(`Failed to save: ${saveResult.error}`);
+      error("[MarkdownFormManager] Failed to save metadata:", metaResult.error);
+      updateStatus(`Failed to save metadata: ${metaResult.error}`);
     }
   }
 
@@ -140,34 +138,29 @@ export function initMarkdownFormManager(containerId) {
     renderForm(templateYaml);
   }
 
-  async function loadFormData(data, filename) {
-    if (!data) {
-      warn("[MarkdownFormManager] No data provided for loading.");
+  async function loadFormData(metaData, filename) {
+    if (!metaData) {
+      warn("[MarkdownFormManager] No metadata provided for loading.");
       return;
     }
     log("[MarkdownFormManager] Loading metadata for:", filename);
-    populateFormFields(data, filename);
+    populateFormFields(metaData, filename);
   }
 
-  async function loadMarkdownData(markdownContent, filename) {
-    const parsedData = parseMarkdownToFields(markdownContent);
+  async function loadMarkdownData(markdownString, filename) {
+    const parsedData = parseMarkdownToFields(markdownString);
     if (!parsedData) {
       warn("[MarkdownFormManager] Failed to parse markdown fallback.");
       return;
     }
-    log("[MarkdownFormManager] Parsed fallback markdown for:", filename);
+    log("[MarkdownFormManager] Parsed markdown as fallback for:", filename);
 
     populateFormFields(parsedData, filename);
 
-    // Auto-save .meta.json
+    // Auto-create meta.json if missing
     if (currentTemplate && currentTemplate.markdown_dir) {
-      log("[MarkdownFormManager] Saving auto-generated metadata...");
-      try {
-        await window.api.saveMeta(currentTemplate.markdown_dir, filename, parsedData);
-        log("[MarkdownFormManager] Auto-created .meta.json from parsed markdown.");
-      } catch (err) {
-        warn("[MarkdownFormManager] Failed to auto-save parsed metadata:", err);
-      }
+      log("[MarkdownFormManager] Saving auto-generated metadata from parsed markdown...");
+      await saveMeta(currentTemplate.markdown_dir, filename, parsedData);
     }
   }
 
@@ -201,7 +194,7 @@ export function initMarkdownFormManager(containerId) {
     btn.addEventListener("click", async () => {
       const selected = await getTemplateCallback();
       if (!selected) {
-        warn("[MarkdownFormManager] No template after button click.");
+        warn("[MarkdownFormManager] No template selected after click.");
         updateStatus("Please select a template first.");
         return;
       }
@@ -215,15 +208,15 @@ export function initMarkdownFormManager(containerId) {
     const firstInput = container.querySelector('input[name="title"], input, select, textarea');
     if (firstInput) {
       firstInput.focus();
-      log("[MarkdownFormManager] Focused input.");
+      log("[MarkdownFormManager] Focused input field.");
     } else {
-      warn("[MarkdownFormManager] No input to focus.");
+      warn("[MarkdownFormManager] No input field to focus.");
     }
   }
 
   function setReloadMarkdownList(fn) {
     reloadMarkdownList = fn;
-    log("[MarkdownFormManager] Set reload markdown list function.");
+    log("[MarkdownFormManager] Reload markdown list function set.");
   }
 
   function parseMarkdownToFields(markdown) {
