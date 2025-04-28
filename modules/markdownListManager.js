@@ -43,10 +43,36 @@ export function initMarkdownListManager(selectedTemplateGetter) {
       }
 
       files.forEach((file) => {
+        
         log("[MarkdownList] Adding file:", file);
         const item = document.createElement("div");
         item.className = "markdown-item";
         item.textContent = file.replace(/\.md$/, "");
+      
+        // 🆕 Add click handler!
+        item.addEventListener("click", async () => {
+          try {
+            log("[MarkdownList] Loading markdown file:", file);
+      
+            const selectedTemplate = await selectedTemplateGetter();
+            if (!selectedTemplate) {
+              warn("[MarkdownList] No template selected when clicking file.");
+              return;
+            }
+      
+            const filePath = selectedTemplate.markdown_dir;
+            const fileContent = await window.api.loadMarkdownFile(filePath, file);
+      
+            // 🆕 Tell the Markdown Form Manager to load the markdown content into the form
+            await window.markdownFormManager.loadMarkdownData(fileContent);
+      
+            updateStatus(`Loaded: ${file}`);
+          } catch (err) {
+            error("[MarkdownList] Failed to load markdown:", err);
+            updateStatus("Error loading markdown file.");
+          }
+        });
+      
         sidebar.appendChild(item);
       });
 

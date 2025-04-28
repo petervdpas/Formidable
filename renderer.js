@@ -53,6 +53,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   window.currentSelectedTemplate = null;
 
   const markdownFormManager = initMarkdownFormManager("markdown-content");
+  window.markdownFormManager = markdownFormManager;
   const markdownListManager = initMarkdownListManager(
     () => window.currentSelectedTemplate
   );

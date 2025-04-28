@@ -1,7 +1,7 @@
 // markdownFormManager.js
 
 import { updateStatus } from "./statusManager.js";
-import { log, warn, error } from "./logger.js"; // <-- ADD THIS
+import { log, warn, error } from "./logger.js";
 
 export function initMarkdownFormManager(containerId) {
   const container = document.getElementById(containerId);
@@ -14,7 +14,9 @@ export function initMarkdownFormManager(containerId) {
 
   let currentTemplate = null;
   let reloadMarkdownList = null;
-  let currentData = {}; // <-- reserved for possible future state
+  let currentData = {};
+  let fields = [];          // <-- NEW
+  let fieldElements = {};   // <-- NEW
 
   function clearForm() {
     log("[MarkdownFormManager] Clearing form...");
@@ -24,6 +26,9 @@ export function initMarkdownFormManager(containerId) {
   function renderForm(template) {
     log("[MarkdownFormManager] Rendering form for template:", template.name || "Unnamed Template");
     clearForm();
+
+    fields = template.fields;        // <-- Track fields
+    fieldElements = {};              // <-- Track input elements
 
     template.fields.forEach((field) => {
       const fieldDiv = document.createElement("div");
@@ -53,6 +58,8 @@ export function initMarkdownFormManager(containerId) {
       }
 
       input.name = field.key;
+      fieldElements[field.key] = input; // <-- Track inputs by field.key
+
       fieldDiv.appendChild(input);
       container.appendChild(fieldDiv);
     });
@@ -66,7 +73,7 @@ export function initMarkdownFormManager(containerId) {
 
     const filenameInput = document.createElement("input");
     filenameInput.type = "text";
-    filenameInput.id = "markdown-filename"; // important ID
+    filenameInput.id = "markdown-filename";
     filenameDiv.appendChild(filenameInput);
 
     container.appendChild(filenameDiv);
@@ -143,6 +150,27 @@ export function initMarkdownFormManager(containerId) {
     renderForm(templateYaml);
   }
 
+  async function loadMarkdownData(markdownString) {
+    const parsedData = parseMarkdownToFields(markdownString);
+    if (!parsedData) {
+      warn("[MarkdownFormManager] Failed to parse markdown.");
+      return;
+    }
+
+    log("[MarkdownFormManager] Parsed markdown data:", parsedData);
+
+    fields.forEach((field) => {
+      const el = fieldElements[field.key];
+      if (!el) return;
+
+      if (field.type === "boolean") {
+        el.checked = parsedData[field.key] === true;
+      } else {
+        el.value = parsedData[field.key] ?? "";
+      }
+    });
+  }
+
   function connectNewButton(buttonId, getTemplateCallback) {
     const btn = document.getElementById(buttonId);
     if (!btn) {
@@ -188,8 +216,31 @@ export function initMarkdownFormManager(containerId) {
     log("[MarkdownFormManager] Reload markdown list function set.");
   }
 
+  function parseMarkdownToFields(markdown) {
+    const lines = markdown.split("\n");
+    const result = {};
+
+    for (const line of lines) {
+      const matchCheckbox = line.match(/- \[(x| )\] (.+)/i);
+      if (matchCheckbox) {
+        const [, checked, key] = matchCheckbox;
+        result[key.trim()] = checked.toLowerCase() === "x";
+        continue;
+      }
+
+      const matchText = line.match(/\*\*(.+):\*\* (.+)/);
+      if (matchText) {
+        const [, key, value] = matchText;
+        result[key.trim()] = value.trim();
+      }
+    }
+
+    return result;
+  }
+
   return {
     loadTemplate,
+    loadMarkdownData,    // <-- Expose this
     getFormData,
     handleSave,
     clearForm,
