@@ -2,25 +2,46 @@
 
 const { contextBridge, ipcRenderer } = require("electron");
 
-// No logger here! Only simple console.log if needed manually.
+// Just list your API methods here:
+const apiMethods = [
+  "get-setup-list",
+  "load-setup-yaml",
+  "ensure-markdown-dir",
+  "save-markdown",
+  "list-markdown-files",
+  "load-markdown-file",
+];
 
-contextBridge.exposeInMainWorld("api", {
-  getSetupList: () => ipcRenderer.invoke("get-setup-list"),
-  loadSetupYaml: (name) => ipcRenderer.invoke("load-setup-yaml", name),
-  ensureMarkdownDir: (dir) => ipcRenderer.invoke("ensure-markdown-dir", dir),
-  saveMarkdown: (directory, filename, data) => ipcRenderer.invoke("save-markdown", directory, filename, data),
-  listMarkdownFiles: (directory) => ipcRenderer.invoke("list-markdown-files", directory),
-  loadMarkdownFile: (args) => {
-    if (!args || typeof args !== "object" || !args.dir || !args.filename) {
-      console.error("[Preload] loadMarkdownFile called with invalid args:", args);
-      throw new Error("Invalid arguments for loadMarkdownFile");
-    }
-    return ipcRenderer.invoke("load-markdown-file", args);
-  },
-});
+// Build the API object dynamically:
+const api = {};
 
-contextBridge.exposeInMainWorld("configAPI", {
-  loadUserConfig: () => ipcRenderer.invoke("load-user-config"),
-  saveUserConfig: (cfg) => ipcRenderer.invoke("save-user-config", cfg),
-  updateUserConfig: (partial) => ipcRenderer.invoke("update-user-config", partial),
-});
+for (const method of apiMethods) {
+  api[camelCase(method)] = (...args) => {
+    return ipcRenderer.invoke(method, ...args);
+  };
+}
+
+// Expose the API into the browser context
+contextBridge.exposeInMainWorld("api", api);
+
+// Same for configAPI separately if you want
+const configMethods = [
+  "load-user-config",
+  "save-user-config",
+  "update-user-config",
+];
+
+const configAPI = {};
+
+for (const method of configMethods) {
+  configAPI[camelCase(method)] = (...args) => {
+    return ipcRenderer.invoke(method, ...args);
+  };
+}
+
+contextBridge.exposeInMainWorld("configAPI", configAPI);
+
+// Helper: Convert "load-user-config" -> "loadUserConfig"
+function camelCase(str) {
+  return str.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
+}
