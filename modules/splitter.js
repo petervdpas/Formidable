@@ -1,3 +1,5 @@
+// splitter.js
+
 export function setupSplitter({ splitter, left, right, container, min = 150 }) {
   let isDragging = false;
   let startX = 0;

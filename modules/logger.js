@@ -1,3 +1,5 @@
+// logger.js
+
 let loggingEnabled = true;
 
 export function setLoggingEnabled(enabled) {
