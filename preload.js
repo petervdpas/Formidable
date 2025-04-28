@@ -11,8 +11,12 @@ contextBridge.exposeInMainWorld("api", {
   saveMarkdown: (directory, filename, data) => ipcRenderer.invoke("save-markdown", directory, filename, data),
   listMarkdownFiles: (directory) => ipcRenderer.invoke("list-markdown-files", directory),
   loadMarkdownFile: (args) => {
+    if (!args || typeof args !== "object" || !args.dir || !args.filename) {
+      console.error("[Preload] loadMarkdownFile called with invalid args:", args);
+      throw new Error("Invalid arguments for loadMarkdownFile");
+    }
     return ipcRenderer.invoke("load-markdown-file", args);
-  }
+  },
 });
 
 contextBridge.exposeInMainWorld("configAPI", {
