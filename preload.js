@@ -6,7 +6,7 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 // API methods as usual
 const apiMethods = [
-  "get-setup-list",
+  "list-template-files",
   "load-setup-yaml",
   "ensure-markdown-dir",
   "list-markdown-files",

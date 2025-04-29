@@ -103,7 +103,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   const templateListManager = createListManager({
     elementId: "setup-list",
-    fetchListFunction: async () => await window.api.getSetupList(),
+    fetchListFunction: async () => await window.api.listTemplateFiles(),
     onItemClick: async (itemName) => {
       try {
         const data = await window.api.loadSetupYaml(itemName);
@@ -216,8 +216,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function loadTemplateOptions() {
-    const setupFiles = await window.api.getSetupList();
-    const options = setupFiles.map((name) => ({
+    const templateFiles = await window.api.listTemplateFiles();
+    const options = templateFiles.map((name) => ({
       value: name,
       label: name.replace(/\.yaml$/, ""),
     }));
