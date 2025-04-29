@@ -8,6 +8,7 @@ const { log, warn, error } = require("./modules/nodeLogger"); // <-- use central
 
 const { buildAppMenu } = require("./modules/appMenu");
 const fileManager = require("./modules/fileManager");
+const setupManager = require("./modules/setupManager"); 
 const fileTransformer = require("./modules/fileTransformer.js");
 const metaManager = require("./modules/metaManager");
 const markdownManager = require("./modules/markdownManager");
@@ -34,7 +35,7 @@ function createWindow() {
 app.whenReady().then(() => {
   log("[Main] App is ready. Checking environment...");
 
-  fileManager.ensureSetupEnvironment();
+  setupManager.ensureSetupEnvironment();
   configManager.ensureConfigFile();
 
   createWindow();
@@ -60,12 +61,12 @@ app.on("window-all-closed", function () {
 // Setup YAML handlers
 ipcMain.handle("get-setup-list", () => {
   log("[IPC] get-setup-list triggered");
-  return fileManager.getSetupYamlList();
+  return setupManager.getSetupYamlList();
 });
 
 ipcMain.handle("load-setup-yaml", (event, name) => {
   log("[IPC] load-setup-yaml triggered for:", name);
-  return fileManager.loadSetupYaml(name);
+  return setupManager.loadSetupYaml(name);
 });
 
 // Config file handlers
