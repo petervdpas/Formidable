@@ -36,6 +36,11 @@ function buildFilePath(directory, baseFilename, { extension = "" } = {}) {
   return path.join(directory, baseFilename + ext);
 }
 
+// Join + normalize path relative to baseDir
+function joinPath(...segments) {
+  return path.normalize(path.join(...segments));
+}
+
 // Resolve a path relative to the base directory
 function resolvePath(...segments) {
   return path.resolve(baseDir, ...segments);
@@ -108,6 +113,7 @@ module.exports = {
   ensureDirectory,
   buildFilePath,
   resolvePath,
+  joinPath,
   listFilesByExtension,
   fileExists,
   loadFile,

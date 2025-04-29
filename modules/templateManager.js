@@ -1,25 +1,27 @@
 // modules/templateManager.js
 
-const fs = require("fs"); 
-const path = require("path");
 const fileManager = require("./fileManager");
 const { log, error } = require("./nodeLogger");
 
-const setupDir = path.join(fileManager.baseDir, "setup");
+const setupDir = fileManager.joinPath("setup");
 const basicYamlName = "basic.yaml";
-const basicYamlPath = path.join(setupDir, basicYamlName);
+const basicYamlPath = fileManager.joinPath("setup", basicYamlName);
 
-// Ensure setup folder and basic.yaml exist
 function ensureSetupEnvironment() {
   fileManager.ensureDirectory(setupDir, { silent: true });
 
-  if (!fs.existsSync(basicYamlPath)) {
+  if (!fileManager.fileExists(basicYamlPath)) {
     const content = {
       name: "Basic Form",
       markdown_dir: "./markdowns/basic",
       fields: [
         { key: "title", type: "text", label: "Title", default: "" },
-        { key: "published", type: "boolean", label: "Published", default: false },
+        {
+          key: "published",
+          type: "boolean",
+          label: "Published",
+          default: false,
+        },
         {
           key: "category",
           type: "dropdown",
@@ -45,16 +47,20 @@ function ensureSetupEnvironment() {
   }
 }
 
-// List all YAML setup files
 function getTemplateList() {
   ensureSetupEnvironment();
   return fileManager.listFilesByExtension(setupDir, ".yaml");
 }
 
-// Load a setup YAML by name
 function loadTemplateFile(name) {
-  const filePath = path.join(setupDir, name);
-  return fileManager.loadFile(filePath, { format: "yaml" });
+  const filePath = fileManager.joinPath("setup", name);
+  const data = fileManager.loadFile(filePath, { format: "yaml" });
+
+  if (data.markdown_dir && typeof data.markdown_dir === "string") {
+    data.markdown_dir = fileManager.joinPath(data.markdown_dir);
+  }
+
+  return data;
 }
 
 module.exports = {
