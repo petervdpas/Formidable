@@ -10,7 +10,7 @@ const { registerIpc } = require("./modules/ipcRoutes");
 
 const { SingleFileRepository } = require("./modules/sfr");
 const fileManager = require("./modules/fileManager");
-const setupManager = require("./modules/setupManager");
+const templateManager = require("./modules/templateManager");
 const configManager = require("./modules/configManager");
 const fileTransformer = require("./modules/fileTransformer");
 
@@ -45,7 +45,7 @@ function createWindow() {
 app.whenReady().then(() => {
   log("[Main] App is ready. Checking environment...");
 
-  setupManager.ensureSetupEnvironment();
+  templateManager.ensureSetupEnvironment();
   configManager.ensureConfigFile();
 
   createWindow();
@@ -66,8 +66,8 @@ app.on("window-all-closed", () => {
 // ================= IPC HANDLERS =================
 
 // Setup YAML handlers
-registerIpc("list-template-files", () => setupManager.getTemplateList());
-registerIpc("load-template-file", (event, name) => setupManager.loadTemplateFile(name));
+registerIpc("list-template-files", () => templateManager.getTemplateList());
+registerIpc("load-template-file", (event, name) => templateManager.loadTemplateFile(name));
 
 // Config handlers
 registerIpc("load-user-config", () => configManager.loadUserConfig());

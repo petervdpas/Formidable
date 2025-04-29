@@ -1,4 +1,4 @@
-// modules/setupManager.js
+// modules/templateManager.js
 
 const fs = require("fs"); 
 const path = require("path");
@@ -36,12 +36,12 @@ function ensureSetupEnvironment() {
     });
 
     if (saved) {
-      log("[SetupManager] Created basic.yaml at:", basicYamlPath);
+      log("[TemplateManager] Created basic.yaml at:", basicYamlPath);
     } else {
-      error("[SetupManager] Failed to create basic.yaml");
+      error("[TemplateManager] Failed to create basic.yaml");
     }
   } else {
-    log("[SetupManager] basic.yaml already exists.");
+    log("[TemplateManager] basic.yaml already exists.");
   }
 }
 
