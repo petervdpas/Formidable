@@ -11,7 +11,6 @@ const { SingleFileRepository } = require("./modules/sfr");
 const setupManager = require("./modules/setupManager"); 
 const fileTransformer = require("./modules/fileTransformer.js");
 const configManager = require("./modules/configManager");
-const sfr = require("./modules/sfr");
 
 const metaRepo = new SingleFileRepository({
   defaultExtension: ".meta.json",
@@ -144,10 +143,6 @@ ipcMain.handle("load-markdown-file", async (event, { dir, filename }) => {
     console.error("[Main] Failed to load markdown file:", err);
     throw err;
   }
-});
-
-ipcMain.handle("load-markdown-meta", async (event, { dir, filename }) => {
-  return sfr.loadMetadata(dir, filename);
 });
 
 ipcMain.handle("load-meta", async (event, directory, filename) => {

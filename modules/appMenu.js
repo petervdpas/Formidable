@@ -22,9 +22,20 @@ function buildAppMenu(win) {
             const config = configManager.loadUserConfig();
             const setupName = config.recent_setups?.[0];
             if (!setupName) return;
-            const yaml = fileManager.loadSetupYaml(setupName);
-            const targetPath = path.resolve(__dirname, "..", yaml.markdown_dir);
-            shell.openPath(targetPath);
+        
+            const setupPath = fileManager.resolvePath("setup", setupName);
+            if (!fileManager.fileExists(setupPath)) {
+              error("[AppMenu] Template not found:", setupPath);
+              return;
+            }
+        
+            try {
+              const yaml = fileManager.loadFile(setupPath, { format: "yaml" });
+              const targetPath = fileManager.resolvePath(yaml.markdown_dir);
+              shell.openPath(targetPath);
+            } catch (err) {
+              error("[AppMenu] Failed to open markdown folder:", err);
+            }
           },
         },
         { type: "separator" },

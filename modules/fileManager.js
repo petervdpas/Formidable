@@ -20,14 +20,19 @@ function ensureDirectory(dirPath, { silent = false } = {}) {
       if (!silent) log(`[FileManager] Directory already exists: ${dirPath}`);
     }
   } catch (err) {
-    if (!silent) error(`[FileManager] Failed to ensure directory ${dirPath}:`, err);
+    if (!silent)
+      error(`[FileManager] Failed to ensure directory ${dirPath}:`, err);
     throw err;
   }
 }
 
 // Build a file path safely, with optional enforced extension
 function buildFilePath(directory, baseFilename, { extension = "" } = {}) {
-  const ext = extension ? (extension.startsWith(".") ? extension : `.${extension}`) : "";
+  const ext = extension
+    ? extension.startsWith(".")
+      ? extension
+      : `.${extension}`
+    : "";
   return path.join(directory, baseFilename + ext);
 }
 
@@ -39,14 +44,24 @@ function resolvePath(...segments) {
 // List files by extension
 function listFilesByExtension(directory, extension, { silent = false } = {}) {
   try {
-    const files = fs.readdirSync(directory)
-      .filter(f => f.endsWith(extension));
-    if (!silent) log(`[FileManager] Found ${files.length} "${extension}" files in ${directory}`);
+    const files = fs
+      .readdirSync(directory)
+      .filter((f) => f.endsWith(extension));
+    if (!silent)
+      log(
+        `[FileManager] Found ${files.length} "${extension}" files in ${directory}`
+      );
     return files;
   } catch (err) {
-    if (!silent) error(`[FileManager] Failed to list files in ${directory}:`, err);
+    if (!silent)
+      error(`[FileManager] Failed to list files in ${directory}:`, err);
     return [];
   }
+}
+
+// Check if a file exists
+function fileExists(filePath) {
+  return fs.existsSync(filePath);
 }
 
 // Generic file loader: format = "text" | "json" | "yaml"
@@ -64,7 +79,8 @@ function loadFile(filepath, { format = "text", silent = false } = {}) {
     if (!silent) log(`[FileManager] Loaded ${format} file: ${filepath}`);
     return content;
   } catch (err) {
-    if (!silent) error(`[FileManager] Failed to load ${format} file ${filepath}:`, err);
+    if (!silent)
+      error(`[FileManager] Failed to load ${format} file ${filepath}:`, err);
     throw err;
   }
 }
@@ -81,7 +97,8 @@ function saveFile(filepath, data, { format = "text", silent = false } = {}) {
     if (!silent) log(`[FileManager] Saved ${format} file: ${filepath}`);
     return true;
   } catch (err) {
-    if (!silent) error(`[FileManager] Failed to save ${format} file ${filepath}:`, err);
+    if (!silent)
+      error(`[FileManager] Failed to save ${format} file ${filepath}:`, err);
     return false;
   }
 }
@@ -92,6 +109,7 @@ module.exports = {
   buildFilePath,
   resolvePath,
   listFilesByExtension,
+  fileExists,
   loadFile,
   saveFile,
 };
