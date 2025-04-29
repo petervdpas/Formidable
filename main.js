@@ -86,12 +86,11 @@ registerIpc("ensure-markdown-dir", (event, dir) => {
   return true;
 });
 
-registerIpc("list-markdown-files", (event, dir) => {
-  const fullPath = fileManager.resolvePath(dir);
-  return fileManager.listFilesByExtension(fullPath, ".md");
-});
-
 // Meta repository
+registerIpc("list-meta", (event, directory) =>
+  metaRepo.listFiles(directory)
+);
+
 registerIpc("load-meta", (event, directory, filename) =>
   metaRepo.loadFromBase(directory, filename)
 );
@@ -101,6 +100,10 @@ registerIpc("save-meta", (event, directory, filename, data) =>
 );
 
 // Markdown repository
+registerIpc("list-markdown", (event, directory) =>
+  markdownRepo.listFiles(directory)
+);
+
 registerIpc("load-markdown", (event, directory, filename) =>
   markdownRepo.loadFromBase(directory, filename)
 );

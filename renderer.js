@@ -140,7 +140,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         return [];
       }
       await window.api.ensureMarkdownDir(selectedTemplate.markdown_dir);
-      const files = await window.api.listMarkdownFiles(
+      const files = await window.api.listMarkdown(
         selectedTemplate.markdown_dir
       );
       return files;
