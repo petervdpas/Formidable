@@ -5,15 +5,25 @@ const path = require("path");
 const fs = require("fs");
 
 const { log, warn, error } = require("./modules/nodeLogger"); // <-- use centralized logger
-
 const { buildAppMenu } = require("./modules/appMenu");
-const fileManager = require("./modules/fileManager");
+const { SingleFileRepository } = require("./modules/sfr");
+
 const setupManager = require("./modules/setupManager"); 
 const fileTransformer = require("./modules/fileTransformer.js");
-const metaManager = require("./modules/metaManager");
-const markdownManager = require("./modules/markdownManager");
 const configManager = require("./modules/configManager");
 const sfr = require("./modules/sfr");
+
+const metaRepo = new SingleFileRepository({
+  defaultExtension: ".meta.json",
+  defaultJson: true,
+  silent: false,
+});
+
+const markdownRepo = new SingleFileRepository({
+  defaultExtension: ".md",
+  defaultJson: false,
+  silent: false,
+});
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -141,19 +151,21 @@ ipcMain.handle("load-markdown-meta", async (event, { dir, filename }) => {
 });
 
 ipcMain.handle("load-meta", async (event, directory, filename) => {
-  return metaManager.loadMeta(directory, filename);
+  return metaRepo.loadFromBase(directory, filename);
 });
 
 ipcMain.handle("save-meta", async (event, directory, filename, data) => {
-  return metaManager.saveMeta(directory, filename, data);
+  return metaRepo.saveFromBase(directory, filename, data);
 });
 
 ipcMain.handle("load-markdown", async (event, directory, filename) => {
-  return markdownManager.loadMarkdown(directory, filename);
+  return markdownRepo.loadFromBase(directory, filename);
 });
 
 ipcMain.handle("save-markdown", async (event, directory, filename, data) => {
-  return markdownManager.saveMarkdown(directory, filename, data);
+  return markdownRepo.saveFromBase(directory, filename, data, {
+    transform: fileTransformer.generateMarkdownFromFields,
+  });
 });
 
 ipcMain.handle("parse-markdown-to-fields", (event, markdownContent) => {
