@@ -46,19 +46,19 @@ function ensureSetupEnvironment() {
 }
 
 // List all YAML setup files
-function getSetupYamlList() {
+function getTemplateList() {
   ensureSetupEnvironment();
   return fileManager.listFilesByExtension(setupDir, ".yaml");
 }
 
 // Load a setup YAML by name
-function loadSetupYaml(name) {
+function loadTemplateFile(name) {
   const filePath = path.join(setupDir, name);
   return fileManager.loadFile(filePath, { format: "yaml" });
 }
 
 module.exports = {
   ensureSetupEnvironment,
-  getSetupYamlList,
-  loadSetupYaml,
+  getTemplateList,
+  loadTemplateFile,
 };

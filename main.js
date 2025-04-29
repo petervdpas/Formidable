@@ -66,8 +66,8 @@ app.on("window-all-closed", () => {
 // ================= IPC HANDLERS =================
 
 // Setup YAML handlers
-registerIpc("list-template-files", () => setupManager.getSetupYamlList());
-registerIpc("load-setup-yaml", (event, name) => setupManager.loadSetupYaml(name));
+registerIpc("list-template-files", () => setupManager.getTemplateList());
+registerIpc("load-template-file", (event, name) => setupManager.loadTemplateFile(name));
 
 // Config handlers
 registerIpc("load-user-config", () => configManager.loadUserConfig());

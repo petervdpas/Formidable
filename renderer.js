@@ -106,7 +106,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     fetchListFunction: async () => await window.api.listTemplateFiles(),
     onItemClick: async (itemName) => {
       try {
-        const data = await window.api.loadSetupYaml(itemName);
+        const data = await window.api.loadTemplateFile(itemName);
         yamlEditor.render(data);
         await window.configAPI.updateUserConfig({ recent_setups: [itemName] });
         updateStatus(`Loaded setup: ${itemName}`);
@@ -197,7 +197,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       return;
     }
     try {
-      const yamlData = await window.api.loadSetupYaml(name);
+      const yamlData = await window.api.loadTemplateFile(name);
       window.currentSelectedTemplate = yamlData;
       if (updateDropdown) {
         templateDropdown.setSelected(name);
