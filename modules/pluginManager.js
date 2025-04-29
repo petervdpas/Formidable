@@ -1,25 +1,27 @@
-const fs = require('fs');
-const path = require('path');
-const { log, error } = require('./nodeLogger'); // Optional: Your existing logger
+// modules/pluginManager.js
+
+const { log, error } = require("./nodeLogger");
+const fileManager = require("./fileManager");
 
 const pluginRepo = {}; // Loaded plugins stored here
 
-// Load all plugins from a given directory
 function loadPlugins(pluginDir) {
-  if (!fs.existsSync(pluginDir)) {
-    error("[PluginManager] Plugin directory not found:", pluginDir);
+  const fullDir = fileManager.resolvePath(pluginDir);
+
+  if (!fileManager.fileExists(fullDir)) {
+    error("[PluginManager] Plugin directory not found:", fullDir);
     return;
   }
 
-  const files = fs.readdirSync(pluginDir).filter(file => file.endsWith(".js"));
-  log(`[PluginManager] Found ${files.length} plugin(s).`);
+  const files = fileManager.listFilesByExtension(fullDir, ".js", { silent: true });
+  log(`[PluginManager] Found ${files.length} plugin(s) in ${pluginDir}`);
 
   for (const file of files) {
-    const fullPath = path.join(pluginDir, file);
+    const fullPath = fileManager.joinPath(fullDir, file);
 
     try {
-      const code = fs.readFileSync(fullPath, 'utf-8');
-      const pluginName = path.basename(file, ".js");
+      const code = fileManager.loadFile(fullPath, { format: "text", silent: true });
+      const pluginName = file.replace(/\.js$/, "");
 
       const pluginFunction = new Function("context", code + "; return runPlugin(context);");
 
@@ -31,7 +33,6 @@ function loadPlugins(pluginDir) {
   }
 }
 
-// Run a plugin by name with a given context
 function runPlugin(name, context = {}) {
   const pluginFunc = pluginRepo[name];
 
@@ -50,12 +51,10 @@ function runPlugin(name, context = {}) {
   }
 }
 
-// List available plugins
 function listPlugins() {
   return Object.keys(pluginRepo);
 }
 
-// Full reload if you add/remove plugins dynamically
 function reloadPlugins(pluginDir) {
   for (const key of Object.keys(pluginRepo)) {
     delete pluginRepo[key];
