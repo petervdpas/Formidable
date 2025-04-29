@@ -10,7 +10,6 @@ const apiMethods = [
   "load-template-file",
   "ensure-markdown-dir",
   "list-markdown-files",
-  "load-markdown-file",
   "load-meta",
   "save-meta",
   "load-markdown",

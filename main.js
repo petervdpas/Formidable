@@ -91,11 +91,6 @@ registerIpc("list-markdown-files", (event, dir) => {
   return fileManager.listFilesByExtension(fullPath, ".md");
 });
 
-registerIpc("load-markdown-file", async (event, { dir, filename }) => {
-  const fullPath = fileManager.joinPath(dir, filename);
-  return fileManager.loadFile(fullPath, { format: "text", silent: true });
-});
-
 // Meta repository
 registerIpc("load-meta", (event, directory, filename) =>
   metaRepo.loadFromBase(directory, filename)

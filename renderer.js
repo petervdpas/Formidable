@@ -153,10 +153,7 @@ window.addEventListener("DOMContentLoaded", async () => {
           return;
         }
         const filePath = selectedTemplate.markdown_dir;
-        const fileContent = await window.api.loadMarkdownFile({
-          dir: filePath,
-          filename: fileName,
-        });
+        const fileContent = await window.api.loadMarkdown(filePath, fileName);
         const parsedFields = await window.api.parseMarkdownToFields(
           fileContent
         );
