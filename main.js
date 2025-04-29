@@ -1,17 +1,18 @@
 // main.js
 
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow } = require("electron");
 const path = require("path");
 const fs = require("fs");
 
-const { log, warn, error } = require("./modules/nodeLogger"); // <-- use centralized logger
+const { log, warn, error } = require("./modules/nodeLogger");
 const { buildAppMenu } = require("./modules/appMenu");
-const { SingleFileRepository } = require("./modules/sfr");
+const { registerIpc } = require("./modules/ipcRoutes");
 
-const setupManager = require("./modules/setupManager"); 
+const { SingleFileRepository } = require("./modules/sfr");
 const fileManager = require("./modules/fileManager");
-const fileTransformer = require("./modules/fileTransformer.js");
+const setupManager = require("./modules/setupManager");
 const configManager = require("./modules/configManager");
+const fileTransformer = require("./modules/fileTransformer");
 
 const metaRepo = new SingleFileRepository({
   defaultExtension: ".meta.json",
@@ -41,7 +42,6 @@ function createWindow() {
   log("[Main] Created main BrowserWindow and loaded index.html");
 }
 
-// Ensure folders on app startup
 app.whenReady().then(() => {
   log("[Main] App is ready. Checking environment...");
 
@@ -50,108 +50,73 @@ app.whenReady().then(() => {
 
   createWindow();
 
-  app.on("activate", function () {
+  app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      log("[Main] Recreating window after activation.");
       createWindow();
     }
   });
 });
 
-// Standard quit behavior
-app.on("window-all-closed", function () {
+app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
-    log("[Main] Quitting app (not macOS).");
     app.quit();
   }
 });
 
-// ========== IPC HANDLERS ==========
+// ================= IPC HANDLERS =================
 
 // Setup YAML handlers
-ipcMain.handle("get-setup-list", () => {
-  log("[IPC] get-setup-list triggered");
-  return setupManager.getSetupYamlList();
+registerIpc("get-setup-list", () => setupManager.getSetupYamlList());
+registerIpc("load-setup-yaml", (event, name) => setupManager.loadSetupYaml(name));
+
+// Config handlers
+registerIpc("load-user-config", () => configManager.loadUserConfig());
+registerIpc("save-user-config", (event, cfg) => configManager.saveUserConfig(cfg));
+registerIpc("update-user-config", (event, partial) => configManager.updateUserConfig(partial));
+
+// Filesystem utilities
+registerIpc("ensure-markdown-dir", (event, dir) => {
+  const fullPath = fileManager.resolvePath(dir);
+  fileManager.ensureDirectory(fullPath, { silent: true });
+  log("[IPC] Ensured markdown directory exists:", fullPath);
+  return true;
 });
 
-ipcMain.handle("load-setup-yaml", (event, name) => {
-  log("[IPC] load-setup-yaml triggered for:", name);
-  return setupManager.loadSetupYaml(name);
+registerIpc("list-markdown-files", (event, dir) => {
+  const fullPath = fileManager.resolvePath(dir);
+  return fileManager.listFilesByExtension(fullPath, ".md");
 });
 
-// Config file handlers
-ipcMain.handle("load-user-config", () => {
-  log("[IPC] load-user-config triggered");
-  return configManager.loadUserConfig();
+registerIpc("load-markdown-file", async (event, { dir, filename }) => {
+  const fullPath = path.join(dir, filename);
+  return await fs.promises.readFile(fullPath, "utf-8");
 });
 
-ipcMain.handle("save-user-config", (event, cfg) => {
-  log("[IPC] save-user-config triggered");
-  return configManager.saveUserConfig(cfg);
-});
+// Meta repository
+registerIpc("load-meta", (event, directory, filename) =>
+  metaRepo.loadFromBase(directory, filename)
+);
 
-ipcMain.handle("update-user-config", (event, partial) => {
-  log("[IPC] update-user-config triggered");
-  return configManager.updateUserConfig(partial);
-});
+registerIpc("save-meta", (event, directory, filename, data) =>
+  metaRepo.saveFromBase(directory, filename, data)
+);
 
-// Ensure markdown directory exists
-ipcMain.handle("ensure-markdown-dir", async (event, dir) => {
-  try {
-    const fullPath = fileManager.resolvePath(dir);
-    fileManager.ensureDirectory(fullPath, { silent: true });
-    log("[IPC] Ensured markdown directory exists:", fullPath);
-    return true;
-  } catch (err) {
-    error("[IPC] Failed to ensure markdown dir:", err);
-    return false;
-  }
-});
+// Markdown repository
+registerIpc("load-markdown", (event, directory, filename) =>
+  markdownRepo.loadFromBase(directory, filename)
+);
 
-// List markdown files
-ipcMain.handle("list-markdown-files", async (event, directory) => {
-  try {
-    const dirPath = fileManager.resolvePath(directory);
-    return fileManager.listFilesByExtension(dirPath, ".md");
-  } catch (err) {
-    error("[IPC] Failed to list markdown files:", err);
-    return [];
-  }
-});
-
-ipcMain.handle("load-markdown-file", async (event, { dir, filename }) => {
-  try {
-    const fullPath = path.join(dir, filename);
-    const content = await fs.promises.readFile(fullPath, "utf-8");  // <-- the fix: await + utf-8
-    return content;
-  } catch (err) {
-    console.error("[Main] Failed to load markdown file:", err);
-    throw err;
-  }
-});
-
-ipcMain.handle("load-meta", async (event, directory, filename) => {
-  return metaRepo.loadFromBase(directory, filename);
-});
-
-ipcMain.handle("save-meta", async (event, directory, filename, data) => {
-  return metaRepo.saveFromBase(directory, filename, data);
-});
-
-ipcMain.handle("load-markdown", async (event, directory, filename) => {
-  return markdownRepo.loadFromBase(directory, filename);
-});
-
-ipcMain.handle("save-markdown", async (event, directory, filename, data) => {
-  return markdownRepo.saveFromBase(directory, filename, data, {
+registerIpc("save-markdown", (event, directory, filename, data) =>
+  markdownRepo.saveFromBase(directory, filename, data, {
     transform: fileTransformer.generateMarkdownFromFields,
-  });
-});
+  })
+);
 
-ipcMain.handle("parse-markdown-to-fields", (event, markdownContent) => {
-  return fileTransformer.parseMarkdownToFields(markdownContent);
-});
+// Markdown transform
+registerIpc("parse-markdown-to-fields", (event, markdownContent) =>
+  fileTransformer.parseMarkdownToFields(markdownContent)
+);
 
-ipcMain.handle("generate-markdown-from-fields", (event, fieldsObject) => {
-  return fileTransformer.generateMarkdownFromFields(fieldsObject);
-});
+registerIpc("generate-markdown-from-fields", (event, fieldsObject) =>
+  fileTransformer.generateMarkdownFromFields(fieldsObject)
+);
