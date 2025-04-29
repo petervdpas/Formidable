@@ -1,17 +1,14 @@
 // modules/configManager.js
 
-const fs = require("fs");
-const path = require("path");
-const { log, warn, error } = require("./nodeLogger"); // <--- use centralized logger
+const { log, error } = require("./nodeLogger");
+const fileManager = require("./fileManager");
 
-const configDir = path.join(__dirname, "..", "config");
-const configPath = path.join(configDir, "user.json");
+const configDir = fileManager.resolvePath("config");
+const configPath = fileManager.resolvePath("config", "user.json");
 
 const defaultConfig = {
   recent_setups: ["basic.yaml"],
-  last_opened_markdown: {
-    "basic.yaml": "",
-  },
+  last_opened_markdown: { "basic.yaml": "" },
   selected_template: "basic.yaml",
   theme: "light",
   font_size: 14,
@@ -22,33 +19,40 @@ log("[ConfigManager] Config file path:", configPath);
 
 // Ensure config dir and user.json exist
 function ensureConfigFile() {
-  if (!fs.existsSync(configDir)) {
-    fs.mkdirSync(configDir, { recursive: true });
-    log("[ConfigManager] Created config directory:", configDir);
-  } else {
-    log("[ConfigManager] Config directory already exists.");
-  }
+  fileManager.ensureDirectory(configDir, { silent: false });
 
-  if (!fs.existsSync(configPath)) {
-    fs.writeFileSync(
-      configPath,
-      JSON.stringify(defaultConfig, null, 2),
-      "utf-8"
-    );
+  if (!configFileExists()) {
+    fileManager.saveFile(configPath, defaultConfig, {
+      format: "json",
+      silent: false,
+    });
     log("[ConfigManager] Created user.json with default settings.");
   } else {
     log("[ConfigManager] Config file already exists.");
   }
 }
 
+// Internal file existence helper
+function configFileExists() {
+  try {
+    fileManager.loadFile(configPath, { format: "json", silent: true });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // Load full user config
 function loadUserConfig() {
   ensureConfigFile();
-  try {
-    const raw = fs.readFileSync(configPath, "utf-8");
-    let config = JSON.parse(raw);
 
-    // --- Auto-repair missing fields ---
+  try {
+    const config = fileManager.loadFile(configPath, {
+      format: "json",
+      silent: false,
+    });
+
+    // Auto-repair missing fields
     let updated = false;
     for (const key in defaultConfig) {
       if (!(key in config)) {
@@ -67,14 +71,17 @@ function loadUserConfig() {
     return config;
   } catch (err) {
     error("[ConfigManager] Failed to load user config:", err);
-    return { ...defaultConfig }; // Return default config fallback
+    return { ...defaultConfig };
   }
 }
 
 // Save full config
 function saveUserConfig(config) {
   try {
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 2), "utf-8");
+    fileManager.saveFile(configPath, config, {
+      format: "json",
+      silent: false,
+    });
     log("[ConfigManager] Saved user config.");
   } catch (err) {
     error("[ConfigManager] Failed to save user config:", err);

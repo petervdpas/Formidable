@@ -8,12 +8,12 @@ const metaRepo = new SingleFileRepository({
   silent: false,
 });
 
-function saveMeta(directory, markdownFilename, data) {
-  return metaRepo.saveMetadata(directory, markdownFilename, data);
+function saveMeta(directory, filename, data) {
+  return metaRepo.saveFromBase(directory, filename, data);
 }
 
-function loadMeta(directory, markdownFilename) {
-  return metaRepo.loadMetadata(directory, markdownFilename);
+function loadMeta(directory, filename) {
+  return metaRepo.loadFromBase(directory, filename);
 }
 
 module.exports = {

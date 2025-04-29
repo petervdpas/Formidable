@@ -1,6 +1,5 @@
 // modules/sfr.js
 
-const path = require("path");
 const { log, warn, error } = require("./nodeLogger");
 const fileManager = require("./fileManager");
 
@@ -62,14 +61,14 @@ class SingleFileRepository {
     }
   }
 
-  saveMetadata(directory, markdownFilename, data) {
-    const filePath = this.getStoragePath(directory, markdownFilename);
-    return this.saveFile(filePath, data);
+  saveFromBase(directory, baseFilename, data, opts = {}) {
+    const filePath = this.getStoragePath(directory, baseFilename, opts);
+    return this.saveFile(filePath, data, opts);
   }
 
-  loadMetadata(directory, markdownFilename) {
-    const filePath = this.getStoragePath(directory, markdownFilename);
-    return this.loadFile(filePath);
+  loadFromBase(directory, baseFilename, opts = {}) {
+    const filePath = this.getStoragePath(directory, baseFilename, opts);
+    return this.loadFile(filePath, opts);
   }
 }
 

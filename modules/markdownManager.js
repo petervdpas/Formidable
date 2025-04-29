@@ -9,16 +9,14 @@ const markdownRepo = new SingleFileRepository({
   silent: false,
 });
 
-function saveMarkdown(directory, filename, dataObject) {
-  const fullPath = markdownRepo.getStoragePath(directory, filename, { extension: ".md" });
-  return markdownRepo.saveFile(fullPath, dataObject, {
+function saveMarkdown(directory, filename, data) {
+  return markdownRepo.saveFromBase(directory, filename, data, {
     transform: generateMarkdownFromFields,
   });
 }
 
 function loadMarkdown(directory, filename) {
-  const fullPath = markdownRepo.getStoragePath(directory, filename, { extension: ".md" });
-  return markdownRepo.loadFile(fullPath);
+  return markdownRepo.loadFromBase(directory, filename);
 }
 
 module.exports = {
