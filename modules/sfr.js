@@ -20,6 +20,19 @@ class SingleFileRepository {
     return fileManager.buildFilePath(directory, name, { extension: extension || this.defaultExtension });
   }
 
+  listFiles(directory, extension = this.defaultExtension) {
+    try {
+      const files = fileManager.listFilesByExtension(directory, extension, {
+        silent: this.silent,
+      });
+      if (!this.silent) log("[SFR] Listed", files.length, "files in", directory);
+      return files;
+    } catch (err) {
+      if (!this.silent) error("[SFR] Failed to list files:", err);
+      return [];
+    }
+  }
+
   saveFile(filePath, data, { json = this.defaultJson, transform = null } = {}) {
     try {
       const processed = typeof transform === "function" ? transform(data) : data;

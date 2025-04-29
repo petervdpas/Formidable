@@ -9,6 +9,7 @@ const { buildAppMenu } = require("./modules/appMenu");
 const { SingleFileRepository } = require("./modules/sfr");
 
 const setupManager = require("./modules/setupManager"); 
+const fileManager = require("./modules/fileManager");
 const fileTransformer = require("./modules/fileTransformer.js");
 const configManager = require("./modules/configManager");
 
@@ -97,13 +98,9 @@ ipcMain.handle("update-user-config", (event, partial) => {
 // Ensure markdown directory exists
 ipcMain.handle("ensure-markdown-dir", async (event, dir) => {
   try {
-    const fullPath = path.resolve(dir);
-    if (!fs.existsSync(fullPath)) {
-      fs.mkdirSync(fullPath, { recursive: true });
-      log("[IPC] Created markdown directory:", fullPath);
-    } else {
-      log("[IPC] Markdown directory already exists:", fullPath);
-    }
+    const fullPath = fileManager.resolvePath(dir);
+    fileManager.ensureDirectory(fullPath, { silent: true });
+    log("[IPC] Ensured markdown directory exists:", fullPath);
     return true;
   } catch (err) {
     error("[IPC] Failed to ensure markdown dir:", err);
@@ -114,20 +111,8 @@ ipcMain.handle("ensure-markdown-dir", async (event, dir) => {
 // List markdown files
 ipcMain.handle("list-markdown-files", async (event, directory) => {
   try {
-    const dirPath = path.isAbsolute(directory)
-      ? directory
-      : path.join(__dirname, directory);
-
-    log("[IPC] Listing markdown files at:", dirPath);
-
-    if (!fs.existsSync(dirPath)) {
-      warn("[IPC] Directory does NOT exist:", dirPath);
-      return [];
-    }
-
-    const files = fs.readdirSync(dirPath);
-    log("[IPC] Found markdown files:", files);
-    return files.filter((file) => file.endsWith(".md"));
+    const dirPath = fileManager.resolvePath(directory);
+    return fileManager.listFilesByExtension(dirPath, ".md");
   } catch (err) {
     error("[IPC] Failed to list markdown files:", err);
     return [];
