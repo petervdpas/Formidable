@@ -1,8 +1,6 @@
 // main.js
 
 const { app, BrowserWindow } = require("electron");
-const path = require("path");
-const fs = require("fs");
 
 const { log, warn, error } = require("./modules/nodeLogger");
 const { buildAppMenu } = require("./modules/appMenu");
@@ -10,9 +8,9 @@ const { registerIpc } = require("./modules/ipcRoutes");
 
 const { SingleFileRepository } = require("./modules/sfr");
 const fileManager = require("./modules/fileManager");
+const fileTransformer = require("./modules/fileTransformer");
 const templateManager = require("./modules/templateManager");
 const configManager = require("./modules/configManager");
-const fileTransformer = require("./modules/fileTransformer");
 
 const metaRepo = new SingleFileRepository({
   defaultExtension: ".meta.json",
@@ -32,7 +30,7 @@ function createWindow() {
     height: 700,
     webPreferences: {
       contextIsolation: true,
-      preload: path.join(__dirname, "preload.js"),
+      preload: fileManager.joinPath(__dirname, "preload.js"),
     },
   });
 
@@ -67,12 +65,18 @@ app.on("window-all-closed", () => {
 
 // Setup YAML handlers
 registerIpc("list-template-files", () => templateManager.getTemplateList());
-registerIpc("load-template-file", (event, name) => templateManager.loadTemplateFile(name));
+registerIpc("load-template-file", (event, name) =>
+  templateManager.loadTemplateFile(name)
+);
 
 // Config handlers
 registerIpc("load-user-config", () => configManager.loadUserConfig());
-registerIpc("save-user-config", (event, cfg) => configManager.saveUserConfig(cfg));
-registerIpc("update-user-config", (event, partial) => configManager.updateUserConfig(partial));
+registerIpc("save-user-config", (event, cfg) =>
+  configManager.saveUserConfig(cfg)
+);
+registerIpc("update-user-config", (event, partial) =>
+  configManager.updateUserConfig(partial)
+);
 
 // Filesystem utilities
 registerIpc("ensure-markdown-dir", (event, dir) => {
@@ -88,8 +92,8 @@ registerIpc("list-markdown-files", (event, dir) => {
 });
 
 registerIpc("load-markdown-file", async (event, { dir, filename }) => {
-  const fullPath = path.join(dir, filename);
-  return await fs.promises.readFile(fullPath, "utf-8");
+  const fullPath = fileManager.joinPath(dir, filename);
+  return fileManager.loadFile(fullPath, { format: "text", silent: true });
 });
 
 // Meta repository
