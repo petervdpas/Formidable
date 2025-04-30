@@ -7,7 +7,10 @@ import { initStatusManager, updateStatus } from "./modules/statusManager.js";
 import { initFormManager } from "./modules/formManager.js";
 import { log, warn, error } from "./modules/logger.js"; // <- Correct
 import { setContextView } from "./modules/contextManager.js";
-import { initTemplateListManager, initMetaListManager } from "./modules/listLoader.js";
+import {
+  initTemplateListManager,
+  initMetaListManager,
+} from "./modules/listLoader.js";
 
 window.addEventListener("DOMContentLoaded", async () => {
   log("[App] DOM loaded.");
@@ -27,7 +30,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   window.currentSelectedTemplate = null;
   window.currentSelectedTemplateName = null;
-  
+
   const yamlEditor = initYamlEditor("template-content", async (updatedYaml) => {
     const filename = window.currentSelectedTemplateName;
     if (!filename) {
@@ -35,7 +38,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       updateStatus("Cannot save: no template selected.");
       return;
     }
-  
+
     const success = await window.api.saveTemplateFile(filename, updatedYaml);
     if (success) {
       updateStatus(`Saved: ${filename}`);
@@ -97,14 +100,19 @@ window.addEventListener("DOMContentLoaded", async () => {
     },
   });
 
-  const templateListManager = initTemplateListManager(yamlEditor, templateModal);
+  const templateListManager = initTemplateListManager(
+    yamlEditor,
+    templateModal
+  );
   const metaListManager = initMetaListManager(formManager, entryInputModal);
 
   async function selectTemplate(name, { updateDropdown = true } = {}) {
     if (!name || name === window.currentSelectedTemplateName) return;
 
     try {
-      const yamlData = await window.api.loadTemplateFile(name);
+      const result = await window.api.getTemplateDescriptor(name);
+      const yamlData = result.yaml;
+
       window.currentSelectedTemplate = yamlData;
       window.currentSelectedTemplateName = name;
 
@@ -113,7 +121,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       }
 
       await window.configAPI.updateUserConfig({ last_selected_template: name });
-      await window.api.ensureMarkdownDir(yamlData.markdown_dir);
+      await window.api.ensureMarkdownDir(result.markdownDir);
       await formManager.loadTemplate(yamlData);
       await metaListManager.loadList();
       updateStatus(`Selected template: ${yamlData.name}`);

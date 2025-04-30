@@ -47,6 +47,21 @@ function ensureTemplatesEnvironment() {
   }
 }
 
+function getTemplateDescriptor(name) {
+  ensureTemplatesEnvironment();
+  const data = loadTemplateFile(name); // already defined
+
+  if (!data) {
+    throw new Error(`Template "${name}" not found.`);
+  }
+
+  return {
+    name,
+    yaml: data,
+    markdownDir: data.markdown_dir,
+  };
+}
+
 function getTemplateList() {
   ensureTemplatesEnvironment();
   return fileManager.listFilesByExtension(templatesDir, ".yaml");
@@ -104,6 +119,7 @@ function saveTemplateFile(name, data) {
 
 module.exports = {
   ensureTemplatesEnvironment,
+  getTemplateDescriptor,
   getTemplateList,
   loadTemplateForDir,
   loadTemplateFile,

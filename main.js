@@ -71,6 +71,9 @@ registerIpc("load-template-file", (event, name) =>
 registerIpc("save-template-file", (event, name, data) =>
   templateManager.saveTemplateFile(name, data)
 );
+registerIpc("get-template-descriptor", (event, name) => {
+  return templateManager.getTemplateDescriptor(name);
+});
 
 // Config handlers
 registerIpc("load-user-config", () => configManager.loadUserConfig());
@@ -90,14 +93,10 @@ registerIpc("ensure-markdown-dir", (event, dir) => {
 });
 
 // Meta repository
-registerIpc("list-meta", (event, directory) =>
-  metaRepo.listFiles(directory)
-);
-
+registerIpc("list-meta", (event, directory) => metaRepo.listFiles(directory));
 registerIpc("load-meta", (event, directory, filename) =>
   metaRepo.loadFromBase(directory, filename)
 );
-
 registerIpc("save-meta", (event, directory, filename, data) =>
   metaRepo.saveFromBase(directory, filename, data)
 );
@@ -106,11 +105,9 @@ registerIpc("save-meta", (event, directory, filename, data) =>
 registerIpc("list-markdown", (event, directory) =>
   markdownRepo.listFiles(directory)
 );
-
 registerIpc("load-markdown", (event, directory, filename) =>
   markdownRepo.loadFromBase(directory, filename)
 );
-
 registerIpc("save-markdown", (event, directory, filename, data) =>
   markdownRepo.saveFromBase(directory, filename, data, {
     transform: fileTransformer.generateMarkdownFromFields,
@@ -121,7 +118,6 @@ registerIpc("save-markdown", (event, directory, filename, data) =>
 registerIpc("parse-markdown-to-fields", (event, markdownContent) =>
   fileTransformer.parseMarkdownToFields(markdownContent)
 );
-
 registerIpc("generate-markdown-from-fields", (event, fieldsObject) =>
   fileTransformer.generateMarkdownFromFields(fieldsObject)
 );
