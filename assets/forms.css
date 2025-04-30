@@ -1,4 +1,4 @@
-/* ───── Form Layout ───── */
+/* ───── Form Containers ───── */
 
 form,
 fieldset {
@@ -12,6 +12,8 @@ legend {
   font-weight: bold;
   padding: 0 6px;
 }
+
+/* ───── General Row Layout ───── */
 
 .form-row {
   display: flex;
@@ -28,64 +30,13 @@ legend {
   border-radius: 4px;
 }
 
-/* Optional narrower width for specific inputs */
 .field-default {
   min-width: 100px;
 }
 
-/* Remove Field Button */
-.form-row button.remove-field {
-  padding: 4px 8px;
-  font-size: 14px;
-  background-color: #d66;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.form-row button.remove-field:hover {
-  background-color: #b44;
-}
-
-/* Add Field Button */
-#add-field {
-  margin-top: 10px;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  background-color: #2196f3;
-  color: white;
-  cursor: pointer;
-}
-
-#add-field:hover {
-  background-color: #0b7dda;
-}
-
-/* Save Button Group */
-.button-group {
-  margin-top: 20px;
-}
-
-.button-group button {
-  padding: 8px 16px;
-  font-weight: bold;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.button-group button:hover {
-  background-color: #3b9740;
-}
-
-/* ───── Two Column Layout Support ───── */
+/* ───── Two Column Support ───── */
 
 .form-row.two-column {
-  display: flex;
   justify-content: space-between;
   gap: 12px;
 }
@@ -101,7 +52,13 @@ legend {
   margin-bottom: 4px;
 }
 
-/* ───── Field List Item Layout ───── */
+/* ───── Field List ───── */
+
+#fields-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
 
 .field-list-item {
   display: flex;
@@ -112,11 +69,12 @@ legend {
   margin-bottom: 10px;
   font-size: 14px;
   color: white;
-  background-color: #1e1e1e; /* default fallback */
-  border-left: 6px solid #666; /* fallback border */
+  background-color: #1e1e1e;
+  border-left: 6px solid #666;
 }
 
-/* Label with type */
+/* ───── Field Label & Type ───── */
+
 .field-label {
   font-weight: bold;
   display: flex;
@@ -132,39 +90,15 @@ legend {
   text-transform: uppercase;
 }
 
-/* Action buttons */
+/* ───── Action Button Wrapper ───── */
+
 .field-actions {
   display: flex;
   gap: 8px;
 }
 
-.field-actions button {
-  padding: 4px 10px;
-  font-size: 13px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
+/* ───── Field Type Color Themes ───── */
 
-.field-actions .btn-edit {
-  background-color: #444;
-  color: white;
-}
-
-.field-actions .btn-edit:hover {
-  background-color: #555;
-}
-
-.field-actions .btn-delete {
-  background-color: #ffc107;
-  color: black;
-}
-
-.field-actions .btn-delete:hover {
-  background-color: #e0a800;
-}
-
-/* Type-based styling */
 .field-list-item[data-type="text"] {
   background-color: #174c77;
   border-left-color: #2196f3;

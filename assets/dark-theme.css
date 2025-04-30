@@ -14,7 +14,7 @@
   color: #eee;
 }
 
-/* Sidebar */
+/* Sidebar Borders */
 .dark-mode #template-sidebar,
 .dark-mode #markdown-sidebar {
   border-right: 1px solid #444;
@@ -36,17 +36,6 @@
   background-color: #1e1e1e;
   border-top: 1px solid #444;
   color: #ccc;
-}
-
-/* Buttons */
-.dark-mode button {
-  background-color: #333;
-  color: #eee;
-  border: 1px solid #666;
-}
-
-.dark-mode button:hover {
-  background-color: #444;
 }
 
 /* Modal Dialogs */
@@ -98,45 +87,4 @@
 .dark-mode #markdown-resizeHandle {
   background-color: #666;
   border-color: #444;
-}
-
-/* ───── Dark Theme Buttons ───── */
-.dark-mode .btn-default {
-  background-color: #333;
-  border-color: #666;
-  color: #eee;
-}
-
-.dark-mode .btn-default:hover {
-  background-color: #444;
-}
-
-.dark-mode .btn-info {
-  background-color: #337ab7;
-  border-color: #285e8e;
-  color: #fff;
-}
-
-.dark-mode .btn-info:hover {
-  background-color: #286090;
-}
-
-.dark-mode .btn-warn {
-  background-color: #ffc107;
-  border-color: #e0a800;
-  color: #212529;
-}
-
-.dark-mode .btn-warn:hover {
-  background-color: #e0a800;
-}
-
-.dark-mode .btn-danger {
-  background-color: #dc3545;
-  border-color: #c82333;
-  color: #fff;
-}
-
-.dark-mode .btn-danger:hover {
-  background-color: #c82333;
 }

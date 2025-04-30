@@ -1,0 +1,73 @@
+/* ───── Base Button Styling ───── */
+button,
+.btn {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 6px 12px;
+  border: 1px solid;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* ───── Button Variants ───── */
+
+.btn-default {
+  background-color: #e0e0e0;
+  border-color: #bbb;
+  color: #222;
+}
+
+.btn-default:hover {
+  background-color: #d5d5d5;
+}
+
+.btn-info {
+  background-color: #cce5ff;
+  border-color: #66b0ff;
+  color: #004085;
+}
+
+.btn-info:hover {
+  background-color: #b8dbff;
+}
+
+.btn-warn {
+  background-color: #ffc107;
+  border-color: #e0a800;
+  color: #212529;
+}
+
+.btn-warn:hover {
+  background-color: #e0a800;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #c82333;
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+/* ───── Inline Field Buttons (List Items) ───── */
+
+.field-actions .btn-edit {
+  background-color: #444;
+  color: white;
+}
+
+.field-actions .btn-edit:hover {
+  background-color: #555;
+}
+
+.field-actions .btn-delete {
+  background-color: #ffc107;
+  color: black;
+}
+
+.field-actions .btn-delete:hover {
+  background-color: #e0a800;
+}
