@@ -5,9 +5,9 @@ import { initYamlEditor } from "./modules/yaml_editor.js";
 import { createDropdown } from "./modules/dropdownManager.js";
 import { initStatusManager, updateStatus } from "./modules/statusManager.js";
 import { initFormManager } from "./modules/formManager.js";
-import { createListManager } from "./modules/listManager.js";
 import { log, warn, error } from "./modules/logger.js"; // <- Correct
-import { initSplitters, setContextView } from "./modules/contextManager.js";
+import { setContextView } from "./modules/contextManager.js";
+import { initTemplateListManager, initMetaListManager } from "./modules/listLoader.js";
 
 window.addEventListener("DOMContentLoaded", async () => {
   log("[App] DOM loaded.");
@@ -97,170 +97,8 @@ window.addEventListener("DOMContentLoaded", async () => {
     },
   });
 
-  const templateListManager = createListManager({
-    elementId: "template-list",
-    fetchListFunction: async () => await window.api.listTemplateFiles(),
-    onItemClick: async (itemName) => {
-      try {
-        const data = await window.api.loadTemplateFile(itemName);
-        yamlEditor.render(data);
-        await window.configAPI.updateUserConfig({
-          recent_templates: [itemName],
-        });
-        updateStatus(`Loaded Template: ${itemName}`);
-      } catch (err) {
-        error("[TemplateList] Failed to load template:", err);
-        updateStatus("Error loading template.");
-      }
-    },
-    emptyMessage: "No template files found.",
-    addButton: {
-      label: "+ Add Template",
-      onClick: async () => {
-        promptForTemplateName(async ({ filename, yaml }) => {
-          try {
-            await window.api.saveTemplateFile(filename, yaml);
-            await templateListManager.loadList();
-            await window.configAPI.updateUserConfig({
-              recent_templates: [filename],
-            });
-            yamlEditor.render(yaml);
-            updateStatus(`Created new template: ${filename}`);
-          } catch (err) {
-            error("[AddTemplate] Failed to save:", err);
-            updateStatus("Error creating new template.");
-          }
-        });
-      },
-    },
-  });
-
-  function promptForTemplateName(callback) {
-    const nameInput = document.getElementById("template-name");
-    const dirInput = document.getElementById("template-dir");
-    const confirmBtn = document.getElementById("template-confirm");
-
-    nameInput.value = "";
-    dirInput.value = "./markdowns";
-
-    confirmBtn.onclick = async () => {
-      const raw = nameInput.value.trim();
-      if (!raw) return;
-
-      const safeName = raw.replace(/\s+/g, "-").toLowerCase();
-      const filename = `${safeName}.yaml`;
-      const markdown_dir = dirInput.value.trim() || "markdown";
-
-      templateModal.hide();
-
-      callback({
-        filename,
-        yaml: {
-          name: safeName,
-          markdown_dir,
-          fields: [],
-        },
-      });
-    };
-
-    templateModal.show();
-    setTimeout(() => nameInput.focus(), 100);
-  }
-
-  const metaListManager = createListManager({
-    elementId: "markdown-list", // still using this container ID
-    fetchListFunction: async () => {
-      const selectedTemplate = window.currentSelectedTemplate;
-      if (!selectedTemplate) {
-        warn("[MetaList] No selected template.");
-        updateStatus("No template selected.");
-        return [];
-      }
-      if (!selectedTemplate.markdown_dir) {
-        warn("[MetaList] No markdown_dir field.");
-        updateStatus("Template missing markdown_dir field.");
-        return [];
-      }
-
-      await window.api.ensureMarkdownDir(selectedTemplate.markdown_dir);
-      const files = await window.api.listMeta(selectedTemplate.markdown_dir);
-      return files.map((f) => f.replace(/\.meta\.json$/, "")); // strip extension
-    },
-
-    onItemClick: async (entryName) => {
-      try {
-        const selectedTemplate = window.currentSelectedTemplate;
-        if (!selectedTemplate) {
-          warn("[MetaList] No template selected when clicking item.");
-          return;
-        }
-
-        const dir = selectedTemplate.markdown_dir;
-        const data = await window.api.loadMeta(dir, entryName);
-
-        if (!data) {
-          updateStatus("Failed to load metadata entry.");
-          return;
-        }
-
-        await window.formManager.loadFormData(data, entryName);
-        updateStatus(`Loaded metadata: ${entryName}`);
-      } catch (err) {
-        error("[MetaList] Failed to load entry:", err);
-        updateStatus("Error loading metadata.");
-      }
-    },
-
-    emptyMessage: "No metadata files found.",
-
-    addButton: {
-      label: "+ Add Entry",
-      onClick: async () => {
-        const selectedTemplate = window.currentSelectedTemplate;
-        if (!selectedTemplate) {
-          warn("[AddMarkdown] No template selected.");
-          updateStatus("Please select a template first.");
-          return;
-        }
-
-        promptForEntryName(async (filename) => {
-          log("[AddMarkdown] Creating new entry:", filename);
-          await window.formManager.loadFormData({}, filename);
-          updateStatus("New metadata entry ready.");
-        });
-      },
-    },
-  });
-
-  function promptForEntryName(callback) {
-    const input = document.getElementById("entry-name");
-    const checkbox = document.getElementById("entry-append-date");
-    const confirm = document.getElementById("entry-confirm");
-
-    input.value = "";
-    checkbox.checked = true;
-
-    confirm.onclick = () => {
-      const raw = input.value.trim();
-      if (!raw) return;
-
-      const sanitized = raw.replace(/\s+/g, "-").toLowerCase();
-      const appendDate = checkbox.checked;
-
-      let finalName = sanitized;
-      if (appendDate) {
-        const now = new Date();
-        const formatted = now.toISOString().slice(0, 10).replaceAll("-", "");
-        finalName = `${sanitized}-${formatted}`;
-      }
-
-      entryInputModal.hide();
-      callback(finalName);
-    };
-
-    entryInputModal.show();
-    setTimeout(() => input.focus(), 100);
-  }
+  const templateListManager = initTemplateListManager(yamlEditor, templateModal);
+  const metaListManager = initMetaListManager(formManager, entryInputModal);
 
   async function selectTemplate(name, { updateDropdown = true } = {}) {
     if (!name || name === window.currentSelectedTemplateName) return;

@@ -7,7 +7,7 @@
   },
   "theme": "dark",
   "font_size": 14,
-  "context_mode": "template",
+  "context_mode": "markdown",
   "selected_template": "basic.yaml",
   "last_selected_template": "duckie.yaml"
 }

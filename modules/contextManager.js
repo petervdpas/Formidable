@@ -6,7 +6,7 @@ import { log } from "./logger.js";
 let templateSplitterInitialized = false;
 let markdownSplitterInitialized = false;
 
-export function initSplitters(mode) {
+function initSplitters(mode) {
   if (mode === "template" && !templateSplitterInitialized) {
     setupSplitter({
       splitter: document.getElementById("template-splitter"),
