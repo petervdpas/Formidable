@@ -18,6 +18,6 @@ fields:
       - Blog
       - Tutorial
     markdown: p
-  - key: another
+  - key: test
     type: text
-    label: Another
+    label: Test

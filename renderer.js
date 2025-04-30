@@ -32,7 +32,19 @@ window.addEventListener("DOMContentLoaded", async () => {
   window.currentSelectedTemplateName = null;
 
   const yamlEditor = initYamlEditor("template-content", async (updatedYaml) => {
-    const filename = window.currentSelectedTemplateName;
+    let filename = window.currentSelectedTemplateName;
+
+    // Fallback if not set but we know the name
+    if (!filename && updatedYaml?.name) {
+      filename = `${updatedYaml.name}.yaml`;
+      window.currentSelectedTemplateName = filename;
+      window.currentSelectedTemplate = updatedYaml;
+      log(
+        "[YamlEditor] Recovered filename from template name field:",
+        filename
+      );
+    }
+
     if (!filename) {
       warn("[YamlEditor] No template filename selected.");
       updateStatus("Cannot save: no template selected.");
