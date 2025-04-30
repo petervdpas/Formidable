@@ -58,6 +58,14 @@ window.addEventListener("DOMContentLoaded", async () => {
     },
   });
 
+  const entryInputModal = setupModal("entry-modal", {
+    closeBtn: "entry-cancel",
+    escToClose: true,
+    backdropClick: true,
+    width: "30%",
+    height: "auto",
+  });
+
   window.openSettingsModal = settings.show;
 
   function initSplitters(mode) {
@@ -125,48 +133,54 @@ window.addEventListener("DOMContentLoaded", async () => {
     },
   });
 
-  const markdownListManager = createListManager({
-    elementId: "markdown-list",
+  const metaListManager = createListManager({
+    elementId: "markdown-list", // still using this container ID
     fetchListFunction: async () => {
       const selectedTemplate = window.currentSelectedTemplate;
       if (!selectedTemplate) {
-        warn("[MarkdownList] No selected template.");
+        warn("[MetaList] No selected template.");
         updateStatus("No template selected.");
         return [];
       }
       if (!selectedTemplate.markdown_dir) {
-        warn("[MarkdownList] No markdown_dir field.");
+        warn("[MetaList] No markdown_dir field.");
         updateStatus("Template missing markdown_dir field.");
         return [];
       }
+
       await window.api.ensureMarkdownDir(selectedTemplate.markdown_dir);
-      const files = await window.api.listMarkdown(
-        selectedTemplate.markdown_dir
-      );
-      return files;
+      const files = await window.api.listMeta(selectedTemplate.markdown_dir);
+      return files.map((f) => f.replace(/\.meta\.json$/, "")); // strip extension
     },
-    onItemClick: async (fileName) => {
+
+    onItemClick: async (entryName) => {
       try {
         const selectedTemplate = window.currentSelectedTemplate;
         if (!selectedTemplate) {
-          warn("[MarkdownList] No template selected when clicking file.");
+          warn("[MetaList] No template selected when clicking item.");
           return;
         }
-        const filePath = selectedTemplate.markdown_dir;
-        const fileContent = await window.api.loadMarkdown(filePath, fileName);
-        const parsedFields = await window.api.parseMarkdownToFields(
-          fileContent
-        );
-        await window.formManager.loadFormData(parsedFields, fileName);
-        updateStatus(`Loaded: ${fileName}`);
+
+        const dir = selectedTemplate.markdown_dir;
+        const data = await window.api.loadMeta(dir, entryName);
+
+        if (!data) {
+          updateStatus("Failed to load metadata entry.");
+          return;
+        }
+
+        await window.formManager.loadFormData(data, entryName);
+        updateStatus(`Loaded metadata: ${entryName}`);
       } catch (err) {
-        error("[MarkdownList] Failed to load markdown file:", err);
-        updateStatus("Error loading markdown file.");
+        error("[MetaList] Failed to load entry:", err);
+        updateStatus("Error loading metadata.");
       }
     },
-    emptyMessage: "No markdown files yet.",
+
+    emptyMessage: "No metadata files found.",
+
     addButton: {
-      label: "+ Add Markdown",
+      label: "+ Add Entry",
       onClick: async () => {
         const selectedTemplate = window.currentSelectedTemplate;
         if (!selectedTemplate) {
@@ -175,17 +189,34 @@ window.addEventListener("DOMContentLoaded", async () => {
           return;
         }
 
-        log(
-          "[AddMarkdown] Creating new markdown document for template:",
-          selectedTemplate.name
-        );
-
-        await window.formManager.loadFormData({}, null);
-
-        updateStatus("New markdown document ready.");
+        promptForEntryName(async (filename) => {
+          log("[AddMarkdown] Creating new entry:", filename);
+          await window.formManager.loadFormData({}, filename);
+          updateStatus("New metadata entry ready.");
+        });
       },
     },
   });
+
+  function promptForEntryName(callback) {
+    const input = document.getElementById("entry-name");
+    const confirm = document.getElementById("entry-confirm");
+
+    input.value = ""; // Reset input
+    confirm.onclick = () => {
+      const raw = input.value.trim();
+      if (!raw) return;
+      const sanitized = raw.replace(/\s+/g, "-").toLowerCase();
+      const now = new Date();
+      const formatted = now.toISOString().slice(0, 10); // "2025-04-14"
+      const uniqueName = `${sanitized}-${formatted}`;
+      entryInputModal.hide();
+      callback(uniqueName);
+    };
+
+    entryInputModal.show();
+    setTimeout(() => input.focus(), 100);
+  }
 
   async function selectTemplate(name, { updateDropdown = true } = {}) {
     if (!name) {
@@ -204,7 +235,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         window.currentSelectedTemplate.markdown_dir
       );
       await formManager.loadTemplate(window.currentSelectedTemplate);
-      await markdownListManager.loadList();
+      await metaListManager.loadList();
       updateStatus(`Selected template: ${window.currentSelectedTemplate.name}`);
     } catch (err) {
       error("[SelectTemplate] Error:", err);
@@ -234,7 +265,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   setContextView(config.context_mode);
 
   if (config.context_mode === "markdown" && window.currentSelectedTemplate) {
-    await markdownListManager.loadList();
+    await metaListManager.loadList();
   }
 
   themeToggle.addEventListener("change", async (e) => {
@@ -251,7 +282,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     await window.configAPI.updateUserConfig({ context_mode: mode });
     setContextView(mode);
     if (mode === "markdown" && window.currentSelectedTemplate) {
-      await markdownListManager.loadList();
+      await metaListManager.loadList();
     }
     updateStatus(
       `Context set to ${mode === "markdown" ? "Markdown" : "Setup"}`

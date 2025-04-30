@@ -26,7 +26,7 @@
     </div>
 
     <!-- Markdown Document Editor Context -->
-    <div id="markdown-container" style="display: none;">
+    <div id="markdown-container" style="display: none">
       <div id="markdown-sidebar">
         <div id="template-selector"></div>
         <h3>Using Forms</h3>
@@ -68,6 +68,23 @@
         </div>
       </div>
       <div class="modal-resizer"></div>
+    </div>
+
+    <!-- Entry Prompt Modal -->
+    <div id="entry-modal" class="modal">
+      <div class="modal-header">
+        <h2>New Entry</h2>
+        <button id="entry-cancel">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row" style="flex-direction: column; align-items: stretch;">
+          <label for="entry-name">Enter a name for this entry:</label>
+          <input type="text" id="entry-name" placeholder="e.g. my-article-title" />
+        </div>
+        <div class="button-group">
+          <button id="entry-confirm" class="btn btn-primary">Confirm</button>
+        </div>
+      </div>
     </div>
 
     <div id="modalBackdrop" class="modal-backdrop"></div>
