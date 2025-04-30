@@ -74,6 +74,9 @@ registerIpc("save-template-file", (event, name, data) =>
 registerIpc("get-template-descriptor", (event, name) => {
   return templateManager.getTemplateDescriptor(name);
 });
+registerIpc("delete-template-file", (event, name) =>
+  templateManager.deleteTemplateFile(name)
+);
 
 // Config handlers
 registerIpc("load-user-config", () => configManager.loadUserConfig());

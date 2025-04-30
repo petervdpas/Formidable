@@ -1,7 +1,7 @@
 // modules/templateManager.js
 
 const fileManager = require("./fileManager");
-const { log, error } = require("./nodeLogger");
+const { log, warn, error } = require("./nodeLogger");
 
 const templatesDir = fileManager.joinPath("templates");
 const basicYamlName = "basic.yaml";
@@ -49,7 +49,7 @@ function ensureTemplatesEnvironment() {
 
 function getTemplateDescriptor(name) {
   ensureTemplatesEnvironment();
-  const data = loadTemplateFile(name); // already defined
+  const data = loadTemplateFile(name);
 
   if (!data) {
     throw new Error(`Template "${name}" not found.`);
@@ -117,6 +117,23 @@ function saveTemplateFile(name, data) {
   }
 }
 
+function deleteTemplateFile(name) {
+  try {
+    const filePath = fileManager.joinPath("templates", name);
+    const deleted = fileManager.deleteFile(filePath);
+    if (deleted) {
+      log("[TemplateManager] Deleted template:", filePath);
+      return true;
+    } else {
+      warn("[TemplateManager] File not found or not deleted:", filePath);
+      return false;
+    }
+  } catch (err) {
+    error("[TemplateManager] Failed to delete template:", err);
+    return false;
+  }
+}
+
 module.exports = {
   ensureTemplatesEnvironment,
   getTemplateDescriptor,
@@ -124,4 +141,5 @@ module.exports = {
   loadTemplateForDir,
   loadTemplateFile,
   saveTemplateFile,
+  deleteTemplateFile,
 };

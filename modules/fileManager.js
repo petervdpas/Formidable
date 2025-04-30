@@ -108,6 +108,23 @@ function saveFile(filepath, data, { format = "text", silent = false } = {}) {
   }
 }
 
+// Delete a file if it exists
+function deleteFile(filepath, { silent = false } = {}) {
+  try {
+    if (fs.existsSync(filepath)) {
+      fs.unlinkSync(filepath);
+      if (!silent) log(`[FileManager] Deleted file: ${filepath}`);
+      return true;
+    } else {
+      if (!silent) warn(`[FileManager] File not found for deletion: ${filepath}`);
+      return false;
+    }
+  } catch (err) {
+    if (!silent) error(`[FileManager] Failed to delete file ${filepath}:`, err);
+    return false;
+  }
+}
+
 module.exports = {
   baseDir,
   ensureDirectory,
@@ -118,4 +135,5 @@ module.exports = {
   fileExists,
   loadFile,
   saveFile,
+  deleteFile,
 };

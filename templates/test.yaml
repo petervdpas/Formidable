@@ -1,23 +1,6 @@
-name: Basic Form
-markdown_dir: markdowns\basic
+name: test
+markdown_dir: ./markdowns/test
 fields:
-  - key: title
-    type: text
-    label: Title
-    markdown: h1
-  - key: published
-    type: boolean
-    label: Published
-    markdown: checkbox
-  - key: category
-    type: dropdown
-    label: Category
-    options:
-      - News
-      - Updates
-      - Blog
-      - Tutorial
-    markdown: p
   - key: test
     type: text
     label: Test

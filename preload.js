@@ -9,6 +9,7 @@ const apiMethods = [
   "list-template-files",
   "load-template-file",
   "save-template-file",
+  "delete-template-file",
   "get-template-descriptor",
   "ensure-markdown-dir",
   "list-meta",

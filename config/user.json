@@ -1,6 +1,6 @@
 {
   "recent_templates": [
-    "test.yaml"
+    "basic.yaml"
   ],
   "last_opened_markdown": {
     "basic.yaml": ""
@@ -9,5 +9,5 @@
   "font_size": 14,
   "context_mode": "template",
   "selected_template": "basic.yaml",
-  "last_selected_template": "duckie.yaml"
+  "last_selected_template": "test.yaml"
 }
