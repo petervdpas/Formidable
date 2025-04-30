@@ -5,24 +5,27 @@ import { updateStatus } from "./statusManager.js";
 import { log, warn, error } from "./logger.js";
 
 // --- Internal prompt for template creation ---
-function promptForTemplateName(modal, callback) {
+function promptForTemplateName(modal, defaultMarkdownDir, callback) {
   const nameInput = document.getElementById("template-name");
   const dirInput = document.getElementById("template-dir");
   const confirmBtn = document.getElementById("template-confirm");
 
   nameInput.value = "";
-  dirInput.value = "./markdowns";
+  dirInput.value = defaultMarkdownDir;
 
-  // 👇 Automatically update markdown dir when typing filename
-  nameInput.addEventListener("input", () => {
+  function updateDirValue() {
     const raw = nameInput.value.trim();
     const safeName = raw.replace(/\s+/g, "-").toLowerCase();
     if (safeName) {
-      dirInput.value = `./markdowns/${safeName}`;
+      dirInput.value = `${defaultMarkdownDir}/${safeName}`;
     } else {
       dirInput.value = "./markdowns";
     }
-  });
+  }
+  
+  // 🔁 Prevent stacking duplicate listeners:
+  nameInput.removeEventListener("input", updateDirValue);
+  nameInput.addEventListener("input", updateDirValue);
 
   confirmBtn.onclick = async () => {
     const raw = nameInput.value.trim();
@@ -79,47 +82,59 @@ function promptForEntryName(modal, callback) {
   setTimeout(() => input.focus(), 100);
 }
 
-export function initTemplateListManager(yamlEditor, modal) {
+export function initTemplateListManager(
+  yamlEditor,
+  modal,
+  defaultMarkdownDir = "./markdowns"
+) {
   let listManager = null;
 
   listManager = createListManager({
     elementId: "template-list",
     fetchListFunction: async () => await window.api.listTemplateFiles(),
     onItemClick: async (itemName) => {
-        try {
-          const data = await window.api.loadTemplateFile(itemName);
-          yamlEditor.render(data);
+      try {
+        const data = await window.api.loadTemplateFile(itemName);
+        yamlEditor.render(data);
 
-          window.currentSelectedTemplate = data;
-          window.currentSelectedTemplateName = itemName;
-      
-          await window.configAPI.updateUserConfig({ recent_templates: [itemName] });
-          updateStatus(`Loaded Template: ${itemName}`);
-        } catch (err) {
-          error("[TemplateList] Failed to load template:", err);
-          updateStatus("Error loading template.");
-        }
-      },
+        window.currentSelectedTemplate = data;
+        window.currentSelectedTemplateName = itemName;
+
+        await window.configAPI.updateUserConfig({
+          recent_templates: [itemName],
+        });
+        updateStatus(`Loaded Template: ${itemName}`);
+      } catch (err) {
+        error("[TemplateList] Failed to load template:", err);
+        updateStatus("Error loading template.");
+      }
+    },
     emptyMessage: "No template files found.",
     addButton: {
       label: "+ Add Template",
       onClick: async () => {
-        promptForTemplateName(modal, async ({ filename, yaml }) => {
-          try {
-            await window.api.saveTemplateFile(filename, yaml);
-            await listManager.loadList();
-            await window.configAPI.updateUserConfig({ recent_templates: [filename] });
-            
-            window.currentSelectedTemplate = yaml;
-            window.currentSelectedTemplateName = filename;
-            
-            yamlEditor.render(yaml);
-            updateStatus(`Created new template: ${filename}`);
-          } catch (err) {
-            error("[AddTemplate] Failed to save:", err);
-            updateStatus("Error creating new template.");
+        promptForTemplateName(
+          modal,
+          defaultMarkdownDir,
+          async ({ filename, yaml }) => {
+            try {
+              await window.api.saveTemplateFile(filename, yaml);
+              await listManager.loadList();
+              await window.configAPI.updateUserConfig({
+                recent_templates: [filename],
+              });
+
+              window.currentSelectedTemplate = yaml;
+              window.currentSelectedTemplateName = filename;
+
+              yamlEditor.render(yaml);
+              updateStatus(`Created new template: ${filename}`);
+            } catch (err) {
+              error("[AddTemplate] Failed to save:", err);
+              updateStatus("Error creating new template.");
+            }
           }
-        });
+        );
       },
     },
   });

@@ -68,6 +68,17 @@ body {
   cursor: pointer;
 }
 
+.setting-row.directory-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+#default-dir {
+  flex: 1;
+  min-width: 0;
+}
+
 /* ───── Status Bar ───── */
 #status-bar {
   height: 24px;
@@ -117,6 +128,14 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.setting-row input[type="text"] {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  height: 32px; /* matches button height */
+  box-sizing: border-box;
 }
 
 /* ───── Modal Resizer ───── */
@@ -260,13 +279,13 @@ button, .btn {
 }
 
 /* Error / Danger Button */
-.btn-error {
+.btn-danger {
   background-color: #f8d7da;
   border-color: #f5c2c7;
   color: #842029;
 }
 
-.btn-error:hover {
+.btn-danger:hover {
   background-color: #f1b0b7;
 }
 

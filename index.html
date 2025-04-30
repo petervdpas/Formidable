@@ -53,16 +53,21 @@
       </div>
       <div class="modal-body">
         <div class="setting-row">
-          <label for="context-toggle">Context Mode</label>
-          <label class="switch">
-            <input type="checkbox" id="context-toggle" />
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div class="setting-row">
           <label for="theme-toggle">Dark Mode</label>
           <label class="switch">
             <input type="checkbox" id="theme-toggle" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-row directory-picker">
+          <label for="default-dir">Default Markdown Directory</label>
+          <input type="text" id="default-dir" readonly />
+          <button id="choose-dir" class="btn btn-default">Browse</button>
+        </div>
+        <div class="setting-row">
+          <label for="context-toggle">Form Input Mode</label>
+          <label class="switch">
+            <input type="checkbox" id="context-toggle" />
             <span class="slider"></span>
           </label>
         </div>
@@ -172,6 +177,17 @@
         </div>
       </div>
       <div class="modal-resizer"></div>
+    </div>
+
+     <!-- Confirm Modal -->
+    <div id="confirm-modal" class="modal hidden">
+      <div class="modal-content">
+        <p id="confirm-message">Are you sure?</p>
+        <div class="button-group">
+          <button id="confirm-ok" class="btn btn-danger">OK</button>
+          <button id="confirm-cancel" class="btn btn-default">Cancel</button>
+        </div>
+      </div>
     </div>
 
     <div id="modalBackdrop" class="modal-backdrop"></div>

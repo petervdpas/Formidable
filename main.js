@@ -1,6 +1,6 @@
 // main.js
 
-const { app, BrowserWindow } = require("electron");
+const { app, dialog, BrowserWindow } = require("electron");
 
 const { log, warn, error } = require("./modules/nodeLogger");
 const { buildAppMenu } = require("./modules/appMenu");
@@ -124,3 +124,13 @@ registerIpc("parse-markdown-to-fields", (event, markdownContent) =>
 registerIpc("generate-markdown-from-fields", (event, fieldsObject) =>
   fileTransformer.generateMarkdownFromFields(fieldsObject)
 );
+
+registerIpc("dialog-choose-directory", async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ["openDirectory"],
+  });
+  if (result.canceled || !result.filePaths.length) return null;
+  return result.filePaths[0];
+});
+
+registerIpc("get-app-root", () => process.cwd());

@@ -30,6 +30,7 @@ for (const method of apiMethods) {
   };
 }
 
+api.getAppRoot = () => ipcRenderer.invoke("get-app-root");
 contextBridge.exposeInMainWorld("api", api);
 
 // Config API
@@ -48,6 +49,10 @@ for (const method of configMethods) {
 }
 
 contextBridge.exposeInMainWorld("configAPI", configAPI);
+
+contextBridge.exposeInMainWorld("dialogAPI", {
+  chooseDirectory: () => ipcRenderer.invoke("dialog-choose-directory"),
+});
 
 function camelCase(str) {
   return str.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());

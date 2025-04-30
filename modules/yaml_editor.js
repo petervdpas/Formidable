@@ -1,7 +1,8 @@
 // modules/yaml_editor.js
 
 import { log, warn } from "./logger.js";
-import { setupModal } from "./modalManager.js";
+import { setupModal, showConfirmModal } from "./modalManager.js";
+import { updateStatus } from "./statusManager.js";
 
 export function initYamlEditor(containerId, onSaveCallback) {
   const container = document.getElementById(containerId);
@@ -40,7 +41,8 @@ export function initYamlEditor(containerId, onSaveCallback) {
       </fieldset>
 
       <div class="button-group">
-        <button id="save-yaml" class="btn btn-default">Save</button>
+        <button id="save-yaml" class="btn btn-warn">Save</button>
+        <button id="delete-yaml" class="btn btn-danger">Delete</button>
       </div>
     `;
 
@@ -61,8 +63,8 @@ export function initYamlEditor(containerId, onSaveCallback) {
           <span class="field-type type-${field.type}">(${field.type.toUpperCase()})</span>
         </div>
         <div class="field-actions">
-          <button class="btn-edit" data-idx="${idx}">Edit</button>
-          <button class="btn-delete" data-idx="${idx}">Delete</button>
+          <button class="btn btn-warn" data-idx="${idx}">Edit</button>
+          <button class="btn btn-danger" data-idx="${idx}">Delete</button>
         </div>
       `;
       item.dataset.type = field.type;
@@ -119,6 +121,43 @@ export function initYamlEditor(containerId, onSaveCallback) {
       onSaveCallback?.(updated);
     };
 
+    container.querySelector("#delete-yaml").onclick = async () => {
+      const filename = window.currentSelectedTemplateName;
+      if (!filename) {
+        warn("[YamlEditor] No template selected to delete.");
+        updateStatus("No template selected.");
+        return;
+      }
+    
+      const confirmed = await showConfirmModal(
+        `Are you sure you want to delete template: ${filename}?`,
+        {
+          okText: "Delete",
+          cancelText: "Cancel",
+          width: "auto",
+          height: "auto",
+        }
+      );
+    
+      if (!confirmed) return;
+    
+      const success = await window.api.deleteTemplateFile(filename);
+      if (success) {
+        log("[YamlEditor] Deleted template:", filename);
+        container.innerHTML = "<div class='empty-message'>Template deleted.</div>";
+        updateStatus(`Deleted template: ${filename}`);
+        window.currentSelectedTemplate = null;
+        window.currentSelectedTemplateName = null;
+    
+        if (window.templateListManager?.loadList) {
+          window.templateListManager.loadList();
+        }
+      } else {
+        warn("[YamlEditor] Failed to delete template:", filename);
+        updateStatus("Failed to delete template.");
+      }
+    };
+
     if (!editModal) {
       editModal = setupModal("field-edit-modal", {
         closeBtn: "field-edit-close",
@@ -130,7 +169,6 @@ export function initYamlEditor(containerId, onSaveCallback) {
 
       const modal = document.getElementById("field-edit-modal");
 
-      // 🔄 Update modal background on type change
       document.getElementById("edit-type").addEventListener("change", (e) => {
         const type = e.target.value;
         applyModalTypeClass(modal, type);
@@ -167,3 +205,4 @@ export function initYamlEditor(containerId, onSaveCallback) {
 
   return { render: renderEditor };
 }
+

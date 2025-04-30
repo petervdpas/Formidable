@@ -1,6 +1,0 @@
-name: test
-markdown_dir: ./markdowns/test
-fields:
-  - key: test
-    type: text
-    label: Test

@@ -52,7 +52,7 @@ function getTemplateDescriptor(name) {
   const data = loadTemplateFile(name);
 
   if (!data) {
-    throw new Error(`Template "${name}" not found.`);
+    throw new Error(`Template descriptor missing or malformed for: ${name}`);
   }
 
   return {
@@ -69,13 +69,19 @@ function getTemplateList() {
 
 function loadTemplateFile(name) {
   const filePath = fileManager.joinPath("templates", name);
-  const data = fileManager.loadFile(filePath, { format: "yaml" });
 
-  if (data.markdown_dir && typeof data.markdown_dir === "string") {
-    data.markdown_dir = fileManager.joinPath(data.markdown_dir);
+  try {
+    const data = fileManager.loadFile(filePath, { format: "yaml" });
+
+    if (data.markdown_dir && typeof data.markdown_dir === "string") {
+      data.markdown_dir = fileManager.joinPath(data.markdown_dir);
+    }
+
+    return data;
+  } catch (err) {
+    error("[TemplateManager] Failed to load template file:", filePath, err);
+    return null;
   }
-
-  return data;
 }
 
 function loadTemplateForDir(markdownDir) {
@@ -101,6 +107,12 @@ function loadTemplateForDir(markdownDir) {
 function saveTemplateFile(name, data) {
   try {
     ensureTemplatesEnvironment();
+
+    // Normalize path to use forward slashes (avoids YAML escaping issues)
+    if (typeof data.markdown_dir === "string") {
+      data.markdown_dir = data.markdown_dir.replace(/\\/g, "/");
+    }
+
     const filePath = fileManager.joinPath("templates", name);
     const saved = fileManager.saveFile(filePath, data, { format: "yaml" });
 

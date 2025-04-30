@@ -12,6 +12,8 @@ const defaultConfig = {
   selected_template: "basic.yaml",
   theme: "light",
   font_size: 14,
+  context_mode: "template",
+  default_markdown_dir: "./markdowns", // ✅ add this line
 };
 
 log("[ConfigManager] Config directory:", configDir);

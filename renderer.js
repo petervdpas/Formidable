@@ -74,12 +74,33 @@ window.addEventListener("DOMContentLoaded", async () => {
     escToClose: true,
     backdropClick: true,
     resizable: true,
-    width: "20em",
+    width: "30em",
     height: "auto",
     onOpen: async () => {
       const config = await window.configAPI.loadUserConfig();
       themeToggle.checked = config.theme === "dark";
       contextToggle.checked = config.context_mode === "markdown";
+
+      const defaultDirInput = document.getElementById("default-dir");
+      const chooseDirBtn = document.getElementById("choose-dir");
+
+      defaultDirInput.value = config.default_markdown_dir || "./markdowns";
+
+      chooseDirBtn.onclick = async () => {
+        const selected = await window.dialogAPI.chooseDirectory();
+        if (selected) {
+          // Convert to relative path
+          const appRoot = await window.api.getAppRoot?.() || ".";
+
+          const relativePath = selected.startsWith(appRoot)
+            ? "./" + selected.slice(appRoot.length).replace(/^[\\/]/, "").replace(/\\/g, "/")
+            : selected; // fallback to absolute if not under root
+      
+          defaultDirInput.value = relativePath;
+          await window.configAPI.updateUserConfig({ default_markdown_dir: relativePath });
+          updateStatus(`Updated default markdown dir: ${relativePath}`);
+        }
+      };
     },
   });
 
@@ -112,9 +133,10 @@ window.addEventListener("DOMContentLoaded", async () => {
     },
   });
 
-  const templateListManager = initTemplateListManager(
+  window.templateListManager = initTemplateListManager(
     yamlEditor,
-    templateModal
+    templateModal,
+    config.default_markdown_dir
   );
   const metaListManager = initMetaListManager(formManager, entryInputModal);
 
@@ -123,6 +145,12 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     try {
       const result = await window.api.getTemplateDescriptor(name);
+      if (!result || !result.yaml) {
+        throw new Error(
+          `Template descriptor missing or malformed for: ${name}`
+        );
+      }
+
       const yamlData = result.yaml;
 
       window.currentSelectedTemplate = yamlData;
