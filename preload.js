@@ -8,6 +8,7 @@ const { contextBridge, ipcRenderer } = require("electron");
 const apiMethods = [
   "list-template-files",
   "load-template-file",
+  "save-template-file",
   "ensure-markdown-dir",
   "list-meta",
   "load-meta",

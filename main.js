@@ -43,7 +43,7 @@ function createWindow() {
 app.whenReady().then(() => {
   log("[Main] App is ready. Checking environment...");
 
-  templateManager.ensureSetupEnvironment();
+  templateManager.ensureTemplatesEnvironment();
   configManager.ensureConfigFile();
 
   createWindow();
@@ -63,10 +63,13 @@ app.on("window-all-closed", () => {
 
 // ================= IPC HANDLERS =================
 
-// Setup YAML handlers
+// Template YAML handlers
 registerIpc("list-template-files", () => templateManager.getTemplateList());
 registerIpc("load-template-file", (event, name) =>
   templateManager.loadTemplateFile(name)
+);
+registerIpc("save-template-file", (event, name, data) =>
+  templateManager.saveTemplateFile(name, data)
 );
 
 // Config handlers

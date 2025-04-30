@@ -14,4 +14,7 @@ fields:
     label: Category
     options:
       - News
+      - Updates
+      - Blog
+      - Tutorial
     markdown: p

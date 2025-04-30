@@ -15,7 +15,7 @@ body {
   overflow: hidden;
 }
 
-/* ───── Setup, Markdown Context Layout ───── */
+/* ───── Template, Markdown Context Layout ───── */
 #template-sidebar, 
 #markdown-sidebar {
   width: 250px;
@@ -62,7 +62,7 @@ body {
 }
 
 /* ───── List Items ───── */
-.setup-item {
+.template-item {
   padding: 8px;
   margin-bottom: 5px;
   cursor: pointer;

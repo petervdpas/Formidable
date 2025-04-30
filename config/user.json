@@ -1,5 +1,5 @@
 {
-  "recent_setups": [
+  "recent_templates": [
     "basic.yaml"
   ],
   "last_opened_markdown": {
@@ -7,7 +7,7 @@
   },
   "theme": "dark",
   "font_size": 14,
-  "context_mode": "setup",
+  "context_mode": "template",
   "selected_template": "basic.yaml",
-  "last_selected_template": "basic.yaml"
+  "last_selected_template": "duckie.yaml"
 }

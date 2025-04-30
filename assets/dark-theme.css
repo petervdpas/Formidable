@@ -20,13 +20,13 @@
   border-right: 1px solid #444;
 }
 
-/* Setup List + Markdown List */
-.dark-mode .setup-item,
+/* Template List + Markdown List */
+.dark-mode .template-item,
 .dark-mode .markdown-item {
   background-color: #2a2a2a;
 }
 
-.dark-mode .setup-item:hover,
+.dark-mode .template-item:hover,
 .dark-mode .markdown-item:hover {
   background-color: #3a3a3a;
 }

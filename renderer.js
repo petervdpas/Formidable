@@ -1,13 +1,13 @@
 // renderer.js
 
 import { setupModal } from "./modules/modalManager.js";
-import { setupSplitter } from "./modules/splitter.js";
 import { initYamlEditor } from "./modules/yaml_editor.js";
 import { createDropdown } from "./modules/dropdownManager.js";
 import { initStatusManager, updateStatus } from "./modules/statusManager.js";
 import { initFormManager } from "./modules/formManager.js";
 import { createListManager } from "./modules/listManager.js";
 import { log, warn, error } from "./modules/logger.js"; // <- Correct
+import { initSplitters, setContextView } from "./modules/contextManager.js";
 
 window.addEventListener("DOMContentLoaded", async () => {
   log("[App] DOM loaded.");
@@ -20,23 +20,31 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   initStatusManager("status-bar");
 
-  const setupContainer = document.getElementById("template-container");
+  const templateContainer = document.getElementById("template-container");
   const markdownContainer = document.getElementById("markdown-container");
   const themeToggle = document.getElementById("theme-toggle");
   const contextToggle = document.getElementById("context-toggle");
 
-  let setupSplitterInitialized = false;
-  let markdownSplitterInitialized = false;
-
   window.currentSelectedTemplate = null;
-
-  const yamlEditor = initYamlEditor(
-    "template-content",
-    async (updatedYaml) => {
-      updateStatus(`Saving "${updatedYaml.name}"...`);
-      log("[YamlEditor] Save triggered:", updatedYaml);
+  window.currentSelectedTemplateName = null;
+  
+  const yamlEditor = initYamlEditor("template-content", async (updatedYaml) => {
+    const filename = window.currentSelectedTemplateName;
+    if (!filename) {
+      warn("[YamlEditor] No template filename selected.");
+      updateStatus("Cannot save: no template selected.");
+      return;
     }
-  );
+  
+    const success = await window.api.saveTemplateFile(filename, updatedYaml);
+    if (success) {
+      updateStatus(`Saved: ${filename}`);
+      log("[YamlEditor] Saved template:", filename);
+    } else {
+      updateStatus("Failed to save template.");
+      error("[YamlEditor] Save failed for:", filename);
+    }
+  });
 
   const formManager = initFormManager("markdown-content");
   window.formManager = formManager;
@@ -68,38 +76,16 @@ window.addEventListener("DOMContentLoaded", async () => {
     height: "auto",
   });
 
+  const templateModal = setupModal("template-modal", {
+    closeBtn: "template-cancel",
+    escToClose: true,
+    backdropClick: true,
+    width: "30em",
+    height: "auto",
+  });
+
   window.openSettingsModal = settings.show;
-
-  function initSplitters(mode) {
-    if (mode === "setup" && !setupSplitterInitialized) {
-      setupSplitter({
-        splitter: document.getElementById("template-splitter"),
-        left: document.getElementById("template-sidebar"),
-        right: document.getElementById("template-workspace"),
-        container: document.getElementById("template-container"),
-        min: 150,
-      });
-      setupSplitterInitialized = true;
-    }
-    if (mode === "markdown" && !markdownSplitterInitialized) {
-      setupSplitter({
-        splitter: document.getElementById("markdown-splitter"),
-        left: document.getElementById("markdown-sidebar"),
-        right: document.getElementById("markdown-workspace"),
-        container: document.getElementById("markdown-container"),
-        min: 150,
-      });
-      markdownSplitterInitialized = true;
-    }
-  }
-
-  function setContextView(mode) {
-    const isMarkdown = mode === "markdown";
-    setupContainer.style.display = isMarkdown ? "none" : "flex";
-    markdownContainer.style.display = isMarkdown ? "flex" : "none";
-    initSplitters(mode);
-    log("[Context] Switched to:", mode);
-  }
+  window.currentSelectedTemplateName = null;
 
   const templateDropdown = createDropdown({
     containerId: "template-selector",
@@ -118,22 +104,68 @@ window.addEventListener("DOMContentLoaded", async () => {
       try {
         const data = await window.api.loadTemplateFile(itemName);
         yamlEditor.render(data);
-        await window.configAPI.updateUserConfig({ recent_setups: [itemName] });
-        updateStatus(`Loaded setup: ${itemName}`);
+        await window.configAPI.updateUserConfig({
+          recent_templates: [itemName],
+        });
+        updateStatus(`Loaded Template: ${itemName}`);
       } catch (err) {
-        error("[SetupList] Failed to load setup:", err);
-        updateStatus("Error loading setup.");
+        error("[TemplateList] Failed to load template:", err);
+        updateStatus("Error loading template.");
       }
     },
-    emptyMessage: "No setup files found.",
+    emptyMessage: "No template files found.",
     addButton: {
-      label: "+ Add Setup",
+      label: "+ Add Template",
       onClick: async () => {
-        log("[SetupList] Add Setup clicked.");
-        // Optional: Open a "new setup" modal, etc.
+        promptForTemplateName(async ({ filename, yaml }) => {
+          try {
+            await window.api.saveTemplateFile(filename, yaml);
+            await templateListManager.loadList();
+            await window.configAPI.updateUserConfig({
+              recent_templates: [filename],
+            });
+            yamlEditor.render(yaml);
+            updateStatus(`Created new template: ${filename}`);
+          } catch (err) {
+            error("[AddTemplate] Failed to save:", err);
+            updateStatus("Error creating new template.");
+          }
+        });
       },
     },
   });
+
+  function promptForTemplateName(callback) {
+    const nameInput = document.getElementById("template-name");
+    const dirInput = document.getElementById("template-dir");
+    const confirmBtn = document.getElementById("template-confirm");
+
+    nameInput.value = "";
+    dirInput.value = "./markdowns";
+
+    confirmBtn.onclick = async () => {
+      const raw = nameInput.value.trim();
+      if (!raw) return;
+
+      const safeName = raw.replace(/\s+/g, "-").toLowerCase();
+      const filename = `${safeName}.yaml`;
+      const markdown_dir = dirInput.value.trim() || "markdown";
+
+      templateModal.hide();
+
+      callback({
+        filename,
+        yaml: {
+          name: safeName,
+          markdown_dir,
+          fields: [],
+        },
+      });
+    };
+
+    templateModal.show();
+    setTimeout(() => nameInput.focus(), 100);
+  }
 
   const metaListManager = createListManager({
     elementId: "markdown-list", // still using this container ID
@@ -204,51 +236,49 @@ window.addEventListener("DOMContentLoaded", async () => {
     const input = document.getElementById("entry-name");
     const checkbox = document.getElementById("entry-append-date");
     const confirm = document.getElementById("entry-confirm");
-  
+
     input.value = "";
     checkbox.checked = true;
-  
+
     confirm.onclick = () => {
       const raw = input.value.trim();
       if (!raw) return;
-  
+
       const sanitized = raw.replace(/\s+/g, "-").toLowerCase();
       const appendDate = checkbox.checked;
-  
+
       let finalName = sanitized;
       if (appendDate) {
         const now = new Date();
         const formatted = now.toISOString().slice(0, 10).replaceAll("-", "");
         finalName = `${sanitized}-${formatted}`;
       }
-  
+
       entryInputModal.hide();
       callback(finalName);
     };
-  
+
     entryInputModal.show();
     setTimeout(() => input.focus(), 100);
   }
 
   async function selectTemplate(name, { updateDropdown = true } = {}) {
-    if (!name) {
-      window.currentSelectedTemplate = null;
-      updateStatus("No template selected.");
-      return;
-    }
+    if (!name || name === window.currentSelectedTemplateName) return;
+
     try {
       const yamlData = await window.api.loadTemplateFile(name);
       window.currentSelectedTemplate = yamlData;
+      window.currentSelectedTemplateName = name;
+
       if (updateDropdown) {
         templateDropdown.setSelected(name);
       }
+
       await window.configAPI.updateUserConfig({ last_selected_template: name });
-      await window.api.ensureMarkdownDir(
-        window.currentSelectedTemplate.markdown_dir
-      );
-      await formManager.loadTemplate(window.currentSelectedTemplate);
+      await window.api.ensureMarkdownDir(yamlData.markdown_dir);
+      await formManager.loadTemplate(yamlData);
       await metaListManager.loadList();
-      updateStatus(`Selected template: ${window.currentSelectedTemplate.name}`);
+      updateStatus(`Selected template: ${yamlData.name}`);
     } catch (err) {
       error("[SelectTemplate] Error:", err);
       updateStatus("Error selecting template.");
@@ -274,7 +304,10 @@ window.addEventListener("DOMContentLoaded", async () => {
   await loadTemplateOptions();
   await templateListManager.loadList();
 
-  setContextView(config.context_mode);
+  setContextView(config.context_mode, {
+    templateContainer,
+    markdownContainer,
+  });
 
   if (config.context_mode === "markdown" && window.currentSelectedTemplate) {
     await metaListManager.loadList();
@@ -290,14 +323,17 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
 
   contextToggle.addEventListener("change", async (e) => {
-    const mode = e.target.checked ? "markdown" : "setup";
+    const mode = e.target.checked ? "markdown" : "template";
     await window.configAPI.updateUserConfig({ context_mode: mode });
-    setContextView(mode);
+    setContextView(mode, {
+      templateContainer,
+      markdownContainer,
+    });
     if (mode === "markdown" && window.currentSelectedTemplate) {
       await metaListManager.loadList();
     }
     updateStatus(
-      `Context set to ${mode === "markdown" ? "Markdown" : "Setup"}`
+      `Context set to ${mode === "markdown" ? "Markdown" : "Template"}`
     );
   });
 });

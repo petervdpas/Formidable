@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="assets/dark-theme.css" />
   </head>
   <body>
-    <!-- Setup Form Editor Context -->
+    <!-- Template Form Editor Context -->
     <div id="template-container">
       <div id="template-sidebar">
         <h3>Templates</h3>
@@ -20,7 +20,7 @@
       </div>
       <div id="template-workspace">
         <section id="template-content">
-          <p>Select a setup YAML to begin editing Markdown.</p>
+          <p>Select a template YAML to begin editing Markdown.</p>
         </section>
       </div>
     </div>
@@ -68,6 +68,31 @@
         </div>
       </div>
       <div class="modal-resizer"></div>
+    </div>
+
+    <!-- Template Creation Modal -->
+    <div id="template-modal" class="modal">
+      <div class="modal-header">
+        <h2>New Template</h2>
+        <button id="template-cancel">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-form-row">
+          <label for="template-name">Filename</label>
+          <input
+            type="text"
+            id="template-name"
+            placeholder="e.g., user-survey"
+          />
+        </div>
+        <div class="modal-form-row">
+          <label for="template-dir">Markdown Dir</label>
+          <input type="text" id="template-dir" value="markdown" />
+        </div>
+        <div class="button-group">
+          <button id="template-confirm" class="btn btn-default">Create</button>
+        </div>
+      </div>
     </div>
 
     <!-- Entry Prompt Modal -->

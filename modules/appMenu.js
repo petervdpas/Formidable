@@ -10,26 +10,26 @@ function buildAppMenu(win) {
       label: "File",
       submenu: [
         {
-          label: "Open Setup Folder",
+          label: "Open Template Folder",
           click: () => {
-            shell.openPath(fileManager.resolvePath("setup"));
+            shell.openPath(fileManager.resolvePath("templates"));
           },
         },
         {
           label: "Open Markdown Folder",
           click: () => {
             const config = configManager.loadUserConfig();
-            const setupName = config.recent_setups?.[0];
-            if (!setupName) return;
+            const templateName = config.recent_templates?.[0];
+            if (!templateName) return;
         
-            const setupPath = fileManager.resolvePath("setup", setupName);
-            if (!fileManager.fileExists(setupPath)) {
-              error("[AppMenu] Template not found:", setupPath);
+            const templatePath = fileManager.resolvePath("templates", templateName);
+            if (!fileManager.fileExists(templatePath)) {
+              error("[AppMenu] Template not found:", templatePath);
               return;
             }
         
             try {
-              const yaml = fileManager.loadFile(setupPath, { format: "yaml" });
+              const yaml = fileManager.loadFile(templatePath, { format: "yaml" });
               const targetPath = fileManager.resolvePath(yaml.markdown_dir);
               shell.openPath(targetPath);
             } catch (err) {

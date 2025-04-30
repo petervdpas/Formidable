@@ -7,7 +7,7 @@ const configDir = fileManager.resolvePath("config");
 const configPath = fileManager.resolvePath("config", "user.json");
 
 const defaultConfig = {
-  recent_setups: ["basic.yaml"],
+  recent_templates: ["basic.yaml"],
   last_opened_markdown: { "basic.yaml": "" },
   selected_template: "basic.yaml",
   theme: "light",

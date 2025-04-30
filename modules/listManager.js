@@ -29,7 +29,7 @@ export function createListManager({
       } else {
         items.forEach((itemName) => {
           const item = document.createElement("div");
-          item.className = "setup-item"; 
+          item.className = "template-item"; 
           item.textContent = itemName.replace(/\.yaml$|\.md$/i, "");
 
           item.addEventListener("click", () => {

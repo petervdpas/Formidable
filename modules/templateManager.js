@@ -3,12 +3,12 @@
 const fileManager = require("./fileManager");
 const { log, error } = require("./nodeLogger");
 
-const setupDir = fileManager.joinPath("setup");
+const templatesDir = fileManager.joinPath("templates");
 const basicYamlName = "basic.yaml";
-const basicYamlPath = fileManager.joinPath("setup", basicYamlName);
+const basicYamlPath = fileManager.joinPath("templates", basicYamlName);
 
-function ensureSetupEnvironment() {
-  fileManager.ensureDirectory(setupDir, { silent: true });
+function ensureTemplatesEnvironment() {
+  fileManager.ensureDirectory(templatesDir, { silent: true });
 
   if (!fileManager.fileExists(basicYamlPath)) {
     const content = {
@@ -26,7 +26,7 @@ function ensureSetupEnvironment() {
           key: "category",
           type: "dropdown",
           label: "Category",
-          options: ["News"],
+          options: ["News", "Updates", "Blog", "Tutorial"],
           markdown: "p",
         },
       ],
@@ -48,12 +48,12 @@ function ensureSetupEnvironment() {
 }
 
 function getTemplateList() {
-  ensureSetupEnvironment();
-  return fileManager.listFilesByExtension(setupDir, ".yaml");
+  ensureTemplatesEnvironment();
+  return fileManager.listFilesByExtension(templatesDir, ".yaml");
 }
 
 function loadTemplateFile(name) {
-  const filePath = fileManager.joinPath("setup", name);
+  const filePath = fileManager.joinPath("templates", name);
   const data = fileManager.loadFile(filePath, { format: "yaml" });
 
   if (data.markdown_dir && typeof data.markdown_dir === "string") {
@@ -64,10 +64,10 @@ function loadTemplateFile(name) {
 }
 
 function loadTemplateForDir(markdownDir) {
-  const files = fileManager.listFilesByExtension(setupDir, ".yaml");
+  const files = fileManager.listFilesByExtension(templatesDir, ".yaml");
 
   for (const filename of files) {
-    const fullPath = fileManager.joinPath(setupDir, filename);
+    const fullPath = fileManager.joinPath(templatesDir, filename);
     const data = fileManager.loadFile(fullPath, { format: "yaml" });
 
     const resolvedDir = fileManager.resolvePath(data.markdown_dir || "");
@@ -83,9 +83,29 @@ function loadTemplateForDir(markdownDir) {
   return null;
 }
 
+function saveTemplateFile(name, data) {
+  try {
+    ensureTemplatesEnvironment();
+    const filePath = fileManager.joinPath("templates", name);
+    const saved = fileManager.saveFile(filePath, data, { format: "yaml" });
+
+    if (saved) {
+      log("[TemplateManager] Saved template:", filePath);
+      return true;
+    } else {
+      error("[TemplateManager] Failed to save template:", filePath);
+      return false;
+    }
+  } catch (err) {
+    error("[TemplateManager] Exception while saving template:", err);
+    return false;
+  }
+}
+
 module.exports = {
-  ensureSetupEnvironment,
+  ensureTemplatesEnvironment,
   getTemplateList,
-  loadTemplateFile,
   loadTemplateForDir,
+  loadTemplateFile,
+  saveTemplateFile,
 };

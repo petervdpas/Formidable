@@ -24,8 +24,8 @@ body {
   color: #222;
 }
 
-/* Setup List + Markdown File List Items */
-.setup-item,
+/* Template List + Markdown File List Items */
+.template-item,
 .markdown-item {
   background-color: #e0e0e0;
   margin-bottom: 5px;
@@ -33,7 +33,7 @@ body {
   cursor: pointer;
 }
 
-.setup-item:hover,
+.template-item:hover,
 .markdown-item:hover {
   background-color: #d0d0d0;
 }
