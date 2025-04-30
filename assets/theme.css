@@ -6,19 +6,19 @@ body {
 }
 
 /* Sidebar and Panels */
-#setup-sidebar,
+#template-sidebar,
 #markdown-sidebar {
   background-color: #f0f0f0;
   border-right: 1px solid #ccc;
 }
 
-#setup-workspace,
+#template-workspace,
 #markdown-workspace {
   background-color: #ffffff;
   color: #222;
 }
 
-#workspace-content,
+#template-content,
 #markdown-content {
   background-color: #ffffff;
   color: #222;
@@ -70,6 +70,22 @@ button:hover {
 /* Modal Backdrop */
 .modal-backdrop {
   background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* ───── Modal Type Coloring ───── */
+#field-edit-modal.modal-text {
+  background-color: #0e3a5a;
+  border-left: 6px solid #2196f3;
+}
+
+#field-edit-modal.modal-boolean {
+  background-color: #0e4020;
+  border-left: 6px solid #4caf50;
+}
+
+#field-edit-modal.modal-dropdown {
+  background-color: #3b1057;
+  border-left: 6px solid #ba68c8;
 }
 
 /* Toggle Sliders */

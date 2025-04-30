@@ -7,7 +7,7 @@ body {
   flex-direction: column;
 }
 
-#setup-container,
+#template-container,
 #markdown-container {
   display: flex;
   flex: 1;
@@ -16,7 +16,7 @@ body {
 }
 
 /* ───── Setup, Markdown Context Layout ───── */
-#setup-sidebar, 
+#template-sidebar, 
 #markdown-sidebar {
   width: 250px;
   padding: 10px;
@@ -25,7 +25,7 @@ body {
   flex-shrink: 0;
 }
 
-#setup-splitter,
+#template-splitter,
 #markdown-splitter {
   width: 6px;
   cursor: col-resize;
@@ -37,7 +37,7 @@ body {
   user-select: none;
 }
 
-#setup-resizeHandle,
+#template-resizeHandle,
 #markdown-resizeHandle {
   width: 16px;
   height: 16px;
@@ -46,7 +46,7 @@ body {
   cursor: col-resize;
 }
 
-#setup-workspace,
+#template-workspace,
 #markdown-workspace {
   display: flex;
   flex-direction: column;
@@ -54,7 +54,7 @@ body {
   overflow: hidden;
 }
 
-#workspace-content,
+#template-content,
 #markdown-content {
   flex: 1;
   padding: 20px;
@@ -146,6 +146,33 @@ body {
 .modal-backdrop.show {
   display: block;
   opacity: 1;
+}
+
+/* ───── Modal Layout Adjustments ───── */
+
+#field-edit-modal {
+  width: 500px;
+  max-width: 90vw;
+}
+
+.modal-body .modal-form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.modal-body .modal-form-row label {
+  min-width: 110px;
+  font-weight: bold;
+}
+
+.modal-body .modal-form-row input,
+.modal-body .modal-form-row select {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
 
 /* ───── Toggle Switch ───── */

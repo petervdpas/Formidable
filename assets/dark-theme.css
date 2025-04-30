@@ -1,12 +1,12 @@
 /* ───── Dark Theme ───── */
 
 .dark-mode body,
-.dark-mode #setup-container,
+.dark-mode #template-container,
 .dark-mode #markdown-container,
-.dark-mode #setup-sidebar,
+.dark-mode #template-sidebar,
 .dark-mode #markdown-sidebar,
-.dark-mode #setup-workspace,
-.dark-mode #workspace-content,
+.dark-mode #template-workspace,
+.dark-mode #template-content,
 .dark-mode #markdown-workspace,
 .dark-mode #markdown-content,
 .dark-mode #status-bar {
@@ -15,7 +15,7 @@
 }
 
 /* Sidebar */
-.dark-mode #setup-sidebar,
+.dark-mode #template-sidebar,
 .dark-mode #markdown-sidebar {
   border-right: 1px solid #444;
 }
@@ -94,7 +94,7 @@
 }
 
 /* Splitter Handles */
-.dark-mode #setup-resizeHandle,
+.dark-mode #template-resizeHandle,
 .dark-mode #markdown-resizeHandle {
   background-color: #666;
   border-color: #444;

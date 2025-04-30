@@ -4,13 +4,14 @@ fields:
   - key: title
     type: text
     label: Title
-    default: ""
+    markdown: h1
   - key: published
     type: boolean
     label: Published
-    default: false
+    markdown: checkbox
   - key: category
     type: dropdown
     label: Category
-    options: [News, Tutorial, Opinion]
-    default: News
+    options:
+      - News
+    markdown: p

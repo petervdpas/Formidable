@@ -10,16 +10,16 @@
   </head>
   <body>
     <!-- Setup Form Editor Context -->
-    <div id="setup-container">
-      <div id="setup-sidebar">
-        <h3>Forms</h3>
-        <div id="setup-list"></div>
+    <div id="template-container">
+      <div id="template-sidebar">
+        <h3>Templates</h3>
+        <div id="template-list"></div>
       </div>
-      <div id="setup-splitter">
-        <div id="setup-resizeHandle" title="Drag to Resize"></div>
+      <div id="template-splitter">
+        <div id="template-resizeHandle" title="Drag to Resize"></div>
       </div>
-      <div id="setup-workspace">
-        <section id="workspace-content">
+      <div id="template-workspace">
+        <section id="template-content">
           <p>Select a setup YAML to begin editing Markdown.</p>
         </section>
       </div>
@@ -29,7 +29,7 @@
     <div id="markdown-container" style="display: none">
       <div id="markdown-sidebar">
         <div id="template-selector"></div>
-        <h3>Using Forms</h3>
+        <h3>Forms</h3>
         <div id="markdown-list"></div>
       </div>
       <div id="markdown-splitter">
@@ -77,14 +77,76 @@
         <button id="entry-cancel">✕</button>
       </div>
       <div class="modal-body">
-        <div class="form-row" style="flex-direction: column; align-items: stretch;">
+        <div class="form-row">
           <label for="entry-name">Enter a name for this entry:</label>
-          <input type="text" id="entry-name" placeholder="e.g. my-article-title" />
+          <input
+            type="text"
+            id="entry-name"
+            placeholder="e.g. my-article-title"
+          />
+        </div>
+        <div class="form-row">
+          <label>
+            <input type="checkbox" id="entry-append-date" checked />
+            Append date (YYYYMMDD)
+          </label>
         </div>
         <div class="button-group">
           <button id="entry-confirm" class="btn btn-primary">Confirm</button>
         </div>
       </div>
+    </div>
+
+    <!-- Field Edit Modal -->
+    <div id="field-edit-modal" class="modal">
+      <div class="modal-header">
+        <h2>Edit Field</h2>
+        <button id="field-edit-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row modal-form-row">
+          <label for="edit-key">Key</label>
+          <input type="text" id="edit-key" />
+        </div>
+        <div class="form-row modal-form-row">
+          <label for="edit-type">Type</label>
+          <select id="edit-type">
+            <option value="text">Text</option>
+            <option value="boolean">Boolean</option>
+            <option value="dropdown">Dropdown</option>
+          </select>
+        </div>
+        <div class="form-row modal-form-row">
+          <label for="edit-label">Label</label>
+          <input type="text" id="edit-label" />
+        </div>
+        <div class="form-row modal-form-row">
+          <label for="edit-default">Default</label>
+          <input type="text" id="edit-default" />
+        </div>
+        <div class="form-row modal-form-row">
+          <label for="edit-markdown">Markdown</label>
+          <select id="edit-markdown">
+            <option value="">None</option>
+            <option value="h1">H1</option>
+            <option value="h2">H2</option>
+            <option value="h3">H3</option>
+            <option value="p">Paragraph</option>
+            <option value="checkbox">Checkbox</option>
+            <option value="list">List</option>
+          </select>
+        </div>
+        <div class="form-row modal-form-row">
+          <label for="edit-options">Options</label>
+          <input type="text" id="edit-options" placeholder="Comma-separated" />
+        </div>
+        <div class="button-group">
+          <button id="field-edit-confirm" class="btn btn-primary">
+            Confirm
+          </button>
+        </div>
+      </div>
+      <div class="modal-resizer"></div>
     </div>
 
     <div id="modalBackdrop" class="modal-backdrop"></div>

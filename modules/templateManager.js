@@ -15,19 +15,19 @@ function ensureSetupEnvironment() {
       name: "Basic Form",
       markdown_dir: "./markdowns/basic",
       fields: [
-        { key: "title", type: "text", label: "Title", default: "" },
+        { key: "title", type: "text", label: "Title", markdown: "h1" },
         {
           key: "published",
           type: "boolean",
           label: "Published",
-          default: false,
+          markdown: "checkbox",
         },
         {
           key: "category",
           type: "dropdown",
           label: "Category",
-          options: ["News", "Tutorial", "Opinion"],
-          default: "News",
+          options: ["News"],
+          markdown: "p",
         },
       ],
     };
@@ -63,8 +63,29 @@ function loadTemplateFile(name) {
   return data;
 }
 
+function loadTemplateForDir(markdownDir) {
+  const files = fileManager.listFilesByExtension(setupDir, ".yaml");
+
+  for (const filename of files) {
+    const fullPath = fileManager.joinPath(setupDir, filename);
+    const data = fileManager.loadFile(fullPath, { format: "yaml" });
+
+    const resolvedDir = fileManager.resolvePath(data.markdown_dir || "");
+    const targetDir = fileManager.resolvePath(markdownDir);
+
+    if (resolvedDir === targetDir) {
+      log("[TemplateManager] Found template for dir:", targetDir);
+      return data;
+    }
+  }
+
+  warn("[TemplateManager] No template found for dir:", markdownDir);
+  return null;
+}
+
 module.exports = {
   ensureSetupEnvironment,
   getTemplateList,
   loadTemplateFile,
+  loadTemplateForDir,
 };

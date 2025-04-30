@@ -20,7 +20,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   initStatusManager("status-bar");
 
-  const setupContainer = document.getElementById("setup-container");
+  const setupContainer = document.getElementById("template-container");
   const markdownContainer = document.getElementById("markdown-container");
   const themeToggle = document.getElementById("theme-toggle");
   const contextToggle = document.getElementById("context-toggle");
@@ -31,7 +31,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   window.currentSelectedTemplate = null;
 
   const yamlEditor = initYamlEditor(
-    "workspace-content",
+    "template-content",
     async (updatedYaml) => {
       updateStatus(`Saving "${updatedYaml.name}"...`);
       log("[YamlEditor] Save triggered:", updatedYaml);
@@ -51,6 +51,8 @@ window.addEventListener("DOMContentLoaded", async () => {
     escToClose: true,
     backdropClick: true,
     resizable: true,
+    width: "20em",
+    height: "auto",
     onOpen: async () => {
       const config = await window.configAPI.loadUserConfig();
       themeToggle.checked = config.theme === "dark";
@@ -62,7 +64,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     closeBtn: "entry-cancel",
     escToClose: true,
     backdropClick: true,
-    width: "30%",
+    width: "30em",
     height: "auto",
   });
 
@@ -71,10 +73,10 @@ window.addEventListener("DOMContentLoaded", async () => {
   function initSplitters(mode) {
     if (mode === "setup" && !setupSplitterInitialized) {
       setupSplitter({
-        splitter: document.getElementById("setup-splitter"),
-        left: document.getElementById("setup-sidebar"),
-        right: document.getElementById("setup-workspace"),
-        container: document.getElementById("setup-container"),
+        splitter: document.getElementById("template-splitter"),
+        left: document.getElementById("template-sidebar"),
+        right: document.getElementById("template-workspace"),
+        container: document.getElementById("template-container"),
         min: 150,
       });
       setupSplitterInitialized = true;
@@ -110,7 +112,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
 
   const templateListManager = createListManager({
-    elementId: "setup-list",
+    elementId: "template-list",
     fetchListFunction: async () => await window.api.listTemplateFiles(),
     onItemClick: async (itemName) => {
       try {
@@ -200,20 +202,30 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   function promptForEntryName(callback) {
     const input = document.getElementById("entry-name");
+    const checkbox = document.getElementById("entry-append-date");
     const confirm = document.getElementById("entry-confirm");
-
-    input.value = ""; // Reset input
+  
+    input.value = "";
+    checkbox.checked = true;
+  
     confirm.onclick = () => {
       const raw = input.value.trim();
       if (!raw) return;
+  
       const sanitized = raw.replace(/\s+/g, "-").toLowerCase();
-      const now = new Date();
-      const formatted = now.toISOString().slice(0, 10); // "2025-04-14"
-      const uniqueName = `${sanitized}-${formatted}`;
+      const appendDate = checkbox.checked;
+  
+      let finalName = sanitized;
+      if (appendDate) {
+        const now = new Date();
+        const formatted = now.toISOString().slice(0, 10).replaceAll("-", "");
+        finalName = `${sanitized}-${formatted}`;
+      }
+  
       entryInputModal.hide();
-      callback(uniqueName);
+      callback(finalName);
     };
-
+  
     entryInputModal.show();
     setTimeout(() => input.focus(), 100);
   }
