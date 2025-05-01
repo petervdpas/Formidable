@@ -1,6 +1,6 @@
 // main.js
 
-const { app, dialog, BrowserWindow, ipcMain } = require("electron");
+const { app, dialog, BrowserWindow, Menu, ipcMain } = require("electron");
 
 const { log, warn, error } = require("./modules/nodeLogger");
 const { registerIpc } = require("./modules/ipcRoutes");
@@ -34,7 +34,11 @@ function createWindow() {
     icon: fileManager.joinPath(__dirname, "assets", "formidable.png"),
   });
 
+  // Disable Electron's native menu
+  // Menu.setApplicationMenu(null);
+
   win.loadFile("index.html");
+  win.setTitle("Formidable v1.0");
 
   log("[Main] Created main BrowserWindow and loaded index.html");
 }
@@ -145,3 +149,11 @@ registerIpc("dialog-choose-directory", async () => {
 });
 
 registerIpc("get-app-root", () => process.cwd());
+
+registerIpc("resolve-path", (event, ...segments) => {
+  return fileManager.resolvePath(...segments);
+});
+
+registerIpc("file-exists", (event, path) => {
+  return fileManager.fileExists(path);
+});

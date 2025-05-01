@@ -2,7 +2,7 @@
 
 const { contextBridge, ipcRenderer, shell } = require("electron");
 
-// API methods as usual
+// API methods exposed under window.api
 const apiMethods = [
   "list-template-files",
   "load-template-file",
@@ -21,37 +21,34 @@ const apiMethods = [
 ];
 
 const api = {};
-
 for (const method of apiMethods) {
-  api[camelCase(method)] = (...args) => {
-    return ipcRenderer.invoke(method, ...args);
-  };
+  api[camelCase(method)] = (...args) => ipcRenderer.invoke(method, ...args);
 }
-
 api.getAppRoot = () => ipcRenderer.invoke("get-app-root");
+api.resolvePath = (...args) => ipcRenderer.invoke("resolve-path", ...args);
+api.fileExists = (path) => ipcRenderer.invoke("file-exists", path);
+
 contextBridge.exposeInMainWorld("api", api);
 
-// Config API
+// Config API exposed under window.configAPI
 const configMethods = [
   "load-user-config",
   "save-user-config",
   "update-user-config",
 ];
-
 const configAPI = {};
-
 for (const method of configMethods) {
-  configAPI[camelCase(method)] = (...args) => {
-    return ipcRenderer.invoke(method, ...args);
-  };
+  configAPI[camelCase(method)] = (...args) =>
+    ipcRenderer.invoke(method, ...args);
 }
-
 contextBridge.exposeInMainWorld("configAPI", configAPI);
 
+// Dialog API (directory picker)
 contextBridge.exposeInMainWorld("dialogAPI", {
   chooseDirectory: () => ipcRenderer.invoke("dialog-choose-directory"),
 });
 
+// Electron shell/app/devtools controls exposed under window.electron
 contextBridge.exposeInMainWorld("electron", {
   shell: {
     openPath: (targetPath) => shell.openPath(targetPath),
@@ -64,7 +61,7 @@ contextBridge.exposeInMainWorld("electron", {
   },
 });
 
+// Helper to convert kebab-case to camelCase
 function camelCase(str) {
-  return str.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
+  return str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
 }
-

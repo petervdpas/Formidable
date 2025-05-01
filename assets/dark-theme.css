@@ -88,3 +88,35 @@
   background-color: #666;
   border-color: #444;
 }
+
+/* ───── Dark Mode: HTML Menu Bar ───── */
+.dark-mode #app-menu {
+  background-color: #1e1e1e;
+  border-bottom: 1px solid #444;
+  color: #eee;
+}
+
+.dark-mode .menu-bar {
+  color: #eee;
+}
+
+.dark-mode .menu-item:hover {
+  background-color: #2a2a2a;
+}
+
+.dark-mode .submenu {
+  background-color: #2a2a2a;
+  border: 1px solid #555;
+}
+
+.dark-mode .submenu li {
+  color: #eee;
+}
+
+.dark-mode .submenu li:hover {
+  background-color: #3a3a3a;
+}
+
+.dark-mode .submenu .separator {
+  border-top: 1px solid #444;
+}
