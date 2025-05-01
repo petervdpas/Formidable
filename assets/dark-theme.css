@@ -120,3 +120,29 @@
 .dark-mode .submenu .separator {
   border-top: 1px solid #444;
 }
+
+/* ───── Input + Select Styling (Dark Mode) ───── */
+.dark-mode input[type="text"],
+.dark-mode input[type="password"],
+.dark-mode input[type="email"],
+.dark-mode textarea,
+.dark-mode select {
+  background-color: #1c1c1c;
+  color: #eee;
+  border: 1px solid #555;
+}
+
+.dark-mode input[type="text"]:focus,
+.dark-mode input[type="password"]:focus,
+.dark-mode input[type="email"]:focus,
+.dark-mode textarea:focus,
+.dark-mode select:focus {
+  border-color: #888;
+  outline: none;
+}
+
+/* Checkboxes & Radios */
+.dark-mode input[type="checkbox"],
+.dark-mode input[type="radio"] {
+  accent-color: #88d88c;
+}
