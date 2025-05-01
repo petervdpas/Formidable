@@ -51,7 +51,7 @@ contextBridge.exposeInMainWorld("dialogAPI", {
 // Electron shell/app/devtools controls exposed under window.electron
 contextBridge.exposeInMainWorld("electron", {
   shell: {
-    openPath: (targetPath) => shell.openPath(targetPath),
+    openPath: (targetPath) => ipcRenderer.invoke("shell-open-path", targetPath),
   },
   app: {
     quit: () => ipcRenderer.invoke("app-quit"),

@@ -51,23 +51,3 @@ button,
 .btn-danger:hover {
   background-color: #c82333;
 }
-
-/* ───── Inline Field Buttons (List Items) ───── */
-
-.field-actions .btn-edit {
-  background-color: #444;
-  color: white;
-}
-
-.field-actions .btn-edit:hover {
-  background-color: #555;
-}
-
-.field-actions .btn-delete {
-  background-color: #ffc107;
-  color: black;
-}
-
-.field-actions .btn-delete:hover {
-  background-color: #e0a800;
-}

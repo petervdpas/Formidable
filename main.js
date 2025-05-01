@@ -1,7 +1,13 @@
 // main.js
 
-const { app, dialog, BrowserWindow, Menu, ipcMain } = require("electron");
-
+const {
+  app,
+  dialog,
+  shell,
+  BrowserWindow,
+  Menu,
+  ipcMain,
+} = require("electron");
 const { log, warn, error } = require("./modules/nodeLogger");
 const { registerIpc } = require("./modules/ipcRoutes");
 
@@ -27,18 +33,26 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1000,
     height: 700,
+    backgroundColor: "#808080",
+    show: false,
     webPreferences: {
       contextIsolation: true,
+      nodeIntegration: false,
+      enableRemoteModule: false,
       preload: fileManager.joinPath(__dirname, "preload.js"),
     },
     icon: fileManager.joinPath(__dirname, "assets", "formidable.png"),
   });
-
+  
   // Disable Electron's native menu
-  // Menu.setApplicationMenu(null);
+  Menu.setApplicationMenu(null);
 
   win.loadFile("index.html");
   win.setTitle("Formidable v1.0");
+
+  win.once("ready-to-show", () => {
+    win.show();
+  });
 
   log("[Main] Created main BrowserWindow and loaded index.html");
 }
@@ -76,6 +90,10 @@ ipcMain.handle("toggle-devtools", (event) => {
     const wc = win.webContents;
     wc.isDevToolsOpened() ? wc.closeDevTools() : wc.openDevTools();
   }
+});
+
+ipcMain.handle("shell-open-path", async (event, targetPath) => {
+  return await shell.openPath(targetPath); // returns empty string on success
 });
 
 // Template YAML handlers

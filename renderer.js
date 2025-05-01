@@ -26,9 +26,16 @@ window.addEventListener("DOMContentLoaded", async () => {
     switch (action) {
       case "open-template-folder": {
         const resolved = await window.api.resolvePath("templates");
+
+        // Ensure directory exists before opening
+        await window.api.ensureMarkdownDir?.(resolved);
+
         const result = await window.electron.shell.openPath(resolved);
-        if (result)
+        if (result) {
           console.error("[Shell] Failed to open template folder:", result);
+        } else {
+          console.log("[Shell] Opened template folder:", resolved);
+        }
         break;
       }
 
@@ -36,7 +43,10 @@ window.addEventListener("DOMContentLoaded", async () => {
         try {
           const config = await window.configAPI.loadUserConfig();
           const templateName = config.recent_templates?.[0];
-          if (!templateName) return;
+          if (!templateName) {
+            console.warn("[Menu] No recent_templates entry found.");
+            return;
+          }
 
           const templatePath = await window.api.resolvePath(
             "templates",
@@ -50,9 +60,16 @@ window.addEventListener("DOMContentLoaded", async () => {
 
           const yaml = await window.api.loadTemplateFile(templateName);
           const targetPath = await window.api.resolvePath(yaml.markdown_dir);
+
+          // Ensure directory exists before opening
+          await window.api.ensureMarkdownDir?.(targetPath);
+
           const result = await window.electron.shell.openPath(targetPath);
-          if (result)
+          if (result) {
             console.error("[Shell] Failed to open markdown folder:", result);
+          } else {
+            console.log("[Shell] Opened markdown folder:", targetPath);
+          }
         } catch (err) {
           console.error("[Menu] Failed to open markdown folder:", err);
         }

@@ -63,15 +63,15 @@ export function initYamlEditor(containerId, onSaveCallback) {
           <span class="field-type type-${field.type}">(${field.type.toUpperCase()})</span>
         </div>
         <div class="field-actions">
-          <button class="btn btn-warn" data-idx="${idx}">Edit</button>
-          <button class="btn btn-danger" data-idx="${idx}">Delete</button>
+          <button class="btn btn-warn action-edit" data-idx="${idx}">Edit</button>
+          <button class="btn btn-danger action-delete" data-idx="${idx}">Delete</button>
         </div>
       `;
       item.dataset.type = field.type;
       list.appendChild(item);
     });
 
-    list.querySelectorAll(".btn-edit").forEach((btn) => {
+    list.querySelectorAll(".action-edit").forEach((btn) => {
       btn.onclick = () => {
         const idx = +btn.dataset.idx;
         currentEditIndex = idx;
@@ -79,7 +79,7 @@ export function initYamlEditor(containerId, onSaveCallback) {
       };
     });
 
-    list.querySelectorAll(".btn-delete").forEach((btn) => {
+    list.querySelectorAll(".action-delete").forEach((btn) => {
       btn.onclick = () => {
         const idx = +btn.dataset.idx;
         currentData.fields.splice(idx, 1);

@@ -2,13 +2,19 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
     <title>Formidable v1.0</title>
+  
+    <!-- Core Styles -->
     <link rel="stylesheet" href="assets/layout.css" />
     <link rel="stylesheet" href="assets/menu.css" />
     <link rel="stylesheet" href="assets/forms.css" />
     <link rel="stylesheet" href="assets/theme.css" />
     <link rel="stylesheet" href="assets/dark-theme.css" />
     <link rel="stylesheet" href="assets/buttons.css" />
+  
   </head>
   <body>
     <div id="app-menu"></div>
@@ -197,5 +203,6 @@
     <div id="modalBackdrop" class="modal-backdrop"></div>
 
     <script type="module" src="renderer.js"></script>
+
   </body>
 </html>
