@@ -1,5 +1,6 @@
 // renderer.js
 
+import { buildMenu } from "./modules/menuManager.js";
 import { setupModal } from "./modules/modalManager.js";
 import { initYamlEditor } from "./modules/yaml_editor.js";
 import { createDropdown } from "./modules/dropdownManager.js";
@@ -21,6 +22,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
+  buildMenu("app-menu");
   initStatusManager("status-bar");
 
   const templateContainer = document.getElementById("template-container");

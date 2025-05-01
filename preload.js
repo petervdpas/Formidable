@@ -1,6 +1,6 @@
 // preload.js
 
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge, ipcRenderer, shell } = require("electron");
 
 // API methods as usual
 const apiMethods = [
@@ -52,6 +52,19 @@ contextBridge.exposeInMainWorld("dialogAPI", {
   chooseDirectory: () => ipcRenderer.invoke("dialog-choose-directory"),
 });
 
+contextBridge.exposeInMainWorld("electron", {
+  shell: {
+    openPath: (targetPath) => shell.openPath(targetPath),
+  },
+  app: {
+    quit: () => ipcRenderer.invoke("app-quit"),
+  },
+  devtools: {
+    toggle: () => ipcRenderer.invoke("toggle-devtools"),
+  },
+});
+
 function camelCase(str) {
   return str.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
 }
+

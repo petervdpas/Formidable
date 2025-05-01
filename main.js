@@ -1,9 +1,8 @@
 // main.js
 
-const { app, dialog, BrowserWindow } = require("electron");
+const { app, dialog, BrowserWindow, ipcMain } = require("electron");
 
 const { log, warn, error } = require("./modules/nodeLogger");
-const { buildAppMenu } = require("./modules/appMenu");
 const { registerIpc } = require("./modules/ipcRoutes");
 
 const { SingleFileRepository } = require("./modules/sfr");
@@ -36,7 +35,6 @@ function createWindow() {
   });
 
   win.loadFile("index.html");
-  buildAppMenu(win);
 
   log("[Main] Created main BrowserWindow and loaded index.html");
 }
@@ -63,6 +61,18 @@ app.on("window-all-closed", () => {
 });
 
 // ================= IPC HANDLERS =================
+
+ipcMain.handle("app-quit", () => {
+  app.quit();
+});
+
+ipcMain.handle("toggle-devtools", (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (win) {
+    const wc = win.webContents;
+    wc.isDevToolsOpened() ? wc.closeDevTools() : wc.openDevTools();
+  }
+});
 
 // Template YAML handlers
 registerIpc("list-template-files", () => templateManager.getTemplateList());
