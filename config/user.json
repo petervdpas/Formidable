@@ -1,14 +1,14 @@
 {
   "recent_templates": [
-    "basic.yaml"
+    "ducki.yaml"
   ],
   "last_opened_markdown": {
     "basic.yaml": ""
   },
-  "theme": "dark",
+  "theme": "light",
   "font_size": 14,
-  "context_mode": "template",
+  "context_mode": "markdown",
   "selected_template": "basic.yaml",
-  "last_selected_template": "basic.yaml",
+  "last_selected_template": "ducki.yaml",
   "default_markdown_dir": "./markdowns"
 }

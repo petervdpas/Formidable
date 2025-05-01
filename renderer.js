@@ -22,6 +22,9 @@ import { createTemplateSelector } from "./modules/templateSelector.js";
 window.addEventListener("DOMContentLoaded", async () => {
   log("[App] DOM loaded.");
 
+  window.currentSelectedTemplate = null;
+  window.currentSelectedTemplateName = null;
+
   document.querySelectorAll("button").forEach((btn) => {
     if (!btn.className.includes("btn")) {
       btn.classList.add("btn", "btn-default");
@@ -35,9 +38,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   const markdownContainer = document.getElementById("markdown-container");
   const themeToggle = document.getElementById("theme-toggle");
   const contextToggle = document.getElementById("context-toggle");
-
-  window.currentSelectedTemplate = null;
-  window.currentSelectedTemplateName = null;
 
   const yamlEditor = initYamlEditor("template-content", async (updatedYaml) => {
     let filename = window.currentSelectedTemplateName;
@@ -106,6 +106,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   );
 
   const metaListManager = initMetaListManager(formManager, entryInputModal);
+  formManager.setReloadMarkdownList(() => metaListManager.loadList());
 
   const { selectTemplate, loadTemplateOptions } = createTemplateSelector({
     formManager,
@@ -113,9 +114,11 @@ window.addEventListener("DOMContentLoaded", async () => {
     templateDropdown,
   });
 
-  await loadTemplateOptions();
-  await templateListManager.loadList();
-  await templateDropdown.refresh?.();
+  await Promise.all([
+    loadTemplateOptions(),
+    templateListManager.loadList(),
+    templateDropdown.refresh?.() ?? Promise.resolve(),
+  ]);
 
   setContextView(config.context_mode, {
     templateContainer,
