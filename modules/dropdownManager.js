@@ -1,15 +1,24 @@
 // modules/dropdownManager.js
 
-import { log, warn, error } from "./logger.js"; // <-- ADD THIS
+import { log, warn, error } from "./logger.js";
 
-export function createDropdown({ containerId, labelText, options = [], onChange, selectedValue = "" }) {
+export function createDropdown({
+  containerId,
+  labelText,
+  selectedValue = "",
+  options = [],
+  onChange,
+  onRefresh,
+}) {
   const container = document.getElementById(containerId);
   if (!container) {
     error(`[DropdownManager] Container #${containerId} not found.`);
     return;
   }
 
-  log(`[DropdownManager] Creating dropdown in #${containerId} with label "${labelText}"`);
+  log(
+    `[DropdownManager] Creating dropdown in #${containerId} with label "${labelText}"`
+  );
 
   container.innerHTML = ""; // Clear old content
 
@@ -23,16 +32,21 @@ export function createDropdown({ containerId, labelText, options = [], onChange,
   select.style.padding = "6px";
   select.style.marginBottom = "10px";
 
-  // Populate initial options
-  options.forEach(opt => {
-    const option = document.createElement("option");
-    option.value = opt.value;
-    option.textContent = opt.label;
-    if (opt.value === selectedValue) {
-      option.selected = true;
-    }
-    select.appendChild(option);
-  });
+  // Initial option load
+  function populateOptions(optList) {
+    select.innerHTML = "";
+    optList.forEach((opt) => {
+      const option = document.createElement("option");
+      option.value = opt.value;
+      option.textContent = opt.label;
+      if (opt.value === selectedValue) {
+        option.selected = true;
+      }
+      select.appendChild(option);
+    });
+  }
+
+  populateOptions(options);
 
   select.addEventListener("change", (e) => {
     const selected = e.target.value;
@@ -62,14 +76,38 @@ export function createDropdown({ containerId, labelText, options = [], onChange,
       }
     },
     updateOptions: (newOptions) => {
-      log(`[DropdownManager] updateOptions() called with ${newOptions.length} options.`);
-      select.innerHTML = ""; // Clear old options
-      newOptions.forEach(opt => {
-        const option = document.createElement("option");
-        option.value = opt.value;
-        option.textContent = opt.label;
-        select.appendChild(option);
-      });
-    }
+      log(
+        `[DropdownManager] updateOptions() called with ${newOptions.length} options.`
+      );
+      populateOptions(newOptions);
+    },
+    refresh: async () => {
+      if (typeof onRefresh !== "function") {
+        warn(
+          `[DropdownManager] refresh() called but no onRefresh handler provided.`
+        );
+        return;
+      }
+      try {
+        const newOptions = await onRefresh();
+        populateOptions(newOptions);
+
+        const current = select.value;
+        const values = newOptions.map((opt) => opt.value);
+
+        if (!values.includes(current)) {
+          log(
+            `[DropdownManager] Current selection "${current}" no longer valid, clearing selection.`
+          );
+          select.value = ""; // deselect
+          // optional: trigger change event
+          if (onChange) onChange("");
+        }
+
+        log(`[DropdownManager] refresh() updated options.`);
+      } catch (err) {
+        error(`[DropdownManager] refresh() failed:`, err);
+      }
+    },
   };
 }

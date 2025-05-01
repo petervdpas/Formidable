@@ -2,8 +2,6 @@
 
 const { contextBridge, ipcRenderer } = require("electron");
 
-// No fileTransformer here
-
 // API methods as usual
 const apiMethods = [
   "list-template-files",

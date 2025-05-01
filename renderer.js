@@ -90,14 +90,20 @@ window.addEventListener("DOMContentLoaded", async () => {
         const selected = await window.dialogAPI.chooseDirectory();
         if (selected) {
           // Convert to relative path
-          const appRoot = await window.api.getAppRoot?.() || ".";
+          const appRoot = (await window.api.getAppRoot?.()) || ".";
 
           const relativePath = selected.startsWith(appRoot)
-            ? "./" + selected.slice(appRoot.length).replace(/^[\\/]/, "").replace(/\\/g, "/")
+            ? "./" +
+              selected
+                .slice(appRoot.length)
+                .replace(/^[\\/]/, "")
+                .replace(/\\/g, "/")
             : selected; // fallback to absolute if not under root
-      
+
           defaultDirInput.value = relativePath;
-          await window.configAPI.updateUserConfig({ default_markdown_dir: relativePath });
+          await window.configAPI.updateUserConfig({
+            default_markdown_dir: relativePath,
+          });
           updateStatus(`Updated default markdown dir: ${relativePath}`);
         }
       };
@@ -130,6 +136,13 @@ window.addEventListener("DOMContentLoaded", async () => {
     onChange: async (selectedName) => {
       log("[Dropdown] Changed selection to:", selectedName);
       await selectTemplate(selectedName);
+    },
+    onRefresh: async () => {
+      const templates = await window.api.listTemplateFiles();
+      return templates.map((name) => ({
+        value: name,
+        label: name.replace(/\.yaml$/, ""),
+      }));
     },
   });
 
@@ -180,15 +193,25 @@ window.addEventListener("DOMContentLoaded", async () => {
     templateDropdown.updateOptions(options);
 
     const config = await window.configAPI.loadUserConfig();
-    if (config.last_selected_template) {
-      await selectTemplate(config.last_selected_template, {
-        updateDropdown: false,
+    const lastSelected = config.last_selected_template;
+
+    if (lastSelected && templateFiles.includes(lastSelected)) {
+      await selectTemplate(lastSelected, { updateDropdown: false });
+    } else if (options.length > 0) {
+      const fallback = options[0].value;
+      log(`[loadTemplateOptions] Falling back to: ${fallback}`);
+      await selectTemplate(fallback, { updateDropdown: false });
+      await window.configAPI.updateUserConfig({
+        last_selected_template: fallback,
       });
+    } else {
+      log("[loadTemplateOptions] No templates available to select.");
     }
   }
 
   await loadTemplateOptions();
   await templateListManager.loadList();
+  await templateDropdown.refresh?.();
 
   setContextView(config.context_mode, {
     templateContainer,
@@ -215,8 +238,11 @@ window.addEventListener("DOMContentLoaded", async () => {
       templateContainer,
       markdownContainer,
     });
-    if (mode === "markdown" && window.currentSelectedTemplate) {
-      await metaListManager.loadList();
+    if (mode === "markdown") {
+      await templateDropdown.refresh?.(); // always refresh
+      if (window.currentSelectedTemplate) {
+        await metaListManager.loadList();
+      }
     }
     updateStatus(
       `Context set to ${mode === "markdown" ? "Markdown" : "Template"}`

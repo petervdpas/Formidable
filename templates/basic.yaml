@@ -1,5 +1,5 @@
 name: Basic Form
-markdown_dir: markdowns\basic
+markdown_dir: ./markdowns/basic
 fields:
   - key: title
     type: text
