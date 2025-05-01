@@ -1,7 +1,11 @@
 // renderer.js
 
 import { buildMenu, handleMenuAction } from "./modules/menuManager.js";
-import { setupModal } from "./modules/modalManager.js";
+import {
+  setupSettingsModal,
+  setupEntryModal,
+  setupTemplateModal,
+} from "./modules/modalSetup.js";
 import { initYamlEditor } from "./modules/yaml_editor.js";
 import { createDropdown } from "./modules/dropdownManager.js";
 import { initStatusManager, updateStatus } from "./modules/statusManager.js";
@@ -70,62 +74,9 @@ window.addEventListener("DOMContentLoaded", async () => {
   const config = await window.configAPI.loadUserConfig();
   await applyInitialTheme(config);
 
-  const settings = setupModal("settings-modal", {
-    closeBtn: "settings-close",
-    escToClose: true,
-    backdropClick: true,
-    resizable: true,
-    width: "30em",
-    height: "auto",
-    onOpen: async () => {
-      const config = await window.configAPI.loadUserConfig();
-      themeToggle.checked = config.theme === "dark";
-      contextToggle.checked = config.context_mode === "markdown";
-
-      const defaultDirInput = document.getElementById("default-dir");
-      const chooseDirBtn = document.getElementById("choose-dir");
-
-      defaultDirInput.value = config.default_markdown_dir || "./markdowns";
-
-      chooseDirBtn.onclick = async () => {
-        const selected = await window.dialogAPI.chooseDirectory();
-        if (selected) {
-          // Convert to relative path
-          const appRoot = (await window.api.getAppRoot?.()) || ".";
-
-          const relativePath = selected.startsWith(appRoot)
-            ? "./" +
-              selected
-                .slice(appRoot.length)
-                .replace(/^[\\/]/, "")
-                .replace(/\\/g, "/")
-            : selected; // fallback to absolute if not under root
-
-          defaultDirInput.value = relativePath;
-          await window.configAPI.updateUserConfig({
-            default_markdown_dir: relativePath,
-          });
-          updateStatus(`Updated default markdown dir: ${relativePath}`);
-        }
-      };
-    },
-  });
-
-  const entryInputModal = setupModal("entry-modal", {
-    closeBtn: "entry-cancel",
-    escToClose: true,
-    backdropClick: true,
-    width: "30em",
-    height: "auto",
-  });
-
-  const templateModal = setupModal("template-modal", {
-    closeBtn: "template-cancel",
-    escToClose: true,
-    backdropClick: true,
-    width: "30em",
-    height: "auto",
-  });
+  const settings = setupSettingsModal(themeToggle, contextToggle);
+  const entryInputModal = setupEntryModal();
+  const templateModal = setupTemplateModal();
 
   window.openSettingsModal = settings.show;
   window.currentSelectedTemplateName = null;
