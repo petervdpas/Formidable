@@ -1,6 +1,6 @@
 // renderer.js
 
-import { buildMenu } from "./modules/menuManager.js";
+import { buildMenu, handleMenuAction } from "./modules/menuManager.js";
 import { setupModal } from "./modules/modalManager.js";
 import { initYamlEditor } from "./modules/yaml_editor.js";
 import { createDropdown } from "./modules/dropdownManager.js";
@@ -22,82 +22,6 @@ window.addEventListener("DOMContentLoaded", async () => {
       btn.classList.add("btn", "btn-default");
     }
   });
-
-  async function handleMenuAction(action) {
-    switch (action) {
-      case "open-template-folder": {
-        const resolved = await window.api.resolvePath("templates");
-
-        // Ensure directory exists before opening
-        await window.api.ensureMarkdownDir?.(resolved);
-
-        const result = await window.electron.shell.openPath(resolved);
-        if (result) {
-          console.error("[Shell] Failed to open template folder:", result);
-        } else {
-          console.log("[Shell] Opened template folder:", resolved);
-        }
-        break;
-      }
-
-      case "open-markdown-folder": {
-        try {
-          const config = await window.configAPI.loadUserConfig();
-          const templateName = config.recent_templates?.[0];
-          if (!templateName) {
-            console.warn("[Menu] No recent_templates entry found.");
-            return;
-          }
-
-          const templatePath = await window.api.resolvePath(
-            "templates",
-            templateName
-          );
-          const exists = await window.api.fileExists(templatePath);
-          if (!exists) {
-            console.error("[Menu] Template not found:", templatePath);
-            return;
-          }
-
-          const yaml = await window.api.loadTemplateFile(templateName);
-          const targetPath = await window.api.resolvePath(yaml.markdown_dir);
-
-          // Ensure directory exists before opening
-          await window.api.ensureMarkdownDir?.(targetPath);
-
-          const result = await window.electron.shell.openPath(targetPath);
-          if (result) {
-            console.error("[Shell] Failed to open markdown folder:", result);
-          } else {
-            console.log("[Shell] Opened markdown folder:", targetPath);
-          }
-        } catch (err) {
-          console.error("[Menu] Failed to open markdown folder:", err);
-        }
-        break;
-      }
-
-      case "quit":
-        window.electron.app.quit();
-        break;
-
-      case "open-settings":
-        window.openSettingsModal?.();
-        break;
-
-      case "reload":
-        location.reload();
-        break;
-
-      case "devtools":
-        window.electron.devtools.toggle();
-        break;
-
-      case "about":
-        alert("Formidable v1.0\nMarkdown Form Editor\nBuilt with Electron");
-        break;
-    }
-  }
 
   buildMenu("app-menu", handleMenuAction);
   initStatusManager("status-bar");
