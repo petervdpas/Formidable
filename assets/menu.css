@@ -1,3 +1,17 @@
+.menu-bar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+}
+
+#menu-context-toggle {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 #app-menu {
     background: #f4f4f4;
     border-bottom: 1px solid #ccc;

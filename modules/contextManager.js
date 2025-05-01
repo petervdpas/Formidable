@@ -2,6 +2,7 @@
 
 import { setupSplitter } from "./splitter.js";
 import { log } from "./logger.js";
+import { updateStatus } from "./statusManager.js";
 
 let templateSplitterInitialized = false;
 let markdownSplitterInitialized = false;
@@ -29,11 +30,34 @@ function initSplitters(mode) {
   }
 }
 
-// Pass containers in as arguments
-export function setContextView(mode, { templateContainer, markdownContainer }) {
+export function setContextView(mode, containers) {
   const isMarkdown = mode === "markdown";
-  templateContainer.style.display = isMarkdown ? "none" : "flex";
-  markdownContainer.style.display = isMarkdown ? "flex" : "none";
+  containers.templateContainer.style.display = isMarkdown ? "none" : "flex";
+  containers.markdownContainer.style.display = isMarkdown ? "flex" : "none";
   initSplitters(mode);
   log("[Context] Switched to:", mode);
+}
+
+export function initContextToggle({
+  toggleElement,
+  containers,
+  dropdown,
+  metaListManager,
+  currentTemplateGetter,
+}) {
+  toggleElement.addEventListener("change", async (e) => {
+    const mode = e.target.checked ? "markdown" : "template";
+    await window.configAPI.updateUserConfig({ context_mode: mode });
+
+    setContextView(mode, containers);
+
+    if (mode === "markdown") {
+      await dropdown.refresh?.();
+      if (currentTemplateGetter()) {
+        await metaListManager.loadList();
+      }
+    }
+
+    updateStatus(`Context set to ${mode === "markdown" ? "Markdown" : "Template"}`);
+  });
 }

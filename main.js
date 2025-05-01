@@ -45,7 +45,7 @@ function createWindow() {
   });
   
   // Disable Electron's native menu
-  Menu.setApplicationMenu(null);
+  // Menu.setApplicationMenu(null);
 
   win.loadFile("index.html");
   win.setTitle("Formidable v1.0");

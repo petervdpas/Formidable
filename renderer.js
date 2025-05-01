@@ -6,8 +6,9 @@ import { initYamlEditor } from "./modules/yaml_editor.js";
 import { createDropdown } from "./modules/dropdownManager.js";
 import { initStatusManager, updateStatus } from "./modules/statusManager.js";
 import { initFormManager } from "./modules/formManager.js";
-import { log, warn, error } from "./modules/logger.js"; // <- Correct
-import { setContextView } from "./modules/contextManager.js";
+import { log, warn, error } from "./modules/logger.js";
+import { setContextView, initContextToggle } from "./modules/contextManager.js";
+import { initThemeToggle, applyInitialTheme } from "./modules/themeToggler.js";
 import {
   initTemplateListManager,
   initMetaListManager,
@@ -143,9 +144,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   window.formManager = formManager;
 
   const config = await window.configAPI.loadUserConfig();
-  if (config.theme === "dark") {
-    document.body.classList.add("dark-mode");
-  }
+  await applyInitialTheme(config);
 
   const settings = setupModal("settings-modal", {
     closeBtn: "settings-close",
@@ -296,34 +295,21 @@ window.addEventListener("DOMContentLoaded", async () => {
     markdownContainer,
   });
 
+  // After setContextView(...) call
+  initContextToggle({
+    toggleElement: contextToggle,
+    containers: {
+      templateContainer,
+      markdownContainer,
+    },
+    dropdown: templateDropdown,
+    metaListManager,
+    currentTemplateGetter: () => window.currentSelectedTemplate,
+  });
+
   if (config.context_mode === "markdown" && window.currentSelectedTemplate) {
     await metaListManager.loadList();
   }
 
-  themeToggle.addEventListener("change", async (e) => {
-    const isDark = e.target.checked;
-    document.body.classList.toggle("dark-mode", isDark);
-    await window.configAPI.updateUserConfig({
-      theme: isDark ? "dark" : "light",
-    });
-    updateStatus(`Theme set to ${isDark ? "Dark" : "Light"}`);
-  });
-
-  contextToggle.addEventListener("change", async (e) => {
-    const mode = e.target.checked ? "markdown" : "template";
-    await window.configAPI.updateUserConfig({ context_mode: mode });
-    setContextView(mode, {
-      templateContainer,
-      markdownContainer,
-    });
-    if (mode === "markdown") {
-      await templateDropdown.refresh?.(); // always refresh
-      if (window.currentSelectedTemplate) {
-        await metaListManager.loadList();
-      }
-    }
-    updateStatus(
-      `Context set to ${mode === "markdown" ? "Markdown" : "Template"}`
-    );
-  });
+  initThemeToggle(themeToggle);
 });

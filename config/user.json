@@ -7,7 +7,7 @@
   },
   "theme": "light",
   "font_size": 14,
-  "context_mode": "markdown",
+  "context_mode": "template",
   "selected_template": "basic.yaml",
   "last_selected_template": "basic.yaml",
   "default_markdown_dir": "./markdowns"
