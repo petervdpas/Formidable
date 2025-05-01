@@ -32,6 +32,7 @@ function createWindow() {
       contextIsolation: true,
       preload: fileManager.joinPath(__dirname, "preload.js"),
     },
+    icon: fileManager.joinPath(__dirname, "assets", "formidable.png"),
   });
 
   win.loadFile("index.html");
