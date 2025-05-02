@@ -13,7 +13,8 @@ export function initYamlEditor(containerId, onSaveCallback) {
 
   log("[YamlEditor] Initialized editor in container:", containerId);
   let currentData = null;
-  let editModal, currentEditIndex = null;
+  let editModal,
+    currentEditIndex = null;
 
   function renderEditor(data) {
     currentData = structuredClone(data);
@@ -28,7 +29,9 @@ export function initYamlEditor(containerId, onSaveCallback) {
         </div>
         <div class="form-row">
           <label for="markdown-dir">Markdown Dir</label>
-          <input type="text" id="markdown-dir" value="${currentData.markdown_dir || ""}" />
+          <input type="text" id="markdown-dir" value="${
+            currentData.markdown_dir || ""
+          }" />
         </div>
       </fieldset>
 
@@ -60,7 +63,9 @@ export function initYamlEditor(containerId, onSaveCallback) {
       item.innerHTML = `
         <div class="field-label">
           ${field.label}
-          <span class="field-type type-${field.type}">(${field.type.toUpperCase()})</span>
+          <span class="field-type type-${
+            field.type
+          }">(${field.type.toUpperCase()})</span>
         </div>
         <div class="field-actions">
           <button class="btn btn-warn action-edit" data-idx="${idx}">Edit</button>
@@ -102,7 +107,9 @@ export function initYamlEditor(containerId, onSaveCallback) {
     modal.querySelector("#edit-label").value = field.label;
     modal.querySelector("#edit-default").value = field.default || "";
     modal.querySelector("#edit-markdown").value = field.markdown || "";
-    modal.querySelector("#edit-options").value = (field.options || []).join(", ");
+    modal.querySelector("#edit-options").value = (field.options || []).join(
+      ", "
+    );
 
     editModal.show();
   }
@@ -128,7 +135,7 @@ export function initYamlEditor(containerId, onSaveCallback) {
         updateStatus("No template selected.");
         return;
       }
-    
+
       const confirmed = await showConfirmModal(
         `Are you sure you want to delete template: ${filename}?`,
         {
@@ -138,17 +145,18 @@ export function initYamlEditor(containerId, onSaveCallback) {
           height: "auto",
         }
       );
-    
+
       if (!confirmed) return;
-    
+
       const success = await window.api.templates.deleteTemplate(filename);
       if (success) {
         log("[YamlEditor] Deleted template:", filename);
-        container.innerHTML = "<div class='empty-message'>Template deleted.</div>";
+        container.innerHTML =
+          "<div class='empty-message'>Template deleted.</div>";
         updateStatus(`Deleted template: ${filename}`);
         window.currentSelectedTemplate = null;
         window.currentSelectedTemplateName = null;
-    
+
         if (window.templateListManager?.loadList) {
           window.templateListManager.loadList();
         }
@@ -205,4 +213,3 @@ export function initYamlEditor(containerId, onSaveCallback) {
 
   return { render: renderEditor };
 }
-

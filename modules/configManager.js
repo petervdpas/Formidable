@@ -2,29 +2,16 @@
 
 const { log, error } = require("./nodeLogger");
 const fileManager = require("./fileManager");
+const schema = require("./config.schema.js");
 
 const configDir = fileManager.resolvePath("config");
 const configPath = fileManager.resolvePath("config", "user.json");
 
-const defaultConfig = {
-  recent_templates: ["basic.yaml"],
-  last_opened_markdown: { "basic.yaml": "" },
-  selected_template: "basic.yaml",
-  theme: "light",
-  font_size: 14,
-  context_mode: "template",
-  default_markdown_dir: "./markdowns",
-};
-
-log("[ConfigManager] Config directory:", configDir);
-log("[ConfigManager] Config file path:", configPath);
-
-// Ensure config dir and user.json exist
 function ensureConfigFile() {
   fileManager.ensureDirectory(configDir, { silent: false });
 
-  if (!configFileExists()) {
-    fileManager.saveFile(configPath, defaultConfig, {
+  if (!fileManager.fileExists(configPath)) {
+    fileManager.saveFile(configPath, schema.defaults, {
       format: "json",
       silent: false,
     });
@@ -34,50 +21,28 @@ function ensureConfigFile() {
   }
 }
 
-// Internal file existence helper
-function configFileExists() {
-  try {
-    fileManager.loadFile(configPath, { format: "json", silent: true });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-// Load full user config
 function loadUserConfig() {
   ensureConfigFile();
 
   try {
-    const config = fileManager.loadFile(configPath, {
+    const raw = fileManager.loadFile(configPath, {
       format: "json",
       silent: false,
     });
 
-    // Auto-repair missing fields
-    let updated = false;
-    for (const key in defaultConfig) {
-      if (!(key in config)) {
-        config[key] = defaultConfig[key];
-        updated = true;
-      }
-    }
-
-    if (updated) {
+    const { config, changed } = schema.sanitize(raw);
+    if (changed) {
       saveUserConfig(config);
-      log("[ConfigManager] Auto-repaired user config: missing fields added.");
-    } else {
-      log("[ConfigManager] User config loaded successfully.");
+      log("[ConfigManager] Repaired missing config fields.");
     }
 
     return config;
   } catch (err) {
-    error("[ConfigManager] Failed to load user config:", err);
-    return { ...defaultConfig };
+    error("[ConfigManager] Failed to load config:", err);
+    return { ...schema.defaults };
   }
 }
 
-// Save full config
 function saveUserConfig(config) {
   try {
     fileManager.saveFile(configPath, config, {
@@ -90,13 +55,12 @@ function saveUserConfig(config) {
   }
 }
 
-// Merge a partial update into current config
 function updateUserConfig(partial) {
   try {
     const current = loadUserConfig();
     const updated = { ...current, ...partial };
     saveUserConfig(updated);
-    log("[ConfigManager] Updated user config with partial changes:", partial);
+    log("[ConfigManager] Merged partial config:", partial);
   } catch (err) {
     error("[ConfigManager] Failed to update user config:", err);
   }

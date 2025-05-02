@@ -2,6 +2,7 @@
 
 const fileManager = require("./fileManager");
 const { log, warn, error } = require("./nodeLogger");
+const schema = require("./template.schema");
 
 const templatesDir = fileManager.joinPath("templates");
 const basicYamlName = "basic.yaml";
@@ -26,22 +27,17 @@ function listTemplates() {
 function loadTemplate(name) {
   const filePath = fileManager.joinPath("templates", name);
   try {
-    const data = fileManager.loadFile(filePath, { format: "yaml" });
-
-    if (data.markdown_dir && typeof data.markdown_dir === "string") {
-      data.markdown_dir = fileManager.joinPath(data.markdown_dir);
-    }
-
-    return data;
+    const raw = fileManager.loadFile(filePath, { format: "yaml" });
+    const sanitized = schema.sanitize(raw);
+    return sanitized;
   } catch (err) {
-    error("[TemplateManager] Failed to load template file:", filePath, err);
+    error("[TemplateManager] Failed to load:", filePath, err);
     return null;
   }
 }
 
 function saveTemplate(name, data) {
   try {
-    // Normalize path
     if (typeof data.markdown_dir === "string") {
       data.markdown_dir = data.markdown_dir.replace(/\\/g, "/");
     }
@@ -79,7 +75,6 @@ function deleteTemplate(name) {
   }
 }
 
-// 🧠 Still a unique helper — okay to keep
 function getTemplateDescriptor(name) {
   const data = loadTemplate(name);
 

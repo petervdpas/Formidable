@@ -1,7 +1,7 @@
 // modules/formUI.js
 
-import { updateStatus } from "./statusManager.js"; 
-import { log, warn, error } from "./logger.js"; 
+import { updateStatus } from "./statusManager.js";
+import { log, warn, error } from "./logger.js";
 
 function renderForm(container, template) {
   if (!container || !template) {
@@ -9,7 +9,10 @@ function renderForm(container, template) {
     return {};
   }
 
-  log("[FormInputManager] Rendering form for:", template.name || "Unnamed Template");
+  log(
+    "[FormInputManager] Rendering form for:",
+    template.name || "Unnamed Template"
+  );
 
   container.innerHTML = "";
   const fields = template.fields || [];

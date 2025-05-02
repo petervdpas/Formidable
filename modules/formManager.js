@@ -1,7 +1,8 @@
-// modules/formManager.js (Node, CommonJS)
+// modules/formManager.js
 
 const { SingleFileRepository } = require("./sfr");
 const fileManager = require("./fileManager");
+const metaSchema = require("./meta.schema");
 const { log, warn, error } = require("./nodeLogger");
 
 const metaRepo = new SingleFileRepository({
@@ -26,8 +27,19 @@ function listForms(markdownDir) {
   return metaRepo.listFiles(markdownDir);
 }
 
-function loadForm(markdownDir, filename) {
-  return metaRepo.loadFromBase(markdownDir, filename);
+function loadForm(markdownDir, filename, templateFields = []) {
+  try {
+    const raw = metaRepo.loadFromBase(markdownDir, filename);
+    if (!raw) {
+      warn("[FormManager] No data loaded.");
+      return null;
+    }
+    const sanitized = metaSchema.sanitize(raw, templateFields);
+    return sanitized;
+  } catch (err) {
+    error("[FormManager] Failed to load form:", err);
+    return null;
+  }
 }
 
 function saveForm(markdownDir, filename, data) {

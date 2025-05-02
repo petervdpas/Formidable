@@ -229,7 +229,7 @@ export function initMetaListManager(formManager, modal) {
           return;
         }
         const dir = template.markdown_dir;
-        const data = await window.api.forms.loadForm(dir, entryName);
+        const data = await window.api.forms.loadForm(dir, entryName, template.fields || []);
         if (!data) {
           updateStatus("Failed to load metadata entry.");
           return;

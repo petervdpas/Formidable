@@ -18,7 +18,6 @@ const formManager = require("./modules/formManager");
 const markdownManager = require("./modules/markdownManager");
 const configManager = require("./modules/configManager");
 
-
 function createWindow() {
   const win = new BrowserWindow({
     width: 1000,
@@ -90,18 +89,26 @@ ipcMain.handle("shell-open-path", async (event, targetPath) => {
 // Template handlers
 registerIpc("list-templates", () => templateManager.listTemplates());
 registerIpc("load-template", (e, name) => templateManager.loadTemplate(name));
-registerIpc("save-template", (e, name, data) => templateManager.saveTemplate(name, data));
-registerIpc("delete-template", (e, name) => templateManager.deleteTemplate(name));
-registerIpc("get-template-descriptor", (e, name) => templateManager.getTemplateDescriptor(name));
-registerIpc("create-basic-template", () => templateManager.createBasicTemplateIfMissing());
+registerIpc("save-template", (e, name, data) =>
+  templateManager.saveTemplate(name, data)
+);
+registerIpc("delete-template", (e, name) =>
+  templateManager.deleteTemplate(name)
+);
+registerIpc("get-template-descriptor", (e, name) =>
+  templateManager.getTemplateDescriptor(name)
+);
+registerIpc("create-basic-template", () =>
+  templateManager.createBasicTemplateIfMissing()
+);
 
 // Form JSON handlers
 registerIpc("ensure-form-dir", (event, dir) =>
   formManager.ensureFormDirectory(dir)
 );
 registerIpc("list-forms", (event, dir) => formManager.listForms(dir));
-registerIpc("load-form", (event, dir, filename) =>
-  formManager.loadForm(dir, filename)
+registerIpc("load-form", (event, dir, filename, templateFields = []) =>
+  formManager.loadForm(dir, filename, templateFields)
 );
 registerIpc("save-form", (event, dir, filename, data) =>
   formManager.saveForm(dir, filename, data)
@@ -114,7 +121,9 @@ registerIpc("delete-form", (event, dir, filename) =>
 registerIpc("ensure-markdown-dir", (event, dir) =>
   markdownManager.ensureMarkdownDirectory(dir)
 );
-registerIpc("list-markdowns", (event, dir) => markdownManager.listMarkdownFiles(dir));
+registerIpc("list-markdowns", (event, dir) =>
+  markdownManager.listMarkdownFiles(dir)
+);
 registerIpc("load-markdown", (event, dir, filename) =>
   markdownManager.loadMarkdownFile(dir, filename)
 );

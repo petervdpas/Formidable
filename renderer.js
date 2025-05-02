@@ -59,7 +59,10 @@ window.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const success = await window.api.templates.saveTemplate(filename, updatedYaml);
+    const success = await window.api.templates.saveTemplate(
+      filename,
+      updatedYaml
+    );
     if (success) {
       updateStatus(`Saved: ${filename}`);
       log("[YamlEditor] Saved template:", filename);
