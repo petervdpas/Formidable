@@ -13,7 +13,7 @@ const defaultConfig = {
   theme: "light",
   font_size: 14,
   context_mode: "template",
-  default_markdown_dir: "./markdowns", // ✅ add this line
+  default_markdown_dir: "./markdowns",
 };
 
 log("[ConfigManager] Config directory:", configDir);

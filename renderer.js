@@ -16,7 +16,7 @@ import { initThemeToggle, applyInitialTheme } from "./modules/themeToggler.js";
 import {
   initTemplateListManager,
   initMetaListManager,
-} from "./modules/listLoader.js";
+} from "./modules/sidebarManager.js";
 import { createTemplateSelector } from "./modules/templateSelector.js";
 
 window.addEventListener("DOMContentLoaded", async () => {
