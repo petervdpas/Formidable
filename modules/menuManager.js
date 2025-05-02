@@ -124,7 +124,7 @@ export async function handleMenuAction(action) {
       break;
 
     case "about":
-      alert("Formidable v1.0\nMarkdown Form Editor\nBuilt with Electron");
+      window.openAboutModal?.();
       break;
   }
 }

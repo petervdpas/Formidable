@@ -4,6 +4,7 @@ const {
   app,
   dialog,
   shell,
+  clipboard,
   BrowserWindow,
   Menu,
   ipcMain,
@@ -73,7 +74,6 @@ app.on("window-all-closed", () => {
 ipcMain.handle("app-quit", () => {
   app.quit();
 });
-
 ipcMain.handle("toggle-devtools", (event) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   if (win) {
@@ -81,9 +81,33 @@ ipcMain.handle("toggle-devtools", (event) => {
     wc.isDevToolsOpened() ? wc.closeDevTools() : wc.openDevTools();
   }
 });
-
 ipcMain.handle("shell-open-path", async (event, targetPath) => {
   return await shell.openPath(targetPath); // returns empty string on success
+});
+ipcMain.handle("shell-open-external", async (event, url) => {
+  return await shell.openExternal(url); // Opens in default browser
+});
+ipcMain.on("window-reload", (e) => {
+  const win = BrowserWindow.fromWebContents(e.sender);
+  win?.reload();
+});
+ipcMain.on("window-minimize", (e) => {
+  const win = BrowserWindow.fromWebContents(e.sender);
+  win?.minimize();
+});
+ipcMain.on("window-maximize", (e) => {
+  const win = BrowserWindow.fromWebContents(e.sender);
+  win?.maximize();
+});
+ipcMain.on("window-close", (e) => {
+  const win = BrowserWindow.fromWebContents(e.sender);
+  win?.close();
+});
+ipcMain.handle("clipboard-write", (e, text) => {
+  clipboard.writeText(text);
+});
+ipcMain.handle("clipboard-read", () => {
+  return clipboard.readText();
 });
 
 // Template handlers

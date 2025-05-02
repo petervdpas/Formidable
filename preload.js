@@ -1,6 +1,6 @@
 // preload.js
 
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge, ipcRenderer, dialog } = require("electron");
 
 // ---------- IPC Method Groups ----------
 const api = {
@@ -39,17 +39,16 @@ const api = {
     resolvePath: (...args) => ipcRenderer.invoke("resolve-path", ...args),
     fileExists: (path) => ipcRenderer.invoke("file-exists", path),
   },
-};
-
-// ---------- Dialog API ----------
-const dialogAPI = {
-  chooseDirectory: () => ipcRenderer.invoke("dialog-choose-directory"),
+  dialog: {
+    chooseDirectory: () => ipcRenderer.invoke("dialog-choose-directory"),
+  },
 };
 
 // ---------- Electron Shell / App Controls ----------
 const electronAPI = {
   shell: {
     openPath: (targetPath) => ipcRenderer.invoke("shell-open-path", targetPath),
+    openExternal: (url) => ipcRenderer.invoke("shell-open-external", url),
   },
   app: {
     quit: () => ipcRenderer.invoke("app-quit"),
@@ -57,11 +56,20 @@ const electronAPI = {
   devtools: {
     toggle: () => ipcRenderer.invoke("toggle-devtools"),
   },
+  window: {
+    reload: () => ipcRenderer.send("window-reload"),
+    minimize: () => ipcRenderer.send("window-minimize"),
+    maximize: () => ipcRenderer.send("window-maximize"),
+    close: () => ipcRenderer.send("window-close"),
+  },
+  clipboard: {
+    writeText: (text) => ipcRenderer.invoke("clipboard-write", text),
+    readText: () => ipcRenderer.invoke("clipboard-read"),
+  },
 };
 
 // ---------- Expose to Renderer ----------
 contextBridge.exposeInMainWorld("api", api);
-contextBridge.exposeInMainWorld("dialogAPI", dialogAPI);
 contextBridge.exposeInMainWorld("electron", electronAPI);
 
 // ---------- Helpers ----------

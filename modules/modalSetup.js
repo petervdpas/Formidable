@@ -22,7 +22,7 @@ export function setupSettingsModal(themeToggle, contextToggle) {
       defaultDirInput.value = config.default_markdown_dir || "./markdowns";
 
       chooseDirBtn.onclick = async () => {
-        const selected = await window.dialogAPI.chooseDirectory();
+        const selected = await window.api.dialog.chooseDirectory();
         if (selected) {
           const appRoot = (await window.api.system.getAppRoot?.()) || ".";
           const relativePath = selected.startsWith(appRoot)
@@ -60,6 +60,17 @@ export function setupTemplateModal() {
     escToClose: true,
     backdropClick: true,
     width: "30em",
+    height: "auto",
+  });
+}
+
+export function setupAboutModal() {
+  return setupModal("about-modal", {
+    closeBtn: "about-close",
+    escToClose: true,
+    backdropClick: true,
+    resizable: false,
+    width: "25em",
     height: "auto",
   });
 }

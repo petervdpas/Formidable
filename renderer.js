@@ -5,6 +5,7 @@ import {
   setupSettingsModal,
   setupEntryModal,
   setupTemplateModal,
+  setupAboutModal,
 } from "./modules/modalSetup.js";
 import { initYamlEditor } from "./modules/yaml_editor.js";
 import { createDropdown } from "./modules/dropdownManager.js";
@@ -81,9 +82,11 @@ window.addEventListener("DOMContentLoaded", async () => {
   const settings = setupSettingsModal(themeToggle, contextToggle);
   const entryInputModal = setupEntryModal();
   const templateModal = setupTemplateModal();
+  const aboutModal = setupAboutModal();
 
-  window.openSettingsModal = settings.show;
   window.currentSelectedTemplateName = null;
+  window.openSettingsModal = settings.show;
+  window.openAboutModal = aboutModal.show;
 
   const templateDropdown = createDropdown({
     containerId: "template-selector",
