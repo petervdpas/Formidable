@@ -40,7 +40,7 @@ export function createTemplateSelector({
   }
 
   async function loadTemplateOptions() {
-    const templateFiles = await window.api.listTemplateFiles();
+    const templateFiles = await window.api.listTemplates();
     const options = templateFiles.map((name) => ({
       value: name,
       label: name.replace(/\.yaml$/, ""),

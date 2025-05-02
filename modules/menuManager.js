@@ -91,9 +91,9 @@ export async function handleMenuAction(action) {
           return;
         }
 
-        const yaml = await window.api.loadTemplateFile(templateName);
+        const yaml = await window.api.loadTemplate(templateName);
         const targetPath = await window.api.resolvePath(yaml.markdown_dir);
-        await window.api.ensureMarkdownDir?.(targetPath);
+        await window.api.ensureFormDir?.(targetPath);
 
         const result = await window.electron.shell.openPath(targetPath);
         if (result) {

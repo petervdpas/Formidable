@@ -9,7 +9,7 @@ import {
 import { initYamlEditor } from "./modules/yaml_editor.js";
 import { createDropdown } from "./modules/dropdownManager.js";
 import { initStatusManager, updateStatus } from "./modules/statusManager.js";
-import { initFormManager } from "./modules/formManager.js";
+import { initFormManager } from "./modules/formUI.js";
 import { log, warn, error } from "./modules/logger.js";
 import { setContextView, initContextToggle } from "./modules/contextManager.js";
 import { initThemeToggle, applyInitialTheme } from "./modules/themeToggler.js";
@@ -59,7 +59,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const success = await window.api.saveTemplateFile(filename, updatedYaml);
+    const success = await window.api.saveTemplate(filename, updatedYaml);
     if (success) {
       updateStatus(`Saved: ${filename}`);
       log("[YamlEditor] Saved template:", filename);
@@ -91,7 +91,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       await selectTemplate(selectedName);
     },
     onRefresh: async () => {
-      const templates = await window.api.listTemplateFiles();
+      const templates = await window.api.listTemplates();
       return templates.map((name) => ({
         value: name,
         label: name.replace(/\.yaml$/, ""),

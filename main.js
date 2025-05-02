@@ -11,23 +11,13 @@ const {
 const { log, warn, error } = require("./modules/nodeLogger");
 const { registerIpc } = require("./modules/ipcRoutes");
 
-const { SingleFileRepository } = require("./modules/sfr");
 const fileManager = require("./modules/fileManager");
 const fileTransformer = require("./modules/fileTransformer");
 const templateManager = require("./modules/templateManager");
+const formManager = require("./modules/formManager");
+const markdownManager = require("./modules/markdownManager");
 const configManager = require("./modules/configManager");
 
-const metaRepo = new SingleFileRepository({
-  defaultExtension: ".meta.json",
-  defaultJson: true,
-  silent: false,
-});
-
-const markdownRepo = new SingleFileRepository({
-  defaultExtension: ".md",
-  defaultJson: false,
-  silent: false,
-});
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -43,7 +33,7 @@ function createWindow() {
     },
     icon: fileManager.joinPath(__dirname, "assets", "formidable.png"),
   });
-  
+
   // Disable Electron's native menu
   Menu.setApplicationMenu(null);
 
@@ -60,7 +50,8 @@ function createWindow() {
 app.whenReady().then(() => {
   log("[Main] App is ready. Checking environment...");
 
-  templateManager.ensureTemplatesEnvironment();
+  templateManager.ensureTemplateDirectory();
+  templateManager.createBasicTemplateIfMissing();
   configManager.ensureConfigFile();
 
   createWindow();
@@ -96,19 +87,42 @@ ipcMain.handle("shell-open-path", async (event, targetPath) => {
   return await shell.openPath(targetPath); // returns empty string on success
 });
 
-// Template YAML handlers
-registerIpc("list-template-files", () => templateManager.getTemplateList());
-registerIpc("load-template-file", (event, name) =>
-  templateManager.loadTemplateFile(name)
+// Template handlers
+registerIpc("list-templates", () => templateManager.listTemplates());
+registerIpc("load-template", (e, name) => templateManager.loadTemplate(name));
+registerIpc("save-template", (e, name, data) => templateManager.saveTemplate(name, data));
+registerIpc("delete-template", (e, name) => templateManager.deleteTemplate(name));
+registerIpc("get-template-descriptor", (e, name) => templateManager.getTemplateDescriptor(name));
+registerIpc("create-basic-template", () => templateManager.createBasicTemplateIfMissing());
+
+// Form JSON handlers
+registerIpc("ensure-form-dir", (event, dir) =>
+  formManager.ensureFormDirectory(dir)
 );
-registerIpc("save-template-file", (event, name, data) =>
-  templateManager.saveTemplateFile(name, data)
+registerIpc("list-forms", (event, dir) => formManager.listForms(dir));
+registerIpc("load-form", (event, dir, filename) =>
+  formManager.loadForm(dir, filename)
 );
-registerIpc("get-template-descriptor", (event, name) => {
-  return templateManager.getTemplateDescriptor(name);
-});
-registerIpc("delete-template-file", (event, name) =>
-  templateManager.deleteTemplateFile(name)
+registerIpc("save-form", (event, dir, filename, data) =>
+  formManager.saveForm(dir, filename, data)
+);
+registerIpc("delete-form", (event, dir, filename) =>
+  formManager.deleteForm(dir, filename)
+);
+
+// Markdown handlers
+registerIpc("ensure-markdown-dir", (event, dir) =>
+  markdownManager.ensureMarkdownDirectory(dir)
+);
+registerIpc("list-markdowns", (event, dir) => markdownManager.listMarkdownFiles(dir));
+registerIpc("load-markdown", (event, dir, filename) =>
+  markdownManager.loadMarkdownFile(dir, filename)
+);
+registerIpc("save-markdown", (event, dir, filename, data) =>
+  markdownManager.saveMarkdownFile(dir, filename, data)
+);
+registerIpc("delete-markdown", (event, dir, filename) =>
+  markdownManager.deleteMarkdownFile(dir, filename)
 );
 
 // Config handlers
@@ -118,36 +132,6 @@ registerIpc("save-user-config", (event, cfg) =>
 );
 registerIpc("update-user-config", (event, partial) =>
   configManager.updateUserConfig(partial)
-);
-
-// Filesystem utilities
-registerIpc("ensure-markdown-dir", (event, dir) => {
-  const fullPath = fileManager.resolvePath(dir);
-  fileManager.ensureDirectory(fullPath, { silent: true });
-  log("[IPC] Ensured markdown directory exists:", fullPath);
-  return true;
-});
-
-// Meta repository
-registerIpc("list-meta", (event, directory) => metaRepo.listFiles(directory));
-registerIpc("load-meta", (event, directory, filename) =>
-  metaRepo.loadFromBase(directory, filename)
-);
-registerIpc("save-meta", (event, directory, filename, data) =>
-  metaRepo.saveFromBase(directory, filename, data)
-);
-
-// Markdown repository
-registerIpc("list-markdown", (event, directory) =>
-  markdownRepo.listFiles(directory)
-);
-registerIpc("load-markdown", (event, directory, filename) =>
-  markdownRepo.loadFromBase(directory, filename)
-);
-registerIpc("save-markdown", (event, directory, filename, data) =>
-  markdownRepo.saveFromBase(directory, filename, data, {
-    transform: fileTransformer.generateMarkdownFromFields,
-  })
 );
 
 // Markdown transform

@@ -4,18 +4,25 @@ const { contextBridge, ipcRenderer, shell } = require("electron");
 
 // API methods exposed under window.api
 const apiMethods = [
-  "list-template-files",
-  "load-template-file",
-  "save-template-file",
-  "delete-template-file",
+
+  "list-templates",
+  "load-template",
+  "save-template",
+  "delete-template",
   "get-template-descriptor",
+
+  "ensure-form-dir",
+  "list-forms",
+  "load-form",
+  "save-form",
+  "delete-form",
+
   "ensure-markdown-dir",
-  "list-meta",
-  "load-meta",
-  "save-meta",
-  "list-markdown",
+  "list-markdowns",
   "load-markdown",
   "save-markdown",
+  "delete-markdown",
+
   "parse-markdown-to-fields",
   "generate-markdown-from-fields",
 ];

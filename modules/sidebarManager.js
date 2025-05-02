@@ -151,10 +151,10 @@ export function initTemplateListManager(
 
   listManager = createListManager({
     elementId: "template-list",
-    fetchListFunction: async () => await window.api.listTemplateFiles(),
+    fetchListFunction: async () => await window.api.listTemplates(),
     onItemClick: async (itemName) => {
       try {
-        const data = await window.api.loadTemplateFile(itemName);
+        const data = await window.api.loadTemplate(itemName);
         yamlEditor.render(data);
 
         window.currentSelectedTemplate = data;
@@ -178,7 +178,7 @@ export function initTemplateListManager(
           defaultMarkdownDir,
           async ({ filename, yaml }) => {
             try {
-              await window.api.saveTemplateFile(filename, yaml);
+              await window.api.saveTemplate(filename, yaml);
               await listManager.loadList();
               await window.configAPI.updateUserConfig({
                 recent_templates: [filename],
@@ -217,8 +217,8 @@ export function initMetaListManager(formManager, modal) {
         updateStatus("Template missing markdown_dir field.");
         return [];
       }
-      await window.api.ensureMarkdownDir(template.markdown_dir);
-      const files = await window.api.listMeta(template.markdown_dir);
+      await window.api.ensureFormDir(template.markdown_dir);
+      const files = await window.api.listForms(template.markdown_dir);
       return files.map((f) => f.replace(/\.meta\.json$/, ""));
     },
     onItemClick: async (entryName) => {
@@ -229,7 +229,7 @@ export function initMetaListManager(formManager, modal) {
           return;
         }
         const dir = template.markdown_dir;
-        const data = await window.api.loadMeta(dir, entryName);
+        const data = await window.api.loadForm(dir, entryName);
         if (!data) {
           updateStatus("Failed to load metadata entry.");
           return;
