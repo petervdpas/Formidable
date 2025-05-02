@@ -12,7 +12,7 @@ export function setupSettingsModal(themeToggle, contextToggle) {
     width: "30em",
     height: "auto",
     onOpen: async () => {
-      const config = await window.configAPI.loadUserConfig();
+      const config = await window.api.config.loadUserConfig();
       themeToggle.checked = config.theme === "dark";
       contextToggle.checked = config.context_mode === "markdown";
 
@@ -24,7 +24,7 @@ export function setupSettingsModal(themeToggle, contextToggle) {
       chooseDirBtn.onclick = async () => {
         const selected = await window.dialogAPI.chooseDirectory();
         if (selected) {
-          const appRoot = (await window.api.getAppRoot?.()) || ".";
+          const appRoot = (await window.api.system.getAppRoot?.()) || ".";
           const relativePath = selected.startsWith(appRoot)
             ? "./" +
               selected
@@ -34,7 +34,7 @@ export function setupSettingsModal(themeToggle, contextToggle) {
             : selected;
 
           defaultDirInput.value = relativePath;
-          await window.configAPI.updateUserConfig({
+          await window.api.config.updateUserConfig({
             default_markdown_dir: relativePath,
           });
           updateStatus(`Updated default markdown dir: ${relativePath}`);

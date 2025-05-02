@@ -47,7 +47,7 @@ export function initContextToggle({
 }) {
   toggleElement.addEventListener("change", async (e) => {
     const mode = e.target.checked ? "markdown" : "template";
-    await window.configAPI.updateUserConfig({ context_mode: mode });
+    await window.api.config.updateUserConfig({ context_mode: mode });
 
     setContextView(mode, containers);
 

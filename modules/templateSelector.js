@@ -28,7 +28,7 @@ export function createTemplateSelector({
         templateDropdown.setSelected(name);
       }
 
-      await window.configAPI.updateUserConfig({ last_selected_template: name });
+      await window.api.config.updateUserConfig({ last_selected_template: name });
       await window.api.markdown.ensureMarkdownDir(result.markdownDir);
       await formManager.loadTemplate(yamlData);
       await metaListManager.loadList();
@@ -47,7 +47,7 @@ export function createTemplateSelector({
     }));
     templateDropdown.updateOptions(options);
 
-    const config = await window.configAPI.loadUserConfig();
+    const config = await window.api.config.loadUserConfig();
     const lastSelected = config.last_selected_template;
 
     if (lastSelected && templateFiles.includes(lastSelected)) {
@@ -56,7 +56,7 @@ export function createTemplateSelector({
       const fallback = options[0].value;
       log(`[loadTemplateOptions] Falling back to: ${fallback}`);
       await selectTemplate(fallback, { updateDropdown: false });
-      await window.configAPI.updateUserConfig({
+      await window.api.config.updateUserConfig({
         last_selected_template: fallback,
       });
     } else {

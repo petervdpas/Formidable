@@ -75,7 +75,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const formManager = initFormManager("markdown-content");
   window.formManager = formManager;
 
-  const config = await window.configAPI.loadUserConfig();
+  const config = await window.api.config.loadUserConfig();
   await applyInitialTheme(config);
 
   const settings = setupSettingsModal(themeToggle, contextToggle);

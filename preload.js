@@ -4,6 +4,11 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 // ---------- IPC Method Groups ----------
 const api = {
+  config: buildGroup([
+    "load-user-config",
+    "save-user-config",
+    "update-user-config",
+  ]),
   templates: buildGroup([
     "list-templates",
     "load-template",
@@ -29,16 +34,11 @@ const api = {
     "parse-markdown-to-fields",
     "generate-markdown-from-fields",
   ]),
-  getAppRoot: () => ipcRenderer.invoke("get-app-root"),
-  resolvePath: (...args) => ipcRenderer.invoke("resolve-path", ...args),
-  fileExists: (path) => ipcRenderer.invoke("file-exists", path),
-};
-
-// ---------- Config API ----------
-const configAPI = {
-  loadUserConfig: () => ipcRenderer.invoke("load-user-config"),
-  saveUserConfig: (cfg) => ipcRenderer.invoke("save-user-config", cfg),
-  updateUserConfig: (patch) => ipcRenderer.invoke("update-user-config", patch),
+  system: {
+    getAppRoot: () => ipcRenderer.invoke("get-app-root"),
+    resolvePath: (...args) => ipcRenderer.invoke("resolve-path", ...args),
+    fileExists: (path) => ipcRenderer.invoke("file-exists", path),
+  },
 };
 
 // ---------- Dialog API ----------
@@ -61,7 +61,6 @@ const electronAPI = {
 
 // ---------- Expose to Renderer ----------
 contextBridge.exposeInMainWorld("api", api);
-contextBridge.exposeInMainWorld("configAPI", configAPI);
 contextBridge.exposeInMainWorld("dialogAPI", dialogAPI);
 contextBridge.exposeInMainWorld("electron", electronAPI);
 

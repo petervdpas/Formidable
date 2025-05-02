@@ -61,7 +61,7 @@ export function buildMenu(containerId = "app-menu", commandHandler) {
 export async function handleMenuAction(action) {
   switch (action) {
     case "open-template-folder": {
-      const resolved = await window.api.resolvePath("templates");
+      const resolved = await window.api.system.resolvePath("templates");
       await window.api.markdown.ensureMarkdownDir?.(resolved);
       const result = await window.electron.shell.openPath(resolved);
       if (result) {
@@ -74,25 +74,25 @@ export async function handleMenuAction(action) {
 
     case "open-markdown-folder": {
       try {
-        const config = await window.configAPI.loadUserConfig();
+        const config = await window.api.config.loadUserConfig();
         const templateName = config.recent_templates?.[0];
         if (!templateName) {
           console.warn("[Menu] No recent_templates entry found.");
           return;
         }
 
-        const templatePath = await window.api.resolvePath(
+        const templatePath = await window.api.system.resolvePath(
           "templates",
           templateName
         );
-        const exists = await window.api.fileExists(templatePath);
+        const exists = await window.api.system.fileExists(templatePath);
         if (!exists) {
           console.error("[Menu] Template not found:", templatePath);
           return;
         }
 
         const yaml = await window.api.templates.loadTemplate(templateName);
-        const targetPath = await window.api.resolvePath(yaml.markdown_dir);
+        const targetPath = await window.api.system.resolvePath(yaml.markdown_dir);
         await window.api.forms.ensureFormDir?.(targetPath);
 
         const result = await window.electron.shell.openPath(targetPath);

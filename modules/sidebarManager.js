@@ -160,7 +160,7 @@ export function initTemplateListManager(
         window.currentSelectedTemplate = data;
         window.currentSelectedTemplateName = itemName;
 
-        await window.configAPI.updateUserConfig({
+        await window.api.config.updateUserConfig({
           recent_templates: [itemName],
         });
         updateStatus(`Loaded Template: ${itemName}`);
@@ -180,7 +180,7 @@ export function initTemplateListManager(
             try {
               await window.api.templates.saveTemplate(filename, yaml);
               await listManager.loadList();
-              await window.configAPI.updateUserConfig({
+              await window.api.config.updateUserConfig({
                 recent_templates: [filename],
               });
 

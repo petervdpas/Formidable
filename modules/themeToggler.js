@@ -6,7 +6,7 @@ export function initThemeToggle(toggleElement) {
   toggleElement.addEventListener("change", async (e) => {
     const isDark = e.target.checked;
     document.body.classList.toggle("dark-mode", isDark);
-    await window.configAPI.updateUserConfig({
+    await window.api.config.updateUserConfig({
       theme: isDark ? "dark" : "light",
     });
     updateStatus(`Theme set to ${isDark ? "Dark" : "Light"}`);
