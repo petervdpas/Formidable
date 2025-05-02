@@ -141,7 +141,7 @@ export function initYamlEditor(containerId, onSaveCallback) {
     
       if (!confirmed) return;
     
-      const success = await window.api.deleteTemplate(filename);
+      const success = await window.api.templates.deleteTemplate(filename);
       if (success) {
         log("[YamlEditor] Deleted template:", filename);
         container.innerHTML = "<div class='empty-message'>Template deleted.</div>";

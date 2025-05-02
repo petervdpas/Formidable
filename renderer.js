@@ -59,7 +59,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const success = await window.api.saveTemplate(filename, updatedYaml);
+    const success = await window.api.templates.saveTemplate(filename, updatedYaml);
     if (success) {
       updateStatus(`Saved: ${filename}`);
       log("[YamlEditor] Saved template:", filename);
@@ -91,7 +91,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       await selectTemplate(selectedName);
     },
     onRefresh: async () => {
-      const templates = await window.api.listTemplates();
+      const templates = await window.api.templates.listTemplates();
       return templates.map((name) => ({
         value: name,
         label: name.replace(/\.yaml$/, ""),

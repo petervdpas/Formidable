@@ -1,62 +1,53 @@
 // preload.js
 
-const { contextBridge, ipcRenderer, shell } = require("electron");
+const { contextBridge, ipcRenderer } = require("electron");
 
-// API methods exposed under window.api
-const apiMethods = [
+// ---------- IPC Method Groups ----------
+const api = {
+  templates: buildGroup([
+    "list-templates",
+    "load-template",
+    "save-template",
+    "delete-template",
+    "get-template-descriptor",
+  ]),
+  forms: buildGroup([
+    "ensure-form-dir",
+    "list-forms",
+    "load-form",
+    "save-form",
+    "delete-form",
+  ]),
+  markdown: buildGroup([
+    "ensure-markdown-dir",
+    "list-markdowns",
+    "load-markdown",
+    "save-markdown",
+    "delete-markdown",
+  ]),
+  transform: buildGroup([
+    "parse-markdown-to-fields",
+    "generate-markdown-from-fields",
+  ]),
+  getAppRoot: () => ipcRenderer.invoke("get-app-root"),
+  resolvePath: (...args) => ipcRenderer.invoke("resolve-path", ...args),
+  fileExists: (path) => ipcRenderer.invoke("file-exists", path),
+};
 
-  "list-templates",
-  "load-template",
-  "save-template",
-  "delete-template",
-  "get-template-descriptor",
+// ---------- Config API ----------
+const configAPI = {
+  loadUserConfig: () => ipcRenderer.invoke("load-user-config"),
+  saveUserConfig: (cfg) => ipcRenderer.invoke("save-user-config", cfg),
+  updateUserConfig: (patch) => ipcRenderer.invoke("update-user-config", patch),
+};
 
-  "ensure-form-dir",
-  "list-forms",
-  "load-form",
-  "save-form",
-  "delete-form",
-
-  "ensure-markdown-dir",
-  "list-markdowns",
-  "load-markdown",
-  "save-markdown",
-  "delete-markdown",
-
-  "parse-markdown-to-fields",
-  "generate-markdown-from-fields",
-];
-
-const api = {};
-for (const method of apiMethods) {
-  api[camelCase(method)] = (...args) => ipcRenderer.invoke(method, ...args);
-}
-api.getAppRoot = () => ipcRenderer.invoke("get-app-root");
-api.resolvePath = (...args) => ipcRenderer.invoke("resolve-path", ...args);
-api.fileExists = (path) => ipcRenderer.invoke("file-exists", path);
-
-contextBridge.exposeInMainWorld("api", api);
-
-// Config API exposed under window.configAPI
-const configMethods = [
-  "load-user-config",
-  "save-user-config",
-  "update-user-config",
-];
-const configAPI = {};
-for (const method of configMethods) {
-  configAPI[camelCase(method)] = (...args) =>
-    ipcRenderer.invoke(method, ...args);
-}
-contextBridge.exposeInMainWorld("configAPI", configAPI);
-
-// Dialog API (directory picker)
-contextBridge.exposeInMainWorld("dialogAPI", {
+// ---------- Dialog API ----------
+const dialogAPI = {
   chooseDirectory: () => ipcRenderer.invoke("dialog-choose-directory"),
-});
+};
 
-// Electron shell/app/devtools controls exposed under window.electron
-contextBridge.exposeInMainWorld("electron", {
+// ---------- Electron Shell / App Controls ----------
+const electronAPI = {
   shell: {
     openPath: (targetPath) => ipcRenderer.invoke("shell-open-path", targetPath),
   },
@@ -66,9 +57,24 @@ contextBridge.exposeInMainWorld("electron", {
   devtools: {
     toggle: () => ipcRenderer.invoke("toggle-devtools"),
   },
-});
+};
 
-// Helper to convert kebab-case to camelCase
+// ---------- Expose to Renderer ----------
+contextBridge.exposeInMainWorld("api", api);
+contextBridge.exposeInMainWorld("configAPI", configAPI);
+contextBridge.exposeInMainWorld("dialogAPI", dialogAPI);
+contextBridge.exposeInMainWorld("electron", electronAPI);
+
+// ---------- Helpers ----------
+function buildGroup(methods) {
+  const group = {};
+  for (const method of methods) {
+    const camel = camelCase(method);
+    group[camel] = (...args) => ipcRenderer.invoke(method, ...args);
+  }
+  return group;
+}
+
 function camelCase(str) {
   return str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
 }

@@ -12,7 +12,7 @@ export function createTemplateSelector({
     if (!name || name === window.currentSelectedTemplateName) return;
 
     try {
-      const result = await window.api.getTemplateDescriptor(name);
+      const result = await window.api.templates.getTemplateDescriptor(name);
       if (!result || !result.yaml) {
         throw new Error(
           `Template descriptor missing or malformed for: ${name}`
@@ -29,7 +29,7 @@ export function createTemplateSelector({
       }
 
       await window.configAPI.updateUserConfig({ last_selected_template: name });
-      await window.api.ensureMarkdownDir(result.markdownDir);
+      await window.api.markdown.ensureMarkdownDir(result.markdownDir);
       await formManager.loadTemplate(yamlData);
       await metaListManager.loadList();
       updateStatus(`Selected template: ${yamlData.name}`);
@@ -40,7 +40,7 @@ export function createTemplateSelector({
   }
 
   async function loadTemplateOptions() {
-    const templateFiles = await window.api.listTemplates();
+    const templateFiles = await window.api.templates.listTemplates();
     const options = templateFiles.map((name) => ({
       value: name,
       label: name.replace(/\.yaml$/, ""),

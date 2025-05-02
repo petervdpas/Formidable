@@ -160,7 +160,7 @@ export function initFormManager(containerId) {
     }
 
     const markdownDir = currentTemplate.markdown_dir;
-    const saveResult = await window.api.saveForm(
+    const saveResult = await window.api.forms.saveForm(
       markdownDir,
       filename + ".md",
       formData

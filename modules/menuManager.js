@@ -62,7 +62,7 @@ export async function handleMenuAction(action) {
   switch (action) {
     case "open-template-folder": {
       const resolved = await window.api.resolvePath("templates");
-      await window.api.ensureMarkdownDir?.(resolved);
+      await window.api.markdown.ensureMarkdownDir?.(resolved);
       const result = await window.electron.shell.openPath(resolved);
       if (result) {
         console.error("[Shell] Failed to open template folder:", result);
@@ -91,9 +91,9 @@ export async function handleMenuAction(action) {
           return;
         }
 
-        const yaml = await window.api.loadTemplate(templateName);
+        const yaml = await window.api.templates.loadTemplate(templateName);
         const targetPath = await window.api.resolvePath(yaml.markdown_dir);
-        await window.api.ensureFormDir?.(targetPath);
+        await window.api.forms.ensureFormDir?.(targetPath);
 
         const result = await window.electron.shell.openPath(targetPath);
         if (result) {
