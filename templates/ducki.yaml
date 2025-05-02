@@ -1,6 +1,0 @@
-name: ducki
-markdown_dir: ./markdowns/ducki
-fields:
-  - key: test
-    type: text
-    label: Test

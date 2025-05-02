@@ -13,6 +13,7 @@
     <!-- Core Styles -->
     <link rel="stylesheet" href="assets/layout.css" />
     <link rel="stylesheet" href="assets/menu.css" />
+    <link rel="stylesheet" href="assets/modal.css" />
     <link rel="stylesheet" href="assets/forms.css" />
     <link rel="stylesheet" href="assets/theme.css" />
     <link rel="stylesheet" href="assets/dark-theme.css" />
@@ -162,13 +163,8 @@
           <label for="edit-key">Key</label>
           <input type="text" id="edit-key" />
         </div>
-        <div class="form-row modal-form-row">
-          <label for="edit-type">Type</label>
-          <select id="edit-type">
-            <option value="text">Text</option>
-            <option value="boolean">Boolean</option>
-            <option value="dropdown">Dropdown</option>
-          </select>
+        <div class="form-row modal-form-row" id="edit-type-container">
+          <!-- Type dropdown will be injected here -->
         </div>
         <div class="form-row modal-form-row">
           <label for="edit-label">Label</label>
@@ -178,17 +174,8 @@
           <label for="edit-default">Default</label>
           <input type="text" id="edit-default" />
         </div>
-        <div class="form-row modal-form-row">
-          <label for="edit-markdown">Markdown</label>
-          <select id="edit-markdown">
-            <option value="">None</option>
-            <option value="h1">H1</option>
-            <option value="h2">H2</option>
-            <option value="h3">H3</option>
-            <option value="p">Paragraph</option>
-            <option value="checkbox">Checkbox</option>
-            <option value="list">List</option>
-          </select>
+        <div class="form-row modal-form-row" id="edit-markdown-container">
+          <!-- Markdown dropdown will be injected here -->
         </div>
         <div class="form-row modal-form-row">
           <label for="edit-options">Options</label>
@@ -222,7 +209,11 @@
       </div>
       <div class="modal-body">
         <div class="about-content">
-          <img src="assets/formidable.png" alt="Formidable Icon" class="about-icon" />
+          <img
+            src="assets/formidable.png"
+            alt="Formidable Icon"
+            class="about-icon"
+          />
           <div class="about-text">
             <p>Formidable is a Template/Form Editor created in Electron.</p>
             <p>© 2025 Peter van de Pas</p>

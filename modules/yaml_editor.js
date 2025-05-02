@@ -3,6 +3,8 @@
 import { log, warn } from "./logger.js";
 import { setupModal, showConfirmModal } from "./modalManager.js";
 import { updateStatus } from "./statusManager.js";
+import { fieldTypes } from "./fieldTypes.js";
+import { createDropdown } from "./dropdownManager.js";
 
 export function initYamlEditor(containerId, onSaveCallback) {
   const container = document.getElementById(containerId);
@@ -93,23 +95,41 @@ export function initYamlEditor(containerId, onSaveCallback) {
     });
   }
 
-  function applyModalTypeClass(modal, type) {
-    modal.classList.remove("modal-text", "modal-boolean", "modal-dropdown");
-    modal.classList.add(`modal-${type}`);
+  function applyModalTypeClass(modal, typeKey) {
+    if (!modal) return;
+  
+    // Remove existing modal-* classes except "modal"
+    modal.classList.forEach(cls => {
+      if (cls.startsWith("modal-") && cls !== "modal") {
+        modal.classList.remove(cls);
+      }
+    });
+  
+    const typeDef = fieldTypes[typeKey];
+    if (typeDef?.cssClass) {
+      modal.classList.add(typeDef.cssClass); // e.g., type-text
+    } else {
+      warn(`[YamlEditor] Unknown type "${typeKey}" passed to applyModalTypeClass.`);
+    }
   }
+
+  let typeDropdown = null;
+  let markdownDropdown = null;
 
   function openEditModal(field) {
     const modal = document.getElementById("field-edit-modal");
     applyModalTypeClass(modal, field.type || "text");
 
-    modal.querySelector("#edit-key").value = field.key;
-    modal.querySelector("#edit-type").value = field.type;
-    modal.querySelector("#edit-label").value = field.label;
-    modal.querySelector("#edit-default").value = field.default || "";
-    modal.querySelector("#edit-markdown").value = field.markdown || "";
-    modal.querySelector("#edit-options").value = (field.options || []).join(
+    document.getElementById("edit-key").value = field.key;
+    document.getElementById("edit-label").value = field.label;
+    document.getElementById("edit-default").value = field.default ?? "";
+    document.getElementById("edit-options").value = (field.options || []).join(
       ", "
     );
+
+    // ✅ Use .setSelected on dropdowns
+    typeDropdown?.setSelected(field.type || "text");
+    markdownDropdown?.setSelected(field.markdown || "");
 
     editModal.show();
   }
@@ -156,10 +176,8 @@ export function initYamlEditor(containerId, onSaveCallback) {
         updateStatus(`Deleted template: ${filename}`);
         window.currentSelectedTemplate = null;
         window.currentSelectedTemplateName = null;
-
-        if (window.templateListManager?.loadList) {
+        if (window.templateListManager?.loadList)
           window.templateListManager.loadList();
-        }
       } else {
         warn("[YamlEditor] Failed to delete template:", filename);
         updateStatus("Failed to delete template.");
@@ -175,19 +193,44 @@ export function initYamlEditor(containerId, onSaveCallback) {
         height: "auto",
       });
 
-      const modal = document.getElementById("field-edit-modal");
+      const typeOptions = Object.entries(fieldTypes).map(([key, def]) => ({
+        value: key,
+        label: def.label,
+      }));
 
-      document.getElementById("edit-type").addEventListener("change", (e) => {
-        const type = e.target.value;
-        applyModalTypeClass(modal, type);
+      const markdownOptions = Array.from(
+        new Set(
+          Object.values(fieldTypes).map((def) => def.defaultMarkdownHint || "")
+        )
+      )
+        .filter(Boolean)
+        .sort()
+        .map((tag) => ({ value: tag, label: tag.toUpperCase() }));
+
+      // ✅ Store references to use .setSelected later
+      typeDropdown = createDropdown({
+        containerId: "edit-type-container",
+        labelText: "Type",
+        options: typeOptions,
+        selectedValue: "text",
+        onChange: (val) => {
+          applyModalTypeClass(document.getElementById("field-edit-modal"), val);
+        },
+      });
+
+      markdownDropdown = createDropdown({
+        containerId: "edit-markdown-container",
+        labelText: "Markdown",
+        options: [{ value: "", label: "None" }, ...markdownOptions],
+        selectedValue: "",
       });
 
       document.getElementById("field-edit-confirm").onclick = () => {
         const key = document.getElementById("edit-key").value.trim();
-        const type = document.getElementById("edit-type").value;
+        const type = typeDropdown?.getSelected() || "text";
         const label = document.getElementById("edit-label").value.trim();
         const def = document.getElementById("edit-default").value.trim();
-        const markdown = document.getElementById("edit-markdown").value.trim();
+        const markdown = markdownDropdown?.getSelected() || "";
         const options = document
           .getElementById("edit-options")
           .value.split(",")
@@ -197,7 +240,9 @@ export function initYamlEditor(containerId, onSaveCallback) {
         const field = { key, type, label };
         if (def) field.default = def;
         if (markdown) field.markdown = markdown;
-        if (type === "dropdown" && options.length) field.options = options;
+        if (["dropdown", "radio"].includes(type) && options.length) {
+          field.options = options;
+        }
 
         if (currentEditIndex != null) {
           currentData.fields[currentEditIndex] = field;

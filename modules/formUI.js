@@ -1,5 +1,6 @@
 // modules/formUI.js
 
+import { fieldTypes } from "./fieldTypes.js";
 import { updateStatus } from "./statusManager.js";
 import { log, warn, error } from "./logger.js";
 
@@ -26,33 +27,23 @@ function renderForm(container, template) {
     label.textContent = field.label;
     fieldDiv.appendChild(label);
 
-    let input;
-    if (field.type === "boolean") {
-      input = document.createElement("input");
-      input.type = "checkbox";
-      input.checked = field.default === true;
-    } else if (field.type === "dropdown") {
-      input = document.createElement("select");
-      (field.options || []).forEach((opt) => {
-        const option = document.createElement("option");
-        option.value = opt;
-        option.textContent = opt;
-        input.appendChild(option);
-      });
-    } else {
-      input = document.createElement("input");
-      input.type = "text";
-      input.value = field.default || "";
+    const typeDef = fieldTypes[field.type];
+    if (!typeDef) {
+      warn(`[FormInputManager] Unknown field type: ${field.type}`);
+      return;
     }
 
-    input.name = field.key;
-    fieldElements[field.key] = input;
+    const input = typeDef.renderInput(field);
+    if (!input) {
+      warn(`[FormInputManager] No input rendered for type: ${field.type}`);
+      return;
+    }
 
+    fieldElements[field.key] = input;
     fieldDiv.appendChild(input);
     container.appendChild(fieldDiv);
   });
 
-  // Special: Add filename input
   const filenameDiv = document.createElement("div");
   filenameDiv.className = "form-row";
 
@@ -70,33 +61,73 @@ function renderForm(container, template) {
   return fieldElements;
 }
 
-function getFormData(container) {
+function getFormData(container, template) {
   const data = {};
-  container.querySelectorAll("input, select").forEach((el) => {
-    if (el.name) {
-      data[el.name] = el.type === "checkbox" ? el.checked : el.value;
+  const fields = template.fields || [];
+
+  fields.forEach((field) => {
+    const typeDef = fieldTypes[field.type];
+    if (!typeDef || typeof typeDef.parseValue !== "function") {
+      warn(`[FormOutputManager] No parser for field type: ${field.type}`);
+      return;
     }
+
+    const el = container.querySelector(`[name="${field.key}"]`);
+    if (!el) {
+      warn(`[FormOutputManager] Missing input for: ${field.key}`);
+      return;
+    }
+
+    data[field.key] = typeDef.parseValue(el);
   });
+
   log("[FormOutputManager] Collected form data:", data);
   return data;
 }
 
-function populateFormFields(fieldElements, data) {
+function populateFormFields(container, template, data) {
   if (!data) {
     warn("[FormOutputManager] No data to populate form fields.");
     return;
   }
 
-  for (const key in fieldElements) {
-    const el = fieldElements[key];
-    if (!el) continue;
+  const fields = template.fields || [];
 
-    if (el.type === "checkbox") {
-      el.checked = data[key] === true;
-    } else {
-      el.value = data[key] ?? "";
+  fields.forEach((field) => {
+    const typeDef = fieldTypes[field.type];
+    if (!typeDef || typeof typeDef.renderInput !== "function") {
+      warn(`[FormOutputManager] No renderer for field type: ${field.type}`);
+      return;
     }
-  }
+
+    const input = container.querySelector(`[name="${field.key}"]`);
+    if (!input) {
+      warn(`[FormOutputManager] Missing input for: ${field.key}`);
+      return;
+    }
+
+    const value = data[field.key];
+
+    // Smart assignment
+    if (input.type === "checkbox") {
+      input.checked = value === true;
+    } else if (input.type === "radio") {
+      const group = container.querySelectorAll(
+        `input[type="radio"][name="${field.key}"]`
+      );
+      group.forEach((el) => {
+        el.checked = el.value === value;
+      });
+    } else if (
+      input.tagName === "TEXTAREA" ||
+      input.tagName === "INPUT" ||
+      input.tagName === "SELECT"
+    ) {
+      input.value = value ?? "";
+    } else {
+      warn(`[FormOutputManager] Unhandled input type for: ${field.key}`);
+    }
+  });
 
   log("[FormOutputManager] Populated form fields from data.");
 }
@@ -131,7 +162,7 @@ export function initFormManager(containerId) {
 
   async function loadFormData(metaData, filename) {
     log("[FormManager] Loading metadata for:", filename);
-  
+
     if (!metaData && currentTemplate?.markdown_dir && filename) {
       metaData = await window.api.forms.loadForm(
         currentTemplate.markdown_dir,
@@ -139,14 +170,14 @@ export function initFormManager(containerId) {
         currentTemplate.fields || []
       );
     }
-  
+
     if (!metaData) {
       warn("[FormManager] No metadata available.");
       return;
     }
-  
-    populateFormFields(fieldElements, metaData);
-  
+
+    populateFormFields(container, currentTemplate, metaData);
+
     const filenameInput = container.querySelector("#markdown-filename");
     if (filenameInput) {
       filenameInput.value = filename.replace(/\.md$/, "");
@@ -162,7 +193,7 @@ export function initFormManager(containerId) {
       return;
     }
 
-    const formData = getFormData(container);
+    const formData = getFormData(container, currentTemplate);
     const filenameInput = container.querySelector("#markdown-filename");
     const filename = filenameInput?.value.trim();
 

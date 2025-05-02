@@ -1,5 +1,4 @@
 /* ───── Form Containers ───── */
-
 form,
 fieldset {
   border: 1px solid #888;
@@ -14,7 +13,6 @@ legend {
 }
 
 /* ───── General Row Layout ───── */
-
 .form-row {
   display: flex;
   align-items: center;
@@ -35,13 +33,12 @@ legend {
 }
 
 /* ───── Two Column Support ───── */
-
 .form-row.two-column {
   justify-content: space-between;
   gap: 12px;
 }
 
-.form-row.two-column > div {
+.form-row.two-column>div {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -53,7 +50,6 @@ legend {
 }
 
 /* ───── Field List ───── */
-
 #fields-list {
   list-style: none;
   margin: 0;
@@ -74,7 +70,6 @@ legend {
 }
 
 /* ───── Field Label & Type ───── */
-
 .field-label {
   font-weight: bold;
   display: flex;
@@ -91,40 +86,118 @@ legend {
 }
 
 /* ───── Action Button Wrapper ───── */
-
 .field-actions {
   display: flex;
   gap: 8px;
 }
 
 /* ───── Field Type Color Themes ───── */
-
+/* Sidebar Field List Items */
 .field-list-item[data-type="text"] {
-  background-color: #174c77;
-  border-left-color: #2196f3;
+  background-color: #1565c0;
+  /* Darker Blue */
+  border-left: 4px solid #2196f3;
 }
 
 .field-list-item[data-type="boolean"] {
-  background-color: #1b5e20;
-  border-left-color: #4caf50;
+  background-color: #2e7d32;
+  /* Darker Green */
+  border-left: 4px solid #4caf50;
 }
 
 .field-list-item[data-type="dropdown"] {
-  background-color: #4a148c;
-  border-left-color: #ba68c8;
+  background-color: #5e178b;
+  /* Darker Purple */
+  border-left: 4px solid #ba68c8;
 }
 
+.field-list-item[data-type="radio"] {
+  background-color: #cc4417;
+  /* Darker Orange */
+  border-left: 4px solid #ff7043;
+}
+
+.field-list-item[data-type="textarea"] {
+  background-color: #6c4ab0;
+  /* Darker Violet */
+  border-left: 4px solid #9575cd;
+}
+
+.field-list-item[data-type="number"] {
+  background-color: #3a94e4;
+  /* Darker Sky Blue */
+  border-left: 4px solid #64b5f6;
+}
+
+.field-list-item[data-type="date"] {
+  background-color: #229388;
+  /* Darker Aqua Green */
+  border-left: 4px solid #4dd0e1;
+}
+
+.field-list-item[data-type="list"] {
+  background-color: #6fbf73;
+  /* Darker Light Green */
+  border-left: 4px solid #aed581;
+}
+
+.field-list-item[data-type="table"] {
+  background-color: #ee9b84;
+  /* Darker Peach */
+  border-left: 4px solid #ffccbc;
+}
+
+/* ───── Field Type Color Badges ───── */
 .field-type.type-text {
-  background-color: #2196f3;
+  background-color: #1976d2;
+  /* Slightly darker Blue */
   color: white;
 }
 
 .field-type.type-boolean {
-  background-color: #4caf50;
+  background-color: #43a047;
+  /* Slightly darker Green */
   color: white;
 }
 
 .field-type.type-dropdown {
-  background-color: #ba68c8;
+  background-color: #a05db5;
+  /* Slightly darker Purple */
   color: white;
+}
+
+.field-type.type-radio {
+  background-color: #f46333;
+  /* Slightly darker Orange */
+  color: white;
+}
+
+.field-type.type-textarea {
+  background-color: #8567b9;
+  /* Slightly darker Violet */
+  color: white;
+}
+
+.field-type.type-number {
+  background-color: #5aaae9;
+  /* Slightly darker Light Blue */
+  color: black;
+}
+
+.field-type.type-date {
+  background-color: #44c5d1;
+  /* Slightly darker Cyan */
+  color: black;
+}
+
+.field-type.type-list {
+  background-color: #9dcf6e;
+  /* Slightly darker Yellow Green */
+  color: black;
+}
+
+.field-type.type-table {
+  background-color: #f5bfa9;
+  /* Slightly darker Pale Peach */
+  color: black;
 }
