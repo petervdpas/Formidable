@@ -9,6 +9,5 @@
   "theme": "dark",
   "font_size": 14,
   "context_mode": "markdown",
-  "default_markdown_dir": "./markdowns",
-  "last_selected_template": "ducki.yaml"
+  "default_markdown_dir": "./markdowns"
 }

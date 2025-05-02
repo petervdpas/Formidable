@@ -130,13 +130,23 @@ export function initFormManager(containerId) {
   }
 
   async function loadFormData(metaData, filename) {
+    log("[FormManager] Loading metadata for:", filename);
+  
+    if (!metaData && currentTemplate?.markdown_dir && filename) {
+      metaData = await window.api.forms.loadForm(
+        currentTemplate.markdown_dir,
+        filename,
+        currentTemplate.fields || []
+      );
+    }
+  
     if (!metaData) {
-      warn("[FormManager] No metadata provided for loading.");
+      warn("[FormManager] No metadata available.");
       return;
     }
-    log("[FormManager] Loading metadata for:", filename);
+  
     populateFormFields(fieldElements, metaData);
-
+  
     const filenameInput = container.querySelector("#markdown-filename");
     if (filenameInput) {
       filenameInput.value = filename.replace(/\.md$/, "");
@@ -166,8 +176,9 @@ export function initFormManager(containerId) {
     const saveResult = await window.api.forms.saveForm(
       markdownDir,
       filename + ".md",
-      formData
-    ); // 🛠 FIXED: use window.api
+      formData,
+      currentTemplate.fields || []
+    );
 
     if (saveResult.success) {
       updateStatus(`Saved metadata: ${saveResult.path}`);

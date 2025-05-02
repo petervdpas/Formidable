@@ -110,8 +110,8 @@ registerIpc("list-forms", (event, dir) => formManager.listForms(dir));
 registerIpc("load-form", (event, dir, filename, templateFields = []) =>
   formManager.loadForm(dir, filename, templateFields)
 );
-registerIpc("save-form", (event, dir, filename, data) =>
-  formManager.saveForm(dir, filename, data)
+registerIpc("save-form", (event, dir, filename, data, fields = []) =>
+  formManager.saveForm(dir, filename, data, fields)
 );
 registerIpc("delete-form", (event, dir, filename) =>
   formManager.deleteForm(dir, filename)
