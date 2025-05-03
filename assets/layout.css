@@ -62,11 +62,14 @@ body {
 }
 
 /* ───── List Items ───── */
-.template-item {
+.template-item,
+.markdown-item {
   padding: 8px;
   margin-bottom: 5px;
   cursor: pointer;
 }
+
+
 
 .setting-row.directory-picker {
   display: flex;

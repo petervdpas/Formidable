@@ -109,7 +109,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   window.templateListManager = initTemplateListManager(
     yamlEditor,
     templateModal,
-    config.default_markdown_dir
+    config.default_markdown_dir,
+    templateDropdown ?? null,
   );
 
   const metaListManager = initMetaListManager(formManager, entryInputModal);

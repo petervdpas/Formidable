@@ -6,7 +6,7 @@
     "basic.yaml": ""
   },
   "selected_template": "basic.yaml",
-  "theme": "dark",
+  "theme": "light",
   "font_size": 14,
   "context_mode": "template",
   "default_markdown_dir": "./markdowns"

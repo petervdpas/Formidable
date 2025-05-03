@@ -8,7 +8,10 @@ export function createTemplateSelector({
   metaListManager,
   templateDropdown,
 }) {
-  async function selectTemplate(name, { updateDropdown = true } = {}) {
+  async function selectTemplate(
+    name,
+    { updateDropdown = true, updateSidebar = true } = {}
+  ) {
     if (!name || name === window.currentSelectedTemplateName) return;
 
     try {
@@ -28,7 +31,25 @@ export function createTemplateSelector({
         templateDropdown.setSelected(name);
       }
 
-      await window.api.config.updateUserConfig({ last_selected_template: name });
+      if (updateSidebar) {
+        // Highlight matching item in the template list
+        const sidebarItems = document.querySelectorAll(
+          "#template-list .template-item"
+        );
+        sidebarItems.forEach((el) => {
+          const normalized = el.textContent.trim().toLowerCase();
+          const match = name.replace(/\.yaml$/, "").toLowerCase();
+          if (normalized === match) {
+            el.classList.add("selected");
+          } else {
+            el.classList.remove("selected");
+          }
+        });
+      }
+
+      await window.api.config.updateUserConfig({
+        last_selected_template: name,
+      });
       await window.api.markdown.ensureMarkdownDir(result.markdownDir);
       await formManager.loadTemplate(yamlData);
       await metaListManager.loadList();

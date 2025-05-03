@@ -20,7 +20,7 @@ function createListManager({
   async function loadList() {
     log(`[ListManager] Loading list into #${elementId}...`);
     container.innerHTML = "";
-
+    let selectedItem = null;
     try {
       const items = await fetchListFunction();
       log("[ListManager] Items:", items);
@@ -34,6 +34,12 @@ function createListManager({
           item.textContent = itemName.replace(/\.yaml$|\.md$/i, "");
 
           item.addEventListener("click", () => {
+            if (selectedItem) {
+              selectedItem.classList.remove("selected");
+            }
+            item.classList.add("selected");
+            selectedItem = item;
+
             onItemClick(itemName);
           });
 
@@ -145,7 +151,8 @@ function promptForEntryName(modal, callback) {
 export function initTemplateListManager(
   yamlEditor,
   modal,
-  defaultMarkdownDir = "./markdowns"
+  defaultMarkdownDir = "./markdowns",
+  dropdown = null
 ) {
   let listManager = null;
 
@@ -163,6 +170,11 @@ export function initTemplateListManager(
         await window.api.config.updateUserConfig({
           recent_templates: [itemName],
         });
+
+        if (dropdown?.setSelected) {
+          dropdown.setSelected(itemName);
+        }
+        
         updateStatus(`Loaded Template: ${itemName}`);
       } catch (err) {
         error("[TemplateList] Failed to load template:", err);
@@ -180,6 +192,11 @@ export function initTemplateListManager(
             try {
               await window.api.templates.saveTemplate(filename, yaml);
               await listManager.loadList();
+
+              if (dropdown?.refresh) {
+                await dropdown.refresh();
+              }
+
               await window.api.config.updateUserConfig({
                 recent_templates: [filename],
               });
@@ -229,7 +246,11 @@ export function initMetaListManager(formManager, modal) {
           return;
         }
         const dir = template.markdown_dir;
-        const data = await window.api.forms.loadForm(dir, entryName, template.fields || []);
+        const data = await window.api.forms.loadForm(
+          dir,
+          entryName,
+          template.fields || []
+        );
         if (!data) {
           updateStatus("Failed to load metadata entry.");
           return;

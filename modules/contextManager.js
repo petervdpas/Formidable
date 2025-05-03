@@ -53,6 +53,12 @@ export function initContextToggle({
 
     if (mode === "markdown") {
       await dropdown.refresh?.();
+    
+      const currentName = window.currentSelectedTemplateName;
+      if (currentName && dropdown?.setSelected) {
+        dropdown.setSelected(currentName);
+      }
+    
       if (currentTemplateGetter()) {
         await metaListManager.loadList();
       }

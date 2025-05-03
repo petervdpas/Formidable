@@ -24,14 +24,20 @@ body {
 .template-item,
 .markdown-item {
   background-color: #e0e0e0;
-  margin-bottom: 5px;
-  padding: 8px;
-  cursor: pointer;
 }
 
 .template-item:hover,
 .markdown-item:hover {
   background-color: #d0d0d0;
+}
+
+/* Light Theme Selected */
+.template-item.selected,
+.markdown-item.selected {
+  background-color: #2196f3 !important; /* vibrant blue */
+  color: white;
+  font-weight: bold;
+  border-left: 4px solid #1976d2;
 }
 
 /* Status Bar */
