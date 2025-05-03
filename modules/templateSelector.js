@@ -1,5 +1,6 @@
 // modules/templateSelector.js
 
+import { EventBus } from "./eventBus.js";
 import { updateStatus } from "./statusManager.js";
 import { log, error } from "./logger.js";
 
@@ -26,6 +27,12 @@ export function createTemplateSelector({
 
       window.currentSelectedTemplate = yamlData;
       window.currentSelectedTemplateName = name;
+
+      // ✅ DEPRECATED-STYLE: Emit EventBus event in parallel with existing behavior
+      EventBus.emit("template:selected", {
+        name,
+        yaml: yamlData,
+      });
 
       if (updateDropdown) {
         templateDropdown.setSelected(name);

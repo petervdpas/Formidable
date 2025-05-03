@@ -1,5 +1,6 @@
 // /modules/sidebarManager.js
 
+import { EventBus } from "./eventBus.js";
 import { updateStatus } from "./statusManager.js";
 import { log, warn, error } from "./logger.js";
 
@@ -167,6 +168,12 @@ export function initTemplateListManager(
         window.currentSelectedTemplate = data;
         window.currentSelectedTemplateName = itemName;
 
+        // 🔁 DEPRECATED-STYLE: Emit selection event
+        EventBus.emit("template:selected", {
+          name: itemName,
+          yaml: data,
+        });
+
         await window.api.config.updateUserConfig({
           recent_templates: [itemName],
         });
@@ -174,7 +181,7 @@ export function initTemplateListManager(
         if (dropdown?.setSelected) {
           dropdown.setSelected(itemName);
         }
-        
+
         updateStatus(`Loaded Template: ${itemName}`);
       } catch (err) {
         error("[TemplateList] Failed to load template:", err);
@@ -206,6 +213,12 @@ export function initTemplateListManager(
 
               yamlEditor.render(yaml);
               updateStatus(`Created new template: ${filename}`);
+
+              // 🔁 DEPRECATED-STYLE: Emit selection event
+              EventBus.emit("template:selected", {
+                name: filename,
+                yaml,
+              });
             } catch (err) {
               error("[AddTemplate] Failed to save:", err);
               updateStatus("Error creating new template.");

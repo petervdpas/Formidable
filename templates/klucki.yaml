@@ -1,0 +1,6 @@
+name: klucki
+markdown_dir: ./markdowns/klucki
+fields:
+  - key: test
+    type: text
+    label: Test

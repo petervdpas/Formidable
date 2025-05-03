@@ -156,5 +156,29 @@ window.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
+  EventBus.on("template:selected", async ({ name, yaml }) => {
+    log("[EventBus] template:selected received:", name);
+  
+    // DEPRECATED-STYLE: Parallel update
+    if (window.currentSelectedTemplateName !== name) {
+      window.currentSelectedTemplateName = name;
+      window.currentSelectedTemplate = yaml;
+    }
+  
+    // 🔄 Only update dropdown if needed
+    if (templateDropdown?.getSelected?.() !== name) {
+      templateDropdown.setSelected(name);
+    }
+  
+    // 🔄 Highlight sidebar only if not already selected
+    const listItem = Array.from(
+      document.querySelectorAll("#template-list .template-item")
+    ).find((el) => el.textContent.trim().toLowerCase() === name.replace(/\.yaml$/, "").toLowerCase());
+  
+    if (listItem && !listItem.classList.contains("selected")) {
+      listItem.click(); // simulate selection to trigger existing logic
+    }
+  });
+
   initThemeToggle(themeToggle);
 });
