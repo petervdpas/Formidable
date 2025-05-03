@@ -169,10 +169,6 @@ export function initTemplateListManager(
           yaml: data,
         });
 
-        await window.api.config.updateUserConfig({
-          selected_template: itemName,
-        });
-
         EventBus.emit("status:update", `Loaded Template: ${itemName}`);
       } catch (err) {
         error("[TemplateList] Failed to load template:", err);
@@ -195,15 +191,12 @@ export function initTemplateListManager(
                 await dropdown.refresh();
               }
 
-              await window.api.config.updateUserConfig({
-                selected_template: filename,
-              });
-
               yamlEditor.render(yaml);
               EventBus.emit("template:selected", {
                 name: filename,
                 yaml,
               });
+
               EventBus.emit("status:update", `Created new template: ${filename}`);
 
             } catch (err) {
@@ -255,7 +248,10 @@ export function initMetaListManager(formManager, modal) {
           EventBus.emit("status:update", "Failed to load metadata entry.");
           return;
         }
+
         await formManager.loadFormData(data, entryName);
+
+        EventBus.emit("form:selected", entryName);
         EventBus.emit("status:update", `Loaded metadata: ${entryName}`);
       } catch (err) {
         error("[MetaList] Failed to load entry:", err);
@@ -274,7 +270,9 @@ export function initMetaListManager(formManager, modal) {
         }
         promptForEntryName(modal, async (filename) => {
           log("[AddMarkdown] Creating new entry:", filename);
+          
           await formManager.loadFormData({}, filename);
+          EventBus.emit("form:selected", filename);
           EventBus.emit("status:update", "New metadata entry ready.");
         });
       },

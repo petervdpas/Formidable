@@ -46,22 +46,15 @@ export function initContextToggle({
   metaListManager,
   currentTemplateGetter,
 }) {
-  // Listen for EventBus-based context toggle
+  // 🔄 Handle context changes
   EventBus.on("context:toggle", async (isMarkdown) => {
     const mode = isMarkdown ? "markdown" : "template";
 
-    // Sync UI toggle state
-    if (toggleElement) {
-      toggleElement.checked = isMarkdown;
-    }
+    if (toggleElement) toggleElement.checked = isMarkdown;
 
-    // Persist to config
+    setContextView(mode, containers);
     await window.api.config.updateUserConfig({ context_mode: mode });
 
-    // Switch UI view
-    setContextView(mode, containers);
-
-    // Sync markdown data
     if (mode === "markdown") {
       await dropdown.refresh?.();
 
@@ -75,10 +68,25 @@ export function initContextToggle({
       }
     }
 
-    EventBus.emit("status:update", `Context set to ${isMarkdown ? "Markdown" : "Template"}`);
+    EventBus.emit(
+      "status:update",
+      `Context set to ${isMarkdown ? "Markdown" : "Template"}`
+    );
   });
 
-  // Emit context:toggle when toggle is manually changed
+  // 🔄 Handle template selection
+  EventBus.on("template:selected", async ({ name, yaml }) => {
+    window.currentSelectedTemplateName = name;
+    window.currentSelectedTemplate = yaml;
+    await window.api.config.updateUserConfig({ selected_template: name });
+  });
+
+  // 🔄 Handle form selection
+  EventBus.on("form:selected", async (filename) => {
+    await window.api.config.updateUserConfig({ selected_data_file: filename });
+  });
+
+  // 🖱️ Handle manual toggle
   toggleElement.addEventListener("change", (e) => {
     const isMarkdown = e.target.checked;
     EventBus.emit("context:toggle", isMarkdown);
