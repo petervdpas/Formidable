@@ -1,5 +1,6 @@
 // modules/menuManager.js
 
+import { toggleContextMode } from "./contextManager.js";
 import { log, warn, error } from "./logger.js";
 
 export function buildMenu(containerId = "app-menu", commandHandler) {
@@ -18,33 +19,40 @@ export function buildMenu(containerId = "app-menu", commandHandler) {
   log(`[Menu] Building menu in container: #${containerId}`);
 
   container.innerHTML = `
-    <ul class="menu-bar">
-      <li class="menu-item">File
-        <ul class="submenu">
-          <li data-action="open-template-folder">Open Template Folder</li>
-          <li data-action="open-markdown-folder">Open Markdown Folder</li>
-          <li class="separator"></li>
-          <li data-action="quit">Quit</li>
-        </ul>
-      </li>
-      <li class="menu-item">Config
-        <ul class="submenu">
-          <li data-action="open-settings">Settings...</li>
-        </ul>
-      </li>
-      <li class="menu-item">View
-        <ul class="submenu">
-          <li data-action="reload">Reload</li>
-          <li data-action="devtools">Toggle DevTools</li>
-        </ul>
-      </li>
-      <li class="menu-item">Help
-        <ul class="submenu">
-          <li data-action="about">About</li>
-        </ul>
-      </li>
-    </ul>
-  `;
+  <ul class="menu-bar">
+    <li class="menu-item">File
+      <ul class="submenu">
+        <li data-action="open-template-folder">Open Template Folder</li>
+        <li data-action="open-markdown-folder">Open Markdown Folder</li>
+        <li class="separator"></li>
+        <li data-action="quit">Quit</li>
+      </ul>
+    </li>
+    <li class="menu-item">Config
+      <ul class="submenu">
+        <li data-action="open-settings">Settings...</li>
+      </ul>
+    </li>
+    <li class="menu-item">View
+      <ul class="submenu">
+        <li data-action="reload">Reload</li>
+        <li data-action="devtools">Toggle DevTools</li>
+      </ul>
+    </li>
+    <li class="menu-item">Help
+      <ul class="submenu">
+        <li data-action="about">About</li>
+      </ul>
+    </li>
+    <li class="menu-item" id="menu-context-toggle" style="display: flex; align-items: center; gap: 6px;">
+      <span>Context Mode:</span>
+      <label class="switch" title="Toggle Form Input Mode">
+        <input type="checkbox" id="context-toggle-menu" />
+        <span class="slider"></span>
+      </label>
+    </li>
+  </ul>
+`;
 
   container.querySelectorAll("[data-action]").forEach((item) => {
     const action = item.getAttribute("data-action");
@@ -54,6 +62,22 @@ export function buildMenu(containerId = "app-menu", commandHandler) {
       commandHandler(action);
     });
   });
+
+  const contextToggle = container.querySelector("#context-toggle-menu");
+  if (contextToggle) {
+    contextToggle.addEventListener("change", (e) => {
+      const isChecked = e.target.checked;
+      log(`[Menu] Context toggle changed: ${isChecked}`);
+      toggleContextMode(isChecked);
+    });
+
+    // ✅ Initialize based on config
+    window.api.config.loadUserConfig().then((config) => {
+      const mode = config.context_mode || "template";
+      contextToggle.checked = mode === "markdown";
+      toggleContextMode(contextToggle.checked);
+    });
+  }
 
   log("[Menu] Menu setup complete.");
 }
@@ -92,7 +116,9 @@ export async function handleMenuAction(action) {
         }
 
         const yaml = await window.api.templates.loadTemplate(templateName);
-        const targetPath = await window.api.system.resolvePath(yaml.markdown_dir);
+        const targetPath = await window.api.system.resolvePath(
+          yaml.markdown_dir
+        );
         await window.api.forms.ensureFormDir?.(targetPath);
 
         const result = await window.electron.shell.openPath(targetPath);

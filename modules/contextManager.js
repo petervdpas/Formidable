@@ -61,3 +61,15 @@ export function initContextToggle({
     updateStatus(`Context set to ${mode === "markdown" ? "Markdown" : "Template"}`);
   });
 }
+
+export async function toggleContextMode(enabled) {
+  const mode = enabled ? "markdown" : "template";
+  await window.api.config.updateUserConfig({ context_mode: mode });
+
+  setContextView(mode, {
+    templateContainer: document.getElementById("template-container"),
+    markdownContainer: document.getElementById("markdown-container"),
+  });
+
+  updateStatus(`Context set to ${mode === "markdown" ? "Markdown" : "Template"}`);
+}

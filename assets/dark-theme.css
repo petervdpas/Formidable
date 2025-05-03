@@ -55,16 +55,8 @@
 }
 
 /* Toggle Sliders */
-.dark-mode .slider {
-  background-color: #444;
-}
-
 .dark-mode .slider:before {
   background-color: #ccc;
-}
-
-.dark-mode input:checked + .slider {
-  background-color: #88d88c;
 }
 
 /* Scrollbars */

@@ -23,14 +23,8 @@
     <div id="app-menu">
       <div class="menu-bar-container">
         <ul class="menu-bar">
-          ...
+          <!-- Menu items -->
         </ul>
-        <div id="menu-context-toggle">
-          <label class="switch" title="Toggle Form Input Mode">
-            <input type="checkbox" id="context-toggle-menu" />
-            <span class="slider"></span>
-          </label>
-        </div>
       </div>
     </div>
 
@@ -84,17 +78,17 @@
             <span class="slider"></span>
           </label>
         </div>
-        <div class="setting-row directory-picker">
-          <label for="default-dir">Default Markdown Directory</label>
-          <input type="text" id="default-dir" readonly />
-          <button id="choose-dir" class="btn btn-default">Browse</button>
-        </div>
         <div class="setting-row">
-          <label for="context-toggle">Form Input Mode</label>
+          <label for="context-toggle">Context Mode</label>
           <label class="switch">
             <input type="checkbox" id="context-toggle" />
             <span class="slider"></span>
           </label>
+        </div>
+        <div class="setting-row directory-picker">
+          <label for="default-dir">Default Markdown Directory</label>
+          <input type="text" id="default-dir" readonly />
+          <button id="choose-dir" class="btn btn-default">Browse</button>
         </div>
       </div>
       <div class="modal-resizer"></div>

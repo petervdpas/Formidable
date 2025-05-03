@@ -90,8 +90,7 @@ body {
   align-items: center;
 }
 
-
-/* ───── Toggle Switch ───── */
+/* ───── Toggle Switch (Red/Green) ───── */
 .switch {
   position: relative;
   display: inline-block;
@@ -103,31 +102,38 @@ body {
   opacity: 0;
   width: 0;
   height: 0;
+  position: absolute;
 }
 
-.slider {
+.switch .slider {
   position: absolute;
   cursor: pointer;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  transition: 0.2s;
+  background-color: #c0392b; /* 🔴 Red when OFF */
+  transition: background-color 0.3s;
   border-radius: 34px;
 }
 
-.slider:before {
-  position: absolute;
+.switch .slider::before {
   content: "";
+  position: absolute;
   height: 14px;
   width: 14px;
   left: 3px;
   bottom: 3px;
-  transition: 0.2s;
+  background-color: white;
   border-radius: 50%;
+  transition: transform 0.3s;
 }
 
-input:checked + .slider:before {
+.switch input:checked + .slider {
+  background-color: #2ecc71; /* ✅ Green when ON */
+}
+
+.switch input:checked + .slider::before {
   transform: translateX(20px);
 }
 

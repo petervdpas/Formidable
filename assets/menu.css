@@ -1,3 +1,14 @@
+#app-menu {
+    background: #f4f4f4;
+    border-bottom: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.dark-mode #app-menu {
+    background: #1e1e1e;
+    border-bottom: 1px solid #444;
+}
+
 .menu-bar-container {
     display: flex;
     align-items: center;
@@ -5,31 +16,26 @@
     padding: 0 10px;
 }
 
-#menu-context-toggle {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-#app-menu {
-    background: #f4f4f4;
-    border-bottom: 1px solid #ccc;
-    font-size: 14px;
-}
-
 .menu-bar {
-    list-style: none;
-    margin: 0;
-    padding: 0 10px;
     display: flex;
     gap: 20px;
+    list-style: none;
+    padding: 0 10px;
+    margin: 0;
 }
 
 .menu-item {
     position: relative;
     padding: 8px 12px;
     cursor: pointer;
+}
+
+.menu-item:hover {
+    background-color: #eaeaea;
+}
+
+.dark-mode .menu-item:hover {
+    background-color: #2a2a2a;
 }
 
 .menu-item:hover .submenu {
@@ -65,10 +71,17 @@
     height: 0;
 }
 
-.menu-item:hover {
-    background-color: #eaeaea;
+#menu-context-toggle {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    gap: 8px;
 }
 
+#menu-context-toggle .switch {
+    margin-left: 2px;
+}
 
 .about-content {
     display: flex;
@@ -89,8 +102,4 @@
 
 .about-text p {
     margin: 0.3em 0;
-}
-
-.dark-mode .menu-item:hover {
-    background-color: #2a2a2a;
 }

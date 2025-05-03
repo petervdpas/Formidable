@@ -39,6 +39,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const markdownContainer = document.getElementById("markdown-container");
   const themeToggle = document.getElementById("theme-toggle");
   const contextToggle = document.getElementById("context-toggle");
+  const menuToggle = document.getElementById("context-toggle-menu");
 
   const yamlEditor = initYamlEditor("template-content", async (updatedYaml) => {
     let filename = window.currentSelectedTemplateName;
@@ -143,6 +144,16 @@ window.addEventListener("DOMContentLoaded", async () => {
     currentTemplateGetter: () => window.currentSelectedTemplate,
   });
 
+  if (menuToggle) {
+    contextToggle.addEventListener("change", () => {
+      menuToggle.checked = contextToggle.checked;
+    });
+  
+    menuToggle.addEventListener("change", () => {
+      contextToggle.checked = menuToggle.checked;
+    });
+  }
+  
   if (config.context_mode === "markdown" && window.currentSelectedTemplate) {
     await metaListManager.loadList();
   }
