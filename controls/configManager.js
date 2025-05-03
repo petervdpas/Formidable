@@ -1,8 +1,8 @@
-// modules/configManager.js
+// controls/configManager.js
 
 const { log, error } = require("./nodeLogger");
 const fileManager = require("./fileManager");
-const schema = require("./config.schema.js");
+const schema = require("../modules/config.schema.js");
 
 const configDir = fileManager.resolvePath("config");
 const configPath = fileManager.resolvePath("config", "user.json");

@@ -1,8 +1,8 @@
-// modules/templateManager.js
+// controls/templateManager.js
 
 const fileManager = require("./fileManager");
 const { log, warn, error } = require("./nodeLogger");
-const schema = require("./template.schema");
+const schema = require("../modules/template.schema");
 
 const templatesDir = fileManager.joinPath("templates");
 const basicYamlName = "basic.yaml";

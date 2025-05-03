@@ -1,4 +1,4 @@
-// modules/fileManager.js
+// controls/fileManager.js
 
 const fs = require("fs");
 const path = require("path");
@@ -6,7 +6,7 @@ const yaml = require("js-yaml");
 const { log, warn, error } = require("./nodeLogger");
 
 // Base directory (root of project)
-const baseDir = __dirname.includes("modules")
+const baseDir = __dirname.includes("controls")
   ? path.resolve(__dirname, "..")
   : __dirname;
 

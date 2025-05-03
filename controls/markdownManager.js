@@ -1,4 +1,4 @@
-// modules/markdownManager.js
+// controls/markdownManager.js
 
 const { SingleFileRepository } = require("./sfr");
 const fileManager = require("./fileManager");

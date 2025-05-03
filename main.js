@@ -9,15 +9,15 @@ const {
   Menu,
   ipcMain,
 } = require("electron");
-const { log, warn, error } = require("./modules/nodeLogger");
-const { registerIpc } = require("./modules/ipcRoutes");
+const { log, warn, error } = require("./controls/nodeLogger");
+const { registerIpc } = require("./controls/ipcRoutes");
 
-const fileManager = require("./modules/fileManager");
-const fileTransformer = require("./modules/fileTransformer");
-const templateManager = require("./modules/templateManager");
-const formManager = require("./modules/formManager");
-const markdownManager = require("./modules/markdownManager");
-const configManager = require("./modules/configManager");
+const fileManager = require("./controls/fileManager");
+const fileTransformer = require("./controls/fileTransformer");
+const templateManager = require("./controls/templateManager");
+const formManager = require("./controls/formManager");
+const markdownManager = require("./controls/markdownManager");
+const configManager = require("./controls/configManager");
 
 function createWindow() {
   const win = new BrowserWindow({

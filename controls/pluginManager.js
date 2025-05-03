@@ -1,4 +1,4 @@
-// modules/pluginManager.js
+// controls/pluginManager.js
 
 const { log, error } = require("./nodeLogger");
 const fileManager = require("./fileManager");

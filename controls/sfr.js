@@ -1,4 +1,4 @@
-// modules/sfr.js
+// controls/sfr.js
 
 const { log, warn, error } = require("./nodeLogger");
 const fileManager = require("./fileManager");

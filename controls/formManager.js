@@ -1,8 +1,8 @@
-// modules/formManager.js
+// controls/formManager.js
 
 const { SingleFileRepository } = require("./sfr");
 const fileManager = require("./fileManager");
-const metaSchema = require("./meta.schema");
+const metaSchema = require("../modules/meta.schema");
 const { log, warn, error } = require("./nodeLogger");
 
 const metaRepo = new SingleFileRepository({

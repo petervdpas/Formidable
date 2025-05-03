@@ -1,4 +1,4 @@
-// modules/ipcRoutes.js
+// controls/ipcRoutes.js
 
 const { ipcMain } = require("electron");
 const { log, error } = require("./nodeLogger");
