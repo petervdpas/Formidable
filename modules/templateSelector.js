@@ -9,10 +9,7 @@ export function createTemplateSelector({
   metaListManager,
   templateDropdown,
 }) {
-  async function selectTemplate(
-    name,
-    { updateDropdown = true, updateSidebar = true } = {}
-  ) {
+  async function selectTemplate(name) {
     if (!name || name === window.currentSelectedTemplateName) return;
 
     try {
@@ -28,31 +25,10 @@ export function createTemplateSelector({
       window.currentSelectedTemplate = yamlData;
       window.currentSelectedTemplateName = name;
 
-      // ✅ DEPRECATED-STYLE: Emit EventBus event in parallel with existing behavior
       EventBus.emit("template:selected", {
         name,
         yaml: yamlData,
       });
-
-      if (updateDropdown) {
-        templateDropdown.setSelected(name);
-      }
-
-      if (updateSidebar) {
-        // Highlight matching item in the template list
-        const sidebarItems = document.querySelectorAll(
-          "#template-list .template-item"
-        );
-        sidebarItems.forEach((el) => {
-          const normalized = el.textContent.trim().toLowerCase();
-          const match = name.replace(/\.yaml$/, "").toLowerCase();
-          if (normalized === match) {
-            el.classList.add("selected");
-          } else {
-            el.classList.remove("selected");
-          }
-        });
-      }
 
       await window.api.config.updateUserConfig({
         last_selected_template: name,
@@ -79,11 +55,11 @@ export function createTemplateSelector({
     const lastSelected = config.last_selected_template;
 
     if (lastSelected && templateFiles.includes(lastSelected)) {
-      await selectTemplate(lastSelected, { updateDropdown: false });
+      await selectTemplate(lastSelected);
     } else if (options.length > 0) {
       const fallback = options[0].value;
       log(`[loadTemplateOptions] Falling back to: ${fallback}`);
-      await selectTemplate(fallback, { updateDropdown: false });
+      await selectTemplate(fallback);
       await window.api.config.updateUserConfig({
         last_selected_template: fallback,
       });

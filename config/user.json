@@ -8,6 +8,6 @@
   "selected_template": "basic.yaml",
   "theme": "dark",
   "font_size": 14,
-  "context_mode": "template",
+  "context_mode": "markdown",
   "default_markdown_dir": "./markdowns"
 }

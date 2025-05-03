@@ -165,10 +165,6 @@ export function initTemplateListManager(
         const data = await window.api.templates.loadTemplate(itemName);
         yamlEditor.render(data);
 
-        window.currentSelectedTemplate = data;
-        window.currentSelectedTemplateName = itemName;
-
-        // 🔁 DEPRECATED-STYLE: Emit selection event
         EventBus.emit("template:selected", {
           name: itemName,
           yaml: data,
@@ -177,10 +173,6 @@ export function initTemplateListManager(
         await window.api.config.updateUserConfig({
           recent_templates: [itemName],
         });
-
-        if (dropdown?.setSelected) {
-          dropdown.setSelected(itemName);
-        }
 
         updateStatus(`Loaded Template: ${itemName}`);
       } catch (err) {
@@ -208,17 +200,13 @@ export function initTemplateListManager(
                 recent_templates: [filename],
               });
 
-              window.currentSelectedTemplate = yaml;
-              window.currentSelectedTemplateName = filename;
-
               yamlEditor.render(yaml);
-              updateStatus(`Created new template: ${filename}`);
-
-              // 🔁 DEPRECATED-STYLE: Emit selection event
               EventBus.emit("template:selected", {
                 name: filename,
                 yaml,
               });
+              updateStatus(`Created new template: ${filename}`);
+              
             } catch (err) {
               error("[AddTemplate] Failed to save:", err);
               updateStatus("Error creating new template.");
