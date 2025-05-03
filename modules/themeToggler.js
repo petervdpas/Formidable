@@ -1,6 +1,6 @@
 // modules/themeToggler.js
 
-import { updateStatus } from "./statusManager.js";
+import { EventBus } from "./eventBus.js";
 
 export function initThemeToggle(toggleElement) {
   toggleElement.addEventListener("change", async (e) => {
@@ -9,7 +9,7 @@ export function initThemeToggle(toggleElement) {
     await window.api.config.updateUserConfig({
       theme: isDark ? "dark" : "light",
     });
-    updateStatus(`Theme set to ${isDark ? "Dark" : "Light"}`);
+    EventBus.emit("status:update", `Theme set to ${isDark ? "Dark" : "Light"}`);
   });
 }
 

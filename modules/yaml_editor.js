@@ -2,7 +2,7 @@
 
 import { log, warn } from "./logger.js";
 import { setupModal, showConfirmModal } from "./modalManager.js";
-import { updateStatus } from "./statusManager.js";
+import { EventBus } from "./eventBus.js";
 import { fieldTypes } from "./fieldTypes.js";
 import { createDropdown } from "./dropdownManager.js";
 
@@ -97,19 +97,21 @@ export function initYamlEditor(containerId, onSaveCallback) {
 
   function applyModalTypeClass(modal, typeKey) {
     if (!modal) return;
-  
+
     // Remove existing modal-* classes except "modal"
-    modal.classList.forEach(cls => {
+    modal.classList.forEach((cls) => {
       if (cls.startsWith("modal-") && cls !== "modal") {
         modal.classList.remove(cls);
       }
     });
-  
+
     const typeDef = fieldTypes[typeKey];
     if (typeDef?.cssClass) {
       modal.classList.add(typeDef.cssClass); // e.g., type-text
     } else {
-      warn(`[YamlEditor] Unknown type "${typeKey}" passed to applyModalTypeClass.`);
+      warn(
+        `[YamlEditor] Unknown type "${typeKey}" passed to applyModalTypeClass.`
+      );
     }
   }
 
@@ -152,7 +154,7 @@ export function initYamlEditor(containerId, onSaveCallback) {
       const filename = window.currentSelectedTemplateName;
       if (!filename) {
         warn("[YamlEditor] No template selected to delete.");
-        updateStatus("No template selected.");
+        EventBus.emit("status:update", "No template selected.");
         return;
       }
 
@@ -173,14 +175,14 @@ export function initYamlEditor(containerId, onSaveCallback) {
         log("[YamlEditor] Deleted template:", filename);
         container.innerHTML =
           "<div class='empty-message'>Template deleted.</div>";
-        updateStatus(`Deleted template: ${filename}`);
+        EventBus.emit("status:update", `Deleted template: ${filename}`);
         window.currentSelectedTemplate = null;
         window.currentSelectedTemplateName = null;
         if (window.templateListManager?.loadList)
           window.templateListManager.loadList();
       } else {
         warn("[YamlEditor] Failed to delete template:", filename);
-        updateStatus("Failed to delete template.");
+        EventBus.emit("status:update", "Failed to delete template.");
       }
     };
 

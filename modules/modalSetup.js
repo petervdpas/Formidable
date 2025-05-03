@@ -1,7 +1,7 @@
 // modules/setupModal.js
 
 import { setupModal } from "./modalManager.js";
-import { updateStatus } from "./statusManager.js";
+import { EventBus } from "./eventBus.js";
 
 export function setupSettingsModal(themeToggle, contextToggle) {
   return setupModal("settings-modal", {
@@ -37,7 +37,7 @@ export function setupSettingsModal(themeToggle, contextToggle) {
           await window.api.config.updateUserConfig({
             default_markdown_dir: relativePath,
           });
-          updateStatus(`Updated default markdown dir: ${relativePath}`);
+          EventBus.emit("status:update", `Updated default markdown dir: ${relativePath}`);
         }
       };
     },

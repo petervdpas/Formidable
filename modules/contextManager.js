@@ -2,7 +2,6 @@
 
 import { setupSplitter } from "./splitter.js";
 import { log } from "./logger.js";
-import { updateStatus } from "./statusManager.js";
 import { EventBus } from "./eventBus.js";
 
 let templateSplitterInitialized = false;
@@ -76,7 +75,7 @@ export function initContextToggle({
       }
     }
 
-    updateStatus(`Context set to ${isMarkdown ? "Markdown" : "Template"}`);
+    EventBus.emit("status:update", `Context set to ${isMarkdown ? "Markdown" : "Template"}`);
   });
 
   // Emit context:toggle when toggle is manually changed

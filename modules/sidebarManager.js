@@ -1,7 +1,6 @@
 // /modules/sidebarManager.js
 
 import { EventBus } from "./eventBus.js";
-import { updateStatus } from "./statusManager.js";
 import { log, warn, error } from "./logger.js";
 
 // ─── Internal: Shared List Creator ───
@@ -58,12 +57,12 @@ function createListManager({
         container.appendChild(btn);
       }
 
-      updateStatus(`Loaded ${items.length} item(s).`);
+      EventBus.emit("status:update", `Loaded ${items.length} item(s).`);
     } catch (err) {
       error("[ListManager] Failed to load list:", err);
       container.innerHTML =
         "<div class='empty-message'>Error loading list.</div>";
-      updateStatus("Error loading list.");
+        EventBus.emit("status:update", "Error loading list.");
     }
   }
 
@@ -174,10 +173,10 @@ export function initTemplateListManager(
           recent_templates: [itemName],
         });
 
-        updateStatus(`Loaded Template: ${itemName}`);
+        EventBus.emit("status:update", `Loaded Template: ${itemName}`);
       } catch (err) {
         error("[TemplateList] Failed to load template:", err);
-        updateStatus("Error loading template.");
+        EventBus.emit("status:update", "Error loading template.");
       }
     },
     emptyMessage: "No template files found.",
@@ -205,11 +204,11 @@ export function initTemplateListManager(
                 name: filename,
                 yaml,
               });
-              updateStatus(`Created new template: ${filename}`);
-              
+              EventBus.emit("status:update", `Created new template: ${filename}`);
+
             } catch (err) {
               error("[AddTemplate] Failed to save:", err);
-              updateStatus("Error creating new template.");
+              EventBus.emit("status:update", "Error creating new template.");
             }
           }
         );
@@ -227,12 +226,12 @@ export function initMetaListManager(formManager, modal) {
       const template = window.currentSelectedTemplate;
       if (!template) {
         warn("[MetaList] No selected template.");
-        updateStatus("No template selected.");
+        EventBus.emit("status:update", "No template selected.");
         return [];
       }
       if (!template.markdown_dir) {
         warn("[MetaList] No markdown_dir field.");
-        updateStatus("Template missing markdown_dir field.");
+        EventBus.emit("status:update", "Template missing markdown_dir field.");
         return [];
       }
       await window.api.forms.ensureFormDir(template.markdown_dir);
@@ -253,14 +252,14 @@ export function initMetaListManager(formManager, modal) {
           template.fields || []
         );
         if (!data) {
-          updateStatus("Failed to load metadata entry.");
+          EventBus.emit("status:update", "Failed to load metadata entry.");
           return;
         }
         await formManager.loadFormData(data, entryName);
-        updateStatus(`Loaded metadata: ${entryName}`);
+        EventBus.emit("status:update", `Loaded metadata: ${entryName}`);
       } catch (err) {
         error("[MetaList] Failed to load entry:", err);
-        updateStatus("Error loading metadata.");
+        EventBus.emit("status:update", "Error loading metadata.");
       }
     },
     emptyMessage: "No metadata files found.",
@@ -270,13 +269,13 @@ export function initMetaListManager(formManager, modal) {
         const template = window.currentSelectedTemplate;
         if (!template) {
           warn("[AddMarkdown] No template selected.");
-          updateStatus("Please select a template first.");
+          EventBus.emit("status:update", "Please select a template first.");
           return;
         }
         promptForEntryName(modal, async (filename) => {
           log("[AddMarkdown] Creating new entry:", filename);
           await formManager.loadFormData({}, filename);
-          updateStatus("New metadata entry ready.");
+          EventBus.emit("status:update", "New metadata entry ready.");
         });
       },
     },

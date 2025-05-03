@@ -1,7 +1,7 @@
 // modules/formUI.js
 
 import { fieldTypes } from "./fieldTypes.js";
-import { updateStatus } from "./statusManager.js";
+import { EventBus } from "./eventBus.js";
 import { log, warn, error } from "./logger.js";
 
 function renderForm(container, template) {
@@ -189,7 +189,7 @@ export function initFormManager(containerId) {
 
     if (!currentTemplate || !currentTemplate.markdown_dir) {
       warn("[FormManager] No template or markdown_dir selected.");
-      updateStatus("No template or markdown directory selected.");
+      EventBus.emit("status:update", "No template or markdown directory selected.");
       return;
     }
 
@@ -199,7 +199,7 @@ export function initFormManager(containerId) {
 
     if (!filename) {
       warn("[FormManager] No filename provided.");
-      updateStatus("Please enter a filename.");
+      EventBus.emit("status:update", "Please enter a filename.");
       return;
     }
 
@@ -212,11 +212,11 @@ export function initFormManager(containerId) {
     );
 
     if (saveResult.success) {
-      updateStatus(`Saved metadata: ${saveResult.path}`);
+      EventBus.emit("status:update", `Saved metadata: ${saveResult.path}`);
       if (reloadMarkdownList) reloadMarkdownList();
     } else {
       error("[FormManager] Save failed:", saveResult.error);
-      updateStatus(`Failed to save metadata: ${saveResult.error}`);
+      EventBus.emit("status:update", `Failed to save metadata: ${saveResult.error}`);
     }
   }
 
@@ -238,12 +238,12 @@ export function initFormManager(containerId) {
       const selected = await getTemplateCallback();
       if (!selected) {
         warn("[FormManager] No template selected after button click.");
-        updateStatus("Please select a template first.");
+        EventBus.emit("status:update", "Please select a template first.");
         return;
       }
       await loadTemplate(selected);
       focusFirstInput();
-      updateStatus("Ready to create a new markdown document.");
+      EventBus.emit("status:update", "Ready to create a new markdown document.");
     });
   }
 

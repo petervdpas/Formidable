@@ -9,7 +9,7 @@ import {
 } from "./modules/modalSetup.js";
 import { initYamlEditor } from "./modules/yaml_editor.js";
 import { createDropdown } from "./modules/dropdownManager.js";
-import { initStatusManager, updateStatus } from "./modules/statusManager.js";
+import { initStatusManager } from "./modules/statusManager.js";
 import { initFormManager } from "./modules/formUI.js";
 import { log, warn, error } from "./modules/logger.js";
 import { setContextView, initContextToggle } from "./modules/contextManager.js";
@@ -57,7 +57,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     if (!filename) {
       warn("[YamlEditor] No template filename selected.");
-      updateStatus("Cannot save: no template selected.");
+      EventBus.emit("status:update", "Cannot save: no template selected.");
       return;
     }
 
@@ -66,10 +66,10 @@ window.addEventListener("DOMContentLoaded", async () => {
       updatedYaml
     );
     if (success) {
-      updateStatus(`Saved: ${filename}`);
+      EventBus.emit("status:update", `Saved: ${filename}`);
       log("[YamlEditor] Saved template:", filename);
     } else {
-      updateStatus("Failed to save template.");
+      EventBus.emit("status:update", "Failed to save template.");
       error("[YamlEditor] Save failed for:", filename);
     }
   });

@@ -1,7 +1,6 @@
 // modules/templateSelector.js
 
 import { EventBus } from "./eventBus.js";
-import { updateStatus } from "./statusManager.js";
 import { log, error } from "./logger.js";
 
 export function createTemplateSelector({
@@ -36,10 +35,10 @@ export function createTemplateSelector({
       await window.api.markdown.ensureMarkdownDir(result.markdownDir);
       await formManager.loadTemplate(yamlData);
       await metaListManager.loadList();
-      updateStatus(`Selected template: ${yamlData.name}`);
+      EventBus.emit("status:update", `Selected template: ${yamlData.name}`);
     } catch (err) {
       error("[SelectTemplate] Error:", err);
-      updateStatus("Error selecting template.");
+      EventBus.emit("status:update", "Error selecting template.");
     }
   }
 
