@@ -177,5 +177,5 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
 
   initThemeToggle(themeToggle);
-  EventBus.emit("theme:set", config.theme);
+  EventBus.emit("theme:toggle", config.theme);
 });

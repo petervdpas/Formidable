@@ -6,10 +6,10 @@ export function initThemeToggle(toggleElement) {
   
   toggleElement.addEventListener("change", (e) => {
     const isDark = e.target.checked;
-    EventBus.emit("theme:set", isDark ? "dark" : "light");
+    EventBus.emit("theme:toggle", isDark ? "dark" : "light");
   });
 
-  EventBus.on("theme:set", async (theme) => {
+  EventBus.on("theme:toggle", async (theme) => {
     const isDark = theme === "dark";
 
     document.body.classList.toggle("dark-mode", isDark);
