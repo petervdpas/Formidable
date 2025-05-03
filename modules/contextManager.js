@@ -3,6 +3,7 @@
 import { setupSplitter } from "./splitter.js";
 import { log } from "./logger.js";
 import { updateStatus } from "./statusManager.js";
+import { EventBus } from "./eventBus.js";
 
 let templateSplitterInitialized = false;
 let markdownSplitterInitialized = false;
@@ -18,6 +19,7 @@ function initSplitters(mode) {
     });
     templateSplitterInitialized = true;
   }
+
   if (mode === "markdown" && !markdownSplitterInitialized) {
     setupSplitter({
       splitter: document.getElementById("markdown-splitter"),
@@ -45,37 +47,41 @@ export function initContextToggle({
   metaListManager,
   currentTemplateGetter,
 }) {
-  toggleElement.addEventListener("change", async (e) => {
-    const mode = e.target.checked ? "markdown" : "template";
+  // Listen for EventBus-based context toggle
+  EventBus.on("context:toggle", async (isMarkdown) => {
+    const mode = isMarkdown ? "markdown" : "template";
+
+    // Sync UI toggle state
+    if (toggleElement) {
+      toggleElement.checked = isMarkdown;
+    }
+
+    // Persist to config
     await window.api.config.updateUserConfig({ context_mode: mode });
 
+    // Switch UI view
     setContextView(mode, containers);
 
+    // Sync markdown data
     if (mode === "markdown") {
       await dropdown.refresh?.();
-    
+
       const currentName = window.currentSelectedTemplateName;
       if (currentName && dropdown?.setSelected) {
         dropdown.setSelected(currentName);
       }
-    
+
       if (currentTemplateGetter()) {
         await metaListManager.loadList();
       }
     }
 
-    updateStatus(`Context set to ${mode === "markdown" ? "Markdown" : "Template"}`);
-  });
-}
-
-export async function toggleContextMode(enabled) {
-  const mode = enabled ? "markdown" : "template";
-  await window.api.config.updateUserConfig({ context_mode: mode });
-
-  setContextView(mode, {
-    templateContainer: document.getElementById("template-container"),
-    markdownContainer: document.getElementById("markdown-container"),
+    updateStatus(`Context set to ${isMarkdown ? "Markdown" : "Template"}`);
   });
 
-  updateStatus(`Context set to ${mode === "markdown" ? "Markdown" : "Template"}`);
+  // Emit context:toggle when toggle is manually changed
+  toggleElement.addEventListener("change", (e) => {
+    const isMarkdown = e.target.checked;
+    EventBus.emit("context:toggle", isMarkdown);
+  });
 }

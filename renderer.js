@@ -19,6 +19,7 @@ import {
   initMetaListManager,
 } from "./modules/sidebarManager.js";
 import { createTemplateSelector } from "./modules/templateSelector.js";
+import { EventBus } from "./modules/eventBus.js";
 
 window.addEventListener("DOMContentLoaded", async () => {
   log("[App] DOM loaded.");
@@ -44,7 +45,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   const yamlEditor = initYamlEditor("template-content", async (updatedYaml) => {
     let filename = window.currentSelectedTemplateName;
 
-    // Fallback if not set but we know the name
     if (!filename && updatedYaml?.name) {
       filename = `${updatedYaml.name}.yaml`;
       window.currentSelectedTemplateName = filename;
@@ -133,7 +133,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     markdownContainer,
   });
 
-  // After setContextView(...) call
   initContextToggle({
     toggleElement: contextToggle,
     containers: {
@@ -145,19 +144,17 @@ window.addEventListener("DOMContentLoaded", async () => {
     currentTemplateGetter: () => window.currentSelectedTemplate,
   });
 
-  if (menuToggle) {
-    contextToggle.addEventListener("change", () => {
-      menuToggle.checked = contextToggle.checked;
+  // ✅ NEW: Listen for EventBus toggle events
+  EventBus.on("context:toggle", (isMarkdown) => {
+    log("[EventBus] Received context:toggle:", isMarkdown);
+    if (contextToggle) contextToggle.checked = isMarkdown;
+    if (menuToggle) menuToggle.checked = isMarkdown;
+
+    setContextView(isMarkdown ? "markdown" : "template", {
+      templateContainer,
+      markdownContainer,
     });
-  
-    menuToggle.addEventListener("change", () => {
-      contextToggle.checked = menuToggle.checked;
-    });
-  }
-  
-  if (config.context_mode === "markdown" && window.currentSelectedTemplate) {
-    await metaListManager.loadList();
-  }
+  });
 
   initThemeToggle(themeToggle);
 });
