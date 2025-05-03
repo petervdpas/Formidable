@@ -13,7 +13,7 @@ import { initStatusManager } from "./modules/statusManager.js";
 import { initFormManager } from "./modules/formUI.js";
 import { log, warn, error } from "./modules/logger.js";
 import { setContextView, initContextToggle } from "./modules/contextManager.js";
-import { initThemeToggle, applyInitialTheme } from "./modules/themeToggler.js";
+import { initThemeToggle } from "./modules/themeToggler.js";
 import {
   initTemplateListManager,
   initMetaListManager,
@@ -78,7 +78,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   window.formManager = formManager;
 
   const config = await window.api.config.loadUserConfig();
-  await applyInitialTheme(config);
 
   const settings = setupSettingsModal(themeToggle, contextToggle);
   const entryInputModal = setupEntryModal();
@@ -178,4 +177,5 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
 
   initThemeToggle(themeToggle);
+  EventBus.emit("theme:set", config.theme);
 });

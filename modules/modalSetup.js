@@ -11,10 +11,13 @@ export function setupSettingsModal(themeToggle, contextToggle) {
     resizable: true,
     width: "30em",
     height: "auto",
+
     onOpen: async () => {
       const config = await window.api.config.loadUserConfig();
-      themeToggle.checked = config.theme === "dark";
-      contextToggle.checked = config.context_mode === "markdown";
+
+      // Just emit event to trigger handlers elsewhere
+      EventBus.emit("theme:set", config.theme);
+      EventBus.emit("context:set", config.context_mode);
 
       const defaultDirInput = document.getElementById("default-dir");
       const chooseDirBtn = document.getElementById("choose-dir");
@@ -27,16 +30,15 @@ export function setupSettingsModal(themeToggle, contextToggle) {
           const appRoot = (await window.api.system.getAppRoot?.()) || ".";
           const relativePath = selected.startsWith(appRoot)
             ? "./" +
-              selected
-                .slice(appRoot.length)
-                .replace(/^[\\/]/, "")
-                .replace(/\\/g, "/")
+              selected.slice(appRoot.length).replace(/^[\\/]/, "").replace(/\\/g, "/")
             : selected;
 
           defaultDirInput.value = relativePath;
+
           await window.api.config.updateUserConfig({
             default_markdown_dir: relativePath,
           });
+
           EventBus.emit("status:update", `Updated default markdown dir: ${relativePath}`);
         }
       };

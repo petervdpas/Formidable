@@ -3,17 +3,22 @@
 import { EventBus } from "./eventBus.js";
 
 export function initThemeToggle(toggleElement) {
-  toggleElement.addEventListener("change", async (e) => {
+  
+  toggleElement.addEventListener("change", (e) => {
     const isDark = e.target.checked;
+    EventBus.emit("theme:set", isDark ? "dark" : "light");
+  });
+
+  EventBus.on("theme:set", async (theme) => {
+    const isDark = theme === "dark";
+
     document.body.classList.toggle("dark-mode", isDark);
-    await window.api.config.updateUserConfig({
-      theme: isDark ? "dark" : "light",
-    });
+
+    if (toggleElement) toggleElement.checked = isDark;
+
+    await window.api.config.updateUserConfig({ theme });
+
     EventBus.emit("status:update", `Theme set to ${isDark ? "Dark" : "Light"}`);
   });
 }
 
-export async function applyInitialTheme(config) {
-  const isDark = config.theme === "dark";
-  document.body.classList.toggle("dark-mode", isDark);
-}
