@@ -2,7 +2,7 @@
 
 const { log, error } = require("./nodeLogger");
 const fileManager = require("./fileManager");
-const schema = require("../modules/config.schema.js");
+const schema = require("../schemas/config.schema");
 
 const configDir = fileManager.resolvePath("config");
 const configPath = fileManager.resolvePath("config", "user.json");

@@ -2,7 +2,7 @@
 
 const fileManager = require("./fileManager");
 const { log, warn, error } = require("./nodeLogger");
-const schema = require("../modules/template.schema");
+const schema = require("../schemas/template.schema");
 
 const templatesDir = fileManager.joinPath("templates");
 const basicYamlName = "basic.yaml";
