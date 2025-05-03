@@ -170,7 +170,7 @@ export function initTemplateListManager(
         });
 
         await window.api.config.updateUserConfig({
-          recent_templates: [itemName],
+          selected_template: itemName,
         });
 
         EventBus.emit("status:update", `Loaded Template: ${itemName}`);
@@ -196,7 +196,7 @@ export function initTemplateListManager(
               }
 
               await window.api.config.updateUserConfig({
-                recent_templates: [filename],
+                selected_template: filename,
               });
 
               yamlEditor.render(yaml);

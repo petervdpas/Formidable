@@ -2,9 +2,8 @@
 
 module.exports = {
   defaults: {
-    recent_templates: ["basic.yaml"],
-    last_opened_markdown: { "basic.yaml": "" },
     selected_template: "basic.yaml",
+    selected_data_file: "",
     theme: "light",
     font_size: 14,
     context_mode: "template",

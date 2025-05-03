@@ -102,9 +102,9 @@ export async function handleMenuAction(action) {
     case "open-markdown-folder": {
       try {
         const config = await window.api.config.loadUserConfig();
-        const templateName = config.recent_templates?.[0];
+        const templateName = config.selected_template;
         if (!templateName) {
-          console.warn("[Menu] No recent_templates entry found.");
+          console.warn("[Menu] No selected_template entry found.");
           return;
         }
 
