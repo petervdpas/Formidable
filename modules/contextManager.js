@@ -1,8 +1,8 @@
 // modules/contextManager.js
 
+import { EventBus } from "./eventBus.js";
 import { setupSplitter } from "./uiBehaviors.js";
 import { log } from "./logger.js";
-import { EventBus } from "./eventBus.js";
 
 let templateSplitterInitialized = false;
 let markdownSplitterInitialized = false;
@@ -39,54 +39,7 @@ export function setContextView(mode, containers) {
   log("[Context] Switched to:", mode);
 }
 
-export function initContextToggle({
-  toggleElement,
-  containers,
-  dropdown,
-  metaListManager,
-  currentTemplateGetter,
-}) {
-  // 🔄 Handle context changes
-  EventBus.on("context:toggle", async (isMarkdown) => {
-    const mode = isMarkdown ? "markdown" : "template";
-
-    if (toggleElement) toggleElement.checked = isMarkdown;
-
-    setContextView(mode, containers);
-    await window.api.config.updateUserConfig({ context_mode: mode });
-
-    if (mode === "markdown") {
-      await dropdown.refresh?.();
-
-      const currentName = window.currentSelectedTemplateName;
-      if (currentName && dropdown?.setSelected) {
-        dropdown.setSelected(currentName);
-      }
-
-      if (currentTemplateGetter()) {
-        await metaListManager.loadList();
-      }
-    }
-
-    EventBus.emit(
-      "status:update",
-      `Context set to ${isMarkdown ? "Markdown" : "Template"}`
-    );
-  });
-
-  // 🔄 Handle template selection
-  EventBus.on("template:selected", async ({ name, yaml }) => {
-    window.currentSelectedTemplateName = name;
-    window.currentSelectedTemplate = yaml;
-    await window.api.config.updateUserConfig({ selected_template: name });
-  });
-
-  // 🔄 Handle form selection
-  EventBus.on("form:selected", async (filename) => {
-    await window.api.config.updateUserConfig({ selected_data_file: filename });
-  });
-
-  // 🖱️ Handle manual toggle
+export function initContextToggle({ toggleElement }) {
   toggleElement.addEventListener("change", (e) => {
     const isMarkdown = e.target.checked;
     EventBus.emit("context:toggle", isMarkdown);

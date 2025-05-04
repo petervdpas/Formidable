@@ -9,15 +9,6 @@ export function initThemeToggle(toggleElement) {
     const isDark = e.target.checked;
     EventBus.emit("theme:toggle", isDark ? "dark" : "light");
   });
-
-  EventBus.on("theme:toggle", async (theme) => {
-    const isDark = theme === "dark";
-    document.body.classList.toggle("dark-mode", isDark);
-    if (toggleElement) toggleElement.checked = isDark;
-
-    await window.api.config.updateUserConfig({ theme });
-    EventBus.emit("status:update", `Theme set to ${isDark ? "Dark" : "Light"}`);
-  });
 }
 
 // Splitter logic
@@ -66,7 +57,6 @@ export function setupSplitter({ splitter, left, right, container, min = 150 }) {
   });
 }
 
-// Highlight + click match
 // Highlight + click match
 export function highlightAndClickMatch(
   container,

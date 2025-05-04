@@ -60,7 +60,6 @@ export function buildMenu(containerId = "app-menu", commandHandler) {
     item.addEventListener("click", () => {
       log(`[Menu] Triggered action: ${action}`);
       commandHandler(action); // ✅ still used
-      EventBus.emit("menu:action", action); // ✅ EventBus-driven
     });
   });
 
@@ -77,7 +76,6 @@ export function buildMenu(containerId = "app-menu", commandHandler) {
       const mode = config.context_mode || "template";
       const isChecked = mode === "markdown";
       contextToggle.checked = isChecked;
-      EventBus.emit("context:toggle", isChecked); // ✅ sync with all listeners
     });
   }
 

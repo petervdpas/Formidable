@@ -15,6 +15,7 @@ import { initStatusHandler } from "./modules/handlers/statusHandler.js";
 import { initFormManager } from "./modules/formUI.js";
 import { log, warn, error } from "./modules/logger.js";
 import { setContextView, initContextToggle } from "./modules/contextManager.js";
+import { bindContextDependencies } from "./modules/handlers/contextHandlers.js";
 import { initThemeToggle } from "./modules/uiBehaviors.js";
 import {
   initTemplateListManager,
@@ -42,7 +43,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   const markdownContainer = document.getElementById("markdown-container");
   const themeToggle = document.getElementById("theme-toggle");
   const contextToggle = document.getElementById("context-toggle");
-  const menuToggle = document.getElementById("context-toggle-menu");
 
   const yamlEditor = initYamlEditor("template-content", async (updatedYaml) => {
     let filename = window.currentSelectedTemplateName;
@@ -86,7 +86,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   const templateModal = setupTemplateModal();
   const aboutModal = setupAboutModal();
 
-  window.currentSelectedTemplateName = null;
   window.openSettingsModal = settings.show;
   window.openAboutModal = aboutModal.show;
 
@@ -111,7 +110,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     yamlEditor,
     templateModal,
     config.default_markdown_dir,
-    templateDropdown ?? null
+    templateDropdown
   );
 
   const metaListManager = initMetaListManager(formManager, entryInputModal);
@@ -121,6 +120,14 @@ window.addEventListener("DOMContentLoaded", async () => {
     formManager,
     metaListManager,
     templateDropdown,
+  });
+
+  // Inject required context dependencies into handler module
+  bindContextDependencies({
+    containers: { templateContainer, markdownContainer },
+    dropdown: templateDropdown,
+    metaListManager,
+    currentTemplateGetter: () => window.currentSelectedTemplate,
   });
 
   await Promise.all([
@@ -145,23 +152,24 @@ window.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  // Set initial context view
   setContextView(config.context_mode, {
     templateContainer,
     markdownContainer,
   });
 
-  initContextToggle({
-    toggleElement: contextToggle,
-    containers: {
-      templateContainer,
-      markdownContainer,
-    },
-    dropdown: templateDropdown,
-    metaListManager,
-    currentTemplateGetter: () => window.currentSelectedTemplate,
-  });
+  // Listen for UI toggle and emit context change
+  initContextToggle({ toggleElement: contextToggle });
 
+  // Register all EventBus listeners (template:selected, context:toggle, status:update)
   initEventRouter();
+
+  // Initial context mode from config
+  const isMarkdown = config.context_mode === "markdown";
+  document.getElementById("context-toggle").checked = isMarkdown;
+  document.getElementById("context-toggle-menu").checked = isMarkdown;
+
+  EventBus.emit("context:toggle", isMarkdown);
 
   initThemeToggle(themeToggle);
   EventBus.emit("theme:toggle", config.theme);
