@@ -161,18 +161,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     currentTemplateGetter: () => window.currentSelectedTemplate,
   });
 
-  // ✅ NEW: Listen for EventBus toggle events
-  EventBus.on("context:toggle", (isMarkdown) => {
-    log("[EventBus] Received context:toggle:", isMarkdown);
-    if (contextToggle) contextToggle.checked = isMarkdown;
-    if (menuToggle) menuToggle.checked = isMarkdown;
-
-    setContextView(isMarkdown ? "markdown" : "template", {
-      templateContainer,
-      markdownContainer,
-    });
-  });
-
   initEventRouter();
 
   initThemeToggle(themeToggle);
