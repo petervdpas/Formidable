@@ -1,18 +1,14 @@
 // modules/formRenderer.js
-
 import { fieldTypes } from "./fieldTypes.js";
 import { warn, log } from "./logger.js";
 
 export function renderForm(container, template) {
   if (!container || !template) {
     console.warn("[FormRenderer] Missing container or template.");
-    return {};
+    return { fieldElements: {}, saveButton: null };
   }
 
-  log(
-    "[FormRenderer] Rendering form for:",
-    template.name || "Unnamed Template"
-  );
+  log("[FormRenderer] Rendering form for:", template.name || "Unnamed Template");
 
   container.innerHTML = "";
   const fields = template.fields || [];
@@ -57,51 +53,10 @@ export function renderForm(container, template) {
 
   container.appendChild(filenameDiv);
 
-  return fieldElements;
-}
+  // 💾 Save button
+  const saveBtn = document.createElement("button");
+  saveBtn.textContent = "Save Input";
+  saveBtn.className = "btn btn-default btn-info";
 
-export function populateFormFields(container, template, data) {
-  if (!data) {
-    warn("[FormRenderer] No data to populate form fields.");
-    return;
-  }
-
-  const fields = template.fields || [];
-
-  fields.forEach((field) => {
-    const typeDef = fieldTypes[field.type];
-    if (!typeDef || typeof typeDef.renderInput !== "function") {
-      warn(`[FormRenderer] No renderer for field type: ${field.type}`);
-      return;
-    }
-
-    const input = container.querySelector(`[name="${field.key}"]`);
-    if (!input) {
-      warn(`[FormRenderer] Missing input for: ${field.key}`);
-      return;
-    }
-
-    const value = data[field.key];
-
-    if (input.type === "checkbox") {
-      input.checked = value === true;
-    } else if (input.type === "radio") {
-      const group = container.querySelectorAll(
-        `input[type="radio"][name="${field.key}"]`
-      );
-      group.forEach((el) => {
-        el.checked = el.value === value;
-      });
-    } else if (
-      input.tagName === "TEXTAREA" ||
-      input.tagName === "INPUT" ||
-      input.tagName === "SELECT"
-    ) {
-      input.value = value ?? "";
-    } else {
-      warn(`[FormRenderer] Unhandled input type for: ${field.key}`);
-    }
-  });
-
-  log("[FormRenderer] Populated form fields from data.");
+  return { fieldElements, saveButton: saveBtn };
 }

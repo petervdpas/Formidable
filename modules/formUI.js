@@ -2,7 +2,7 @@
 
 import { log, warn, error } from "./logger.js";
 import { EventBus } from "./eventBus.js";
-import { getFormData } from "./formData.js";
+import { getFormData, focusFirstInput } from "./formData.js";
 import { renderForm, populateFormFields } from "./formRenderer.js";
 
 export function initFormManager(containerId) {
@@ -21,16 +21,14 @@ export function initFormManager(containerId) {
   async function loadTemplate(templateYaml) {
     log("[FormManager] Loading template:", templateYaml.name);
     currentTemplate = templateYaml;
-    fieldElements = renderForm(container, templateYaml);
-
-    // 💾 Add Save Button
-    const saveBtn = document.createElement("button");
-    saveBtn.textContent = "Save Input";
-    saveBtn.className = "btn btn-default btn-info";
-    saveBtn.addEventListener("click", async () => {
+  
+    const { fieldElements: elements, saveButton } = renderForm(container, templateYaml);
+    fieldElements = elements;
+  
+    saveButton.addEventListener("click", async () => {
       await saveForm();
     });
-    container.appendChild(saveBtn);
+    container.appendChild(saveButton);
   }
 
   async function loadFormData(metaData, filename) {
@@ -115,21 +113,10 @@ export function initFormManager(containerId) {
         return;
       }
       await loadTemplate(selected);
-      focusFirstInput();
+      focusFirstInput(container);
+
       EventBus.emit("status:update", "Ready to create a new markdown document.");
     });
-  }
-
-  function focusFirstInput() {
-    const firstInput = container.querySelector(
-      'input[name="title"], input, select, textarea'
-    );
-    if (firstInput) {
-      firstInput.focus();
-      log("[FormManager] Focused first input.");
-    } else {
-      warn("[FormManager] No input to focus.");
-    }
   }
 
   return {
