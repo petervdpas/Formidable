@@ -127,6 +127,22 @@ window.addEventListener("DOMContentLoaded", async () => {
     templateDropdown.refresh?.() ?? Promise.resolve(),
   ]);
 
+  const selected = config.selected_template;
+  if (selected) {
+    window.currentSelectedTemplateName = selected;
+
+    const container = document.getElementById("template-list");
+    const { highlightAndClickMatch } = await import("./modules/utils.js");
+    highlightAndClickMatch(container, selected, async (fallbackName) => {
+      const data = await window.api.templates.loadTemplate(fallbackName);
+      yamlEditor.render(data);
+      EventBus.emit("template:selected", {
+        name: fallbackName,
+        yaml: data,
+      });
+    });
+  }
+
   setContextView(config.context_mode, {
     templateContainer,
     markdownContainer,

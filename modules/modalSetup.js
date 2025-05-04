@@ -17,7 +17,6 @@ export function setupSettingsModal(themeToggle, contextToggle) {
 
       // Just emit event to trigger handlers elsewhere
       EventBus.emit("theme:toggle", config.theme);
-      EventBus.emit("context:toggle", config.context_mode);
 
       const defaultDirInput = document.getElementById("default-dir");
       const chooseDirBtn = document.getElementById("choose-dir");
