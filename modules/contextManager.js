@@ -1,6 +1,6 @@
 // modules/contextManager.js
 
-import { setupSplitter } from "./splitter.js";
+import { setupSplitter } from "./uiBehaviors.js";
 import { log } from "./logger.js";
 import { EventBus } from "./eventBus.js";
 
