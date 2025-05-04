@@ -1,5 +1,7 @@
 // renderer.js
 
+import { initEventRouter } from "./modules/eventRouter.js";
+
 import { buildMenu, handleMenuAction } from "./modules/menuManager.js";
 import {
   setupSettingsModal,
@@ -171,26 +173,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
-  EventBus.on("template:selected", async ({ name, yaml }) => {
-    log("[EventBus] template:selected received:", name);
-
-    // 🔄 Central state update
-    window.currentSelectedTemplateName = name;
-    window.currentSelectedTemplate = yaml;
-
-    // 🔄 Highlight sidebar only if not already selected
-    const listItem = Array.from(
-      document.querySelectorAll("#template-list .template-item")
-    ).find(
-      (el) =>
-        el.textContent.trim().toLowerCase() ===
-        name.replace(/\.yaml$/, "").toLowerCase()
-    );
-
-    if (listItem && !listItem.classList.contains("selected")) {
-      listItem.click(); // simulate selection to trigger sidebar visuals
-    }
-  });
+  initEventRouter();
 
   initThemeToggle(themeToggle);
   EventBus.emit("theme:toggle", config.theme);
