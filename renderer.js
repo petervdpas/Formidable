@@ -11,7 +11,7 @@ import {
 } from "./modules/modalSetup.js";
 import { initYamlEditor } from "./modules/yaml_editor.js";
 import { createDropdown } from "./modules/dropdownManager.js";
-import { initStatusManager } from "./modules/statusManager.js";
+import { initStatusHandler } from "./modules/handlers/statusHandler.js";
 import { initFormManager } from "./modules/formUI.js";
 import { log, warn, error } from "./modules/logger.js";
 import { setContextView, initContextToggle } from "./modules/contextManager.js";
@@ -36,7 +36,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
 
   buildMenu("app-menu", handleMenuAction);
-  initStatusManager("status-bar");
+  initStatusHandler("status-bar");
 
   const templateContainer = document.getElementById("template-container");
   const markdownContainer = document.getElementById("markdown-container");
