@@ -44,15 +44,17 @@ export function highlightAndClickMatch(
 
 export function focusFirstInput(
   container,
-  selector = 'input[name="title"], input, select, textarea'
+  selector = 'input, select, textarea'
 ) {
-  const firstInput = container.querySelector(selector);
-  if (firstInput) {
-    firstInput.focus();
-    log("[UI] Focused first input.");
-  } else {
-    warn("[UI] No input to focus.");
-  }
+  setTimeout(() => {
+    const firstInput = container.querySelector(selector);
+    if (firstInput) {
+      firstInput.focus();
+      log("[UI] Focused first input.");
+    } else {
+      warn("[UI] No input to focus.");
+    }
+  }, 0); // 🔁 defer until after DOM update
 }
 
 export function applyFieldValues(container, fieldsOrKeys = [], data = {}) {

@@ -25,7 +25,7 @@ export async function handleTemplateSelected({ name, yaml }) {
 
   if (templateChanged) {
     EventBus.emit("form:selected", null); 
-
+    EventBus.emit("form:clear");
   }
 
   const listItem = Array.from(

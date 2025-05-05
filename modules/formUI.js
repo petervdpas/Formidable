@@ -31,6 +31,8 @@ export function createFormManager(containerId) {
       await saveForm();
     });
     container.appendChild(saveButton);
+
+    focusFirstInput(container);
   }
 
   async function loadFormData(metaData, datafile) {
@@ -116,7 +118,6 @@ export function createFormManager(containerId) {
         return;
       }
       await loadTemplate(selected);
-      focusFirstInput(container);
 
       EventBus.emit(
         "status:update",
@@ -126,7 +127,9 @@ export function createFormManager(containerId) {
   }
 
   function clearFormUI() {
-    container.innerHTML = "";
+    container.innerHTML = `
+      <p>Select or create a data-file to begin.</p>
+    `;
     log("[FormManager] Form UI cleared.");
   }
 
