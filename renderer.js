@@ -129,7 +129,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // ── Template Selection Logic ──
   const { selectTemplate, loadTemplateOptions } = createTemplateSelector({
-    templateDropdown
+    templateDropdown,
   });
 
   // ── Event Handler Binding ──
@@ -151,8 +151,10 @@ window.addEventListener("DOMContentLoaded", async () => {
   ]);
 
   // ── Re-apply Last Selected Template ──
-  window.currentSelectedTemplateName = config.selected_template;
-  EventBus.emit("template:list:highlighted", config.selected_template);
+  if (config.selected_template) {
+    window.currentSelectedTemplateName = config.selected_template;
+    EventBus.emit("template:list:highlighted", config.selected_template);
+  }
 
   // ── Context & Theme Setup ──
   setContextView(config.context_mode, {

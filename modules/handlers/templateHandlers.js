@@ -12,13 +12,20 @@ export function bindTemplateDependencies(deps) {
   metaListManager = deps.metaListManager;
 }
 
-export function handleTemplateSelected({ name, yaml }) {
+export async function handleTemplateSelected({ name, yaml }) {
   log("[Handler] template:selected received:", name);
 
   window.currentSelectedTemplateName = name;
   window.currentSelectedTemplate = yaml;
 
-  EventBus.emit("form:selected", null); // clear form data
+  const config = await window.api.config.loadUserConfig();
+  const templateChanged = config.selected_template !== name;
+
+  await window.api.config.updateUserConfig({ selected_template: name });
+
+  if (templateChanged) {
+    EventBus.emit("form:selected", null); // only clear if switching templates
+  }
 
   const listItem = Array.from(
     document.querySelectorAll("#template-list .template-item")
@@ -34,9 +41,13 @@ export function handleTemplateSelected({ name, yaml }) {
     listItem.classList.add("selected");
   }
 
-  // ✅ Now trigger load only from here
   if (formManager && metaListManager) {
-    formManager.loadTemplate(yaml);
-    metaListManager.loadList(); // reload metadata
+    await formManager.loadTemplate(yaml);
+    await metaListManager.loadList();
+
+    const config = await window.api.config.loadUserConfig();
+    if (config.selected_data_file) {
+      EventBus.emit("form:list:highlighted", config.selected_data_file);
+    }
   }
 }

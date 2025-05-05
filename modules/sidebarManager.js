@@ -9,7 +9,9 @@ import {
   handleEntryConfirm,
 } from "./handlers.js";
 import { log, warn, error } from "./logger.js";
-import { stripMetaExtension } from "../utils/pathUtils.js";
+import {
+  stripMetaExtension,
+} from "../utils/pathUtils.js";
 import { highlightAndClickMatch } from "../utils/domUtils.js";
 
 // ─── Public Init Functions ───
