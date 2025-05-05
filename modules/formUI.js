@@ -3,8 +3,8 @@
 import { log, warn, error } from "./logger.js";
 import { EventBus } from "./eventBus.js";
 import { getFormData } from "./formData.js";
-import { focusFirstInput } from "./uiBehaviors.js";
-import { renderForm, populateFormFields } from "./formRenderer.js";
+import { applyFieldValues, focusFirstInput } from "./uiBehaviors.js";
+import { renderForm } from "./formRenderer.js";
 
 export function initFormManager(containerId) {
   const container = document.getElementById(containerId);
@@ -22,10 +22,13 @@ export function initFormManager(containerId) {
   async function loadTemplate(templateYaml) {
     log("[FormManager] Loading template:", templateYaml.name);
     currentTemplate = templateYaml;
-  
-    const { fieldElements: elements, saveButton } = renderForm(container, templateYaml);
+
+    const { fieldElements: elements, saveButton } = renderForm(
+      container,
+      templateYaml
+    );
     fieldElements = elements;
-  
+
     saveButton.addEventListener("click", async () => {
       await saveForm();
     });
@@ -48,7 +51,7 @@ export function initFormManager(containerId) {
       return;
     }
 
-    populateFormFields(container, currentTemplate, metaData);
+    applyFieldValues(container, currentTemplate.fields, metaData);
 
     const filenameInput = container.querySelector("#markdown-filename");
     if (filenameInput) {
@@ -61,7 +64,10 @@ export function initFormManager(containerId) {
 
     if (!currentTemplate || !currentTemplate.markdown_dir) {
       warn("[FormManager] No template or markdown_dir selected.");
-      EventBus.emit("status:update", "No template or markdown directory selected.");
+      EventBus.emit(
+        "status:update",
+        "No template or markdown directory selected."
+      );
       return;
     }
 
@@ -88,7 +94,10 @@ export function initFormManager(containerId) {
       if (reloadMarkdownList) reloadMarkdownList();
     } else {
       error("[FormManager] Save failed:", saveResult.error);
-      EventBus.emit("status:update", `Failed to save metadata: ${saveResult.error}`);
+      EventBus.emit(
+        "status:update",
+        `Failed to save metadata: ${saveResult.error}`
+      );
     }
   }
 
@@ -116,7 +125,10 @@ export function initFormManager(containerId) {
       await loadTemplate(selected);
       focusFirstInput(container);
 
-      EventBus.emit("status:update", "Ready to create a new markdown document.");
+      EventBus.emit(
+        "status:update",
+        "Ready to create a new markdown document."
+      );
     });
   }
 

@@ -180,3 +180,46 @@ export function wrapInputWithLabel(inputElement, labelText) {
   wrapper.appendChild(inputElement);
   return wrapper;
 }
+
+export function applyFieldValues(container, fieldsOrKeys = [], data = {}) {
+  if (!container || typeof container.querySelector !== "function") {
+    warn("[UI] applyFieldValues: Invalid container.");
+    return;
+  }
+
+  if (!data || typeof data !== "object") {
+    warn("[UI] applyFieldValues: No valid data object provided.");
+    return;
+  }
+
+  const keys = fieldsOrKeys
+    .map((f) => (typeof f === "string" ? f : f?.key))
+    .filter(Boolean);
+
+  keys.forEach((key) => {
+    const value = data[key];
+    const input = container.querySelector(`[name="${key}"]`);
+
+    if (!input) {
+      warn(`[UI] applyFieldValues: Missing input for key "${key}".`);
+      return;
+    }
+
+    if (input.type === "checkbox") {
+      input.checked = value === true;
+    } else if (input.type === "radio") {
+      const group = container.querySelectorAll(
+        `input[type="radio"][name="${key}"]`
+      );
+      group.forEach((el) => {
+        el.checked = el.value === value;
+      });
+    } else if ("value" in input) {
+      input.value = value ?? "";
+    } else {
+      warn(`[UI] applyFieldValues: Unsupported input for key "${key}".`);
+    }
+  });
+
+  log("[UI] applyFieldValues: Applied field values.");
+}
