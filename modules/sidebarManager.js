@@ -9,6 +9,7 @@ import {
   handleEntryConfirm,
 } from "./handlers.js";
 import { log, warn, error } from "./logger.js";
+import { stripMetaExtension } from "./pathUtils.js";
 
 // ─── Public Init Functions ───
 export function initTemplateListManager(
@@ -76,7 +77,7 @@ export function initMetaListManager(formManager, modal) {
 
       await window.api.forms.ensureFormDir(template.markdown_dir);
       const files = await window.api.forms.listForms(template.markdown_dir);
-      return files.map((f) => f.replace(/\.meta\.json$/, ""));
+      return files.map(stripMetaExtension);
     },
     onItemClick: (entryName) => handleEntryClick(entryName, formManager),
     emptyMessage: "No metadata files found.",

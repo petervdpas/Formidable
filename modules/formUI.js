@@ -5,6 +5,7 @@ import { EventBus } from "./eventBus.js";
 import { getFormData } from "./formData.js";
 import { applyFieldValues, focusFirstInput } from "./uiBehaviors.js";
 import { renderForm } from "./formRenderer.js";
+import { stripMarkdownExtension, validateFilenameInput } from "./formUtils.js";
 
 export function createFormManager(containerId) {
   const container = document.getElementById(containerId);
@@ -55,7 +56,7 @@ export function createFormManager(containerId) {
 
     const filenameInput = container.querySelector("#markdown-filename");
     if (filenameInput) {
-      filenameInput.value = filename.replace(/\.md$/, "");
+      filenameInput.value = stripMarkdownExtension(filename);
     }
   }
 
@@ -73,7 +74,7 @@ export function createFormManager(containerId) {
 
     const formData = getFormData(container, currentTemplate);
     const filenameInput = container.querySelector("#markdown-filename");
-    const filename = filenameInput?.value.trim();
+    const filename = validateFilenameInput(filenameInput);
 
     if (!filename) {
       warn("[FormManager] No filename provided.");

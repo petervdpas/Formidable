@@ -300,12 +300,6 @@ export function enableEscToClose(onEscape) {
   return () => document.removeEventListener("keydown", handler);
 }
 
-export function formatAsRelativePath(selected, appRoot) {
-  return selected.startsWith(appRoot)
-    ? "./" + selected.slice(appRoot.length).replace(/^[\\/]/, "").replace(/\\/g, "/")
-    : selected;
-}
-
 export function applyModalCssClass(modalEl, typeDef) {
   if (!modalEl) return;
 

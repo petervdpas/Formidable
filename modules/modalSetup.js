@@ -3,7 +3,8 @@
 import { setupModal } from "./modalManager.js";
 import { EventBus } from "./eventBus.js";
 import { fieldTypes } from "./fieldTypes.js";
-import { applyModalCssClass, formatAsRelativePath } from "./uiBehaviors.js";
+import { formatAsRelativePath } from "./pathUtils.js";
+import { applyModalCssClass } from "./uiBehaviors.js";
 import { extractFieldDefinition } from "./formUtils.js";
 import { createDropdown } from "./dropdownManager.js";
 
