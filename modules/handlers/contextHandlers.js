@@ -4,13 +4,11 @@ import { setContextView } from "../contextManager.js";
 import { EventBus } from "../eventBus.js";
 import { log } from "../logger.js";
 
-let containers, dropdown, metaListManager, currentTemplateGetter;
+let containers, dropdown;
 
 export function bindContextDependencies(deps) {
   containers = deps.containers;
   dropdown = deps.dropdown;
-  metaListManager = deps.metaListManager;
-  currentTemplateGetter = deps.currentTemplateGetter;
 }
 
 export async function handleContextToggle(isMarkdown) {
@@ -32,10 +30,6 @@ export async function handleContextToggle(isMarkdown) {
     const currentName = window.currentSelectedTemplateName;
     if (currentName && dropdown?.setSelected) {
       dropdown.setSelected(currentName);
-    }
-
-    if (currentTemplateGetter?.()) {
-      await metaListManager?.loadList?.();
     }
   }
 

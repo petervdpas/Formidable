@@ -5,7 +5,10 @@ import { EventBus } from "./eventBus.js";
 import { getFormData } from "./formData.js";
 import { applyFieldValues, focusFirstInput } from "../utils/domUtils.js";
 import { renderForm } from "./formRenderer.js";
-import { stripMarkdownExtension, validateFilenameInput } from "../utils/formUtils.js";
+import {
+  stripMarkdownExtension,
+  validateFilenameInput,
+} from "../utils/formUtils.js";
 
 export function createFormManager(containerId) {
   const container = document.getElementById(containerId);
@@ -17,18 +20,13 @@ export function createFormManager(containerId) {
   log("[FormManager] Initialized with container:", containerId);
 
   let currentTemplate = null;
-  let fieldElements = {};
   let reloadMarkdownList = null;
 
   async function loadTemplate(templateYaml) {
     log("[FormManager] Loading template:", templateYaml.name);
     currentTemplate = templateYaml;
 
-    const { fieldElements: elements, saveButton } = renderForm(
-      container,
-      templateYaml
-    );
-    fieldElements = elements;
+    const { saveButton } = renderForm(container, templateYaml);
 
     saveButton.addEventListener("click", async () => {
       await saveForm();
@@ -133,11 +131,32 @@ export function createFormManager(containerId) {
     });
   }
 
+  function clearFormUI() {
+    container.innerHTML = "";
+    log("[FormManager] Form UI cleared.");
+  }
+
+  // 🔁 React to EventBus-driven form:selected
+  EventBus.on("form:selected", async (filename) => {
+    if (!filename) {
+      clearFormUI();
+      return;
+    }
+
+    if (!currentTemplate) {
+      warn("[FormManager] No current template to load form.");
+      return;
+    }
+
+    await loadFormData(null, filename);
+  });
+
   return {
     loadTemplate,
     loadFormData,
     saveForm,
     setReloadMarkdownList,
     connectNewButton,
+    clearFormUI,
   };
 }

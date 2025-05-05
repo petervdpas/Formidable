@@ -6,8 +6,6 @@ import { stripYamlExtension } from "../utils/pathUtils.js";
 import { selectLastOrFallback } from "../utils/configUtils.js";
 
 export function createTemplateSelector({
-  formManager,
-  metaListManager,
   templateDropdown,
 }) {
   async function selectTemplate(name) {
@@ -32,11 +30,10 @@ export function createTemplateSelector({
       });
 
       await window.api.config.updateUserConfig({
-        last_selected_template: name,
+        selected_template: name,
       });
+
       await window.api.markdown.ensureMarkdownDir(result.markdownDir);
-      await formManager.loadTemplate(yamlData);
-      await metaListManager.loadList();
       EventBus.emit("status:update", `Selected template: ${yamlData.name}`);
     } catch (err) {
       error("[SelectTemplate] Error:", err);
@@ -50,15 +47,15 @@ export function createTemplateSelector({
       value: name,
       label: stripYamlExtension(name),
     }));
-  
+
     templateDropdown.updateOptions(options);
-  
+
     const config = await window.api.config.loadUserConfig();
-  
+
     await selectLastOrFallback({
       options: options.map((opt) => opt.value),
-      lastSelected: config.last_selected_template,
-      configKey: "last_selected_template",
+      lastSelected: config.selected_template,
+      configKey: "selected_template",
       onSelect: async (name) => {
         await selectTemplate(name);
       },

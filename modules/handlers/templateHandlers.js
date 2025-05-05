@@ -1,12 +1,24 @@
-// modules.handlers/templateHandlers.js
+// modules/handlers/templateHandlers.js
 
+import { EventBus } from "../eventBus.js";
 import { log } from "../logger.js";
+
+let formManager = null;
+let metaListManager = null;
+
+// 🔗 Inject dependencies from renderer.js
+export function bindTemplateDependencies(deps) {
+  formManager = deps.formManager;
+  metaListManager = deps.metaListManager;
+}
 
 export function handleTemplateSelected({ name, yaml }) {
   log("[Handler] template:selected received:", name);
 
   window.currentSelectedTemplateName = name;
   window.currentSelectedTemplate = yaml;
+
+  EventBus.emit("form:selected", null); // clear form data
 
   const listItem = Array.from(
     document.querySelectorAll("#template-list .template-item")
@@ -16,7 +28,23 @@ export function handleTemplateSelected({ name, yaml }) {
       name.replace(/\.yaml$/, "").toLowerCase()
   );
 
-  if (listItem && !listItem.classList.contains("selected")) {
-    listItem.click(); // simulate selection to trigger sidebar visuals
+  if (listItem) {
+    document.querySelectorAll("#template-list .template-item.selected")
+      .forEach((el) => el.classList.remove("selected"));
+    listItem.classList.add("selected");
+  }
+
+  // ✅ Now trigger load only from here
+  if (formManager && metaListManager) {
+    formManager.loadTemplate(yaml);
+    metaListManager.loadList(); // reload metadata
+  }
+}
+
+export function handleMetaListClear() {
+  const container = document.getElementById("markdown-list");
+  if (container) {
+    container.innerHTML = `<div class="empty-message">No template selected.</div>`;
+    log("[Handler] meta:list:clear → list cleared.");
   }
 }

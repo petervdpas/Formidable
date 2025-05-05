@@ -20,7 +20,6 @@ export function createListManager({
   async function loadList() {
     log(`[ListManager] Loading list into #${elementId}...`);
     container.innerHTML = "";
-    let selectedItem = null;
     try {
       const items = await fetchListFunction();
       log("[ListManager] Items:", items);

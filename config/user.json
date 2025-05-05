@@ -1,9 +1,8 @@
 {
   "selected_template": "basic.yaml",
   "selected_data_file": "good-20250502",
-  "theme": "light",
+  "theme": "dark",
   "font_size": 14,
   "context_mode": "markdown",
-  "default_markdown_dir": "./markdowns",
-  "last_selected_template": "basic.yaml"
+  "default_markdown_dir": "./markdowns"
 }

@@ -12,7 +12,7 @@ import { log, warn, error } from "./logger.js";
 import { stripMetaExtension } from "../utils/pathUtils.js";
 
 // ─── Public Init Functions ───
-export function initTemplateListManager(
+export function createTemplateListManager(
   yamlEditor,
   modal,
   defaultMarkdownDir = "./markdowns",
@@ -58,7 +58,7 @@ export function initTemplateListManager(
   return listManager;
 }
 
-export function initMetaListManager(formManager, modal) {
+export function createMetaListManager(formManager, modal) {
   const listManager = createListManager({
     elementId: "markdown-list",
     fetchListFunction: async () => {
