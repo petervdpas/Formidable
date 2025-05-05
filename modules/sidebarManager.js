@@ -10,6 +10,7 @@ import {
 } from "./handlers.js";
 import { log, warn, error } from "./logger.js";
 import { stripMetaExtension } from "../utils/pathUtils.js";
+import { highlightAndClickMatch } from "../utils/domUtils.js";
 
 // ─── Public Init Functions ───
 export function createTemplateListManager(
@@ -59,6 +60,12 @@ export function createTemplateListManager(
     await listManager.loadList();
   });
 
+  EventBus.on("template:list:highlighted", (name) => {
+    if (!name) return;
+    const container = document.getElementById("template-list");
+    highlightAndClickMatch(container, name);
+  });
+
   return listManager;
 }
 
@@ -106,6 +113,12 @@ export function createMetaListManager(formManager, modal) {
 
   EventBus.on("meta:list:reload", async () => {
     await listManager.loadList();
+  });
+
+  EventBus.on("form:list:highlighted", (name) => {
+    if (!name) return;
+    const container = document.getElementById("markdown-list");
+    highlightAndClickMatch(container, name);
   });
 
   return listManager;

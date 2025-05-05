@@ -22,17 +22,20 @@ export function highlightAndClickMatch(
   );
 
   if (match) {
-    if (!match.classList.contains("selected")) {
-      match.click();
+    container.querySelectorAll(".selected").forEach((el) =>
+      el.classList.remove("selected")
+    );
+    match.classList.add("selected");
 
-      if (typeof onClickFallback === "function") {
-        setTimeout(() => {
-          if (!match.classList.contains("selected")) {
-            warn("[highlightAndClickMatch] Click failed, running fallback");
-            onClickFallback(targetName);
-          }
-        }, 50);
-      }
+    match.click();
+
+    if (typeof onClickFallback === "function") {
+      setTimeout(() => {
+        if (!match.classList.contains("selected")) {
+          warn("[highlightAndClickMatch] Click failed, running fallback");
+          onClickFallback(targetName);
+        }
+      }, 50);
     }
   } else {
     warn(`[highlightAndClickMatch] No match found for: ${normalizedTarget}`);

@@ -151,21 +151,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   ]);
 
   // ── Re-apply Last Selected Template ──
-  const selected = config.selected_template;
-  if (selected) {
-    window.currentSelectedTemplateName = selected;
-
-    const container = document.getElementById("template-list");
-    const { highlightAndClickMatch } = await import("./utils/domUtils.js");
-    highlightAndClickMatch(container, selected, async (fallbackName) => {
-      const data = await window.api.templates.loadTemplate(fallbackName);
-      yamlEditor.render(data);
-      EventBus.emit("template:selected", {
-        name: fallbackName,
-        yaml: data,
-      });
-    });
-  }
+  window.currentSelectedTemplateName = config.selected_template;
+  EventBus.emit("template:list:highlighted", config.selected_template);
 
   // ── Context & Theme Setup ──
   setContextView(config.context_mode, {
