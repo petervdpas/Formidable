@@ -1,7 +1,7 @@
 // modules/handlers.js
 
 import { EventBus } from "./eventBus.js";
-import { error, warn, log } from "./logger.js";
+import { log, warn, error } from "../utils/logger.js";
 
 export async function handleTemplateClick(itemName, yamlEditor) {
   try {

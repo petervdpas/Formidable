@@ -1,10 +1,10 @@
 // modules/yamlEditor.js
 
-import { log, warn } from "./logger.js";
+import { log, warn, error } from "../utils/logger.js";
 import { showConfirmModal } from "./modalManager.js";
 import { setupFieldEditModal } from "./modalSetup.js";
 import { EventBus } from "./eventBus.js";
-import { fieldTypes } from "./fieldTypes.js";
+import { fieldTypes } from "../utils/fieldTypes.js";
 
 export function initYamlEditor(containerId, onSaveCallback) {
   const container = document.getElementById(containerId);

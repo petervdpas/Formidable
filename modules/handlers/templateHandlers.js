@@ -1,7 +1,7 @@
 // modules/handlers/templateHandlers.js
 
 import { EventBus } from "../eventBus.js";
-import { log } from "../logger.js";
+import { log } from "../../utils/logger.js";
 
 let formManager = null;
 let metaListManager = null;
@@ -24,7 +24,8 @@ export async function handleTemplateSelected({ name, yaml }) {
   await window.api.config.updateUserConfig({ selected_template: name });
 
   if (templateChanged) {
-    EventBus.emit("form:selected", null); // only clear if switching templates
+    EventBus.emit("form:selected", null); 
+
   }
 
   const listItem = Array.from(

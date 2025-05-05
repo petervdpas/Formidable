@@ -2,7 +2,7 @@
 
 import { EventBus } from "./eventBus.js";
 import { setupSplitter } from "../utils/resizing.js";
-import { log } from "./logger.js";
+import { log, warn, error } from "../utils/logger.js";
 
 let templateSplitterInitialized = false;
 let markdownSplitterInitialized = false;

@@ -1,8 +1,8 @@
 // modules/formRenderer.js
 
-import { fieldTypes } from "./fieldTypes.js";
+import { fieldTypes } from "../utils/fieldTypes.js";
 import { wrapInputWithLabel } from "../utils/elementBuilders.js";
-import { warn, log } from "./logger.js";
+import { log, warn, error } from "../utils/logger.js";
 
 export function renderForm(container, template) {
   if (!container || !template) {

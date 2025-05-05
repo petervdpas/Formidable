@@ -1,7 +1,7 @@
 // renderer.js
 
 // ───── Imports ──────────────────────────────
-import { log, warn, error } from "./modules/logger.js";
+import { log, warn, error } from "./utils/logger.js";
 import { EventBus } from "./modules/eventBus.js";
 
 import { initStatusHandler } from "./modules/handlers/statusHandler.js";

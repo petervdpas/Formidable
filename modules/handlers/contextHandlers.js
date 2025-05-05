@@ -2,7 +2,7 @@
 
 import { setContextView } from "../contextManager.js";
 import { EventBus } from "../eventBus.js";
-import { log } from "../logger.js";
+import { log } from "../../utils/logger.js";
 
 let containers, dropdown;
 

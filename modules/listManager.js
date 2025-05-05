@@ -1,6 +1,6 @@
 // modules/listManager.js
 
-import { error, log, warn } from "./logger.js";
+import { log, warn, error } from "../utils/logger.js";
 import { EventBus } from "./eventBus.js";
 import { makeSelectableList } from "../utils/domUtils.js";
 

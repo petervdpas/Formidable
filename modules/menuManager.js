@@ -1,6 +1,6 @@
 // modules/menuManager.js
 
-import { log, warn, error } from "./logger.js";
+import { log, warn, error } from "../utils/logger.js";
 import { EventBus } from "./eventBus.js";
 import { bindActionHandlers } from "../utils/domUtils.js";
 

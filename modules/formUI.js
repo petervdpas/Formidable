@@ -1,8 +1,8 @@
 // modules/formUI.js
 
-import { log, warn, error } from "./logger.js";
+import { log, warn, error } from "../utils/logger.js";
 import { EventBus } from "./eventBus.js";
-import { getFormData } from "./formData.js";
+import { getFormData } from "../utils/formUtils.js";
 import { applyFieldValues, focusFirstInput } from "../utils/domUtils.js";
 import { renderForm } from "./formRenderer.js";
 import {

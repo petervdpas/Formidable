@@ -1,6 +1,6 @@
 // modules/eventBus.js
 
-import { log, warn, error } from "./logger.js";
+import { log, warn, error } from "../utils/logger.js";
 
 const listeners = {};
 

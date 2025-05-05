@@ -1,7 +1,7 @@
 // modules/templateSelector.js
 
 import { EventBus } from "./eventBus.js";
-import { log, error } from "./logger.js";
+import { log, warn, error } from "../utils/logger.js";
 import { stripYamlExtension } from "../utils/pathUtils.js";
 import { selectLastOrFallback } from "../utils/configUtils.js";
 

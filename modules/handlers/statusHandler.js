@@ -1,6 +1,6 @@
 // modules/handlers/statusHandler.js
 
-import { log, warn } from "../logger.js";
+import { log, warn } from "../../utils/logger.js";
 
 let statusBar = null;
 

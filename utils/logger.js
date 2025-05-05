@@ -1,4 +1,4 @@
-// modules/logger.js
+// utils/logger.js
 
 let loggingEnabled = true;
 

@@ -1,6 +1,6 @@
 // modules/uiBehaviors.js
 
-import { log, warn } from "../modules/logger.js";
+import { log, warn } from "./logger.js";
 
 // Highlight + click match
 export function highlightAndClickMatch(

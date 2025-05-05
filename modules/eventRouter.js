@@ -8,7 +8,7 @@ import * as formHandlers from "./handlers/formHandlers.js";
 import * as themeHandler from "./handlers/themeHandler.js";
 import * as statusHandler from "./handlers/statusHandler.js";
 
-import { log } from "./logger.js";
+import { log, warn, error } from "../utils/logger.js";
 
 export function initEventRouter() {
   log("[EventRouter] Initializing global event listeners...");

@@ -8,7 +8,7 @@ import {
   handleEntryClick,
   handleEntryConfirm,
 } from "./handlers.js";
-import { log, warn, error } from "./logger.js";
+import { log, warn, error } from "../utils/logger.js";
 import {
   stripMetaExtension,
 } from "../utils/pathUtils.js";

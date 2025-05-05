@@ -2,7 +2,7 @@
 
 import { setupModal } from "./modalManager.js";
 import { EventBus } from "./eventBus.js";
-import { fieldTypes } from "./fieldTypes.js";
+import { fieldTypes } from "../utils/fieldTypes.js";
 import { formatAsRelativePath } from "../utils/pathUtils.js";
 import { applyModalCssClass } from "../utils/modalUtils.js";
 import { extractFieldDefinition } from "../utils/formUtils.js";
