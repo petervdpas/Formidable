@@ -1,4 +1,4 @@
-// modules/yaml_editor.js
+// modules/yamlEditor.js
 
 import { log, warn } from "./logger.js";
 import { showConfirmModal } from "./modalManager.js";

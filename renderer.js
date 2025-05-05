@@ -9,7 +9,7 @@ import {
   setupTemplateModal,
   setupAboutModal,
 } from "./modules/modalSetup.js";
-import { initYamlEditor } from "./modules/yaml_editor.js";
+import { initYamlEditor } from "./modules/yamlEditor.js";
 import { createDropdown } from "./modules/dropdownManager.js";
 import { initStatusHandler } from "./modules/handlers/statusHandler.js";
 import { createFormManager } from "./modules/formUI.js";

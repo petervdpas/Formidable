@@ -4,5 +4,6 @@
   "theme": "light",
   "font_size": 14,
   "context_mode": "markdown",
-  "default_markdown_dir": "./markdowns"
+  "default_markdown_dir": "./markdowns",
+  "last_selected_template": "basic.yaml"
 }
