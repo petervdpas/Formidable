@@ -5,7 +5,7 @@ import { EventBus } from "./eventBus.js";
 import { getFormData } from "./formData.js";
 import { applyFieldValues, focusFirstInput } from "./uiBehaviors.js";
 import { renderForm } from "./formRenderer.js";
-import { stripMarkdownExtension, validateFilenameInput } from "./formUtils.js";
+import { stripMarkdownExtension, validateFilenameInput } from "../utils/formUtils.js";
 
 export function createFormManager(containerId) {
   const container = document.getElementById(containerId);

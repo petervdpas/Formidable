@@ -9,7 +9,7 @@ import {
   handleEntryConfirm,
 } from "./handlers.js";
 import { log, warn, error } from "./logger.js";
-import { stripMetaExtension } from "./pathUtils.js";
+import { stripMetaExtension } from "../utils/pathUtils.js";
 
 // ─── Public Init Functions ───
 export function initTemplateListManager(

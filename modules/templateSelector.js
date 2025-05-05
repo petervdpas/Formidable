@@ -2,6 +2,8 @@
 
 import { EventBus } from "./eventBus.js";
 import { log, error } from "./logger.js";
+import { stripYamlExtension } from "../utils/pathUtils.js";
+import { selectLastOrFallback } from "../utils/configUtils.js";
 
 export function createTemplateSelector({
   formManager,
@@ -46,25 +48,24 @@ export function createTemplateSelector({
     const templateFiles = await window.api.templates.listTemplates();
     const options = templateFiles.map((name) => ({
       value: name,
-      label: name.replace(/\.yaml$/, ""),
+      label: stripYamlExtension(name),
     }));
+  
     templateDropdown.updateOptions(options);
-
+  
     const config = await window.api.config.loadUserConfig();
-    const lastSelected = config.last_selected_template;
-
-    if (lastSelected && templateFiles.includes(lastSelected)) {
-      await selectTemplate(lastSelected);
-    } else if (options.length > 0) {
-      const fallback = options[0].value;
-      log(`[loadTemplateOptions] Falling back to: ${fallback}`);
-      await selectTemplate(fallback);
-      await window.api.config.updateUserConfig({
-        last_selected_template: fallback,
-      });
-    } else {
-      log("[loadTemplateOptions] No templates available to select.");
-    }
+  
+    await selectLastOrFallback({
+      options: options.map((opt) => opt.value),
+      lastSelected: config.last_selected_template,
+      configKey: "last_selected_template",
+      onSelect: async (name) => {
+        await selectTemplate(name);
+      },
+      onFallback: (fallback) => {
+        log(`[loadTemplateOptions] Falling back to: ${fallback}`);
+      },
+    });
   }
 
   return { selectTemplate, loadTemplateOptions };

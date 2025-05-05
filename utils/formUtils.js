@@ -1,4 +1,4 @@
-// modules/formUtils.js
+// utils/formUtils.js
 
 export function extractFieldDefinition({
   keyId = "edit-key",

@@ -3,9 +3,9 @@
 import { setupModal } from "./modalManager.js";
 import { EventBus } from "./eventBus.js";
 import { fieldTypes } from "./fieldTypes.js";
-import { formatAsRelativePath } from "./pathUtils.js";
+import { formatAsRelativePath } from "../utils/pathUtils.js";
 import { applyModalCssClass } from "./uiBehaviors.js";
-import { extractFieldDefinition } from "./formUtils.js";
+import { extractFieldDefinition } from "../utils/formUtils.js";
 import { createDropdown } from "./dropdownManager.js";
 
 export function setupSettingsModal(themeToggle, contextToggle) {
