@@ -1,6 +1,11 @@
 // modules/dropdownManager.js
 
 import { log, warn, error } from "./logger.js";
+import {
+  createStyledLabel,
+  createStyledSelect,
+  populateSelectOptions,
+} from "./uiBehaviors.js";
 
 export function createDropdown({
   containerId,
@@ -22,38 +27,15 @@ export function createDropdown({
 
   container.innerHTML = ""; // Clear old content
 
-  const label = document.createElement("label");
-  label.textContent = labelText;
-  label.style.display = "block";
-  label.style.marginBottom = "6px";
+  const label = createStyledLabel(labelText);
+  const select = createStyledSelect();
 
-  const select = document.createElement("select");
-  select.style.width = "100%";
-  select.style.padding = "6px";
-  select.style.marginBottom = "10px";
-
-  // Initial option load
-  function populateOptions(optList) {
-    select.innerHTML = "";
-    optList.forEach((opt) => {
-      const option = document.createElement("option");
-      option.value = opt.value;
-      option.textContent = opt.label;
-      if (opt.value === selectedValue) {
-        option.selected = true;
-      }
-      select.appendChild(option);
-    });
-  }
-
-  populateOptions(options);
+  populateSelectOptions(select, options, selectedValue);
 
   select.addEventListener("change", (e) => {
     const selected = e.target.value;
     log(`[DropdownManager] Selection changed to: ${selected}`);
-    if (onChange) {
-      onChange(selected);
-    }
+    if (onChange) onChange(selected);
   });
 
   container.appendChild(label);
@@ -71,15 +53,13 @@ export function createDropdown({
     setSelected: (value) => {
       log(`[DropdownManager] setSelected() -> ${value}`);
       select.value = value;
-      if (onChange) {
-        onChange(value);
-      }
+      if (onChange) onChange(value);
     },
     updateOptions: (newOptions) => {
       log(
         `[DropdownManager] updateOptions() called with ${newOptions.length} options.`
       );
-      populateOptions(newOptions);
+      populateSelectOptions(select, newOptions, selectedValue);
     },
     refresh: async () => {
       if (typeof onRefresh !== "function") {
@@ -90,17 +70,15 @@ export function createDropdown({
       }
       try {
         const newOptions = await onRefresh();
-        populateOptions(newOptions);
+        populateSelectOptions(select, newOptions, selectedValue);
 
         const current = select.value;
         const values = newOptions.map((opt) => opt.value);
-
         if (!values.includes(current)) {
           log(
             `[DropdownManager] Current selection "${current}" no longer valid, clearing selection.`
           );
-          select.value = ""; // deselect
-          // optional: trigger change event
+          select.value = "";
           if (onChange) onChange("");
         }
 

@@ -2,7 +2,8 @@
 
 import { log, warn, error } from "./logger.js";
 import { EventBus } from "./eventBus.js";
-import { getFormData, focusFirstInput } from "./formData.js";
+import { getFormData } from "./formData.js";
+import { focusFirstInput } from "./uiBehaviors.js";
 import { renderForm, populateFormFields } from "./formRenderer.js";
 
 export function initFormManager(containerId) {

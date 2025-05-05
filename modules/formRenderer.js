@@ -1,6 +1,7 @@
 // modules/formRenderer.js
 
 import { fieldTypes } from "./fieldTypes.js";
+import { wrapInputWithLabel } from "./uiBehaviors.js";
 import { warn, log } from "./logger.js";
 
 export function renderForm(container, template) {
@@ -9,23 +10,13 @@ export function renderForm(container, template) {
     return { fieldElements: {}, saveButton: null };
   }
 
-  log(
-    "[FormRenderer] Rendering form for:",
-    template.name || "Unnamed Template"
-  );
+  log("[FormRenderer] Rendering form for:", template.name || "Unnamed Template");
 
   container.innerHTML = "";
   const fields = template.fields || [];
   const fieldElements = {};
 
   fields.forEach((field) => {
-    const fieldDiv = document.createElement("div");
-    fieldDiv.className = "form-row";
-
-    const label = document.createElement("label");
-    label.textContent = field.label;
-    fieldDiv.appendChild(label);
-
     const typeDef = fieldTypes[field.type];
     if (!typeDef) {
       warn(`[FormRenderer] Unknown field type: ${field.type}`);
@@ -39,23 +30,17 @@ export function renderForm(container, template) {
     }
 
     fieldElements[field.key] = input;
-    fieldDiv.appendChild(input);
-    container.appendChild(fieldDiv);
+    const fieldRow = wrapInputWithLabel(input, field.label);
+    container.appendChild(fieldRow);
   });
 
-  const filenameDiv = document.createElement("div");
-  filenameDiv.className = "form-row";
-
-  const filenameLabel = document.createElement("label");
-  filenameLabel.textContent = "Filename (without extension)";
-  filenameDiv.appendChild(filenameLabel);
-
+  // Filename input
   const filenameInput = document.createElement("input");
   filenameInput.type = "text";
   filenameInput.id = "markdown-filename";
-  filenameDiv.appendChild(filenameInput);
 
-  container.appendChild(filenameDiv);
+  const filenameRow = wrapInputWithLabel(filenameInput, "Filename (without extension)");
+  container.appendChild(filenameRow);
 
   // 💾 Save button
   const saveBtn = document.createElement("button");

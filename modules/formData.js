@@ -26,15 +26,3 @@ export function getFormData(container, template) {
   log("[FormData] Collected form data:", data);
   return data;
 }
-
-export function focusFirstInput(container) {
-  const firstInput = container.querySelector(
-    'input[name="title"], input, select, textarea'
-  );
-  if (firstInput) {
-    firstInput.focus();
-    log("[FormData] Focused first input.");
-  } else {
-    warn("[FormData] No input to focus.");
-  }
-}
