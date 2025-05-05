@@ -46,13 +46,13 @@ export function handleTemplateConfirm(modal, defaultMarkdownDir, callback) {
     if (!raw) return;
 
     const safeName = raw.replace(/\s+/g, "-").toLowerCase();
-    const filename = `${safeName}.yaml`;
+    const template = `${safeName}.yaml`;
     const markdown_dir = dirInput.value.trim() || "markdown";
 
     modal.hide();
 
     callback({
-      filename,
+      template,
       yaml: {
         name: safeName,
         markdown_dir,

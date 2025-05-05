@@ -20,7 +20,6 @@ export function createFormManager(containerId) {
   log("[FormManager] Initialized with container:", containerId);
 
   let currentTemplate = null;
-  let reloadMarkdownList = null;
 
   async function loadTemplate(templateYaml) {
     log("[FormManager] Loading template:", templateYaml.name);
@@ -34,13 +33,13 @@ export function createFormManager(containerId) {
     container.appendChild(saveButton);
   }
 
-  async function loadFormData(metaData, filename) {
-    log("[FormManager] Loading metadata for:", filename);
+  async function loadFormData(metaData, datafile) {
+    log("[FormManager] Loading metadata for:", datafile);
 
-    if (!metaData && currentTemplate?.markdown_dir && filename) {
+    if (!metaData && currentTemplate?.markdown_dir && datafile) {
       metaData = await window.api.forms.loadForm(
         currentTemplate.markdown_dir,
-        filename,
+        datafile,
         currentTemplate.fields || []
       );
     }
@@ -52,9 +51,9 @@ export function createFormManager(containerId) {
 
     applyFieldValues(container, currentTemplate.fields, metaData);
 
-    const filenameInput = container.querySelector("#markdown-filename");
-    if (filenameInput) {
-      filenameInput.value = stripMarkdownExtension(filename);
+    const datafileInput = container.querySelector("#markdown-filename");
+    if (datafileInput) {
+      datafileInput.value = stripMarkdownExtension(datafile);
     }
   }
 
@@ -71,26 +70,26 @@ export function createFormManager(containerId) {
     }
 
     const formData = getFormData(container, currentTemplate);
-    const filenameInput = container.querySelector("#markdown-filename");
-    const filename = validateFilenameInput(filenameInput);
+    const datafileInput = container.querySelector("#markdown-filename");
+    const datafile = validateFilenameInput(datafileInput);
 
-    if (!filename) {
-      warn("[FormManager] No filename provided.");
-      EventBus.emit("status:update", "Please enter a filename.");
+    if (!datafile) {
+      warn("[FormManager] No datafile provided.");
+      EventBus.emit("status:update", "Please enter a filename for datafile.");
       return;
     }
 
     const markdownDir = currentTemplate.markdown_dir;
     const saveResult = await window.api.forms.saveForm(
       markdownDir,
-      filename + ".md",
+      datafile,
       formData,
       currentTemplate.fields || []
     );
 
     if (saveResult.success) {
       EventBus.emit("status:update", `Saved metadata: ${saveResult.path}`);
-      if (reloadMarkdownList) reloadMarkdownList();
+      EventBus.emit("meta:list:reload");
     } else {
       error("[FormManager] Save failed:", saveResult.error);
       EventBus.emit(
@@ -98,11 +97,6 @@ export function createFormManager(containerId) {
         `Failed to save metadata: ${saveResult.error}`
       );
     }
-  }
-
-  function setReloadMarkdownList(fn) {
-    reloadMarkdownList = fn;
-    log("[FormManager] Reload markdown list function set.");
   }
 
   function connectNewButton(buttonId, getTemplateCallback) {
@@ -137,8 +131,8 @@ export function createFormManager(containerId) {
   }
 
   // 🔁 React to EventBus-driven form:selected
-  EventBus.on("form:selected", async (filename) => {
-    if (!filename) {
+  EventBus.on("form:selected", async (datafile) => {
+    if (!datafile) {
       clearFormUI();
       return;
     }
@@ -148,14 +142,17 @@ export function createFormManager(containerId) {
       return;
     }
 
-    await loadFormData(null, filename);
+    await loadFormData(null, datafile);
+  });
+
+  EventBus.on("form:clear", async () => {
+    clearFormUI();
   });
 
   return {
     loadTemplate,
     loadFormData,
     saveForm,
-    setReloadMarkdownList,
     connectNewButton,
     clearFormUI,
   };

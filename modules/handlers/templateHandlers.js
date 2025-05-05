@@ -40,11 +40,3 @@ export function handleTemplateSelected({ name, yaml }) {
     metaListManager.loadList(); // reload metadata
   }
 }
-
-export function handleMetaListClear() {
-  const container = document.getElementById("markdown-list");
-  if (container) {
-    container.innerHTML = `<div class="empty-message">No template selected.</div>`;
-    log("[Handler] meta:list:clear → list cleared.");
-  }
-}

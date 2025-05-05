@@ -27,13 +27,13 @@ function listForms(markdownDir) {
   return metaRepo.listFiles(markdownDir);
 }
 
-function loadForm(markdownDir, filename, templateFields = []) {
+function loadForm(markdownDir, datafile, templateFields = []) {
   try {
-    const raw = metaRepo.loadFromBase(markdownDir, filename);
+    const raw = metaRepo.loadFromBase(markdownDir, datafile);
     if (!raw) return null;
 
     const sanitized = metaSchema.sanitize(raw, templateFields);
-    log("[FormManager] Loaded and sanitized form:", filename);
+    log("[FormManager] Loaded and sanitized form:", datafile);
     return sanitized;
   } catch (err) {
     error("[FormManager] Failed to load form:", err);
@@ -41,10 +41,10 @@ function loadForm(markdownDir, filename, templateFields = []) {
   }
 }
 
-function saveForm(markdownDir, filename, data, templateFields = []) {
+function saveForm(markdownDir, datafile, data, templateFields = []) {
   try {
     const sanitized = metaSchema.sanitize(data, templateFields);
-    const result = metaRepo.saveFromBase(markdownDir, filename, sanitized);
+    const result = metaRepo.saveFromBase(markdownDir, datafile, sanitized);
     if (result.success) {
       log("[FormManager] Saved form:", result.path);
     } else {
@@ -57,8 +57,8 @@ function saveForm(markdownDir, filename, data, templateFields = []) {
   }
 }
 
-function deleteForm(markdownDir, filename) {
-  return metaRepo.deleteFromBase(markdownDir, filename);
+function deleteForm(markdownDir, datafile) {
+  return metaRepo.deleteFromBase(markdownDir, datafile);
 }
 
 module.exports = {

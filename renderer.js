@@ -91,27 +91,27 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // ── Template Editor ──
   const yamlEditor = initYamlEditor("template-content", async (updatedYaml) => {
-    let filename = window.currentSelectedTemplateName;
+    let template = window.currentSelectedTemplateName;
 
-    if (!filename && updatedYaml?.name) {
-      filename = `${updatedYaml.name}.yaml`;
-      window.currentSelectedTemplateName = filename;
+    if (!template && updatedYaml?.name) {
+      template = `${updatedYaml.name}.yaml`;
+      window.currentSelectedTemplateName = template;
       window.currentSelectedTemplate = updatedYaml;
-      log("[YamlEditor] Recovered filename from template name:", filename);
+      log("[YamlEditor] Recovered from template name:", template);
     }
 
-    if (!filename) {
-      warn("[YamlEditor] No template filename selected.");
+    if (!template) {
+      warn("[YamlEditor] No template selected.");
       EventBus.emit("status:update", "Cannot save: no template selected.");
       return;
     }
 
     const success = await window.api.templates.saveTemplate(
-      filename,
+      template,
       updatedYaml
     );
     if (success) {
-      EventBus.emit("status:update", `Saved: ${filename}`);
+      EventBus.emit("status:update", `Saved: ${template}`);
     } else {
       EventBus.emit("status:update", "Failed to save template.");
     }

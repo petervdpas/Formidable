@@ -12,7 +12,6 @@ import { log } from "./logger.js";
 export function initEventRouter() {
   log("[EventRouter] Initializing global event listeners...");
   EventBus.on("template:selected", templateHandlers.handleTemplateSelected);
-  EventBus.on("meta:list:clear", templateHandlers.handleMetaListClear);
   EventBus.on("context:toggle", contextHandlers.handleContextToggle);
   EventBus.on("theme:toggle", themeHandler.handleThemeToggle);
   EventBus.on("status:update", statusHandler.handleStatusUpdate);

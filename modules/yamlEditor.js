@@ -150,15 +150,15 @@ export function initYamlEditor(containerId, onSaveCallback) {
     };
 
     container.querySelector("#delete-yaml").onclick = async () => {
-      const filename = window.currentSelectedTemplateName;
-      if (!filename) {
+      const template = window.currentSelectedTemplateName;
+      if (!template) {
         warn("[YamlEditor] No template selected to delete.");
         EventBus.emit("status:update", "No template selected.");
         return;
       }
 
       const confirmed = await showConfirmModal(
-        `Are you sure you want to delete template: ${filename}?`,
+        `Are you sure you want to delete template: ${template}?`,
         {
           okText: "Delete",
           cancelText: "Cancel",
@@ -169,18 +169,18 @@ export function initYamlEditor(containerId, onSaveCallback) {
 
       if (!confirmed) return;
 
-      const success = await window.api.templates.deleteTemplate(filename);
+      const success = await window.api.templates.deleteTemplate(template);
       if (success) {
-        log("[YamlEditor] Deleted template:", filename);
+        log("[YamlEditor] Deleted template:", template);
         container.innerHTML =
           "<div class='empty-message'>Template deleted.</div>";
-        EventBus.emit("status:update", `Deleted template: ${filename}`);
+        EventBus.emit("status:update", `Deleted template: ${template}`);
         window.currentSelectedTemplate = null;
         window.currentSelectedTemplateName = null;
         if (window.templateListManager?.loadList)
           window.templateListManager.loadList();
       } else {
-        warn("[YamlEditor] Failed to delete template:", filename);
+        warn("[YamlEditor] Failed to delete template:", template);
         EventBus.emit("status:update", "Failed to delete template.");
       }
     };

@@ -131,14 +131,14 @@ registerIpc("ensure-form-dir", (event, dir) =>
   formManager.ensureFormDirectory(dir)
 );
 registerIpc("list-forms", (event, dir) => formManager.listForms(dir));
-registerIpc("load-form", (event, dir, filename, templateFields = []) =>
-  formManager.loadForm(dir, filename, templateFields)
+registerIpc("load-form", (event, dir, datefile, templateFields = []) =>
+  formManager.loadForm(dir, datefile, templateFields)
 );
-registerIpc("save-form", (event, dir, filename, data, fields = []) =>
-  formManager.saveForm(dir, filename, data, fields)
+registerIpc("save-form", (event, dir, datefile, data, fields = []) =>
+  formManager.saveForm(dir, datefile, data, fields)
 );
-registerIpc("delete-form", (event, dir, filename) =>
-  formManager.deleteForm(dir, filename)
+registerIpc("delete-form", (event, dir, datefile) =>
+  formManager.deleteForm(dir, datefile)
 );
 
 // Markdown handlers

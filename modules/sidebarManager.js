@@ -29,9 +29,9 @@ export function createTemplateListManager(
         handleTemplateConfirm(
           modal,
           defaultMarkdownDir,
-          async ({ filename, yaml }) => {
+          async ({ template, yaml }) => {
             try {
-              await window.api.templates.saveTemplate(filename, yaml);
+              await window.api.templates.saveTemplate(template, yaml);
               await listManager.loadList();
 
               if (dropdown?.refresh) {
@@ -40,10 +40,10 @@ export function createTemplateListManager(
 
               yamlEditor.render(yaml);
 
-              EventBus.emit("template:selected", { name: filename, yaml });
+              EventBus.emit("template:selected", { name: template, yaml });
               EventBus.emit(
                 "status:update",
-                `Created new template: ${filename}`
+                `Created new template: ${template}`
               );
             } catch (err) {
               error("[AddTemplate] Failed to save:", err);
@@ -53,6 +53,10 @@ export function createTemplateListManager(
         );
       },
     },
+  });
+
+  EventBus.on("template:list:reload", async () => {
+    await listManager.loadList();
   });
 
   return listManager;
@@ -91,14 +95,17 @@ export function createMetaListManager(formManager, modal) {
           return;
         }
 
-        handleEntryConfirm(modal, async (filename) => {
-          log("[AddMarkdown] Creating new entry:", filename);
-          await formManager.loadFormData({}, filename);
-          EventBus.emit("form:selected", filename);
+        handleEntryConfirm(modal, async (datafile) => {
+          log("[AddMarkdown] Creating new entry:", datafile);
+          await formManager.loadFormData({}, datafile);
           EventBus.emit("status:update", "New metadata entry ready.");
         });
       },
     },
+  });
+
+  EventBus.on("meta:list:reload", async () => {
+    await listManager.loadList();
   });
 
   return listManager;

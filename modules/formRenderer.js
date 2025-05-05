@@ -35,12 +35,12 @@ export function renderForm(container, template) {
   });
 
   // Filename input
-  const filenameInput = document.createElement("input");
-  filenameInput.type = "text";
-  filenameInput.id = "markdown-filename";
+  const datafileInput = document.createElement("input");
+  datafileInput.type = "text";
+  datafileInput.id = "markdown-filename";
 
-  const filenameRow = wrapInputWithLabel(filenameInput, "Filename (without extension)");
-  container.appendChild(filenameRow);
+  const datafileRow = wrapInputWithLabel(datafileInput, "Filename (without extension)");
+  container.appendChild(datafileRow);
 
   // 💾 Save button
   const saveBtn = document.createElement("button");

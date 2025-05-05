@@ -42,6 +42,6 @@ export async function handleTemplateSelected({ name, yaml }) {
   await window.api.config.updateUserConfig({ selected_template: name });
 }
 
-export async function handleFormSelected(filename) {
-  await window.api.config.updateUserConfig({ selected_data_file: filename });
+export async function handleFormSelected(datefile) {
+  await window.api.config.updateUserConfig({ selected_data_file: datefile });
 }
