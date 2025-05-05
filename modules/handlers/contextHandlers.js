@@ -36,12 +36,4 @@ export async function handleContextToggle(isMarkdown) {
   EventBus.emit("status:update", `Context set to ${mode}`);
 }
 
-export async function handleTemplateSelected({ name, yaml }) {
-  window.currentSelectedTemplateName = name;
-  window.currentSelectedTemplate = yaml;
-  await window.api.config.updateUserConfig({ selected_template: name });
-}
 
-export async function handleFormSelected(datefile) {
-  await window.api.config.updateUserConfig({ selected_data_file: datefile });
-}
