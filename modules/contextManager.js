@@ -1,7 +1,7 @@
 // modules/contextManager.js
 
 import { EventBus } from "./eventBus.js";
-import { setupSplitter } from "./uiBehaviors.js";
+import { setupSplitter } from "../utils/resizing.js";
 import { log } from "./logger.js";
 
 let templateSplitterInitialized = false;

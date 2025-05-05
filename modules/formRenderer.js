@@ -1,7 +1,7 @@
 // modules/formRenderer.js
 
 import { fieldTypes } from "./fieldTypes.js";
-import { wrapInputWithLabel } from "./uiBehaviors.js";
+import { wrapInputWithLabel } from "../utils/elementBuilders.js";
 import { warn, log } from "./logger.js";
 
 export function renderForm(container, template) {

@@ -11,51 +11,7 @@ export function initThemeToggle(toggleElement) {
   });
 }
 
-// Splitter logic
-export function setupSplitter({ splitter, left, right, container, min = 150 }) {
-  let isDragging = false;
-  let startX = 0;
-  let startLeftWidth = 0;
 
-  const handle = splitter.querySelector("div");
-
-  const updateCursor = (active) => {
-    document.body.style.cursor = active ? "col-resize" : "";
-  };
-
-  handle?.addEventListener("mousedown", (e) => {
-    isDragging = true;
-    startX = e.clientX;
-    startLeftWidth = left.offsetWidth;
-    updateCursor(true);
-    e.preventDefault();
-  });
-
-  document.addEventListener("mousemove", (e) => {
-    if (!isDragging) return;
-
-    const dx = e.clientX - startX;
-    const newLeftWidth = startLeftWidth + dx;
-    const containerWidth = container.clientWidth;
-    const maxLeftWidth = containerWidth - min;
-
-    if (newLeftWidth >= min && newLeftWidth <= maxLeftWidth) {
-      left.style.width = `${newLeftWidth}px`;
-      right.style.width = `${
-        containerWidth - newLeftWidth - splitter.offsetWidth
-      }px`;
-      left.style.flex = "none";
-      right.style.flex = "none";
-    }
-  });
-
-  document.addEventListener("mouseup", () => {
-    if (isDragging) {
-      isDragging = false;
-      updateCursor(false);
-    }
-  });
-}
 
 // Highlight + click match
 export function highlightAndClickMatch(
@@ -94,68 +50,6 @@ export function highlightAndClickMatch(
   }
 }
 
-export function createStyledLabel(
-  text,
-  { forId = null, className = "", styles = {} } = {}
-) {
-  const label = document.createElement("label");
-  label.textContent = text;
-  if (forId) label.htmlFor = forId;
-  if (className) label.className = className;
-
-  // Apply default and custom styles
-  Object.assign(label.style, {
-    display: "block",
-    marginBottom: "6px",
-    ...styles,
-  });
-
-  return label;
-}
-
-export function createStyledSelect({
-  className = "",
-  styles = {},
-  attributes = {},
-} = {}) {
-  const select = document.createElement("select");
-  if (className) select.className = className;
-
-  // Apply default and custom styles
-  Object.assign(select.style, {
-    width: "100%",
-    padding: "6px",
-    marginBottom: "10px",
-    ...styles,
-  });
-
-  // Apply any additional HTML attributes (e.g. id, name, data-* props)
-  Object.entries(attributes).forEach(([key, val]) => {
-    select.setAttribute(key, val);
-  });
-
-  return select;
-}
-
-export function populateSelectOptions(
-  selectElement,
-  options = [],
-  selectedValue = ""
-) {
-  selectElement.innerHTML = "";
-
-  options.forEach(({ value, label, disabled = false }) => {
-    const option = document.createElement("option");
-    option.value = value;
-    option.textContent = label;
-    option.disabled = disabled;
-    if (value === selectedValue) {
-      option.selected = true;
-    }
-    selectElement.appendChild(option);
-  });
-}
-
 export function focusFirstInput(
   container,
   selector = 'input[name="title"], input, select, textarea'
@@ -167,18 +61,6 @@ export function focusFirstInput(
   } else {
     warn("[UI] No input to focus.");
   }
-}
-
-export function wrapInputWithLabel(inputElement, labelText) {
-  const wrapper = document.createElement("div");
-  wrapper.className = "form-row";
-
-  const label = document.createElement("label");
-  label.textContent = labelText;
-
-  wrapper.appendChild(label);
-  wrapper.appendChild(inputElement);
-  return wrapper;
 }
 
 export function applyFieldValues(container, fieldsOrKeys = [], data = {}) {
@@ -257,38 +139,6 @@ export function bindActionHandlers(container, selector, callback) {
       log(`[UI] Triggered action: ${action}`);
       callback(action);
     });
-  });
-}
-
-export function enableElementResizing(target, grip, { minWidth = 300, minHeight = 200 } = {}) {
-  let isResizing = false;
-
-  grip.addEventListener("mousedown", (e) => {
-    isResizing = true;
-    document.body.style.userSelect = "none";
-
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const startWidth = target.offsetWidth;
-    const startHeight = target.offsetHeight;
-
-    const onMouseMove = (e) => {
-      if (!isResizing) return;
-      const newWidth = startWidth + (e.clientX - startX);
-      const newHeight = startHeight + (e.clientY - startY);
-      target.style.width = `${Math.max(newWidth, minWidth)}px`;
-      target.style.height = `${Math.max(newHeight, minHeight)}px`;
-    };
-
-    const onMouseUp = () => {
-      isResizing = false;
-      document.body.style.userSelect = "";
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
-    };
-
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
   });
 }
 

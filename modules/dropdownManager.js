@@ -5,7 +5,7 @@ import {
   createStyledLabel,
   createStyledSelect,
   populateSelectOptions,
-} from "./uiBehaviors.js";
+} from "../utils/elementBuilders.js";
 
 export function createDropdown({
   containerId,
