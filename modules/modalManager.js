@@ -1,7 +1,7 @@
 // modules/modalManager.js
 
 import { enableElementResizing } from "../utils/resizing.js";
-import { enableEscToClose } from "./uiBehaviors.js";
+import { enableEscToClose } from "../utils/modalUtils.js";
 
 export function setupModal(
   modalId,

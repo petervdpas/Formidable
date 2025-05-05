@@ -3,6 +3,6 @@
   "selected_data_file": "good-20250502",
   "theme": "light",
   "font_size": 14,
-  "context_mode": "template",
+  "context_mode": "markdown",
   "default_markdown_dir": "./markdowns"
 }

@@ -2,7 +2,7 @@
 
 import { error, log, warn } from "./logger.js";
 import { EventBus } from "./eventBus.js";
-import { makeSelectableList } from "./uiBehaviors.js";
+import { makeSelectableList } from "../utils/domUtils.js";
 
 export function createListManager({
   elementId,

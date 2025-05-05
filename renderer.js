@@ -16,7 +16,7 @@ import { createFormManager } from "./modules/formUI.js";
 import { log, warn, error } from "./modules/logger.js";
 import { setContextView, initContextToggle } from "./modules/contextManager.js";
 import { bindContextDependencies } from "./modules/handlers/contextHandlers.js";
-import { initThemeToggle } from "./modules/uiBehaviors.js";
+import { initThemeToggle } from "./modules/themeToggle.js";
 import {
   initTemplateListManager,
   initMetaListManager,
@@ -141,7 +141,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     window.currentSelectedTemplateName = selected;
 
     const container = document.getElementById("template-list");
-    const { highlightAndClickMatch } = await import("./modules/uiBehaviors.js");
+    const { highlightAndClickMatch } = await import("./utils/domUtils.js");
     highlightAndClickMatch(container, selected, async (fallbackName) => {
       const data = await window.api.templates.loadTemplate(fallbackName);
       yamlEditor.render(data);

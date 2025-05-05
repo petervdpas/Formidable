@@ -1,17 +1,6 @@
 // modules/uiBehaviors.js
 
-import { EventBus } from "./eventBus.js";
-import { log, warn } from "./logger.js";
-
-// Theme toggle logic
-export function initThemeToggle(toggleElement) {
-  toggleElement.addEventListener("change", (e) => {
-    const isDark = e.target.checked;
-    EventBus.emit("theme:toggle", isDark ? "dark" : "light");
-  });
-}
-
-
+import { log, warn } from "../modules/logger.js";
 
 // Highlight + click match
 export function highlightAndClickMatch(
@@ -140,26 +129,4 @@ export function bindActionHandlers(container, selector, callback) {
       callback(action);
     });
   });
-}
-
-export function enableEscToClose(onEscape) {
-  const handler = (e) => {
-    if (e.key === "Escape") onEscape();
-  };
-  document.addEventListener("keydown", handler);
-  return () => document.removeEventListener("keydown", handler);
-}
-
-export function applyModalCssClass(modalEl, typeDef) {
-  if (!modalEl) return;
-
-  modalEl.classList.forEach((cls) => {
-    if (cls.startsWith("modal-") && cls !== "modal") {
-      modalEl.classList.remove(cls);
-    }
-  });
-
-  if (typeDef?.cssClass) {
-    modalEl.classList.add(typeDef.cssClass);
-  }
 }

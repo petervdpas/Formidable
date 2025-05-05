@@ -3,7 +3,7 @@
 import { log, warn, error } from "./logger.js";
 import { EventBus } from "./eventBus.js";
 import { getFormData } from "./formData.js";
-import { applyFieldValues, focusFirstInput } from "./uiBehaviors.js";
+import { applyFieldValues, focusFirstInput } from "../utils/domUtils.js";
 import { renderForm } from "./formRenderer.js";
 import { stripMarkdownExtension, validateFilenameInput } from "../utils/formUtils.js";
 

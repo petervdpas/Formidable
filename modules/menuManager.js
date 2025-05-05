@@ -2,7 +2,7 @@
 
 import { log, warn, error } from "./logger.js";
 import { EventBus } from "./eventBus.js";
-import { bindActionHandlers } from "./uiBehaviors.js";
+import { bindActionHandlers } from "../utils/domUtils.js";
 
 export function buildMenu(containerId = "app-menu", commandHandler) {
   const container = document.getElementById(containerId);
