@@ -2,6 +2,7 @@
 
 import { error, log, warn } from "./logger.js";
 import { EventBus } from "./eventBus.js";
+import { makeSelectableList } from "./uiBehaviors.js";
 
 export function createListManager({
   elementId,
@@ -27,23 +28,15 @@ export function createListManager({
       if (!items || items.length === 0) {
         container.innerHTML = `<div class="empty-message">${emptyMessage}</div>`;
       } else {
-        items.forEach((itemName) => {
+        const listItems = items.map((itemName) => {
           const item = document.createElement("div");
           item.className = "template-item";
           item.textContent = itemName.replace(/\.yaml$|\.md$/i, "");
-
-          item.addEventListener("click", () => {
-            if (selectedItem) {
-              selectedItem.classList.remove("selected");
-            }
-            item.classList.add("selected");
-            selectedItem = item;
-
-            onItemClick(itemName);
-          });
-
           container.appendChild(item);
+          return { element: item, value: itemName };
         });
+        
+        makeSelectableList(listItems, onItemClick);
       }
 
       if (addButton) {

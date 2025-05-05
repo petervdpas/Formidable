@@ -6,7 +6,7 @@ import { getFormData } from "./formData.js";
 import { applyFieldValues, focusFirstInput } from "./uiBehaviors.js";
 import { renderForm } from "./formRenderer.js";
 
-export function initFormManager(containerId) {
+export function createFormManager(containerId) {
   const container = document.getElementById(containerId);
   if (!container) {
     error("[FormManager] Form container not found:", containerId);

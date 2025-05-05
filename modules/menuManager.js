@@ -2,6 +2,7 @@
 
 import { log, warn, error } from "./logger.js";
 import { EventBus } from "./eventBus.js";
+import { bindActionHandlers } from "./uiBehaviors.js";
 
 export function buildMenu(containerId = "app-menu", commandHandler) {
   const container = document.getElementById(containerId);
@@ -54,14 +55,7 @@ export function buildMenu(containerId = "app-menu", commandHandler) {
     </ul>
   `;
 
-  container.querySelectorAll("[data-action]").forEach((item) => {
-    const action = item.getAttribute("data-action");
-    log(`[Menu] Binding handler for: ${action}`);
-    item.addEventListener("click", () => {
-      log(`[Menu] Triggered action: ${action}`);
-      commandHandler(action); // ✅ still used
-    });
-  });
+  bindActionHandlers(container, "[data-action]", commandHandler);
 
   const contextToggle = container.querySelector("#context-toggle-menu");
   if (contextToggle) {

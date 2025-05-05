@@ -12,7 +12,7 @@ import {
 import { initYamlEditor } from "./modules/yaml_editor.js";
 import { createDropdown } from "./modules/dropdownManager.js";
 import { initStatusHandler } from "./modules/handlers/statusHandler.js";
-import { initFormManager } from "./modules/formUI.js";
+import { createFormManager } from "./modules/formUI.js";
 import { log, warn, error } from "./modules/logger.js";
 import { setContextView, initContextToggle } from "./modules/contextManager.js";
 import { bindContextDependencies } from "./modules/handlers/contextHandlers.js";
@@ -76,7 +76,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  const formManager = initFormManager("markdown-content");
+  const formManager = createFormManager("markdown-content");
   window.formManager = formManager;
 
   const config = await window.api.config.loadUserConfig();

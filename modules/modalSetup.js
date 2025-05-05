@@ -3,6 +3,8 @@
 import { setupModal } from "./modalManager.js";
 import { EventBus } from "./eventBus.js";
 import { fieldTypes } from "./fieldTypes.js";
+import { applyModalCssClass, formatAsRelativePath } from "./uiBehaviors.js";
+import { extractFieldDefinition } from "./formUtils.js";
 import { createDropdown } from "./dropdownManager.js";
 
 export function setupSettingsModal(themeToggle, contextToggle) {
@@ -29,13 +31,7 @@ export function setupSettingsModal(themeToggle, contextToggle) {
         const selected = await window.api.dialog.chooseDirectory();
         if (selected) {
           const appRoot = (await window.api.system.getAppRoot?.()) || ".";
-          const relativePath = selected.startsWith(appRoot)
-            ? "./" +
-              selected
-                .slice(appRoot.length)
-                .replace(/^[\\/]/, "")
-                .replace(/\\/g, "/")
-            : selected;
+          const relativePath = formatAsRelativePath(selected, appRoot);
 
           defaultDirInput.value = relativePath;
 
@@ -115,18 +111,7 @@ export function setupFieldEditModal(onConfirm) {
     onChange: (val) => {
       const modalEl = document.getElementById("field-edit-modal");
       if (!modalEl) return;
-
-      // Remove existing type-* class
-      modalEl.classList.forEach((cls) => {
-        if (cls.startsWith("modal-") && cls !== "modal") {
-          modalEl.classList.remove(cls);
-        }
-      });
-
-      const typeDef = fieldTypes[val];
-      if (typeDef?.cssClass) {
-        modalEl.classList.add(typeDef.cssClass);
-      }
+      applyModalCssClass(modalEl, fieldTypes[val]);
     },
   });
 
@@ -139,24 +124,11 @@ export function setupFieldEditModal(onConfirm) {
 
   const confirmBtn = document.getElementById("field-edit-confirm");
   confirmBtn.onclick = () => {
-    const key = document.getElementById("edit-key").value.trim();
-    const label = document.getElementById("edit-label").value.trim();
-    const def = document.getElementById("edit-default").value.trim();
-    const markdown = markdownDropdown.getSelected() || "";
-    const type = typeDropdown.getSelected() || "text";
-    const options = document
-      .getElementById("edit-options")
-      .value.split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
-
-    const field = { key, label, type };
-    if (def) field.default = def;
-    if (markdown) field.markdown = markdown;
-    if (["dropdown", "radio"].includes(type) && options.length) {
-      field.options = options;
-    }
-
+    const field = extractFieldDefinition({
+      typeDropdown,
+      markdownDropdown,
+    });
+  
     onConfirm(field);
     modal.hide();
   };

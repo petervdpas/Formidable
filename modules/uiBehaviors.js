@@ -223,3 +223,99 @@ export function applyFieldValues(container, fieldsOrKeys = [], data = {}) {
 
   log("[UI] applyFieldValues: Applied field values.");
 }
+
+export function makeSelectableList(
+  items,
+  onSelect,
+  selectedClass = "selected"
+) {
+  let current = null;
+
+  items.forEach(({ element, value }) => {
+    element.addEventListener("click", () => {
+      if (current) current.classList.remove(selectedClass);
+      element.classList.add(selectedClass);
+      current = element;
+      onSelect(value);
+    });
+  });
+}
+
+export function bindActionHandlers(container, selector, callback) {
+  if (!container || typeof container.querySelectorAll !== "function") {
+    warn("[UI] bindActionHandlers: Invalid container.");
+    return;
+  }
+
+  const items = container.querySelectorAll(selector);
+  items.forEach((el) => {
+    const action = el.getAttribute("data-action");
+    if (!action) return;
+
+    log(`[UI] Binding action handler: ${action}`);
+    el.addEventListener("click", () => {
+      log(`[UI] Triggered action: ${action}`);
+      callback(action);
+    });
+  });
+}
+
+export function enableElementResizing(target, grip, { minWidth = 300, minHeight = 200 } = {}) {
+  let isResizing = false;
+
+  grip.addEventListener("mousedown", (e) => {
+    isResizing = true;
+    document.body.style.userSelect = "none";
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startWidth = target.offsetWidth;
+    const startHeight = target.offsetHeight;
+
+    const onMouseMove = (e) => {
+      if (!isResizing) return;
+      const newWidth = startWidth + (e.clientX - startX);
+      const newHeight = startHeight + (e.clientY - startY);
+      target.style.width = `${Math.max(newWidth, minWidth)}px`;
+      target.style.height = `${Math.max(newHeight, minHeight)}px`;
+    };
+
+    const onMouseUp = () => {
+      isResizing = false;
+      document.body.style.userSelect = "";
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  });
+}
+
+export function enableEscToClose(onEscape) {
+  const handler = (e) => {
+    if (e.key === "Escape") onEscape();
+  };
+  document.addEventListener("keydown", handler);
+  return () => document.removeEventListener("keydown", handler);
+}
+
+export function formatAsRelativePath(selected, appRoot) {
+  return selected.startsWith(appRoot)
+    ? "./" + selected.slice(appRoot.length).replace(/^[\\/]/, "").replace(/\\/g, "/")
+    : selected;
+}
+
+export function applyModalCssClass(modalEl, typeDef) {
+  if (!modalEl) return;
+
+  modalEl.classList.forEach((cls) => {
+    if (cls.startsWith("modal-") && cls !== "modal") {
+      modalEl.classList.remove(cls);
+    }
+  });
+
+  if (typeDef?.cssClass) {
+    modalEl.classList.add(typeDef.cssClass);
+  }
+}
