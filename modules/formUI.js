@@ -67,6 +67,7 @@ export function createFormManager(containerId) {
     container.appendChild(buttonGroup);
 
     applyFieldValues(container, currentTemplate.fields, metaData);
+    focusFirstInput(container);
 
     const datafileInput = container.querySelector("#meta-json-filename");
     if (datafileInput) {
@@ -107,6 +108,9 @@ export function createFormManager(containerId) {
     if (saveResult.success) {
       EventBus.emit("status:update", `Saved metadata: ${saveResult.path}`);
       EventBus.emit("meta:list:reload");
+      setTimeout(() => {
+        EventBus.emit("form:list:highlighted", datafile);
+      }, 100);
     } else {
       error("[FormUI] Save failed:", saveResult.error);
       EventBus.emit(
