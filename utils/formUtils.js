@@ -57,7 +57,6 @@ export function getFormData(container, template) {
   return data;
 }
 
-
 export function stripMarkdownExtension(filename = "") {
   return filename.replace(/\.md$/, "");
 }

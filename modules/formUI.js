@@ -13,30 +13,23 @@ import {
 export function createFormManager(containerId) {
   const container = document.getElementById(containerId);
   if (!container) {
-    error("[FormManager] Form container not found:", containerId);
+    error("[FormUI] Form container not found:", containerId);
     return;
   }
 
-  log("[FormManager] Initialized with container:", containerId);
+  log("[FormUI] Initialized with container:", containerId);
 
   let currentTemplate = null;
 
   async function loadTemplate(templateYaml) {
-    log("[FormManager] Loading template:", templateYaml.name);
+    log("[FormUI] Loading template:", templateYaml.name);
     currentTemplate = templateYaml;
 
-    const { saveButton } = renderForm(container, templateYaml);
-
-    saveButton.addEventListener("click", async () => {
-      await saveForm();
-    });
-    container.appendChild(saveButton);
-
-    focusFirstInput(container);
+    clearFormUI(); // Don't render fields yet—wait for metadata
   }
 
   async function loadFormData(metaData, datafile) {
-    log("[FormManager] Loading metadata for:", datafile);
+    log("[FormUI] loadFormData datafile:", datafile);
 
     if (!metaData && currentTemplate?.markdown_dir && datafile) {
       metaData = await window.api.forms.loadForm(
@@ -44,12 +37,22 @@ export function createFormManager(containerId) {
         datafile,
         currentTemplate.fields || []
       );
+      log("[FormUI] loaded metaData from API:", metaData);
     }
 
     if (!metaData) {
-      warn("[FormManager] No metadata available.");
+      warn("[FormUI] No metadata available.");
       return;
     }
+
+    // Now we can render the form
+    container.innerHTML = "";
+    const { saveButton } = renderForm(container, currentTemplate);
+
+    saveButton.addEventListener("click", async () => {
+      await saveForm();
+    });
+    container.appendChild(saveButton);
 
     applyFieldValues(container, currentTemplate.fields, metaData);
 
@@ -60,10 +63,10 @@ export function createFormManager(containerId) {
   }
 
   async function saveForm() {
-    log("[FormManager] Save triggered.");
+    log("[FormUI] Save triggered.");
 
     if (!currentTemplate || !currentTemplate.markdown_dir) {
-      warn("[FormManager] No template or markdown_dir selected.");
+      warn("[FormUI] No template or markdown_dir selected.");
       EventBus.emit(
         "status:update",
         "No template or markdown directory selected."
@@ -76,7 +79,7 @@ export function createFormManager(containerId) {
     const datafile = validateFilenameInput(datafileInput);
 
     if (!datafile) {
-      warn("[FormManager] No datafile provided.");
+      warn("[FormUI] No datafile provided.");
       EventBus.emit("status:update", "Please enter a filename for datafile.");
       return;
     }
@@ -93,7 +96,7 @@ export function createFormManager(containerId) {
       EventBus.emit("status:update", `Saved metadata: ${saveResult.path}`);
       EventBus.emit("meta:list:reload");
     } else {
-      error("[FormManager] Save failed:", saveResult.error);
+      error("[FormUI] Save failed:", saveResult.error);
       EventBus.emit(
         "status:update",
         `Failed to save metadata: ${saveResult.error}`
@@ -104,16 +107,16 @@ export function createFormManager(containerId) {
   function connectNewButton(buttonId, getTemplateCallback) {
     const btn = document.getElementById(buttonId);
     if (!btn) {
-      warn(`[FormManager] Button not found: ${buttonId}`);
+      warn(`[FormUI] Button not found: ${buttonId}`);
       return;
     }
 
-    log("[FormManager] Connecting new button:", buttonId);
+    log("[FormUI] Connecting new button:", buttonId);
 
     btn.addEventListener("click", async () => {
       const selected = await getTemplateCallback();
       if (!selected) {
-        warn("[FormManager] No template selected after button click.");
+        warn("[FormUI] No template selected after button click.");
         EventBus.emit("status:update", "Please select a template first.");
         return;
       }
@@ -130,10 +133,10 @@ export function createFormManager(containerId) {
     container.innerHTML = `
       <p>Select or create a data-file to begin.</p>
     `;
-    log("[FormManager] Form UI cleared.");
+    log("[FormUI] Form UI cleared.");
   }
 
-  // 🔁 React to EventBus-driven form:selected
+  // React to EventBus-driven form:selected
   EventBus.on("form:selected", async (datafile) => {
     if (!datafile) {
       clearFormUI();
@@ -141,15 +144,11 @@ export function createFormManager(containerId) {
     }
 
     if (!currentTemplate) {
-      warn("[FormManager] No current template to load form.");
+      warn("[FormUI] No current template to load form.");
       return;
     }
 
     await loadFormData(null, datafile);
-  });
-
-  EventBus.on("form:clear", async () => {
-    clearFormUI();
   });
 
   return {
@@ -157,6 +156,5 @@ export function createFormManager(containerId) {
     loadFormData,
     saveForm,
     connectNewButton,
-    clearFormUI,
   };
 }
