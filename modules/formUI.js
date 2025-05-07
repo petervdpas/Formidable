@@ -9,6 +9,7 @@ import {
   stripMarkdownExtension,
   validateFilenameInput,
 } from "../utils/formUtils.js";
+import { showConfirmModal } from "./modalManager.js";
 
 export function createFormManager(containerId) {
   const container = document.getElementById(containerId);
@@ -85,33 +86,6 @@ export function createFormManager(containerId) {
       return;
     }
 
-    async function deleteForm(datafile) {
-      if (!currentTemplate || !currentTemplate.markdown_dir) {
-        warn("[FormUI] No template or markdown_dir selected for deletion.");
-        EventBus.emit("status:update", "Cannot delete: template not selected.");
-        return;
-      }
-
-      const confirmed = confirm(
-        `Are you sure you want to delete "${datafile}"?`
-      );
-      if (!confirmed) return;
-
-      const result = await window.api.forms.deleteForm(
-        currentTemplate.markdown_dir,
-        datafile
-      );
-
-      if (result) {
-        EventBus.emit("status:update", `Deleted: ${datafile}`);
-        EventBus.emit("meta:list:reload");
-        clearFormUI();
-      } else {
-        error("[FormUI] Deletion failed.");
-        EventBus.emit("status:update", "Failed to delete metadata file.");
-      }
-    }
-
     const formData = getFormData(container, currentTemplate);
     const datafileInput = container.querySelector("#meta-json-filename");
     const datafile = validateFilenameInput(datafileInput);
@@ -139,6 +113,39 @@ export function createFormManager(containerId) {
         "status:update",
         `Failed to save metadata: ${saveResult.error}`
       );
+    }
+  }
+
+  async function deleteForm(datafile) {
+    if (!currentTemplate || !currentTemplate.markdown_dir) {
+      warn("[FormUI] No template or markdown_dir selected for deletion.");
+      EventBus.emit("status:update", "Cannot delete: template not selected.");
+      return;
+    }
+
+    const confirmed = await showConfirmModal(
+      `Are you sure you want to delete "${datafile}"?`,
+      {
+        okText: "Delete",
+        cancelText: "Cancel",
+        width: "auto",
+        height: "auto",
+      }
+    );
+    if (!confirmed) return;
+
+    const result = await window.api.forms.deleteForm(
+      currentTemplate.markdown_dir,
+      datafile
+    );
+
+    if (result) {
+      EventBus.emit("status:update", `Deleted: ${datafile}`);
+      EventBus.emit("meta:list:reload");
+      clearFormUI();
+    } else {
+      error("[FormUI] Deletion failed.");
+      EventBus.emit("status:update", "Failed to delete metadata file.");
     }
   }
 

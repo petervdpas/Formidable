@@ -90,6 +90,11 @@ class SingleFileRepository {
     const filePath = this.getStoragePath(directory, baseFilename, opts);
     return this.loadFile(filePath, opts);
   }
+
+  deleteFromBase(directory, baseFilename, opts = {}) {
+    const filePath = this.getStoragePath(directory, baseFilename, opts);
+    return fileManager.deleteFile(filePath, { silent: this.silent });
+  }
 }
 
 module.exports = { SingleFileRepository };
