@@ -10,7 +10,10 @@ export function renderForm(container, template) {
     return { fieldElements: {}, saveButton: null };
   }
 
-  log("[FormRenderer] Rendering form for:", template.name || "Unnamed Template");
+  log(
+    "[FormRenderer] Rendering form for:",
+    template.name || "Unnamed Template"
+  );
 
   container.innerHTML = "";
   const fields = template.fields || [];
@@ -43,10 +46,14 @@ export function renderForm(container, template) {
   const datafileRow = wrapInputWithLabel(datafileInput, "Filename");
   container.appendChild(datafileRow);
 
-  // 💾 Save button
+  // Buttons
   const saveBtn = document.createElement("button");
-  saveBtn.textContent = "Save Input";
-  saveBtn.className = "btn btn-default btn-info";
+  saveBtn.textContent = "Save";
+  saveBtn.className = "btn btn-default btn-warn";
 
-  return { fieldElements, saveButton: saveBtn };
+  const deleteBtn = document.createElement("button");
+  deleteBtn.textContent = "Delete";
+  deleteBtn.className = "btn btn-default btn-danger";
+
+  return { fieldElements, saveButton: saveBtn, deleteButton: deleteBtn };
 }

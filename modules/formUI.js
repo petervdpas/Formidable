@@ -47,12 +47,23 @@ export function createFormManager(containerId) {
 
     // Now we can render the form
     container.innerHTML = "";
-    const { saveButton } = renderForm(container, currentTemplate);
+    const { saveButton, deleteButton } = renderForm(container, currentTemplate);
 
     saveButton.addEventListener("click", async () => {
       await saveForm();
     });
-    container.appendChild(saveButton);
+    deleteButton.addEventListener("click", async () => {
+      await deleteForm(datafileInput?.value);
+    });
+
+    // Wrap in button group
+    const buttonGroup = document.createElement("div");
+    buttonGroup.className = "button-group";
+    buttonGroup.appendChild(saveButton);
+    buttonGroup.appendChild(deleteButton);
+
+    // Append button group to container
+    container.appendChild(buttonGroup);
 
     applyFieldValues(container, currentTemplate.fields, metaData);
 
@@ -72,6 +83,33 @@ export function createFormManager(containerId) {
         "No template or markdown directory selected."
       );
       return;
+    }
+
+    async function deleteForm(datafile) {
+      if (!currentTemplate || !currentTemplate.markdown_dir) {
+        warn("[FormUI] No template or markdown_dir selected for deletion.");
+        EventBus.emit("status:update", "Cannot delete: template not selected.");
+        return;
+      }
+
+      const confirmed = confirm(
+        `Are you sure you want to delete "${datafile}"?`
+      );
+      if (!confirmed) return;
+
+      const result = await window.api.forms.deleteForm(
+        currentTemplate.markdown_dir,
+        datafile
+      );
+
+      if (result) {
+        EventBus.emit("status:update", `Deleted: ${datafile}`);
+        EventBus.emit("meta:list:reload");
+        clearFormUI();
+      } else {
+        error("[FormUI] Deletion failed.");
+        EventBus.emit("status:update", "Failed to delete metadata file.");
+      }
     }
 
     const formData = getFormData(container, currentTemplate);
