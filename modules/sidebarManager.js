@@ -90,7 +90,10 @@ export function createMetaListManager(formManager, modal) {
 
       await window.api.forms.ensureFormDir(template.markdown_dir);
       const files = await window.api.forms.listForms(template.markdown_dir);
-      return files.map(stripMetaExtension);
+      return files.map((fullName) => ({
+        display: stripMetaExtension(fullName),
+        value: fullName,
+      }));
     },
     onItemClick: (entryName) => handleEntryClick(entryName, formManager),
     emptyMessage: "No metadata files found.",

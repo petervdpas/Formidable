@@ -27,14 +27,21 @@ export function createListManager({
       if (!items || items.length === 0) {
         container.innerHTML = `<div class="empty-message">${emptyMessage}</div>`;
       } else {
-        const listItems = items.map((itemName) => {
+        const listItems = items.map((raw) => {
+          const isObject = typeof raw === "object" && raw !== null;
+          const display = isObject
+            ? raw.display
+            : raw.replace(/\.yaml$|\.md$/i, "");
+          const value = isObject ? raw.value : raw;
+
           const item = document.createElement("div");
           item.className = "template-item";
-          item.textContent = itemName.replace(/\.yaml$|\.md$/i, "");
+          item.textContent = display;
+
           container.appendChild(item);
-          return { element: item, value: itemName };
+          return { element: item, value };
         });
-        
+
         makeSelectableList(listItems, onItemClick);
       }
 
@@ -43,7 +50,6 @@ export function createListManager({
         btn.textContent = addButton.label || "+ Add New";
         btn.className = "btn btn-default btn-add-item";
         btn.addEventListener("click", addButton.onClick);
-
         container.appendChild(btn);
       }
 

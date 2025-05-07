@@ -58,7 +58,7 @@ export function createFormManager(containerId) {
 
     const datafileInput = container.querySelector("#meta-json-filename");
     if (datafileInput) {
-      datafileInput.value = stripMarkdownExtension(datafile);
+      datafileInput.value = datafile; // stripMarkdownExtension(datafile);
     }
   }
 

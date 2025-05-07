@@ -14,7 +14,7 @@ export function highlightAndClickMatch(
   }
 
   const normalizedTarget = targetName
-    .replace(/\.yaml$|\.md$/i, "")
+    .replace(/\.meta\.json$|\.yaml$|\.md$/i, "")
     .toLowerCase();
 
   const match = Array.from(container.children).find(
@@ -22,9 +22,9 @@ export function highlightAndClickMatch(
   );
 
   if (match) {
-    container.querySelectorAll(".selected").forEach((el) =>
-      el.classList.remove("selected")
-    );
+    container
+      .querySelectorAll(".selected")
+      .forEach((el) => el.classList.remove("selected"));
     match.classList.add("selected");
 
     match.click();
@@ -44,7 +44,7 @@ export function highlightAndClickMatch(
 
 export function focusFirstInput(
   container,
-  selector = 'input, select, textarea'
+  selector = "input, select, textarea"
 ) {
   setTimeout(() => {
     const firstInput = container.querySelector(selector);

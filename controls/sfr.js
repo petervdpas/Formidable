@@ -14,10 +14,15 @@ class SingleFileRepository {
     this.silent = silent;
   }
 
-    // This is the domain-aware filename logic (e.g., strip .md)
+  // This is the domain-aware filename logic (e.g., strip .md)
   getStoragePath(directory, baseFilename, { extension } = {}) {
-    const name = baseFilename.replace(/\.md$/, ""); // <-- Domain-specific
-    return fileManager.buildFilePath(directory, name, { extension: extension || this.defaultExtension });
+    const ext = extension || this.defaultExtension;
+
+    let base = baseFilename;
+    if (base.endsWith(".md")) base = base.slice(0, -3);
+    if (base.endsWith(ext)) base = base.slice(0, -ext.length);
+
+    return fileManager.buildFilePath(directory, base, { extension: ext });
   }
 
   listFiles(directory, extension = this.defaultExtension) {
@@ -25,7 +30,8 @@ class SingleFileRepository {
       const files = fileManager.listFilesByExtension(directory, extension, {
         silent: this.silent,
       });
-      if (!this.silent) log("[SFR] Listed", files.length, "files in", directory);
+      if (!this.silent)
+        log("[SFR] Listed", files.length, "files in", directory);
       return files;
     } catch (err) {
       if (!this.silent) error("[SFR] Failed to list files:", err);
@@ -35,7 +41,8 @@ class SingleFileRepository {
 
   saveFile(filePath, data, { json = this.defaultJson, transform = null } = {}) {
     try {
-      const processed = typeof transform === "function" ? transform(data) : data;
+      const processed =
+        typeof transform === "function" ? transform(data) : data;
       const format = json ? "json" : "text";
 
       const ok = fileManager.saveFile(filePath, processed, {
