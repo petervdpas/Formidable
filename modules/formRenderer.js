@@ -37,9 +37,10 @@ export function renderForm(container, template) {
   // Filename input
   const datafileInput = document.createElement("input");
   datafileInput.type = "text";
-  datafileInput.id = "markdown-filename";
+  datafileInput.id = "meta-json-filename";
+  datafileInput.readOnly = true;
 
-  const datafileRow = wrapInputWithLabel(datafileInput, "Filename (without extension)");
+  const datafileRow = wrapInputWithLabel(datafileInput, "Filename");
   container.appendChild(datafileRow);
 
   // 💾 Save button

@@ -56,7 +56,7 @@ export function createFormManager(containerId) {
 
     applyFieldValues(container, currentTemplate.fields, metaData);
 
-    const datafileInput = container.querySelector("#markdown-filename");
+    const datafileInput = container.querySelector("#meta-json-filename");
     if (datafileInput) {
       datafileInput.value = stripMarkdownExtension(datafile);
     }
@@ -75,7 +75,7 @@ export function createFormManager(containerId) {
     }
 
     const formData = getFormData(container, currentTemplate);
-    const datafileInput = container.querySelector("#markdown-filename");
+    const datafileInput = container.querySelector("#meta-json-filename");
     const datafile = validateFilenameInput(datafileInput);
 
     if (!datafile) {

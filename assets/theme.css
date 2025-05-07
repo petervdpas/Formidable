@@ -101,7 +101,12 @@ select:focus {
   border-color: #888;
   outline: none;
 }
-
+input[readonly] {
+  background-color: #FFFFE0;
+  color: #888;
+  border-color: #333;
+  font-style: italic;
+}
 /* Checkboxes & Radios (light mode keeps OS native look mostly) */
 input[type="checkbox"],
 input[type="radio"] {
