@@ -1,5 +1,7 @@
 // modules/fieldTypes.js
 
+import * as parsers from "./fieldParsers.js";
+
 export const fieldTypes = {
   text: {
     label: "Text",
@@ -13,9 +15,7 @@ export const fieldTypes = {
       input.name = field.key;
       return input;
     },
-    parseValue(input) {
-      return input.value.trim();
-    },
+    parseValue: parsers.parseTextField,
   },
 
   boolean: {
@@ -30,9 +30,7 @@ export const fieldTypes = {
       input.name = field.key;
       return input;
     },
-    parseValue(input) {
-      return input.checked;
-    },
+    parseValue: parsers.parseBooleanField,
   },
 
   dropdown: {
@@ -52,9 +50,7 @@ export const fieldTypes = {
       select.name = field.key;
       return select;
     },
-    parseValue(input) {
-      return input.value;
-    },
+    parseValue: parsers.parseDropdownField,
   },
 
   radio: {
@@ -83,12 +79,7 @@ export const fieldTypes = {
       wrapper.dataset.radioGroup = field.key;
       return wrapper;
     },
-    parseValue(wrapper) {
-      const group = wrapper.querySelector(
-        `input[name="${wrapper.dataset.radioGroup}"]:checked`
-      );
-      return group?.value || "";
-    },
+    parseValue: parsers.parseRadioField,
   },
 
   textarea: {
@@ -102,9 +93,7 @@ export const fieldTypes = {
       textarea.name = field.key;
       return textarea;
     },
-    parseValue(input) {
-      return input.value.trim();
-    },
+    parseValue: parsers.parseTextareaField,
   },
 
   number: {
@@ -119,9 +108,7 @@ export const fieldTypes = {
       input.name = field.key;
       return input;
     },
-    parseValue(input) {
-      return parseFloat(input.value) || 0;
-    },
+    parseValue: parsers.parseNumberField,
   },
 
   date: {
@@ -136,9 +123,7 @@ export const fieldTypes = {
       input.name = field.key;
       return input;
     },
-    parseValue(input) {
-      return input.value;
-    },
+    parseValue: parsers.parseDateField,
   },
 
   list: {
@@ -154,12 +139,7 @@ export const fieldTypes = {
       input.placeholder = "e.g., item1, item2, item3";
       return input;
     },
-    parseValue(input) {
-      return input.value
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-    },
+    parseValue: parsers.parseListField,
   },
 
   table: {
@@ -178,12 +158,6 @@ export const fieldTypes = {
       }
       return textarea;
     },
-    parseValue(input) {
-      try {
-        return JSON.parse(input.value);
-      } catch {
-        return [];
-      }
-    },
+    parseValue: parsers.parseTableField,
   },
 };

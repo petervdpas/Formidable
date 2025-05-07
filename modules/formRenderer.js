@@ -1,6 +1,6 @@
 // modules/formRenderer.js
 
-import { fieldTypes } from "../utils/fieldTypes.js";
+import { renderFieldElement } from "../utils/formUtils.js";
 import { wrapInputWithLabel } from "../utils/elementBuilders.js";
 import { log, warn, error } from "../utils/logger.js";
 
@@ -20,21 +20,12 @@ export function renderForm(container, template) {
   const fieldElements = {};
 
   fields.forEach((field) => {
-    const typeDef = fieldTypes[field.type];
-    if (!typeDef) {
-      warn(`[FormRenderer] Unknown field type: ${field.type}`);
-      return;
+    const fieldRow = renderFieldElement(field);
+    if (fieldRow) {
+      const input = fieldRow.querySelector(`[name="${field.key}"]`);
+      fieldElements[field.key] = input;
+      container.appendChild(fieldRow);
     }
-
-    const input = typeDef.renderInput(field);
-    if (!input) {
-      warn(`[FormRenderer] No input rendered for: ${field.type}`);
-      return;
-    }
-
-    fieldElements[field.key] = input;
-    const fieldRow = wrapInputWithLabel(input, field.label);
-    container.appendChild(fieldRow);
   });
 
   // Filename input

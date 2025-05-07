@@ -4,3 +4,22 @@ fields:
   - key: test
     label: Test
     type: text
+    default: Default value
+  - key: check
+    label: Check
+    type: boolean
+  - key: dropdown
+    label: Dropdown
+    type: dropdown
+    default: Right
+    options:
+      - Left
+      - Right
+  - key: radio
+    label: Radio
+    type: radio
+    default: Dog
+    options:
+      - Cat
+      - Dog
+      - Bird

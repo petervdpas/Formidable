@@ -1,6 +1,7 @@
 // utils/formUtils.js
 
 import { fieldTypes } from "./fieldTypes.js";
+import * as renderers from "./fieldRenderers.js";
 import { warn, log } from "./logger.js";
 
 export function extractFieldDefinition({
@@ -44,7 +45,11 @@ export function getFormData(container, template) {
       return;
     }
 
-    const el = container.querySelector(`[name="${field.key}"]`);
+    const el =
+      field.type === "radio"
+        ? container.querySelector(`[data-radio-group="${field.key}"]`)
+        : container.querySelector(`[name="${field.key}"]`);
+
     if (!el) {
       warn(`[FormUtils] Missing input for: ${field.key}`);
       return;
@@ -64,4 +69,26 @@ export function stripMarkdownExtension(filename = "") {
 export function validateFilenameInput(inputEl) {
   const name = inputEl?.value.trim();
   return name || null;
+}
+
+export function renderFieldElement(field) {
+  const type = field.type;
+  const fn = renderers[`render${capitalize(type)}Field`];
+  const typeDef = fieldTypes[type];
+
+  if (!fn || !typeDef) {
+    warn(`[FormUtils] No renderer found for type: ${type}`);
+    return null;
+  }
+
+  // Ensure default is set if not explicitly provided
+  if (!Object.prototype.hasOwnProperty.call(field, "default")) {
+    field.default = typeDef.defaultValue();
+  }
+
+  return fn(field);
+}
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }

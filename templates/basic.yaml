@@ -2,9 +2,9 @@ name: Basic Form
 markdown_dir: ./markdowns/basic
 fields:
   - key: title
-    type: text
     label: Title
-    markdown: h1
+    type: text
+    default: Hello World
   - key: published
     type: boolean
     label: Published

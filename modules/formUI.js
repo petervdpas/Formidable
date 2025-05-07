@@ -5,10 +5,7 @@ import { EventBus } from "./eventBus.js";
 import { getFormData } from "../utils/formUtils.js";
 import { applyFieldValues, focusFirstInput } from "../utils/domUtils.js";
 import { renderForm } from "./formRenderer.js";
-import {
-  stripMarkdownExtension,
-  validateFilenameInput,
-} from "../utils/formUtils.js";
+import { validateFilenameInput } from "../utils/formUtils.js";
 import { showConfirmModal } from "./modalManager.js";
 
 export function createFormManager(containerId) {
@@ -32,6 +29,7 @@ export function createFormManager(containerId) {
   async function loadFormData(metaData, datafile) {
     log("[FormUI] loadFormData datafile:", datafile);
 
+    // If no metadata yet, try to load it
     if (!metaData && currentTemplate?.markdown_dir && datafile) {
       metaData = await window.api.forms.loadForm(
         currentTemplate.markdown_dir,
@@ -46,7 +44,8 @@ export function createFormManager(containerId) {
       return;
     }
 
-    // Now we can render the form
+    const isNewEntry = Object.keys(metaData).length === 0;
+
     container.innerHTML = "";
     const { saveButton, deleteButton } = renderForm(container, currentTemplate);
 
@@ -57,22 +56,30 @@ export function createFormManager(containerId) {
       await deleteForm(datafileInput?.value);
     });
 
-    // Wrap in button group
     const buttonGroup = document.createElement("div");
     buttonGroup.className = "button-group";
     buttonGroup.appendChild(saveButton);
     buttonGroup.appendChild(deleteButton);
-
-    // Append button group to container
     container.appendChild(buttonGroup);
-
-    applyFieldValues(container, currentTemplate.fields, metaData);
-    focusFirstInput(container);
 
     const datafileInput = container.querySelector("#meta-json-filename");
     if (datafileInput) {
-      datafileInput.value = datafile; // stripMarkdownExtension(datafile);
+      datafileInput.value = datafile;
     }
+
+    // ✅ Inject defaults ONLY if this is a new entry
+    if (isNewEntry) {
+      currentTemplate.fields.forEach((field) => {
+        const defFn = fieldTypes[field.type]?.defaultValue;
+        const key = field.key;
+        if (!(key in metaData) && typeof defFn === "function") {
+          metaData[key] = defFn();
+        }
+      });
+    }
+
+    applyFieldValues(container, currentTemplate.fields, metaData);
+    focusFirstInput(container);
   }
 
   async function saveForm() {
