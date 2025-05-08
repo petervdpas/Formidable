@@ -40,7 +40,7 @@ export function initYamlEditor(containerId, onSaveCallback) {
       <fieldset>
         <legend>Fields</legend>
         <ul id="fields-list" class="field-list"></ul>
-        <div class="form-row">
+        <div class="field-add-row">
           <button id="add-field" class="btn btn-info">+ Add Field</button>
         </div>
       </fieldset>

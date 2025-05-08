@@ -64,7 +64,10 @@ export function populateSelectOptions(
 
 export function wrapInputWithLabel(inputElement, labelText) {
   const wrapper = document.createElement("div");
-  wrapper.className = "form-row";
+
+  // Use horizontal layout for checkboxes
+  const isCheckbox = inputElement?.type === "checkbox";
+  wrapper.className = isCheckbox ? "form-row inline-label" : "form-row";
 
   const label = document.createElement("label");
   label.textContent = labelText;

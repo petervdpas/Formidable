@@ -15,9 +15,26 @@ legend {
 /* ───── General Row Layout ───── */
 .form-row {
   display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+}
+
+.form-row label {
+  margin-bottom: 4px;
+  display: block;
+  text-align: left;
+}
+
+/* Only for checkboxes and similar inputs */
+.form-row.inline-label {
+  flex-direction: row;
   align-items: center;
   gap: 10px;
-  margin-bottom: 12px;
+}
+
+.form-row.inline-label label {
+  margin-bottom: 0;
+  display: inline;
 }
 
 .form-row input[type="text"],
@@ -47,6 +64,32 @@ legend {
 .form-row.two-column label {
   font-weight: bold;
   margin-bottom: 4px;
+}
+
+/* Ensure textareas stretch appropriately */
+.form-row textarea {
+  width: 100%;
+  min-height: 4rem;
+  resize: vertical;
+}
+
+.form-row [data-radio-group] {
+  display: flex;
+  flex-direction: row;
+  gap: .8rem;
+  align-items: center;
+}
+
+/* ───── Add Field Button Row ───── */
+.field-add-row {
+  display: block;
+  text-align: left;
+  margin-top: 12px;
+}
+
+.field-add-row button {
+  width: auto;
+  padding: 6px 16px;
 }
 
 /* ───── Field List ───── */

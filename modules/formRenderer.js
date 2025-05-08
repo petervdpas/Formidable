@@ -19,6 +19,16 @@ export function renderForm(container, template) {
   const fields = template.fields || [];
   const fieldElements = {};
 
+  // Filename input FIRST
+  const datafileInput = document.createElement("input");
+  datafileInput.type = "text";
+  datafileInput.id = "meta-json-filename";
+  datafileInput.readOnly = true;
+
+  const datafileRow = wrapInputWithLabel(datafileInput, "Filename");
+  container.appendChild(datafileRow);
+
+  // Now render field inputs
   fields.forEach((field) => {
     const fieldRow = renderFieldElement(field);
     if (fieldRow) {
@@ -27,15 +37,6 @@ export function renderForm(container, template) {
       container.appendChild(fieldRow);
     }
   });
-
-  // Filename input
-  const datafileInput = document.createElement("input");
-  datafileInput.type = "text";
-  datafileInput.id = "meta-json-filename";
-  datafileInput.readOnly = true;
-
-  const datafileRow = wrapInputWithLabel(datafileInput, "Filename");
-  container.appendChild(datafileRow);
 
   // Buttons
   const saveBtn = document.createElement("button");

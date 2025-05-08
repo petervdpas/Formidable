@@ -2,6 +2,7 @@
 
 import { log, warn, error } from "../utils/logger.js";
 import { EventBus } from "./eventBus.js";
+import { fieldTypes } from "../utils/fieldTypes.js"; // Added this line bc it was missing and the filling of defaults doesnt work no longer
 import { getFormData } from "../utils/formUtils.js";
 import { applyFieldValues, focusFirstInput } from "../utils/domUtils.js";
 import { renderForm } from "./formRenderer.js";
@@ -29,7 +30,7 @@ export function createFormManager(containerId) {
   async function loadFormData(metaData, datafile) {
     log("[FormUI] loadFormData datafile:", datafile);
 
-    // If no metadata yet, try to load it
+    // Load from file if needed
     if (!metaData && currentTemplate?.markdown_dir && datafile) {
       metaData = await window.api.forms.loadForm(
         currentTemplate.markdown_dir,
@@ -39,6 +40,9 @@ export function createFormManager(containerId) {
       log("[FormUI] loaded metaData from API:", metaData);
     }
 
+    // 🩹 Ensure metaData is at least an empty object
+    metaData = metaData || {};
+
     if (!metaData) {
       warn("[FormUI] No metadata available.");
       return;
@@ -46,8 +50,33 @@ export function createFormManager(containerId) {
 
     const isNewEntry = Object.keys(metaData).length === 0;
 
+    // ✅ Inject defaults before rendering (if creating a new entry)
+    // Use `field.default` if defined in the template; otherwise fall back to type default
+    if (isNewEntry) {
+      currentTemplate.fields.forEach((field) => {
+        const key = field.key;
+        const type = field.type;
+        const defFn = fieldTypes[type]?.defaultValue;
+
+        if (!(key in metaData)) {
+          metaData[key] = field.hasOwnProperty("default")
+            ? field.default
+            : typeof defFn === "function"
+            ? defFn()
+            : undefined;
+        }
+      });
+    }
+
+    // ✅ Now render the form
     container.innerHTML = "";
     const { saveButton, deleteButton } = renderForm(container, currentTemplate);
+
+    // ✅ Only now is the input present in the DOM
+    const datafileInput = container.querySelector("#meta-json-filename");
+    if (datafileInput) {
+      datafileInput.value = datafile;
+    }
 
     saveButton.addEventListener("click", async () => {
       await saveForm();
@@ -61,22 +90,6 @@ export function createFormManager(containerId) {
     buttonGroup.appendChild(saveButton);
     buttonGroup.appendChild(deleteButton);
     container.appendChild(buttonGroup);
-
-    const datafileInput = container.querySelector("#meta-json-filename");
-    if (datafileInput) {
-      datafileInput.value = datafile;
-    }
-
-    // ✅ Inject defaults ONLY if this is a new entry
-    if (isNewEntry) {
-      currentTemplate.fields.forEach((field) => {
-        const defFn = fieldTypes[field.type]?.defaultValue;
-        const key = field.key;
-        if (!(key in metaData) && typeof defFn === "function") {
-          metaData[key] = defFn();
-        }
-      });
-    }
 
     applyFieldValues(container, currentTemplate.fields, metaData);
     focusFirstInput(container);
