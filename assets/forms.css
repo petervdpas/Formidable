@@ -15,26 +15,14 @@ legend {
 /* ───── General Row Layout ───── */
 .form-row {
   display: flex;
-  flex-direction: column;
-  margin-bottom: 14px;
+  align-items: flex-start; /* ⬅ Align label to top of input */
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .form-row label {
-  margin-bottom: 4px;
+  margin: 2px 0;
   display: block;
-  text-align: left;
-}
-
-/* Only for checkboxes and similar inputs */
-.form-row.inline-label {
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-}
-
-.form-row.inline-label label {
-  margin-bottom: 0;
-  display: inline;
 }
 
 .form-row input[type="text"],
@@ -78,18 +66,6 @@ legend {
   flex-direction: row;
   gap: .8rem;
   align-items: center;
-}
-
-/* ───── Add Field Button Row ───── */
-.field-add-row {
-  display: block;
-  text-align: left;
-  margin-top: 12px;
-}
-
-.field-add-row button {
-  width: auto;
-  padding: 6px 16px;
 }
 
 /* ───── Field List ───── */

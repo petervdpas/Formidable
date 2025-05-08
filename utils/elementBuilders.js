@@ -31,7 +31,7 @@ export function createStyledSelect({
   Object.assign(select.style, {
     width: "100%",
     padding: "6px",
-    marginBottom: "10px",
+    marginBottom: "4px",
     ...styles,
   });
 

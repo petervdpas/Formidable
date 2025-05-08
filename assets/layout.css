@@ -140,7 +140,7 @@ body {
 
 /* ───── Selector Styles ───── */
 #template-selector {
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 #template-selector label {
@@ -151,7 +151,6 @@ body {
 
 #template-dropdown {
   width: 100%;
-  padding: 6px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
