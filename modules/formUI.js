@@ -130,7 +130,7 @@ export function createFormManager(containerId) {
       EventBus.emit("meta:list:reload");
       setTimeout(() => {
         EventBus.emit("form:list:highlighted", datafile);
-      }, 100);
+      }, 500);
     } else {
       error("[FormUI] Save failed:", saveResult.error);
       EventBus.emit(

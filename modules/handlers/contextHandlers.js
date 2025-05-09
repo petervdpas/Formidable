@@ -19,7 +19,8 @@ export async function handleContextToggle(isMarkdown) {
   const menuToggle = document.getElementById("context-toggle-menu");
 
   if (toggle && toggle.checked !== isMarkdown) toggle.checked = isMarkdown;
-  if (menuToggle && menuToggle.checked !== isMarkdown) menuToggle.checked = isMarkdown;
+  if (menuToggle && menuToggle.checked !== isMarkdown)
+    menuToggle.checked = isMarkdown;
 
   setContextView(mode, containers);
   await window.api.config.updateUserConfig({ context_mode: mode });
@@ -33,7 +34,13 @@ export async function handleContextToggle(isMarkdown) {
     }
   }
 
+  if (mode === "template") {
+    const selectedTemplate = window.currentSelectedTemplateName;
+    if (selectedTemplate) {
+      const yaml = await window.api.templates.loadTemplate(selectedTemplate);
+      EventBus.emit("template:selected", { name: selectedTemplate, yaml });
+    }
+  }
+
   EventBus.emit("status:update", `Context set to ${mode}`);
 }
-
-

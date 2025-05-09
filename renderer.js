@@ -117,6 +117,10 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
+  EventBus.on("template:selected", ({ name, yaml }) => {
+    yamlEditor.render(yaml);
+  });
+  
   // ── Sidebars ──
   window.templateListManager = createTemplateListManager(
     yamlEditor,
