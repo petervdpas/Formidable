@@ -41,11 +41,9 @@ export function parseDateField(input) {
 }
 
 // List
-export function parseListField(input) {
-  return input.value
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
+export function parseListField(wrapper) {
+  const items = Array.from(wrapper.querySelectorAll('input[type="text"]'));
+  return items.map((input) => input.value.trim()).filter(Boolean);
 }
 
 // Table

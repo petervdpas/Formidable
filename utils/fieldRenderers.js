@@ -91,14 +91,49 @@ export function renderDateField(field) {
 }
 
 // ─────────────────────────────────────────────
-// Type: list
+// Type: list (dynamic add/remove)
 export function renderListField(field) {
+  const wrapper = document.createElement("div");
+  wrapper.dataset.type = "list";
+  wrapper.dataset.listField = field.key; // ✅ this is crucial for getFormData()
+
+  const items = field.default || [];
+
+  items.forEach((item) => {
+    const input = createListItem(item);
+    wrapper.appendChild(input);
+  });
+
+  const addBtn = document.createElement("button");
+  addBtn.textContent = "+";
+  addBtn.onclick = () => {
+    const input = createListItem("");
+    wrapper.insertBefore(input, addBtn);
+  };
+  wrapper.appendChild(addBtn);
+
+  return wrapInputWithLabel(wrapper, field.label);
+}
+
+function createListItem(value) {
+  const container = document.createElement("div");
+  container.style.display = "flex";
+  container.style.alignItems = "center";
+  container.style.marginBottom = "6px";
+
   const input = document.createElement("input");
   input.type = "text";
-  input.name = field.key;
-  input.placeholder = "e.g., item1, item2";
-  input.value = "default" in field ? (field.default || []).join(", ") : "";
-  return wrapInputWithLabel(input, field.label);
+  input.value = value;
+  input.style.flex = "1";
+
+  const removeBtn = document.createElement("button");
+  removeBtn.textContent = "-";
+  removeBtn.style.marginLeft = "6px";
+  removeBtn.onclick = () => container.remove();
+
+  container.appendChild(input);
+  container.appendChild(removeBtn);
+  return container;
 }
 
 // ─────────────────────────────────────────────

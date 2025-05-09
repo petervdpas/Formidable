@@ -34,3 +34,7 @@ fields:
   - key: bday
     label: Birthday
     type: date
+    default: '1968-12-23'
+  - key: listy
+    label: Listy
+    type: list

@@ -1,7 +1,7 @@
 {
   "selected_template": "ducki.yaml",
-  "selected_data_file": null,
-  "theme": "light",
+  "selected_data_file": "sdgs-20250509.meta.json",
+  "theme": "dark",
   "font_size": 14,
   "context_mode": "markdown",
   "default_markdown_dir": "./markdowns"

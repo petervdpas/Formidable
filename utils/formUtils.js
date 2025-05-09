@@ -45,10 +45,15 @@ export function getFormData(container, template) {
       return;
     }
 
-    const el =
-      field.type === "radio"
-        ? container.querySelector(`[data-radio-group="${field.key}"]`)
-        : container.querySelector(`[name="${field.key}"]`);
+    let el;
+
+    if (field.type === "radio") {
+      el = container.querySelector(`[data-radio-group="${field.key}"]`);
+    } else if (field.type === "list") {
+      el = container.querySelector(`[data-list-field="${field.key}"]`);
+    } else {
+      el = container.querySelector(`[name="${field.key}"]`);
+    }
 
     if (!el) {
       warn(`[FormUtils] Missing input for: ${field.key}`);
