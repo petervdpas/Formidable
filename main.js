@@ -21,8 +21,8 @@ const configManager = require("./controls/configManager");
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1000,
-    height: 700,
+    width: 1024,
+    height: 800,
     backgroundColor: "#808080",
     show: false,
     webPreferences: {

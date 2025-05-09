@@ -1,8 +1,8 @@
 {
-  "selected_template": "basic.yaml",
+  "selected_template": "ducki.yaml",
   "selected_data_file": null,
-  "theme": "dark",
+  "theme": "light",
   "font_size": 14,
-  "context_mode": "template",
+  "context_mode": "markdown",
   "default_markdown_dir": "./markdowns"
 }

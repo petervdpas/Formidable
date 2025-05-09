@@ -27,3 +27,10 @@ fields:
     label: Mline
     type: textarea
     default: A whole lot of prefab text...
+  - key: numpy
+    label: Numpy
+    type: number
+    default: '17'
+  - key: bday
+    label: Birthday
+    type: date
