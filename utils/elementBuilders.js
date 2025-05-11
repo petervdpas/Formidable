@@ -74,7 +74,6 @@ export function wrapInputWithLabel(
   const wrapper = document.createElement("div");
   wrapper.className = isTwoColumn ? "form-row two-column" : "form-row";
 
-
   if (isTwoColumn) {
     const left = document.createElement("div");
     const right = document.createElement("div");
