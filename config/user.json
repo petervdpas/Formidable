@@ -1,7 +1,7 @@
 {
-  "selected_template": "basic.yaml",
-  "selected_data_file": "hello-20250505.meta.json",
-  "theme": "light",
+  "selected_template": "ducki.yaml",
+  "selected_data_file": "test-20250510.meta.json",
+  "theme": "dark",
   "font_size": 14,
   "context_mode": "markdown",
   "default_markdown_dir": "./markdowns"

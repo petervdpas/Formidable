@@ -6,13 +6,16 @@ fields:
     type: text
     default: Default value
     description: A test description
+    two_column: true
   - key: check
     label: Check
     type: boolean
+    two_column: true
   - key: dropdown
     label: Dropdown
     type: dropdown
     default: Right
+    two_column: true
     options:
       - Left
       - Right
@@ -20,6 +23,7 @@ fields:
     label: Radio
     type: radio
     default: Dog
+    two_column: true
     options:
       - Cat
       - Dog
@@ -39,3 +43,4 @@ fields:
   - key: listy
     label: Listy
     type: list
+    two_column: true
