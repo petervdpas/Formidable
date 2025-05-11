@@ -110,6 +110,35 @@ legend {
   gap: 8px;
 }
 
+/* Ensure list item rows span full width including the remove button */
+[data-list-field] {
+  width: 100%;
+}
+
+[data-list-field] .list-item {
+  display: flex;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+[data-list-field] .list-input {
+  flex-grow: 1;
+  min-width: 0; /* ✅ Allow shrinking when needed */
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+  box-sizing: border-box;
+}
+
+[data-list-field] .remove-btn {
+  padding: 6px 12px;
+  background-color: #555;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+
 /* ───── Field Type Color Themes ───── */
 /* Sidebar Field List Items */
 .field-list-item[data-type="text"] {

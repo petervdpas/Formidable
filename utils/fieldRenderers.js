@@ -117,18 +117,17 @@ export function renderListField(field) {
 
 function createListItem(value) {
   const container = document.createElement("div");
-  container.style.display = "flex";
-  container.style.alignItems = "center";
-  container.style.marginBottom = "6px";
+  container.className = "list-item";
 
   const input = document.createElement("input");
   input.type = "text";
   input.value = value;
-  input.style.flex = "1";
+  input.name = "list-item";
+  input.className = "list-input";
 
   const removeBtn = document.createElement("button");
   removeBtn.textContent = "-";
-  removeBtn.style.marginLeft = "6px";
+  removeBtn.className = "remove-btn";
   removeBtn.onclick = () => container.remove();
 
   container.appendChild(input);
