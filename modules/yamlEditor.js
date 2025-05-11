@@ -25,12 +25,12 @@ export function initYamlEditor(containerId, onSaveCallback) {
     container.innerHTML = `
       <fieldset>
         <legend>Setup Info</legend>
-        <div class="form-row">
+        <div class="modal-form-row">
           <label for="yaml-name">Name</label>
           <input type="text" id="yaml-name" value="${currentData.name || ""}" />
         </div>
-        <div class="form-row">
-          <label for="markdown-dir">Markdown Dir</label>
+        <div class="modal-form-row">
+          <label for="markdown-dir">Storage Directory</label>
           <input type="text" id="markdown-dir" value="${
             currentData.markdown_dir || ""
           }" />

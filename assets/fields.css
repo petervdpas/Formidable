@@ -1,0 +1,240 @@
+/* ───── Field List ───── */
+#fields-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.field-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  font-size: 14px;
+  color: white;
+  background-color: #1e1e1e;
+  border-left: 6px solid #666;
+}
+
+/* ───── Field Label & Type ───── */
+.field-label {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field-description {
+  font-size: 0.85em;
+  color: #888;
+  margin-top: -6px;
+  margin-bottom: 6px;
+}
+
+.field-type {
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+/* ───── Action Button Wrapper ───── */
+.field-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Ensure list item rows span full width including the remove button */
+[data-list-field] {
+  width: 100%;
+}
+
+[data-list-field] .list-item {
+  display: flex;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+[data-list-field] .list-input {
+  flex-grow: 1;
+  min-width: 0; /* ✅ Allow shrinking when needed */
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+  box-sizing: border-box;
+}
+
+[data-list-field] .remove-btn {
+  padding: 6px 12px;
+  background-color: #555;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+
+/* ───── Field Type Color Themes ───── */
+/* Sidebar Field List Items */
+.field-list-item[data-type="text"] {
+  background-color: #1565c0;
+  /* Darker Blue */
+  border-left: 4px solid #2196f3;
+}
+
+.field-list-item[data-type="boolean"] {
+  background-color: #2e7d32;
+  /* Darker Green */
+  border-left: 4px solid #4caf50;
+}
+
+.field-list-item[data-type="dropdown"] {
+  background-color: #5e178b;
+  /* Darker Purple */
+  border-left: 4px solid #ba68c8;
+}
+
+.field-list-item[data-type="radio"] {
+  background-color: #cc4417;
+  /* Darker Orange */
+  border-left: 4px solid #ff7043;
+}
+
+.field-list-item[data-type="textarea"] {
+  background-color: #6c4ab0;
+  /* Darker Violet */
+  border-left: 4px solid #9575cd;
+}
+
+.field-list-item[data-type="number"] {
+  background-color: #3a94e4;
+  /* Darker Sky Blue */
+  border-left: 4px solid #64b5f6;
+}
+
+.field-list-item[data-type="date"] {
+  background-color: #229388;
+  /* Darker Aqua Green */
+  border-left: 4px solid #4dd0e1;
+}
+
+.field-list-item[data-type="list"] {
+  background-color: #6fbf73;
+  /* Darker Light Green */
+  border-left: 4px solid #aed581;
+}
+
+.field-list-item[data-type="table"] {
+  background-color: #ee9b84;
+  /* Darker Peach */
+  border-left: 4px solid #ffccbc;
+}
+
+/* ───── Field Type Color Badges ───── */
+.field-type.type-text {
+  background-color: #1976d2;
+  /* Slightly darker Blue */
+  color: white;
+}
+
+.field-type.type-boolean {
+  background-color: #43a047;
+  /* Slightly darker Green */
+  color: white;
+}
+
+.field-type.type-dropdown {
+  background-color: #a05db5;
+  /* Slightly darker Purple */
+  color: white;
+}
+
+.field-type.type-radio {
+  background-color: #f46333;
+  /* Slightly darker Orange */
+  color: white;
+}
+
+.field-type.type-textarea {
+  background-color: #8567b9;
+  /* Slightly darker Violet */
+  color: white;
+}
+
+.field-type.type-number {
+  background-color: #5aaae9;
+  /* Slightly darker Light Blue */
+  color: black;
+}
+
+.field-type.type-date {
+  background-color: #44c5d1;
+  /* Slightly darker Cyan */
+  color: black;
+}
+
+.field-type.type-list {
+  background-color: #9dcf6e;
+  /* Slightly darker Yellow Green */
+  color: black;
+}
+
+.field-type.type-table {
+  background-color: #f5bfa9;
+  /* Slightly darker Pale Peach */
+  color: black;
+}
+
+/* ───── Field Edit Modal Size ───── */
+#field-edit-modal {
+    width: 500px;
+    max-width: 90vw;
+}
+
+/* ───── Modal Field Edit Styling ───── */
+#field-edit-modal.modal-text {
+    background-color: #1258aa;
+    border-left: 6px solid #2196f3;
+}
+
+#field-edit-modal.modal-boolean {
+    background-color: #266b2b;
+    border-left: 6px solid #4caf50;
+}
+
+#field-edit-modal.modal-dropdown {
+    background-color: #6b1a91;
+    border-left: 6px solid #ba68c8;
+}
+
+#field-edit-modal.modal-radio {
+    background-color: #c63e13;
+    border-left: 6px solid #ff7043;
+}
+
+#field-edit-modal.modal-textarea {
+    background-color: #5d33a0;
+    border-left: 6px solid #9575cd;
+}
+
+#field-edit-modal.modal-number {
+    background-color: #1d84db;
+    border-left: 6px solid #64b5f6;
+}
+
+#field-edit-modal.modal-date {
+    background-color: #007e72;
+    border-left: 6px solid #4dd0e1;
+}
+
+#field-edit-modal.modal-list {
+    background-color: #5da861;
+    border-left: 6px solid #aed581;
+}
+
+#field-edit-modal.modal-table {
+    background-color: #f07b59;
+    border-left: 6px solid #ffccbc;
+}

@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="assets/menu.css" />
     <link rel="stylesheet" href="assets/modal.css" />
     <link rel="stylesheet" href="assets/forms.css" />
+    <link rel="stylesheet" href="assets/fields.css" />
+    <link rel="stylesheet" href="assets/switch.css" />
     <link rel="stylesheet" href="assets/theme.css" />
     <link rel="stylesheet" href="assets/dark-theme.css" />
     <link rel="stylesheet" href="assets/buttons.css" />
@@ -71,27 +73,28 @@
         <button id="settings-close">✕</button>
       </div>
       <div class="modal-body">
-        <div class="setting-row">
+        <div class="modal-form-row switch-row">
           <label for="theme-toggle">Dark Mode</label>
           <label class="switch">
             <input type="checkbox" id="theme-toggle" />
             <span class="slider"></span>
           </label>
         </div>
-        <div class="setting-row">
+        <div class="modal-form-row switch-row">
           <label for="context-toggle">Context Mode</label>
           <label class="switch">
             <input type="checkbox" id="context-toggle" />
             <span class="slider"></span>
           </label>
         </div>
-        <div class="setting-row directory-picker">
-          <label for="default-dir">Default Markdown Directory</label>
-          <input type="text" id="default-dir" readonly />
-          <button id="choose-dir" class="btn btn-default">Browse</button>
+        <div class="modal-form-row directory-picker">
+          <label for="default-dir">Storage Directory</label>
+          <div style="display: flex; gap: 6px; flex: 1">
+            <input type="text" id="default-dir" readonly />
+            <button id="choose-dir" class="btn btn-default">Browse</button>
+          </div>
         </div>
       </div>
-      <div class="modal-resizer"></div>
     </div>
 
     <!-- Template Creation Modal -->
@@ -110,7 +113,7 @@
           />
         </div>
         <div class="modal-form-row">
-          <label for="template-dir">Markdown Dir</label>
+          <label for="template-dir">Storage Directory</label>
           <input type="text" id="template-dir" value="markdown" />
         </div>
         <div class="button-group">
@@ -126,7 +129,7 @@
         <button id="entry-cancel">✕</button>
       </div>
       <div class="modal-body">
-        <div class="form-row">
+        <div class="modal-form-row">
           <label for="entry-name">Enter a name for this entry:</label>
           <input
             type="text"
@@ -134,7 +137,7 @@
             placeholder="e.g. my-article-title"
           />
         </div>
-        <div class="form-row">
+        <div class="modal-form-row">
           <label>
             <input type="checkbox" id="entry-append-date" checked />
             Append date (YYYYMMDD)
@@ -153,18 +156,18 @@
         <button id="field-edit-close">✕</button>
       </div>
       <div class="modal-body">
-        <div class="form-row modal-form-row">
+        <div class="modal-form-row">
           <label for="edit-key">Key</label>
           <input type="text" id="edit-key" />
         </div>
-        <div class="form-row modal-form-row" id="edit-type-container">
+        <div class="modal-form-row" id="edit-type-container">
           <!-- Type dropdown will be injected here -->
         </div>
-        <div class="form-row modal-form-row">
+        <div class="modal-form-row">
           <label for="edit-label">Label</label>
           <input type="text" id="edit-label" />
         </div>
-        <div class="form-row modal-form-row">
+        <div class="modal-form-row">
           <label for="edit-description">Description</label>
           <textarea
             id="edit-description"
@@ -172,14 +175,14 @@
             placeholder="Optional description"
           ></textarea>
         </div>
-        <div class="form-row modal-form-row">
+        <div class="modal-form-row">
           <label for="edit-default">Default</label>
           <input type="text" id="edit-default" />
         </div>
-        <div class="form-row modal-form-row" id="edit-markdown-container">
+        <div class="modal-form-row" id="edit-markdown-container">
           <!-- Markdown dropdown will be injected here -->
         </div>
-        <div class="form-row modal-form-row">
+        <div class="modal-form-row">
           <label for="edit-options">Options</label>
           <textarea
             id="edit-options"
@@ -193,7 +196,6 @@
           </button>
         </div>
       </div>
-      <div class="modal-resizer"></div>
     </div>
 
     <!-- Confirm Modal -->
@@ -226,7 +228,6 @@
           </div>
         </div>
       </div>
-      <div class="modal-resizer"></div>
     </div>
 
     <div id="modalBackdrop" class="modal-backdrop"></div>

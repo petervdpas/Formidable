@@ -14,7 +14,7 @@ export function setupSettingsModal(themeToggle, contextToggle) {
     escToClose: true,
     backdropClick: true,
     resizable: true,
-    width: "30em",
+    width: "26em",
     height: "auto",
 
     onOpen: async () => {

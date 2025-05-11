@@ -62,17 +62,48 @@ export function populateSelectOptions(
   });
 }
 
-export function wrapInputWithLabel(inputElement, labelText) {
+export function wrapInputWithLabel(
+  inputElement,
+  labelText,
+  descriptionText = "",
+  layout = "single"
+) {
   const wrapper = document.createElement("div");
+  wrapper.className =
+    layout === "two-column" ? "form-row two-column" : "form-row";
 
-  // Use horizontal layout for checkboxes
-  const isCheckbox = inputElement?.type === "checkbox";
-  wrapper.className = isCheckbox ? "form-row inline-label" : "form-row";
+  if (layout === "two-column") {
+    const left = document.createElement("div");
+    const right = document.createElement("div");
 
-  const label = document.createElement("label");
-  label.textContent = labelText;
+    const label = document.createElement("label");
+    label.textContent = labelText;
+    left.appendChild(label);
 
-  wrapper.appendChild(label);
-  wrapper.appendChild(inputElement);
+    if (descriptionText) {
+      const desc = document.createElement("div");
+      desc.className = "field-description";
+      desc.textContent = descriptionText;
+      left.appendChild(desc);
+    }
+
+    right.appendChild(inputElement);
+    wrapper.appendChild(left);
+    wrapper.appendChild(right);
+  } else {
+    const label = document.createElement("label");
+    label.textContent = labelText;
+    wrapper.appendChild(label);
+
+    if (descriptionText) {
+      const desc = document.createElement("div");
+      desc.className = "field-description";
+      desc.textContent = descriptionText;
+      wrapper.appendChild(desc); // ← insert BEFORE input
+    }
+
+    wrapper.appendChild(inputElement);
+  }
+
   return wrapper;
 }

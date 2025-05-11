@@ -10,13 +10,6 @@ button,
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
-.button-group {
-  display: flex;
-  gap: 4px;
-  margin-top: 1em;
-  justify-content: flex-start;
-}
-
 /* ───── Button Variants ───── */
 
 .btn-default {
@@ -57,4 +50,18 @@ button,
 
 .btn-danger:hover {
   background-color: #c82333;
+}
+
+/* ───── Button Group ───── */
+
+.button-group {
+  display: flex;
+  gap: 4px;
+  margin-top: 1em;
+  justify-content: flex-start;
+}
+
+/* ───── Button Hover ───── */
+.modal-actions button:hover {
+    background-color: #f0f0f0;
 }

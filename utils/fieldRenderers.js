@@ -9,17 +9,27 @@ export function renderTextField(field) {
   input.type = "text";
   input.name = field.key;
   input.value = "default" in field ? field.default : "";
-  return wrapInputWithLabel(input, field.label);
+  return wrapInputWithLabel(input, field.label, field.description, "two-column");
 }
 
 // ─────────────────────────────────────────────
 // Type: boolean
 export function renderBooleanField(field) {
+  const wrapper = document.createElement("label");
+  wrapper.className = "switch";
+
   const input = document.createElement("input");
   input.type = "checkbox";
   input.name = field.key;
   input.checked = "default" in field ? field.default === true : false;
-  return wrapInputWithLabel(input, field.label);
+
+  const slider = document.createElement("span");
+  slider.className = "slider";
+
+  wrapper.appendChild(input);
+  wrapper.appendChild(slider);
+
+  return wrapInputWithLabel(wrapper, field.label, field.description);
 }
 
 // ─────────────────────────────────────────────
@@ -34,7 +44,7 @@ export function renderDropdownField(field) {
   });
   select.name = field.key;
   select.value = "default" in field ? field.default : "";
-  return wrapInputWithLabel(select, field.label);
+  return wrapInputWithLabel(select, field.label, field.description);
 }
 
 // ─────────────────────────────────────────────
@@ -58,7 +68,7 @@ export function renderRadioField(field) {
     wrapper.appendChild(label);
   });
 
-  return wrapInputWithLabel(wrapper, field.label);
+  return wrapInputWithLabel(wrapper, field.label, field.description);
 }
 
 // ─────────────────────────────────────────────
@@ -67,7 +77,7 @@ export function renderTextareaField(field) {
   const textarea = document.createElement("textarea");
   textarea.name = field.key;
   textarea.value = "default" in field ? field.default : "";
-  return wrapInputWithLabel(textarea, field.label);
+  return wrapInputWithLabel(textarea, field.label, field.description);
 }
 
 // ─────────────────────────────────────────────
@@ -77,7 +87,7 @@ export function renderNumberField(field) {
   input.type = "number";
   input.name = field.key;
   input.value = "default" in field ? field.default : 0;
-  return wrapInputWithLabel(input, field.label);
+  return wrapInputWithLabel(input, field.label, field.description);
 }
 
 // ─────────────────────────────────────────────
@@ -87,7 +97,7 @@ export function renderDateField(field) {
   input.type = "date";
   input.name = field.key;
   input.value = "default" in field ? field.default : "";
-  return wrapInputWithLabel(input, field.label);
+  return wrapInputWithLabel(input, field.label, field.description);
 }
 
 // ─────────────────────────────────────────────
@@ -112,7 +122,7 @@ export function renderListField(field) {
   };
   wrapper.appendChild(addBtn);
 
-  return wrapInputWithLabel(wrapper, field.label);
+  return wrapInputWithLabel(wrapper, field.label, field.description);
 }
 
 function createListItem(value) {
@@ -149,5 +159,5 @@ export function renderTableField(field) {
     textarea.value = "[]";
   }
 
-  return wrapInputWithLabel(textarea, field.label);
+  return wrapInputWithLabel(textarea, field.label, field.description);
 }
