@@ -5,6 +5,7 @@ fields:
     label: Test
     type: text
     default: Default value
+    description: A test description
   - key: check
     label: Check
     type: boolean

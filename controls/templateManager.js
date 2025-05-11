@@ -95,12 +95,25 @@ function createBasicTemplateIfMissing() {
       name: "Basic Form",
       markdown_dir: "./markdowns/basic",
       fields: [
-        { key: "title", type: "text", label: "Title", markdown: "h1" },
-        { key: "published", type: "boolean", label: "Published", markdown: "checkbox" },
+        {
+          key: "title",
+          type: "text",
+          label: "Title",
+          description: "Main headline of the entry",
+          markdown: "h1",
+        },
+        {
+          key: "published",
+          type: "boolean",
+          label: "Published",
+          description: "Is this post publicly visible?",
+          markdown: "checkbox",
+        },
         {
           key: "category",
           type: "dropdown",
           label: "Category",
+          description: "Choose the content category",
           options: ["News", "Updates", "Blog", "Tutorial"],
           markdown: "p",
         },

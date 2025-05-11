@@ -5,16 +5,19 @@ fields:
     label: Title
     type: text
     default: Hello World
+    description: Please put in the title here...
   - key: published
-    type: boolean
     label: Published
+    type: boolean
+    description: Is it published? Tick the box for 'Yes'
     markdown: checkbox
   - key: category
-    type: dropdown
     label: Category
+    type: dropdown
+    description: Select the proper category.
+    markdown: p
     options:
       - News
       - Updates
       - Blog
       - Tutorial
-    markdown: p

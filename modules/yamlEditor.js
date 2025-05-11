@@ -124,6 +124,7 @@ export function initYamlEditor(containerId, onSaveCallback) {
 
     document.getElementById("edit-key").value = field.key;
     document.getElementById("edit-label").value = field.label;
+    document.getElementById("edit-description").value = field.description || "";
     document.getElementById("edit-default").value = field.default ?? "";
     document.getElementById("edit-options").value = (field.options || []).join(
       ", "

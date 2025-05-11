@@ -7,6 +7,7 @@ import { warn, log } from "./logger.js";
 export function extractFieldDefinition({
   keyId = "edit-key",
   labelId = "edit-label",
+  descriptionId = "edit-description",
   defaultId = "edit-default",
   typeDropdown,
   markdownDropdown,
@@ -14,6 +15,7 @@ export function extractFieldDefinition({
 }) {
   const key = document.getElementById(keyId)?.value.trim();
   const label = document.getElementById(labelId)?.value.trim();
+  const description = document.getElementById(descriptionId)?.value.trim();
   const def = document.getElementById(defaultId)?.value.trim();
   const type = typeDropdown?.getSelected() || "text";
   const markdown = markdownDropdown?.getSelected() || "";
@@ -26,6 +28,7 @@ export function extractFieldDefinition({
 
   const field = { key, label, type };
   if (def) field.default = def;
+  if (description) field.description = description; 
   if (markdown) field.markdown = markdown;
   if (["dropdown", "radio"].includes(type) && options?.length) {
     field.options = options;
