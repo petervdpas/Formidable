@@ -9,7 +9,7 @@ export function renderTextField(field) {
   input.type = "text";
   input.name = field.key;
   input.value = "default" in field ? field.default : "";
-  return wrapInputWithLabel(input, field.label, field.description, "two-column");
+  return wrapInputWithLabel(input, field.label, field.description, field.two_column);
 }
 
 // ─────────────────────────────────────────────
@@ -29,7 +29,7 @@ export function renderBooleanField(field) {
   wrapper.appendChild(input);
   wrapper.appendChild(slider);
 
-  return wrapInputWithLabel(wrapper, field.label, field.description);
+  return wrapInputWithLabel(wrapper, field.label, field.description, field.two_column);
 }
 
 // ─────────────────────────────────────────────
@@ -44,7 +44,7 @@ export function renderDropdownField(field) {
   });
   select.name = field.key;
   select.value = "default" in field ? field.default : "";
-  return wrapInputWithLabel(select, field.label, field.description);
+  return wrapInputWithLabel(select, field.label, field.description, field.two_column);
 }
 
 // ─────────────────────────────────────────────
@@ -68,7 +68,7 @@ export function renderRadioField(field) {
     wrapper.appendChild(label);
   });
 
-  return wrapInputWithLabel(wrapper, field.label, field.description);
+  return wrapInputWithLabel(wrapper, field.label, field.description, field.two_column);
 }
 
 // ─────────────────────────────────────────────
@@ -77,7 +77,7 @@ export function renderTextareaField(field) {
   const textarea = document.createElement("textarea");
   textarea.name = field.key;
   textarea.value = "default" in field ? field.default : "";
-  return wrapInputWithLabel(textarea, field.label, field.description);
+  return wrapInputWithLabel(textarea, field.label, field.description, field.two_column);
 }
 
 // ─────────────────────────────────────────────
@@ -87,7 +87,7 @@ export function renderNumberField(field) {
   input.type = "number";
   input.name = field.key;
   input.value = "default" in field ? field.default : 0;
-  return wrapInputWithLabel(input, field.label, field.description);
+  return wrapInputWithLabel(input, field.label, field.description, field.two_column);
 }
 
 // ─────────────────────────────────────────────
@@ -97,7 +97,7 @@ export function renderDateField(field) {
   input.type = "date";
   input.name = field.key;
   input.value = "default" in field ? field.default : "";
-  return wrapInputWithLabel(input, field.label, field.description);
+  return wrapInputWithLabel(input, field.label, field.description, field.two_column);
 }
 
 // ─────────────────────────────────────────────
@@ -122,7 +122,7 @@ export function renderListField(field) {
   };
   wrapper.appendChild(addBtn);
 
-  return wrapInputWithLabel(wrapper, field.label, field.description);
+  return wrapInputWithLabel(wrapper, field.label, field.description, field.two_column);
 }
 
 function createListItem(value) {
@@ -159,5 +159,5 @@ export function renderTableField(field) {
     textarea.value = "[]";
   }
 
-  return wrapInputWithLabel(textarea, field.label, field.description);
+  return wrapInputWithLabel(textarea, field.label, field.description, field.two_column);
 }

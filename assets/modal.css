@@ -2,7 +2,7 @@
 .modal {
     display: none;
     position: fixed;
-    padding: 20px;
+    padding: 4px 20px 20px 20px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -34,7 +34,7 @@
 .modal-body {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 6px;
 }
 
 /* ───── Form Row: Label + Input Side-by-Side ───── */
@@ -62,24 +62,40 @@
     font: inherit;
     min-height: 32px;
     resize: vertical;
+    line-height: normal;
+    margin-bottom: 2px;
 }
 
 .modal-form-row textarea {
     min-height: 48px;
 }
 
+.modal-form-row select {
+    vertical-align: middle;
+    line-height: normal;
+    margin-bottom: 0;
+}
+
 /* Specifically for switch alignment rows */
 .modal-form-row .switch {
-  min-width: 10px;
+    min-width: 10px;
 }
 
 .modal-form-row.switch-row {
-  align-items: center;
-  justify-content: space-between;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.modal-form-row.switch-row label:not(.switch) {
+    min-width: 140px; /* same as regular label */
+    font-weight: bold;
+    text-align: right;
 }
 
 .modal-form-row.switch-row label.switch {
-  margin-left: auto;
+    margin-left: 0;
 }
 
 /* ───── Modal Resizer ───── */
@@ -159,7 +175,7 @@
 }
 
 .modal-form-row.directory-picker {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
 }

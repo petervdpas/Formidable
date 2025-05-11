@@ -6,6 +6,7 @@ import { warn, log } from "./logger.js";
 
 export function extractFieldDefinition({
   keyId = "edit-key",
+  twoColumnId = "edit-two-column",
   labelId = "edit-label",
   descriptionId = "edit-description",
   defaultId = "edit-default",
@@ -14,6 +15,7 @@ export function extractFieldDefinition({
   optionsId = "edit-options",
 }) {
   const key = document.getElementById(keyId)?.value.trim();
+  const twoColumn = document.getElementById(twoColumnId)?.checked || false;
   const label = document.getElementById(labelId)?.value.trim();
   const description = document.getElementById(descriptionId)?.value.trim();
   const def = document.getElementById(defaultId)?.value.trim();
@@ -30,6 +32,7 @@ export function extractFieldDefinition({
   if (def) field.default = def;
   if (description) field.description = description; 
   if (markdown) field.markdown = markdown;
+  if (twoColumn) field.two_column = true;
   if (["dropdown", "radio"].includes(type) && options?.length) {
     field.options = options;
   }

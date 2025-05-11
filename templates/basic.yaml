@@ -6,16 +6,20 @@ fields:
     type: text
     default: Hello World
     description: Please put in the title here...
+    two_column: true
   - key: published
     label: Published
     type: boolean
     description: Is it published? Tick the box for 'Yes'
     markdown: checkbox
+    two_column: true
   - key: category
     label: Category
     type: dropdown
+    default: Blog
     description: Select the proper category.
     markdown: p
+    two_column: true
     options:
       - News
       - Updates

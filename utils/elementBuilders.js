@@ -68,11 +68,14 @@ export function wrapInputWithLabel(
   descriptionText = "",
   layout = "single"
 ) {
-  const wrapper = document.createElement("div");
-  wrapper.className =
-    layout === "two-column" ? "form-row two-column" : "form-row";
+  
+  const isTwoColumn = layout === true || layout === "two-column";
 
-  if (layout === "two-column") {
+  const wrapper = document.createElement("div");
+  wrapper.className = isTwoColumn ? "form-row two-column" : "form-row";
+
+
+  if (isTwoColumn) {
     const left = document.createElement("div");
     const right = document.createElement("div");
 
@@ -99,7 +102,7 @@ export function wrapInputWithLabel(
       const desc = document.createElement("div");
       desc.className = "field-description";
       desc.textContent = descriptionText;
-      wrapper.appendChild(desc); // ← insert BEFORE input
+      wrapper.appendChild(desc);
     }
 
     wrapper.appendChild(inputElement);

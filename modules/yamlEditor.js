@@ -123,6 +123,7 @@ export function initYamlEditor(containerId, onSaveCallback) {
     applyModalTypeClass(modal, field.type || "text");
 
     document.getElementById("edit-key").value = field.key;
+    document.getElementById("edit-two-column").checked = !!field.two_column;
     document.getElementById("edit-label").value = field.label;
     document.getElementById("edit-description").value = field.description || "";
     document.getElementById("edit-default").value = field.default ?? "";
