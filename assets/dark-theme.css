@@ -1,4 +1,12 @@
 /* ───── Dark Theme ───── */
+.dark-mode {
+  --input-border-color: #555;
+  --input-bg: #1c1c1c;
+  --input-fg: #eee;
+  --readonly-bg: #888;
+  --readonly-fg: #ffffe0;
+  --input-icon-bg: #3f3f3f;
+}
 
 .dark-mode body,
 .dark-mode #template-container,
@@ -14,13 +22,11 @@
   color: #eee;
 }
 
-/* Sidebar Borders */
 .dark-mode #template-sidebar,
 .dark-mode #markdown-sidebar {
   border-right: 1px solid #444;
 }
 
-/* Template List + Markdown List */
 .dark-mode .template-item,
 .dark-mode .markdown-item {
   background-color: #2a2a2a;
@@ -31,7 +37,6 @@
   background-color: #3a3a3a;
 }
 
-/* Dark Theme Selected */
 .dark-mode .template-item.selected,
 .dark-mode .markdown-item.selected {
   background-color: #2196f3;
@@ -40,14 +45,12 @@
   border-left: 4px solid #0d47a1;
 }
 
-/* Status Bar */
 .dark-mode #status-bar {
   background-color: #1e1e1e;
   border-top: 1px solid #444;
   color: #ccc;
 }
 
-/* Modal Dialogs */
 .dark-mode .modal {
   background-color: #2a2a2a;
   border-color: #555;
@@ -58,17 +61,14 @@
   background-color: #444;
 }
 
-/* Modal Backdrop */
 .dark-mode .modal-backdrop {
   background-color: rgba(0, 0, 0, 0.6) !important;
 }
 
-/* Toggle Sliders */
 .dark-mode .slider:before {
   background-color: #ccc;
 }
 
-/* Scrollbars */
 .dark-mode ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -83,14 +83,12 @@
   background: #222;
 }
 
-/* Splitter Handles */
 .dark-mode #template-resizeHandle,
 .dark-mode #markdown-resizeHandle {
   background-color: #666;
   border-color: #444;
 }
 
-/* ───── Dark Mode: HTML Menu Bar ───── */
 .dark-mode #app-menu {
   background-color: #1e1e1e;
   border-bottom: 1px solid #444;
@@ -122,7 +120,7 @@
   border-top: 1px solid #444;
 }
 
-/* ───── Input + Select Styling (Dark Mode) ───── */
+/* Inputs (dark) */
 .dark-mode input[type="text"],
 .dark-mode input[type="password"],
 .dark-mode input[type="email"],
@@ -130,9 +128,9 @@
 .dark-mode input[type="date"],
 .dark-mode textarea,
 .dark-mode select {
-  background-color: #1c1c1c;
-  color: #eee;
-  border: 1px solid #555;
+  background-color: var(--input-bg);
+  color: var(--input-fg);
+  border: 1px solid var(--input-border-color);
   padding: 6px 10px;
   border-radius: 4px;
   font-size: 14px;
@@ -143,6 +141,8 @@
 .dark-mode input[type="text"]:focus,
 .dark-mode input[type="password"]:focus,
 .dark-mode input[type="email"]:focus,
+.dark-mode input[type="number"]:focus,
+.dark-mode input[type="date"]:focus,
 .dark-mode textarea:focus,
 .dark-mode select:focus {
   border-color: #888;
@@ -150,25 +150,24 @@
 }
 
 .dark-mode input[readonly] {
-  background-color: #888;
-  color: #FFFFE0;
-  border-color: #333;
+  background-color: var(--readonly-bg);
+  color: var(--readonly-fg);
+  border-color: var(--input-border-color);
   font-style: italic;
 }
 
-/* Checkboxes & Radios */
 .dark-mode input[type="checkbox"],
 .dark-mode input[type="radio"] {
   accent-color: #88d88c;
 }
 
 .dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
-  background-color: #3f3f3f;
+  background-color: var(--input-icon-bg);
   border-radius: 4px;
   padding: 5px;
   cursor: pointer;
 }
 
 .dark-mode input[type="date"]::-webkit-calendar-picker-indicator:hover {
-  background-color: #000000;
+  background-color: #000;
 }
