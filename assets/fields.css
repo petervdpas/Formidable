@@ -256,7 +256,7 @@
 
 .dynamic-table th:last-child,
 .dynamic-table td:last-child {
-  width: 36px;
+  width: 32px;
   padding: 0;
   text-align: center;
 }
