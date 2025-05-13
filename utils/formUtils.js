@@ -30,10 +30,10 @@ export function extractFieldDefinition({
 
   const field = { key, label, type };
   if (def) field.default = def;
-  if (description) field.description = description; 
+  if (description) field.description = description;
   if (markdown) field.markdown = markdown;
   if (twoColumn) field.two_column = true;
-  if (["dropdown", "radio"].includes(type) && options?.length) {
+  if (options?.length) {
     field.options = options;
   }
 

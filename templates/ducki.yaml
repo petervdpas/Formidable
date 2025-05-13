@@ -44,3 +44,10 @@ fields:
     label: Listy
     type: list
     two_column: true
+  - key: datable
+    label: Table
+    type: table
+    options:
+      - Header1
+      - Header2
+      - Header3
