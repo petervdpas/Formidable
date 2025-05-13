@@ -235,7 +235,7 @@ export function renderTableField(field) {
     // Remove button cell
     const tdRemove = document.createElement("td");
     const removeBtn = document.createElement("button");
-    removeBtn.textContent = "–";
+    removeBtn.textContent = "-";
     removeBtn.className = "remove-btn";
     removeBtn.onclick = () => tr.remove();
     tdRemove.appendChild(removeBtn);
