@@ -56,6 +56,7 @@ export function handleTemplateConfirm(modal, defaultMarkdownDir, callback) {
       yaml: {
         name: safeName,
         markdown_dir,
+        markdown_template: "",
         fields: [],
       },
     });

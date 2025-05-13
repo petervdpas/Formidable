@@ -1,5 +1,6 @@
 name: ducki
 markdown_dir: ./markdowns/ducki
+markdown_template: test
 fields:
   - key: test
     label: Test

@@ -35,6 +35,12 @@ export function initYamlEditor(containerId, onSaveCallback) {
             currentData.markdown_dir || ""
           }" />
         </div>
+        <div class="modal-form-row">
+          <label for="markdown-template">Markdown Template</label>
+            <textarea id="markdown-template" rows="6">${
+              currentData.markdown_template || ""
+            }</textarea>
+        </div>
       </fieldset>
 
       <fieldset>
@@ -146,7 +152,13 @@ export function initYamlEditor(containerId, onSaveCallback) {
     container.querySelector("#save-yaml").onclick = () => {
       const name = container.querySelector("#yaml-name").value.trim();
       const dir = container.querySelector("#markdown-dir").value.trim();
-      const updated = { name, markdown_dir: dir, fields: currentData.fields };
+      const tmpl = container.querySelector("#markdown-template").value.trim();
+      const updated = {
+        name,
+        markdown_dir: dir,
+        markdown_template: tmpl,
+        fields: currentData.fields,
+      };
       log("[YamlEditor] Calling save callback with updated data:", updated);
       onSaveCallback?.(updated);
     };

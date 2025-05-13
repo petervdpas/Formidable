@@ -94,6 +94,11 @@ function createBasicTemplateIfMissing() {
     const content = {
       name: "Basic Form",
       markdown_dir: "./markdowns/basic",
+      markdown_template: `# {{field "title"}}
+
+{{field "published"}}
+
+Category: **{{field "category"}}**`,
       fields: [
         {
           key: "title",

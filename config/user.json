@@ -1,6 +1,6 @@
 {
-  "selected_template": "ducki.yaml",
-  "selected_data_file": "test-20250510.meta.json",
+  "selected_template": "basic.yaml",
+  "selected_data_file": null,
   "theme": "light",
   "font_size": 14,
   "context_mode": "template",
