@@ -31,8 +31,7 @@ const api = {
     "delete-markdown",
   ]),
   transform: buildGroup([
-    "parse-markdown-to-fields",
-    "generate-markdown-from-fields",
+    "render-markdown-template",
   ]),
   system: {
     getAppRoot: () => ipcRenderer.invoke("get-app-root"),

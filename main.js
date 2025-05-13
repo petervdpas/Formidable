@@ -13,11 +13,11 @@ const { log, warn, error } = require("./controls/nodeLogger");
 const { registerIpc } = require("./controls/ipcRoutes");
 
 const fileManager = require("./controls/fileManager");
-const fileTransformer = require("./controls/fileTransformer");
 const templateManager = require("./controls/templateManager");
 const formManager = require("./controls/formManager");
 const markdownManager = require("./controls/markdownManager");
 const configManager = require("./controls/configManager");
+const markdownRenderer = require("./controls/markdownRenderer");
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -168,11 +168,8 @@ registerIpc("update-user-config", (event, partial) =>
 );
 
 // Markdown transform
-registerIpc("parse-markdown-to-fields", (event, markdownContent) =>
-  fileTransformer.parseMarkdownToFields(markdownContent)
-);
-registerIpc("generate-markdown-from-fields", (event, fieldsObject) =>
-  fileTransformer.generateMarkdownFromFields(fieldsObject)
+registerIpc("render-markdown-template", (event, formData, templateYaml) =>
+  markdownRenderer.renderMarkdown(formData, templateYaml)
 );
 
 registerIpc("dialog-choose-directory", async () => {
