@@ -47,11 +47,20 @@ export function parseListField(wrapper) {
 }
 
 // Table
-export function parseTableField(input) {
-  try {
-    return JSON.parse(input.value);
-  } catch {
-    warn("[ParseTable] Invalid JSON input.");
-    return [];
-  }
+export function parseTableField(wrapper) {
+  const table = wrapper.querySelector("table");
+  if (!table) return [];
+
+  const data = [];
+  const rows = table.querySelectorAll("tbody tr");
+  rows.forEach((tr) => {
+    const row = Array.from(tr.querySelectorAll("td input")).map((input) =>
+      input.value.trim()
+    );
+    if (row.some((cell) => cell !== "")) {
+      data.push(row);
+    }
+  });
+
+  return data;
 }

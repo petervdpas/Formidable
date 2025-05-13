@@ -10,11 +10,13 @@ fields:
   - key: check
     label: Check
     type: boolean
+    description: A test description - two-column
     two_column: true
   - key: dropdown
     label: Dropdown
     type: dropdown
     default: Right
+    description: A test description - two-column
     two_column: true
     options:
       - Left
@@ -23,6 +25,7 @@ fields:
     label: Radio
     type: radio
     default: Dog
+    description: A test description - two-column
     two_column: true
     options:
       - Cat
@@ -32,21 +35,25 @@ fields:
     label: Mline
     type: textarea
     default: A whole lot of prefab text...
+    description: A test description - single-column
   - key: numpy
     label: Numpy
     type: number
     default: '17'
+    description: A test description - single-column
   - key: bday
     label: Birthday
     type: date
     default: '1968-12-23'
+    description: A test description - single-column
   - key: listy
     label: Listy
     type: list
-    two_column: true
+    description: A test description - single-column
   - key: datable
     label: Table
     type: table
+    description: A test description - single-column
     options:
       - Header1
       - Header2

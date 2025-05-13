@@ -88,3 +88,19 @@ legend {
   gap: 0.8rem;
   align-items: center;
 }
+
+.dynamic-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dynamic-table th,
+.dynamic-table td {
+  padding: 4px;
+  text-align: left;
+}
+
+.dynamic-table input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+}

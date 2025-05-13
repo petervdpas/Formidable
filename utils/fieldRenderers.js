@@ -9,7 +9,12 @@ export function renderTextField(field) {
   input.type = "text";
   input.name = field.key;
   input.value = "default" in field ? field.default : "";
-  return wrapInputWithLabel(input, field.label, field.description, field.two_column);
+  return wrapInputWithLabel(
+    input,
+    field.label,
+    field.description,
+    field.two_column
+  );
 }
 
 // ─────────────────────────────────────────────
@@ -29,7 +34,12 @@ export function renderBooleanField(field) {
   wrapper.appendChild(input);
   wrapper.appendChild(slider);
 
-  return wrapInputWithLabel(wrapper, field.label, field.description, field.two_column);
+  return wrapInputWithLabel(
+    wrapper,
+    field.label,
+    field.description,
+    field.two_column
+  );
 }
 
 // ─────────────────────────────────────────────
@@ -44,7 +54,12 @@ export function renderDropdownField(field) {
   });
   select.name = field.key;
   select.value = "default" in field ? field.default : "";
-  return wrapInputWithLabel(select, field.label, field.description, field.two_column);
+  return wrapInputWithLabel(
+    select,
+    field.label,
+    field.description,
+    field.two_column
+  );
 }
 
 // ─────────────────────────────────────────────
@@ -68,7 +83,12 @@ export function renderRadioField(field) {
     wrapper.appendChild(label);
   });
 
-  return wrapInputWithLabel(wrapper, field.label, field.description, field.two_column);
+  return wrapInputWithLabel(
+    wrapper,
+    field.label,
+    field.description,
+    field.two_column
+  );
 }
 
 // ─────────────────────────────────────────────
@@ -77,7 +97,12 @@ export function renderTextareaField(field) {
   const textarea = document.createElement("textarea");
   textarea.name = field.key;
   textarea.value = "default" in field ? field.default : "";
-  return wrapInputWithLabel(textarea, field.label, field.description, field.two_column);
+  return wrapInputWithLabel(
+    textarea,
+    field.label,
+    field.description,
+    field.two_column
+  );
 }
 
 // ─────────────────────────────────────────────
@@ -87,7 +112,12 @@ export function renderNumberField(field) {
   input.type = "number";
   input.name = field.key;
   input.value = "default" in field ? field.default : 0;
-  return wrapInputWithLabel(input, field.label, field.description, field.two_column);
+  return wrapInputWithLabel(
+    input,
+    field.label,
+    field.description,
+    field.two_column
+  );
 }
 
 // ─────────────────────────────────────────────
@@ -97,7 +127,12 @@ export function renderDateField(field) {
   input.type = "date";
   input.name = field.key;
   input.value = "default" in field ? field.default : "";
-  return wrapInputWithLabel(input, field.label, field.description, field.two_column);
+  return wrapInputWithLabel(
+    input,
+    field.label,
+    field.description,
+    field.two_column
+  );
 }
 
 // ─────────────────────────────────────────────
@@ -122,7 +157,12 @@ export function renderListField(field) {
   };
   wrapper.appendChild(addBtn);
 
-  return wrapInputWithLabel(wrapper, field.label, field.description, field.two_column);
+  return wrapInputWithLabel(
+    wrapper,
+    field.label,
+    field.description,
+    field.two_column
+  );
 }
 
 function createListItem(value) {
@@ -148,16 +188,83 @@ function createListItem(value) {
 // ─────────────────────────────────────────────
 // Type: table
 export function renderTableField(field) {
-  const textarea = document.createElement("textarea");
-  textarea.name = field.key;
-  textarea.rows = 5;
+  const wrapper = document.createElement("div");
+  wrapper.className = "table-wrapper";
+  wrapper.dataset.type = "table";
+  wrapper.dataset.tableField = field.key;
 
-  try {
-    textarea.value =
-      "default" in field ? JSON.stringify(field.default || [], null, 2) : "[]";
-  } catch {
-    textarea.value = "[]";
+  const columns = field.options || [];
+  const rows = field.default || [];
+
+  const table = document.createElement("table");
+  table.className = "dynamic-table";
+
+  // Header
+  const thead = document.createElement("thead");
+  const headRow = document.createElement("tr");
+
+  columns.forEach((col) => {
+    const th = document.createElement("th");
+    th.textContent = col;
+    headRow.appendChild(th);
+  });
+
+  // Add a header cell for the remove button
+  const thRemove = document.createElement("th");
+  thRemove.textContent = ""; // for remove column
+  headRow.appendChild(thRemove);
+
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  // Body
+  const tbody = document.createElement("tbody");
+
+  function createRow(values = []) {
+    const tr = document.createElement("tr");
+
+    columns.forEach((_, colIdx) => {
+      const td = document.createElement("td");
+      const input = document.createElement("input");
+      input.type = "text";
+      input.value = values[colIdx] || "";
+      td.appendChild(input);
+      tr.appendChild(td);
+    });
+
+    // Remove button cell
+    const tdRemove = document.createElement("td");
+    const removeBtn = document.createElement("button");
+    removeBtn.textContent = "–";
+    removeBtn.className = "remove-btn";
+    removeBtn.onclick = () => tr.remove();
+    tdRemove.appendChild(removeBtn);
+    tr.appendChild(tdRemove);
+
+    return tr;
   }
 
-  return wrapInputWithLabel(textarea, field.label, field.description, field.two_column);
+  rows.forEach((row) => {
+    tbody.appendChild(createRow(row));
+  });
+
+  table.appendChild(tbody);
+
+  // Add Row Button
+  const addBtn = document.createElement("button");
+  addBtn.textContent = "+";
+  addBtn.onclick = () => {
+    const newRow = createRow();
+    tbody.appendChild(newRow);
+  };
+
+  wrapper.appendChild(table);
+  wrapper.appendChild(addBtn);
+
+  return wrapInputWithLabel(
+    wrapper,
+    field.label,
+    field.description,
+    field.two_column
+  );
 }

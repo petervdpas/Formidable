@@ -57,6 +57,8 @@ export function getFormData(container, template) {
       el = container.querySelector(`[data-radio-group="${field.key}"]`);
     } else if (field.type === "list") {
       el = container.querySelector(`[data-list-field="${field.key}"]`);
+    } else if (field.type === "table") {
+      el = container.querySelector(`[data-table-field="${field.key}"]`);
     } else {
       el = container.querySelector(`[name="${field.key}"]`);
     }
