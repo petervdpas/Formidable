@@ -36,7 +36,7 @@ export function initYamlEditor(containerId, onSaveCallback) {
           }" />
         </div>
         <div class="modal-form-row">
-          <label for="markdown-template">Markdown Template</label>
+          <label for="markdown-template">Template Code</label>
             <textarea id="markdown-template" rows="6">${
               currentData.markdown_template || ""
             }</textarea>

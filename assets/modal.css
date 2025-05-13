@@ -40,15 +40,16 @@
 /* ───── Form Row: Label + Input Side-by-Side ───── */
 .modal-form-row {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
     margin-bottom: 6px;
 }
 
 .modal-form-row label {
-    min-width: 140px;
-    font-weight: bold;
-    text-align: right;
+  min-width: 140px;
+  font-weight: bold;
+  text-align: right;
+  padding-top: 2px; /* optional, if label seems too high */
 }
 
 .modal-form-row input,
@@ -83,13 +84,20 @@
 
 .modal-form-row.switch-row {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
     margin-bottom: 6px;
 }
 
+.modal-form-row.switch-row .switch {
+  height: 32px;         /* ← input height */
+  display: inline-flex;
+  align-items: center;  /* centreren slider */
+}
+
 .modal-form-row.switch-row label:not(.switch) {
-    min-width: 140px; /* same as regular label */
+    min-width: 140px;
+    /* same as regular label */
     font-weight: bold;
     text-align: right;
 }

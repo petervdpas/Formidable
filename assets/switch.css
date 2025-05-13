@@ -26,6 +26,12 @@
     border-radius: 34px;
 }
 
+.switch .slider {
+  top: 50%;
+  transform: translateY(-50%);
+  height: 20px; /* as defined */
+}
+
 .switch .slider::before {
     content: "";
     position: absolute;
