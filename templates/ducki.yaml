@@ -3,7 +3,7 @@ markdown_dir: ./markdowns/ducki
 markdown_template: |-
   # {{field "test"}}
 
-  {{#if (field "check")}}
+  {{#if (fieldRaw "check")}}
   ✅ Check is enabled
   {{else}}
   ❌ Check is disabled
@@ -25,23 +25,24 @@ markdown_template: |-
   ---
 
   ### List Items
-  {{#each (field "listy")}}
+  {{#each (fieldRaw "listy")}}
   - {{this}}
   {{/each}}
 
   ---
 
   ### Table of Data
-  {{#if (field "datable")}}
-  | {{#each (fieldMeta "datable").options}}{{this}} |{{/each}}
-  |{{#each (fieldMeta "datable").options}}:--|{{/each}}
-  {{#each (field "datable")}}
-  | {{#each this}}{{this}} |{{/each}}
-  {{/each}}
+  {{#if (fieldRaw "datable")}}
+    {{#with (fieldMeta "datable") as |meta|}}
+    | {{#each meta.options}}{{this}} |{{/each}}
+    | {{#each meta.options}}:--|{{/each}}
+    {{/with}}
+    {{#each (fieldRaw "datable")}}
+    | {{#each this}}{{this}} |{{/each}}
+    {{/each}}
   {{else}}
   _No table data provided._
   {{/if}}
-
 
   ## End
 fields:

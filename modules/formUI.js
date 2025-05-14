@@ -2,7 +2,7 @@
 
 import { log, warn, error } from "../utils/logger.js";
 import { EventBus } from "./eventBus.js";
-import { fieldTypes } from "../utils/fieldTypes.js"; // Added this line bc it was missing and the filling of defaults doesnt work no longer
+import { fieldTypes } from "../utils/fieldTypes.js";
 import { getFormData } from "../utils/formUtils.js";
 import { applyFieldValues, focusFirstInput } from "../utils/domUtils.js";
 import { renderForm } from "./formRenderer.js";
@@ -70,7 +70,10 @@ export function createFormManager(containerId) {
 
     // ✅ Now render the form
     container.innerHTML = "";
-    const { saveButton, deleteButton } = renderForm(container, currentTemplate);
+    const { saveButton, deleteButton, renderButton } = renderForm(
+      container,
+      currentTemplate
+    );
 
     // ✅ Only now is the input present in the DOM
     const datafileInput = container.querySelector("#meta-json-filename");
@@ -85,10 +88,20 @@ export function createFormManager(containerId) {
       await deleteForm(datafileInput?.value);
     });
 
+    renderButton.addEventListener("click", async () => {
+      const formData = getFormData(container, currentTemplate);
+      const output = await window.api.transform.renderMarkdownTemplate(
+        formData,
+        currentTemplate
+      );
+      console.log("[Render Output]\n" + output);
+    });
+
     const buttonGroup = document.createElement("div");
     buttonGroup.className = "button-group";
     buttonGroup.appendChild(saveButton);
     buttonGroup.appendChild(deleteButton);
+    buttonGroup.appendChild(renderButton);
     container.appendChild(buttonGroup);
 
     applyFieldValues(container, currentTemplate.fields, metaData);

@@ -7,7 +7,7 @@ import { log, warn, error } from "../utils/logger.js";
 export function renderForm(container, template) {
   if (!container || !template) {
     console.warn("[FormRenderer] Missing container or template.");
-    return { fieldElements: {}, saveButton: null };
+    return { fieldElements: {}, saveButton: null, deleteButton: null, renderButton: null };
   }
 
   log(
@@ -47,5 +47,14 @@ export function renderForm(container, template) {
   deleteBtn.textContent = "Delete";
   deleteBtn.className = "btn btn-default btn-danger";
 
-  return { fieldElements, saveButton: saveBtn, deleteButton: deleteBtn };
+  const renderBtn = document.createElement("button");
+  renderBtn.textContent = "Render";
+  renderBtn.className = "btn btn-default btn-info";
+
+  return {
+    fieldElements,
+    saveButton: saveBtn,
+    deleteButton: deleteBtn,
+    renderButton: renderBtn
+  };
 }
