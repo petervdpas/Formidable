@@ -8,6 +8,7 @@ import { applyFieldValues, focusFirstInput } from "../utils/domUtils.js";
 import { renderForm } from "./formRenderer.js";
 import { validateFilenameInput } from "../utils/formUtils.js";
 import { showConfirmModal } from "./modalManager.js";
+import { setupRenderModal } from "./modalSetup.js";
 
 export function createFormManager(containerId) {
   const container = document.getElementById(containerId);
@@ -88,13 +89,16 @@ export function createFormManager(containerId) {
       await deleteForm(datafileInput?.value);
     });
 
+    const renderModal = setupRenderModal();
+
     renderButton.addEventListener("click", async () => {
       const formData = getFormData(container, currentTemplate);
       const output = await window.api.transform.renderMarkdownTemplate(
         formData,
         currentTemplate
       );
-      console.log("[Render Output]\n" + output);
+      document.getElementById("render-output").textContent = output;
+      renderModal.show();
     });
 
     const buttonGroup = document.createElement("div");

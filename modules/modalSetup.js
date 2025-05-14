@@ -81,6 +81,21 @@ export function setupAboutModal() {
   });
 }
 
+export function setupRenderModal() {
+  return setupModal("render-modal", {
+    closeBtn: "render-close",
+    escToClose: true,
+    backdropClick: true,
+    resizable: true,
+    width: "40em",
+    height: "40vh",
+    onOpen: () => {
+      const modal = document.getElementById("render-modal");
+      if (modal) modal.classList.add("large");
+    },
+  });
+}
+
 export function setupFieldEditModal(onConfirm) {
   const modal = setupModal("field-edit-modal", {
     closeBtn: "field-edit-close",
@@ -129,7 +144,7 @@ export function setupFieldEditModal(onConfirm) {
       typeDropdown,
       markdownDropdown,
     });
-  
+
     onConfirm(field);
     modal.hide();
   };

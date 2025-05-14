@@ -25,8 +25,10 @@ export function setupModal(
   const close =
     typeof closeBtn === "string" ? document.getElementById(closeBtn) : closeBtn;
 
-  modal.style.width = width;
-  modal.style.height = height;
+  if (!modal.classList.contains("large")) {
+    modal.style.width = width;
+    modal.style.height = height;
+  }
 
   if (resizable) {
     const resizer = document.createElement("div");

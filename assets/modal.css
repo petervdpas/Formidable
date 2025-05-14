@@ -46,10 +46,11 @@
 }
 
 .modal-form-row label {
-  min-width: 140px;
-  font-weight: bold;
-  text-align: right;
-  padding-top: 2px; /* optional, if label seems too high */
+    min-width: 140px;
+    font-weight: bold;
+    text-align: right;
+    padding-top: 2px;
+    /* optional, if label seems too high */
 }
 
 .modal-form-row input,
@@ -90,9 +91,11 @@
 }
 
 .modal-form-row.switch-row .switch {
-  height: 32px;         /* ← input height */
-  display: inline-flex;
-  align-items: center;  /* centreren slider */
+    height: 32px;
+    /* ← input height */
+    display: inline-flex;
+    align-items: center;
+    /* centreren slider */
 }
 
 .modal-form-row.switch-row label:not(.switch) {
@@ -186,4 +189,25 @@
     display: flex;
     align-items: center;
     gap: 0.5em;
+}
+
+.modal.large {
+    max-width: 80vw;
+    width: 70em !important;
+    height: 70vh !important;
+}
+
+/* Markdown output fix */
+#render-output {
+    font-family: "Courier New", monospace;
+    font-size: 14px;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    color: var(--input-fg);
+    padding: 12px;
+    border: none;
+    background: transparent;
+    overflow: auto;
+    max-height: 60vh;
+    box-sizing: border-box;
 }
