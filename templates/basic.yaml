@@ -6,6 +6,8 @@ markdown_template: |-
   {{field "published"}}
 
   Category: **{{field "category"}}**
+
+  test
 fields:
   - key: title
     label: Title

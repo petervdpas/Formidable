@@ -6,6 +6,62 @@ import { setupFieldEditModal } from "./modalSetup.js";
 import { EventBus } from "./eventBus.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 
+let codeMirrorEditor = null;
+let keyboardListenerAttached = false;
+let editorWrapper = null;
+
+function toggleFullscreen() {
+  if (!editorWrapper) return;
+
+  const entering = !editorWrapper.classList.contains("fullscreen");
+  editorWrapper.classList.toggle("fullscreen");
+  setTimeout(() => codeMirrorEditor.refresh(), 50);
+
+  const oldHint = editorWrapper.querySelector(".fullscreen-hint");
+  if (oldHint) oldHint.remove();
+
+  if (entering) {
+    const notice = document.createElement("div");
+    notice.className = "fullscreen-hint";
+    notice.textContent = "ESC to exit fullscreen";
+    editorWrapper.appendChild(notice);
+  }
+}
+
+function handleEditorKey(e) {
+  log(`[YamlEditor] Key pressed: ctrl=${e.ctrlKey}, key=${e.key}`);
+  if (e.ctrlKey && e.key === "Enter") {
+    e.preventDefault();
+    log("[YamlEditor] CTRL+ENTER pressed → toggle fullscreen");
+    toggleFullscreen();
+  }
+  if (e.key === "Escape" && editorWrapper?.classList.contains("fullscreen")) {
+    log("[YamlEditor] ESC pressed → exit fullscreen");
+    toggleFullscreen();
+  }
+}
+
+// ─── CodeMirror Initializer ─────────────────────
+function initCodeMirror(textarea, initialValue = "") {
+  if (codeMirrorEditor) {
+    codeMirrorEditor.toTextArea(); // Clean up old instance
+  }
+
+  codeMirrorEditor = CodeMirror.fromTextArea(textarea, {
+    mode: "yaml",
+    theme: "monokai",
+    lineNumbers: true,
+    lineWrapping: true,
+  });
+
+  codeMirrorEditor.setValue(initialValue);
+  setTimeout(() => codeMirrorEditor.refresh(), 50);
+}
+
+function getMarkdownTemplate() {
+  return codeMirrorEditor?.getValue().trim() || "";
+}
+
 export function initYamlEditor(containerId, onSaveCallback) {
   const container = document.getElementById(containerId);
   if (!container) {
@@ -23,42 +79,55 @@ export function initYamlEditor(containerId, onSaveCallback) {
     log("[YamlEditor] Rendering editor for:", currentData.name || "Unnamed");
 
     container.innerHTML = `
-      <fieldset>
-        <legend>Setup Info</legend>
-        <div class="modal-form-row">
-          <label for="yaml-name">Name</label>
-          <input type="text" id="yaml-name" value="${currentData.name || ""}" />
-        </div>
-        <div class="modal-form-row">
-          <label for="markdown-dir">Storage Directory</label>
-          <input type="text" id="markdown-dir" value="${
-            currentData.markdown_dir || ""
-          }" />
-        </div>
-        <div class="modal-form-row">
-          <label for="markdown-template">Template Code</label>
-            <textarea id="markdown-template" rows="6">${
-              currentData.markdown_template || ""
-            }</textarea>
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend>Fields</legend>
-        <ul id="fields-list" class="field-list"></ul>
-        <div class="field-add-row">
-          <button id="add-field" class="btn btn-info">+ Add Field</button>
-        </div>
-      </fieldset>
-
-      <div class="button-group">
-        <button id="save-yaml" class="btn btn-warn">Save</button>
-        <button id="delete-yaml" class="btn btn-danger">Delete</button>
+    <fieldset>
+      <legend>Setup Info</legend>
+      <div class="modal-form-row">
+        <label for="yaml-name">Name</label>
+        <input type="text" id="yaml-name" value="${currentData.name || ""}" />
       </div>
-    `;
+      <div class="modal-form-row">
+        <label for="markdown-dir">Storage Directory</label>
+        <input type="text" id="markdown-dir" value="${
+          currentData.markdown_dir || ""
+        }" />
+      </div>
+      <div class="modal-form-row full-editor-row">
+        <label for="markdown-template">Template Code <small>CTRL+ENTER for full screen</small></label>
+        <div class="editor-wrapper">
+          <textarea id="markdown-template" rows="4">${
+            currentData.markdown_template || ""
+          }</textarea>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Fields</legend>
+      <ul id="fields-list" class="field-list"></ul>
+      <div class="field-add-row">
+        <button id="add-field" class="btn btn-info">+ Add Field</button>
+      </div>
+    </fieldset>
+
+    <div class="button-group">
+      <button id="save-yaml" class="btn btn-warn">Save</button>
+      <button id="delete-yaml" class="btn btn-danger">Delete</button>
+    </div>
+  `;
 
     wireEvents();
     renderFieldList();
+
+    const textarea = container.querySelector("#markdown-template");
+    initCodeMirror(textarea, currentData.markdown_template || "");
+
+    editorWrapper = container.querySelector(".editor-wrapper");
+
+    if (keyboardListenerAttached) {
+      document.removeEventListener("keydown", handleEditorKey);
+    }
+    document.addEventListener("keydown", handleEditorKey);
+    keyboardListenerAttached = true;
   }
 
   function renderFieldList() {
@@ -152,7 +221,7 @@ export function initYamlEditor(containerId, onSaveCallback) {
     container.querySelector("#save-yaml").onclick = () => {
       const name = container.querySelector("#yaml-name").value.trim();
       const dir = container.querySelector("#markdown-dir").value.trim();
-      const tmpl = container.querySelector("#markdown-template").value.trim();
+      const tmpl = getMarkdownTemplate();
       const updated = {
         name,
         markdown_dir: dir,
