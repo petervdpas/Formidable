@@ -1,6 +1,49 @@
 name: ducki
 markdown_dir: ./markdowns/ducki
-markdown_template: test
+markdown_template: |-
+  # {{field "test"}}
+
+  {{#if (field "check")}}
+  ✅ Check is enabled
+  {{else}}
+  ❌ Check is disabled
+  {{/if}}
+
+  ## Direction: {{field "dropdown"}}
+  You selected: _{{field "radio"}}_
+
+  ---
+
+  ### Notes
+  {{field "mline"}}
+
+  ---
+
+  ### Number: {{field "numpy"}}
+  Birthday: {{field "bday"}}
+
+  ---
+
+  ### List Items
+  {{#each (field "listy")}}
+  - {{this}}
+  {{/each}}
+
+  ---
+
+  ### Table of Data
+  {{#if (field "datable")}}
+  | {{#each (fieldMeta "datable").options}}{{this}} |{{/each}}
+  |{{#each (fieldMeta "datable").options}}:--|{{/each}}
+  {{#each (field "datable")}}
+  | {{#each this}}{{this}} |{{/each}}
+  {{/each}}
+  {{else}}
+  _No table data provided._
+  {{/if}}
+
+
+  ## End
 fields:
   - key: test
     label: Test

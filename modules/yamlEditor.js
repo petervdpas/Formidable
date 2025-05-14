@@ -44,7 +44,7 @@ function handleEditorKey(e) {
 // ─── CodeMirror Initializer ─────────────────────
 function initCodeMirror(textarea, initialValue = "") {
   if (codeMirrorEditor) {
-    codeMirrorEditor.toTextArea(); // Clean up old instance
+    codeMirrorEditor.toTextArea();
   }
 
   codeMirrorEditor = CodeMirror.fromTextArea(textarea, {
@@ -52,10 +52,18 @@ function initCodeMirror(textarea, initialValue = "") {
     theme: "monokai",
     lineNumbers: true,
     lineWrapping: true,
+    scrollbarStyle: "native",
+    viewportMargin: Infinity,
+    autofocus: true,
   });
 
   codeMirrorEditor.setValue(initialValue);
-  setTimeout(() => codeMirrorEditor.refresh(), 50);
+
+  // Resize correctly after mount (especially for fullscreen toggle)
+  setTimeout(() => {
+    codeMirrorEditor.refresh();
+    codeMirrorEditor.setSize("100%", "100%");
+  }, 50);
 }
 
 function getMarkdownTemplate() {
