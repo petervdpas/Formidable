@@ -8,6 +8,11 @@
   --input-icon-bg: #1d1d1d;
 }
 
+.editor-wrapper.fullscreen {
+  background-color: var(--input-bg);
+  border: 2px solid var(--input-border-color);
+}
+
 /* General Light Theme Styling */
 body {
   background-color: #ffffff;

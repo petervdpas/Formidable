@@ -1,7 +1,7 @@
 {
   "selected_template": "basic.yaml",
   "selected_data_file": null,
-  "theme": "light",
+  "theme": "dark",
   "font_size": 14,
   "context_mode": "template",
   "default_markdown_dir": "./markdowns"

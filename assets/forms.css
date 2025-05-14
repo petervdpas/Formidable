@@ -134,8 +134,6 @@ label small {
   left: 20px;
   right: 20px;
   z-index: 9999;
-  background: #1e1e1e;
-  border: 2px solid #333;
   border-radius: 6px;
   padding: 10px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
