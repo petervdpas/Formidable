@@ -12,6 +12,7 @@ export function createTemplateSelector({
     if (!name || name === window.currentSelectedTemplateName) return;
 
     try {
+      log("[SelectTemplate] Selecting template:", name);
       const result = await window.api.templates.getTemplateDescriptor(name);
       if (!result || !result.yaml) {
         throw new Error(

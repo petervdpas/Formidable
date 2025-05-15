@@ -48,7 +48,10 @@ function buildFilePath(directory, baseFilename, { extension = "" } = {}) {
 
 // Join + normalize path relative to app root
 function joinPath(...segments) {
-  return path.normalize(path.join(getAppRoot(), ...segments));
+  const flattened = segments.flatMap((s) =>
+    typeof s === "string" ? s.split(/[/\\]/).filter(Boolean) : []
+  );
+  return path.join(getAppRoot(), ...flattened);
 }
 
 // Resolve a path relative to app root

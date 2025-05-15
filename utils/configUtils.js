@@ -7,8 +7,16 @@ export async function selectLastOrFallback({
   onFallback,
   configKey,
 }) {
-  if (lastSelected && options.includes(lastSelected)) {
-    await onSelect(lastSelected);
+  // Strip eventueel padinfo van bv. "templates/basic.yaml" → "basic.yaml"
+  const cleanLast = lastSelected?.split(/[/\\]/).pop();
+
+  if (cleanLast && options.includes(cleanLast)) {
+    await onSelect(cleanLast);
+    if (configKey && cleanLast !== lastSelected) {
+      await window.api.config.updateUserConfig({
+        [configKey]: cleanLast,
+      });
+    }
   } else if (options.length > 0) {
     const fallback = options[0];
     await onSelect(fallback);

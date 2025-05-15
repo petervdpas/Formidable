@@ -1,14 +1,12 @@
 {
-  "selected_template": "basic.yaml",
+  "selected_template": "control-beleid.yaml",
   "selected_data_file": null,
-  "theme": "dark",
+  "theme": "light",
   "font_size": 14,
   "context_mode": "template",
   "default_markdown_dir": "./markdowns",
   "window_bounds": {
-    "width": 1167,
-    "height": 902,
-    "x": 395,
-    "y": 96
+    "width": 1024,
+    "height": 800
   }
 }

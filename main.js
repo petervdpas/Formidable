@@ -36,7 +36,7 @@ function createWindow() {
       enableRemoteModule: false,
       preload: path.resolve(__dirname, "preload.js"),
     },
-    icon: fileManager.joinPath(__dirname, "assets", "formidable.ico"),
+    icon: path.join(__dirname, "assets", "formidable.ico"),
   });
 
   // Disable Electron's native menu
@@ -63,9 +63,16 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+
+  //const base = path.dirname(process.execPath);
+  //fileManager.setAppRoot(base);
+
   fileManager.setAppRoot(app.getAppPath());
 
   log("[Main] App is ready. Checking environment...");
+  log("[DEBUG] app.getAppPath() =", app.getAppPath());
+  log("[DEBUG] process.cwd() =", process.cwd());
+  log("[DEBUG] __dirname =", __dirname);
 
   templateManager.ensureTemplateDirectory();
   templateManager.createBasicTemplateIfMissing();
@@ -201,7 +208,7 @@ registerIpc("dialog-choose-directory", async () => {
   return result.filePaths[0];
 });
 
-registerIpc("get-app-root", () => process.cwd());
+registerIpc("get-app-root", () => fileManager.getAppRoot());
 
 registerIpc("resolve-path", (event, ...segments) => {
   return fileManager.resolvePath(...segments);
