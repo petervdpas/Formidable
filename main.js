@@ -35,7 +35,7 @@ function createWindow() {
       enableRemoteModule: false,
       preload: fileManager.joinPath(__dirname, "preload.js"),
     },
-    icon: fileManager.joinPath(__dirname, "assets", "formidable.png"),
+    icon: fileManager.joinPath(__dirname, "assets", "formidable.ico"),
   });
 
   // Disable Electron's native menu
