@@ -156,6 +156,8 @@ export function initYamlEditor(containerId, onSaveCallback) {
           }">(${field.type.toUpperCase()})</span>
         </div>
         <div class="field-actions">
+          <button class="btn btn-light action-up" data-idx="${idx}">▲</button>
+          <button class="btn btn-light action-down" data-idx="${idx}">▼</button>
           <button class="btn btn-warn action-edit" data-idx="${idx}">Edit</button>
           <button class="btn btn-danger action-delete" data-idx="${idx}">Delete</button>
         </div>
@@ -179,6 +181,37 @@ export function initYamlEditor(containerId, onSaveCallback) {
         renderFieldList();
       };
     });
+
+    list.querySelectorAll(".action-up").forEach((btn) => {
+      btn.onclick = () => {
+        const idx = +btn.dataset.idx;
+        if (idx > 0) {
+          const fields = currentData.fields;
+          [fields[idx - 1], fields[idx]] = [fields[idx], fields[idx - 1]];
+          renderFieldList();
+        }
+      };
+    });
+
+    // Disable the first "up" button
+    const firstUp = list.querySelector('.action-up[data-idx="0"]');
+    if (firstUp) firstUp.disabled = true;
+
+    list.querySelectorAll(".action-down").forEach((btn) => {
+      btn.onclick = () => {
+        const idx = +btn.dataset.idx;
+        if (idx < currentData.fields.length - 1) {
+          const fields = currentData.fields;
+          [fields[idx], fields[idx + 1]] = [fields[idx + 1], fields[idx]];
+          renderFieldList();
+        }
+      };
+    });
+
+    // Disable the last "down" button
+    const lastIdx = currentData.fields.length - 1;
+    const lastDown = list.querySelector(`.action-down[data-idx="${lastIdx}"]`);
+    if (lastDown) lastDown.disabled = true;
   }
 
   function applyModalTypeClass(modal, typeKey) {

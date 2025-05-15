@@ -1,8 +1,8 @@
 {
-  "selected_template": "control-beleid.yaml",
-  "selected_data_file": "id04-20250515.meta.json",
+  "selected_template": "basic.yaml",
+  "selected_data_file": null,
   "theme": "dark",
   "font_size": 14,
-  "context_mode": "markdown",
+  "context_mode": "template",
   "default_markdown_dir": "./markdowns"
 }
