@@ -5,10 +5,20 @@ const path = require("path");
 const yaml = require("js-yaml");
 const { log, warn, error } = require("./nodeLogger");
 
-// Base directory (root of project)
+let appRoot = null;
+
+// Fallback base directory (used only if app root isn't set)
 const baseDir = __dirname.includes("controls")
   ? path.resolve(__dirname, "..")
   : __dirname;
+
+function setAppRoot(dir) {
+  appRoot = dir;
+}
+
+function getAppRoot() {
+  return appRoot || baseDir;
+}
 
 // Ensure a directory exists (creates if missing)
 function ensureDirectory(dirPath, { silent = false } = {}) {
@@ -36,14 +46,14 @@ function buildFilePath(directory, baseFilename, { extension = "" } = {}) {
   return path.join(directory, baseFilename + ext);
 }
 
-// Join + normalize path relative to baseDir
+// Join + normalize path relative to app root
 function joinPath(...segments) {
-  return path.normalize(path.join(...segments));
+  return path.normalize(path.join(getAppRoot(), ...segments));
 }
 
-// Resolve a path relative to the base directory
+// Resolve a path relative to app root
 function resolvePath(...segments) {
-  return path.resolve(baseDir, ...segments);
+  return path.resolve(getAppRoot(), ...segments);
 }
 
 // List files by extension
@@ -127,6 +137,8 @@ function deleteFile(filepath, { silent = false } = {}) {
 
 module.exports = {
   baseDir,
+  setAppRoot,
+  getAppRoot,
   ensureDirectory,
   buildFilePath,
   resolvePath,

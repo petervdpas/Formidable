@@ -13,6 +13,7 @@ const { log, warn, error } = require("./controls/nodeLogger");
 const { registerIpc } = require("./controls/ipcRoutes");
 const { getSafeBounds } = require("./controls/windowBounds");
 
+const path = require("path");
 const fileManager = require("./controls/fileManager");
 const templateManager = require("./controls/templateManager");
 const formManager = require("./controls/formManager");
@@ -33,7 +34,7 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
       enableRemoteModule: false,
-      preload: fileManager.joinPath(__dirname, "preload.js"),
+      preload: path.resolve(__dirname, "preload.js"),
     },
     icon: fileManager.joinPath(__dirname, "assets", "formidable.ico"),
   });
@@ -57,11 +58,13 @@ function createWindow() {
       });
     }
   });
-  
+
   log("[Main] Created main BrowserWindow and loaded index.html");
 }
 
 app.whenReady().then(() => {
+  fileManager.setAppRoot(app.getAppPath());
+
   log("[Main] App is ready. Checking environment...");
 
   templateManager.ensureTemplateDirectory();
