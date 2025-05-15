@@ -26,6 +26,17 @@
   gap: 8px;
 }
 
+.field-label {
+  cursor: grab;
+}
+
+.field-label::before {
+  content: "☰";
+  display: inline-block;
+  margin-right: 6px;
+  opacity: 0.6;
+}
+
 .field-description {
   font-size: 0.85em;
   color: #888;

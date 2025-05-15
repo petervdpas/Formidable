@@ -7,6 +7,8 @@ import { EventBus } from "./eventBus.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 import { getCurrentTheme } from "./themeToggle.js";
 
+const Sortable = window.Sortable;
+
 let codeMirrorEditor = null;
 let keyboardListenerAttached = false;
 let editorWrapper = null;
@@ -144,6 +146,18 @@ export function initYamlEditor(containerId, onSaveCallback) {
   function renderFieldList() {
     const list = container.querySelector("#fields-list");
     list.innerHTML = "";
+
+    if (!list.sortableInstance && typeof Sortable !== "undefined") {
+      list.sortableInstance = Sortable.create(list, {
+        animation: 150,
+        handle: ".field-label",
+        onEnd: (evt) => {
+          const moved = currentData.fields.splice(evt.oldIndex, 1)[0];
+          currentData.fields.splice(evt.newIndex, 0, moved);
+          renderFieldList();
+        },
+      });
+    }
 
     currentData.fields.forEach((field, idx) => {
       const item = document.createElement("li");
