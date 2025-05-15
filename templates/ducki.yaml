@@ -32,6 +32,9 @@ markdown_template: |-
   ---
 
   ### Table of Data
+
+  | Column1 | Column2 | Column3 |
+  |--|--|--|
   {{#if (fieldRaw "datable")}}
     {{#with (fieldMeta "datable") as |meta|}}
     | {{#each meta.options}}{{this}} |{{/each}}

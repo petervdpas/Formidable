@@ -32,6 +32,7 @@ const api = {
   ]),
   transform: buildGroup([
     "render-markdown-template",
+    "render-html-preview", 
   ]),
   system: {
     getAppRoot: () => ipcRenderer.invoke("get-app-root"),

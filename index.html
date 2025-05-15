@@ -211,13 +211,20 @@
     </div>
 
     <!-- Markdown Preview Modal -->
-    <div id="render-modal" class="modal">
+    <div id="render-modal" class="modal large">
       <div class="modal-header">
         <h2>Render Preview</h2>
         <button id="render-close">✕</button>
       </div>
-      <div class="modal-body">
-        <pre id="render-output" style="white-space: pre-wrap; font-family: monospace;"></pre>
+      <div class="modal-body two-pane">
+        <div class="pane raw-pane">
+          <h4>Markdown</h4>
+          <pre id="render-output" class="output-block"></pre>
+        </div>
+        <div class="pane html-pane">
+          <h4>Preview</h4>
+          <div id="render-preview" class="output-block preview-block"></div>
+        </div>
       </div>
     </div>
 

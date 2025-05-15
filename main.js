@@ -18,6 +18,7 @@ const formManager = require("./controls/formManager");
 const markdownManager = require("./controls/markdownManager");
 const configManager = require("./controls/configManager");
 const markdownRenderer = require("./controls/markdownRenderer");
+const htmlRenderer = require("./controls/htmlRenderer");
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -170,6 +171,10 @@ registerIpc("update-user-config", (event, partial) =>
 // Markdown transform
 registerIpc("render-markdown-template", (event, formData, templateYaml) =>
   markdownRenderer.renderMarkdown(formData, templateYaml)
+);
+
+registerIpc("render-html-preview", (event, markdown) =>
+  htmlRenderer.renderHtml(markdown)
 );
 
 registerIpc("dialog-choose-directory", async () => {

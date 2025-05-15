@@ -93,11 +93,16 @@ export function createFormManager(containerId) {
 
     renderButton.addEventListener("click", async () => {
       const formData = getFormData(container, currentTemplate);
-      const output = await window.api.transform.renderMarkdownTemplate(
+      const markdown = await window.api.transform.renderMarkdownTemplate(
         formData,
         currentTemplate
       );
-      document.getElementById("render-output").textContent = output;
+
+      document.getElementById("render-output").textContent = markdown;
+
+      const html = await window.api.transform.renderHtmlPreview(markdown);
+      document.getElementById("render-preview").innerHTML = html;
+
       renderModal.show();
     });
 

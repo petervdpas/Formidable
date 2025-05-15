@@ -192,9 +192,47 @@
 }
 
 .modal.large {
-    max-width: 80vw;
-    width: 70em !important;
-    height: 70vh !important;
+  max-width: 90vw;
+  width: 80em !important;
+  height: 80vh !important;
+}
+
+/* Make sure the header and content align well */
+.modal-body.two-pane {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  height: 100%;
+  overflow: hidden;
+  padding-top: 8px;
+}
+
+.pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pane h4 {
+  margin: 0 0 6px 0;
+  padding: 0;
+  font-size: 1em;
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+}
+
+.output-block {
+  flex: 1;
+  overflow: auto;
+  padding: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #000;
 }
 
 /* Markdown output fix */
@@ -210,4 +248,55 @@
     overflow: auto;
     max-height: 60vh;
     box-sizing: border-box;
+}
+
+/* Preview HTML should look natural */
+#render-preview {
+  font-family: system-ui, sans-serif;
+  white-space: normal;
+  background-color: #fff;
+  color: #000;
+  line-height: 1.6;
+  padding: 12px;
+  overflow: auto;
+  max-height: 60vh;
+  box-sizing: border-box;
+}
+
+/* Optional: extra structuur binnen #render-preview */
+#render-preview h1,
+#render-preview h2,
+#render-preview h3 {
+  margin-top: 1em;
+  margin-bottom: 0.4em;
+}
+
+#render-preview p {
+  margin: 0.5em 0;
+}
+
+#render-preview ul {
+  padding-left: 1.2em;
+  margin: 0.5em 0;
+}
+
+#render-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+#render-preview th,
+#render-preview td {
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+#render-preview blockquote {
+  border-left: 4px solid #aaa;
+  padding-left: 10px;
+  color: #555;
+  margin: 1em 0;
+  font-style: italic;
 }
