@@ -2,36 +2,25 @@
   "control_code": "ID.04",
   "control_name": "Noodtoegang",
   "control_date": "2025-05-15",
-  "control_author": "Peter van de Pas",
-  "control_owner": "IS",
-  "control_version_latest": "0.3",
+  "control_author": "Jeffrey Bodde",
+  "control_owner": "Team IS",
+  "control_version_latest": "0.1",
   "control_validity_period": 1,
   "control_revision_date": "2026-05-15",
+  "control_introduction": "Het ontbreken van een adequate procedure voor noodtoegang kan leiden tot ongeoorloofde toegang tot programma's en gegevens of tot verstoring van IT-services. Dit document probeer het structurerende en/of mitigerende beleid hierop uit een te zetten",
   "control_version": [
     [
       "0.1",
-      "01-03-2025",
-      "Andy van Veldhoven",
+      "15-05-2025",
+      "Jeffrey Bodde",
       "Initiële conceptversie"
-    ],
-    [
-      "0.2",
-      "09-03-2025",
-      "Andy van Veldhoven",
-      "Herziene versie"
-    ],
-    [
-      "0.3",
-      "11-03-2025",
-      "Andy van Veldhoven",
-      "Feedback verwerkt van Agile Team Coach"
     ]
   ],
   "control_approval": [
     [
-      "0.3",
-      "Frans Vermeulen",
-      "Agile Team Coach",
+      "0.1",
+      "Diana Pors",
+      "Product Owner",
       "",
       ""
     ]

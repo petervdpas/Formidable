@@ -1,5 +1,5 @@
-name: Beleidsdocument voor ID.04 - Noodtoegang (breakglassprocedure)
-markdown_dir: ./markdowns/controls/id04
+name: Beleidsdocument voor Audit Controls
+markdown_dir: ./markdowns/controls/beleid
 markdown_template: >-
   ---
 
@@ -26,10 +26,10 @@ markdown_template: >-
   ---
 
 
-  ## Inleiding
+  ## Inleiding {{field "control_code"}} - {{field "control_name"}}
 
 
-  {{inleiding}}
+  {{field "control_introduction"}}
 
 
   ## Documentbeheer
@@ -115,10 +115,10 @@ markdown_template: >-
   |--------------|-------------------------------------------------------------------|
 
   | Tactisch     | GOV - {{field "control_name"}} - Werkwijze en stappenplan –
-  Team {{field "control_owner"}}  |
+  {{field "control_owner"}}  |
 
   | Operationeel | GOV - {{field "control_name"}} - Procedures en instructies -
-  Team {{field "control_owner"}} |
+  {{field "control_owner"}} |
 
 
   ## 2 Definitie {{field "control_name"}}
@@ -165,10 +165,10 @@ fields:
     description: De eigenaar (team) van deze control.
     two_column: true
     options:
-      - IS
-      - BI
-      - GAS
-      - CSIAM
+      - Team IS
+      - Team BI
+      - Team GAS
+      - Team CSIAM
   - key: control_version_latest
     label: Versie
     type: text
@@ -186,6 +186,12 @@ fields:
     type: date
     description: De datum waarop dit document herzien moet zijn.
     two_column: true
+  - key: control_introduction
+    label: Introductie
+    type: textarea
+    description: >-
+      Geef hier de introductie voor het beleidsdocument van de aangegeven
+      control.
   - key: control_version
     label: Versiebeheer
     type: table
