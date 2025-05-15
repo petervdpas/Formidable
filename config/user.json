@@ -3,6 +3,6 @@
   "selected_data_file": "id04-20250515.meta.json",
   "theme": "dark",
   "font_size": 14,
-  "context_mode": "template",
+  "context_mode": "markdown",
   "default_markdown_dir": "./markdowns"
 }

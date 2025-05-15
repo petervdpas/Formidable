@@ -138,6 +138,53 @@ markdown_template: >-
 
 
   ### 3.1 Aanvrager
+
+
+  {{#each (fieldRaw "control_role_applicant")}}
+
+  - {{this}}
+
+  {{/each}}
+
+
+  ### 3.2 Goedkeurder
+
+
+  {{#each (fieldRaw "control_role_aprover")}}
+
+  - {{this}}
+
+  {{/each}}
+
+
+  ### 3.3 Uitvoerder
+
+
+  {{#each (fieldRaw "control_role_executor")}}
+
+  - {{this}}
+
+  {{/each}}
+
+
+  ### 3.4 Controleur
+
+
+  {{#each (fieldRaw "control_role_controller")}}
+
+  - {{this}}
+
+  {{/each}}
+
+
+  ### 3.5 Vervangers
+
+
+  {{#each (fieldRaw "control_role_replacements")}}
+
+  - {{this}}
+
+  {{/each}}
 fields:
   - key: control_code
     label: Code van Control
@@ -231,3 +278,33 @@ fields:
     label: Definitie onderdelen
     type: list
     description: Geef de diverse onderdelen die horen bij de definitie.
+  - key: control_role_applicant
+    label: Rol - Aanvrager
+    type: list
+    description: >-
+      Geef hier de criteria waaraan een 'aanvrager' moet voldoen of de acties
+      die deze uitvoert.
+  - key: control_role_aprover
+    label: Rol - Goedkeurder
+    type: list
+    description: >-
+      Geef hier de criteria waaraan een 'goedkeurder' moet voldoen of de acties
+      die deze uitvoert.
+  - key: control_role_executor
+    label: Rol - Uitvoerder
+    type: list
+    description: >-
+      Geef hier de criteria waaraan een 'uitvoerder' moet voldoen of de acties
+      die deze uitvoert.
+  - key: control_role_controller
+    label: Rol - Controleur
+    type: list
+    description: >-
+      Geef hier de criteria waaraan een 'controleur' moet voldoen of de acties
+      die deze uitvoert.
+  - key: control_role_replacements
+    label: Rol - Vervangers
+    type: list
+    description: >-
+      Geef hier de criteria waaraan 'vervangers' moeten voldoen of de acties die
+      deze uitvoert.

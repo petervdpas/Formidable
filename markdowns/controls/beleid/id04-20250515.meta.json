@@ -32,5 +32,28 @@
     "Reguliere gebruikers niet beschikbaar zijn door ziekte, vakantie of andere redenen",
     "Er sprake is van een operationele noodzaak die niet via reguliere toegangsprocessen kan worden opgelost",
     "Er dringende toegang vereist is om continuïteit van dienstverlening te waarborgen"
+  ],
+  "control_role_applicant": [
+    "Kan een noodtoegangssituatie identificeren.",
+    "Verantwoordelijk voor het correct indienen van aanvragen.",
+    "Moet de noodzaak voor noodtoegang kunnen motiveren."
+  ],
+  "control_role_aprover": [
+    "Verantwoordelijk voor beoordeling en goedkeuring van aanvragen.",
+    "Controleert of de aanvraag voldoet aan de criteria voor noodtoegang.",
+    "Zorgt voor tijdige afhandeling (binnen 24 uur)."
+  ],
+  "control_role_executor": [
+    "Voert de technische implementatie van toegang uit.",
+    "Zorgt voor correcte toewijzing van rechten.",
+    "Zorgt voor het instellen van een einddatum."
+  ],
+  "control_role_controller": [
+    "Verantwoordelijk voor het bijhouden van het logboek.",
+    "Monitort activiteiten tijdens noodtoegang.",
+    "Controleert of toegang tijdig wordt ingetrokken."
+  ],
+  "control_role_replacements": [
+    "Voor elke rol moet een formele vervanger zijn aangewezen die de verantwoordelijkheden kan overnemen bij afwezigheid van de primaire rolhouder."
   ]
 }
