@@ -170,8 +170,9 @@ export function initYamlEditor(containerId, onSaveCallback) {
           }">(${field.type.toUpperCase()})</span>
         </div>
         <div class="field-actions">
+        <!--
           <button class="btn btn-light action-up" data-idx="${idx}">▲</button>
-          <button class="btn btn-light action-down" data-idx="${idx}">▼</button>
+          <button class="btn btn-light action-down" data-idx="${idx}">▼</button> -->
           <button class="btn btn-warn action-edit" data-idx="${idx}">Edit</button>
           <button class="btn btn-danger action-delete" data-idx="${idx}">Delete</button>
         </div>
