@@ -21,9 +21,11 @@ const markdownRenderer = require("./controls/markdownRenderer");
 const htmlRenderer = require("./controls/htmlRenderer");
 
 function createWindow() {
+  const userConfig = configManager.loadUserConfig();
+  const bounds = userConfig.window_bounds || { width: 1024, height: 800 };
+
   const win = new BrowserWindow({
-    width: 1024,
-    height: 800,
+    ...bounds,
     backgroundColor: "#808080",
     show: false,
     webPreferences: {
@@ -41,10 +43,14 @@ function createWindow() {
   win.loadFile("index.html");
   win.setTitle("Formidable v1.0");
 
-  win.once("ready-to-show", () => {
-    win.show();
-  });
+  win.once("ready-to-show", () => win.show());
 
+  // track and persist on resize
+  win.on("resize", () => {
+    const [width, height] = win.getSize();
+    configManager.updateUserConfig({ window_bounds: { width, height } });
+  });
+  
   log("[Main] Created main BrowserWindow and loaded index.html");
 }
 
