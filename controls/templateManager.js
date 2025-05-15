@@ -94,37 +94,120 @@ function createBasicTemplateIfMissing() {
     const content = {
       name: "Basic Form",
       markdown_dir: "./markdowns/basic",
-      markdown_template: `# {{field "title"}}
+      markdown_template: `# {{field "test"}}
 
-{{field "published"}}
+{{#if (fieldRaw "check")}}
+✅ Check is enabled
+{{else}}
+❌ Check is disabled
+{{/if}}
 
-Category: **{{field "category"}}**`,
+## Direction: {{field "dropdown"}}
+
+You selected: _{{field "radio"}}_
+
+---
+
+### Notes
+
+{{field "mline"}}
+
+---
+
+### Number: {{field "numpy"}}
+
+Birthday: {{field "bday"}}
+
+---
+
+### List Items
+
+{{#each (fieldRaw "listy")}}
+- {{this}}
+{{/each}}
+
+---
+
+### Table of Data
+
+{{#if (fieldRaw "datable")}}
+{{#with (fieldMeta "datable" "options") as |headers|}}
+|{{#each headers}}{{this}} |{{/each}}
+|{{#each headers}}--|{{/each}}
+{{/with}}
+{{#each (fieldRaw "datable")}}
+|{{#each this}}{{this}} |{{/each}}
+{{/each}}
+{{/if}}
+
+## End`,
       fields: [
         {
-          key: "title",
-          label: "Title",
+          key: "test",
+          label: "Test",
           type: "text",
-          default: "Hello World",
-          description: "Please put in the title here...",
+          default: "Default value",
+          description: "A test description",
           two_column: true,
         },
         {
-          key: "published",
-          label: "Published",
+          key: "check",
+          label: "Check",
           type: "boolean",
-          description: "Is it published? Tick the box for 'Yes'",
-          markdown: "checkbox",
+          description: "A test description - two-column",
           two_column: true,
         },
         {
-          key: "category",
-          label: "Category",
+          key: "dropdown",
+          label: "Dropdown",
           type: "dropdown",
-          default: "Blog",
-          description: "Select the proper category.",
-          markdown: "p",
+          default: "Right",
+          description: "A test description - two-column",
           two_column: true,
-          options: ["News", "Updates", "Blog", "Tutorial"],
+          options: ["Left", "Right"],
+        },
+        {
+          key: "radio",
+          label: "Radio",
+          type: "radio",
+          default: "Dog",
+          description: "A test description - two-column",
+          two_column: true,
+          options: ["Cat", "Dog", "Bird"],
+        },
+        {
+          key: "mline",
+          label: "Mline",
+          type: "textarea",
+          default: "A whole lot of prefab text...",
+          description: "A test description - single-column",
+        },
+        {
+          key: "numpy",
+          label: "Numpy",
+          type: "number",
+          default: "17",
+          description: "A test description - single-column",
+        },
+        {
+          key: "bday",
+          label: "Birthday",
+          type: "date",
+          default: "1968-12-23",
+          description: "A test description - single-column",
+        },
+        {
+          key: "listy",
+          label: "Listy",
+          type: "list",
+          description: "A test description - single-column",
+        },
+        {
+          key: "datable",
+          label: "Table",
+          type: "table",
+          description: "A test description - single-column",
+          options: ["Header1", "Header2", "Header3"],
         },
       ],
     };

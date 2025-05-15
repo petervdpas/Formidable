@@ -1,0 +1,20 @@
+{
+  "test": "Default value",
+  "check": true,
+  "dropdown": "Right",
+  "radio": "Dog",
+  "mline": "A whole lot of prefab text...",
+  "numpy": 17,
+  "bday": "1968-12-23",
+  "listy": [
+    "More lines",
+    "Okay"
+  ],
+  "datable": [
+    [
+      "One",
+      "Two",
+      "Three"
+    ]
+  ]
+}
