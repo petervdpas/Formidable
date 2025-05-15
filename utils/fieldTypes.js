@@ -127,7 +127,7 @@ export const fieldTypes = {
   },
 
   list: {
-    label: "List (Comma Separated)",
+    label: "List",
     cssClass: "modal-list",
     defaultValue: () => [],
     defaultMarkdownHint: "list",
@@ -143,7 +143,7 @@ export const fieldTypes = {
   },
 
   table: {
-    label: "Table (JSON Input)",
+    label: "Table",
     cssClass: "modal-table",
     defaultValue: () => [],
     defaultMarkdownHint: "table",
