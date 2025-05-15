@@ -11,6 +11,12 @@ const md = new MarkdownIt({
   typographer: true,
 });
 
+const frontmatterRegex = /^---\n[\s\S]+?\n---\n*/;
+
+function stripFrontmatter(markdown) {
+  return markdown.replace(frontmatterRegex, "");
+}
+
 /**
  * Converts markdown string into rendered HTML.
  * @param {string} markdown
@@ -18,7 +24,8 @@ const md = new MarkdownIt({
  */
 function renderHtml(markdown) {
   try {
-    const dirty = md.render(markdown || "");
+    const cleaned = stripFrontmatter(markdown);
+    const dirty = md.render(cleaned);
     const clean = sanitizeHtml(dirty, {
       allowedTags: sanitizeHtml.defaults.allowedTags,
       allowedAttributes: false,

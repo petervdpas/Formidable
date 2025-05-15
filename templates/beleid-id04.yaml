@@ -1,0 +1,227 @@
+name: Beleidsdocument voor ID.04 - Noodtoegang (breakglassprocedure)
+markdown_dir: ./markdowns/controls/id04
+markdown_template: >-
+  ---
+
+  title: Generiek beleidsdocument
+
+  subtitle: Audit Control {{field "control_code"}} {{field "control_name"}}
+
+  author: {{field "control_author"}}
+
+  date: {{field "control_date"}}
+
+  keywords: [Audit, Beleid, {{field "control_code"}}]
+
+  table-use-row-colors: true
+
+  table-row-color: "D3D3D3"
+
+  toc: true
+
+  toc-title: Inhoudsopgave
+
+  toc-own-page: true
+
+  ---
+
+
+  ## Inleiding
+
+
+  {{inleiding}}
+
+
+  ## Documentbeheer
+
+
+  - Versie: {{field "control_version_latest"}}
+
+  - Datum: {{field "control_date"}}
+
+  - Eigenaar: {{field "control_owner"}}
+
+  - Geldigheid: {{field "control_validity_period"}}
+
+  - Herzieningsdatum: {{field "control_revision_date"}}
+
+
+  ### Versiegeschiedenis
+
+
+  {{#if (fieldRaw "control_version")}}
+
+  {{#with (fieldMeta "control_version" "options") as |headers|}}
+
+  |{{#each headers}}{{this}} |{{/each}}
+
+  |{{#each headers}}--|{{/each}}
+
+  {{/with}}
+
+  {{#each (fieldRaw "control_version")}}
+
+  |{{#each this}}{{this}} |{{/each}}
+
+  {{/each}}
+
+  {{/if}}
+
+
+
+  ### Goedkeuring
+
+
+  {{#if (fieldRaw "control_approval")}}
+
+  {{#with (fieldMeta "control_approval" "options") as |headers|}}
+
+  |{{#each headers}}{{this}} |{{/each}}
+
+  |{{#each headers}}--|{{/each}}
+
+  {{/with}}
+
+  {{#each (fieldRaw "control_approval")}}
+
+  |{{#each this}}{{this}} |{{/each}}
+
+  {{/each}}
+
+  {{/if}}
+
+
+  ## 1. Doel en reikwijdte
+
+
+  ### 1.1 Doel
+
+
+  {{field "control_purpose"}}
+
+
+  ### 1.2 Reikwijdte
+
+
+  {{field "control_scope"}}
+
+
+  Elk team werkt de volgende documenten uit:
+
+
+  | Niveau       |
+  Document                                                          |
+
+  |--------------|-------------------------------------------------------------------|
+
+  | Tactisch     | GOV - {{field "control_name"}} - Werkwijze en stappenplan –
+  Team {{field "control_owner"}}  |
+
+  | Operationeel | GOV - {{field "control_name"}} - Procedures en instructies -
+  Team {{field "control_owner"}} |
+
+
+  ## 2 Definitie {{field "control_name"}}
+
+
+  {{field "control_definition_main"}}
+
+
+  {{#each (fieldRaw "control_definition_parts")}}
+
+  - {{this}}
+
+  {{/each}}
+
+
+  ## 3. Generiek rollen en verantwoordelijkheden
+
+
+  ### 3.1 Aanvrager
+fields:
+  - key: control_code
+    label: Code van Control
+    type: text
+    description: De code van deze control, zoals is aangegeven in de audit.
+    two_column: true
+  - key: control_name
+    label: Naam van Control
+    type: text
+    description: De uitgeschreven naam van de control, zoals aangegeven in de audit.
+    two_column: true
+  - key: control_date
+    label: Verwerkingsdatum
+    type: date
+    description: Geef de datum van vandaag in.
+    two_column: true
+  - key: control_author
+    label: Auteur
+    type: text
+    description: De naam van de auteur die de control in behandeling heeft.
+    two_column: true
+  - key: control_owner
+    label: Eigenaar/Team
+    type: dropdown
+    description: De eigenaar (team) van deze control.
+    two_column: true
+    options:
+      - IS
+      - BI
+      - GAS
+      - CSIAM
+  - key: control_version_latest
+    label: Versie
+    type: text
+    default: '0.1'
+    description: Het laatste versienummer van deze control.
+    two_column: true
+  - key: control_validity_period
+    label: Geldigheidsduur
+    type: number
+    default: '1'
+    description: De geldigheidsduur van deze control in jaren.
+    two_column: true
+  - key: control_revision_date
+    label: Herzieningsdatum
+    type: date
+    description: De datum waarop dit document herzien moet zijn.
+    two_column: true
+  - key: control_version
+    label: Versiebeheer
+    type: table
+    description: >-
+      De chronologische wijzingen die op dit document zijn aangebracht en door
+      wie.
+    options:
+      - Versie
+      - Datum
+      - Auteur
+      - Wijzigingen
+  - key: control_approval
+    label: Goedkeuring
+    type: table
+    description: Goedgekeurde versie (chronologisch) met paraaf.
+    options:
+      - Versie
+      - Naam
+      - Functie
+      - Datum
+      - Handtekening
+  - key: control_purpose
+    label: Doel
+    type: textarea
+    default: Dit document beschrijft het formele beleid over...
+    description: Beschrijf het doel van de control.
+  - key: control_scope
+    label: Reikwijdte
+    type: textarea
+    default: Dit beleid is van toepassing op alle situaties waarin....
+    description: Beschrijf de reikwijdte van deze control.
+  - key: control_definition_main
+    label: Definitie
+    type: textarea
+    description: Geef de hoofdlijn van de definitie van de control.
+  - key: control_definition_parts
+    label: Definitie onderdelen
+    type: list
+    description: Geef de diverse onderdelen die horen bij de definitie.

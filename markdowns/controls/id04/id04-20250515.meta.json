@@ -1,0 +1,47 @@
+{
+  "control_code": "ID.04",
+  "control_name": "Noodtoegang",
+  "control_date": "2025-05-15",
+  "control_author": "Peter van de Pas",
+  "control_owner": "IS",
+  "control_version_latest": "0.3",
+  "control_validity_period": 1,
+  "control_revision_date": "2026-05-15",
+  "control_version": [
+    [
+      "0.1",
+      "01-03-2025",
+      "Andy van Veldhoven",
+      "Initiële conceptversie"
+    ],
+    [
+      "0.2",
+      "09-03-2025",
+      "Andy van Veldhoven",
+      "Herziene versie"
+    ],
+    [
+      "0.3",
+      "11-03-2025",
+      "Andy van Veldhoven",
+      "Feedback verwerkt van Agile Team Coach"
+    ]
+  ],
+  "control_approval": [
+    [
+      "0.3",
+      "Frans Vermeulen",
+      "Agile Team Coach",
+      "",
+      ""
+    ]
+  ],
+  "control_purpose": "Dit document beschrijft het formele beleid over de noodtoegang tot kritieke IT-systemen binnen Fontys. Het beleid is ontwikkeld als onderdeel van onze strategische doelstelling om een hoger volwassenheidsniveau op het gebied van IT-governance te bereiken. Dit kwam ook naar voor uit de Mazars audit.",
+  "control_scope": "Dit beleid is van toepassing op alle situaties waarin noodtoegang tot Fontys IT-systemen vereist is, en geldt voor alle medewerkers die noodtoegang kunnen aanvragen, goedkeuren, uitvoeren of controleren.",
+  "control_definition_main": "Noodtoegang wordt gedefinieerd als tijdelijke toegang tot systemen die wordt verleend wanneer:",
+  "control_definition_parts": [
+    "Reguliere gebruikers niet beschikbaar zijn door ziekte, vakantie of andere redenen",
+    "Er sprake is van een operationele noodzaak die niet via reguliere toegangsprocessen kan worden opgelost",
+    "Er dringende toegang vereist is om continuïteit van dienstverlening te waarborgen"
+  ]
+}
