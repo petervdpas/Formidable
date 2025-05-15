@@ -1,7 +1,7 @@
 {
   "name": "formidable",
   "version": "1.0.0",
-  "description": "",
+  "description": "Template/Form editor in Electron",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -31,11 +31,17 @@
     ],
     "win": {
       "target": "portable",
-      "icon": "assets/formidable.ico"
+      "icon": "assets/formidable.ico",
+      "signAndEditExecutable": false,
+      "signExts": []
+    },
+    "mac": {
+      "sign": false,
+      "identity": null
     }
   },
   "keywords": [],
-  "author": "",
+  "author": "Peter van de Pas",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
