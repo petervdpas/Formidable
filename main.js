@@ -11,6 +11,7 @@ const {
 } = require("electron");
 const { log, warn, error } = require("./controls/nodeLogger");
 const { registerIpc } = require("./controls/ipcRoutes");
+const { getSafeBounds } = require("./controls/windowBounds");
 
 const fileManager = require("./controls/fileManager");
 const templateManager = require("./controls/templateManager");
@@ -22,7 +23,7 @@ const htmlRenderer = require("./controls/htmlRenderer");
 
 function createWindow() {
   const userConfig = configManager.loadUserConfig();
-  const bounds = userConfig.window_bounds || { width: 1024, height: 800 };
+  const bounds = getSafeBounds(userConfig.window_bounds);
 
   const win = new BrowserWindow({
     ...bounds,
@@ -47,8 +48,14 @@ function createWindow() {
 
   // track and persist on resize
   win.on("resize", () => {
-    const [width, height] = win.getSize();
-    configManager.updateUserConfig({ window_bounds: { width, height } });
+    if (!win.isMinimized() && !win.isFullScreen()) {
+      const [width, height] = win.getSize();
+      const [x, y] = win.getPosition();
+
+      configManager.updateUserConfig({
+        window_bounds: { width, height, x, y },
+      });
+    }
   });
   
   log("[Main] Created main BrowserWindow and loaded index.html");

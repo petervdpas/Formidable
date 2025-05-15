@@ -3,10 +3,12 @@
   "selected_data_file": "id04-20250515.meta.json",
   "theme": "dark",
   "font_size": 14,
-  "context_mode": "markdown",
+  "context_mode": "template",
   "default_markdown_dir": "./markdowns",
   "window_bounds": {
-    "width": 1195,
-    "height": 842
+    "width": 1167,
+    "height": 902,
+    "x": 395,
+    "y": 96
   }
 }
