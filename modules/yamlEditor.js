@@ -5,6 +5,7 @@ import { showConfirmModal } from "./modalManager.js";
 import { setupFieldEditModal } from "./modalSetup.js";
 import { EventBus } from "./eventBus.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
+import { getCurrentTheme } from "./themeToggle.js";
 
 let codeMirrorEditor = null;
 let keyboardListenerAttached = false;
@@ -47,9 +48,11 @@ function initCodeMirror(textarea, initialValue = "") {
     codeMirrorEditor.toTextArea();
   }
 
+  const cmTheme = getCurrentTheme() === "dark" ? "monokai" : "eclipse";
+
   codeMirrorEditor = CodeMirror.fromTextArea(textarea, {
     mode: "yaml",
-    theme: "monokai",
+    theme: cmTheme,
     lineNumbers: true,
     lineWrapping: true,
     scrollbarStyle: "native",
@@ -291,6 +294,14 @@ export function initYamlEditor(containerId, onSaveCallback) {
       markdownDropdown = modalSetup.markdownDropdown;
     }
   }
+
+  EventBus.on("theme:toggle", (theme) => {
+    const cmTheme = theme === "dark" ? "monokai" : "eclipse";
+    if (codeMirrorEditor) {
+      codeMirrorEditor.setOption("theme", cmTheme);
+      log(`[YamlEditor] CodeMirror theme switched to ${cmTheme}`);
+    }
+  });
 
   return { render: renderEditor };
 }
