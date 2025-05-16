@@ -63,11 +63,11 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  const isPackaged = app.isPackaged;
+  const root = isPackaged ? app.getAppPath() : process.cwd();
+  fileManager.setAppRoot(root);
 
-  //const base = path.dirname(process.execPath);
-  //fileManager.setAppRoot(base);
-
-  fileManager.setAppRoot(app.getAppPath());
+  // fileManager.setAppRoot(process.cwd());
 
   log("[Main] App is ready. Checking environment...");
   log("[DEBUG] app.getAppPath() =", app.getAppPath());

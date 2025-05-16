@@ -22,12 +22,14 @@ class SingleFileRepository {
     if (base.endsWith(".md")) base = base.slice(0, -3);
     if (base.endsWith(ext)) base = base.slice(0, -ext.length);
 
-    return fileManager.buildFilePath(directory, base, { extension: ext });
+    const resolvedDir = fileManager.resolvePath(directory);
+    return fileManager.buildFilePath(resolvedDir, base, { extension: ext });
   }
 
   listFiles(directory, extension = this.defaultExtension) {
     try {
-      const files = fileManager.listFilesByExtension(directory, extension, {
+      const resolvedDir = fileManager.resolvePath(directory);
+      const files = fileManager.listFilesByExtension(resolvedDir, extension, {
         silent: this.silent,
       });
       if (!this.silent)

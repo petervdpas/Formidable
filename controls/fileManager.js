@@ -20,6 +20,10 @@ function getAppRoot() {
   return appRoot || baseDir;
 }
 
+function isAbsolute(p) {
+  return path.isAbsolute(p);
+}
+
 // Ensure a directory exists (creates if missing)
 function ensureDirectory(dirPath, { silent = false } = {}) {
   try {
@@ -56,7 +60,8 @@ function joinPath(...segments) {
 
 // Resolve a path relative to app root
 function resolvePath(...segments) {
-  return path.resolve(getAppRoot(), ...segments);
+  const flat = path.join(...segments);
+  return path.isAbsolute(flat) ? flat : path.resolve(getAppRoot(), flat);
 }
 
 // List files by extension

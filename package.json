@@ -11,6 +11,7 @@
   "build": {
     "appId": "com.formidable.editor",
     "productName": "Formidable",
+    "asar": false,
     "directories": {
       "output": "dist"
     },
@@ -30,7 +31,7 @@
       }
     ],
     "win": {
-      "target": "portable",
+      "target": "dir",
       "icon": "assets/formidable.ico",
       "signAndEditExecutable": false,
       "signExts": []
