@@ -38,8 +38,23 @@
       "signExts": []
     },
     "mac": {
+      "icon": "assets/formidable.icns",
+      "target": "dmg",
       "sign": false,
       "identity": null
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "icon": "assets/formidable.png",
+      "category": "Utility",
+      "maintainer": "Peter van de Pas",
+      "synopsis": "Template/Form Editor",
+      "description": "Formidable is een Electron-gebaseerde editor voor templates en Markdown formulieren"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
     }
   },
   "keywords": [],
