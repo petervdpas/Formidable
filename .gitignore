@@ -2,6 +2,7 @@
 node_modules/
 user-data/
 dist/
+temp/
 out/
 .cache/
 *.log
