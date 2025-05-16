@@ -1,7 +1,7 @@
 {
   "selected_template": "basic.yaml",
-  "selected_data_file": "test-20250515.meta.json",
-  "theme": "light",
+  "selected_data_file": null,
+  "theme": "dark",
   "font_size": 14,
   "context_mode": "markdown",
   "default_markdown_dir": "./markdowns",

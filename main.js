@@ -22,6 +22,11 @@ const configManager = require("./controls/configManager");
 const markdownRenderer = require("./controls/markdownRenderer");
 const htmlRenderer = require("./controls/htmlRenderer");
 
+if (process.platform === "win32") {
+  const portableDataPath = path.join(process.cwd(), "user-data");
+  app.setPath("userData", portableDataPath);
+}
+
 function createWindow() {
   const userConfig = configManager.loadUserConfig();
   const bounds = getSafeBounds(userConfig.window_bounds);
