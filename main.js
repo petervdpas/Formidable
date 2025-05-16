@@ -27,6 +27,10 @@ if (process.platform === "win32") {
   app.setPath("userData", portableDataPath);
 }
 
+const iconPath = app.isPackaged
+  ? path.join(process.resourcesPath, "assets", "formidable.ico")
+  : path.join(__dirname, "assets", "formidable.ico");
+
 function createWindow() {
   const userConfig = configManager.loadUserConfig();
   const bounds = getSafeBounds(userConfig.window_bounds);
@@ -35,13 +39,13 @@ function createWindow() {
     ...bounds,
     backgroundColor: "#808080",
     show: false,
+    icon: iconPath,
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
       enableRemoteModule: false,
       preload: path.resolve(__dirname, "preload.js"),
     },
-    icon: path.join(__dirname, "assets", "formidable.ico"),
   });
 
   // Disable Electron's native menu
@@ -68,6 +72,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+
   const isPackaged = app.isPackaged;
   const root = isPackaged ? app.getAppPath() : process.cwd();
   fileManager.setAppRoot(root);
