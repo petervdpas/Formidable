@@ -8,7 +8,7 @@ body {
 }
 
 #template-container,
-#markdown-container {
+#storage-container {
   display: flex;
   flex: 1;
   height: calc(100vh - 24px); /* minus status bar */
@@ -17,7 +17,7 @@ body {
 
 /* ───── Template, Markdown Context Layout ───── */
 #template-sidebar,
-#markdown-sidebar {
+#storage-sidebar {
   width: 250px;
   padding: 10px;
   box-sizing: border-box;
@@ -26,7 +26,7 @@ body {
 }
 
 #template-splitter,
-#markdown-splitter {
+#storage-splitter {
   width: 6px;
   cursor: col-resize;
   display: flex;
@@ -38,7 +38,7 @@ body {
 }
 
 #template-resizeHandle,
-#markdown-resizeHandle {
+#storage-resizeHandle {
   width: 16px;
   height: 16px;
   border-radius: 4px;
@@ -47,7 +47,7 @@ body {
 }
 
 #template-workspace,
-#markdown-workspace {
+#storage-workspace {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -55,7 +55,7 @@ body {
 }
 
 #template-content,
-#markdown-content {
+#storage-content {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
@@ -63,7 +63,7 @@ body {
 
 /* ───── List Items ───── */
 .template-item,
-.markdown-item {
+.storage-item {
   padding: 8px;
   margin-bottom: 5px;
   cursor: pointer;
@@ -102,7 +102,7 @@ body {
   border-radius: 4px;
 }
 
-#new-markdown-wrapper {
+#new-storage-wrapper {
   margin-top: 20px;
   text-align: center;
 }

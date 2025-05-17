@@ -54,7 +54,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // ── Grab DOM Elements ──
   const templateContainer = document.getElementById("template-container");
-  const markdownContainer = document.getElementById("markdown-container");
+  const storageContainer = document.getElementById("storage-container");
   const themeToggle = document.getElementById("theme-toggle");
   const contextToggle = document.getElementById("context-toggle");
 
@@ -68,7 +68,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   window.openAboutModal = aboutModal.show;
 
   // ── Form System ──
-  const formManager = createFormManager("markdown-content");
+  const formManager = createFormManager("storage-content");
   window.formManager = formManager;
 
   // ── Template Dropdown ──
@@ -138,7 +138,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // ── Event Handler Binding ──
   bindContextDependencies({
-    containers: { templateContainer, markdownContainer },
+    containers: { templateContainer, storageContainer },
     dropdown: templateDropdown,
   });
 
@@ -163,19 +163,19 @@ window.addEventListener("DOMContentLoaded", async () => {
   // ── Context & Theme Setup ──
   setContextView(config.context_mode, {
     templateContainer,
-    markdownContainer,
+    storageContainer,
   });
 
   initContextToggle({ toggleElement: contextToggle });
   initThemeToggle(themeToggle);
 
   document.getElementById("context-toggle").checked =
-    config.context_mode === "form";
+    config.context_mode === "storage";
   document.getElementById("context-toggle-menu").checked =
-    config.context_mode === "form";
+    config.context_mode === "storage";
 
   // ── EventBus Startup ──
   initEventRouter();
-  EventBus.emit("context:toggle", config.context_mode === "form");
+  EventBus.emit("context:toggle", config.context_mode === "storage");
   EventBus.emit("theme:toggle", config.theme);
 });

@@ -215,7 +215,7 @@ export function createFormManager(containerId) {
 
       EventBus.emit(
         "status:update",
-        "Ready to create a new markdown document."
+        "Ready to create a new document."
       );
     });
   }

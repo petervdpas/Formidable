@@ -20,31 +20,31 @@ body {
 }
 
 #template-sidebar,
-#markdown-sidebar {
+#storage-sidebar {
   background-color: #f0f0f0;
   border-right: 1px solid #ccc;
 }
 
 #template-workspace,
-#markdown-workspace,
+#storage-workspace,
 #template-content,
-#markdown-content {
+#storage-content {
   background-color: #ffffff;
   color: #222;
 }
 
 .template-item,
-.markdown-item {
+.storage-item {
   background-color: #e0e0e0;
 }
 
 .template-item:hover,
-.markdown-item:hover {
+.storage-item:hover {
   background-color: #d0d0d0;
 }
 
 .template-item.selected,
-.markdown-item.selected {
+.storage-item.selected {
   background-color: #2196f3 !important;
   color: white;
   font-weight: bold;
@@ -84,7 +84,7 @@ input:checked + .slider {
 }
 
 #resizeHandle,
-#markdown-resizeHandle {
+#storage-resizeHandle {
   background-color: #888;
   border: 1px solid #555;
 }

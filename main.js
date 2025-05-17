@@ -17,8 +17,8 @@ const path = require("path");
 const fileManager = require("./controls/fileManager");
 const templateManager = require("./controls/templateManager");
 const formManager = require("./controls/formManager");
-const markdownManager = require("./controls/markdownManager");
 const configManager = require("./controls/configManager");
+const markdownManager = require("./controls/markdownManager");
 const markdownRenderer = require("./controls/markdownRenderer");
 const htmlRenderer = require("./controls/htmlRenderer");
 

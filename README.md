@@ -21,7 +21,7 @@
 
 - **🖱️ Full GUI**
   - Modal-based dialogs for field editing, entry creation, and template management.
-  - Split-view resizable layout for both template and form modes.
+  - Split-view resizable layout for both template and form (storage) modes.
   - CodeMirror-based template editor with fullscreen support.
 
 - **🎨 Theming + Persistence**
@@ -56,7 +56,7 @@ Formidable/
 │   ├── yaml_editor.js          # Template editor UI (CodeMirror + fields)
 │   ├── formUI.js               # Form loader + handler
 │   ├── formRenderer.js         # Converts templates to field DOM
-│   ├── contextManager.js       # View switching: template vs markdown
+│   ├── contextManager.js       # View switching: template vs from(storage)
 │   ├── templateSelector.js     # Dropdown sync for selected template
 │   ├── sidebarManager.js       # Lists for templates and entries
 │   ├── modalManager.js         # Modal control (ESC, sizing, etc)
@@ -132,7 +132,7 @@ Field references:
 
 | Type       | Description          | Supported Features                |
 | ---------- | -------------------- | --------------------------------- |
-| `text`     | Single-line input    | Defaults, markdown as paragraph   |
+| `text`     | Single-line input    | Defaults                          |
 | `textarea` | Multi-line input     | Scrollable text block             |
 | `boolean`  | Checkbox toggle      | Checkbox or conditional logic     |
 | `dropdown` | Select from list     | Static options                    |

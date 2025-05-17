@@ -1,7 +1,7 @@
 {
   "theme": "light",
   "font_size": 14,
-  "context_mode": "form",
+  "context_mode": "storage",
   "storage_location": "./markdowns",
   "selected_template": "basic.yaml",
   "selected_data_file": "test-20250515.meta.json",

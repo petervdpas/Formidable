@@ -24,7 +24,7 @@ export function buildMenu(containerId = "app-menu", commandHandler) {
       <li class="menu-item">File
         <ul class="submenu">
           <li data-action="open-template-folder">Open Template Folder</li>
-          <li data-action="open-markdown-folder">Open Markdown Folder</li>
+          <li data-action="open-storage-folder">Open Storage Folder</li>
           <li class="separator"></li>
           <li data-action="quit">Quit</li>
         </ul>
@@ -68,7 +68,7 @@ export function buildMenu(containerId = "app-menu", commandHandler) {
     // Initial config sync
     window.api.config.loadUserConfig().then((config) => {
       const mode = config.context_mode || "template";
-      const isChecked = mode === "form";
+      const isChecked = mode === "storage";
       contextToggle.checked = isChecked;
     });
   }
@@ -77,7 +77,9 @@ export function buildMenu(containerId = "app-menu", commandHandler) {
 }
 
 export async function handleMenuAction(action) {
+
   log(`[Menu] Handling menu action: ${action}`);
+
   switch (action) {
     case "open-template-folder": {
       const resolved = await window.api.system.resolvePath("templates");
@@ -91,7 +93,7 @@ export async function handleMenuAction(action) {
       break;
     }
 
-    case "open-markdown-folder": {
+    case "open-storage-folder": {
       try {
         const config = await window.api.config.loadUserConfig();
         const templateName = config.selected_template;
@@ -113,12 +115,12 @@ export async function handleMenuAction(action) {
 
         const result = await window.electron.shell.openPath(targetPath);
         if (result) {
-          console.error("[Shell] Failed to open markdown folder:", result);
+          console.error("[Shell] Failed to open storage folder:", result);
         } else {
-          console.log("[Shell] Opened markdown folder:", targetPath);
+          console.log("[Shell] Opened storage folder:", targetPath);
         }
       } catch (err) {
-        console.error("[Menu] Failed to open markdown folder:", err);
+        console.error("[Menu] Failed to open storage folder:", err);
       }
       break;
     }

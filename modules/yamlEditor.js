@@ -99,8 +99,8 @@ export function initYamlEditor(containerId, onSaveCallback) {
         <input type="text" id="yaml-name" value="${currentData.name || ""}" />
       </div>
       <div class="modal-form-row">
-        <label for="markdown-dir">Storage Directory</label>
-        <input type="text" id="markdown-dir" value="${
+        <label for="storage-location">Storage Directory</label>
+        <input type="text" id="storage-location" value="${
           currentData.storage_location || ""
         }" />
       </div>
@@ -279,12 +279,12 @@ export function initYamlEditor(containerId, onSaveCallback) {
 
     container.querySelector("#save-yaml").onclick = () => {
       const name = container.querySelector("#yaml-name").value.trim();
-      const dir = container.querySelector("#markdown-dir").value.trim();
-      const tmpl = getMarkdownTemplate();
+      const storageLocation = container.querySelector("#storage-location").value.trim();
+      const markdownTemplate = getMarkdownTemplate();
       const updated = {
         name,
-        storage_location: dir,
-        markdown_template: tmpl,
+        storage_location: storageLocation,
+        markdown_template: markdownTemplate,
         fields: currentData.fields,
       };
       log("[YamlEditor] Calling save callback with updated data:", updated);
