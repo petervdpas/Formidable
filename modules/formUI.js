@@ -139,9 +139,9 @@ export function createFormManager(containerId) {
       return;
     }
 
-    const markdownDir = currentTemplate.storage_location;
+    const storageLocation = currentTemplate.storage_location;
     const saveResult = await window.api.forms.saveForm(
-      markdownDir,
+      storageLocation,
       datafile,
       formData,
       currentTemplate.fields || []

@@ -34,7 +34,7 @@ export function createTemplateSelector({
         selected_template: name,
       });
 
-      await window.api.markdown.ensureMarkdownDir(result.markdownDir);
+      await window.api.markdown.ensureMarkdownDir(result.storageLocation);
       EventBus.emit("status:update", `Selected template: ${yamlData.name}`);
     } catch (err) {
       error("[SelectTemplate] Error:", err);

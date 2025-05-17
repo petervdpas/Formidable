@@ -10,9 +10,9 @@ const markdownRepo = new SingleFileRepository({
   silent: false,
 });
 
-function ensureMarkdownDirectory(markdownDir) {
+function ensureMarkdownDirectory(storageLocation) {
   try {
-    const fullPath = fileManager.resolvePath(markdownDir);
+    const fullPath = fileManager.resolvePath(storageLocation);
     fileManager.ensureDirectory(fullPath, { silent: true });
     log("[MarkdownManager] Ensured markdown directory:", fullPath);
     return true;
@@ -22,20 +22,20 @@ function ensureMarkdownDirectory(markdownDir) {
   }
 }
 
-function listMarkdownFiles(markdownDir) {
-  return markdownRepo.listFiles(markdownDir);
+function listMarkdownFiles(storageLocation) {
+  return markdownRepo.listFiles(storageLocation);
 }
 
-function loadMarkdownFile(markdownDir, filename) {
-  return markdownRepo.loadFromBase(markdownDir, filename);
+function loadMarkdownFile(storageLocation, filename) {
+  return markdownRepo.loadFromBase(storageLocation, filename);
 }
 
-function saveMarkdownFile(markdownDir, filename, content, options = {}) {
-  return markdownRepo.saveFromBase(markdownDir, filename, content, options);
+function saveMarkdownFile(storageLocation, filename, content, options = {}) {
+  return markdownRepo.saveFromBase(storageLocation, filename, content, options);
 }
 
-function deleteMarkdownFile(markdownDir, filename) {
-  return markdownRepo.deleteFromBase(markdownDir, filename);
+function deleteMarkdownFile(storageLocation, filename) {
+  return markdownRepo.deleteFromBase(storageLocation, filename);
 }
 
 module.exports = {

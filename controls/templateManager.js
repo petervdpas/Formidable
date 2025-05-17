@@ -85,7 +85,7 @@ function getTemplateDescriptor(name) {
   return {
     name,
     yaml: data,
-    markdownDir: data.storage_location,
+    storageLocation: data.storage_location,
   };
 }
 

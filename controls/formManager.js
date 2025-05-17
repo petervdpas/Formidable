@@ -11,9 +11,9 @@ const metaRepo = new SingleFileRepository({
   silent: false,
 });
 
-function ensureFormDirectory(markdownDir) {
+function ensureFormDirectory(storageLocation) {
   try {
-    const fullPath = fileManager.resolvePath(markdownDir);
+    const fullPath = fileManager.resolvePath(storageLocation);
     fileManager.ensureDirectory(fullPath, { silent: true });
     log("[FormManager] Ensured form directory:", fullPath);
     return true;
@@ -23,13 +23,13 @@ function ensureFormDirectory(markdownDir) {
   }
 }
 
-function listForms(markdownDir) {
-  return metaRepo.listFiles(markdownDir);
+function listForms(storageLocation) {
+  return metaRepo.listFiles(storageLocation);
 }
 
-function loadForm(markdownDir, datafile, templateFields = []) {
+function loadForm(storageLocation, datafile, templateFields = []) {
   try {
-    const raw = metaRepo.loadFromBase(markdownDir, datafile);
+    const raw = metaRepo.loadFromBase(storageLocation, datafile);
     if (!raw) return null;
 
     const sanitized = metaSchema.sanitize(raw, templateFields);
@@ -41,10 +41,10 @@ function loadForm(markdownDir, datafile, templateFields = []) {
   }
 }
 
-function saveForm(markdownDir, datafile, data, templateFields = []) {
+function saveForm(storageLocation, datafile, data, templateFields = []) {
   try {
     const sanitized = metaSchema.sanitize(data, templateFields);
-    const result = metaRepo.saveFromBase(markdownDir, datafile, sanitized);
+    const result = metaRepo.saveFromBase(storageLocation, datafile, sanitized);
     if (result.success) {
       log("[FormManager] Saved form:", result.path);
     } else {
@@ -57,8 +57,8 @@ function saveForm(markdownDir, datafile, data, templateFields = []) {
   }
 }
 
-function deleteForm(markdownDir, datafile) {
-  return metaRepo.deleteFromBase(markdownDir, datafile);
+function deleteForm(storageLocation, datafile) {
+  return metaRepo.deleteFromBase(storageLocation, datafile);
 }
 
 module.exports = {

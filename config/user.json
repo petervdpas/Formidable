@@ -1,10 +1,10 @@
 {
-  "theme": "light",
+  "theme": "dark",
   "font_size": 14,
-  "context_mode": "markdown",
+  "context_mode": "template",
   "storage_location": "./markdowns",
   "selected_template": "basic.yaml",
-  "selected_data_file": "",
+  "selected_data_file": "test-20250515.meta.json",
   "window_bounds": {
     "width": 1024,
     "height": 800

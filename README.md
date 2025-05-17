@@ -22,7 +22,7 @@
 - **🖱️ Full GUI**
   - Modal-based dialogs for field editing, entry creation, and template management.
   - Split-view resizable layout for both template and form modes.
-  - CodeMirror-based markdown template editor with fullscreen support.
+  - CodeMirror-based template editor with fullscreen support.
 
 - **🎨 Theming + Persistence**
   - Light/Dark mode toggle with persisted config.
