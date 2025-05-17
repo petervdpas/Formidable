@@ -18,7 +18,7 @@ import { highlightAndClickMatch } from "../utils/domUtils.js";
 export function createTemplateListManager(
   yamlEditor,
   modal,
-  defaultStorageDir = "./markdowns",
+  defaultStorageLocation = "./storage",
   dropdown = null
 ) {
   const listManager = createListManager({
@@ -31,7 +31,7 @@ export function createTemplateListManager(
       onClick: async () => {
         handleTemplateConfirm(
           modal,
-          defaultStorageDir,
+          defaultStorageLocation,
           async ({ template, yaml }) => {
             try {
               await window.api.templates.saveTemplate(template, yaml);

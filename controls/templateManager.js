@@ -93,7 +93,7 @@ function createBasicTemplateIfMissing() {
   if (!fileManager.fileExists(basicYamlPath)) {
     const content = {
       name: "Basic Form",
-      storage_location: "./markdowns/basic",
+      storage_location: "./storage/basic",
       markdown_template: `# {{field "test"}}
 
 {{#if (fieldRaw "check")}}

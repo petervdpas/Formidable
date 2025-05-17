@@ -26,7 +26,7 @@ export function setupSettingsModal(themeToggle, contextToggle) {
       const defaultDirInput = document.getElementById("default-dir");
       const chooseDirBtn = document.getElementById("choose-dir");
 
-      defaultDirInput.value = config.storage_location || "./markdowns";
+      defaultDirInput.value = config.storage_location || "./storage";
 
       chooseDirBtn.onclick = async () => {
         const selected = await window.api.dialog.chooseDirectory();

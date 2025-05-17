@@ -155,7 +155,7 @@ Saved to `./config/user.json`:
   "theme": "dark",
   "font_size": 14,
   "context_mode": "template",
-  "storage_location": "./markdowns",
+  "storage_location": "./storage",
   "window_bounds": { "width": 1024, "height": 800 }
 }
 ```

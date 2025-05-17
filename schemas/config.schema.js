@@ -5,7 +5,7 @@ module.exports = {
     theme: "light",
     font_size: 14,
     context_mode: "template",
-    storage_location: "./markdowns",
+    storage_location: "./storage",
     selected_template: "basic.yaml",
     selected_data_file: "",
     window_bounds: {

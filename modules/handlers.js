@@ -20,21 +20,21 @@ export async function handleTemplateClick(itemName, yamlEditor) {
   }
 }
 
-export function handleTemplateConfirm(modal, defaultMarkdownDir, callback) {
+export function handleTemplateConfirm(modal, defaultStorageLocation, callback) {
   const nameInput = document.getElementById("template-name");
   const dirInput = document.getElementById("template-dir");
   const confirmBtn = document.getElementById("template-confirm");
 
   nameInput.value = "";
-  dirInput.value = defaultMarkdownDir;
+  dirInput.value = defaultStorageLocation;
 
   function updateDirValue() {
     const raw = nameInput.value.trim();
     const safeName = raw.replace(/\s+/g, "-").toLowerCase();
     if (safeName) {
-      dirInput.value = `${defaultMarkdownDir}/${safeName}`;
+      dirInput.value = `${defaultStorageLocation}/${safeName}`;
     } else {
-      dirInput.value = "./markdowns";
+      dirInput.value = "./storage";
     }
   }
 
