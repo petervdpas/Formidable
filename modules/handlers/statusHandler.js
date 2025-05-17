@@ -1,24 +1,32 @@
 // modules/handlers/statusHandler.js
 
-import { log, warn } from "../../utils/logger.js";
+import { EventBus } from "../eventBus.js";
 
 let statusBar = null;
 
 export function initStatusHandler(statusBarId) {
   statusBar = document.getElementById(statusBarId);
   if (!statusBar) {
-    warn(`[StatusHandler] Element #${statusBarId} not found.`);
+    EventBus.emit("logging:warning", [
+      `[StatusHandler] Element #${statusBarId} not found.`,
+    ]);
     return;
   }
 
-  log(`[StatusHandler] Bound to #${statusBarId}`);
+  EventBus.emit("logging:default", [
+    `[StatusHandler] Bound to #${statusBarId}`,
+  ]);
 }
 
 export function handleStatusUpdate(message) {
   if (statusBar) {
     statusBar.textContent = message;
-    log(`[StatusHandler] Status updated: "${message}"`);
+    EventBus.emit("logging:default", [
+      `[StatusHandler] Status updated: "${message}"`,
+    ]);
   } else {
-    warn(`[StatusHandler] No status bar initialized.`);
+    EventBus.emit("logging:warning", [
+      `[StatusHandler] No status bar initialized.`,
+    ]);
   }
 }

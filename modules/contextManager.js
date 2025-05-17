@@ -2,7 +2,6 @@
 
 import { EventBus } from "./eventBus.js";
 import { setupSplitter } from "../utils/resizing.js";
-import { log, warn, error } from "../utils/logger.js";
 
 let templateSplitterInitialized = false;
 let storageSplitterInitialized = false;
@@ -36,7 +35,7 @@ export function setContextView(mode, containers) {
   containers.templateContainer.style.display = isStorage ? "none" : "flex";
   containers.storageContainer.style.display = isStorage ? "flex" : "none";
   initSplitters(mode);
-  log("[Context] Switched to:", mode);
+  EventBus.emit("logging:default", ["[Context] Switched to:", mode]);
 }
 
 export function initContextToggle({ toggleElement }) {

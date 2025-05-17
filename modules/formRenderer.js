@@ -2,18 +2,25 @@
 
 import { renderFieldElement } from "../utils/formUtils.js";
 import { wrapInputWithLabel } from "../utils/elementBuilders.js";
-import { log, warn, error } from "../utils/logger.js";
+import { EventBus } from "./eventBus.js";
 
 export function renderForm(container, template) {
   if (!container || !template) {
-    console.warn("[FormRenderer] Missing container or template.");
-    return { fieldElements: {}, saveButton: null, deleteButton: null, renderButton: null };
+    EventBus.emit("logging:warning", [
+      "[FormRenderer] Missing container or template.",
+    ]);
+    return {
+      fieldElements: {},
+      saveButton: null,
+      deleteButton: null,
+      renderButton: null,
+    };
   }
 
-  log(
+  EventBus.emit("logging:warning", [
     "[FormRenderer] Rendering form for:",
-    template.name || "Unnamed Template"
-  );
+    template.name || "Unnamed Template",
+  ]);
 
   container.innerHTML = "";
   const fields = template.fields || [];
@@ -55,6 +62,6 @@ export function renderForm(container, template) {
     fieldElements,
     saveButton: saveBtn,
     deleteButton: deleteBtn,
-    renderButton: renderBtn
+    renderButton: renderBtn,
   };
 }

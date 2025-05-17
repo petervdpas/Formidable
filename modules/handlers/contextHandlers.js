@@ -2,7 +2,6 @@
 
 import { setContextView } from "../contextManager.js";
 import { EventBus } from "../eventBus.js";
-import { log } from "../../utils/logger.js";
 
 let containers, dropdown;
 
@@ -13,7 +12,7 @@ export function bindContextDependencies(deps) {
 
 export async function handleContextToggle(isStorage) {
   const mode = isStorage ? "storage" : "template";
-  log("[Handler] Context toggled:", mode);
+  EventBus.emit("logging:default", ["[Handler] Context toggled:", mode]);
 
   const toggle = document.getElementById("context-toggle");
   const menuToggle = document.getElementById("context-toggle-menu");

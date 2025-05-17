@@ -1,7 +1,6 @@
 // modules/handlers/templateHandlers.js
 
 import { EventBus } from "../eventBus.js";
-import { log } from "../../utils/logger.js";
 
 let formManager = null;
 let metaListManager = null;
@@ -13,7 +12,10 @@ export function bindTemplateDependencies(deps) {
 }
 
 export async function handleTemplateSelected({ name, yaml }) {
-  log("[Handler] template:selected received:", name);
+  EventBus.emit("logging:default", [
+    "[Handler] template:selected received:",
+    name,
+  ]);
 
   window.currentSelectedTemplateName = name;
   window.currentSelectedTemplate = yaml;
@@ -24,7 +26,7 @@ export async function handleTemplateSelected({ name, yaml }) {
   await window.api.config.updateUserConfig({ selected_template: name });
 
   if (templateChanged) {
-    EventBus.emit("form:selected", null); 
+    EventBus.emit("form:selected", null);
   }
 
   const listItem = Array.from(
@@ -36,7 +38,8 @@ export async function handleTemplateSelected({ name, yaml }) {
   );
 
   if (listItem) {
-    document.querySelectorAll("#template-list .template-item.selected")
+    document
+      .querySelectorAll("#template-list .template-item.selected")
       .forEach((el) => el.classList.remove("selected"));
     listItem.classList.add("selected");
   }
