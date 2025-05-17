@@ -5,7 +5,7 @@ import { setupSplitter } from "../utils/resizing.js";
 import { log, warn, error } from "../utils/logger.js";
 
 let templateSplitterInitialized = false;
-let markdownSplitterInitialized = false;
+let formSplitterInitialized = false;
 
 function initSplitters(mode) {
   if (mode === "template" && !templateSplitterInitialized) {
@@ -19,7 +19,7 @@ function initSplitters(mode) {
     templateSplitterInitialized = true;
   }
 
-  if (mode === "storage" && !markdownSplitterInitialized) {
+  if (mode === "form" && !formSplitterInitialized) {
     setupSplitter({
       splitter: document.getElementById("markdown-splitter"),
       left: document.getElementById("markdown-sidebar"),
@@ -27,21 +27,21 @@ function initSplitters(mode) {
       container: document.getElementById("markdown-container"),
       min: 150,
     });
-    markdownSplitterInitialized = true;
+    formSplitterInitialized = true;
   }
 }
 
 export function setContextView(mode, containers) {
-  const isStorage = mode === "storage";
-  containers.templateContainer.style.display = isStorage ? "none" : "flex";
-  containers.markdownContainer.style.display = isStorage ? "flex" : "none";
+  const isForm = mode === "form";
+  containers.templateContainer.style.display = isForm ? "none" : "flex";
+  containers.markdownContainer.style.display = isForm ? "flex" : "none";
   initSplitters(mode);
   log("[Context] Switched to:", mode);
 }
 
 export function initContextToggle({ toggleElement }) {
   toggleElement.addEventListener("change", (e) => {
-    const isStorage = e.target.checked;
-    EventBus.emit("context:toggle", isStorage);
+    const isForm = e.target.checked;
+    EventBus.emit("context:toggle", isForm);
   });
 }

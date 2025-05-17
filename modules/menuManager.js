@@ -68,7 +68,7 @@ export function buildMenu(containerId = "app-menu", commandHandler) {
     // Initial config sync
     window.api.config.loadUserConfig().then((config) => {
       const mode = config.context_mode || "template";
-      const isChecked = mode === "storage";
+      const isChecked = mode === "form";
       contextToggle.checked = isChecked;
     });
   }
