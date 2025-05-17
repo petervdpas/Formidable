@@ -110,14 +110,6 @@ export function setupFieldEditModal(onConfirm) {
     label: def.label,
   }));
 
-  const markdownOptions = Array.from(
-    new Set(
-      Object.values(fieldTypes).map((def) => def.defaultMarkdownHint || "")
-    )
-  )
-    .filter(Boolean)
-    .sort()
-    .map((tag) => ({ value: tag, label: tag.toUpperCase() }));
 
   const typeDropdown = createDropdown({
     containerId: "edit-type-container",
@@ -131,18 +123,10 @@ export function setupFieldEditModal(onConfirm) {
     },
   });
 
-  const markdownDropdown = createDropdown({
-    containerId: "edit-markdown-container",
-    labelText: "Markdown",
-    options: [{ value: "", label: "None" }, ...markdownOptions],
-    selectedValue: "",
-  });
-
   const confirmBtn = document.getElementById("field-edit-confirm");
   confirmBtn.onclick = () => {
     const field = extractFieldDefinition({
       typeDropdown,
-      markdownDropdown,
     });
 
     onConfirm(field);
@@ -154,6 +138,5 @@ export function setupFieldEditModal(onConfirm) {
     show: modal.show,
     hide: modal.hide,
     typeDropdown,
-    markdownDropdown,
   };
 }

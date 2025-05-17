@@ -11,7 +11,6 @@ export function extractFieldDefinition({
   descriptionId = "edit-description",
   defaultId = "edit-default",
   typeDropdown,
-  markdownDropdown,
   optionsId = "edit-options",
 }) {
   const key = document.getElementById(keyId)?.value.trim();
@@ -20,7 +19,6 @@ export function extractFieldDefinition({
   const description = document.getElementById(descriptionId)?.value.trim();
   const def = document.getElementById(defaultId)?.value.trim();
   const type = typeDropdown?.getSelected() || "text";
-  const markdown = markdownDropdown?.getSelected() || "";
 
   const options = document
     .getElementById(optionsId)
@@ -31,7 +29,6 @@ export function extractFieldDefinition({
   const field = { key, label, type };
   if (def) field.default = def;
   if (description) field.description = description;
-  if (markdown) field.markdown = markdown;
   if (twoColumn) field.two_column = true;
   if (options?.length) {
     field.options = options;

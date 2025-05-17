@@ -7,7 +7,6 @@ export const fieldTypes = {
     label: "Text",
     cssClass: "modal-text",
     defaultValue: () => "",
-    defaultMarkdownHint: "p",
     renderInput(field) {
       const input = document.createElement("input");
       input.type = "text";
@@ -22,7 +21,6 @@ export const fieldTypes = {
     label: "Checkbox",
     cssClass: "modal-boolean",
     defaultValue: () => false,
-    defaultMarkdownHint: "checkbox",
     renderInput(field) {
       const input = document.createElement("input");
       input.type = "checkbox";
@@ -37,7 +35,6 @@ export const fieldTypes = {
     label: "Dropdown",
     cssClass: "modal-dropdown",
     defaultValue: () => "",
-    defaultMarkdownHint: "p",
     renderInput(field) {
       const select = document.createElement("select");
       (field.options || []).forEach((opt) => {
@@ -57,7 +54,6 @@ export const fieldTypes = {
     label: "Radio Buttons",
     cssClass: "modal-radio",
     defaultValue: () => "",
-    defaultMarkdownHint: "p",
     renderInput(field) {
       const wrapper = document.createElement("div");
       (field.options || []).forEach((opt) => {
@@ -86,7 +82,6 @@ export const fieldTypes = {
     label: "Multiline Text",
     cssClass: "modal-textarea",
     defaultValue: () => "",
-    defaultMarkdownHint: "p",
     renderInput(field) {
       const textarea = document.createElement("textarea");
       textarea.value = field.default || "";
@@ -100,7 +95,6 @@ export const fieldTypes = {
     label: "Number",
     cssClass: "modal-number",
     defaultValue: () => 0,
-    defaultMarkdownHint: "p",
     renderInput(field) {
       const input = document.createElement("input");
       input.type = "number";
@@ -115,7 +109,6 @@ export const fieldTypes = {
     label: "Date",
     cssClass: "modal-date",
     defaultValue: () => "",
-    defaultMarkdownHint: "p",
     renderInput(field) {
       const input = document.createElement("input");
       input.type = "date";
@@ -130,7 +123,6 @@ export const fieldTypes = {
     label: "List",
     cssClass: "modal-list",
     defaultValue: () => [],
-    defaultMarkdownHint: "list",
     renderInput(field) {
       const input = document.createElement("input");
       input.type = "text";
@@ -146,7 +138,6 @@ export const fieldTypes = {
     label: "Table",
     cssClass: "modal-table",
     defaultValue: () => [],
-    defaultMarkdownHint: "table",
     renderInput(field) {
       const textarea = document.createElement("textarea");
       textarea.name = field.key;

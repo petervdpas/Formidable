@@ -250,7 +250,6 @@ export function initYamlEditor(containerId, onSaveCallback) {
   }
 
   let typeDropdown = null;
-  let markdownDropdown = null;
 
   function openEditModal(field) {
     const modal = document.getElementById("field-edit-modal");
@@ -266,7 +265,6 @@ export function initYamlEditor(containerId, onSaveCallback) {
     );
 
     typeDropdown?.setSelected(field.type || "text");
-    markdownDropdown?.setSelected(field.markdown || "");
 
     editModal.show();
   }
@@ -339,7 +337,6 @@ export function initYamlEditor(containerId, onSaveCallback) {
 
       editModal = modalSetup.modal;
       typeDropdown = modalSetup.typeDropdown;
-      markdownDropdown = modalSetup.markdownDropdown;
     }
   }
 
