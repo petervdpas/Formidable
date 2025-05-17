@@ -3,11 +3,10 @@
 // ───── Imports ──────────────────────────────
 import { log, warn, error } from "./utils/logger.js";
 import { EventBus } from "./modules/eventBus.js";
-
-import { initStatusHandler } from "./modules/handlers/statusHandler.js";
-import { initThemeToggle } from "./modules/themeToggle.js";
 import { initEventRouter } from "./modules/eventRouter.js";
+import { initStatusHandler } from "./modules/handlers/statusHandler.js";
 
+import { initThemeToggle } from "./modules/themeToggle.js";
 import { buildMenu, handleMenuAction } from "./modules/menuManager.js";
 import { createDropdown } from "./modules/dropdownManager.js";
 import { initYamlEditor } from "./modules/yamlEditor.js";
@@ -58,6 +57,11 @@ window.addEventListener("DOMContentLoaded", async () => {
   const themeToggle = document.getElementById("theme-toggle");
   const contextToggle = document.getElementById("context-toggle");
   const loggingToggle = document.getElementById("logging-toggle");
+
+  // ── EventBus Init
+  initEventRouter();
+  // ── Logging Toggler
+  EventBus.emit("logging:toggle", config.logging_enabled);
 
   // ── Modals ──
   const settings = setupSettingsModal(
@@ -180,8 +184,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     config.context_mode === "storage";
 
   // ── EventBus Startup ──
-  initEventRouter();
   EventBus.emit("context:toggle", config.context_mode === "storage");
   EventBus.emit("theme:toggle", config.theme);
-  EventBus.emit("logging:toggle", config.logging_enabled);
 });
