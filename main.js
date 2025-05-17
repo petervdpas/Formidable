@@ -1,26 +1,14 @@
 // main.js
 
-const {
-  app,
-  dialog,
-  shell,
-  clipboard,
-  BrowserWindow,
-  Menu,
-  ipcMain,
-} = require("electron");
-const { log, warn, error } = require("./controls/nodeLogger");
-const { registerIpc } = require("./controls/ipcRoutes");
-const { getSafeBounds } = require("./controls/windowBounds");
-
+const { app, BrowserWindow, Menu } = require("electron");
 const path = require("path");
+const nodeLogger = require("./controls/nodeLogger");
 const fileManager = require("./controls/fileManager");
 const templateManager = require("./controls/templateManager");
-const formManager = require("./controls/formManager");
 const configManager = require("./controls/configManager");
-const markdownManager = require("./controls/markdownManager");
-const markdownRenderer = require("./controls/markdownRenderer");
-const htmlRenderer = require("./controls/htmlRenderer");
+const { registerIpcHandlers } = require("./controls/ipcRegistry");
+const { getSafeBounds } = require("./controls/windowBounds");
+const { log, warn, error } = nodeLogger;
 
 if (process.platform === "win32") {
   const portableDataPath = path.join(process.cwd(), "user-data");
@@ -72,7 +60,6 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-
   const isPackaged = app.isPackaged;
   const root = isPackaged ? app.getAppPath() : process.cwd();
   fileManager.setAppRoot(root);
@@ -80,13 +67,19 @@ app.whenReady().then(() => {
   // fileManager.setAppRoot(process.cwd());
 
   log("[Main] App is ready. Checking environment...");
+
+  /*
   log("[DEBUG] app.getAppPath() =", app.getAppPath());
   log("[DEBUG] process.cwd() =", process.cwd());
   log("[DEBUG] __dirname =", __dirname);
+  */
 
   templateManager.ensureTemplateDirectory();
   templateManager.createBasicTemplateIfMissing();
-  configManager.ensureConfigFile();
+
+  const userConfig = configManager.loadUserConfig();
+  nodeLogger.setLoggingEnabled(!!userConfig.logging_enabled);
+  nodeLogger.setWriteEnabled(!!userConfig.logging_enabled);
 
   createWindow();
 
@@ -103,127 +96,4 @@ app.on("window-all-closed", () => {
   }
 });
 
-// ================= IPC HANDLERS =================
-
-ipcMain.handle("app-quit", () => {
-  app.quit();
-});
-ipcMain.handle("toggle-devtools", (event) => {
-  const win = BrowserWindow.fromWebContents(event.sender);
-  if (win) {
-    const wc = win.webContents;
-    wc.isDevToolsOpened() ? wc.closeDevTools() : wc.openDevTools();
-  }
-});
-ipcMain.handle("shell-open-path", async (event, targetPath) => {
-  return await shell.openPath(targetPath); // returns empty string on success
-});
-ipcMain.handle("shell-open-external", async (event, url) => {
-  return await shell.openExternal(url); // Opens in default browser
-});
-ipcMain.on("window-reload", (e) => {
-  const win = BrowserWindow.fromWebContents(e.sender);
-  win?.reload();
-});
-ipcMain.on("window-minimize", (e) => {
-  const win = BrowserWindow.fromWebContents(e.sender);
-  win?.minimize();
-});
-ipcMain.on("window-maximize", (e) => {
-  const win = BrowserWindow.fromWebContents(e.sender);
-  win?.maximize();
-});
-ipcMain.on("window-close", (e) => {
-  const win = BrowserWindow.fromWebContents(e.sender);
-  win?.close();
-});
-ipcMain.handle("clipboard-write", (e, text) => {
-  clipboard.writeText(text);
-});
-ipcMain.handle("clipboard-read", () => {
-  return clipboard.readText();
-});
-
-// Template handlers
-registerIpc("list-templates", () => templateManager.listTemplates());
-registerIpc("load-template", (e, name) => templateManager.loadTemplate(name));
-registerIpc("save-template", (e, name, data) =>
-  templateManager.saveTemplate(name, data)
-);
-registerIpc("delete-template", (e, name) =>
-  templateManager.deleteTemplate(name)
-);
-registerIpc("get-template-descriptor", (e, name) =>
-  templateManager.getTemplateDescriptor(name)
-);
-registerIpc("create-basic-template", () =>
-  templateManager.createBasicTemplateIfMissing()
-);
-
-// Form JSON handlers
-registerIpc("ensure-form-dir", (event, dir) =>
-  formManager.ensureFormDirectory(dir)
-);
-registerIpc("list-forms", (event, dir) => formManager.listForms(dir));
-registerIpc("load-form", (event, dir, datefile, templateFields = []) =>
-  formManager.loadForm(dir, datefile, templateFields)
-);
-registerIpc("save-form", (event, dir, datefile, data, fields = []) =>
-  formManager.saveForm(dir, datefile, data, fields)
-);
-registerIpc("delete-form", (event, dir, datefile) =>
-  formManager.deleteForm(dir, datefile)
-);
-
-// Markdown handlers
-registerIpc("ensure-markdown-dir", (event, dir) =>
-  markdownManager.ensureMarkdownDirectory(dir)
-);
-registerIpc("list-markdowns", (event, dir) =>
-  markdownManager.listMarkdownFiles(dir)
-);
-registerIpc("load-markdown", (event, dir, filename) =>
-  markdownManager.loadMarkdownFile(dir, filename)
-);
-registerIpc("save-markdown", (event, dir, filename, data) =>
-  markdownManager.saveMarkdownFile(dir, filename, data)
-);
-registerIpc("delete-markdown", (event, dir, filename) =>
-  markdownManager.deleteMarkdownFile(dir, filename)
-);
-
-// Config handlers
-registerIpc("load-user-config", () => configManager.loadUserConfig());
-registerIpc("save-user-config", (event, cfg) =>
-  configManager.saveUserConfig(cfg)
-);
-registerIpc("update-user-config", (event, partial) =>
-  configManager.updateUserConfig(partial)
-);
-
-// Markdown transform
-registerIpc("render-markdown-template", (event, formData, templateYaml) =>
-  markdownRenderer.renderMarkdown(formData, templateYaml)
-);
-
-registerIpc("render-html-preview", (event, markdown) =>
-  htmlRenderer.renderHtml(markdown)
-);
-
-registerIpc("dialog-choose-directory", async () => {
-  const result = await dialog.showOpenDialog({
-    properties: ["openDirectory"],
-  });
-  if (result.canceled || !result.filePaths.length) return null;
-  return result.filePaths[0];
-});
-
-registerIpc("get-app-root", () => fileManager.getAppRoot());
-
-registerIpc("resolve-path", (event, ...segments) => {
-  return fileManager.resolvePath(...segments);
-});
-
-registerIpc("file-exists", (event, path) => {
-  return fileManager.fileExists(path);
-});
+registerIpcHandlers();

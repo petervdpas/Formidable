@@ -1,4 +1,4 @@
-// modules/setupModal.js
+// modules/modalSetup.js
 
 import { setupModal } from "./modalManager.js";
 import { EventBus } from "./eventBus.js";
@@ -8,7 +8,7 @@ import { applyModalCssClass } from "../utils/modalUtils.js";
 import { extractFieldDefinition } from "../utils/formUtils.js";
 import { createDropdown } from "./dropdownManager.js";
 
-export function setupSettingsModal(themeToggle, contextToggle) {
+export function setupSettingsModal(themeToggle, contextToggle, loggingToggle) {
   return setupModal("settings-modal", {
     closeBtn: "settings-close",
     escToClose: true,
@@ -25,8 +25,12 @@ export function setupSettingsModal(themeToggle, contextToggle) {
 
       const defaultDirInput = document.getElementById("default-dir");
       const chooseDirBtn = document.getElementById("choose-dir");
+      const loggingToggler = document.getElementById("logging-toggle");
 
       defaultDirInput.value = config.storage_location || "./storage";
+      if (loggingToggler) {
+        loggingToggler.checked = !!config.logging_enabled;
+      }
 
       chooseDirBtn.onclick = async () => {
         const selected = await window.api.dialog.chooseDirectory();
@@ -46,6 +50,20 @@ export function setupSettingsModal(themeToggle, contextToggle) {
           );
         }
       };
+
+      if (loggingToggler) {
+        loggingToggler.onchange = async () => {
+          const enabled = loggingToggler.checked;
+          await window.api.config.updateUserConfig({
+            logging_enabled: enabled,
+          });
+
+          EventBus.emit(
+            "status:update",
+            `Logging ${enabled ? "enabled" : "disabled"}`
+          );
+        };
+      }
     },
   });
 }
@@ -109,7 +127,6 @@ export function setupFieldEditModal(onConfirm) {
     value: key,
     label: def.label,
   }));
-
 
   const typeDropdown = createDropdown({
     containerId: "edit-type-container",

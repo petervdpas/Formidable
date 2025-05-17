@@ -57,9 +57,10 @@ window.addEventListener("DOMContentLoaded", async () => {
   const storageContainer = document.getElementById("storage-container");
   const themeToggle = document.getElementById("theme-toggle");
   const contextToggle = document.getElementById("context-toggle");
+  const loggingToggle = document.getElementById("logging-toggle");
 
   // ── Modals ──
-  const settings = setupSettingsModal(themeToggle, contextToggle);
+  const settings = setupSettingsModal(themeToggle, contextToggle, loggingToggle);
   const entryInputModal = setupEntryModal();
   const templateModal = setupTemplateModal();
   const aboutModal = setupAboutModal();
@@ -120,7 +121,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   EventBus.on("template:selected", ({ name, yaml }) => {
     yamlEditor.render(yaml);
   });
-  
+
   // ── Sidebars ──
   window.templateListManager = createTemplateListManager(
     yamlEditor,

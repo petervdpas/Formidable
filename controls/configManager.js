@@ -1,6 +1,7 @@
 // controls/configManager.js
 
-const { log, error } = require("./nodeLogger");
+const nodeLogger = require("./nodeLogger");
+const { log, error } = nodeLogger;
 const fileManager = require("./fileManager");
 const schema = require("../schemas/config.schema");
 
@@ -63,6 +64,12 @@ function updateUserConfig(partial) {
     const current = loadUserConfig();
     const updated = { ...current, ...partial };
     saveUserConfig(updated);
+
+    if (partial.hasOwnProperty("logging_enabled")) {
+      nodeLogger.setLoggingEnabled(!!partial.logging_enabled);
+      nodeLogger.setWriteEnabled(!!partial.logging_enabled);
+    }
+
     log("[ConfigManager] Merged partial config:", partial);
   } catch (err) {
     error("[ConfigManager] Failed to update user config:", err);

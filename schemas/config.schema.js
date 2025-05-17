@@ -4,6 +4,7 @@ module.exports = {
   defaults: {
     theme: "light",
     font_size: 14,
+    logging_enabled: true,
     context_mode: "template",
     storage_location: "./storage",
     selected_template: "basic.yaml",
