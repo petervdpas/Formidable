@@ -2,12 +2,12 @@
 
 module.exports = {
   defaults: {
-    selected_template: "basic.yaml",
-    selected_data_file: "",
     theme: "light",
     font_size: 14,
     context_mode: "template",
     storage_location: "./markdowns",
+    selected_template: "basic.yaml",
+    selected_data_file: "",
     window_bounds: {
       width: 1024,
       height: 800,
