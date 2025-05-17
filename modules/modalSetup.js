@@ -58,6 +58,8 @@ export function setupSettingsModal(themeToggle, contextToggle, loggingToggle) {
             logging_enabled: enabled,
           });
 
+          EventBus.emit("logging:toggle", enabled);
+
           EventBus.emit(
             "status:update",
             `Logging ${enabled ? "enabled" : "disabled"}`

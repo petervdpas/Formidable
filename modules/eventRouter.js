@@ -7,6 +7,7 @@ import * as templateHandlers from "./handlers/templateHandlers.js";
 import * as formHandlers from "./handlers/formHandlers.js";
 import * as themeHandler from "./handlers/themeHandler.js";
 import * as statusHandler from "./handlers/statusHandler.js";
+import * as loggingHandler from "./handlers/loggingHandler.js";
 
 import { log, warn, error } from "../utils/logger.js";
 
@@ -17,5 +18,6 @@ export function initEventRouter() {
   EventBus.on("context:toggle", contextHandlers.handleContextToggle);
   EventBus.on("theme:toggle", themeHandler.handleThemeToggle);
   EventBus.on("status:update", statusHandler.handleStatusUpdate);
+  EventBus.on("logging:toggle", loggingHandler.handleLoggingToggle);
 }
 

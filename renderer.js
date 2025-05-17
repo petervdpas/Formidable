@@ -60,7 +60,11 @@ window.addEventListener("DOMContentLoaded", async () => {
   const loggingToggle = document.getElementById("logging-toggle");
 
   // ── Modals ──
-  const settings = setupSettingsModal(themeToggle, contextToggle, loggingToggle);
+  const settings = setupSettingsModal(
+    themeToggle,
+    contextToggle,
+    loggingToggle
+  );
   const entryInputModal = setupEntryModal();
   const templateModal = setupTemplateModal();
   const aboutModal = setupAboutModal();
@@ -179,4 +183,5 @@ window.addEventListener("DOMContentLoaded", async () => {
   initEventRouter();
   EventBus.emit("context:toggle", config.context_mode === "storage");
   EventBus.emit("theme:toggle", config.theme);
+  EventBus.emit("logging:toggle", config.logging_enabled);
 });
