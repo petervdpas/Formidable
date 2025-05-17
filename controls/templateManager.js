@@ -9,15 +9,11 @@ const basicYamlName = "basic.yaml";
 const basicYamlPath = fileManager.joinPath("templates", basicYamlName);
 
 function ensureTemplateDirectory() {
-  try {
-    const fullPath = fileManager.resolvePath(templatesDir);
-    fileManager.ensureDirectory(fullPath, { silent: true });
-    log("[TemplateManager] Ensured template directory:", fullPath);
-    return true;
-  } catch (err) {
-    error("[TemplateManager] Failed to ensure template directory:", err);
-    return false;
-  }
+  const fullPath = fileManager.resolvePath(templatesDir);
+  return fileManager.ensureDirectory(fullPath, {
+    label: "TemplateManager",
+    silent: true,
+  });
 }
 
 function listTemplates() {

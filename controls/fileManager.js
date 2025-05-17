@@ -25,18 +25,29 @@ function isAbsolute(p) {
 }
 
 // Ensure a directory exists (creates if missing)
-function ensureDirectory(dirPath, { silent = false } = {}) {
+function ensureDirectory(dirPath, { label = null, silent = false, throwOnError = false } = {}) {
   try {
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
-      if (!silent) log(`[FileManager] Created directory: ${dirPath}`);
+    const fullPath = resolvePath(dirPath);
+    const exists = fs.existsSync(fullPath);
+
+    if (!exists) {
+      fs.mkdirSync(fullPath, { recursive: true });
+      if (!silent) {
+        log(`${label ? `[${label}]` : "[FileManager]"} Created directory: ${fullPath}`);
+      }
     } else {
-      if (!silent) log(`[FileManager] Directory already exists: ${dirPath}`);
+      if (!silent) {
+        log(`${label ? `[${label}]` : "[FileManager]"} Directory already exists: ${fullPath}`);
+      }
     }
+
+    return true;
   } catch (err) {
-    if (!silent)
-      error(`[FileManager] Failed to ensure directory ${dirPath}:`, err);
-    throw err;
+    if (!silent) {
+      error(`${label ? `[${label}]` : "[FileManager]"} Failed to ensure directory ${dirPath}:`, err);
+    }
+    if (throwOnError) throw err;
+    return false;
   }
 }
 

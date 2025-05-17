@@ -11,15 +11,11 @@ const markdownRepo = new SingleFileRepository({
 });
 
 function ensureMarkdownDirectory(storageLocation) {
-  try {
-    const fullPath = fileManager.resolvePath(storageLocation);
-    fileManager.ensureDirectory(fullPath, { silent: true });
-    log("[MarkdownManager] Ensured markdown directory:", fullPath);
-    return true;
-  } catch (err) {
-    error("[MarkdownManager] Failed to ensure directory:", err);
-    return false;
-  }
+  const fullPath = fileManager.resolvePath(storageLocation);
+  return fileManager.ensureDirectory(fullPath, {
+    label: "MarkdownManager",
+    silent: true,
+  });
 }
 
 function listMarkdownFiles(storageLocation) {

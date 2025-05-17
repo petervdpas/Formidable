@@ -12,15 +12,11 @@ const metaRepo = new SingleFileRepository({
 });
 
 function ensureFormDirectory(storageLocation) {
-  try {
-    const fullPath = fileManager.resolvePath(storageLocation);
-    fileManager.ensureDirectory(fullPath, { silent: true });
-    log("[FormManager] Ensured form directory:", fullPath);
-    return true;
-  } catch (err) {
-    error("[FormManager] Failed to ensure form directory:", err);
-    return false;
-  }
+  const fullPath = fileManager.resolvePath(storageLocation);
+  return fileManager.ensureDirectory(fullPath, {
+    label: "FormManager",
+    silent: true,
+  });
 }
 
 function listForms(storageLocation) {

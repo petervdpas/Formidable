@@ -4,11 +4,14 @@ const { log, error } = require("./nodeLogger");
 const fileManager = require("./fileManager");
 const schema = require("../schemas/config.schema");
 
-const configDir = fileManager.resolvePath("config");
 const configPath = fileManager.resolvePath("config", "user.json");
 
 function ensureConfigFile() {
-  fileManager.ensureDirectory(configDir, { silent: false });
+  const fullPath = fileManager.resolvePath("config");
+  fileManager.ensureDirectory(fullPath, {
+    label: "ConfigManager",
+    silent: true,
+  });
 
   if (!fileManager.fileExists(configPath)) {
     fileManager.saveFile(configPath, schema.defaults, {
