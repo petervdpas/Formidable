@@ -19,7 +19,7 @@ function initSplitters(mode) {
     templateSplitterInitialized = true;
   }
 
-  if (mode === "markdown" && !markdownSplitterInitialized) {
+  if (mode === "storage" && !markdownSplitterInitialized) {
     setupSplitter({
       splitter: document.getElementById("markdown-splitter"),
       left: document.getElementById("markdown-sidebar"),
@@ -32,16 +32,16 @@ function initSplitters(mode) {
 }
 
 export function setContextView(mode, containers) {
-  const isMarkdown = mode === "markdown";
-  containers.templateContainer.style.display = isMarkdown ? "none" : "flex";
-  containers.markdownContainer.style.display = isMarkdown ? "flex" : "none";
+  const isStorage = mode === "storage";
+  containers.templateContainer.style.display = isStorage ? "none" : "flex";
+  containers.markdownContainer.style.display = isStorage ? "flex" : "none";
   initSplitters(mode);
   log("[Context] Switched to:", mode);
 }
 
 export function initContextToggle({ toggleElement }) {
   toggleElement.addEventListener("change", (e) => {
-    const isMarkdown = e.target.checked;
-    EventBus.emit("context:toggle", isMarkdown);
+    const isStorage = e.target.checked;
+    EventBus.emit("context:toggle", isStorage);
   });
 }

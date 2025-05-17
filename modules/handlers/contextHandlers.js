@@ -11,21 +11,21 @@ export function bindContextDependencies(deps) {
   dropdown = deps.dropdown;
 }
 
-export async function handleContextToggle(isMarkdown) {
-  const mode = isMarkdown ? "markdown" : "template";
+export async function handleContextToggle(isStorage) {
+  const mode = isStorage ? "storage" : "template";
   log("[Handler] Context toggled:", mode);
 
   const toggle = document.getElementById("context-toggle");
   const menuToggle = document.getElementById("context-toggle-menu");
 
-  if (toggle && toggle.checked !== isMarkdown) toggle.checked = isMarkdown;
-  if (menuToggle && menuToggle.checked !== isMarkdown)
-    menuToggle.checked = isMarkdown;
+  if (toggle && toggle.checked !== isStorage) toggle.checked = isStorage;
+  if (menuToggle && menuToggle.checked !== isStorage)
+    menuToggle.checked = isStorage;
 
   setContextView(mode, containers);
   await window.api.config.updateUserConfig({ context_mode: mode });
 
-  if (mode === "markdown") {
+  if (mode === "storage") {
     await dropdown?.refresh?.();
 
     const currentName = window.currentSelectedTemplateName;

@@ -170,12 +170,12 @@ window.addEventListener("DOMContentLoaded", async () => {
   initThemeToggle(themeToggle);
 
   document.getElementById("context-toggle").checked =
-    config.context_mode === "markdown";
+    config.context_mode === "storage";
   document.getElementById("context-toggle-menu").checked =
-    config.context_mode === "markdown";
+    config.context_mode === "storage";
 
   // ── EventBus Startup ──
   initEventRouter();
-  EventBus.emit("context:toggle", config.context_mode === "markdown");
+  EventBus.emit("context:toggle", config.context_mode === "storage");
   EventBus.emit("theme:toggle", config.theme);
 });
