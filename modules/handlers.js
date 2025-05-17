@@ -7,7 +7,7 @@ export async function handleTemplateClick(itemName, yamlEditor) {
   try {
     const data = await window.api.templates.loadTemplate(itemName);
     yamlEditor.render(data);
-
+    
     EventBus.emit("template:selected", {
       name: itemName,
       yaml: data,
@@ -92,7 +92,7 @@ export async function handleEntryClick(entryName, formManager) {
     error("[MetaList] Failed to load entry:", err);
     EventBus.emit("status:update", "Error loading metadata.");
   }
-} 
+}
 
 export function handleEntryConfirm(modal, callback) {
   const input = document.getElementById("entry-name");

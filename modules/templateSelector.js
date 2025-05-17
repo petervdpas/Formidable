@@ -22,9 +22,6 @@ export function createTemplateSelector({
 
       const yamlData = result.yaml;
 
-      window.currentSelectedTemplate = yamlData;
-      window.currentSelectedTemplateName = name;
-
       EventBus.emit("template:selected", {
         name,
         yaml: yamlData,
