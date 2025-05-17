@@ -82,14 +82,14 @@ export function createMetaListManager(formManager, modal) {
         return [];
       }
 
-      if (!template.markdown_dir) {
-        warn("[MetaList] No markdown_dir field.");
-        EventBus.emit("status:update", "Template missing markdown_dir field.");
+      if (!template.storage_location) {
+        warn("[MetaList] No storage location field.");
+        EventBus.emit("status:update", "Template missing storage location field.");
         return [];
       }
 
-      await window.api.forms.ensureFormDir(template.markdown_dir);
-      const files = await window.api.forms.listForms(template.markdown_dir);
+      await window.api.forms.ensureFormDir(template.storage_location);
+      const files = await window.api.forms.listForms(template.storage_location);
       return files.map((fullName) => ({
         display: stripMetaExtension(fullName),
         value: fullName,

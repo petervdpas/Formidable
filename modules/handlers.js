@@ -47,7 +47,7 @@ export function handleTemplateConfirm(modal, defaultMarkdownDir, callback) {
 
     const safeName = raw.replace(/\s+/g, "-").toLowerCase();
     const template = `${safeName}.yaml`;
-    const markdown_dir = dirInput.value.trim() || "markdown";
+    const storage_location = dirInput.value.trim() || "markdown";
 
     modal.hide();
 
@@ -55,7 +55,7 @@ export function handleTemplateConfirm(modal, defaultMarkdownDir, callback) {
       template,
       yaml: {
         name: safeName,
-        markdown_dir,
+        storage_location,
         markdown_template: "",
         fields: [],
       },
@@ -73,7 +73,7 @@ export async function handleEntryClick(entryName, formManager) {
       warn("[MetaList] No template selected when clicking item.");
       return;
     }
-    const dir = template.markdown_dir;
+    const dir = template.storage_location;
     const data = await window.api.forms.loadForm(
       dir,
       entryName,

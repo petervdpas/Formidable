@@ -125,7 +125,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   window.templateListManager = createTemplateListManager(
     yamlEditor,
     templateModal,
-    config.default_markdown_dir,
+    config.storage_location,
     templateDropdown
   );
 

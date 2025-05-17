@@ -3,7 +3,7 @@
 module.exports = {
   defaults: {
     name: "",
-    markdown_dir: "./markdowns/unknown",
+    storage_location: "./markdowns/unknown",
     markdown_template: "",
     fields: [],
   },

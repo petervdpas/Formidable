@@ -38,8 +38,8 @@ function loadTemplate(name) {
 
 function saveTemplate(name, data) {
   try {
-    if (typeof data.markdown_dir === "string") {
-      data.markdown_dir = data.markdown_dir.replace(/\\/g, "/");
+    if (typeof data.storage_location === "string") {
+      data.storage_location = data.storage_location.replace(/\\/g, "/");
     }
 
     const filePath = fileManager.joinPath("templates", name);
@@ -85,7 +85,7 @@ function getTemplateDescriptor(name) {
   return {
     name,
     yaml: data,
-    markdownDir: data.markdown_dir,
+    markdownDir: data.storage_location,
   };
 }
 
@@ -93,7 +93,7 @@ function createBasicTemplateIfMissing() {
   if (!fileManager.fileExists(basicYamlPath)) {
     const content = {
       name: "Basic Form",
-      markdown_dir: "./markdowns/basic",
+      storage_location: "./markdowns/basic",
       markdown_template: `# {{field "test"}}
 
 {{#if (fieldRaw "check")}}

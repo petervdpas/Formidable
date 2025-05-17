@@ -1,10 +1,10 @@
 {
   "selected_template": "basic.yaml",
-  "selected_data_file": "hello_there-20250516.meta.json",
-  "theme": "light",
+  "selected_data_file": "test-20250515.meta.json",
+  "theme": "dark",
   "font_size": 14,
   "context_mode": "markdown",
-  "default_markdown_dir": "./markdowns",
+  "storage_location": "./markdowns",
   "window_bounds": {
     "width": 1282,
     "height": 829,

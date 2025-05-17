@@ -32,9 +32,9 @@ export function createFormManager(containerId) {
     log("[FormUI] loadFormData datafile:", datafile);
 
     // Load from file if needed
-    if (!metaData && currentTemplate?.markdown_dir && datafile) {
+    if (!metaData && currentTemplate?.storage_location && datafile) {
       metaData = await window.api.forms.loadForm(
-        currentTemplate.markdown_dir,
+        currentTemplate.storage_location,
         datafile,
         currentTemplate.fields || []
       );
@@ -120,11 +120,11 @@ export function createFormManager(containerId) {
   async function saveForm() {
     log("[FormUI] Save triggered.");
 
-    if (!currentTemplate || !currentTemplate.markdown_dir) {
-      warn("[FormUI] No template or markdown_dir selected.");
+    if (!currentTemplate || !currentTemplate.storage_location) {
+      warn("[FormUI] No template selected.");
       EventBus.emit(
         "status:update",
-        "No template or markdown directory selected."
+        "No template selected."
       );
       return;
     }
@@ -139,7 +139,7 @@ export function createFormManager(containerId) {
       return;
     }
 
-    const markdownDir = currentTemplate.markdown_dir;
+    const markdownDir = currentTemplate.storage_location;
     const saveResult = await window.api.forms.saveForm(
       markdownDir,
       datafile,
@@ -163,8 +163,8 @@ export function createFormManager(containerId) {
   }
 
   async function deleteForm(datafile) {
-    if (!currentTemplate || !currentTemplate.markdown_dir) {
-      warn("[FormUI] No template or markdown_dir selected for deletion.");
+    if (!currentTemplate || !currentTemplate.storage_location) {
+      warn("[FormUI] No template selected for deletion.");
       EventBus.emit("status:update", "Cannot delete: template not selected.");
       return;
     }
@@ -181,7 +181,7 @@ export function createFormManager(containerId) {
     if (!confirmed) return;
 
     const result = await window.api.forms.deleteForm(
-      currentTemplate.markdown_dir,
+      currentTemplate.storage_location,
       datafile
     );
 

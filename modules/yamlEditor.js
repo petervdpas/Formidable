@@ -101,7 +101,7 @@ export function initYamlEditor(containerId, onSaveCallback) {
       <div class="modal-form-row">
         <label for="markdown-dir">Storage Directory</label>
         <input type="text" id="markdown-dir" value="${
-          currentData.markdown_dir || ""
+          currentData.storage_location || ""
         }" />
       </div>
       <div class="modal-form-row full-editor-row">
@@ -283,7 +283,7 @@ export function initYamlEditor(containerId, onSaveCallback) {
       const tmpl = getMarkdownTemplate();
       const updated = {
         name,
-        markdown_dir: dir,
+        storage_location: dir,
         markdown_template: tmpl,
         fields: currentData.fields,
       };

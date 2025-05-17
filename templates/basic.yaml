@@ -1,5 +1,5 @@
 name: Basic Form
-markdown_dir: ./markdowns/basic
+storage_location: ./markdowns/basic
 markdown_template: |-
   # {{field "test"}}
 
@@ -22,7 +22,6 @@ markdown_template: |-
   ---
 
   ### Number: {{field "numpy"}}
-
 
   Birthday: {{field "bday"}}
 

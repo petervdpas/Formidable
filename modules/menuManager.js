@@ -108,7 +108,7 @@ export async function handleMenuAction(action) {
         }
 
         const yaml = await window.api.templates.loadTemplate(templateName);
-        const targetPath = await window.api.system.resolvePath(yaml.markdown_dir);
+        const targetPath = await window.api.system.resolvePath(yaml.storage_location);
         await window.api.forms.ensureFormDir?.(targetPath);
 
         const result = await window.electron.shell.openPath(targetPath);

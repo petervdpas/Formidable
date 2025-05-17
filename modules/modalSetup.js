@@ -26,7 +26,7 @@ export function setupSettingsModal(themeToggle, contextToggle) {
       const defaultDirInput = document.getElementById("default-dir");
       const chooseDirBtn = document.getElementById("choose-dir");
 
-      defaultDirInput.value = config.default_markdown_dir || "./markdowns";
+      defaultDirInput.value = config.storage_location || "./markdowns";
 
       chooseDirBtn.onclick = async () => {
         const selected = await window.api.dialog.chooseDirectory();
@@ -37,7 +37,7 @@ export function setupSettingsModal(themeToggle, contextToggle) {
           defaultDirInput.value = relativePath;
 
           await window.api.config.updateUserConfig({
-            default_markdown_dir: relativePath,
+            storage_location: relativePath,
           });
 
           EventBus.emit(

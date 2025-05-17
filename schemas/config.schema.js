@@ -7,7 +7,7 @@ module.exports = {
     theme: "light",
     font_size: 14,
     context_mode: "template",
-    default_markdown_dir: "./markdowns",
+    storage_location: "./markdowns",
     window_bounds: {
       width: 1024,
       height: 800,
