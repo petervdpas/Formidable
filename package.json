@@ -7,8 +7,7 @@
     "start": "electron .",
     "prebuild": "electron-builder --dir",
     "patch-icon": "node scripts/patch-icon.js",
-    "build": "npm run prebuild && npm run patch-icon && electron-builder --win --prepackaged dist/win-unpacked",
-    "postbuild": "node scripts/copy-installer.js"
+    "build": "npm run prebuild && npm run patch-icon && electron-builder --win --prepackaged dist/win-unpacked"
   },
   "build": {
     "appId": "com.formidable.editor",
@@ -32,7 +31,9 @@
       {
         "from": "assets/",
         "to": "assets/",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "win": {
@@ -48,7 +49,10 @@
       "identity": null
     },
     "linux": {
-      "target": ["AppImage", "deb"],
+      "target": [
+        "AppImage",
+        "deb"
+      ],
       "icon": "assets/formidable.png",
       "category": "Utility",
       "maintainer": "Peter van de Pas",

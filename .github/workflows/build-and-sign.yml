@@ -1,0 +1,45 @@
+name: Build and Sign Formidable
+
+on:
+  push:
+    branches:
+      - release/*
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Electron App
+        run: npm run build
+
+      - name: Sign with SignPath
+        uses: SignPath/github-action@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ secrets.SIGNPATH_ORG_ID }}
+          project-slug: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ secrets.SIGNPATH_POLICY_SLUG }}
+          artifact-path: dist/Formidable Setup 1.0.0.exe
+          output-path: dist/Formidable Setup 1.0.0 (signed).exe
+
+      - name: Move signed file to installer folder
+        run: |
+          mkdir -p installer
+          mv "dist/Formidable Setup 1.0.0 (signed).exe" "installer/Formidable Setup.exe"
+
+      - name: Upload signed artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Formidable Installer (signed)
+          path: installer/Formidable Setup.exe
