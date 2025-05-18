@@ -43,3 +43,13 @@ jobs:
         with:
           name: Formidable Installer (signed)
           path: installer/Formidable Setup.exe
+      - name: Create GitHub Release and attach signed installer
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.0
+          name: Formidable v1.0.0
+          draft: false
+          prerelease: false
+          files: installer/Formidable Setup.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

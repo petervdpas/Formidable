@@ -14,6 +14,7 @@
     "productName": "Formidable",
     "icon": "assets/formidable.ico",
     "asar": false,
+    "publish": null,
     "directories": {
       "output": "dist"
     },
