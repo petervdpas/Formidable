@@ -1,6 +1,6 @@
 // utils/fieldAppliers.js
 
-import { warn } from "./logger.js";
+import { EventBus } from "../modules/eventBus.js";
 
 export function applyListField(container, key, value) {
   const listWrapper = container.querySelector(`[data-list-field="${key}"]`);
@@ -65,22 +65,26 @@ export function applyTableField(container, key, value) {
 
 export function applyGenericField(input, key, value) {
   if (!input) {
-    warn(`[UI] applyFieldValues: Missing input for key "${key}".`);
+    EventBus.emit("logging:warning", [
+      `[applyGenericField] applyFieldValues: Missing input for key "${key}".`,
+    ]);
     return;
   }
 
   if (input.type === "checkbox") {
     input.checked = value === true;
   } else if (input.type === "radio") {
-    const group = input.closest("form")?.querySelectorAll?.(
-      `input[type="radio"][name="${key}"]`
-    );
+    const group = input
+      .closest("form")
+      ?.querySelectorAll?.(`input[type="radio"][name="${key}"]`);
     group?.forEach((el) => {
       el.checked = el.value === value;
     });
   } else if ("value" in input) {
     input.value = value ?? "";
   } else {
-    warn(`[UI] applyFieldValues: Unsupported input for key "${key}".`);
+    EventBus.emit("logging:warning", [
+      `[applyGenericField] applyFieldValues: Unsupported input for key "${key}".`,
+    ]);
   }
 }

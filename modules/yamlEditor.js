@@ -1,9 +1,8 @@
 // modules/yamlEditor.js
 
-import { log, warn, error } from "../utils/logger.js";
+import { EventBus } from "./eventBus.js";
 import { showConfirmModal } from "./modalManager.js";
 import { setupFieldEditModal } from "./modalSetup.js";
-import { EventBus } from "./eventBus.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 import { getCurrentTheme } from "./themeToggle.js";
 
@@ -32,14 +31,20 @@ function toggleFullscreen() {
 }
 
 function handleEditorKey(e) {
-  log(`[YamlEditor] Key pressed: ctrl=${e.ctrlKey}, key=${e.key}`);
+  EventBus.emit("logging:default", [
+    `[YamlEditor] Key pressed: ctrl=${e.ctrlKey}, key=${e.key}`,
+  ]);
   if (e.ctrlKey && e.key === "Enter") {
     e.preventDefault();
-    log("[YamlEditor] CTRL+ENTER pressed → toggle fullscreen");
+    EventBus.emit("logging:default", [
+      "[YamlEditor] CTRL+ENTER pressed → toggle fullscreen",
+    ]);
     toggleFullscreen();
   }
   if (e.key === "Escape" && editorWrapper?.classList.contains("fullscreen")) {
-    log("[YamlEditor] ESC pressed → exit fullscreen");
+    EventBus.emit("logging:default", [
+      "[YamlEditor] ESC pressed → exit fullscreen",
+    ]);
     toggleFullscreen();
   }
 }
@@ -78,18 +83,27 @@ function getMarkdownTemplate() {
 export function initYamlEditor(containerId, onSaveCallback) {
   const container = document.getElementById(containerId);
   if (!container) {
-    warn("[YamlEditor] YAML editor container not found:", containerId);
+    EventBus.emit("logging:warning", [
+      "[YamlEditor] YAML editor container not found:",
+      containerId,
+    ]);
     return;
   }
 
-  log("[YamlEditor] Initialized editor in container:", containerId);
+  EventBus.emit("logging:default", [
+    "[YamlEditor] Initialized editor in container:",
+    containerId,
+  ]);
   let currentData = null;
   let editModal,
     currentEditIndex = null;
 
   function renderEditor(data) {
     currentData = structuredClone(data);
-    log("[YamlEditor] Rendering editor for:", currentData.name || "Unnamed");
+    EventBus.emit("logging:default", [
+      "[YamlEditor] Rendering editor for:",
+      currentData.name || "Unnamed",
+    ]);
 
     container.innerHTML = `
     <fieldset>
@@ -243,9 +257,9 @@ export function initYamlEditor(containerId, onSaveCallback) {
     if (typeDef?.cssClass) {
       modal.classList.add(typeDef.cssClass); // e.g., type-text
     } else {
-      warn(
-        `[YamlEditor] Unknown type "${typeKey}" passed to applyModalTypeClass.`
-      );
+      EventBus.emit("logging:warning", [
+        `[YamlEditor] Unknown type "${typeKey}" passed to applyModalTypeClass.`,
+      ]);
     }
   }
 
@@ -277,7 +291,9 @@ export function initYamlEditor(containerId, onSaveCallback) {
 
     container.querySelector("#save-yaml").onclick = () => {
       const name = container.querySelector("#yaml-name").value.trim();
-      const storageLocation = container.querySelector("#storage-location").value.trim();
+      const storageLocation = container
+        .querySelector("#storage-location")
+        .value.trim();
       const markdownTemplate = getMarkdownTemplate();
       const updated = {
         name,
@@ -285,14 +301,19 @@ export function initYamlEditor(containerId, onSaveCallback) {
         markdown_template: markdownTemplate,
         fields: currentData.fields,
       };
-      log("[YamlEditor] Calling save callback with updated data:", updated);
+      EventBus.emit("logging:default", [
+        "[YamlEditor] Calling save callback with updated data:",
+        updated,
+      ]);
       onSaveCallback?.(updated);
     };
 
     container.querySelector("#delete-yaml").onclick = async () => {
       const template = window.currentSelectedTemplateName;
       if (!template) {
-        warn("[YamlEditor] No template selected to delete.");
+        EventBus.emit("logging:warning", [
+          "[YamlEditor] No template selected to delete.",
+        ]);
         EventBus.emit("status:update", "No template selected.");
         return;
       }
@@ -311,7 +332,10 @@ export function initYamlEditor(containerId, onSaveCallback) {
 
       const success = await window.api.templates.deleteTemplate(template);
       if (success) {
-        log("[YamlEditor] Deleted template:", template);
+        EventBus.emit("logging:default", [
+          "[YamlEditor] Deleted template:",
+          template,
+        ]);
         container.innerHTML =
           "<div class='empty-message'>Template deleted.</div>";
         EventBus.emit("status:update", `Deleted template: ${template}`);
@@ -320,7 +344,10 @@ export function initYamlEditor(containerId, onSaveCallback) {
         if (window.templateListManager?.loadList)
           window.templateListManager.loadList();
       } else {
-        warn("[YamlEditor] Failed to delete template:", template);
+        EventBus.emit("logging:warning", [
+          "[YamlEditor] Failed to delete template:",
+          template,
+        ]);
         EventBus.emit("status:update", "Failed to delete template.");
       }
     };
@@ -344,7 +371,9 @@ export function initYamlEditor(containerId, onSaveCallback) {
     const cmTheme = theme === "dark" ? "monokai" : "eclipse";
     if (codeMirrorEditor) {
       codeMirrorEditor.setOption("theme", cmTheme);
-      log(`[YamlEditor] CodeMirror theme switched to ${cmTheme}`);
+      EventBus.emit("logging:default", [
+        `[YamlEditor] CodeMirror theme switched to ${cmTheme}`,
+      ]);
     }
   });
 

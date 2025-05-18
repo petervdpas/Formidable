@@ -61,24 +61,26 @@ export function focusFirstInput(
     const firstInput = container.querySelector(selector);
     if (firstInput) {
       firstInput.focus();
-      EventBus.emit("logging:default", ["[UI] Focused first input."]);
+      EventBus.emit("logging:default", [
+        "[focusFirstInput] Focused first input.",
+      ]);
     } else {
-      EventBus.emit("logging:warning", ["[UI] No input to focus."]);
+      EventBus.emit("logging:warning", [
+        "[focusFirstInput] No input to focus.",
+      ]);
     }
   }, 0); // 🔁 defer until after DOM update
 }
 
 export function applyFieldValues(container, fieldsOrKeys = [], data = {}) {
   if (!container || typeof container.querySelector !== "function") {
-    EventBus.emit("logging:default", [
-      "[UI] applyFieldValues: Invalid container.",
-    ]);
+    EventBus.emit("logging:default", ["[applyFieldValues] Invalid container."]);
     return;
   }
 
   if (!data || typeof data !== "object") {
     EventBus.emit("logging:default", [
-      "[UI] applyFieldValues: No valid data object provided.",
+      "[applyFieldValues] No valid data object provided.",
     ]);
     return;
   }
@@ -105,7 +107,7 @@ export function applyFieldValues(container, fieldsOrKeys = [], data = {}) {
   });
 
   EventBus.emit("logging:default", [
-    "[UI] applyFieldValues: Applied field values.",
+    "[applyFieldValues] Applied field values.",
   ]);
 }
 
@@ -129,7 +131,7 @@ export function makeSelectableList(
 export function bindActionHandlers(container, selector, callback) {
   if (!container || typeof container.querySelectorAll !== "function") {
     EventBus.emit("logging:warning", [
-      "[UI] bindActionHandlers: Invalid container.",
+      "[bindActionHandlers] Invalid container.",
     ]);
     return;
   }
@@ -140,10 +142,12 @@ export function bindActionHandlers(container, selector, callback) {
     if (!action) return;
 
     EventBus.emit("logging:default", [
-      `[UI] Binding action handler: ${action}`,
+      `[bindActionHandlers] Binding action handler: ${action}`,
     ]);
     el.addEventListener("click", () => {
-      EventBus.emit("logging:default", [`[UI] Triggered action: ${action}`]);
+      EventBus.emit("logging:default", [
+        `[bindActionHandlers] Triggered action: ${action}`,
+      ]);
       callback(action);
     });
   });
