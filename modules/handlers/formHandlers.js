@@ -32,11 +32,3 @@ export async function handleFormSelected(datafile) {
 
   await formManager.loadFormData(null, datafile);
 }
-
-export async function handleListReload()  {
-  if (!metaListManager) {
-    EventBus.emit("logging:warning", ["[Handler] No metaListManager available."]);
-    return;
-  }
-  await metaListManager.reloadList();
-}

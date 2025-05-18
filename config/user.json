@@ -2,12 +2,12 @@
   "theme": "dark",
   "font_size": 14,
   "logging_enabled": true,
-  "context_mode": "template",
+  "context_mode": "storage",
   "storage_location": "./storage",
   "selected_template": "basic.yaml",
   "selected_data_file": "test-20250515.meta.json",
   "window_bounds": {
-    "width": 1131,
+    "width": 1340,
     "height": 890,
     "x": 448,
     "y": 116

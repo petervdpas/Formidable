@@ -20,7 +20,7 @@ import {
 
 import {
   createTemplateListManager,
-  createMetaListManager,
+  createStorageListManager,
 } from "./modules/sidebarManager.js";
 
 import { createTemplateSelector } from "./modules/templateSelector.js";
@@ -30,6 +30,7 @@ import { setContextView, initContextToggle } from "./modules/contextManager.js";
 import { bindContextDependencies } from "./modules/handlers/contextHandlers.js";
 import { bindTemplateDependencies } from "./modules/handlers/templateHandlers.js";
 import { bindFormDependencies } from "./modules/handlers/formHandlers.js";
+import { bindListDependencies } from "./modules/handlers/listHandlers.js";
 
 // ───── DOM Ready ──────────────────────────────
 window.addEventListener("DOMContentLoaded", async () => {
@@ -145,7 +146,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     templateDropdown
   );
 
-  const metaListManager = createMetaListManager(formManager, entryInputModal);
+  const metaListManager = createStorageListManager(formManager, entryInputModal);
 
   // ── Template Selection Logic ──
   const { selectTemplate, loadTemplateOptions } = createTemplateSelector({
@@ -165,6 +166,11 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   bindFormDependencies({
     formManager,
+    metaListManager,
+  });
+
+  bindListDependencies({
+    templateListManager: window.templateListManager,
     metaListManager,
   });
 

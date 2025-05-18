@@ -3,7 +3,6 @@
 import { createListManager } from "./listManager.js";
 import { EventBus } from "./eventBus.js";
 import { stripMetaExtension } from "../utils/pathUtils.js";
-import { highlightAndClickMatch } from "../utils/domUtils.js";
 import {
   handleTemplateClick,
   handleTemplateConfirm,
@@ -58,20 +57,13 @@ export function createTemplateListManager(
     },
   });
 
-  EventBus.on("template:list:reload", async () => {
-    await listManager.loadList();
-  });
-
-  EventBus.on("template:list:highlighted", (name) => {
-    if (!name) return;
-    const container = document.getElementById("template-list");
-    highlightAndClickMatch(container, name);
-  });
-
-  return listManager;
+  return {
+    ...listManager,
+    reloadList: () => listManager.loadList(),
+  };
 }
 
-export function createMetaListManager(formManager, modal) {
+export function createStorageListManager(formManager, modal) {
   const listManager = createListManager({
     elementId: "storage-list",
     fetchListFunction: async () => {
@@ -124,12 +116,6 @@ export function createMetaListManager(formManager, modal) {
         });
       },
     },
-  });
-
-  EventBus.on("form:list:highlighted", (name) => {
-    if (!name) return;
-    const container = document.getElementById("storage-list");
-    highlightAndClickMatch(container, name);
   });
 
   return {

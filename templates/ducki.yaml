@@ -1,0 +1,7 @@
+name: ducki
+storage_location: ./storage/ducki
+markdown_template: ''
+fields:
+  - key: test
+    label: Test
+    type: text
