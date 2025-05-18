@@ -374,15 +374,5 @@ export function initYamlEditor(containerId, onSaveCallback) {
     }
   }
 
-  EventBus.on("theme:toggle", (theme) => {
-    const cmTheme = theme === "dark" ? "monokai" : "eclipse";
-    if (codeMirrorEditor) {
-      codeMirrorEditor.setOption("theme", cmTheme);
-      EventBus.emit("logging:default", [
-        `[YamlEditor] CodeMirror theme switched to ${cmTheme}`,
-      ]);
-    }
-  });
-
   return { render: renderEditor };
 }

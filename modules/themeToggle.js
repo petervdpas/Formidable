@@ -13,11 +13,20 @@ export function initThemeToggle(toggleElement) {
 }
 
 export function setCodeMirrorTheme(mode) {
-  const link = document.getElementById("cm-theme");
-  if (!link) return;
-  currentTheme = mode;
   const filename = mode === "dark" ? "monokai.css" : "eclipse.css";
-  link.href = `assets/codemirror/${filename}`;
+  const link = document.getElementById("cm-theme");
+  if (link) {
+    link.href = `assets/codemirror/${filename}`;
+  }
+
+  // Apply to any active CodeMirror instances
+  const allEditors = document.querySelectorAll(".CodeMirror");
+  allEditors.forEach((cmEl) => {
+    const cm = cmEl.CodeMirror;
+    if (cm) cm.setOption("theme", mode === "dark" ? "monokai" : "eclipse");
+  });
+  
+  currentTheme = mode;
 }
 
 export function getCurrentTheme() {
