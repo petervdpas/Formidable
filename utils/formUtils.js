@@ -45,26 +45,16 @@ export function getFormData(container, template) {
     const typeDef = fieldTypes[field.type];
     if (!typeDef || typeof typeDef.parseValue !== "function") {
       EventBus.emit("logging:warning", [
-        `[FormUtils] No parser for field type: ${field.type}`,
+        `[getFormData] No parser for field type: ${field.type}`,
       ]);
       return;
     }
 
-    let el;
-
-    if (field.type === "radio") {
-      el = container.querySelector(`[data-radio-group="${field.key}"]`);
-    } else if (field.type === "list") {
-      el = container.querySelector(`[data-list-field="${field.key}"]`);
-    } else if (field.type === "table") {
-      el = container.querySelector(`[data-table-field="${field.key}"]`);
-    } else {
-      el = container.querySelector(`[name="${field.key}"]`);
-    }
+    const el = resolveFieldElement(container, field);
 
     if (!el) {
       EventBus.emit("logging:warning", [
-        `[FormUtils] Missing input for: ${field.key}`,
+        `[getFormData] Missing input for: ${field.key}`,
       ]);
       return;
     }
@@ -72,8 +62,32 @@ export function getFormData(container, template) {
     data[field.key] = typeDef.parseValue(el);
   });
 
-  EventBus.emit("logging:default", ["[FormData] Collected form data:", data]);
+  EventBus.emit("logging:default", [
+    "[getFormData] Collected form data:",
+    data,
+  ]);
   return data;
+}
+
+function resolveFieldElement(container, field) {
+  switch (field.type) {
+    case "radio":
+      return container.querySelector(`[data-radio-group="${field.key}"]`);
+    case "list":
+      return container.querySelector(`[data-list-field="${field.key}"]`);
+    case "table":
+      return container.querySelector(`[data-table-field="${field.key}"]`);
+    default:
+      return container.querySelector(`[name="${field.key}"]`);
+  }
+}
+
+export function clearFormUI(
+  container,
+  label = "Select or create a data-file to begin."
+) {
+  container.innerHTML = `<p>${label}</p>`;
+  EventBus.emit("logging:default", ["[clearFormUI] Form UI cleared."]);
 }
 
 export function stripMarkdownExtension(filename = "") {
@@ -92,7 +106,7 @@ export function renderFieldElement(field) {
 
   if (!fn || !typeDef) {
     EventBus.emit("logging:default", [
-      `[FormUtils] No renderer found for type: ${type}`,
+      `[renderFieldElement] No renderer found for type: ${type}`,
     ]);
     return null;
   }

@@ -2,10 +2,13 @@
 
 import { EventBus } from "./eventBus.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
-import { getFormData } from "../utils/formUtils.js";
+import {
+  getFormData,
+  validateFilenameInput,
+  clearFormUI,
+} from "../utils/formUtils.js";
 import { applyFieldValues, focusFirstInput } from "../utils/domUtils.js";
 import { renderForm } from "./formRenderer.js";
-import { validateFilenameInput } from "../utils/formUtils.js";
 import { showConfirmModal } from "./modalManager.js";
 import { setupRenderModal } from "./modalSetup.js";
 
@@ -13,14 +16,14 @@ export function createFormManager(containerId) {
   const container = document.getElementById(containerId);
   if (!container) {
     EventBus.emit("logging:error", [
-      "[FormUI] Form container not found:",
+      "[createFormManager] Form container not found:",
       containerId,
     ]);
     return;
   }
 
   EventBus.emit("logging:default", [
-    "[FormUI] Initialized with container:",
+    "[createFormManager] Initialized with container:",
     containerId,
   ]);
 
@@ -28,22 +31,24 @@ export function createFormManager(containerId) {
 
   async function loadTemplate(templateYaml) {
     if (!templateYaml) {
-      EventBus.emit("logging:warning", ["[FormUI] loadTemplate received null"]);
+      EventBus.emit("logging:warning", [
+        "[createFormManager:loadTemplate] received null",
+      ]);
       return;
     }
 
     EventBus.emit("logging:default", [
-      "[FormUI] Loading template:",
+      "[createFormManager:loadTemplate] Loading template:",
       templateYaml.name,
     ]);
     currentTemplate = templateYaml;
 
-    clearFormUI(); // Don't render fields yet—wait for metadata
+    clearFormUI(container); // Don't render fields yet—wait for metadata
   }
 
   async function loadFormData(metaData, datafile) {
     EventBus.emit("logging:default", [
-      "[FormUI] loadFormData datafile:",
+      "[createFormManager:loadFormData] datafile:",
       datafile,
     ]);
 
@@ -55,7 +60,7 @@ export function createFormManager(containerId) {
         currentTemplate.fields || []
       );
       EventBus.emit("logging:default", [
-        "[FormUI] loaded metaData from API:",
+        "[createFormManager:loadFormData] loaded metaData from API:",
         metaData,
       ]);
     }
@@ -64,7 +69,9 @@ export function createFormManager(containerId) {
     metaData = metaData || {};
 
     if (!metaData) {
-      EventBus.emit("logging:warning", ["[FormUI] No metadata available."]);
+      EventBus.emit("logging:warning", [
+        "[createFormManager:loadFormData] No metadata available.",
+      ]);
       return;
     }
 
@@ -137,10 +144,14 @@ export function createFormManager(containerId) {
   }
 
   async function saveForm() {
-    EventBus.emit("logging:default", ["[FormUI] Save triggered."]);
+    EventBus.emit("logging:default", [
+      "[createFormManager:saveForm] Save triggered.",
+    ]);
 
     if (!currentTemplate || !currentTemplate.storage_location) {
-      EventBus.emit("logging:warning", ["[FormUI] No template selected."]);
+      EventBus.emit("logging:warning", [
+        "[createFormManager:saveForm] No template selected.",
+      ]);
       EventBus.emit("status:update", "No template selected.");
       return;
     }
@@ -150,7 +161,9 @@ export function createFormManager(containerId) {
     const datafile = validateFilenameInput(datafileInput);
 
     if (!datafile) {
-      EventBus.emit("logging:warning", ["[FormUI] No datafile provided."]);
+      EventBus.emit("logging:warning", [
+        "[createFormManager:saveForm] No datafile provided.",
+      ]);
       EventBus.emit("status:update", "Please enter a filename for datafile.");
       return;
     }
@@ -171,7 +184,7 @@ export function createFormManager(containerId) {
       }, 500);
     } else {
       EventBus.emit("logging:error", [
-        "[FormUI] Save failed:",
+        "[createFormManager:saveForm] Save failed:",
         saveResult.error,
       ]);
       EventBus.emit(
@@ -184,7 +197,7 @@ export function createFormManager(containerId) {
   async function deleteForm(datafile) {
     if (!currentTemplate || !currentTemplate.storage_location) {
       EventBus.emit("logging:warning", [
-        "[FormUI] No template selected for deletion.",
+        "[createFormManager:deleteForm] No template selected for deletion.",
       ]);
 
       EventBus.emit("status:update", "Cannot delete: template not selected.");
@@ -210,9 +223,11 @@ export function createFormManager(containerId) {
     if (result) {
       EventBus.emit("status:update", `Deleted: ${datafile}`);
       EventBus.emit("meta:list:reload");
-      clearFormUI();
+      clearFormUI(container);
     } else {
-      EventBus.emit("logging:error", ["[FormUI] Deletion failed."]);
+      EventBus.emit("logging:error", [
+        "[createFormManager:deleteForm] Deletion failed.",
+      ]);
       EventBus.emit("status:update", "Failed to delete metadata file.");
     }
   }
@@ -221,13 +236,13 @@ export function createFormManager(containerId) {
     const btn = document.getElementById(buttonId);
     if (!btn) {
       EventBus.emit("logging:warning", [
-        `[FormUI] Button not found: ${buttonId}`,
+        `[createFormManager:connectNewButton] Button not found: ${buttonId}`,
       ]);
       return;
     }
 
     EventBus.emit("logging:default", [
-      "[FormUI] Connecting new button:",
+      "[createFormManager:connectNewButton] Connecting new button:",
       buttonId,
     ]);
 
@@ -235,7 +250,7 @@ export function createFormManager(containerId) {
       const selected = await getTemplateCallback();
       if (!selected) {
         EventBus.emit("logging:warning", [
-          "[FormUI] No template selected after button click.",
+          "[createFormManager:connectNewButton] No template selected after button click.",
         ]);
         EventBus.emit("status:update", "Please select a template first.");
         return;
@@ -246,17 +261,10 @@ export function createFormManager(containerId) {
     });
   }
 
-  function clearFormUI() {
-    container.innerHTML = `
-      <p>Select or create a data-file to begin.</p>
-    `;
-    EventBus.emit("logging:default", ["[FormUI] Form UI cleared."]);
-  }
-
   // React to EventBus-driven form:selected
   EventBus.on("form:selected", async (datafile) => {
     if (!datafile) {
-      clearFormUI();
+      clearFormUI(container);
       return;
     }
 
