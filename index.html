@@ -13,6 +13,7 @@
     <!-- Core Styles -->
     <link rel="stylesheet" href="assets/layout.css" />
     <link rel="stylesheet" href="assets/menu.css" />
+    <link rel="stylesheet" href="assets/statusbar.css" />
     <link rel="stylesheet" href="assets/modal.css" />
     <link rel="stylesheet" href="assets/forms.css" />
     <link rel="stylesheet" href="assets/fields.css" />
@@ -26,49 +27,51 @@
     <link id="cm-theme" rel="stylesheet" href="assets/codemirror/monokai.css" />
   </head>
   <body>
-    <div id="app-menu">
-      <div class="menu-bar-container">
-        <ul class="menu-bar">
-          <!-- Menu items -->
-        </ul>
+    <div id="main-wrapper">
+      <div id="app-menu">
+        <div class="menu-bar-container">
+          <ul class="menu-bar">
+            <!-- Menu items -->
+          </ul>
+        </div>
       </div>
-    </div>
 
-    <!-- Template Form Editor Context -->
-    <div id="template-container">
-      <div id="template-sidebar">
-        <h3>Templates</h3>
-        <div id="template-list"></div>
+      <!-- Template Form Editor Context -->
+      <div id="template-container">
+        <div id="template-sidebar">
+          <h3>Templates</h3>
+          <div id="template-list"></div>
+        </div>
+        <div id="template-splitter">
+          <div id="template-resizeHandle" title="Drag to Resize"></div>
+        </div>
+        <div id="template-workspace">
+          <section id="template-content">
+            <p>Select or create a template to begin editing YAML.</p>
+          </section>
+        </div>
       </div>
-      <div id="template-splitter">
-        <div id="template-resizeHandle" title="Drag to Resize"></div>
-      </div>
-      <div id="template-workspace">
-        <section id="template-content">
-          <p>Select or create a template to begin editing YAML.</p>
-        </section>
-      </div>
-    </div>
 
-    <!-- Markdown Document Editor Context -->
-    <div id="storage-container" style="display: none">
-      <div id="storage-sidebar">
-        <div id="template-selector"></div>
-        <h3>Forms</h3>
-        <div id="storage-list"></div>
+      <!-- Markdown Document Editor Context -->
+      <div id="storage-container" style="display: none">
+        <div id="storage-sidebar">
+          <div id="template-selector"></div>
+          <h3>Forms</h3>
+          <div id="storage-list"></div>
+        </div>
+        <div id="storage-splitter">
+          <div id="storage-resizeHandle" title="Drag to Resize"></div>
+        </div>
+        <div id="storage-workspace">
+          <section id="storage-content">
+            <p>Select or create a data-file to begin.</p>
+          </section>
+        </div>
       </div>
-      <div id="storage-splitter">
-        <div id="storage-resizeHandle" title="Drag to Resize"></div>
-      </div>
-      <div id="storage-workspace">
-        <section id="storage-content">
-          <p>Select or create a data-file to begin.</p>
-        </section>
-      </div>
-    </div>
 
-    <!-- Shared Status Bar -->
-    <div id="status-bar">Ready.</div>
+      <!-- Shared Status Bar -->
+      <div id="status-bar">Ready.</div>
+    </div>
 
     <!-- Settings Modal -->
     <div id="settings-modal" class="modal">

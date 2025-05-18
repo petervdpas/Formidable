@@ -1,0 +1,20 @@
+/* ───── Status Bar ───── */
+#status-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 24px;
+  z-index: 999;
+
+  border-top: 1px solid;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+}
+
+#main-wrapper {
+  height: calc(100vh - 28px); /* minus status bar + 4 */
+}

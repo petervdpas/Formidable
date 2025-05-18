@@ -7,11 +7,15 @@ body {
   flex-direction: column;
 }
 
+#main-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
 #template-container,
 #storage-container {
   display: flex;
   flex: 1;
-  height: calc(100vh - 24px); /* minus status bar */
   overflow: hidden;
 }
 
@@ -74,16 +78,7 @@ body {
   min-width: 0;
 }
 
-/* ───── Status Bar ───── */
-#status-bar {
-  height: 24px;
-  border-top: 1px solid;
-  padding: 4px 10px;
-  font-size: 12px;
-  font-style: italic;
-  display: flex;
-  align-items: center;
-}
+
 
 /* ───── Selector Styles ───── */
 #template-selector {

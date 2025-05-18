@@ -33,6 +33,12 @@ body {
   color: #222;
 }
 
+#status-bar {
+  background-color: #f4f4f4;
+  border-top: 1px solid #ccc;
+  color: #333;
+}
+
 .template-item,
 .storage-item {
   background-color: #e0e0e0;
@@ -49,12 +55,6 @@ body {
   color: white;
   font-weight: bold;
   border-left: 4px solid #1976d2;
-}
-
-#status-bar {
-  background-color: #f4f4f4;
-  border-top: 1px solid #ccc;
-  color: #333;
 }
 
 .slider {

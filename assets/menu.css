@@ -2,6 +2,7 @@
     background: #f4f4f4;
     border-bottom: 1px solid #ccc;
     font-size: 14px;
+    z-index: 1000;
 }
 
 .dark-mode #app-menu {

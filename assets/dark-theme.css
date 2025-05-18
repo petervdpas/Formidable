@@ -16,10 +16,15 @@
 .dark-mode #template-workspace,
 .dark-mode #template-content,
 .dark-mode #storage-workspace,
-.dark-mode #storage-content,
-.dark-mode #status-bar {
+.dark-mode #storage-content {
   background-color: #121212;
   color: #eee;
+}
+
+.dark-mode #status-bar {
+  background-color: #1e1e1e;
+  border-top: 1px solid #444;
+  color: #ccc;
 }
 
 .dark-mode #template-sidebar,
@@ -43,12 +48,6 @@
   color: white;
   font-weight: bold;
   border-left: 4px solid #0d47a1;
-}
-
-.dark-mode #status-bar {
-  background-color: #1e1e1e;
-  border-top: 1px solid #444;
-  color: #ccc;
 }
 
 .dark-mode .modal {

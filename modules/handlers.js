@@ -48,36 +48,6 @@ export function handleTemplateConfirm(modal, defaultStorageLocation, callback) {
   setTimeout(() => nameInput.focus(), 100);
 }
 
-export async function handleEntryClick(entryName, formManager) {
-  try {
-    const template = window.currentSelectedTemplate;
-    if (!template) {
-      EventBus.emit("logging:warning", [
-        "[MetaList] No template selected when clicking item.",
-      ]);
-      return;
-    }
-    const dir = template.storage_location;
-    const data = await window.api.forms.loadForm(
-      dir,
-      entryName,
-      template.fields || []
-    );
-    if (!data) {
-      EventBus.emit("status:update", "Failed to load metadata entry.");
-      return;
-    }
-
-    await formManager.loadFormData(data, entryName);
-
-    EventBus.emit("context:select:form", entryName);
-    EventBus.emit("status:update", `Loaded metadata: ${entryName}`);
-  } catch (err) {
-    EventBus.emit("logging:error", ["[MetaList] Failed to load entry:", err]);
-    EventBus.emit("status:update", "Error loading metadata.");
-  }
-}
-
 export function handleEntryConfirm(modal, callback) {
   const input = document.getElementById("entry-name");
   const checkbox = document.getElementById("entry-append-date");

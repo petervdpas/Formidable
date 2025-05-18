@@ -49,6 +49,7 @@ export function createFormManager(containerId) {
   }
 
   async function loadFormData(metaData, datafile) {
+    /*
     if (datafile === currentDatafile) {
       EventBus.emit("logging:default", [
         "[FormManager] Skipping re-render for same datafile:",
@@ -56,6 +57,7 @@ export function createFormManager(containerId) {
       ]);
       return;
     }
+      */
     currentDatafile = datafile;
 
     EventBus.emit("logging:default", [

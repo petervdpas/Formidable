@@ -49,7 +49,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   // ── EventBus Init
   initEventRouter();
 
-  // ── Static UI Init ──
+  // ── Menu ──
   buildMenu("app-menu", handleMenuAction);
   initStatusHandler("status-bar");
 

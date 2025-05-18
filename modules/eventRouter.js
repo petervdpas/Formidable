@@ -54,13 +54,18 @@ export function initEventRouter() {
   EventBus.on("context:select:form", formHandlers.handleFormSelected);
 
   EventBus.off("template:list:reload", listHandlers.handleListReload);
+  EventBus.off("template:list:itemClicked", listHandlers.handleListItemClicked);
   EventBus.off("template:list:highlighted", listHandlers.handleListHighlighted);
 
   EventBus.off("form:list:reload", formHandlers.handleListReload);
+  EventBus.off("form:list:itemClicked", listHandlers.handleListItemClicked);
   EventBus.off("form:list:highlighted", listHandlers.handleListHighlighted);
 
   EventBus.on("template:list:reload", () =>
     listHandlers.handleListReload({ listId: "template-list" })
+  );
+  EventBus.on("template:list:itemClicked", (name) =>
+    listHandlers.handleListItemClicked({ listId: "template-list", name })
   );
   EventBus.on("template:list:highlighted", (name) =>
     listHandlers.handleListHighlighted({ listId: "template-list", name })
@@ -68,6 +73,9 @@ export function initEventRouter() {
 
   EventBus.on("form:list:reload", () =>
     listHandlers.handleListReload({ listId: "storage-list" })
+  );
+  EventBus.on("form:list:itemClicked", (name) =>
+    listHandlers.handleListItemClicked({ listId: "storage-list", name })
   );
   EventBus.on("form:list:highlighted", (name) =>
     listHandlers.handleListHighlighted({ listId: "storage-list", name })

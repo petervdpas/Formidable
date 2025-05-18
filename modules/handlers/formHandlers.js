@@ -15,7 +15,7 @@ export async function handleFormSelected(datafile) {
     "[Handler] context:select:form received:",
     datafile,
   ]);
-
+/*
   if (datafile === window.currentSelectedFormName) {
     EventBus.emit("logging:default", [
       "[Handler] Skipping redundant form selection:",
@@ -24,7 +24,7 @@ export async function handleFormSelected(datafile) {
     return;
   }
   window.currentSelectedFormName = datafile;
-
+*/
   await window.api.config.updateUserConfig({ selected_data_file: datafile });
 
   if (!formManager) {

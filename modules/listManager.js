@@ -5,6 +5,7 @@ import { makeSelectableList } from "../utils/domUtils.js";
 
 export function createListManager({
   elementId,
+  itemClass = "list-item",
   fetchListFunction,
   onItemClick,
   emptyMessage = "No items.",
@@ -38,7 +39,7 @@ export function createListManager({
           const value = isObject ? raw.value : raw;
 
           const item = document.createElement("div");
-          item.className = "template-item";
+          item.className = itemClass;
           item.textContent = display;
 
           container.appendChild(item);
