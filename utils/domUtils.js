@@ -1,6 +1,6 @@
-// modules/uiBehaviors.js
+// utils/domUtils.js
 
-import { log, warn } from "./logger.js";
+import { EventBus } from "../modules/eventBus.js";
 import {
   applyListField,
   applyTableField,
@@ -14,7 +14,9 @@ export function highlightAndClickMatch(
   onClickFallback = null
 ) {
   if (!container || !targetName) {
-    warn("[highlightAndClickMatch] Missing container or targetName");
+    EventBus.emit("logging:warning", [
+      "[highlightAndClickMatch] Missing container or targetName",
+    ]);
     return;
   }
 
@@ -37,13 +39,17 @@ export function highlightAndClickMatch(
     if (typeof onClickFallback === "function") {
       setTimeout(() => {
         if (!match.classList.contains("selected")) {
-          warn("[highlightAndClickMatch] Click failed, running fallback");
+          EventBus.emit("logging:warning", [
+            "[highlightAndClickMatch] Click failed, running fallback",
+          ]);
           onClickFallback(targetName);
         }
       }, 50);
     }
   } else {
-    warn(`[highlightAndClickMatch] No match found for: ${normalizedTarget}`);
+    EventBus.emit("logging:warning", [
+      `[highlightAndClickMatch] No match found for: ${normalizedTarget}`,
+    ]);
   }
 }
 
@@ -55,21 +61,25 @@ export function focusFirstInput(
     const firstInput = container.querySelector(selector);
     if (firstInput) {
       firstInput.focus();
-      log("[UI] Focused first input.");
+      EventBus.emit("logging:default", ["[UI] Focused first input."]);
     } else {
-      warn("[UI] No input to focus.");
+      EventBus.emit("logging:warning", ["[UI] No input to focus."]);
     }
   }, 0); // 🔁 defer until after DOM update
 }
 
 export function applyFieldValues(container, fieldsOrKeys = [], data = {}) {
   if (!container || typeof container.querySelector !== "function") {
-    warn("[UI] applyFieldValues: Invalid container.");
+    EventBus.emit("logging:default", [
+      "[UI] applyFieldValues: Invalid container.",
+    ]);
     return;
   }
 
   if (!data || typeof data !== "object") {
-    warn("[UI] applyFieldValues: No valid data object provided.");
+    EventBus.emit("logging:default", [
+      "[UI] applyFieldValues: No valid data object provided.",
+    ]);
     return;
   }
 
@@ -94,7 +104,9 @@ export function applyFieldValues(container, fieldsOrKeys = [], data = {}) {
     applyGenericField(input, key, value);
   });
 
-  log("[UI] applyFieldValues: Applied field values.");
+  EventBus.emit("logging:default", [
+    "[UI] applyFieldValues: Applied field values.",
+  ]);
 }
 
 export function makeSelectableList(
@@ -116,7 +128,9 @@ export function makeSelectableList(
 
 export function bindActionHandlers(container, selector, callback) {
   if (!container || typeof container.querySelectorAll !== "function") {
-    warn("[UI] bindActionHandlers: Invalid container.");
+    EventBus.emit("logging:warning", [
+      "[UI] bindActionHandlers: Invalid container.",
+    ]);
     return;
   }
 
@@ -125,9 +139,11 @@ export function bindActionHandlers(container, selector, callback) {
     const action = el.getAttribute("data-action");
     if (!action) return;
 
-    log(`[UI] Binding action handler: ${action}`);
+    EventBus.emit("logging:default", [
+      `[UI] Binding action handler: ${action}`,
+    ]);
     el.addEventListener("click", () => {
-      log(`[UI] Triggered action: ${action}`);
+      EventBus.emit("logging:default", [`[UI] Triggered action: ${action}`]);
       callback(action);
     });
   });

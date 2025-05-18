@@ -1,8 +1,8 @@
 // utils/formUtils.js
 
+import { EventBus } from "../modules/eventBus.js";
 import { fieldTypes } from "./fieldTypes.js";
 import * as renderers from "./fieldRenderers.js";
-import { warn, log } from "./logger.js";
 
 export function extractFieldDefinition({
   keyId = "edit-key",
@@ -44,7 +44,9 @@ export function getFormData(container, template) {
   fields.forEach((field) => {
     const typeDef = fieldTypes[field.type];
     if (!typeDef || typeof typeDef.parseValue !== "function") {
-      warn(`[FormUtils] No parser for field type: ${field.type}`);
+      EventBus.emit("logging:warning", [
+        `[FormUtils] No parser for field type: ${field.type}`,
+      ]);
       return;
     }
 
@@ -61,14 +63,16 @@ export function getFormData(container, template) {
     }
 
     if (!el) {
-      warn(`[FormUtils] Missing input for: ${field.key}`);
+      EventBus.emit("logging:warning", [
+        `[FormUtils] Missing input for: ${field.key}`,
+      ]);
       return;
     }
 
     data[field.key] = typeDef.parseValue(el);
   });
 
-  log("[FormData] Collected form data:", data);
+  EventBus.emit("logging:default", ["[FormData] Collected form data:", data]);
   return data;
 }
 
@@ -87,7 +91,9 @@ export function renderFieldElement(field) {
   const typeDef = fieldTypes[type];
 
   if (!fn || !typeDef) {
-    warn(`[FormUtils] No renderer found for type: ${type}`);
+    EventBus.emit("logging:default", [
+      `[FormUtils] No renderer found for type: ${type}`,
+    ]);
     return null;
   }
 

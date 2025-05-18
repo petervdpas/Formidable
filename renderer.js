@@ -1,7 +1,6 @@
 // renderer.js
 
 // ───── Imports ──────────────────────────────
-import { log, warn, error } from "./utils/logger.js";
 import { EventBus } from "./modules/eventBus.js";
 import { initEventRouter } from "./modules/eventRouter.js";
 import { initStatusHandler } from "./modules/handlers/statusHandler.js";
@@ -33,7 +32,7 @@ import { bindTemplateDependencies } from "./modules/handlers/templateHandlers.js
 
 // ───── DOM Ready ──────────────────────────────
 window.addEventListener("DOMContentLoaded", async () => {
-  log("[App] DOM loaded.");
+  console.log("[App] DOM loaded.");
 
   // ── Global UI State ──
   window.currentSelectedTemplate = null;
@@ -44,6 +43,9 @@ window.addEventListener("DOMContentLoaded", async () => {
       btn.classList.add("btn", "btn-default");
     }
   });
+
+  // ── EventBus Init
+  initEventRouter();
 
   // ── Static UI Init ──
   buildMenu("app-menu", handleMenuAction);
@@ -58,8 +60,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   const contextToggle = document.getElementById("context-toggle");
   const loggingToggle = document.getElementById("logging-toggle");
 
-  // ── EventBus Init
-  initEventRouter();
   // ── Logging Toggler
   EventBus.emit("logging:toggle", config.logging_enabled);
 
@@ -86,7 +86,10 @@ window.addEventListener("DOMContentLoaded", async () => {
     labelText: "Template",
     options: [],
     onChange: async (selectedName) => {
-      log("[Dropdown] Changed selection to:", selectedName);
+      EventBus.emit("logging:default", [
+        "[Dropdown] Changed selection to:",
+        selectedName,
+      ]);
       await selectTemplate(selectedName); // wired below
     },
     onRefresh: async () => {
@@ -106,11 +109,14 @@ window.addEventListener("DOMContentLoaded", async () => {
       template = `${updatedYaml.name}.yaml`;
       window.currentSelectedTemplateName = template;
       window.currentSelectedTemplate = updatedYaml;
-      log("[YamlEditor] Recovered from template name:", template);
+      EventBus.emit("logging:default", [
+        "[YamlEditor] Recovered from template name:",
+        template,
+      ]);
     }
 
     if (!template) {
-      warn("[YamlEditor] No template selected.");
+      EventBus.emit("logging:warning", ["[YamlEditor] No template selected."]);
       EventBus.emit("status:update", "Cannot save: no template selected.");
       return;
     }

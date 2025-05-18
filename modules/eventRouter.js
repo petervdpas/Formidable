@@ -9,10 +9,8 @@ import * as themeHandler from "./handlers/themeHandler.js";
 import * as statusHandler from "./handlers/statusHandler.js";
 import * as loggingHandler from "./handlers/loggingHandler.js";
 
-import { log, warn, error } from "../utils/logger.js";
-
 export function initEventRouter() {
-  log("[EventRouter] Initializing global event listeners...");
+  console.log("[EventRouter] Initializing global event listeners...");
   
   EventBus.on("logging:toggle", loggingHandler.handleLoggingToggle);
   EventBus.on("logging:default", loggingHandler.handleLogDefault);

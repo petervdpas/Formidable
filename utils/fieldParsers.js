@@ -1,7 +1,5 @@
 // utils/fieldParsers.js
 
-import { warn } from "./logger.js";
-
 // Text
 export function parseTextField(input) {
   return input.value.trim();
