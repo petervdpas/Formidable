@@ -178,7 +178,7 @@ export function createFormManager(containerId) {
 
     if (saveResult.success) {
       EventBus.emit("status:update", `Saved metadata: ${saveResult.path}`);
-      EventBus.emit("meta:list:reload");
+      EventBus.emit("form:list:reload");
       setTimeout(() => {
         EventBus.emit("form:list:highlighted", datafile);
       }, 500);
@@ -222,7 +222,7 @@ export function createFormManager(containerId) {
 
     if (result) {
       EventBus.emit("status:update", `Deleted: ${datafile}`);
-      EventBus.emit("meta:list:reload");
+      EventBus.emit("form:list:reload");
       clearFormUI(container);
     } else {
       EventBus.emit("logging:error", [

@@ -126,15 +126,14 @@ export function createMetaListManager(formManager, modal) {
     },
   });
 
-  EventBus.on("meta:list:reload", async () => {
-    await listManager.loadList();
-  });
-
   EventBus.on("form:list:highlighted", (name) => {
     if (!name) return;
     const container = document.getElementById("storage-list");
     highlightAndClickMatch(container, name);
   });
 
-  return listManager;
+  return {
+    ...listManager,
+    reloadList: () => listManager.loadList(),
+  };
 }

@@ -163,7 +163,10 @@ window.addEventListener("DOMContentLoaded", async () => {
     metaListManager,
   });
 
-  bindFormDependencies({ formManager });
+  bindFormDependencies({
+    formManager,
+    metaListManager,
+  });
 
   // ── Initial Data Load ──
   await Promise.all([

@@ -31,12 +31,14 @@ export function initEventRouter() {
   // Core events
   EventBus.off("template:selected", templateHandlers.handleTemplateSelected);
   EventBus.off("form:selected", formHandlers.handleFormSelected);
+  EventBus.off("form:list:reload", formHandlers.handleListReload);
   EventBus.off("context:toggle", contextHandlers.handleContextToggle);
   EventBus.off("theme:toggle", themeHandler.handleThemeToggle);
   EventBus.off("status:update", statusHandler.handleStatusUpdate);
 
   EventBus.on("template:selected", templateHandlers.handleTemplateSelected);
   EventBus.on("form:selected", formHandlers.handleFormSelected);
+  EventBus.on("form:list:reload", formHandlers.handleListReload);
   EventBus.on("context:toggle", contextHandlers.handleContextToggle);
   EventBus.on("theme:toggle", themeHandler.handleThemeToggle);
   EventBus.on("status:update", statusHandler.handleStatusUpdate);

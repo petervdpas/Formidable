@@ -3,9 +3,11 @@
 import { EventBus } from "../eventBus.js";
 
 let formManager = null;
+let metaListManager = null;
 
 export function bindFormDependencies(deps) {
   formManager = deps.formManager;
+  metaListManager = deps.metaListManager;
 }
 
 export async function handleFormSelected(datafile) {
@@ -29,4 +31,12 @@ export async function handleFormSelected(datafile) {
   }
 
   await formManager.loadFormData(null, datafile);
+}
+
+export async function handleListReload()  {
+  if (!metaListManager) {
+    EventBus.emit("logging:warning", ["[Handler] No metaListManager available."]);
+    return;
+  }
+  await metaListManager.reloadList();
 }
