@@ -14,6 +14,10 @@ import { setupRenderModal } from "./modalSetup.js";
 
 export function createFormManager(containerId) {
   const container = document.getElementById(containerId);
+  
+  let currentTemplate = null;
+  let currentDatafile = null;
+
   if (!container) {
     EventBus.emit("logging:error", [
       "[createFormManager] Form container not found:",
@@ -26,8 +30,6 @@ export function createFormManager(containerId) {
     "[createFormManager] Initialized with container:",
     containerId,
   ]);
-
-  let currentTemplate = null;
 
   async function loadTemplate(templateYaml) {
     if (!templateYaml) {
@@ -47,16 +49,26 @@ export function createFormManager(containerId) {
   }
 
   async function loadFormData(metaData, datafile) {
+
+    if (datafile === currentDatafile) {
+      EventBus.emit("logging:default", [
+        "[FormManager] Skipping re-render for same datafile:",
+        datafile,
+      ]);
+      return;
+    }
+    currentDatafile = datafile;
+
     EventBus.emit("logging:default", [
       "[createFormManager:loadFormData] datafile:",
-      datafile,
+      currentDatafile,
     ]);
 
     // Load from file if needed
-    if (!metaData && currentTemplate?.storage_location && datafile) {
+    if (!metaData && currentTemplate?.storage_location && currentDatafile) {
       metaData = await window.api.forms.loadForm(
         currentTemplate.storage_location,
-        datafile,
+        currentDatafile,
         currentTemplate.fields || []
       );
       EventBus.emit("logging:default", [
@@ -266,6 +278,9 @@ export function createFormManager(containerId) {
     loadFormData,
     saveForm,
     connectNewButton,
-    clearForm: () => clearFormUI(container),
+    clearForm: () => {
+      currentDatafile = null;
+      clearFormUI(container);
+    },
   };
 }
