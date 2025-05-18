@@ -4,6 +4,13 @@
 
 ---
 
+## 📦 Download
+
+**Latest Windows Installer**:  
+👉 [Formidable Setup 1.0.0.exe](https://github.com/petervdpas/Formidable/raw/main/installer/Formidable%20Setup%201.0.0.exe)
+
+---
+
 ## ✨ Key Features
 
 - **🔧 Dual Editing Modes**

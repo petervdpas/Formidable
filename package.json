@@ -7,7 +7,8 @@
     "start": "electron .",
     "prebuild": "electron-builder --dir",
     "patch-icon": "node scripts/patch-icon.js",
-    "build": "npm run prebuild && npm run patch-icon && electron-builder --win --prepackaged dist/win-unpacked"
+    "build": "npm run prebuild && npm run patch-icon && electron-builder --win --prepackaged dist/win-unpacked",
+    "postbuild": "node scripts/copy-installer.js"
   },
   "build": {
     "appId": "com.formidable.editor",
