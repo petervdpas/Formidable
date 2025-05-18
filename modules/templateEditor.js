@@ -1,4 +1,4 @@
-// modules/yamlEditor.js
+// modules/templateEditor.js
 
 import { EventBus } from "./eventBus.js";
 import { showConfirmModal } from "./modalSetup.js";
@@ -12,25 +12,10 @@ let codeMirrorEditor = null;
 let keyboardListenerAttached = false;
 let editorWrapper = null;
 
-function toggleFullscreen() {
-  if (!editorWrapper) return;
-
-  const entering = !editorWrapper.classList.contains("fullscreen");
-  editorWrapper.classList.toggle("fullscreen");
-  setTimeout(() => codeMirrorEditor.refresh(), 50);
-
-  const oldHint = editorWrapper.querySelector(".fullscreen-hint");
-  if (oldHint) oldHint.remove();
-
-  if (entering) {
-    const notice = document.createElement("div");
-    notice.className = "fullscreen-hint";
-    notice.textContent = "ESC to exit fullscreen";
-    editorWrapper.appendChild(notice);
-  }
-}
-
 function handleEditorKey(e) {
+
+  if (!editorWrapper) return;
+  
   EventBus.emit("logging:default", [
     `[YamlEditor] Key pressed: ctrl=${e.ctrlKey}, key=${e.key}`,
   ]);
@@ -39,13 +24,13 @@ function handleEditorKey(e) {
     EventBus.emit("logging:default", [
       "[YamlEditor] CTRL+ENTER pressed → toggle fullscreen",
     ]);
-    toggleFullscreen();
+    EventBus.emit("screen:fullscreen", editorWrapper);
   }
   if (e.key === "Escape" && editorWrapper?.classList.contains("fullscreen")) {
     EventBus.emit("logging:default", [
       "[YamlEditor] ESC pressed → exit fullscreen",
     ]);
-    toggleFullscreen();
+    EventBus.emit("screen:fullscreen", editorWrapper);
   }
 }
 
@@ -80,7 +65,7 @@ function getMarkdownTemplate() {
   return codeMirrorEditor?.getValue().trim() || "";
 }
 
-export function initYamlEditor(containerId, onSaveCallback) {
+export function initTemplateEditor(containerId, onSaveCallback) {
   const container = document.getElementById(containerId);
   if (!container) {
     EventBus.emit("logging:warning", [

@@ -2,6 +2,7 @@
 
 import { EventBus } from "./eventBus.js";
 
+import * as screenHandlers from "./handlers/screenHandlers.js";
 import * as contextHandlers from "./handlers/contextHandlers.js";
 import * as templateHandlers from "./handlers/templateHandlers.js";
 import * as formHandlers from "./handlers/formHandlers.js";
@@ -30,9 +31,11 @@ export function initEventRouter() {
   EventBus.on("logging:error", loggingHandler.handleLogError);
 
   // Core events
+  EventBus.off("screen:fullscreen", screenHandlers.handleFullscreenToggle);
   EventBus.off("theme:toggle", themeHandler.handleThemeToggle);
   EventBus.off("status:update", statusHandler.handleStatusUpdate);
 
+  EventBus.on("screen:fullscreen", screenHandlers.handleFullscreenToggle);
   EventBus.on("theme:toggle", themeHandler.handleThemeToggle);
   EventBus.on("status:update", statusHandler.handleStatusUpdate);
 

@@ -8,7 +8,7 @@ import { initStatusHandler } from "./modules/handlers/statusHandler.js";
 import { initThemeToggle } from "./modules/themeToggle.js";
 import { buildMenu, handleMenuAction } from "./modules/menuManager.js";
 import { createDropdown } from "./modules/dropdownManager.js";
-import { initYamlEditor } from "./modules/yamlEditor.js";
+import { initTemplateEditor } from "./modules/templateEditor.js";
 import { createFormManager } from "./modules/formUI.js";
 
 import {
@@ -104,7 +104,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
 
   // ── Template Editor ──
-  const yamlEditor = initYamlEditor("template-content", async (updatedYaml) => {
+  const templateEditor = initTemplateEditor("template-content", async (updatedYaml) => {
     let template = window.currentSelectedTemplateName;
 
     if (!template && updatedYaml?.name) {
@@ -157,7 +157,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   bindTemplateDependencies({
     formManager,
     metaListManager,
-    yamlEditor,
+    templateEditor,
   });
 
   bindFormDependencies({
