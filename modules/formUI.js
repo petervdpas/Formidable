@@ -1,6 +1,5 @@
 // modules/formUI.js
 
-import { log, warn, error } from "../utils/logger.js";
 import { EventBus } from "./eventBus.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 import { getFormData } from "../utils/formUtils.js";
@@ -13,23 +12,35 @@ import { setupRenderModal } from "./modalSetup.js";
 export function createFormManager(containerId) {
   const container = document.getElementById(containerId);
   if (!container) {
-    error("[FormUI] Form container not found:", containerId);
+    EventBus.emit("logging:error", [
+      "[FormUI] Form container not found:",
+      containerId,
+    ]);
     return;
   }
 
-  log("[FormUI] Initialized with container:", containerId);
+  EventBus.emit("logging:default", [
+    "[FormUI] Initialized with container:",
+    containerId,
+  ]);
 
   let currentTemplate = null;
 
   async function loadTemplate(templateYaml) {
-    log("[FormUI] Loading template:", templateYaml.name);
+    EventBus.emit("logging:default", [
+      "[FormUI] Loading template:",
+      templateYaml.name,
+    ]);
     currentTemplate = templateYaml;
 
     clearFormUI(); // Don't render fields yet—wait for metadata
   }
 
   async function loadFormData(metaData, datafile) {
-    log("[FormUI] loadFormData datafile:", datafile);
+    EventBus.emit("logging:default", [
+      "[FormUI] loadFormData datafile:",
+      datafile,
+    ]);
 
     // Load from file if needed
     if (!metaData && currentTemplate?.storage_location && datafile) {
@@ -38,14 +49,17 @@ export function createFormManager(containerId) {
         datafile,
         currentTemplate.fields || []
       );
-      log("[FormUI] loaded metaData from API:", metaData);
+      EventBus.emit("logging:default", [
+        "[FormUI] loaded metaData from API:",
+        metaData,
+      ]);
     }
 
     // 🩹 Ensure metaData is at least an empty object
     metaData = metaData || {};
 
     if (!metaData) {
-      warn("[FormUI] No metadata available.");
+      EventBus.emit("logging:warning", ["[FormUI] No metadata available."]);
       return;
     }
 
@@ -118,14 +132,11 @@ export function createFormManager(containerId) {
   }
 
   async function saveForm() {
-    log("[FormUI] Save triggered.");
+    EventBus.emit("logging:default", ["[FormUI] Save triggered."]);
 
     if (!currentTemplate || !currentTemplate.storage_location) {
-      warn("[FormUI] No template selected.");
-      EventBus.emit(
-        "status:update",
-        "No template selected."
-      );
+      EventBus.emit("logging:warning", ["[FormUI] No template selected."]);
+      EventBus.emit("status:update", "No template selected.");
       return;
     }
 
@@ -134,7 +145,7 @@ export function createFormManager(containerId) {
     const datafile = validateFilenameInput(datafileInput);
 
     if (!datafile) {
-      warn("[FormUI] No datafile provided.");
+      EventBus.emit("logging:warning", ["[FormUI] No datafile provided."]);
       EventBus.emit("status:update", "Please enter a filename for datafile.");
       return;
     }
@@ -154,7 +165,10 @@ export function createFormManager(containerId) {
         EventBus.emit("form:list:highlighted", datafile);
       }, 500);
     } else {
-      error("[FormUI] Save failed:", saveResult.error);
+      EventBus.emit("logging:error", [
+        "[FormUI] Save failed:",
+        saveResult.error,
+      ]);
       EventBus.emit(
         "status:update",
         `Failed to save metadata: ${saveResult.error}`
@@ -164,7 +178,10 @@ export function createFormManager(containerId) {
 
   async function deleteForm(datafile) {
     if (!currentTemplate || !currentTemplate.storage_location) {
-      warn("[FormUI] No template selected for deletion.");
+      EventBus.emit("logging:warning", [
+        "[FormUI] No template selected for deletion.",
+      ]);
+
       EventBus.emit("status:update", "Cannot delete: template not selected.");
       return;
     }
@@ -190,7 +207,7 @@ export function createFormManager(containerId) {
       EventBus.emit("meta:list:reload");
       clearFormUI();
     } else {
-      error("[FormUI] Deletion failed.");
+      EventBus.emit("logging:error", ["[FormUI] Deletion failed."]);
       EventBus.emit("status:update", "Failed to delete metadata file.");
     }
   }
@@ -198,25 +215,29 @@ export function createFormManager(containerId) {
   function connectNewButton(buttonId, getTemplateCallback) {
     const btn = document.getElementById(buttonId);
     if (!btn) {
-      warn(`[FormUI] Button not found: ${buttonId}`);
+      EventBus.emit("logging:warning", [
+        `[FormUI] Button not found: ${buttonId}`,
+      ]);
       return;
     }
 
-    log("[FormUI] Connecting new button:", buttonId);
+    EventBus.emit("logging:default", [
+      "[FormUI] Connecting new button:",
+      buttonId,
+    ]);
 
     btn.addEventListener("click", async () => {
       const selected = await getTemplateCallback();
       if (!selected) {
-        warn("[FormUI] No template selected after button click.");
+        EventBus.emit("logging:warning", [
+          "[FormUI] No template selected after button click.",
+        ]);
         EventBus.emit("status:update", "Please select a template first.");
         return;
       }
       await loadTemplate(selected);
 
-      EventBus.emit(
-        "status:update",
-        "Ready to create a new document."
-      );
+      EventBus.emit("status:update", "Ready to create a new document.");
     });
   }
 
@@ -224,7 +245,7 @@ export function createFormManager(containerId) {
     container.innerHTML = `
       <p>Select or create a data-file to begin.</p>
     `;
-    log("[FormUI] Form UI cleared.");
+    EventBus.emit("logging:default", ["[FormUI] Form UI cleared."]);
   }
 
   // React to EventBus-driven form:selected
@@ -235,7 +256,9 @@ export function createFormManager(containerId) {
     }
 
     if (!currentTemplate) {
-      warn("[FormUI] No current template to load form.");
+      EventBus.emit("logging:warning", [
+        "[FormUI] No current template to load form.",
+      ]);
       return;
     }
 

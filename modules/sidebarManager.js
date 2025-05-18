@@ -2,17 +2,14 @@
 
 import { createListManager } from "./listManager.js";
 import { EventBus } from "./eventBus.js";
+import { stripMetaExtension } from "../utils/pathUtils.js";
+import { highlightAndClickMatch } from "../utils/domUtils.js";
 import {
   handleTemplateClick,
   handleTemplateConfirm,
   handleEntryClick,
   handleEntryConfirm,
 } from "./handlers.js";
-import { log, warn, error } from "../utils/logger.js";
-import {
-  stripMetaExtension,
-} from "../utils/pathUtils.js";
-import { highlightAndClickMatch } from "../utils/domUtils.js";
 
 // ─── Public Init Functions ───
 export function createTemplateListManager(
@@ -49,7 +46,10 @@ export function createTemplateListManager(
                 `Created new template: ${template}`
               );
             } catch (err) {
-              error("[AddTemplate] Failed to save:", err);
+              EventBus.emit("logging:error", [
+                "[AddTemplate] Failed to save:",
+                err,
+              ]);
               EventBus.emit("status:update", "Error creating new template.");
             }
           }
@@ -77,14 +77,19 @@ export function createMetaListManager(formManager, modal) {
     fetchListFunction: async () => {
       const template = window.currentSelectedTemplate;
       if (!template) {
-        warn("[MetaList] No selected template.");
+        EventBus.emit("logging:warning", ["[MetaList] No selected template."]);
         EventBus.emit("status:update", "No template selected.");
         return [];
       }
 
       if (!template.storage_location) {
-        warn("[MetaList] No storage location field.");
-        EventBus.emit("status:update", "Template missing storage location field.");
+        EventBus.emit("logging:warning", [
+          "[MetaList] No storage location field.",
+        ]);
+        EventBus.emit(
+          "status:update",
+          "Template missing storage location field."
+        );
         return [];
       }
 
@@ -102,13 +107,18 @@ export function createMetaListManager(formManager, modal) {
       onClick: async () => {
         const template = window.currentSelectedTemplate;
         if (!template) {
-          warn("[AddMarkdown] No template selected.");
+          EventBus.emit("logging:warning", [
+            "[AddMarkdown] No template selected.",
+          ]);
           EventBus.emit("status:update", "Please select a template first.");
           return;
         }
 
         handleEntryConfirm(modal, async (datafile) => {
-          log("[AddMarkdown] Creating new entry:", datafile);
+          EventBus.emit("logging:default", [
+            "[AddMarkdown] Creating new entry:",
+            datafile,
+          ]);
           await formManager.loadFormData({}, datafile);
           EventBus.emit("status:update", "New metadata entry ready.");
         });

@@ -1,6 +1,5 @@
 // modules/listManager.js
 
-import { log, warn, error } from "../utils/logger.js";
 import { EventBus } from "./eventBus.js";
 import { makeSelectableList } from "../utils/domUtils.js";
 
@@ -13,16 +12,20 @@ export function createListManager({
 }) {
   const container = document.getElementById(elementId);
   if (!container) {
-    error(`[ListManager] Element not found: #${elementId}`);
+    EventBus.emit("logging:error", [
+      `[ListManager] Element not found: #${elementId}`,
+    ]);
     throw new Error(`List container #${elementId} not found.`);
   }
 
   async function loadList() {
-    log(`[ListManager] Loading list into #${elementId}...`);
+    EventBus.emit("logging:default", [
+      `[ListManager] Loading list into #${elementId}...`,
+    ]);
     container.innerHTML = "";
     try {
       const items = await fetchListFunction();
-      log("[ListManager] Items:", items);
+      EventBus.emit("logging:default", ["[ListManager] Items:", items]);
 
       if (!items || items.length === 0) {
         container.innerHTML = `<div class="empty-message">${emptyMessage}</div>`;
@@ -55,7 +58,10 @@ export function createListManager({
 
       EventBus.emit("status:update", `Loaded ${items.length} item(s).`);
     } catch (err) {
-      error("[ListManager] Failed to load list:", err);
+      EventBus.emit("logging:error", [
+        "[ListManager] Failed to load list:",
+        err,
+      ]);
       container.innerHTML =
         "<div class='empty-message'>Error loading list.</div>";
       EventBus.emit("status:update", "Error loading list.");

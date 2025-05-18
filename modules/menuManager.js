@@ -1,6 +1,5 @@
 // modules/menuManager.js
 
-import { log, warn, error } from "../utils/logger.js";
 import { EventBus } from "./eventBus.js";
 import { bindActionHandlers } from "../utils/domUtils.js";
 
@@ -8,16 +7,22 @@ export function buildMenu(containerId = "app-menu", commandHandler) {
   const container = document.getElementById(containerId);
 
   if (!container) {
-    warn(`[Menu] No element found with ID: "${containerId}"`);
+    EventBus.emit("logging:warning", [
+      `[Menu] No element found with ID: "${containerId}"`,
+    ]);
     return;
   }
 
   if (typeof commandHandler !== "function") {
-    error("[Menu] Invalid or missing command handler.");
+    EventBus.emit("logging:error", [
+      "[Menu] Invalid or missing command handler.",
+    ]);
     return;
   }
 
-  log(`[Menu] Building menu in container: #${containerId}`);
+  EventBus.emit("logging:default", [
+    `[Menu] Building menu in container: #${containerId}`,
+  ]);
 
   container.innerHTML = `
     <ul class="menu-bar">
@@ -61,8 +66,10 @@ export function buildMenu(containerId = "app-menu", commandHandler) {
   if (contextToggle) {
     contextToggle.addEventListener("change", (e) => {
       const isChecked = e.target.checked;
-      log(`[Menu] Context toggle changed: ${isChecked}`);
-      EventBus.emit("context:toggle", isChecked); // ✅ EventBus only
+      EventBus.emit("logging:default", [
+        `[Menu] Context toggle changed: ${isChecked}`,
+      ]);
+      EventBus.emit("context:toggle", isChecked);
     });
 
     // Initial config sync
@@ -73,12 +80,11 @@ export function buildMenu(containerId = "app-menu", commandHandler) {
     });
   }
 
-  log("[Menu] Menu setup complete.");
+  EventBus.emit("logging:default", ["[Menu] Menu setup complete."]);
 }
 
 export async function handleMenuAction(action) {
-
-  log(`[Menu] Handling menu action: ${action}`);
+  EventBus.emit("logging:default", [`[Menu] Handling menu action: ${action}`]);
 
   switch (action) {
     case "open-template-folder": {
@@ -86,9 +92,15 @@ export async function handleMenuAction(action) {
       await window.api.markdown.ensureMarkdownDir?.(resolved);
       const result = await window.electron.shell.openPath(resolved);
       if (result) {
-        console.error("[Shell] Failed to open template folder:", result);
+        EventBus.emit("logging:error", [
+          "[Shell] Failed to open template folder:",
+          result,
+        ]);
       } else {
-        console.log("[Shell] Opened template folder:", resolved);
+        EventBus.emit("logging:default", [
+          "[Shell] Opened template folder:",
+          resolved,
+        ]);
       }
       break;
     }
@@ -98,59 +110,78 @@ export async function handleMenuAction(action) {
         const config = await window.api.config.loadUserConfig();
         const templateName = config.selected_template;
         if (!templateName) {
-          console.warn("[Menu] No selected_template entry found.");
+          EventBus.emit("logging:warning", [
+            "[Menu] No selected_template entry found.",
+          ]);
           return;
         }
 
-        const templatePath = await window.api.system.resolvePath("templates", templateName);
+        const templatePath = await window.api.system.resolvePath(
+          "templates",
+          templateName
+        );
         const exists = await window.api.system.fileExists(templatePath);
         if (!exists) {
-          console.error("[Menu] Template not found:", templatePath);
+          EventBus.emit("logging:error", [
+            "[Menu] Template not found:",
+            templatePath,
+          ]);
           return;
         }
 
         const yaml = await window.api.templates.loadTemplate(templateName);
-        const targetPath = await window.api.system.resolvePath(yaml.storage_location);
+        const targetPath = await window.api.system.resolvePath(
+          yaml.storage_location
+        );
         await window.api.forms.ensureFormDir?.(targetPath);
 
         const result = await window.electron.shell.openPath(targetPath);
         if (result) {
-          console.error("[Shell] Failed to open storage folder:", result);
+          EventBus.emit("logging:error", [
+            "[Shell] Failed to open storage folder:",
+            result,
+          ]);
         } else {
-          console.log("[Shell] Opened storage folder:", targetPath);
+          EventBus.emit("logging:default", [
+            "[Shell] Opened storage folder:",
+            targetPath,
+          ]);
         }
       } catch (err) {
-        console.error("[Menu] Failed to open storage folder:", err);
+        EventBus.emit("logging:error", [
+          "[Menu] Failed to open storage folder:",
+          err,
+        ]);
       }
       break;
     }
 
     case "quit":
-      log("[Menu] Quitting app...");
+      EventBus.emit("logging:default", ["[Menu] Quitting app..."]);
       window.electron.app.quit();
       break;
 
     case "open-settings":
-      log("[Menu] Opening settings modal...");
+      EventBus.emit("logging:default", ["[Menu] Opening settings modal..."]);
       window.openSettingsModal?.();
       break;
 
     case "reload":
-      log("[Menu] Reloading page...");
+      EventBus.emit("logging:default", ["[Menu] Reloading page..."]);
       location.reload();
       break;
 
     case "devtools":
-      log("[Menu] Toggling devtools...");
+      EventBus.emit("logging:default", ["[Menu] Toggling devtools..."]);
       window.electron.devtools.toggle();
       break;
 
     case "about":
-      log("[Menu] Opening about modal...");
+      EventBus.emit("logging:default", ["[Menu] Opening about modal..."]);
       window.openAboutModal?.();
       break;
 
     default:
-      warn(`[Menu] Unhandled action: ${action}`);
+      EventBus.emit("logging:warning", [`[Menu] Unhandled action: ${action}`]);
   }
 }

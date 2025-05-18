@@ -1,13 +1,12 @@
 // modules/handlers.js
 
 import { EventBus } from "./eventBus.js";
-import { log, warn, error } from "../utils/logger.js";
 
 export async function handleTemplateClick(itemName, yamlEditor) {
   try {
     const data = await window.api.templates.loadTemplate(itemName);
     yamlEditor.render(data);
-    
+
     EventBus.emit("template:selected", {
       name: itemName,
       yaml: data,
@@ -15,7 +14,10 @@ export async function handleTemplateClick(itemName, yamlEditor) {
 
     EventBus.emit("status:update", `Loaded Template: ${itemName}`);
   } catch (err) {
-    error("[TemplateList] Failed to load template:", err);
+    EventBus.emit("logging:error", [
+      "[TemplateList] Failed to load template:",
+      err,
+    ]);
     EventBus.emit("status:update", "Error loading template.");
   }
 }
@@ -70,7 +72,9 @@ export async function handleEntryClick(entryName, formManager) {
   try {
     const template = window.currentSelectedTemplate;
     if (!template) {
-      warn("[MetaList] No template selected when clicking item.");
+      EventBus.emit("logging:warning", [
+        "[MetaList] No template selected when clicking item.",
+      ]);
       return;
     }
     const dir = template.storage_location;
@@ -89,7 +93,7 @@ export async function handleEntryClick(entryName, formManager) {
     EventBus.emit("form:selected", entryName);
     EventBus.emit("status:update", `Loaded metadata: ${entryName}`);
   } catch (err) {
-    error("[MetaList] Failed to load entry:", err);
+    EventBus.emit("logging:error", ["[MetaList] Failed to load entry:", err]);
     EventBus.emit("status:update", "Error loading metadata.");
   }
 }
