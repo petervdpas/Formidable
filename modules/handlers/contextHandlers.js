@@ -1,7 +1,7 @@
 // modules/handlers/contextHandlers.js
 
-import { setContextView } from "../contextManager.js";
 import { EventBus } from "../eventBus.js";
+import { setContextView } from "../contextManager.js";
 
 let containers, dropdown;
 
@@ -35,9 +35,19 @@ export async function handleContextToggle(isStorage) {
 
   if (mode === "template") {
     const selectedTemplate = window.currentSelectedTemplateName;
-    if (selectedTemplate) {
-      const yaml = await window.api.templates.loadTemplate(selectedTemplate);
-      EventBus.emit("context:select:template", { name: selectedTemplate, yaml });
+
+    // Avoid refiring if it's already applied (idempotent)
+    const config = await window.api.config.loadUserConfig();
+
+    // only if not already applied
+    if (selectedTemplate && selectedTemplate !== config.selected_template) {
+      const { selectTemplate } = await import("../templateSelector.js");
+      await selectTemplate(selectedTemplate);
+    } else {
+      EventBus.emit("logging:default", [
+        "[ContextToggle] Skipping redundant selectTemplate for:",
+        selectedTemplate,
+      ]);
     }
   }
 
