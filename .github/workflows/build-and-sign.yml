@@ -23,20 +23,20 @@ jobs:
       - name: Build Electron App
         run: npm run build
 
-      - name: Sign with SignPath
-        uses: SignPath/github-action@v1
-        with:
-          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
-          organization-id: ${{ secrets.SIGNPATH_ORG_ID }}
-          project-slug: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
-          signing-policy-slug: ${{ secrets.SIGNPATH_POLICY_SLUG }}
-          artifact-path: dist/Formidable Setup 1.0.0.exe
-          output-path: dist/Formidable Setup 1.0.0 (signed).exe
+      - name: Sign with SignPath via API
+        run: |
+          curl -sSL "https://app.signpath.io/api/v1/organizations/${{ secrets.SIGNPATH_ORG_ID }}/projects/${{ secrets.SIGNPATH_PROJECT_SLUG }}/signing-requests" ^
+            -H "Authorization: Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" ^
+            -F "PolicySlug=${{ secrets.SIGNPATH_POLICY_SLUG }}" ^
+            -F "File=@dist/Formidable Setup 1.0.0.exe" ^
+            -o dist/signed.zip
+
+          powershell -Command "Expand-Archive -Path 'dist/signed.zip' -DestinationPath 'dist/signed'"
 
       - name: Move signed file to installer folder
         run: |
-          mkdir -p installer
-          mv "dist/Formidable Setup 1.0.0 (signed).exe" "installer/Formidable Setup.exe"
+          mkdir installer
+          move "dist/signed/Formidable Setup 1.0.0.exe" "installer/Formidable Setup.exe"
 
       - name: Upload signed artifact
         uses: actions/upload-artifact@v4
