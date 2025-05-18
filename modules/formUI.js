@@ -1,20 +1,20 @@
 // modules/formUI.js
 
 import { EventBus } from "./eventBus.js";
-import { fieldTypes } from "../utils/fieldTypes.js";
 import {
   getFormData,
   validateFilenameInput,
+  injectFieldDefaults,
   clearFormUI,
 } from "../utils/formUtils.js";
 import { applyFieldValues, focusFirstInput } from "../utils/domUtils.js";
 import { renderForm } from "./formRenderer.js";
+import { setupFormButtons } from "./formButtonSetup.js";
 import { showConfirmModal } from "./modalManager.js";
-import { setupRenderModal } from "./modalSetup.js";
 
 export function createFormManager(containerId) {
   const container = document.getElementById(containerId);
-  
+
   let currentTemplate = null;
   let currentDatafile = null;
 
@@ -49,7 +49,6 @@ export function createFormManager(containerId) {
   }
 
   async function loadFormData(metaData, datafile) {
-
     if (datafile === currentDatafile) {
       EventBus.emit("logging:default", [
         "[FormManager] Skipping re-render for same datafile:",
@@ -92,64 +91,25 @@ export function createFormManager(containerId) {
     // ✅ Inject defaults before rendering (if creating a new entry)
     // Use `field.default` if defined in the template; otherwise fall back to type default
     if (isNewEntry) {
-      currentTemplate.fields.forEach((field) => {
-        const key = field.key;
-        const type = field.type;
-        const defFn = fieldTypes[type]?.defaultValue;
-
-        if (!(key in metaData)) {
-          metaData[key] = field.hasOwnProperty("default")
-            ? field.default
-            : typeof defFn === "function"
-            ? defFn()
-            : undefined;
-        }
-      });
+      injectFieldDefaults(currentTemplate.fields, metaData);
     }
 
     // ✅ Now render the form
     container.innerHTML = "";
-    const { saveButton, deleteButton, renderButton } = renderForm(
-      container,
-      currentTemplate
-    );
+    renderForm(container, currentTemplate);
 
-    // ✅ Only now is the input present in the DOM
-    const datafileInput = container.querySelector("#meta-json-filename");
-    if (datafileInput) {
-      datafileInput.value = datafile;
+    // 🛠 Restore datafile into the input field
+    const filenameInput = container.querySelector("#meta-json-filename");
+    if (filenameInput) {
+      filenameInput.value = datafile;
     }
 
-    saveButton.addEventListener("click", async () => {
-      await saveForm();
+    setupFormButtons({
+      container,
+      template: currentTemplate,
+      onSave: saveForm,
+      onDelete: deleteForm,
     });
-    deleteButton.addEventListener("click", async () => {
-      await deleteForm(datafileInput?.value);
-    });
-
-    const renderModal = setupRenderModal();
-
-    renderButton.addEventListener("click", async () => {
-      const formData = getFormData(container, currentTemplate);
-      const markdown = await window.api.transform.renderMarkdownTemplate(
-        formData,
-        currentTemplate
-      );
-
-      document.getElementById("render-output").textContent = markdown;
-
-      const html = await window.api.transform.renderHtmlPreview(markdown);
-      document.getElementById("render-preview").innerHTML = html;
-
-      renderModal.show();
-    });
-
-    const buttonGroup = document.createElement("div");
-    buttonGroup.className = "button-group";
-    buttonGroup.appendChild(saveButton);
-    buttonGroup.appendChild(deleteButton);
-    buttonGroup.appendChild(renderButton);
-    container.appendChild(buttonGroup);
 
     applyFieldValues(container, currentTemplate.fields, metaData);
     focusFirstInput(container);
@@ -244,40 +204,10 @@ export function createFormManager(containerId) {
     }
   }
 
-  function connectNewButton(buttonId, getTemplateCallback) {
-    const btn = document.getElementById(buttonId);
-    if (!btn) {
-      EventBus.emit("logging:warning", [
-        `[createFormManager:connectNewButton] Button not found: ${buttonId}`,
-      ]);
-      return;
-    }
-
-    EventBus.emit("logging:default", [
-      "[createFormManager:connectNewButton] Connecting new button:",
-      buttonId,
-    ]);
-
-    btn.addEventListener("click", async () => {
-      const selected = await getTemplateCallback();
-      if (!selected) {
-        EventBus.emit("logging:warning", [
-          "[createFormManager:connectNewButton] No template selected after button click.",
-        ]);
-        EventBus.emit("status:update", "Please select a template first.");
-        return;
-      }
-      await loadTemplate(selected);
-
-      EventBus.emit("status:update", "Ready to create a new document.");
-    });
-  }
-
   return {
     loadTemplate,
     loadFormData,
     saveForm,
-    connectNewButton,
     clearForm: () => {
       currentDatafile = null;
       clearFormUI(container);

@@ -82,6 +82,22 @@ function resolveFieldElement(container, field) {
   }
 }
 
+export function injectFieldDefaults(fields, metaData) {
+  fields.forEach((field) => {
+    const key = field.key;
+    const type = field.type;
+    const defFn = fieldTypes[type]?.defaultValue;
+
+    if (!(key in metaData)) {
+      metaData[key] = field.hasOwnProperty("default")
+        ? field.default
+        : typeof defFn === "function"
+        ? defFn()
+        : undefined;
+    }
+  });
+}
+
 export function clearFormUI(
   container,
   label = "Select or create a data-file to begin."
