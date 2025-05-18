@@ -4,11 +4,13 @@ import { EventBus } from "../eventBus.js";
 
 let formManager = null;
 let metaListManager = null;
+let yamlEditor = null;
 
 // 🔗 Inject dependencies from renderer.js
 export function bindTemplateDependencies(deps) {
   formManager = deps.formManager;
   metaListManager = deps.metaListManager;
+  yamlEditor = deps.yamlEditor;
 }
 
 export async function handleTemplateSelected({ name, yaml }) {
@@ -19,6 +21,10 @@ export async function handleTemplateSelected({ name, yaml }) {
 
   window.currentSelectedTemplateName = name;
   window.currentSelectedTemplate = yaml;
+
+  if (yamlEditor) {
+    yamlEditor.render(yaml);
+  }
 
   const config = await window.api.config.loadUserConfig();
   const templateChanged = config.selected_template !== name;

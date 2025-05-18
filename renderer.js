@@ -134,10 +134,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  EventBus.on("template:selected", ({ name, yaml }) => {
-    yamlEditor.render(yaml);
-  });
-
   // ── Sidebars ──
   window.templateListManager = createTemplateListManager(
     yamlEditor,
@@ -162,6 +158,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   bindTemplateDependencies({
     formManager,
     metaListManager,
+    yamlEditor,
   });
 
   bindFormDependencies({
