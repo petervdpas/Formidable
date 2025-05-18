@@ -261,27 +261,11 @@ export function createFormManager(containerId) {
     });
   }
 
-  // React to EventBus-driven form:selected
-  EventBus.on("form:selected", async (datafile) => {
-    if (!datafile) {
-      clearFormUI(container);
-      return;
-    }
-
-    if (!currentTemplate) {
-      EventBus.emit("logging:warning", [
-        "[FormUI] No current template to load form.",
-      ]);
-      return;
-    }
-
-    await loadFormData(null, datafile);
-  });
-
   return {
     loadTemplate,
     loadFormData,
     saveForm,
     connectNewButton,
+    clearForm: () => clearFormUI(container),
   };
 }

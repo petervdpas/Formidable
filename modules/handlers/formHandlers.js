@@ -2,10 +2,31 @@
 
 import { EventBus } from "../eventBus.js";
 
+let formManager = null;
+
+export function bindFormDependencies(deps) {
+  formManager = deps.formManager;
+}
+
 export async function handleFormSelected(datafile) {
   EventBus.emit("logging:default", [
     "[Handler] form:selected received:",
     datafile,
   ]);
+
   await window.api.config.updateUserConfig({ selected_data_file: datafile });
+
+  if (!formManager) {
+    EventBus.emit("logging:warning", [
+      "[Handler] No formManager injected for form:selected.",
+    ]);
+    return;
+  }
+
+  if (!datafile) {
+    formManager.clearForm(); // you'd expose this
+    return;
+  }
+
+  await formManager.loadFormData(null, datafile);
 }

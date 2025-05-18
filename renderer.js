@@ -29,6 +29,7 @@ import { setContextView, initContextToggle } from "./modules/contextManager.js";
 
 import { bindContextDependencies } from "./modules/handlers/contextHandlers.js";
 import { bindTemplateDependencies } from "./modules/handlers/templateHandlers.js";
+import { bindFormDependencies } from "./modules/handlers/formHandlers.js";
 
 // ───── DOM Ready ──────────────────────────────
 window.addEventListener("DOMContentLoaded", async () => {
@@ -161,6 +162,8 @@ window.addEventListener("DOMContentLoaded", async () => {
     formManager,
     metaListManager,
   });
+
+  bindFormDependencies({ formManager });
 
   // ── Initial Data Load ──
   await Promise.all([
