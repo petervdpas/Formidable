@@ -99,6 +99,13 @@ export function initYamlEditor(containerId, onSaveCallback) {
     currentEditIndex = null;
 
   function renderEditor(data) {
+    if (!data) {
+      EventBus.emit("logging:warning", [
+        "[YamlEditor] renderEditor() called with null data",
+      ]);
+      return;
+    }
+
     currentData = structuredClone(data);
     EventBus.emit("logging:default", [
       "[YamlEditor] Rendering editor for:",

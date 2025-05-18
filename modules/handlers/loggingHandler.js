@@ -1,22 +1,31 @@
 // modules/handlers/loggingHandler.js
 
-import { log, warn, error, setLoggingEnabled } from "../../utils/logger.js";
 import { EventBus } from "../eventBus.js";
 
+let loggingEnabled = true;
+
 export function handleLoggingToggle(enabled) {
-  setLoggingEnabled(!!enabled);
-  EventBus.emit("logging:default", ["[Handler] Logging toggled:", enabled]);
+  loggingEnabled = !!enabled;
+  if (loggingEnabled) {
+    console.log("[Handler] Logging toggled:", enabled);
+  }
   EventBus.emit("status:update", `Logging ${enabled ? "enabled" : "disabled"}`);
 }
 
 export function handleLogDefault(args) {
-  log(...args);
+  if (loggingEnabled) {
+    console.log(...args);
+  }
 }
 
 export function handleLogWarning(args) {
-  warn(...args);
+  if (loggingEnabled) {
+    console.warn(...args);
+  }
 }
 
 export function handleLogError(args) {
-  error(...args);
+  if (loggingEnabled) {
+    console.error(...args);
+  }
 }

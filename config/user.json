@@ -2,10 +2,10 @@
   "theme": "dark",
   "font_size": 14,
   "logging_enabled": true,
-  "context_mode": "template",
+  "context_mode": "storage",
   "storage_location": "./storage",
-  "selected_template": "ducki.yaml",
-  "selected_data_file": null,
+  "selected_template": "basic.yaml",
+  "selected_data_file": "test-20250515.meta.json",
   "window_bounds": {
     "width": 1130,
     "height": 890,

@@ -80,7 +80,6 @@ Formidable/
 │   ├── formUtils.js            # Template → form → data mapping
 │   ├── configUtils.js          # Config fallback selector
 │   ├── pathUtils.js            # Filename helpers and normalization
-│   ├── logger.js               # Silent-aware `log/warn/error`
 │   ├── modalUtils.js           # ESC close and type highlighting
 │   ├── resizing.js             # Splitter + modal resizer logic
 │   ├── elementBuilders.js      # Labeled input/textarea/select generators

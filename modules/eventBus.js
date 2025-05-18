@@ -1,51 +1,56 @@
 // modules/eventBus.js
 
 const listeners = {};
+const debug = true;
 
 export const EventBus = {
   on(event, callback) {
     if (!listeners[event]) {
       listeners[event] = [];
     }
-    listeners[event].push(callback);
-    console.log(
-      `[EventBus] Registered listener for "${event}". Total: ${listeners[event].length}`
-    );
-  },
 
-  off(event, callback) {
-    if (!listeners[event]) {
-      console.warn(`[EventBus] Tried to remove listener for unknown event "${event}".`);
+    // Avoid duplicate registration
+    if (listeners[event].includes(callback)) {
+      if (debug) {
+        console.log(`[EventBus] Skipped duplicate listener for "${event}".`);
+      }
       return;
     }
 
-    const originalCount = listeners[event].length;
-    listeners[event] = listeners[event].filter((cb) => cb !== callback);
-    const newCount = listeners[event].length;
+    listeners[event].push(callback);
 
-    if (originalCount === newCount) {
-      console.warn(`[EventBus] Listener not found for "${event}".`);
-    } else {
-      console.log(`[EventBus] Removed listener for "${event}". Remaining: ${newCount}`);
+    if (debug) {
+      console.log(
+        `[EventBus] Registered listener for "${event}". Total: ${listeners[event].length}`
+      );
+    }
+  },
+
+  off(event, callback) {
+    if (!listeners[event]) return;
+
+    const original = listeners[event];
+    listeners[event] = original.filter((cb) => cb !== callback);
+
+    if (debug && original.length !== listeners[event].length) {
+      console.log(
+        `[EventBus] Removed listener for "${event}". Remaining: ${listeners[event].length}`
+      );
     }
   },
 
   emit(event, payload) {
-    if (!listeners[event] || listeners[event].length === 0) {
-      console.log(`[EventBus] Emitted "${event}" but no listeners were registered.`);
-      // console.log(payload);
+    const cbs = listeners[event];
+    if (!cbs || cbs.length === 0) {
+      if (debug) {
+        console.log(`[EventBus] Emitted "${event}" but no listeners were registered.`);
+      }
       return;
     }
 
-    /*
-    console.log(
-      `[EventBus] Emitting "${event}" to ${listeners[event].length} listener(s). Payload:`,
-      payload
-    );
-    */
-    for (const callback of listeners[event]) {
+    for (const cb of cbs) {
       try {
-        callback(payload);
+        cb(payload);
       } catch (err) {
         console.error(`[EventBus] Error in listener for "${event}":`, err);
       }

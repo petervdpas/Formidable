@@ -27,6 +27,11 @@ export function createFormManager(containerId) {
   let currentTemplate = null;
 
   async function loadTemplate(templateYaml) {
+    if (!templateYaml) {
+      EventBus.emit("logging:warning", ["[FormUI] loadTemplate received null"]);
+      return;
+    }
+
     EventBus.emit("logging:default", [
       "[FormUI] Loading template:",
       templateYaml.name,
