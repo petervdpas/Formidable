@@ -10,7 +10,7 @@ import {
 import { applyFieldValues, focusFirstInput } from "../utils/domUtils.js";
 import { renderForm } from "./formRenderer.js";
 import { setupFormButtons } from "./formButtonSetup.js";
-import { showConfirmModal } from "./modalManager.js";
+import { showConfirmModal } from "./modalSetup.js";
 
 export function createFormManager(containerId) {
   const container = document.getElementById(containerId);

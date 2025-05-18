@@ -1,7 +1,7 @@
 // modules/yamlEditor.js
 
 import { EventBus } from "./eventBus.js";
-import { showConfirmModal } from "./modalManager.js";
+import { showConfirmModal } from "./modalSetup.js";
 import { setupFieldEditModal } from "./modalSetup.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 import { getCurrentTheme } from "./themeToggle.js";

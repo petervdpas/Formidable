@@ -159,3 +159,36 @@ export function setupFieldEditModal(onConfirm) {
     typeDropdown,
   };
 }
+
+export function showConfirmModal(message, { ...options } = {}) {
+  const modal = setupModal("confirm-modal", {
+    escToClose: true,
+    backdropClick: true,
+    width: "30em",
+    height: "auto",
+    resizable: false,
+    ...options,
+  });
+
+  const messageEl = document.getElementById("confirm-message");
+  const okBtn = document.getElementById("confirm-ok");
+  const cancelBtn = document.getElementById("confirm-cancel");
+
+  messageEl.textContent = message;
+  okBtn.textContent = options.okText || "OK";
+  cancelBtn.textContent = options.cancelText || "Cancel";
+
+  return new Promise((resolve) => {
+    okBtn.onclick = () => {
+      modal.hide();
+      resolve(true);
+    };
+
+    cancelBtn.onclick = () => {
+      modal.hide();
+      resolve(false);
+    };
+
+    modal.show();
+  });
+}
