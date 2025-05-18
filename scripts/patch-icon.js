@@ -1,30 +1,28 @@
 // scripts/patch-icon.js
 
-const { execFileSync } = require("child_process");
-const path = require("path");
-const fs = require("fs");
+const rcedit = require('rcedit');
+const path = require('path');
+const fs = require('fs');
 
-if (process.platform !== "win32") {
-  console.log("[patch-icon] Skipped: not Windows.");
+if (process.platform !== 'win32') {
+  console.log('[patch-icon] Skipped: not Windows.');
   process.exit(0);
 }
 
-const exePath = path.resolve("dist/win-unpacked/Formidable.exe");
-const icoPath = path.resolve("assets/formidable.ico");
-const rceditPath = path.resolve(
-  process.env.APPDATA,
-  "npm",
-  "node_modules",
-  "rcedit",
-  "bin",
-  "rcedit.exe"
-);
+const exePath = path.resolve(__dirname, '../dist/win-unpacked/Formidable.exe');
+const icoPath = path.resolve(__dirname, '../assets/formidable.ico');
 
 if (!fs.existsSync(exePath)) {
-  console.error("[patch-icon] EXE not found:", exePath);
+  console.error('[patch-icon] EXE not found:', exePath);
   process.exit(1);
 }
 
-console.log("[patch-icon] Running:", rceditPath);
-execFileSync(rceditPath, [exePath, "--set-icon", icoPath]);
-console.log("[patch-icon] Icon patched successfully.");
+console.log('[patch-icon] Patching:', exePath);
+rcedit(exePath, { icon: icoPath }, (err) => {
+  if (err) {
+    console.error('[patch-icon] Failed:', err);
+    process.exit(1);
+  } else {
+    console.log('[patch-icon] Icon patched successfully.');
+  }
+});

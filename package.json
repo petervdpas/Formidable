@@ -74,7 +74,8 @@
   "type": "commonjs",
   "devDependencies": {
     "electron": "^35.2.1",
-    "electron-builder": "^26.0.12"
+    "electron-builder": "^26.0.12",
+    "rcedit": "^4.0.1"
   },
   "dependencies": {
     "codemirror": "^5.65.19",
