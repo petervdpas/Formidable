@@ -136,7 +136,6 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // ── Sidebars ──
   window.templateListManager = createTemplateListManager(
-    yamlEditor,
     templateModal,
     config.storage_location,
     templateDropdown

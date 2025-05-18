@@ -4,7 +4,7 @@
   "logging_enabled": true,
   "context_mode": "template",
   "storage_location": "./storage",
-  "selected_template": "basic.yaml",
+  "selected_template": "ducki.yaml",
   "selected_data_file": null,
   "window_bounds": {
     "width": 1340,

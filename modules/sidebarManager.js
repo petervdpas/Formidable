@@ -11,7 +11,6 @@ import {
 
 // ─── Public Init Functions ───
 export function createTemplateListManager(
-  yamlEditor,
   modal,
   defaultStorageLocation = "./storage",
   dropdown = null
@@ -51,12 +50,11 @@ export function createTemplateListManager(
                 await dropdown.refresh();
               }
 
-              yamlEditor.render(yaml);
-
               EventBus.emit("context:select:template", {
                 name: template,
                 yaml,
               });
+
               EventBus.emit(
                 "status:update",
                 `Created new template: ${template}`
