@@ -38,6 +38,11 @@ jobs:
             -o dist/signed.zip `
             "https://app.signpath.io/api/v1/organizations/$orgId/projects/$project/signing-requests"
 
+          if (-Not (Test-Path "dist/signed.zip")) {
+            Write-Error "SignPath did not return a zip file."
+            exit 1
+          }
+
           Expand-Archive -Path 'dist/signed.zip' -DestinationPath 'dist/signed'
 
       - name: Move signed file to installer folder
