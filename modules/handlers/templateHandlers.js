@@ -15,7 +15,7 @@ export function bindTemplateDependencies(deps) {
 
 export async function handleTemplateSelected({ name, yaml }) {
   EventBus.emit("logging:default", [
-    "[Handler] template:selected received:",
+    "[Handler] context:select:template received:",
     name,
   ]);
 
@@ -32,7 +32,7 @@ export async function handleTemplateSelected({ name, yaml }) {
   await window.api.config.updateUserConfig({ selected_template: name });
 
   if (templateChanged) {
-    EventBus.emit("form:selected", null);
+    EventBus.emit("context:select:form", null);
   }
 
   const listItem = Array.from(

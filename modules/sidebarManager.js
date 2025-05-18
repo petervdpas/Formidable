@@ -4,7 +4,6 @@ import { createListManager } from "./listManager.js";
 import { EventBus } from "./eventBus.js";
 import { stripMetaExtension } from "../utils/pathUtils.js";
 import {
-  handleTemplateClick,
   handleTemplateConfirm,
   handleEntryClick,
   handleEntryConfirm,
@@ -20,7 +19,22 @@ export function createTemplateListManager(
   const listManager = createListManager({
     elementId: "template-list",
     fetchListFunction: async () => await window.api.templates.listTemplates(),
-    onItemClick: (itemName) => handleTemplateClick(itemName, yamlEditor),
+    onItemClick: async (itemName) => {
+      try {
+        const data = await window.api.templates.loadTemplate(itemName);
+        EventBus.emit("context:select:template", {
+          name: itemName,
+          yaml: data,
+        });
+        EventBus.emit("status:update", `Loaded Template: ${itemName}`);
+      } catch (err) {
+        EventBus.emit("logging:error", [
+          "[TemplateList] Failed to load template:",
+          err,
+        ]);
+        EventBus.emit("status:update", "Error loading template.");
+      }
+    },
     emptyMessage: "No template files found.",
     addButton: {
       label: "+ Add Template",
@@ -39,7 +53,10 @@ export function createTemplateListManager(
 
               yamlEditor.render(yaml);
 
-              EventBus.emit("template:selected", { name: template, yaml });
+              EventBus.emit("context:select:template", {
+                name: template,
+                yaml,
+              });
               EventBus.emit(
                 "status:update",
                 `Created new template: ${template}`

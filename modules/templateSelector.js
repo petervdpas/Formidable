@@ -22,7 +22,7 @@ export function createTemplateSelector({ templateDropdown }) {
 
       const yamlData = result.yaml;
 
-      EventBus.emit("template:selected", {
+      EventBus.emit("context:select:template", {
         name,
         yaml: yamlData,
       });

@@ -37,7 +37,7 @@ export async function handleContextToggle(isStorage) {
     const selectedTemplate = window.currentSelectedTemplateName;
     if (selectedTemplate) {
       const yaml = await window.api.templates.loadTemplate(selectedTemplate);
-      EventBus.emit("template:selected", { name: selectedTemplate, yaml });
+      EventBus.emit("context:select:template", { name: selectedTemplate, yaml });
     }
   }
 

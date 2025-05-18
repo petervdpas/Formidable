@@ -30,23 +30,32 @@ export function initEventRouter() {
   EventBus.on("logging:error", loggingHandler.handleLogError);
 
   // Core events
-  EventBus.off("context:toggle", contextHandlers.handleContextToggle);
   EventBus.off("theme:toggle", themeHandler.handleThemeToggle);
   EventBus.off("status:update", statusHandler.handleStatusUpdate);
 
-  EventBus.on("context:toggle", contextHandlers.handleContextToggle);
   EventBus.on("theme:toggle", themeHandler.handleThemeToggle);
   EventBus.on("status:update", statusHandler.handleStatusUpdate);
 
-  EventBus.off("template:selected", templateHandlers.handleTemplateSelected);
+  EventBus.off("context:toggle", contextHandlers.handleContextToggle);
+  EventBus.off(
+    "context:select:template",
+    templateHandlers.handleTemplateSelected
+  );
+  EventBus.off("context:select:form", formHandlers.handleFormSelected);
+
+  EventBus.on("context:toggle", contextHandlers.handleContextToggle);
+  EventBus.on(
+    "context:select:template",
+    templateHandlers.handleTemplateSelected
+  );
+  EventBus.on("context:select:form", formHandlers.handleFormSelected);
+
   EventBus.off("template:list:reload", listHandlers.handleListReload);
   EventBus.off("template:list:highlighted", listHandlers.handleListHighlighted);
 
-  EventBus.off("form:selected", formHandlers.handleFormSelected);
   EventBus.off("form:list:reload", formHandlers.handleListReload);
   EventBus.off("form:list:highlighted", listHandlers.handleListHighlighted);
 
-  EventBus.on("template:selected", templateHandlers.handleTemplateSelected);
   EventBus.on("template:list:reload", () =>
     listHandlers.handleListReload({ listId: "template-list" })
   );
@@ -54,7 +63,6 @@ export function initEventRouter() {
     listHandlers.handleListHighlighted({ listId: "template-list", name })
   );
 
-  EventBus.on("form:selected", formHandlers.handleFormSelected);
   EventBus.on("form:list:reload", () =>
     listHandlers.handleListReload({ listId: "storage-list" })
   );

@@ -5,7 +5,7 @@
   "context_mode": "template",
   "storage_location": "./storage",
   "selected_template": "basic.yaml",
-  "selected_data_file": "test-20250515.meta.json",
+  "selected_data_file": null,
   "window_bounds": {
     "width": 1340,
     "height": 890,
