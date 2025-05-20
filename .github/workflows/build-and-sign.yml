@@ -31,8 +31,7 @@ jobs:
           }
           Move-Item "dist/Formidable Setup 1.0.0.exe" "installer/Formidable Setup.exe" -Force
 
-      # 🔐 Download en correct extracten van eSigner CKA
-      - name: Download and install eSigner CKA
+      - name: Download and extract eSigner CKA
         shell: pwsh
         run: |
           Invoke-WebRequest -OutFile eSignerCKA.zip "https://github.com/SSLcom/eSignerCKA/releases/download/v1.0.6/SSL.COM-eSigner-CKA_1.0.6.zip"
@@ -40,7 +39,6 @@ jobs:
           $tool = Get-ChildItem -Path C:\eSignerCKA -Recurse -Filter eSignerCKATool.exe | Select-Object -First 1
           Copy-Item $tool.FullName -Destination "C:\eSignerCKA\eSignerCKATool.exe"
 
-      # 🛠️ Configureer eSigner CKA met je GitHub secrets
       - name: Configure eSigner CKA
         shell: pwsh
         run: |
@@ -57,15 +55,14 @@ jobs:
           & "C:\eSignerCKA\eSignerCKATool.exe" unload
           & "C:\eSignerCKA\eSignerCKATool.exe" load
 
-      - name: Find certificate thumbprint
+      - name: Find cert thumbprint
         id: find_thumbprint
         shell: pwsh
         run: |
           $cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Select-Object -First 1
           echo "THUMBPRINT=$($cert.Thumbprint)" >> $env:GITHUB_ENV
 
-      # 🖋️ Sign de installer
-      - name: Sign installer
+      - name: Sign executable
         shell: pwsh
         run: |
           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\signtool.exe" sign `
@@ -73,26 +70,24 @@ jobs:
             /sha1 $env:THUMBPRINT `
             "installer/Formidable Setup.exe"
 
-      # 📦 Upload het gesigneerde bestand als artifact
-      - name: Upload signed installer artifact
+      - name: Upload signed installer
         uses: actions/upload-artifact@v4
         with:
           name: Formidable Installer (signed)
           path: installer/Formidable Setup.exe
 
-      # 🚀 Maak GitHub release aan
       - name: Create GitHub Pre-Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v1.0.0-pre
           name: Formidable v1.0.0 Pre-Release
           draft: false
-          prerelease: true
           body: |
             ## Pre-Release Notes
             - This is a pre-release version of Formidable.
-            - Signed automatically with SSL.com's eSigner.
             - Please test and provide feedback.
+            - The final release will be available soon.
+          prerelease: true
           files: installer/Formidable Setup.exe
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
