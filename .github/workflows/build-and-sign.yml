@@ -1,16 +1,17 @@
-name: Build and Sign Formidable
+name: Build Formidable (Pre-Release)
 
 on:
   push:
     branches:
-      - release/*
+      - pre-release/*
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -23,46 +24,13 @@ jobs:
       - name: Build Electron App
         run: npm run build
 
-      - name: Sign with SignPath via API
-        shell: pwsh
-        run: |
-          $orgId = "${{ secrets.SIGNPATH_ORG_ID }}"
-          $project = "${{ secrets.SIGNPATH_PROJECT_SLUG }}"
-          $policy = "${{ secrets.SIGNPATH_POLICY_SLUG }}"
-          $token = "${{ secrets.SIGNPATH_API_TOKEN }}"
-          $artifact = "dist/Formidable Setup 1.0.0.exe"
-
-          curl.exe -sSL -H "Authorization: Bearer $token" `
-            -F "PolicySlug=$policy" `
-            -F "File=@$artifact" `
-            -o dist/signed.zip `
-            "https://app.signpath.io/api/v1/organizations/$orgId/projects/$project/signing-requests"
-
-          if (-Not (Test-Path "dist/signed.zip")) {
-            Write-Error "SignPath did not return a zip file."
-            exit 1
-          }
-
-          Expand-Archive -Path 'dist/signed.zip' -DestinationPath 'dist/signed'
-
-      - name: Move signed file to installer folder
+      - name: Copy built installer to /installer folder
         run: |
           mkdir installer
-          move "dist/signed/Formidable Setup 1.0.0.exe" "installer/Formidable Setup.exe"
+          move "dist/Formidable Setup 1.0.0.exe" "installer/Formidable Setup.exe"
 
-      - name: Upload signed artifact
+      - name: Upload unsigned artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Formidable Installer (signed)
+          name: Formidable Installer (unsigned)
           path: installer/Formidable Setup.exe
-
-      - name: Create GitHub Release and attach signed installer
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v1.0.0
-          name: Formidable v1.0.0
-          draft: false
-          prerelease: false
-          files: installer/Formidable Setup.exe
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
