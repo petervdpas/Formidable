@@ -24,9 +24,12 @@ jobs:
       - name: Build Electron App
         run: npm run build
 
-      - name: Copy built installer to /installer folder
+      - name: Move built file to installer folder
+        shell: pwsh
         run: |
-          mkdir installer
+          if (-Not (Test-Path "installer")) {
+            mkdir installer
+          }
           move "dist/Formidable Setup 1.0.0.exe" "installer/Formidable Setup.exe"
 
       - name: Upload unsigned artifact
