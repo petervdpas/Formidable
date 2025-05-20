@@ -37,6 +37,8 @@ jobs:
         run: |
           Invoke-WebRequest -OutFile eSignerCKA.zip "https://github.com/SSLcom/eSignerCKA/releases/download/v1.0.6/SSL.COM-eSigner-CKA_1.0.6.zip"
           Expand-Archive -Path eSignerCKA.zip -DestinationPath C:\eSignerCKA -Force
+          $tool = Get-ChildItem -Path C:\eSignerCKA -Recurse -Filter eSignerCKATool.exe | Select-Object -First 1
+          Copy-Item $tool.FullName -Destination "C:\eSignerCKA\eSignerCKATool.exe"
 
       # 🛠️ Configureer eSigner CKA met je GitHub secrets
       - name: Configure eSigner CKA
