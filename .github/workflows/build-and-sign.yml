@@ -1,4 +1,4 @@
-name: Build and Sign Formidable (Pre-Release)
+name: Build Formidable (Pre-Release)
 
 on:
   push:
@@ -31,16 +31,18 @@ jobs:
           }
           Move-Item "dist/Formidable Setup 1.0.0.exe" "installer/Formidable Setup.exe" -Force
 
+      # 🔐 Download en correct extracten van eSigner CKA
       - name: Download and install eSigner CKA
+        shell: pwsh
         run: |
-          Invoke-WebRequest -OutFile eSigner_CKA_Setup.zip "https://github.com/SSLcom/eSignerCKA/releases/download/v1.0.6/SSL.COM-eSigner-CKA_1.0.6.zip"
-          Expand-Archive -Force eSigner_CKA_Setup.zip
-          Move-Item -Path eSigner_CKA_*\*.exe -Destination eSigner_CKA_Installer.exe
-          ./eSigner_CKA_Installer.exe /CURRENTUSER /VERYSILENT /SUPPRESSMSGBOXES /DIR="C:\eSignerCKA"
+          Invoke-WebRequest -OutFile eSignerCKA.zip "https://github.com/SSLcom/eSignerCKA/releases/download/v1.0.6/SSL.COM-eSigner-CKA_1.0.6.zip"
+          Expand-Archive -Path eSignerCKA.zip -DestinationPath C:\eSignerCKA -Force
 
+      # 🛠️ Configureer eSigner CKA met je GitHub secrets
       - name: Configure eSigner CKA
+        shell: pwsh
         run: |
-          C:\eSignerCKA\eSignerCKATool.exe config `
+          & "C:\eSignerCKA\eSignerCKATool.exe" config `
             -mode "${{ secrets.ESIGNER_MODE }}" `
             -user "${{ secrets.ESIGNER_USERNAME }}" `
             -pass "${{ secrets.ESIGNER_PASSWORD }}" `
@@ -48,42 +50,47 @@ jobs:
             -key "C:\eSignerCKA\master.key" -r
 
       - name: Load certificate into Windows Store
+        shell: pwsh
         run: |
-          C:\eSignerCKA\eSignerCKATool.exe unload
-          C:\eSignerCKA\eSignerCKATool.exe load
+          & "C:\eSignerCKA\eSignerCKATool.exe" unload
+          & "C:\eSignerCKA\eSignerCKATool.exe" load
 
-      - name: Find cert thumbprint
+      - name: Find certificate thumbprint
         id: find_thumbprint
         shell: pwsh
         run: |
           $cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Select-Object -First 1
           echo "THUMBPRINT=$($cert.Thumbprint)" >> $env:GITHUB_ENV
 
-      - name: Sign executable
+      # 🖋️ Sign de installer
+      - name: Sign installer
+        shell: pwsh
         run: |
           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\signtool.exe" sign `
             /fd sha256 /tr http://ts.ssl.com /td sha256 `
             /sha1 $env:THUMBPRINT `
             "installer/Formidable Setup.exe"
 
+      # 📦 Upload het gesigneerde bestand als artifact
       - name: Upload signed installer artifact
         uses: actions/upload-artifact@v4
         with:
           name: Formidable Installer (signed)
           path: installer/Formidable Setup.exe
 
+      # 🚀 Maak GitHub release aan
       - name: Create GitHub Pre-Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v1.0.0-pre
           name: Formidable v1.0.0 Pre-Release
           draft: false
+          prerelease: true
           body: |
             ## Pre-Release Notes
             - This is a pre-release version of Formidable.
-            - Signed with SSL.com's eSigner Cloud.
+            - Signed automatically with SSL.com's eSigner.
             - Please test and provide feedback.
-          prerelease: true
           files: installer/Formidable Setup.exe
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
