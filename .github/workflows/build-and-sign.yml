@@ -36,7 +36,13 @@ jobs:
         run: |
           Invoke-WebRequest -OutFile eSignerCKA.zip "https://github.com/SSLcom/eSignerCKA/releases/download/v1.0.6/SSL.COM-eSigner-CKA_1.0.6.zip"
           Expand-Archive -Path eSignerCKA.zip -DestinationPath C:\eSignerCKA -Force
+          Write-Host "== Inhoud van C:\eSignerCKA =="
+          Get-ChildItem -Recurse C:\eSignerCKA | ForEach-Object { Write-Host $_.FullName }
+
           $tool = Get-ChildItem -Path C:\eSignerCKA -Recurse -Filter eSignerCKATool.exe | Select-Object -First 1
+          if (-not $tool) {
+            throw "Kon eSignerCKATool.exe niet vinden in uitgepakte ZIP!"
+          }
           Copy-Item $tool.FullName -Destination "C:\eSignerCKA\eSignerCKATool.exe"
 
       - name: Configure eSigner CKA
