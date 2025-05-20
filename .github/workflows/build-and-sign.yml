@@ -36,3 +36,18 @@ jobs:
         with:
           name: Formidable Installer (unsigned)
           path: installer/Formidable Setup.exe
+      - name: Create GitHub Pre-Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.0-pre
+          name: Formidable v1.0.0 Pre-Release
+          draft: false
+          body: |
+            ## Pre-Release Notes
+            - This is a pre-release version of Formidable.
+            - Please test and provide feedback.
+            - The final release will be available soon.
+          prerelease: true
+          files: installer/Formidable Setup.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
