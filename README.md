@@ -4,10 +4,14 @@
 
 ---
 
-## 📦 Download
+## ⚠️ Pre-release
+
+> Deze versie van Formidable is een **pre-release** bedoeld voor testen en feedback.
+> Mogelijk ontbreken er nog functies of treden bugs op. Gebruik op eigen risico.
+> Zie de [release notes](https://github.com/petervdpas/Formidable/releases/tag/v1.0.0-pre) voor details.
 
 **Latest Windows Installer**:  
-👉 [Formidable Setup 1.0.0.exe](https://github.com/petervdpas/Formidable/raw/master/installer/Formidable%20Setup%201.0.0.exe)
+👉 [Formidable Setup 1.0.0.exe (Pre-release)](https://github.com/petervdpas/Formidable/releases/download/v1.0.0-pre/Formidable%20Setup.exe)
 
 ---
 
