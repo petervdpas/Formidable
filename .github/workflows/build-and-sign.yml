@@ -42,12 +42,8 @@ jobs:
           tag_name: v1.0.0-pre
           name: Formidable v1.0.0 Pre-Release
           draft: false
-          body: |
-            ## Pre-Release Notes
-            - This is a pre-release version of Formidable.
-            - Please test and provide feedback.
-            - The final release will be available soon.
           prerelease: true
           files: installer/Formidable Setup.exe
+          fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
