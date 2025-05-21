@@ -31,12 +31,20 @@ jobs:
           }
           Move-Item "dist/Formidable Setup 1.0.0.exe" "installer/Formidable Setup.exe" -Force
 
-      - name: Extract local eSigner CKA
+      - name: Extract local eSigner CKA portable
         shell: pwsh
         run: |
-          Expand-Archive -Path "${{ github.workspace }}\tools\SSL-eSigner-CKA-portable.zip" -DestinationPath "C:\eSignerCKA" -Force
+          Expand-Archive -Path "tools/SSL-eSigner-CKA-portable.zip" -DestinationPath "C:\eSignerCKA" -Force
           Write-Host "== Inhoud van C:\eSignerCKA =="
           Get-ChildItem -Recurse C:\eSignerCKA | ForEach-Object { Write-Host $_.FullName }
+
+      - name: Prepare eSigner config directory
+        shell: pwsh
+        run: |
+          $configPath = "$env:APPDATA\eSignerCKA\Config"
+          if (-Not (Test-Path $configPath)) {
+            New-Item -Path $configPath -ItemType Directory -Force | Out-Null
+          }
 
       - name: Configure eSigner CKA
         shell: pwsh
@@ -59,6 +67,9 @@ jobs:
         shell: pwsh
         run: |
           $cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Select-Object -First 1
+          if (-not $cert) {
+            throw "Geen certificaat gevonden in Cert:\CurrentUser\My"
+          }
           echo "THUMBPRINT=$($cert.Thumbprint)" >> $env:GITHUB_ENV
 
       - name: Sign executable
