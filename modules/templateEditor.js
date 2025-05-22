@@ -13,9 +13,8 @@ let keyboardListenerAttached = false;
 let editorWrapper = null;
 
 function handleEditorKey(e) {
-
   if (!editorWrapper) return;
-  
+
   EventBus.emit("logging:default", [
     `[YamlEditor] Key pressed: ctrl=${e.ctrlKey}, key=${e.key}`,
   ]);
@@ -266,9 +265,15 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     document.getElementById("edit-label").value = field.label;
     document.getElementById("edit-description").value = field.description || "";
     document.getElementById("edit-default").value = field.default ?? "";
-    document.getElementById("edit-options").value = (field.options || []).join(
-      ", "
-    );
+
+    const optionsField = document.getElementById("edit-options");
+    try {
+      optionsField.value = field.options
+        ? JSON.stringify(field.options) // ← now compact
+        : "";
+    } catch {
+      optionsField.value = "";
+    }
 
     typeDropdown?.setSelected(field.type || "text");
 

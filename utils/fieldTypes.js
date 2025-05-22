@@ -86,22 +86,32 @@ export const fieldTypes = {
     defaultValue: () => "",
     renderInput(field) {
       const wrapper = document.createElement("div");
+
       (field.options || []).forEach((opt) => {
-        const label = document.createElement("label");
-        label.style.display = "block";
+        const { value, label } =
+          typeof opt === "string"
+            ? { value: opt, label: opt }
+            : {
+                value: opt.value,
+                label: opt.label ?? opt.value,
+              };
+
+        const labelEl = document.createElement("label");
+        labelEl.style.display = "block";
 
         const input = document.createElement("input");
         input.type = "radio";
         input.name = field.key;
-        input.value = opt;
-        if (opt === field.default) {
+        input.value = value;
+        if (value === field.default) {
           input.checked = true;
         }
 
-        label.appendChild(input);
-        label.appendChild(document.createTextNode(` ${opt}`));
-        wrapper.appendChild(label);
+        labelEl.appendChild(input);
+        labelEl.appendChild(document.createTextNode(` ${label}`));
+        wrapper.appendChild(labelEl);
       });
+
       wrapper.dataset.radioGroup = field.key;
       return wrapper;
     },

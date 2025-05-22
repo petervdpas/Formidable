@@ -1,12 +1,12 @@
 {
   "test": "Default value",
   "check": false,
-  "dropdown": "Right",
+  "dropdown": "R",
   "multichoice": [
-    "Option B",
-    "Option C"
+    "B",
+    "C"
   ],
-  "radio": "Dog",
+  "radio": "BIRD",
   "mline": "A whole lot of prefab text...",
   "numpy": 17,
   "bday": "1968-12-23",

@@ -2,6 +2,15 @@
 
 import { wrapInputWithLabel } from "./elementBuilders.js";
 
+function resolveOption(opt) {
+  return typeof opt === "string"
+    ? { value: opt, label: opt }
+    : {
+        value: opt.value,
+        label: opt.label ?? opt.value,
+      };
+}
+
 // ─────────────────────────────────────────────
 // Type: text
 export function renderTextField(field) {
@@ -47,9 +56,11 @@ export function renderBooleanField(field) {
 export function renderDropdownField(field) {
   const select = document.createElement("select");
   (field.options || []).forEach((opt) => {
+    const { value, label } = resolveOption(opt);
+
     const option = document.createElement("option");
-    option.value = opt;
-    option.textContent = opt;
+    option.value = value;
+    option.textContent = label;
     select.appendChild(option);
   });
   select.name = field.key;
@@ -69,18 +80,19 @@ export function renderMultioptionField(field) {
   wrapper.dataset.multioptionField = field.key;
 
   (field.options || []).forEach((opt) => {
-    const label = document.createElement("label");
-    label.style.display = "block";
+    const { value, label } = resolveOption(opt);
 
     const input = document.createElement("input");
     input.type = "checkbox";
     input.name = field.key;
-    input.value = opt;
-    if ((field.default || []).includes(opt)) input.checked = true;
+    input.value = value;
+    input.checked = (field.default || []).includes(value);
 
-    label.appendChild(input);
-    label.appendChild(document.createTextNode(" " + opt));
-    wrapper.appendChild(label);
+    const labelEl = document.createElement("label");
+    labelEl.style.display = "block";
+    labelEl.appendChild(input);
+    labelEl.appendChild(document.createTextNode(" " + label));
+    wrapper.appendChild(labelEl);
   });
 
   return wrapInputWithLabel(
@@ -98,18 +110,22 @@ export function renderRadioField(field) {
   wrapper.dataset.radioGroup = field.key;
 
   (field.options || []).forEach((opt) => {
-    const label = document.createElement("label");
-    label.style.display = "block";
+    const { value, label } = resolveOption(opt); // ✅ Structured parsing
+
+    const labelEl = document.createElement("label");
+    labelEl.style.display = "block";
 
     const input = document.createElement("input");
     input.type = "radio";
     input.name = field.key;
-    input.value = opt;
-    if (opt === field.default) input.checked = true;
+    input.value = value;
 
-    label.appendChild(input);
-    label.appendChild(document.createTextNode(" " + opt));
-    wrapper.appendChild(label);
+    // ✅ Compare to correct default value
+    if (String(field.default) === String(value)) input.checked = true;
+
+    labelEl.appendChild(input);
+    labelEl.appendChild(document.createTextNode(" " + label));
+    wrapper.appendChild(labelEl);
   });
 
   return wrapInputWithLabel(

@@ -144,12 +144,18 @@ export function setupFieldEditModal(onConfirm) {
 
   const confirmBtn = document.getElementById("field-edit-confirm");
   confirmBtn.onclick = () => {
-    const field = extractFieldDefinition({
-      typeDropdown,
-    });
-
-    onConfirm(field);
-    modal.hide();
+    try {
+      const field = extractFieldDefinition({ typeDropdown });
+      onConfirm(field);
+      modal.hide();
+    } catch (err) {
+      const optField = document.getElementById("edit-options");
+      if (optField) {
+        optField.style.border = "1px solid red";
+        optField.title = "Invalid JSON: " + err.message;
+      }
+      EventBus.emit("logging:warning", ["Invalid JSON in Options field", err]);
+    }
   };
 
   return {

@@ -20,19 +20,29 @@ export function extractFieldDefinition({
   const def = document.getElementById(defaultId)?.value.trim();
   const type = typeDropdown?.getSelected() || "text";
 
-  const options = document
-    .getElementById(optionsId)
-    ?.value.split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
+  let optionsRaw = document.getElementById(optionsId)?.value.trim();
+  let options = [];
+
+  if (optionsRaw) {
+    try {
+      const parsed = JSON.parse(optionsRaw);
+      if (Array.isArray(parsed)) {
+        options = parsed;
+      } else {
+        throw new Error("Parsed options is not an array.");
+      }
+    } catch (err) {
+      EventBus.emit("logging:warning", [
+        `[extractFieldDefinition] Failed to parse options JSON: ${err.message}`,
+      ]);
+    }
+  }
 
   const field = { key, label, type };
   if (def) field.default = def;
   if (description) field.description = description;
   if (twoColumn) field.two_column = true;
-  if (options?.length) {
-    field.options = options;
-  }
+  if (options.length > 0) field.options = options;
 
   return field;
 }

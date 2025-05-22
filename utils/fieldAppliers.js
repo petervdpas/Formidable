@@ -81,15 +81,17 @@ export function applyGenericField(input, key, value) {
     return;
   }
 
+  // 🩹 Handle radio groups
+  if (input.dataset?.radioGroup === key) {
+    const radios = input.querySelectorAll(`input[type="radio"]`);
+    radios.forEach((el) => {
+      el.checked = String(el.value) === String(value);
+    });
+    return;
+  }
+
   if (input.type === "checkbox") {
     input.checked = value === true;
-  } else if (input.type === "radio") {
-    const group = input
-      .closest("form")
-      ?.querySelectorAll?.(`input[type="radio"][name="${key}"]`);
-    group?.forEach((el) => {
-      el.checked = el.value === value;
-    });
   } else if ("value" in input) {
     input.value = value ?? "";
   } else {
