@@ -63,6 +63,16 @@ export function applyTableField(container, key, value) {
   });
 }
 
+export function applyMultioptionField(container, key, value) {
+  const wrapper = container.querySelector(`[data-multioption-field="${key}"]`);
+  if (!wrapper || !Array.isArray(value)) return;
+
+  const checkboxes = wrapper.querySelectorAll(`input[type="checkbox"]`);
+  checkboxes.forEach((cb) => {
+    cb.checked = value.includes(cb.value);
+  });
+}
+
 export function applyGenericField(input, key, value) {
   if (!input) {
     EventBus.emit("logging:warning", [

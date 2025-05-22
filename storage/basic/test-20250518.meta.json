@@ -2,6 +2,10 @@
   "test": "Default value",
   "check": false,
   "dropdown": "Right",
+  "multichoice": [
+    "Option B",
+    "Option C"
+  ],
   "radio": "Dog",
   "mline": "A whole lot of prefab text...",
   "numpy": 17,

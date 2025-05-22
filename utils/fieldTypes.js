@@ -50,6 +50,36 @@ export const fieldTypes = {
     parseValue: parsers.parseDropdownField,
   },
 
+  multioption: {
+    label: "Multiple Choice",
+    cssClass: "modal-multioption",
+    defaultValue: () => [],
+    renderInput(field) {
+      const wrapper = document.createElement("div");
+      (field.options || []).forEach((opt) => {
+        const label = document.createElement("label");
+        label.style.display = "block";
+
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.name = field.key;
+        input.value = opt;
+        if ((field.default || []).includes(opt)) input.checked = true;
+
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(` ${opt}`));
+        wrapper.appendChild(label);
+      });
+      wrapper.dataset.multioptionField = field.key;
+      return wrapper;
+    },
+    parseValue(wrapper) {
+      return Array.from(
+        wrapper.querySelectorAll(`input[type="checkbox"]:checked`)
+      ).map((el) => el.value);
+    },
+  },
+
   radio: {
     label: "Radio Buttons",
     cssClass: "modal-radio",

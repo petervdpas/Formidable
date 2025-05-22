@@ -108,6 +108,12 @@
   border-left: 4px solid #ba68c8;
 }
 
+.field-list-item[data-type="multioption"] {
+  background-color: #4e729a;
+  /* Match modal or tweak */
+  border-left: 4px solid #5bc0de;
+}
+
 .field-list-item[data-type="radio"] {
   background-color: #cc4417;
   /* Darker Orange */
@@ -160,6 +166,11 @@
 .field-type.type-dropdown {
   background-color: #a05db5;
   /* Slightly darker Purple */
+  color: white;
+}
+
+.field-type.type-multioption {
+  background-color: #5bc0de;
   color: white;
 }
 
@@ -219,6 +230,11 @@
 #field-edit-modal.modal-dropdown {
   background-color: #6b1a91;
   border-left: 6px solid #ba68c8;
+}
+
+#field-edit-modal.modal-multioption {
+  background-color: #4e729a;
+  border-left: 6px solid #5bc0de;
 }
 
 #field-edit-modal.modal-radio {

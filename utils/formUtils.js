@@ -73,6 +73,8 @@ function resolveFieldElement(container, field) {
   switch (field.type) {
     case "radio":
       return container.querySelector(`[data-radio-group="${field.key}"]`);
+    case "multioption":
+      return container.querySelector(`[data-multioption-field="${field.key}"]`);
     case "list":
       return container.querySelector(`[data-list-field="${field.key}"]`);
     case "table":

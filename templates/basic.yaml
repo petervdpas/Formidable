@@ -69,6 +69,15 @@ fields:
     options:
       - Left
       - Right
+  - key: multichoice
+    label: Multiple Choice
+    type: multioption
+    description: A test description - single-column
+    two_column: true
+    options:
+      - Option A
+      - Option B
+      - Option C
   - key: radio
     label: Radio
     type: radio

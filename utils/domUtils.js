@@ -4,6 +4,7 @@ import { EventBus } from "../modules/eventBus.js";
 import {
   applyListField,
   applyTableField,
+  applyMultioptionField,
   applyGenericField,
 } from "./fieldAppliers.js";
 
@@ -91,6 +92,11 @@ export function applyFieldValues(container, fieldsOrKeys = [], data = {}) {
 
   keys.forEach((key) => {
     const value = data[key];
+
+    if (container.querySelector(`[data-multioption-field="${key}"]`)) {
+      applyMultioptionField(container, key, value);
+      return;
+    }
 
     if (container.querySelector(`[data-list-field="${key}"]`)) {
       applyListField(container, key, value);
