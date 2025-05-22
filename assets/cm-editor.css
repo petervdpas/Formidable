@@ -1,0 +1,79 @@
+/* ───── CodeMirror Editor ───── */
+
+.modal-form-row.full-editor-row {
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  gap: 6px;
+}
+
+.modal-form-row.full-editor-row label {
+  font-weight: bold;
+  margin-bottom: 4px;
+  text-align: left;
+}
+
+.editor-wrapper {
+  width: auto;
+  min-height: 60px;
+  max-height: 100px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.CodeMirror {
+  flex: 1;
+  width: auto;
+  height: 100% !important;
+  max-height: inherit;
+  overflow: auto; /* ✅ native scrollbars */
+  font-size: 14px;
+}
+
+.editor-wrapper .CodeMirror-scroll {
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+.editor-wrapper.fullscreen {
+  position: fixed;
+  top: 20px;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border-radius: 6px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 40px);
+  overflow: hidden;
+}
+
+.editor-wrapper.fullscreen .CodeMirror {
+  flex: 1;
+  height: 100% !important;
+}
+
+.editor-wrapper.fullscreen .CodeMirror-scroll {
+  overflow-y: auto !important;
+  max-height: 100% !important;
+  height: 100% !important;
+}
+
+.fullscreen-hint {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  font-size: 0.85em;
+  color: #aaa;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 4px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+

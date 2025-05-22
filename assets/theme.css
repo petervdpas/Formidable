@@ -89,40 +89,42 @@ input:checked + .slider {
   border: 1px solid #555;
 }
 
+/* ───── forms.css ───── */
+.dark-mode form,
+.dark-mode fieldset {
+  border-color: var(--input-border-color);
+}
+
+.dark-mode label small,
+.dark-mode .form-row .field-description {
+  color: var(--readonly-fg);
+}
+
+.dark-mode .form-row input[type="text"],
+.dark-mode .form-row select,
+.dark-mode .form-row textarea {
+  border-color: var(--input-border-color);
+}
+
 /* Inputs (light) */
-input[type="text"],
-input[type="password"],
-input[type="email"],
-input[type="number"],
-input[type="date"],
+input,
 textarea,
 select {
   background-color: var(--input-bg);
   color: var(--input-fg);
-  border: 1px solid var(--input-border-color);
-  padding: 6px 10px;
-  border-radius: 4px;
-  font-size: 14px;
-  height: 36px;
-  box-sizing: border-box;
+  border-color: var(--input-border-color);
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus,
-input[type="email"]:focus,
-input[type="number"]:focus,
-input[type="date"]:focus,
+input:focus,
 textarea:focus,
 select:focus {
   border-color: #888;
-  outline: none;
 }
 
 input[readonly] {
   background-color: var(--readonly-bg);
   color: var(--readonly-fg);
   border-color: var(--input-border-color);
-  font-style: italic;
 }
 
 input[type="checkbox"],
@@ -132,9 +134,6 @@ input[type="radio"] {
 
 input[type="date"]::-webkit-calendar-picker-indicator {
   background-color: var(--input-icon-bg);
-  border-radius: 4px;
-  padding: 5px;
-  cursor: pointer;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator:hover {

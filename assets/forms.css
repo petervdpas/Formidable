@@ -1,7 +1,6 @@
 /* ───── Form Containers ───── */
 form,
 fieldset {
-  border: 1px solid #888;
   border-radius: 6px;
   padding: 16px;
   margin-bottom: 20px;
@@ -15,7 +14,6 @@ legend {
 label small {
   font-weight: normal;
   font-size: 0.65em;
-  color: #888;
   margin-left: 6px;
 }
 
@@ -23,7 +21,6 @@ label small {
 .form-row {
   display: flex;
   align-items: flex-start;
-  /* Align label to top of input */
   gap: 10px;
   margin-bottom: 12px;
   width: 100%;
@@ -31,27 +28,34 @@ label small {
 }
 
 .form-row label {
+  font-weight: bold;
   margin: 2px 0;
   display: block;
 }
 
 .form-row .field-description {
   font-size: 0.85em;
-  color: #888;
   margin-top: -4px;
   margin-bottom: 4px;
 }
 
 /* ───── Inputs and Selects ───── */
 .form-row input[type="text"],
-.form-row select,
-.form-row textarea {
+.form-row select {
   flex: 1;
   width: 100%;
   padding: 6px 10px;
-  border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
+}
+
+.form-row textarea {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  min-height: 4rem;
+  resize: vertical;
 }
 
 /* ───── Checkbox Alignment ───── */
@@ -66,7 +70,7 @@ label small {
   gap: 12px;
 }
 
-.form-row.two-column>div {
+.form-row.two-column > div {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -82,95 +86,10 @@ label small {
   flex-direction: column;
 }
 
-/* ───── Textarea ───── */
-.form-row textarea {
-  min-height: 4rem;
-  resize: vertical;
-}
-
 /* ───── Radio Group Layout ───── */
 .form-row [data-radio-group] {
   display: flex;
   flex-direction: row;
   gap: 0.8rem;
   align-items: center;
-}
-
-/* ───── CodeMirror Editor ───── */
-
-.modal-form-row.full-editor-row {
-  flex-direction: column;
-  align-items: stretch;
-  width: 100%;
-  gap: 6px;
-}
-
-.modal-form-row.full-editor-row label {
-  font-weight: bold;
-  margin-bottom: 4px;
-  text-align: left;
-}
-
-.editor-wrapper {
-  width: auto;
-  min-height: 60px;
-  max-height: 100px;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-}
-
-.CodeMirror {
-  flex: 1;
-  width: auto;
-  height: 100% !important;
-  max-height: inherit;
-  overflow: auto; /* ✅ native scrollbars */
-  font-size: 14px;
-}
-
-.editor-wrapper .CodeMirror-scroll {
-  max-height: 100px;
-  overflow-y: auto;
-}
-
-.editor-wrapper.fullscreen {
-  position: fixed;
-  top: 20px;
-  bottom: 20px;
-  left: 20px;
-  right: 20px;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  border-radius: 6px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-  box-sizing: border-box;
-  max-width: calc(100vw - 40px);
-  max-height: calc(100vh - 40px);
-  overflow: hidden;
-}
-
-.editor-wrapper.fullscreen .CodeMirror {
-  flex: 1;
-  height: 100% !important;
-}
-
-.editor-wrapper.fullscreen .CodeMirror-scroll {
-  overflow-y: auto !important;
-  max-height: 100% !important;
-  height: 100% !important;
-}
-
-.fullscreen-hint {
-  position: absolute;
-  top: 8px;
-  right: 16px;
-  font-size: 0.85em;
-  color: #aaa;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 4px 8px;
-  border-radius: 4px;
-  pointer-events: none;
 }

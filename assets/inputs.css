@@ -1,0 +1,42 @@
+/* ───── Input Field Structure ───── */
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="date"],
+select {
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    height: 36px;
+    box-sizing: border-box;
+    border: 1px solid; /* actual color comes from theme */
+}
+
+textarea {
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    min-height: 4rem;
+    resize: vertical;
+    box-sizing: border-box;
+    border: 1px solid; /* actual color comes from theme */
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+}
+
+input[readonly] {
+    font-style: italic;
+}
+
+/* Calendar icon adjustments */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    border-radius: 4px;
+    padding: 5px;
+    cursor: pointer;
+}

@@ -17,7 +17,7 @@ export function renderForm(container, template) {
     };
   }
 
-  EventBus.emit("logging:warning", [
+  EventBus.emit("logging:default", [
     "[FormRenderer] Rendering form for:",
     template.name || "Unnamed Template",
   ]);

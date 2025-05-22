@@ -119,40 +119,42 @@
   border-top: 1px solid #444;
 }
 
+/* ───── forms.css ───── */
+form,
+fieldset {
+  border-color: var(--input-border-color);
+}
+
+label small,
+.form-row .field-description {
+  color: var(--readonly-fg);
+}
+
+.form-row input[type="text"],
+.form-row select,
+.form-row textarea {
+  border-color: var(--input-border-color);
+}
+
 /* Inputs (dark) */
-.dark-mode input[type="text"],
-.dark-mode input[type="password"],
-.dark-mode input[type="email"],
-.dark-mode input[type="number"],
-.dark-mode input[type="date"],
+.dark-mode input,
 .dark-mode textarea,
 .dark-mode select {
   background-color: var(--input-bg);
   color: var(--input-fg);
-  border: 1px solid var(--input-border-color);
-  padding: 6px 10px;
-  border-radius: 4px;
-  font-size: 14px;
-  height: 36px;
-  box-sizing: border-box;
+  border-color: var(--input-border-color);
 }
 
-.dark-mode input[type="text"]:focus,
-.dark-mode input[type="password"]:focus,
-.dark-mode input[type="email"]:focus,
-.dark-mode input[type="number"]:focus,
-.dark-mode input[type="date"]:focus,
+.dark-mode input:focus,
 .dark-mode textarea:focus,
 .dark-mode select:focus {
   border-color: #888;
-  outline: none;
 }
 
 .dark-mode input[readonly] {
   background-color: var(--readonly-bg);
   color: var(--readonly-fg);
   border-color: var(--input-border-color);
-  font-style: italic;
 }
 
 .dark-mode input[type="checkbox"],
@@ -162,9 +164,6 @@
 
 .dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
   background-color: var(--input-icon-bg);
-  border-radius: 4px;
-  padding: 5px;
-  cursor: pointer;
 }
 
 .dark-mode input[type="date"]::-webkit-calendar-picker-indicator:hover {
