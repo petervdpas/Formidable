@@ -108,6 +108,17 @@ export function applyFieldValues(container, fieldsOrKeys = [], data = {}) {
       return;
     }
 
+    // ✅ Handle radios here
+    const radioGroup = container.querySelector(`[data-radio-group="${key}"]`);
+    if (radioGroup) {
+      const radios = radioGroup.querySelectorAll(`input[type="radio"]`);
+      radios.forEach((radio) => {
+        radio.checked = String(radio.value) === String(value);
+      });
+      return;
+    }
+
+    // Default
     const input = container.querySelector(`[name="${key}"]`);
     applyGenericField(input, key, value);
   });
