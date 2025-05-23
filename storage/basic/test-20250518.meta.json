@@ -10,6 +10,14 @@
   "mline": "A whole lot of prefab text...",
   "numpy": 17,
   "bday": "1968-12-23",
-  "listy": [],
-  "datable": []
+  "listy": [
+    "Talk is cheap"
+  ],
+  "datable": [
+    [
+      "bli",
+      "blue",
+      "bla"
+    ]
+  ]
 }

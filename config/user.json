@@ -1,5 +1,5 @@
 {
-  "theme": "dark",
+  "theme": "light",
   "font_size": 14,
   "logging_enabled": true,
   "context_mode": "storage",
