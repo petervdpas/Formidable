@@ -23,7 +23,7 @@ function applyModalTypeClass(modal, typeKey) {
   }
 }
 
-export function setupFieldEditor(container, onChange) {
+function setupFieldEditor(container, onChange) {
   const state = {};
 
   const dom = {
@@ -67,4 +67,91 @@ export function setupFieldEditor(container, onChange) {
   }
 
   return { setField, getField };
+}
+
+function renderReorderButtons(idx, total) {
+  const upDisabled = idx === 0 ? "disabled" : "";
+  const downDisabled = idx === total - 1 ? "disabled" : "";
+  return `
+    <button class="btn btn-light action-up" data-idx="${idx}" ${upDisabled}>▲</button>
+    <button class="btn btn-light action-down" data-idx="${idx}" ${downDisabled}>▼</button>
+  `;
+}
+
+export function renderFieldListInto(
+  listEl,
+  fields,
+  { onEdit, onDelete, onReorder, onUp, onDown }
+) {
+  if (!listEl) return;
+  listEl.innerHTML = "";
+
+  // Setup Sortable once
+  if (!listEl.sortableInstance && typeof Sortable !== "undefined") {
+    listEl.sortableInstance = Sortable.create(listEl, {
+      animation: 150,
+      handle: ".field-label",
+      onEnd: (evt) => {
+        onReorder?.(evt.oldIndex, evt.newIndex);
+      },
+    });
+  }
+
+  fields.forEach((field, idx) => {
+    const item = document.createElement("li");
+    item.className = "field-list-item";
+    item.innerHTML = `
+      <div class="field-label">
+        ${field.label}
+        <span class="field-type type-${field.type}">
+          (${field.type.toUpperCase()})
+        </span>
+      </div>
+      <div class="field-actions">
+        <!-- ${renderReorderButtons(idx, fields.length)}  -->
+        <button class="btn btn-warn action-edit" data-idx="${idx}">Edit</button>
+        <button class="btn btn-danger action-delete" data-idx="${idx}">Delete</button>
+      </div>
+    `;
+    item.dataset.type = field.type;
+    listEl.appendChild(item);
+  });
+
+  listEl.querySelectorAll(".action-edit").forEach((btn) => {
+    btn.onclick = () => onEdit?.(+btn.dataset.idx);
+  });
+
+  listEl.querySelectorAll(".action-delete").forEach((btn) => {
+    btn.onclick = () => onDelete?.(+btn.dataset.idx);
+  });
+
+  listEl.querySelectorAll(".action-up").forEach((btn) => {
+    btn.onclick = () => {
+      const idx = +btn.dataset.idx;
+      if (idx > 0) {
+        onUp ? onUp(idx) : onReorder?.(idx, idx - 1);
+      }
+    };
+  });
+
+  listEl.querySelectorAll(".action-down").forEach((btn) => {
+    btn.onclick = () => {
+      const idx = +btn.dataset.idx;
+      if (idx < fields.length - 1) {
+        onDown ? onDown(idx) : onReorder?.(idx, idx + 1);
+      }
+    };
+  });
+}
+
+export function createEmptyField() {
+  return { key: "", type: "text", label: "" };
+}
+
+export function showFieldEditorModal(field) {
+  const modal = document.getElementById("field-edit-modal");
+  const body = modal.querySelector(".modal-body");
+  const editor = setupFieldEditor(body);
+  editor.setField(field);
+  modal.classList.add("show");
 }

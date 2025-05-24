@@ -3,7 +3,11 @@
 import { EventBus } from "./eventBus.js";
 import { showConfirmModal } from "./modalSetup.js";
 import { setupFieldEditModal } from "./modalSetup.js";
-import { setupFieldEditor } from "./templateFieldEdit.js";
+import {
+  renderFieldListInto,
+  showFieldEditorModal,
+  createEmptyField,
+} from "./templateFieldEdit.js";
 import { generateTemplateCode } from "../utils/templateGenerator.js";
 import { getCurrentTheme } from "./themeToggle.js";
 
@@ -12,7 +16,7 @@ const Sortable = window.Sortable;
 let codeMirrorEditor = null;
 let keyboardListenerAttached = false;
 let editorWrapper = null;
-let fieldEditor = null;
+let typeDropdown = null;
 
 function handleEditorKey(e) {
   if (!editorWrapper) return;
@@ -159,88 +163,35 @@ export function initTemplateEditor(containerId, onSaveCallback) {
 
   function renderFieldList() {
     const list = container.querySelector("#fields-list");
-    list.innerHTML = "";
-
-    if (!list.sortableInstance && typeof Sortable !== "undefined") {
-      list.sortableInstance = Sortable.create(list, {
-        animation: 150,
-        handle: ".field-label",
-        onEnd: (evt) => {
-          const moved = currentData.fields.splice(evt.oldIndex, 1)[0];
-          currentData.fields.splice(evt.newIndex, 0, moved);
-          renderFieldList();
-        },
-      });
-    }
-
-    currentData.fields.forEach((field, idx) => {
-      const item = document.createElement("li");
-      item.className = "field-list-item";
-      item.innerHTML = `
-        <div class="field-label">
-          ${field.label}
-          <span class="field-type type-${
-            field.type
-          }">(${field.type.toUpperCase()})</span>
-        </div>
-        <div class="field-actions">
-        <!--
-          <button class="btn btn-light action-up" data-idx="${idx}">▲</button>
-          <button class="btn btn-light action-down" data-idx="${idx}">▼</button> -->
-          <button class="btn btn-warn action-edit" data-idx="${idx}">Edit</button>
-          <button class="btn btn-danger action-delete" data-idx="${idx}">Delete</button>
-        </div>
-      `;
-      item.dataset.type = field.type;
-      list.appendChild(item);
-    });
-
-    list.querySelectorAll(".action-edit").forEach((btn) => {
-      btn.onclick = () => {
-        const idx = +btn.dataset.idx;
+    renderFieldListInto(list, currentData.fields, {
+      onEdit: (idx) => {
         currentEditIndex = idx;
         openEditModal(currentData.fields[idx]);
-      };
-    });
-
-    list.querySelectorAll(".action-delete").forEach((btn) => {
-      btn.onclick = () => {
-        const idx = +btn.dataset.idx;
+      },
+      onDelete: (idx) => {
         currentData.fields.splice(idx, 1);
-        renderFieldList();
-      };
-    });
-
-    list.querySelectorAll(".action-up").forEach((btn) => {
-      btn.onclick = () => {
-        const idx = +btn.dataset.idx;
+        renderFieldList(); // re-render
+      },
+      onReorder: (from, to) => {
+        const moved = currentData.fields.splice(from, 1)[0];
+        currentData.fields.splice(to, 0, moved);
+        renderFieldList(); // re-render to update indices
+      },
+      onUp: (idx) => {
         if (idx > 0) {
           const fields = currentData.fields;
           [fields[idx - 1], fields[idx]] = [fields[idx], fields[idx - 1]];
           renderFieldList();
         }
-      };
-    });
-
-    // Disable the first "up" button
-    const firstUp = list.querySelector('.action-up[data-idx="0"]');
-    if (firstUp) firstUp.disabled = true;
-
-    list.querySelectorAll(".action-down").forEach((btn) => {
-      btn.onclick = () => {
-        const idx = +btn.dataset.idx;
+      },
+      onDown: (idx) => {
         if (idx < currentData.fields.length - 1) {
           const fields = currentData.fields;
           [fields[idx], fields[idx + 1]] = [fields[idx + 1], fields[idx]];
           renderFieldList();
         }
-      };
+      },
     });
-
-    // Disable the last "down" button
-    const lastIdx = currentData.fields.length - 1;
-    const lastDown = list.querySelector(`.action-down[data-idx="${lastIdx}"]`);
-    if (lastDown) lastDown.disabled = true;
   }
 
   function setupGenerateTemplateButton(container, fields) {
@@ -262,24 +213,14 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     };
   }
 
-  let typeDropdown = null;
-
   function openEditModal(field) {
-    const modal = document.getElementById("field-edit-modal");
-    const body = modal.querySelector(".modal-body");
-
-    if (!fieldEditor) {
-      fieldEditor = setupFieldEditor(body);
-    }
-
-    fieldEditor.setField(field);
-    editModal.show();
+    showFieldEditorModal(field);
   }
 
   function wireEvents() {
     container.querySelector("#add-field").onclick = () => {
       currentEditIndex = null;
-      openEditModal({ key: "", type: "text", label: "" });
+      openEditModal(createEmptyField());
     };
 
     container.querySelector("#save-yaml").onclick = () => {
