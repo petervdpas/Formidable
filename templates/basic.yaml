@@ -284,7 +284,7 @@ fields:
   - key: test
     label: Test
     type: text
-    default: Default value
+    default: Default value TEST
     description: A test description
     two_column: true
   - key: check
@@ -292,6 +292,7 @@ fields:
     type: boolean
     description: A test description - two-column
     two_column: true
+    default: false
   - key: dropdown
     label: Dropdown
     type: dropdown
@@ -315,6 +316,7 @@ fields:
         label: Option B
       - value: C
         label: Option C
+    default: []
   - key: radio
     label: Radio
     type: radio
@@ -347,6 +349,7 @@ fields:
     label: Listy
     type: list
     description: A test description - single-column
+    default: []
   - key: datable
     label: Table
     type: table
@@ -355,3 +358,4 @@ fields:
       - Header1
       - Header2
       - Header3
+    default: []

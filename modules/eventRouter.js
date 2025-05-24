@@ -10,6 +10,7 @@ import * as themeHandler from "./handlers/themeHandler.js";
 import * as statusHandler from "./handlers/statusHandler.js";
 import * as loggingHandler from "./handlers/loggingHandler.js";
 import * as listHandlers from "./handlers/listHandlers.js";
+import * as editorHandler from "./handlers/editorHandler.js";
 
 let routerInitialized = false;
 
@@ -79,5 +80,16 @@ export function initEventRouter() {
   );
   EventBus.on("form:list:highlighted", (name) =>
     listHandlers.handleListHighlighted({ listId: "storage-list", name })
+  );
+
+  EventBus.off("editor:save", editorHandler.handleSaveTemplate);
+  EventBus.off("editor:delete", editorHandler.handleDeleteTemplate);
+
+  EventBus.on("editor:save", ({ container, fields, callback }) =>
+    editorHandler.handleSaveTemplate({ container, fields, callback })
+  );
+
+  EventBus.on("editor:delete", (container) =>
+    editorHandler.handleDeleteTemplate(container)
   );
 }

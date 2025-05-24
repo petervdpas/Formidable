@@ -78,7 +78,7 @@ function renderReorderButtons(idx, total) {
   `;
 }
 
-export function renderFieldListInto(
+function listFields(
   listEl,
   fields,
   { onEdit, onDelete, onReorder, onUp, onDown }
@@ -154,4 +154,37 @@ export function showFieldEditorModal(field) {
   const editor = setupFieldEditor(body);
   editor.setField(field);
   modal.classList.add("show");
+}
+
+export function renderFieldList(listEl, fields, {
+  onEditIndex,
+  onOpenEditModal
+}) {
+  listFields(listEl, fields, {
+    onEdit: (idx) => {
+      onEditIndex(idx);
+      onOpenEditModal(fields[idx]);
+    },
+    onDelete: (idx) => {
+      fields.splice(idx, 1);
+      renderFieldList(listEl, fields, { onEditIndex, onOpenEditModal });
+    },
+    onReorder: (from, to) => {
+      const moved = fields.splice(from, 1)[0];
+      fields.splice(to, 0, moved);
+      renderFieldList(listEl, fields, { onEditIndex, onOpenEditModal });
+    },
+    onUp: (idx) => {
+      if (idx > 0) {
+        [fields[idx - 1], fields[idx]] = [fields[idx], fields[idx - 1]];
+        renderFieldList(listEl, fields, { onEditIndex, onOpenEditModal });
+      }
+    },
+    onDown: (idx) => {
+      if (idx < fields.length - 1) {
+        [fields[idx], fields[idx + 1]] = [fields[idx + 1], fields[idx]];
+        renderFieldList(listEl, fields, { onEditIndex, onOpenEditModal });
+      }
+    },
+  });
 }

@@ -4,71 +4,25 @@ import { EventBus } from "./eventBus.js";
 import { showConfirmModal } from "./modalSetup.js";
 import { setupFieldEditModal } from "./modalSetup.js";
 import {
-  renderFieldListInto,
+  renderFieldList,
   showFieldEditorModal,
   createEmptyField,
 } from "./templateFieldEdit.js";
 import { generateTemplateCode } from "../utils/templateGenerator.js";
-import { getCurrentTheme } from "./themeToggle.js";
+import {
+  getEditor,
+  handleEditorKey,
+  initCodeMirror,
+  getValue as getMarkdownTemplate,
+} from "./templateCodemirror.js";
+
+window.showConfirmModal = showConfirmModal;
 
 const Sortable = window.Sortable;
 
-let codeMirrorEditor = null;
-let keyboardListenerAttached = false;
 let editorWrapper = null;
+let keyboardListenerAttached = false;
 let typeDropdown = null;
-
-function handleEditorKey(e) {
-  if (!editorWrapper) return;
-
-  EventBus.emit("logging:default", [
-    `[YamlEditor] Key pressed: ctrl=${e.ctrlKey}, key=${e.key}`,
-  ]);
-  if (e.ctrlKey && e.key === "Enter") {
-    e.preventDefault();
-    EventBus.emit("logging:default", [
-      "[YamlEditor] CTRL+ENTER pressed → toggle fullscreen",
-    ]);
-    EventBus.emit("screen:fullscreen", editorWrapper);
-  }
-  if (e.key === "Escape" && editorWrapper?.classList.contains("fullscreen")) {
-    EventBus.emit("logging:default", [
-      "[YamlEditor] ESC pressed → exit fullscreen",
-    ]);
-    EventBus.emit("screen:fullscreen", editorWrapper);
-  }
-}
-
-// ─── CodeMirror Initializer ─────────────────────
-function initCodeMirror(textarea, initialValue = "") {
-  if (codeMirrorEditor) {
-    codeMirrorEditor.toTextArea();
-  }
-
-  const cmTheme = getCurrentTheme() === "dark" ? "monokai" : "eclipse";
-
-  codeMirrorEditor = CodeMirror.fromTextArea(textarea, {
-    mode: "yaml",
-    theme: cmTheme,
-    lineNumbers: true,
-    lineWrapping: true,
-    scrollbarStyle: "native",
-    viewportMargin: Infinity,
-    autofocus: true,
-  });
-
-  codeMirrorEditor.setValue(initialValue);
-
-  // Resize correctly after mount (especially for fullscreen toggle)
-  setTimeout(() => {
-    codeMirrorEditor.refresh();
-    codeMirrorEditor.setSize("100%", "100%");
-  }, 50);
-}
-
-function getMarkdownTemplate() {
-  return codeMirrorEditor?.getValue().trim() || "";
-}
 
 export function initTemplateEditor(containerId, onSaveCallback) {
   const container = document.getElementById(containerId);
@@ -145,7 +99,7 @@ export function initTemplateEditor(containerId, onSaveCallback) {
   `;
 
     wireEvents();
-    renderFieldList();
+    renderFieldListWrapper();
 
     const textarea = container.querySelector("#markdown-template");
     initCodeMirror(textarea, currentData.markdown_template || "");
@@ -161,36 +115,13 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     keyboardListenerAttached = true;
   }
 
-  function renderFieldList() {
+  function renderFieldListWrapper() {
     const list = container.querySelector("#fields-list");
-    renderFieldListInto(list, currentData.fields, {
-      onEdit: (idx) => {
+    renderFieldList(list, currentData.fields, {
+      onEditIndex: (idx) => {
         currentEditIndex = idx;
-        openEditModal(currentData.fields[idx]);
       },
-      onDelete: (idx) => {
-        currentData.fields.splice(idx, 1);
-        renderFieldList(); // re-render
-      },
-      onReorder: (from, to) => {
-        const moved = currentData.fields.splice(from, 1)[0];
-        currentData.fields.splice(to, 0, moved);
-        renderFieldList(); // re-render to update indices
-      },
-      onUp: (idx) => {
-        if (idx > 0) {
-          const fields = currentData.fields;
-          [fields[idx - 1], fields[idx]] = [fields[idx], fields[idx - 1]];
-          renderFieldList();
-        }
-      },
-      onDown: (idx) => {
-        if (idx < currentData.fields.length - 1) {
-          const fields = currentData.fields;
-          [fields[idx], fields[idx + 1]] = [fields[idx + 1], fields[idx]];
-          renderFieldList();
-        }
-      },
+      onOpenEditModal: openEditModal,
     });
   }
 
@@ -198,17 +129,19 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     const generateBtn = container.querySelector("#generate-template");
     if (!generateBtn) return;
 
+    const editor = getEditor();
+
     const updateVisibility = () => {
-      const hasCode = codeMirrorEditor.getValue().trim().length > 0;
+      const hasCode = editor.getValue().trim().length > 0;
       generateBtn.style.display = hasCode ? "none" : "block";
     };
 
-    codeMirrorEditor.on("change", updateVisibility);
+    editor.on("change", updateVisibility);
     updateVisibility(); // Initial check
 
     generateBtn.onclick = () => {
       const code = generateTemplateCode(fields);
-      codeMirrorEditor.setValue(code);
+      editor.setValue(code);
       generateBtn.style.display = "none";
     };
   }
@@ -223,6 +156,12 @@ export function initTemplateEditor(containerId, onSaveCallback) {
       openEditModal(createEmptyField());
     };
 
+    container.querySelector("#save-yaml").onclick = () => {
+      EventBus.emit("editor:save", {
+        container,
+        callback: onSaveCallback,
+      });
+    };
     container.querySelector("#save-yaml").onclick = () => {
       const name = container.querySelector("#yaml-name").value.trim();
       const storageLocation = container
@@ -239,51 +178,15 @@ export function initTemplateEditor(containerId, onSaveCallback) {
         "[YamlEditor] Calling save callback with updated data:",
         updated,
       ]);
-      onSaveCallback?.(updated);
+      EventBus.emit("editor:save", {
+        container,
+        fields: currentData.fields,
+        callback: onSaveCallback,
+      });
     };
 
-    container.querySelector("#delete-yaml").onclick = async () => {
-      const template = window.currentSelectedTemplateName;
-      if (!template) {
-        EventBus.emit("logging:warning", [
-          "[YamlEditor] No template selected to delete.",
-        ]);
-        EventBus.emit("status:update", "No template selected.");
-        return;
-      }
-
-      const confirmed = await showConfirmModal(
-        `Are you sure you want to delete template: ${template}?`,
-        {
-          okText: "Delete",
-          cancelText: "Cancel",
-          width: "auto",
-          height: "auto",
-        }
-      );
-
-      if (!confirmed) return;
-
-      const success = await window.api.templates.deleteTemplate(template);
-      if (success) {
-        EventBus.emit("logging:default", [
-          "[YamlEditor] Deleted template:",
-          template,
-        ]);
-        container.innerHTML =
-          "<div class='empty-message'>Template deleted.</div>";
-        EventBus.emit("status:update", `Deleted template: ${template}`);
-        window.currentSelectedTemplate = null;
-        window.currentSelectedTemplateName = null;
-        if (window.templateListManager?.loadList)
-          window.templateListManager.loadList();
-      } else {
-        EventBus.emit("logging:warning", [
-          "[YamlEditor] Failed to delete template:",
-          template,
-        ]);
-        EventBus.emit("status:update", "Failed to delete template.");
-      }
+    container.querySelector("#delete-yaml").onclick = () => {
+      EventBus.emit("editor:delete", container);
     };
 
     if (!editModal) {
@@ -293,7 +196,7 @@ export function initTemplateEditor(containerId, onSaveCallback) {
         } else {
           currentData.fields.push(field);
         }
-        renderFieldList();
+        renderFieldListWrapper();
       });
 
       editModal = modalSetup.modal;
