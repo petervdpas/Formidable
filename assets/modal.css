@@ -342,6 +342,7 @@
 #render-preview pre code {
     display: block;
     max-width: 100%;
+    max-height: 300px;
     box-sizing: border-box;
     padding: 10px 12px;
     background-color: #f4f4f4;
@@ -350,7 +351,7 @@
     font-size: 13px;
     line-height: 1.4;
     border-radius: 4px;
-    overflow-x: auto;
+    overflow: auto;
     white-space: pre;
 }
 

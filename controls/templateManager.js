@@ -90,53 +90,7 @@ function createBasicTemplateIfMissing() {
     const content = {
       name: "Basic Form",
       storage_location: "./storage/basic",
-      markdown_template: `# {{field "test"}}
-
-{{#if (fieldRaw "check")}}
-✅ Check is enabled
-{{else}}
-❌ Check is disabled
-{{/if}}
-
-## Direction: {{field "dropdown"}}
-
-You selected: _{{field "radio"}}_
-
----
-
-### Notes
-
-{{field "mline"}}
-
----
-
-### Number: {{field "numpy"}}
-
-Birthday: {{field "bday"}}
-
----
-
-### List Items
-
-{{#each (fieldRaw "listy")}}
-- {{this}}
-{{/each}}
-
----
-
-### Table of Data
-
-{{#if (fieldRaw "datable")}}
-{{#with (fieldMeta "datable" "options") as |headers|}}
-|{{#each headers}}{{this}} |{{/each}}
-|{{#each headers}}--|{{/each}}
-{{/with}}
-{{#each (fieldRaw "datable")}}
-|{{#each this}}{{this}} |{{/each}}
-{{/each}}
-{{/if}}
-
-## End`,
+      markdown_template: ``,
       fields: [
         {
           key: "test",
@@ -161,6 +115,18 @@ Birthday: {{field "bday"}}
           description: "A test description - two-column",
           two_column: true,
           options: ["Left", "Right"],
+        },
+        {
+          key: "multichoice",
+          label: "Multiple Choice",
+          type: "multioption",
+          description: "A test description - single-column... jk...",
+          two_column: true,
+          options: [
+            { value: "A", label: "Option A" },
+            { value: "B", label: "Option B" },
+            { value: "C", label: "Option C" },
+          ],
         },
         {
           key: "radio",
