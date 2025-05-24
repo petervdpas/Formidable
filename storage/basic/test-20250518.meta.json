@@ -1,6 +1,6 @@
 {
   "test": "Default value",
-  "check": false,
+  "check": true,
   "dropdown": "R",
   "multichoice": [
     "B",
@@ -10,6 +10,14 @@
   "mline": "A whole lot of prefab text...",
   "numpy": 17,
   "bday": "1968-12-23",
-  "listy": [],
-  "datable": []
+  "listy": [
+    "Velua"
+  ],
+  "datable": [
+    [
+      "dsd",
+      "dsd",
+      "dsd"
+    ]
+  ]
 }

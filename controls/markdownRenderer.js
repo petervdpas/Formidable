@@ -11,28 +11,110 @@ const defaultRenderers = {
   text: (v) => v || "",
   number: (v) => `${v}`,
   date: (v) => `${v}`,
-  dropdown: (v) => v,
-  radio: (v) => v,
+  dropdown: (v, field) => {
+    const opt = (field.options || []).find((o) =>
+      typeof o === "string" ? o === v : o.value === v
+    );
+    return typeof opt === "string" ? opt : opt?.label || v;
+  },
+  radio: (v, field) => {
+    const opt = (field.options || []).find((o) =>
+      typeof o === "string" ? o === v : o.value === v
+    );
+    return typeof opt === "string" ? opt : opt?.label || v;
+  },
+  multioption: (v, field) => {
+    if (!Array.isArray(v)) return "";
+    const options = field.options || [];
+    const map = new Map(
+      options.map((o) => {
+        const val = typeof o === "string" ? o : o.value;
+        const label = typeof o === "string" ? o : o.label ?? o.value;
+        return [val, label];
+      })
+    );
+    return v.map((val) => map.get(val) || val).join(", ");
+  },
   textarea: (v) => v,
 };
 
 function registerHelpers() {
-  Handlebars.registerHelper("field", function (key) {
-    const fields = this._fields || [];
-    const field = fields.find((f) => f.key === key);
-    const value = this[key];
+  Handlebars.registerHelper("log", function (value) {
+    return `\n[LOG] ${JSON.stringify(value, null, 2)}\n`;
+  });
 
-    if (!field) {
-      return `(unknown field: ${key})`;
+  Handlebars.registerHelper("eq", (a, b) => a === b);
+
+  Handlebars.registerHelper("length", (arr) =>
+    Array.isArray(arr) ? arr.length : 0
+  );
+
+  Handlebars.registerHelper("subtract", (a, b) => a - b);
+
+  Handlebars.registerHelper("isSelected", function (array, value, options) {
+    console.log("[Renderer] isSelected called with:", { array, value });
+    return Array.isArray(array) && array.includes(value)
+      ? options.fn(this)
+      : options.inverse(this);
+  });
+
+  Handlebars.registerHelper(
+    "includes",
+    (array, value) => Array.isArray(array) && array.includes(value)
+  );
+
+  Handlebars.registerHelper("lookupOption", function (options, value) {
+    log("Looking up option:", value, "in", options);
+
+    if (!Array.isArray(options)) return { value, label: value };
+
+    const found = options.find((opt) => {
+      const optValue = typeof opt === "string" ? opt : opt.value;
+      return optValue === value;
+    });
+
+    return found
+      ? typeof found === "string"
+        ? { value: found, label: found }
+        : { ...found }
+      : { value, label: value };
+  });
+
+  Handlebars.registerHelper("field", function (key, mode = "label", options) {
+    const context = options?.data?.root || this;
+    const fields = context._fields || [];
+    const field = fields.find((f) => f.key === key);
+    const value = context[key];
+
+    if (!field) return `(unknown field: ${key})`;
+
+    const isOptioned = ["dropdown", "radio", "multioption"].includes(
+      field.type
+    );
+    if (!isOptioned) {
+      const fn =
+        typeof field.render === "function"
+          ? field.render
+          : defaultRenderers[field.type] || defaultRenderers.text;
+      return fn(value, field);
     }
 
-    const fn =
-      typeof field.render === "function"
-        ? field.render
-        : defaultRenderers[field.type] || defaultRenderers.text;
+    const optionsList = field.options || [];
+    const optMap = new Map(
+      optionsList.map((opt) => {
+        const val = typeof opt === "string" ? opt : opt.value;
+        const label = typeof opt === "string" ? opt : opt.label ?? opt.value;
+        return [val, label];
+      })
+    );
 
-    const rendered = fn(value, field);
-    return rendered;
+    if (field.type === "multioption" && Array.isArray(value)) {
+      return value
+        .map((val) => (mode === "value" ? val : optMap.get(val) || val))
+        .join(", ");
+    }
+
+    return mode === "value" ? value : optMap.get(value) || value;
   });
 
   Handlebars.registerHelper("fieldRaw", function (key) {
@@ -40,16 +122,12 @@ function registerHelpers() {
     return value;
   });
 
-  Handlebars.registerHelper("fieldMeta", function (key, prop) {
-    const fields = this._fields || [];
+  Handlebars.registerHelper("fieldMeta", function (key, prop, options) {
+    const context = options?.data?.root || this;
+    const fields = context._fields || [];
     const field = fields.find((f) => f.key === key);
-
-    if (!field) {
-      return undefined;
-    }
-
-    const result = prop ? field[prop] : field;
-    return result;
+    if (!field) return undefined;
+    return prop ? field[prop] : field;
   });
 }
 
@@ -69,7 +147,6 @@ function renderMarkdown(formData, templateYaml) {
     const tmpl = Handlebars.compile(templateYaml.markdown_template);
     const output = tmpl(context);
 
-    log("[Renderer] Rendered markdown template successfully.");
     return output;
   } catch (err) {
     error("[Renderer] Failed to render markdown:", err);

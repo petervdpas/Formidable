@@ -11,24 +11,48 @@ markdown_template: |-
 
   ## Direction: {{field "dropdown"}}
 
-  You selected: _{{field "radio"}}_
+  Stems from {{field "dropdown" "value"}}
+
+  ## Selected Option: {{field "radio"}}
+
+  Stems from {{field "radio" "value"}}
+
+  ---
+
+  ## Selected Multiple Choices:
+
+  {{log (fieldRaw "multichoice")}}
+  {{log (fieldMeta "multichoice" "options")}}
+
+  - Labels:
+  {{#each (fieldRaw "multichoice") as |val idx|}}
+    {{#with (lookupOption (fieldMeta "multichoice" "options") val) as |opt|}}
+      {{opt.label}}{{#unless (eq idx (subtract (length (fieldRaw "multichoice")) 1))}}, {{/unless}}
+    {{/with}}
+  {{/each}}
+
+  - Values: {{fieldRaw "multichoice"}}
+
+  - All Options:
+  {{#with (fieldRaw "multichoice") as |selected|}}
+    {{#each (fieldMeta "multichoice" "options") as |opt|}}
+    - [{{#if (includes selected opt.value)}}x{{else}} {{/if}}] {{opt.label}}
+    {{/each}}
+  {{/with}}
 
   ---
 
   ### Notes
-
   {{field "mline"}}
 
   ---
 
   ### Number: {{field "numpy"}}
-
   Birthday: {{field "bday"}}
 
   ---
 
   ### List Items
-
   {{#each (fieldRaw "listy")}}
   - {{this}}
   {{/each}}
@@ -36,15 +60,14 @@ markdown_template: |-
   ---
 
   ### Table of Data
-
   {{#if (fieldRaw "datable")}}
-  {{#with (fieldMeta "datable" "options") as |headers|}}
+    {{#with (fieldMeta "datable" "options") as |headers|}}
   |{{#each headers}}{{this}} |{{/each}}
   |{{#each headers}}--|{{/each}}
-  {{/with}}
-  {{#each (fieldRaw "datable")}}
+    {{/with}}
+    {{#each (fieldRaw "datable")}}
   |{{#each this}}{{this}} |{{/each}}
-  {{/each}}
+    {{/each}}
   {{/if}}
 
   ## End
@@ -74,7 +97,7 @@ fields:
   - key: multichoice
     label: Multiple Choice
     type: multioption
-    description: A test description - single-column
+    description: A test description - single-column... jk...
     two_column: true
     options:
       - value: A
