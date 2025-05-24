@@ -1,6 +1,8 @@
 /* ───── Modal Container ───── */
 .modal {
     display: none;
+    opacity: 0;
+    pointer-events: none;
     position: fixed;
     padding: 4px 20px 20px 20px;
     top: 50%;
@@ -10,7 +12,6 @@
     width: 400px;
     max-width: 90%;
     z-index: 1000;
-    opacity: 0;
     transition: opacity 0.2s ease;
     background-color: #ffffff;
     border-color: #555;
@@ -20,6 +21,22 @@
 .modal.show {
     display: block;
     opacity: 1;
+    pointer-events: auto;
+}
+
+.modal.large {
+    display: none;
+    flex-direction: column;
+    height: 80vh;
+    max-width: 90vw;
+    width: 80em !important;
+    height: 80vh !important;
+}
+
+.modal.large.show {
+    display: flex;
+    opacity: 1;
+    pointer-events: auto;
 }
 
 /* ───── Modal Header ───── */
@@ -30,11 +47,24 @@
     margin-bottom: 5px;
 }
 
+.modal-header {
+    flex-shrink: 0;
+}
+
 /* ───── Modal Body ───── */
 .modal-body {
     display: flex;
     flex-direction: column;
     gap: 6px;
+}
+
+/* Make sure the header and content align well */
+.modal-body.two-pane {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+    overflow: hidden;
 }
 
 /* ───── Form Row: Label + Input Side-by-Side ───── */
@@ -191,48 +221,42 @@
     gap: 0.5em;
 }
 
-.modal.large {
-  max-width: 90vw;
-  width: 80em !important;
-  height: 80vh !important;
-}
-
-/* Make sure the header and content align well */
-.modal-body.two-pane {
-  display: flex;
-  flex-direction: row;
-  gap: 24px;
-  height: 100%;
-  overflow: hidden;
-  padding-top: 8px;
-}
-
 .pane {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .pane h4 {
-  margin: 0 0 6px 0;
-  padding: 0;
-  font-size: 1em;
-  font-weight: bold;
-  border-bottom: 1px solid #ccc;
+    margin: 0;
+    padding: 0 0 4px 0;
+    font-size: 1em;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+    flex-shrink: 0;
 }
 
 .output-block {
-  flex: 1;
-  overflow: auto;
-  padding: 10px;
-  font-size: 14px;
-  line-height: 1.5;
-  box-sizing: border-box;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  color: #000;
+    flex: 1;
+    overflow: auto;
+    padding: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    box-sizing: border-box;
+    background: transparent;
+    color: #000;
+}
+
+#render-output,
+#render-preview {
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: auto;
+    padding: 0;
+    margin: 0;
 }
 
 /* Markdown output fix */
@@ -242,61 +266,53 @@
     white-space: pre-wrap;
     line-height: 1.5;
     color: var(--input-fg);
-    padding: 12px;
-    border: none;
     background: transparent;
-    overflow: auto;
-    max-height: 60vh;
-    box-sizing: border-box;
+    border: none;
 }
 
 /* Preview HTML should look natural */
 #render-preview {
-  font-family: system-ui, sans-serif;
-  white-space: normal;
-  background-color: #fff;
-  color: #000;
-  line-height: 1.6;
-  padding: 12px;
-  overflow: auto;
-  max-height: 60vh;
-  box-sizing: border-box;
+    font-family: system-ui, sans-serif;
+    white-space: normal;
+    background-color: #fff;
+    color: #000;
+    line-height: 1.6;
 }
 
 /* Optional: extra structuur binnen #render-preview */
 #render-preview h1,
 #render-preview h2,
 #render-preview h3 {
-  margin-top: 1em;
-  margin-bottom: 0.4em;
+    margin-top: 1em;
+    margin-bottom: 0.4em;
 }
 
 #render-preview p {
-  margin: 0.5em 0;
+    margin: 0.5em 0;
 }
 
 #render-preview ul {
-  padding-left: 1.2em;
-  margin: 0.5em 0;
+    padding-left: 1.2em;
+    margin: 0.5em 0;
 }
 
 #render-preview table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1em 0;
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
 }
 
 #render-preview th,
 #render-preview td {
-  border: 1px solid #ccc;
-  padding: 6px 10px;
-  text-align: left;
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    text-align: left;
 }
 
 #render-preview blockquote {
-  border-left: 4px solid #aaa;
-  padding-left: 10px;
-  color: #555;
-  margin: 1em 0;
-  font-style: italic;
+    border-left: 4px solid #aaa;
+    padding-left: 10px;
+    color: #555;
+    margin: 1em 0;
+    font-style: italic;
 }
