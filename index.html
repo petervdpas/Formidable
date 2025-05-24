@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="assets/buttons.css" />
     <link rel="stylesheet" href="assets/theme.css" />
     <link rel="stylesheet" href="assets/dark-theme.css" />
-    
+
     <!-- CodeMirror Styles -->
     <link rel="stylesheet" href="assets/codemirror/codemirror.css" />
     <link id="cm-theme" rel="stylesheet" href="assets/codemirror/monokai.css" />
@@ -227,11 +227,21 @@
       </div>
       <div class="modal-body two-pane">
         <div class="pane raw-pane">
-          <h4>Markdown</h4>
+          <div class="pane-header">
+            <h4>Markdown</h4>
+            <button id="copy-markdown" class="copy-btn" title="Copy Markdown">
+              &#x29C9;
+            </button>
+          </div>
           <pre id="render-output" class="output-block"></pre>
         </div>
         <div class="pane html-pane">
-          <h4>Preview</h4>
+          <div class="pane-header">
+            <h4>Preview</h4>
+            <button id="copy-preview" class="copy-btn" title="Copy HTML">
+              &#x29C9;
+            </button>
+          </div>
           <div id="render-preview" class="output-block preview-block"></div>
         </div>
       </div>

@@ -65,3 +65,21 @@ button,
 .modal-actions button:hover {
     background-color: #f0f0f0;
 }
+
+.copy-btn {
+  background: none;
+  border: none;
+  font-size: 1.1em;
+  padding: 2px;
+  margin: 0;
+  line-height: 1;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s ease;
+}
+
+.copy-btn:hover,
+.copy-btn:focus {
+  color: #000;
+  outline: none;
+}
