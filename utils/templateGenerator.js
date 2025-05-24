@@ -3,7 +3,7 @@
 export function generateTemplateCode(fields = []) {
   if (!Array.isArray(fields) || fields.length === 0) return "";
 
-  const headerComment = `<!-- AUTO-GENERATED TEMPLATE - You can edit this, but changes will be overwritten if regenerated -->\n`;
+  const headerComment = `<!-- AUTO-GENERATED TEMPLATE - Only if Editor is empty! -->\n`;
 
   const body = fields
     .map((field) => {

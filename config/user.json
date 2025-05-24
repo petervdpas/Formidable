@@ -1,13 +1,13 @@
 {
-  "theme": "light",
+  "theme": "dark",
   "font_size": 14,
-  "logging_enabled": true,
+  "logging_enabled": false,
   "context_mode": "storage",
   "storage_location": "./storage",
   "selected_template": "basic.yaml",
   "selected_data_file": "test-20250518.meta.json",
   "window_bounds": {
-    "width": 1178,
+    "width": 1299,
     "height": 903,
     "x": 146,
     "y": 97
