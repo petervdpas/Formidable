@@ -3,6 +3,7 @@
 import { EventBus } from "./eventBus.js";
 import { getFormData } from "../utils/formUtils.js";
 import { setupRenderModal } from "./modalSetup.js";
+import { showToast } from "./toastManager.js";
 
 export function setupFormButtons({ container, template, onSave, onDelete }) {
   const saveBtn = document.createElement("button");
@@ -46,12 +47,16 @@ export function setupFormButtons({ container, template, onSave, onDelete }) {
       copyMarkdownBtn.onclick = () => {
         navigator.clipboard
           .writeText(markdown)
-          .then(() =>
-            EventBus.emit("logging:default", ["✅ Markdown copied to clipboard"])
-          )
-          .catch((err) =>
-            EventBus.emit("logging:error", ["❌ Markdown copy failed", err])
-          );
+          .then(() => {
+            EventBus.emit("logging:default", [
+              "✅ Markdown copied to clipboard",
+            ]);
+            showToast("Markdown copied", "success");
+          })
+          .catch((err) => {
+            EventBus.emit("logging:error", ["❌ Markdown copy failed", err]);
+            showToast("Failed to copy Markdown", "error");
+          });
       };
     }
 
@@ -59,12 +64,14 @@ export function setupFormButtons({ container, template, onSave, onDelete }) {
       copyPreviewBtn.onclick = () => {
         navigator.clipboard
           .writeText(html)
-          .then(() =>
-            EventBus.emit("logging:default", ["✅ HTML copied to clipboard"])
-          )
-          .catch((err) =>
-            EventBus.emit("logging:error", ["❌ HTML copy failed", err])
-          );
+          .then(() => {
+            EventBus.emit("logging:default", ["✅ HTML copied to clipboard"]);
+            showToast("HTML copied", "success");
+          })
+          .catch((err) => {
+            EventBus.emit("logging:error", ["❌ HTML copy failed", err]);
+            showToast("Failed to copy HTML", "error");
+          });
       };
     }
 

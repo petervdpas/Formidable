@@ -6,6 +6,18 @@
   --readonly-bg: #ffffe0;
   --readonly-fg: #888;
   --input-icon-bg: #1d1d1d;
+
+  --toast-bg-info: #333;
+  --toast-fg-info: #fff;
+
+  --toast-bg-success: #4caf50;
+  --toast-fg-success: #fff;
+
+  --toast-bg-error: #f44336;
+  --toast-fg-error: #fff;
+
+  --toast-bg-warn: #ff9800;
+  --toast-fg-warn: #000;
 }
 
 .editor-wrapper.fullscreen {
@@ -65,7 +77,7 @@ body {
   background-color: #ffffff;
 }
 
-input:checked + .slider {
+input:checked+.slider {
   background-color: #4caf50;
 }
 

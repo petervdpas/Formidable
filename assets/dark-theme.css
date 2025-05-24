@@ -6,6 +6,18 @@
   --readonly-bg: #888;
   --readonly-fg: #ffffe0;
   --input-icon-bg: #3f3f3f;
+
+  --toast-bg-info: #1e1e1e;    /* darker than #333 */
+  --toast-fg-info: #ddd;
+
+  --toast-bg-success: #2e7d32;
+  --toast-fg-success: #fff;
+
+  --toast-bg-error: #c62828;
+  --toast-fg-error: #fff;
+
+  --toast-bg-warn: #ef6c00;
+  --toast-fg-warn: #000;
 }
 
 .dark-mode body,
