@@ -3,7 +3,7 @@
 import { EventBus } from "./eventBus.js";
 import { showConfirmModal } from "./modalSetup.js";
 import { setupFieldEditModal } from "./modalSetup.js";
-import { fieldTypes } from "../utils/fieldTypes.js";
+import { setupFieldEditor } from "./templateFieldEdit.js";
 import { generateTemplateCode } from "../utils/templateGenerator.js";
 import { getCurrentTheme } from "./themeToggle.js";
 
@@ -12,6 +12,7 @@ const Sortable = window.Sortable;
 let codeMirrorEditor = null;
 let keyboardListenerAttached = false;
 let editorWrapper = null;
+let fieldEditor = null;
 
 function handleEditorKey(e) {
   if (!editorWrapper) return;
@@ -261,49 +262,17 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     };
   }
 
-  function applyModalTypeClass(modal, typeKey) {
-    if (!modal) return;
-
-    // Remove existing modal-* classes except "modal"
-    modal.classList.forEach((cls) => {
-      if (cls.startsWith("modal-") && cls !== "modal") {
-        modal.classList.remove(cls);
-      }
-    });
-
-    const typeDef = fieldTypes[typeKey];
-    if (typeDef?.cssClass) {
-      modal.classList.add(typeDef.cssClass); // e.g., type-text
-    } else {
-      EventBus.emit("logging:warning", [
-        `[YamlEditor] Unknown type "${typeKey}" passed to applyModalTypeClass.`,
-      ]);
-    }
-  }
-
   let typeDropdown = null;
 
   function openEditModal(field) {
     const modal = document.getElementById("field-edit-modal");
-    applyModalTypeClass(modal, field.type || "text");
+    const body = modal.querySelector(".modal-body");
 
-    document.getElementById("edit-key").value = field.key;
-    document.getElementById("edit-two-column").checked = !!field.two_column;
-    document.getElementById("edit-label").value = field.label;
-    document.getElementById("edit-description").value = field.description || "";
-    document.getElementById("edit-default").value = field.default ?? "";
-
-    const optionsField = document.getElementById("edit-options");
-    try {
-      optionsField.value = field.options
-        ? JSON.stringify(field.options) // ← now compact
-        : "";
-    } catch {
-      optionsField.value = "";
+    if (!fieldEditor) {
+      fieldEditor = setupFieldEditor(body);
     }
 
-    typeDropdown?.setSelected(field.type || "text");
-
+    fieldEditor.setField(field);
     editModal.show();
   }
 
