@@ -6,6 +6,10 @@ markdown_template: >-
 
   ### Test
 
+
+  _{{fieldDescription "test"}}_
+
+
   ```sh
 
   [LOG]
@@ -13,6 +17,7 @@ markdown_template: >-
   {{json (fieldRaw "test")}}
 
   ```
+
 
   {{field "test"}}
 
@@ -22,6 +27,10 @@ markdown_template: >-
 
   ### Check
 
+
+  _{{fieldDescription "check"}}_
+
+
   ```sh
 
   [LOG]
@@ -29,6 +38,7 @@ markdown_template: >-
   {{json (fieldRaw "check")}}
 
   ```
+
 
   {{field "check"}}
 
@@ -38,6 +48,10 @@ markdown_template: >-
 
   ### Dropdown
 
+
+  _{{fieldDescription "dropdown"}}_
+
+
   ```sh
 
   [LOG]
@@ -46,6 +60,7 @@ markdown_template: >-
 
   ```
 
+
   ```sh
 
   [LOG]
@@ -53,6 +68,7 @@ markdown_template: >-
   {{json (fieldMeta "dropdown" "options")}}
 
   ```
+
 
   Selected: {{field "dropdown"}}
 
@@ -64,6 +80,10 @@ markdown_template: >-
 
   ### Multiple Choice
 
+
+  _{{fieldDescription "multichoice"}}_
+
+
   ```sh
 
   [LOG]
@@ -72,6 +92,7 @@ markdown_template: >-
 
   ```
 
+
   ```sh
 
   [LOG]
@@ -79,6 +100,7 @@ markdown_template: >-
   {{json (fieldMeta "multichoice" "options")}}
 
   ```
+
 
   - Labels:
 
@@ -106,6 +128,10 @@ markdown_template: >-
 
   ### Radio
 
+
+  _{{fieldDescription "radio"}}_
+
+
   ```sh
 
   [LOG]
@@ -114,6 +140,7 @@ markdown_template: >-
 
   ```
 
+
   ```sh
 
   [LOG]
@@ -121,6 +148,7 @@ markdown_template: >-
   {{json (fieldMeta "radio" "options")}}
 
   ```
+
 
   Selected: {{field "radio"}}
 
@@ -132,6 +160,10 @@ markdown_template: >-
 
   ### Mline
 
+
+  _{{fieldDescription "mline"}}_
+
+
   ```sh
 
   [LOG]
@@ -139,6 +171,7 @@ markdown_template: >-
   {{json (fieldRaw "mline")}}
 
   ```
+
 
   {{field "mline"}}
 
@@ -148,6 +181,10 @@ markdown_template: >-
 
   ### Numpy
 
+
+  _{{fieldDescription "numpy"}}_
+
+
   ```sh
 
   [LOG]
@@ -155,6 +192,7 @@ markdown_template: >-
   {{json (fieldRaw "numpy")}}
 
   ```
+
 
   {{field "numpy"}}
 
@@ -164,6 +202,10 @@ markdown_template: >-
 
   ### Birthday
 
+
+  _{{fieldDescription "bday"}}_
+
+
   ```sh
 
   [LOG]
@@ -171,6 +213,7 @@ markdown_template: >-
   {{json (fieldRaw "bday")}}
 
   ```
+
 
   {{field "bday"}}
 
@@ -180,6 +223,10 @@ markdown_template: >-
 
   ### Listy
 
+
+  _{{fieldDescription "listy"}}_
+
+
   ```sh
 
   [LOG]
@@ -187,6 +234,7 @@ markdown_template: >-
   {{json (fieldRaw "listy")}}
 
   ```
+
 
   {{#each (fieldRaw "listy")}}
 
@@ -200,6 +248,10 @@ markdown_template: >-
 
   ### Table
 
+
+  _{{fieldDescription "datable"}}_
+
+
   ```sh
 
   [LOG]
@@ -208,6 +260,7 @@ markdown_template: >-
 
   ```
 
+
   ```sh
 
   [LOG]
@@ -215,6 +268,7 @@ markdown_template: >-
   {{json (fieldMeta "datable" "options")}}
 
   ```
+
 
   {{#if (fieldRaw "datable")}}
     {{#with (fieldMeta "datable" "options") as |headers|}}
@@ -241,12 +295,14 @@ fields:
   - key: dropdown
     label: Dropdown
     type: dropdown
-    default: Right
+    default: R
     description: A test description - two-column
     two_column: true
     options:
-      - Left
-      - Right
+      - value: L
+        label: Left
+      - value: R
+        label: Right
   - key: multichoice
     label: Multiple Choice
     type: multioption
@@ -262,13 +318,16 @@ fields:
   - key: radio
     label: Radio
     type: radio
-    default: Dog
+    default: DOG
     description: A test description - two-column
     two_column: true
     options:
-      - Cat
-      - Dog
-      - Bird
+      - value: CAT
+        label: Cat
+      - value: DOG
+        label: Dog
+      - value: BIRD
+        label: Bird
   - key: mline
     label: Mline
     type: textarea

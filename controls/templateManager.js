@@ -111,10 +111,13 @@ function createBasicTemplateIfMissing() {
           key: "dropdown",
           label: "Dropdown",
           type: "dropdown",
-          default: "Right",
+          default: "R",
           description: "A test description - two-column",
           two_column: true,
-          options: ["Left", "Right"],
+          options: [
+            { value: "L", label: "Left" },
+            { value: "R", label: "Right" },
+          ],
         },
         {
           key: "multichoice",
@@ -125,17 +128,21 @@ function createBasicTemplateIfMissing() {
           options: [
             { value: "A", label: "Option A" },
             { value: "B", label: "Option B" },
-            { value: "C", label: "Option C" },
-          ],
+            { value: "C", label: "Option C" }
+          ]
         },
         {
           key: "radio",
           label: "Radio",
           type: "radio",
-          default: "Dog",
+          default: "DOG",
           description: "A test description - two-column",
           two_column: true,
-          options: ["Cat", "Dog", "Bird"],
+          options: [
+            { value: "CAT", label: "Cat" },
+            { value: "DOG", label: "Dog" },
+            { value: "BIRD", label: "Bird" }
+          ],
         },
         {
           key: "mline",

@@ -130,6 +130,13 @@ function registerHelpers() {
     if (!field) return undefined;
     return prop ? field[prop] : field;
   });
+
+  Handlebars.registerHelper("fieldDescription", function (key, options) {
+    const context = options?.data?.root || this;
+    const fields = context._fields || [];
+    const field = fields.find((f) => f.key === key);
+    return field?.description || "";
+  });
 }
 
 function renderMarkdown(formData, templateYaml) {

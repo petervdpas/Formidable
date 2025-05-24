@@ -12,16 +12,16 @@ export function generateTemplateCode(fields = []) {
       const type = (field.type || "text").toLowerCase();
 
       // Logs wrapped in ```sh blocks
-      const logs = ["```sh", `[LOG]\n{{json (fieldRaw "${key}")}}`, "```"];
+      const logs = ["```sh", `[LOG]\n{{json (fieldRaw "${key}")}}`, "```\n"];
       if (["dropdown", "radio", "multioption", "table"].includes(type)) {
         logs.push(
           "```sh",
           `[LOG]\n{{json (fieldMeta "${key}" "options")}}`,
-          "```"
+          "```\n"
         );
       }
 
-      const header = `### ${label}`;
+      const header = `### ${label}\n\n_{{fieldDescription "${key}"}}_\n`;
       const block = (() => {
         switch (type) {
           case "checkbox":
