@@ -159,27 +159,6 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     container.querySelector("#save-yaml").onclick = () => {
       EventBus.emit("editor:save", {
         container,
-        callback: onSaveCallback,
-      });
-    };
-    container.querySelector("#save-yaml").onclick = () => {
-      const name = container.querySelector("#yaml-name").value.trim();
-      const storageLocation = container
-        .querySelector("#storage-location")
-        .value.trim();
-      const markdownTemplate = getMarkdownTemplate();
-      const updated = {
-        name,
-        storage_location: storageLocation,
-        markdown_template: markdownTemplate,
-        fields: currentData.fields,
-      };
-      EventBus.emit("logging:default", [
-        "[YamlEditor] Calling save callback with updated data:",
-        updated,
-      ]);
-      EventBus.emit("editor:save", {
-        container,
         fields: currentData.fields,
         callback: onSaveCallback,
       });

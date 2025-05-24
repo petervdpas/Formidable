@@ -284,7 +284,7 @@ fields:
   - key: test
     label: Test
     type: text
-    default: Default value TEST
+    default: Default value TESTING
     description: A test description
     two_column: true
   - key: check
