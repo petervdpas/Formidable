@@ -262,15 +262,15 @@
 #render-preview {
     flex: 1;
     height: 100%;
-    width: 100%;
     box-sizing: border-box;
     overflow: auto;
-    padding: 0;
+    padding: 2px 4px;
     margin: 0;
 }
 
 /* Markdown output fix */
 #render-output {
+    flex: 1;
     font-family: "Courier New", monospace;
     font-size: 14px;
     white-space: pre-wrap;
@@ -282,11 +282,13 @@
 
 /* Preview HTML should look natural */
 #render-preview {
+    flex: 1.2;
     font-family: system-ui, sans-serif;
     white-space: normal;
     background-color: #fff;
     color: #000;
     line-height: 1.6;
+    padding-right: 12px;
 }
 
 /* Optional: extra structuur binnen #render-preview */
@@ -334,4 +336,25 @@
     color: #555;
     margin: 1em 0;
     font-style: italic;
+}
+
+/* Code block styling for Markdown preview */
+#render-preview pre code {
+    display: block;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    background-color: #f4f4f4;
+    color: #333;
+    font-family: "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.4;
+    border-radius: 4px;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+/* Optional: if using a syntax highlighter later */
+#render-preview code.language-sh {
+    color: #005cc5;
 }

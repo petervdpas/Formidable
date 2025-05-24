@@ -4,6 +4,7 @@ import { EventBus } from "./eventBus.js";
 import { showConfirmModal } from "./modalSetup.js";
 import { setupFieldEditModal } from "./modalSetup.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
+import { generateTemplateCode } from "../utils/templateGenerator.js";
 import { getCurrentTheme } from "./themeToggle.js";
 
 const Sortable = window.Sortable;
@@ -116,6 +117,11 @@ export function initTemplateEditor(containerId, onSaveCallback) {
             currentData.markdown_template || ""
           }</textarea>
         </div>
+        <div class="button-row">
+          <button id="generate-template" class="btn btn-info" style="display: none;">
+            Generate Template
+          </button>
+        </div>
       </div>
     </fieldset>
 
@@ -138,6 +144,8 @@ export function initTemplateEditor(containerId, onSaveCallback) {
 
     const textarea = container.querySelector("#markdown-template");
     initCodeMirror(textarea, currentData.markdown_template || "");
+
+    setupGenerateTemplateButton(container, currentData.fields);
 
     editorWrapper = container.querySelector(".editor-wrapper");
 
@@ -232,6 +240,25 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     const lastIdx = currentData.fields.length - 1;
     const lastDown = list.querySelector(`.action-down[data-idx="${lastIdx}"]`);
     if (lastDown) lastDown.disabled = true;
+  }
+
+  function setupGenerateTemplateButton(container, fields) {
+    const generateBtn = container.querySelector("#generate-template");
+    if (!generateBtn) return;
+
+    const updateVisibility = () => {
+      const hasCode = codeMirrorEditor.getValue().trim().length > 0;
+      generateBtn.style.display = hasCode ? "none" : "block";
+    };
+
+    codeMirrorEditor.on("change", updateVisibility);
+    updateVisibility(); // Initial check
+
+    generateBtn.onclick = () => {
+      const code = generateTemplateCode(fields);
+      codeMirrorEditor.setValue(code);
+      generateBtn.style.display = "none";
+    };
   }
 
   function applyModalTypeClass(modal, typeKey) {

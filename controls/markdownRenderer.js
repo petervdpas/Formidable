@@ -39,6 +39,9 @@ const defaultRenderers = {
 };
 
 function registerHelpers() {
+  Handlebars.registerHelper("json", (value) => {
+    return new Handlebars.SafeString(JSON.stringify(value, null, 2));
+  });
   Handlebars.registerHelper("log", function (value) {
     return `\n[LOG] ${JSON.stringify(value, null, 2)}\n`;
   });
