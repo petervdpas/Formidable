@@ -169,3 +169,21 @@ export function bindActionHandlers(container, selector, callback) {
     });
   });
 }
+
+export function syncScroll(el1, el2) {
+  let isSyncing = false;
+
+  const sync = (source, target) => () => {
+    if (isSyncing) return;
+    isSyncing = true;
+
+    const ratio =
+      source.scrollTop / (source.scrollHeight - source.clientHeight);
+    target.scrollTop = ratio * (target.scrollHeight - target.clientHeight);
+
+    isSyncing = false;
+  };
+
+  el1.addEventListener("scroll", sync(el1, el2));
+  el2.addEventListener("scroll", sync(el2, el1));
+}

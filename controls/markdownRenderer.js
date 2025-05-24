@@ -64,8 +64,6 @@ function registerHelpers() {
   );
 
   Handlebars.registerHelper("lookupOption", function (options, value) {
-    log("Looking up option:", value, "in", options);
-
     if (!Array.isArray(options)) return { value, label: value };
 
     const found = options.find((opt) => {

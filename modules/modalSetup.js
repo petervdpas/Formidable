@@ -7,6 +7,7 @@ import { formatAsRelativePath } from "../utils/pathUtils.js";
 import { applyModalCssClass } from "../utils/modalUtils.js";
 import { extractFieldDefinition } from "../utils/formUtils.js";
 import { createDropdown } from "./dropdownManager.js";
+import { syncScroll } from "../utils/domUtils.js";
 
 export function setupSettingsModal(themeToggle, contextToggle, loggingToggle) {
   return setupModal("settings-modal", {
@@ -112,6 +113,13 @@ export function setupRenderModal() {
     onOpen: () => {
       const modal = document.getElementById("render-modal");
       if (modal) modal.classList.add("large");
+
+      const rawPane = document.getElementById("render-output");
+      const htmlPane = document.getElementById("render-preview");
+
+      if (rawPane && htmlPane) {
+        syncScroll(rawPane, htmlPane);
+      }
     },
   });
 }

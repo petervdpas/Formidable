@@ -237,6 +237,10 @@
     flex-shrink: 0;
 }
 
+.modal-body.two-pane > .pane:first-child {
+    border-right: 1px solid #ddd;
+}
+
 .output-block {
     flex: 1;
     overflow: auto;
@@ -294,6 +298,15 @@
 #render-preview ul {
     padding-left: 1.2em;
     margin: 0.5em 0;
+}
+
+#render-output pre,
+#render-preview pre,
+#render-output table,
+#render-preview table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
 }
 
 #render-preview table {
