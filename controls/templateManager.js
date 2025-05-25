@@ -97,14 +97,14 @@ function createBasicTemplateIfMissing() {
           label: "Test",
           type: "text",
           default: "Default value",
-          description: "A test description",
+          description: "A basic text input for demonstration purposes.",
           two_column: true,
         },
         {
           key: "check",
           label: "Check",
           type: "boolean",
-          description: "A test description - two-column",
+          description: "Enable or disable this feature using a checkbox.",
           two_column: true,
         },
         {
@@ -112,7 +112,7 @@ function createBasicTemplateIfMissing() {
           label: "Dropdown",
           type: "dropdown",
           default: "R",
-          description: "A test description - two-column",
+          description: "Select a single value from a dropdown menu.",
           two_column: true,
           options: [
             { value: "L", label: "Left" },
@@ -123,25 +123,25 @@ function createBasicTemplateIfMissing() {
           key: "multichoice",
           label: "Multiple Choice",
           type: "multioption",
-          description: "A test description - single-column... jk...",
+          description: "Choose one or more options from a list of checkboxes.",
           two_column: true,
           options: [
             { value: "A", label: "Option A" },
             { value: "B", label: "Option B" },
-            { value: "C", label: "Option C" }
-          ]
+            { value: "C", label: "Option C" },
+          ],
         },
         {
           key: "radio",
           label: "Radio",
           type: "radio",
           default: "DOG",
-          description: "A test description - two-column",
+          description: "Pick one option using radio buttons.",
           two_column: true,
           options: [
             { value: "CAT", label: "Cat" },
             { value: "DOG", label: "Dog" },
-            { value: "BIRD", label: "Bird" }
+            { value: "BIRD", label: "Bird" },
           ],
         },
         {
@@ -149,34 +149,38 @@ function createBasicTemplateIfMissing() {
           label: "Mline",
           type: "textarea",
           default: "A whole lot of prefab text...",
-          description: "A test description - single-column",
+          description: "Enter longer text, such as notes or paragraphs.",
         },
         {
           key: "numpy",
           label: "Numpy",
           type: "number",
           default: "17",
-          description: "A test description - single-column",
+          description: "A numeric input field. Only accepts numbers.",
         },
         {
           key: "bday",
           label: "Birthday",
           type: "date",
           default: "1968-12-23",
-          description: "A test description - single-column",
+          description: "Select a date from the calendar picker.",
         },
         {
           key: "listy",
           label: "Listy",
           type: "list",
-          description: "A test description - single-column",
+          description: "Add multiple short entries in list format.",
         },
         {
           key: "datable",
           label: "Table",
           type: "table",
-          description: "A test description - single-column",
-          options: ["Header1", "Header2", "Header3"],
+          description: "Enter rows of structured data using defined columns.",
+          options: [
+            { value: "col1", label: "Column 1" },
+            { value: "col2", label: "Column 2" },
+            { value: "col3", label: "Column 3" },
+          ],
         },
       ],
     };

@@ -192,19 +192,18 @@ fields:
     label: Test
     type: text
     default: Default value
-    description: A test description
+    description: A basic text input for demonstration purposes.
     two_column: true
   - key: check
     label: Check
     type: boolean
-    description: A test description - two-column
+    description: Enable or disable this feature using a checkbox.
     two_column: true
-    default: false
   - key: dropdown
     label: Dropdown
     type: dropdown
     default: R
-    description: A test description - two-column
+    description: Select a single value from a dropdown menu.
     two_column: true
     options:
       - value: L
@@ -214,7 +213,7 @@ fields:
   - key: multichoice
     label: Multiple Choice
     type: multioption
-    description: A test description - single-column... jk...
+    description: Choose one or more options from a list of checkboxes.
     two_column: true
     options:
       - value: A
@@ -223,12 +222,11 @@ fields:
         label: Option B
       - value: C
         label: Option C
-    default: []
   - key: radio
     label: Radio
     type: radio
-    default: BIRD
-    description: A test description - two-column
+    default: DOG
+    description: Pick one option using radio buttons.
     two_column: true
     options:
       - value: CAT
@@ -241,26 +239,25 @@ fields:
     label: Mline
     type: textarea
     default: A whole lot of prefab text...
-    description: A test description - single-column
+    description: Enter longer text, such as notes or paragraphs.
   - key: numpy
     label: Numpy
     type: number
     default: '17'
-    description: A test description - single-column
+    description: A numeric input field. Only accepts numbers.
   - key: bday
     label: Birthday
     type: date
     default: '1968-12-23'
-    description: A test description - single-column
+    description: Select a date from the calendar picker.
   - key: listy
     label: Listy
     type: list
-    description: A test description - single-column
-    default: []
+    description: Add multiple short entries in list format.
   - key: datable
     label: Table
     type: table
-    description: A test description - single-column
+    description: Enter rows of structured data using defined columns.
     options:
       - value: col1
         label: Column 1
