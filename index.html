@@ -83,44 +83,8 @@
         <h2>Settings</h2>
         <button id="settings-close">✕</button>
       </div>
-      <div class="modal-body">
-        <div class="modal-form-row switch-row">
-          <label for="theme-toggle">Dark Mode</label>
-          <label class="switch">
-            <input type="checkbox" id="theme-toggle" />
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div class="modal-form-row switch-row">
-          <label for="context-toggle">Context Mode</label>
-          <label class="switch">
-            <input type="checkbox" id="context-toggle" />
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div class="modal-form-row switch-row">
-          <label for="logging-toggle">Enable Logging</label>
-          <label class="switch">
-            <input type="checkbox" id="logging-toggle" />
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div class="modal-form-row directory-picker">
-          <label for="template-dir">Template Directory</label>
-          <div style="display: flex; gap: 6px; flex: 1">
-            <input type="text" id="template-dir" readonly />
-            <button id="choose-template-dir" class="btn btn-default">
-              Browse
-            </button>
-          </div>
-        </div>
-        <div class="modal-form-row directory-picker">
-          <label for="default-dir">Storage Directory</label>
-          <div style="display: flex; gap: 6px; flex: 1">
-            <input type="text" id="storage-dir" readonly />
-            <button id="choose-storage-dir" class="btn btn-default">Browse</button>
-          </div>
-        </div>
+      <div class="modal-body" id="settings-body">
+        <!-- Populated dynamically via settingsManager -->
       </div>
     </div>
 

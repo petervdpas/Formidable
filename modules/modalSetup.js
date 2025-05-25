@@ -3,13 +3,13 @@
 import { setupModal } from "./modalManager.js";
 import { EventBus } from "./eventBus.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
-import { formatAsRelativePath } from "../utils/pathUtils.js";
+import { renderSettings } from "./settingsManager.js";
 import { applyModalCssClass } from "../utils/modalUtils.js";
 import { extractFieldDefinition } from "../utils/formUtils.js";
 import { createDropdown } from "./dropdownManager.js";
 import { syncScroll } from "../utils/domUtils.js";
 
-export function setupSettingsModal(themeToggle, contextToggle, loggingToggle) {
+export function setupSettingsModal() {
   return setupModal("settings-modal", {
     closeBtn: "settings-close",
     escToClose: true,
@@ -17,78 +17,10 @@ export function setupSettingsModal(themeToggle, contextToggle, loggingToggle) {
     resizable: true,
     width: "30em",
     height: "auto",
-
     onOpen: async () => {
-      const config = await window.api.config.loadUserConfig();
-
-      // Just emit event to trigger handlers elsewhere
-      EventBus.emit("theme:toggle", config.theme);
-
-      const templateDirInput = document.getElementById("template-dir");
-      const chooseTemplateBtn = document.getElementById("choose-template-dir");
-      const storageDirInput = document.getElementById("storage-dir");
-      const chooseStorageBtn = document.getElementById("choose-storage-dir");
-      const loggingToggler = document.getElementById("logging-toggle");
-
-      templateDirInput.value = config.templates_location || "./templates";
-      storageDirInput.value = config.storage_location || "./storage";
-
-      if (loggingToggler) {
-        loggingToggler.checked = !!config.logging_enabled;
-      }
-
-      chooseTemplateBtn.onclick = async () => {
-        const selected = await window.api.dialog.chooseDirectory();
-        if (selected) {
-          const appRoot = (await window.api.system.getAppRoot?.()) || ".";
-          const relativePath = formatAsRelativePath(selected, appRoot);
-
-          templateDirInput.value = relativePath;
-          await window.api.config.updateUserConfig({
-            templates_location: relativePath,
-          });
-
-          EventBus.emit(
-            "status:update",
-            `Updated template directory: ${relativePath}`
-          );
-          EventBus.emit("template:list:reload");
-        }
-      };
-
-      chooseStorageBtn.onclick = async () => {
-        const selected = await window.api.dialog.chooseDirectory();
-        if (selected) {
-          const appRoot = (await window.api.system.getAppRoot?.()) || ".";
-          const relativePath = formatAsRelativePath(selected, appRoot);
-
-          storageDirInput.value = relativePath;
-          await window.api.config.updateUserConfig({
-            storage_location: relativePath,
-          });
-
-          EventBus.emit(
-            "status:update",
-            `Updated storage directory: ${relativePath}`
-          );
-          EventBus.emit("form:list:reload");
-        }
-      };
-
-      if (loggingToggler) {
-        loggingToggler.onchange = async () => {
-          const enabled = loggingToggler.checked;
-          await window.api.config.updateUserConfig({
-            logging_enabled: enabled,
-          });
-
-          EventBus.emit("logging:toggle", enabled);
-          EventBus.emit(
-            "status:update",
-            `Logging ${enabled ? "enabled" : "disabled"}`
-          );
-        };
-      }
+      const ok = await renderSettings();
+      if (!ok)
+        EventBus.emit("logging:warning", ["Settings container not found"]);
     },
   });
 }

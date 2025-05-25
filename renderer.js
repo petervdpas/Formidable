@@ -5,7 +5,6 @@ import { EventBus } from "./modules/eventBus.js";
 import { initEventRouter } from "./modules/eventRouter.js";
 import { initStatusHandler } from "./modules/handlers/statusHandler.js";
 
-import { initThemeToggle } from "./modules/themeToggle.js";
 import { buildMenu, handleMenuAction } from "./modules/menuManager.js";
 import { createDropdown } from "./modules/dropdownManager.js";
 import { initTemplateEditor } from "./modules/templateEditor.js";
@@ -65,24 +64,19 @@ window.addEventListener("DOMContentLoaded", async () => {
   buildMenu("app-menu", handleMenuAction);
   initStatusHandler("status-bar");
 
-  const config = await window.api.config.loadUserConfig();
-
   // ── Grab DOM Elements ──
   const templateContainer = document.getElementById("template-container");
   const storageContainer = document.getElementById("storage-container");
-  const themeToggle = document.getElementById("theme-toggle");
   const contextToggle = document.getElementById("context-toggle");
-  const loggingToggle = document.getElementById("logging-toggle");
 
-  // ── Logging Toggler
+  // ── Emit config stuff ──
+  const config = await window.api.config.loadUserConfig();
+
   EventBus.emit("logging:toggle", config.logging_enabled);
+  EventBus.emit("theme:toggle", config.theme);
 
   // ── Modals ──
-  const settings = setupSettingsModal(
-    themeToggle,
-    contextToggle,
-    loggingToggle
-  );
+  const settings = setupSettingsModal();
   const entryInputModal = setupEntryModal();
   const templateModal = setupTemplateModal();
   const aboutModal = setupAboutModal();
@@ -210,7 +204,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
 
   initContextToggle({ toggleElement: contextToggle });
-  initThemeToggle(themeToggle);
 
   document.getElementById("context-toggle").checked =
     config.context_mode === "storage";
@@ -219,5 +212,4 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // ── EventBus Startup ──
   EventBus.emit("context:toggle", config.context_mode === "storage");
-  EventBus.emit("theme:toggle", config.theme);
 });
