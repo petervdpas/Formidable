@@ -71,6 +71,9 @@ const electronAPI = {
 // ---------- Expose to Renderer ----------
 contextBridge.exposeInMainWorld("api", api);
 contextBridge.exposeInMainWorld("electron", electronAPI);
+contextBridge.exposeInMainWorld("getAppInfo", () =>
+  ipcRenderer.invoke("get-app-info")
+);
 
 // ---------- Helpers ----------
 function buildGroup(methods) {

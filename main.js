@@ -1,5 +1,6 @@
 // main.js
 
+const packageJson = require("./package.json");
 const { app, BrowserWindow, Menu } = require("electron");
 const path = require("path");
 const nodeLogger = require("./controls/nodeLogger");
@@ -28,6 +29,12 @@ function createWindow() {
     backgroundColor: "#808080",
     show: false,
     icon: iconPath,
+    additionalArguments: [
+      `--appInfo=${JSON.stringify({
+        name: packageJson.name,
+        version: packageJson.version,
+      })}`,
+    ],
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
@@ -36,20 +43,23 @@ function createWindow() {
     },
   });
 
-  // Disable Electron's native menu
   Menu.setApplicationMenu(null);
-
   win.loadFile("index.html");
-  win.setTitle("Formidable v1.0");
 
   win.once("ready-to-show", () => win.show());
 
-  // track and persist on resize
+  win.loadFile("index.html");
+
+  win.webContents.on("did-finish-load", () => {
+    const versionedTitle = `Formidable v${packageJson.version}`;
+    win.setTitle(versionedTitle);
+    log("[Main] Set title after load:", versionedTitle);
+  });
+
   win.on("resize", () => {
     if (!win.isMinimized() && !win.isFullScreen()) {
       const [width, height] = win.getSize();
       const [x, y] = win.getPosition();
-
       configManager.updateUserConfig({
         window_bounds: { width, height, x, y },
       });

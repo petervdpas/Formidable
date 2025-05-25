@@ -8,7 +8,7 @@ const {
   BrowserWindow,
 } = require("electron");
 const { registerIpc } = require("./ipcRoutes");
-
+const packageJson = require("../package.json");
 const fileManager = require("./fileManager");
 const templateManager = require("./templateManager");
 const formManager = require("./formManager");
@@ -45,6 +45,13 @@ function registerIpcHandlers() {
   ipcMain.handle("shell-open-external", (e, url) => shell.openExternal(url));
   ipcMain.handle("clipboard-write", (e, text) => clipboard.writeText(text));
   ipcMain.handle("clipboard-read", () => clipboard.readText());
+
+  ipcMain.handle("get-app-info", () => {
+    return {
+      name: packageJson.name,
+      version: packageJson.version,
+    };
+  });
 
   // Templates
   registerIpc("list-templates", () => templateManager.listTemplates());

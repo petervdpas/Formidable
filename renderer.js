@@ -36,6 +36,18 @@ import { bindListDependencies } from "./modules/handlers/listHandlers.js";
 window.addEventListener("DOMContentLoaded", async () => {
   console.log("[App] DOM loaded.");
 
+  // ── Version injection ──
+  const appInfo = await window.getAppInfo?.();
+  if (appInfo?.version) {
+    const versionedTitle = `${appInfo.name} v${appInfo.version}`;
+
+    document.title = versionedTitle;
+    window.electron.window.setTitle?.(versionedTitle);
+
+    const aboutHeader = document.getElementById("about-title");
+    if (aboutHeader) aboutHeader.textContent = versionedTitle;
+  }
+
   // ── Global UI State ──
   window.currentSelectedTemplate = null;
   window.currentSelectedTemplateName = null;
@@ -104,35 +116,40 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
 
   // ── Template Editor ──
-  const templateEditor = initTemplateEditor("template-content", async (updatedYaml) => {
-    let template = window.currentSelectedTemplateName;
+  const templateEditor = initTemplateEditor(
+    "template-content",
+    async (updatedYaml) => {
+      let template = window.currentSelectedTemplateName;
 
-    if (!template && updatedYaml?.name) {
-      template = `${updatedYaml.name}.yaml`;
-      window.currentSelectedTemplateName = template;
-      window.currentSelectedTemplate = updatedYaml;
-      EventBus.emit("logging:default", [
-        "[YamlEditor] Recovered from template name:",
+      if (!template && updatedYaml?.name) {
+        template = `${updatedYaml.name}.yaml`;
+        window.currentSelectedTemplateName = template;
+        window.currentSelectedTemplate = updatedYaml;
+        EventBus.emit("logging:default", [
+          "[YamlEditor] Recovered from template name:",
+          template,
+        ]);
+      }
+
+      if (!template) {
+        EventBus.emit("logging:warning", [
+          "[YamlEditor] No template selected.",
+        ]);
+        EventBus.emit("status:update", "Cannot save: no template selected.");
+        return;
+      }
+
+      const success = await window.api.templates.saveTemplate(
         template,
-      ]);
+        updatedYaml
+      );
+      if (success) {
+        EventBus.emit("status:update", `Saved: ${template}`);
+      } else {
+        EventBus.emit("status:update", "Failed to save template.");
+      }
     }
-
-    if (!template) {
-      EventBus.emit("logging:warning", ["[YamlEditor] No template selected."]);
-      EventBus.emit("status:update", "Cannot save: no template selected.");
-      return;
-    }
-
-    const success = await window.api.templates.saveTemplate(
-      template,
-      updatedYaml
-    );
-    if (success) {
-      EventBus.emit("status:update", `Saved: ${template}`);
-    } else {
-      EventBus.emit("status:update", "Failed to save template.");
-    }
-  });
+  );
 
   // ── Sidebars ──
   window.templateListManager = createTemplateListManager(
@@ -141,7 +158,10 @@ window.addEventListener("DOMContentLoaded", async () => {
     templateDropdown
   );
 
-  const metaListManager = createStorageListManager(formManager, entryInputModal);
+  const metaListManager = createStorageListManager(
+    formManager,
+    entryInputModal
+  );
 
   // ── Template Selection Logic ──
   const { selectTemplate, loadTemplateOptions } = createTemplateSelector({
