@@ -26,21 +26,41 @@ jobs:
       - name: Move installer to installer directory
         shell: pwsh
         run: |
-          if (-Not (Test-Path "installer")) {
-            New-Item -ItemType Directory -Path "installer" | Out-Null
+          $pkg = Get-Content package.json | ConvertFrom-Json
+          $version = $pkg.version
+          $src = "dist/Formidable Setup $version.exe"
+          $destDir = "installer"
+          $dest = "$destDir/Formidable Setup.exe"
+
+          if (-Not (Test-Path $destDir)) {
+            New-Item -ItemType Directory -Path $destDir | Out-Null
           }
-          Move-Item "dist/Formidable Setup 1.0.0.exe" "installer/Formidable Setup.exe" -Force
+
+          if (-Not (Test-Path $src)) {
+            Write-Error "Expected installer file '$src' not found!"
+            exit 1
+          }
+
+          Move-Item $src $dest -Force
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
         with:
           name: Formidable Installer (unsigned)
           path: installer/Formidable Setup.exe
+
+      - name: Set version-based release metadata
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          echo "TAG_NAME=v$version-pre" >> $env:GITHUB_ENV
+          echo "RELEASE_NAME=Formidable v$version Pre-Release" >> $env:GITHUB_ENV
+
       - name: Create GitHub Pre-Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v1.0.0-pre
-          name: Formidable v1.0.0 Pre-Release
+          tag_name: ${{ env.TAG_NAME }}
+          name: ${{ env.RELEASE_NAME }}
           draft: false
           prerelease: true
           files: installer/Formidable Setup.exe
