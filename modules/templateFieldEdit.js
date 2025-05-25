@@ -16,6 +16,49 @@ function setupFieldEditor(container, onChange) {
     type: container.querySelector("#edit-type-container select"),
   };
 
+  let optionsEditor = null;
+
+  function setupOptionsEditor() {
+    if (!dom.options) return;
+
+    const containerRow = dom.options.closest(".modal-form-row");
+
+    // Always clean up old editor/message
+    const existingEditor = containerRow.querySelector(".options-editor");
+    if (existingEditor) existingEditor.remove();
+
+    const existingMessage = containerRow.querySelector(".options-message");
+    if (existingMessage) existingMessage.remove();
+
+    optionsEditor = null;
+
+    const optionTypes = ["dropdown", "multioption", "radio", "table"];
+    const currentType = dom.type?.value || "text";
+
+    if (!optionTypes.includes(currentType)) {
+      dom.options.style.display = "none";
+
+      // 💬 Insert 'Options not available!' message
+      const msg = document.createElement("div");
+      msg.className = "options-message";
+      msg.textContent = "Options not available!";
+      msg.style.color = "var(--readonly-fg)";
+      msg.style.fontStyle = "italic";
+      msg.style.marginTop = "6px";
+      containerRow.appendChild(msg);
+
+      return;
+    }
+
+    dom.options.style.display = "none";
+
+    // ✅ Create graphical options editor
+    optionsEditor = createOptionsEditor(containerRow, (newOptions) => {
+      dom.options.value = JSON.stringify(newOptions, null, 2);
+      state.options = newOptions;
+    });
+  }
+
   function setField(field) {
     Object.assign(state, field);
 
@@ -24,10 +67,20 @@ function setupFieldEditor(container, onChange) {
     dom.description.value = field.description || "";
     dom.twoColumn.checked = !!field.two_column;
     dom.default.value = field.default ?? "";
-    dom.options.value = field.options ? JSON.stringify(field.options) : "";
     if (dom.type) dom.type.value = field.type || "text";
 
-    // 🔥 Automatically apply modal CSS class
+    if (dom.options) {
+      dom.options.value = field.options ? JSON.stringify(field.options) : "";
+    }
+
+    // 💡 Ensure we always re-setup the options editor when switching fields
+    setupOptionsEditor();
+    if (optionsEditor) {
+      optionsEditor.setValues([]);
+      if (field.options) optionsEditor.setValues(field.options);
+    }
+
+    // 🔥 Update modal styling
     const modal = container.closest(".modal");
     applyModalTypeClass(modal, field.type || "text", fieldTypes);
 
@@ -35,13 +88,17 @@ function setupFieldEditor(container, onChange) {
   }
 
   function getField() {
+    const options =
+      optionsEditor?.getValues() ||
+      (dom.options.value ? JSON.parse(dom.options.value) : undefined);
+
     return {
       key: dom.key.value.trim(),
       label: dom.label.value.trim(),
       description: dom.description.value.trim(),
       two_column: dom.twoColumn.checked,
       default: dom.default.value,
-      options: dom.options.value ? JSON.parse(dom.options.value) : undefined,
+      options,
       type: dom.type?.value || "text",
     };
   }
@@ -124,6 +181,89 @@ function listFields(
   });
 }
 
+function createOptionsEditor(container, onChange) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "options-editor";
+
+  const list = document.createElement("div");
+  list.className = "options-list";
+
+  const addBtn = document.createElement("button");
+  addBtn.type = "button";
+  addBtn.textContent = "+";
+  addBtn.className = "add-option-btn";
+  addBtn.setAttribute("aria-label", "Add option");
+  addBtn.title = "Add option";
+  addBtn.onclick = () => addRow();
+
+  wrapper.appendChild(list);
+  wrapper.appendChild(addBtn);
+  container.appendChild(wrapper);
+
+  function addRow(value = "", label = "") {
+    const row = document.createElement("div");
+    row.className = "option-row";
+
+    const valueInput = document.createElement("input");
+    valueInput.type = "text";
+    valueInput.placeholder = "value";
+    valueInput.value = value;
+
+    const labelInput = document.createElement("input");
+    labelInput.type = "text";
+    labelInput.placeholder = "label";
+    labelInput.value = label;
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.textContent = "−";
+    removeBtn.className = "remove-option-btn";
+    removeBtn.setAttribute("aria-label", "Remove option");
+    removeBtn.title = "Remove option";
+    removeBtn.onclick = () => {
+      row.remove();
+      emitChange();
+    };
+
+    row.appendChild(valueInput);
+    row.appendChild(labelInput);
+    row.appendChild(removeBtn);
+    list.appendChild(row);
+
+    valueInput.addEventListener("input", emitChange);
+    labelInput.addEventListener("input", emitChange);
+  }
+
+  function emitChange() {
+    onChange?.(getValues());
+  }
+
+  function getValues() {
+    const rows = list.querySelectorAll(".option-row");
+    const options = [];
+    rows.forEach((row) => {
+      const [valueInput, labelInput] = row.querySelectorAll("input");
+      const value = valueInput.value.trim();
+      const label = labelInput.value.trim();
+      if (value) {
+        options.push({ value, label: label || value });
+      }
+    });
+    return options;
+  }
+
+  function setValues(options) {
+    list.innerHTML = "";
+    options.forEach((opt) => {
+      const { value, label } =
+        typeof opt === "string" ? { value: opt, label: opt } : opt;
+      addRow(value, label);
+    });
+  }
+
+  return { setValues, getValues };
+}
+
 export function createEmptyField() {
   return { key: "", type: "text", label: "" };
 }
@@ -136,10 +276,11 @@ export function showFieldEditorModal(field) {
   modal.classList.add("show");
 }
 
-export function renderFieldList(listEl, fields, {
-  onEditIndex,
-  onOpenEditModal
-}) {
+export function renderFieldList(
+  listEl,
+  fields,
+  { onEditIndex, onOpenEditModal }
+) {
   listFields(listEl, fields, {
     onEdit: (idx) => {
       onEditIndex(idx);

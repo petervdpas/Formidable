@@ -1,5 +1,5 @@
 {
-  "theme": "light",
+  "theme": "dark",
   "font_size": 14,
   "logging_enabled": true,
   "context_mode": "storage",
@@ -8,8 +8,8 @@
   "selected_data_file": "test-20250518.meta.json",
   "window_bounds": {
     "width": 1134,
-    "height": 899,
+    "height": 892,
     "x": 884,
-    "y": 87
+    "y": 94
   }
 }
