@@ -38,7 +38,27 @@ export function generateTemplateCode(fields = []) {
             return `{{#each (fieldRaw "${key}")}}\n- {{this}}\n{{/each}}`;
 
           case "table":
-            return `{{#if (fieldRaw "${key}")}}\n  {{#with (fieldMeta "${key}" "options") as |headers|}}\n|{{#each headers}}{{this}} |{{/each}}\n|{{#each headers}}--|{{/each}}\n  {{/with}}\n  {{#each (fieldRaw "${key}")}}\n|{{#each this}}{{this}} |{{/each}}\n  {{/each}}\n{{/if}}`;
+            return `{{#if (fieldRaw "${key}")}}
+
+<!-- Column Values -->
+  {{#with (fieldMeta "${key}" "options") as |headers|}}
+|{{#each headers}}{{value}} |{{/each}}
+|{{#each headers}}--|{{/each}}
+  {{/with}}
+  {{#each (fieldRaw "${key}")}}
+|{{#each this}}{{this}} |{{/each}}
+  {{/each}}
+
+<!-- Column Labels -->
+  {{#with (fieldMeta "${key}" "options") as |headers|}}
+|{{#each headers}}{{label}}{{^label}}{{value}}{{/label}} |{{/each}}
+|{{#each headers}}--|{{/each}}
+  {{/with}}
+  {{#each (fieldRaw "${key}")}}
+|{{#each this}}{{this}} |{{/each}}
+  {{/each}}
+
+{{/if}}`;
 
           default:
             return `{{field "${key}"}}`;

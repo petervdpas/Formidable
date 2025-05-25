@@ -1,284 +1,191 @@
 name: Basic Form
 storage_location: ./storage/basic
-markdown_template: >-
-  <!-- AUTO-GENERATED TEMPLATE - You can edit this, but changes will be
-  overwritten if regenerated -->
-
+markdown_template: |-
+  <!-- AUTO-GENERATED TEMPLATE - Only if Editor is empty! -->
   ### Test
-
 
   _{{fieldDescription "test"}}_
 
-
   ```sh
-
   [LOG]
-
   {{json (fieldRaw "test")}}
-
   ```
-
 
   {{field "test"}}
 
-
   ---
-
 
   ### Check
 
-
   _{{fieldDescription "check"}}_
 
-
   ```sh
-
   [LOG]
-
   {{json (fieldRaw "check")}}
-
   ```
-
 
   {{field "check"}}
 
-
   ---
-
 
   ### Dropdown
 
-
   _{{fieldDescription "dropdown"}}_
 
-
   ```sh
-
   [LOG]
-
   {{json (fieldRaw "dropdown")}}
-
   ```
-
 
   ```sh
-
   [LOG]
-
   {{json (fieldMeta "dropdown" "options")}}
-
   ```
-
 
   Selected: {{field "dropdown"}}
-
   (Value: {{field "dropdown" "value"}})
-
 
   ---
 
-
   ### Multiple Choice
-
 
   _{{fieldDescription "multichoice"}}_
 
-
   ```sh
-
   [LOG]
-
   {{json (fieldRaw "multichoice")}}
-
   ```
-
 
   ```sh
-
   [LOG]
-
   {{json (fieldMeta "multichoice" "options")}}
-
   ```
-
 
   - Labels:
-
   {{#each (fieldRaw "multichoice") as |val idx|}}
     {{#with (lookupOption (fieldMeta "multichoice" "options") val) as |opt|}}
       {{opt.label}}{{#unless (eq idx (subtract (length (fieldRaw "multichoice")) 1))}}, {{/unless}}
     {{/with}}
   {{/each}}
 
-
   - Values: {{fieldRaw "multichoice"}}
 
-
   - All Options:
-
   {{#with (fieldRaw "multichoice") as |selected|}}
     {{#each (fieldMeta "multichoice" "options") as |opt|}}
     - [{{#if (includes selected opt.value)}}x{{else}} {{/if}}] {{opt.label}}
     {{/each}}
   {{/with}}
 
-
   ---
-
 
   ### Radio
 
-
   _{{fieldDescription "radio"}}_
 
-
   ```sh
-
   [LOG]
-
   {{json (fieldRaw "radio")}}
-
   ```
-
 
   ```sh
-
   [LOG]
-
   {{json (fieldMeta "radio" "options")}}
-
   ```
-
 
   Selected: {{field "radio"}}
-
   (Value: {{field "radio" "value"}})
 
-
   ---
-
 
   ### Mline
 
-
   _{{fieldDescription "mline"}}_
 
-
   ```sh
-
   [LOG]
-
   {{json (fieldRaw "mline")}}
-
   ```
-
 
   {{field "mline"}}
 
-
   ---
-
 
   ### Numpy
 
-
   _{{fieldDescription "numpy"}}_
 
-
   ```sh
-
   [LOG]
-
   {{json (fieldRaw "numpy")}}
-
   ```
-
 
   {{field "numpy"}}
 
-
   ---
-
 
   ### Birthday
 
-
   _{{fieldDescription "bday"}}_
 
-
   ```sh
-
   [LOG]
-
   {{json (fieldRaw "bday")}}
-
   ```
-
 
   {{field "bday"}}
 
-
   ---
-
 
   ### Listy
 
-
   _{{fieldDescription "listy"}}_
 
-
   ```sh
-
   [LOG]
-
   {{json (fieldRaw "listy")}}
-
   ```
 
-
   {{#each (fieldRaw "listy")}}
-
   - {{this}}
-
   {{/each}}
-
 
   ---
 
-
   ### Table
-
 
   _{{fieldDescription "datable"}}_
 
-
   ```sh
-
   [LOG]
-
   {{json (fieldRaw "datable")}}
-
   ```
-
 
   ```sh
-
   [LOG]
-
   {{json (fieldMeta "datable" "options")}}
-
   ```
-
 
   {{#if (fieldRaw "datable")}}
-    {{#with (fieldMeta "datable" "options") as |headers|}}
-  |{{#each headers}}{{this}} |{{/each}}
 
+  <!-- Column Values -->
+    {{#with (fieldMeta "datable" "options") as |headers|}}
+  |{{#each headers}}{{value}} |{{/each}}
   |{{#each headers}}--|{{/each}}
     {{/with}}
     {{#each (fieldRaw "datable")}}
   |{{#each this}}{{this}} |{{/each}}
     {{/each}}
+
+  <!-- Column Labels -->
+    {{#with (fieldMeta "datable" "options") as |headers|}}
+  |{{#each headers}}{{label}}{{^label}}{{value}}{{/label}} |{{/each}}
+  |{{#each headers}}--|{{/each}}
+    {{/with}}
+    {{#each (fieldRaw "datable")}}
+  |{{#each this}}{{this}} |{{/each}}
+    {{/each}}
+
   {{/if}}
 fields:
   - key: test
