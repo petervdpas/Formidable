@@ -1,15 +1,42 @@
 // controls/templateManager.js
 
 const fileManager = require("./fileManager");
+const configManager = require("./configManager");
 const { log, warn, error } = require("./nodeLogger");
 const schema = require("../schemas/template.schema");
 
-const templatesDir = fileManager.joinPath("templates");
 const basicYamlName = "basic.yaml";
-const basicYamlPath = fileManager.joinPath("templates", basicYamlName);
+
+let cachedConfig = null;
+
+function getConfig() {
+  if (!cachedConfig) {
+    cachedConfig = configManager.loadUserConfig();
+  }
+  return cachedConfig;
+}
+
+function getConfigTemplatesDir() {
+  try {
+    const cfg = getConfig(); // uses cache
+    return typeof cfg.templates_location === "string" && cfg.templates_location.trim()
+      ? cfg.templates_location
+      : "./templates";
+  } catch {
+    return "./templates";
+  }
+}
+
+function getTemplatesDir() {
+  return fileManager.joinPath(getConfigTemplatesDir());
+}
+
+function getTemplatePath(name = "") {
+  return fileManager.joinPath(getConfigTemplatesDir(), name);
+}
 
 function ensureTemplateDirectory() {
-  const fullPath = fileManager.resolvePath(templatesDir);
+  const fullPath = fileManager.resolvePath(getTemplatesDir());
   return fileManager.ensureDirectory(fullPath, {
     label: "TemplateManager",
     silent: true,
@@ -17,11 +44,11 @@ function ensureTemplateDirectory() {
 }
 
 function listTemplates() {
-  return fileManager.listFilesByExtension(templatesDir, ".yaml");
+  return fileManager.listFilesByExtension(getTemplatesDir(), ".yaml");
 }
 
 function loadTemplate(name) {
-  const filePath = fileManager.joinPath("templates", name);
+  const filePath = getTemplatePath(name);
   try {
     const raw = fileManager.loadFile(filePath, { format: "yaml" });
     const sanitized = schema.sanitize(raw);
@@ -38,7 +65,7 @@ function saveTemplate(name, data) {
       data.storage_location = data.storage_location.replace(/\\/g, "/");
     }
 
-    const filePath = fileManager.joinPath("templates", name);
+    const filePath = getTemplatePath(name);
     const saved = fileManager.saveFile(filePath, data, { format: "yaml" });
 
     if (saved) {
@@ -56,7 +83,7 @@ function saveTemplate(name, data) {
 
 function deleteTemplate(name) {
   try {
-    const filePath = fileManager.joinPath("templates", name);
+    const filePath = getTemplatePath(name);
     const deleted = fileManager.deleteFile(filePath);
     if (deleted) {
       log("[TemplateManager] Deleted template:", filePath);
@@ -86,7 +113,7 @@ function getTemplateDescriptor(name) {
 }
 
 function createBasicTemplateIfMissing() {
-  if (!fileManager.fileExists(basicYamlPath)) {
+  if (!fileManager.fileExists(getTemplatePath(basicYamlName))) {
     const content = {
       name: "Basic Form",
       storage_location: "./storage/basic",
@@ -185,13 +212,13 @@ function createBasicTemplateIfMissing() {
       ],
     };
 
-    const saved = fileManager.saveFile(basicYamlPath, content, {
+    const saved = fileManager.saveFile(getTemplatePath(basicYamlName), content, {
       format: "yaml",
       silent: false,
     });
 
     if (saved) {
-      log("[TemplateManager] Created basic.yaml at:", basicYamlPath);
+      log("[TemplateManager] Created basic.yaml at:", getTemplatePath(basicYamlName));
     } else {
       error("[TemplateManager] Failed to create basic.yaml");
     }

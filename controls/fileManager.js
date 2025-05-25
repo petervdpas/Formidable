@@ -66,6 +66,12 @@ function joinPath(...segments) {
   const flattened = segments.flatMap((s) =>
     typeof s === "string" ? s.split(/[/\\]/).filter(Boolean) : []
   );
+
+  const first = segments[0];
+  if (typeof first === "string" && path.isAbsolute(first)) {
+    return path.join(...flattened);
+  }
+
   return path.join(getAppRoot(), ...flattened);
 }
 

@@ -88,7 +88,10 @@ export async function handleMenuAction(action) {
 
   switch (action) {
     case "open-template-folder": {
-      const resolved = await window.api.system.resolvePath("templates");
+      const config = await window.api.config.loadUserConfig();
+      const resolved = await window.api.system.resolvePath(
+        config.templates_location || "templates"
+      );
       await window.api.markdown.ensureMarkdownDir?.(resolved);
       const result = await window.electron.shell.openPath(resolved);
       if (result) {

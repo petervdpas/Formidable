@@ -24,31 +24,54 @@ export function setupSettingsModal(themeToggle, contextToggle, loggingToggle) {
       // Just emit event to trigger handlers elsewhere
       EventBus.emit("theme:toggle", config.theme);
 
-      const defaultDirInput = document.getElementById("default-dir");
-      const chooseDirBtn = document.getElementById("choose-dir");
+      const templateDirInput = document.getElementById("template-dir");
+      const chooseTemplateBtn = document.getElementById("choose-template-dir");
+      const storageDirInput = document.getElementById("storage-dir");
+      const chooseStorageBtn = document.getElementById("choose-storage-dir");
       const loggingToggler = document.getElementById("logging-toggle");
 
-      defaultDirInput.value = config.storage_location || "./storage";
+      templateDirInput.value = config.templates_location || "./templates";
+      storageDirInput.value = config.storage_location || "./storage";
+
       if (loggingToggler) {
         loggingToggler.checked = !!config.logging_enabled;
       }
 
-      chooseDirBtn.onclick = async () => {
+      chooseTemplateBtn.onclick = async () => {
         const selected = await window.api.dialog.chooseDirectory();
         if (selected) {
           const appRoot = (await window.api.system.getAppRoot?.()) || ".";
           const relativePath = formatAsRelativePath(selected, appRoot);
 
-          defaultDirInput.value = relativePath;
+          templateDirInput.value = relativePath;
+          await window.api.config.updateUserConfig({
+            templates_location: relativePath,
+          });
 
+          EventBus.emit(
+            "status:update",
+            `Updated template directory: ${relativePath}`
+          );
+          EventBus.emit("template:list:reload");
+        }
+      };
+
+      chooseStorageBtn.onclick = async () => {
+        const selected = await window.api.dialog.chooseDirectory();
+        if (selected) {
+          const appRoot = (await window.api.system.getAppRoot?.()) || ".";
+          const relativePath = formatAsRelativePath(selected, appRoot);
+
+          storageDirInput.value = relativePath;
           await window.api.config.updateUserConfig({
             storage_location: relativePath,
           });
 
           EventBus.emit(
             "status:update",
-            `Updated default markdown dir: ${relativePath}`
+            `Updated storage directory: ${relativePath}`
           );
+          EventBus.emit("form:list:reload");
         }
       };
 
@@ -60,7 +83,6 @@ export function setupSettingsModal(themeToggle, contextToggle, loggingToggle) {
           });
 
           EventBus.emit("logging:toggle", enabled);
-
           EventBus.emit(
             "status:update",
             `Logging ${enabled ? "enabled" : "disabled"}`

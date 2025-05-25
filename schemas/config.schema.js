@@ -6,6 +6,7 @@ module.exports = {
     font_size: 14,
     logging_enabled: true,
     context_mode: "template",
+    templates_location: "./templates",
     storage_location: "./storage",
     selected_template: "basic.yaml",
     selected_data_file: "",
