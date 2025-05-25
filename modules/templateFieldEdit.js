@@ -22,41 +22,35 @@ function setupFieldEditor(container, onChange) {
     if (!dom.options) return;
 
     const containerRow = dom.options.closest(".modal-form-row");
-
-    // Always clean up old editor/message
-    const existingEditor = containerRow.querySelector(".options-editor");
-    if (existingEditor) existingEditor.remove();
-
-    const existingMessage = containerRow.querySelector(".options-message");
-    if (existingMessage) existingMessage.remove();
-
-    optionsEditor = null;
-
-    const optionTypes = ["dropdown", "multioption", "radio", "table"];
     const currentType = dom.type?.value || "text";
+    const optionTypes = ["dropdown", "multioption", "radio", "table"];
+
+    // Always hide raw <textarea> or JSON field
+    dom.options.style.display = "none";
+
+    // Clean previous editors/messages
+    containerRow.querySelector(".options-editor")?.remove();
+    containerRow.querySelector(".options-message")?.remove();
 
     if (!optionTypes.includes(currentType)) {
-      dom.options.style.display = "none";
-
-      // 💬 Insert 'Options not available!' message
+      // ➤ Add fallback message if unsupported
       const msg = document.createElement("div");
       msg.className = "options-message";
       msg.textContent = "Options not available!";
-      msg.style.color = "var(--readonly-fg)";
-      msg.style.fontStyle = "italic";
-      msg.style.marginTop = "6px";
       containerRow.appendChild(msg);
-
+      optionsEditor = null;
       return;
     }
 
-    dom.options.style.display = "none";
-
-    // ✅ Create graphical options editor
+    // Otherwise inject proper editor
     optionsEditor = createOptionsEditor(containerRow, (newOptions) => {
       dom.options.value = JSON.stringify(newOptions, null, 2);
       state.options = newOptions;
     });
+
+    if (state.options) {
+      optionsEditor.setValues(state.options);
+    }
   }
 
   function setField(field) {
@@ -67,7 +61,12 @@ function setupFieldEditor(container, onChange) {
     dom.description.value = field.description || "";
     dom.twoColumn.checked = !!field.two_column;
     dom.default.value = field.default ?? "";
-    if (dom.type) dom.type.value = field.type || "text";
+    if (dom.type) {
+      dom.type.value = field.type || "text";
+      dom.type.onchange = () => {
+        setupOptionsEditor(); // re-evaluate which editor/message should be shown
+      };
+    }
 
     if (dom.options) {
       dom.options.value = field.options ? JSON.stringify(field.options) : "";
