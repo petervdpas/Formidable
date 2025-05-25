@@ -1,4 +1,4 @@
-# 🧾 Formidable
+# 🧾 Formidable - a template designer
 
 **Formidable** is a dual-context desktop application for managing structured Markdown content through YAML-based templates. Built with Electron, it combines a full YAML editor with a form-based Markdown generator, offering a flexible and powerful editing experience.
 
