@@ -1,6 +1,7 @@
-// modules/settingsManager.js (ES module)
+// modules/settingsManager.js
 
 import { EventBus } from "./eventBus.js";
+import { initTabs } from "../utils/tabUtils.js";
 import { formatAsRelativePath } from "../utils/pathUtils.js";
 import { initThemeToggle } from "./themeToggle.js";
 
@@ -11,27 +12,45 @@ export async function renderSettings() {
   const config = await window.api.config.loadUserConfig();
 
   container.innerHTML = `
-    ${createSwitch("theme-toggle", "Dark Mode", config.theme === "dark")}
-    ${createSwitch(
-      "context-toggle",
-      "Context Mode",
-      config.context_mode === "template"
-    )}
-    ${createSwitch("logging-toggle", "Enable Logging", config.logging_enabled)}
-
-    ${createDirectoryPicker(
-      "template-dir",
-      "Template Directory",
-      config.templates_location || "./templates"
-    )}
-    ${createDirectoryPicker(
-      "storage-dir",
-      "Storage Directory",
-      config.storage_location || "./storage"
-    )}
+    <div class="tab-buttons">
+      <button class="tab-btn">General</button>
+      <button class="tab-btn">Directories</button>
+    </div>
+    <div class="tab-panel tab-general">
+      ${createSwitch("theme-toggle", "Dark Mode", config.theme === "dark")}
+      ${createSwitch(
+        "context-toggle",
+        "Context Mode",
+        config.context_mode === "template"
+      )}
+      ${createSwitch(
+        "logging-toggle",
+        "Enable Logging",
+        config.logging_enabled
+      )}
+    </div>
+    <div class="tab-panel tab-dirs">
+      ${createDirectoryPicker(
+        "template-dir",
+        "Template Directory",
+        config.templates_location || "./templates"
+      )}
+      ${createDirectoryPicker(
+        "storage-dir",
+        "Storage Directory",
+        config.storage_location || "./storage"
+      )}
+    </div>
   `;
 
-  setupBindings();
+  initTabs("#settings-body", ".tab-btn", ".tab-panel", {
+    activeClass: "active",
+    onTabChange: (index) => {
+      EventBus.emit("logging:default", [`[Settings] Switched to tab ${index}`]);
+    },
+  });
+
+  setupBindings(config);
   return true;
 }
 
@@ -59,23 +78,25 @@ function createDirectoryPicker(id, label, value) {
   `;
 }
 
-function setupBindings() {
+function setupBindings(config) {
   const themeToggle = document.getElementById("theme-toggle");
   const contextToggle = document.getElementById("context-toggle");
   const loggingToggle = document.getElementById("logging-toggle");
 
   if (themeToggle) {
-    initThemeToggle(themeToggle); // ← make the theme system aware
-    // Optional: pre-emit the theme to ensure app sync
+    initThemeToggle(themeToggle);
     EventBus.emit("theme:toggle", themeToggle.checked ? "dark" : "light");
   }
 
   if (contextToggle) {
-    contextToggle.onchange = async () => {
-      const mode = contextToggle.checked ? "template" : "storage";
-      await window.api.config.updateUserConfig({ context_mode: mode });
-      EventBus.emit("context:mode", mode);
-    };
+    contextToggle.checked = config.context_mode === "storage";
+    contextToggle.addEventListener("change", () => {
+      const isStorage = contextToggle.checked;
+      EventBus.emit("logging:default", [
+        `[Settings] Context toggle changed: ${isStorage}`,
+      ]);
+      EventBus.emit("context:toggle", isStorage);
+    });
   }
 
   if (loggingToggle) {
@@ -97,7 +118,6 @@ function setupBindings() {
 function bindDirButton(fieldId, configKey, reloadEvent) {
   const input = document.getElementById(fieldId);
   const button = document.getElementById(`choose-${fieldId}`);
-
   if (!input || !button) return;
 
   button.onclick = async () => {

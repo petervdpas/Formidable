@@ -1,0 +1,48 @@
+/* ───── Tabbs ───── */
+
+.tab-buttons {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 10px;
+  padding-bottom: 4px;
+}
+
+.tab-btn {
+  padding: 6px 16px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-color);
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  background-color: var(--hover-bg);
+}
+
+.tab-btn.active {
+  border-bottom-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.tab-panel {
+  display: none;
+  padding: 12px 0;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.tab-panel {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.tab-panel.active {
+  opacity: 1;
+  pointer-events: auto;
+}

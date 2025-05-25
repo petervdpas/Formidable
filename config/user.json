@@ -1,8 +1,8 @@
 {
   "theme": "dark",
   "font_size": 14,
-  "logging_enabled": true,
-  "context_mode": "storage",
+  "logging_enabled": false,
+  "context_mode": "template",
   "templates_location": "./templates",
   "storage_location": "./storage",
   "selected_template": "basic.yaml",

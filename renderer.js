@@ -24,7 +24,7 @@ import {
 
 import { createTemplateSelector } from "./modules/templateSelector.js";
 
-import { setContextView, initContextToggle } from "./modules/contextManager.js";
+import { setContextView } from "./modules/contextManager.js";
 
 import { bindContextDependencies } from "./modules/handlers/contextHandlers.js";
 import { bindTemplateDependencies } from "./modules/handlers/templateHandlers.js";
@@ -67,13 +67,9 @@ window.addEventListener("DOMContentLoaded", async () => {
   // ── Grab DOM Elements ──
   const templateContainer = document.getElementById("template-container");
   const storageContainer = document.getElementById("storage-container");
-  const contextToggle = document.getElementById("context-toggle");
 
   // ── Emit config stuff ──
   const config = await window.api.config.loadUserConfig();
-
-  EventBus.emit("logging:toggle", config.logging_enabled);
-  EventBus.emit("theme:toggle", config.theme);
 
   // ── Modals ──
   const settings = setupSettingsModal();
@@ -203,13 +199,8 @@ window.addEventListener("DOMContentLoaded", async () => {
     storageContainer,
   });
 
-  initContextToggle({ toggleElement: contextToggle });
-
-  document.getElementById("context-toggle").checked =
-    config.context_mode === "storage";
-  document.getElementById("context-toggle-menu").checked =
-    config.context_mode === "storage";
-
   // ── EventBus Startup ──
   EventBus.emit("context:toggle", config.context_mode === "storage");
+  EventBus.emit("logging:toggle", config.logging_enabled);
+  EventBus.emit("theme:toggle", config.theme);
 });
