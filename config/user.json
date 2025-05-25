@@ -2,7 +2,7 @@
   "theme": "light",
   "font_size": 14,
   "logging_enabled": true,
-  "context_mode": "template",
+  "context_mode": "storage",
   "storage_location": "./storage",
   "selected_template": "basic.yaml",
   "selected_data_file": "test-20250518.meta.json",

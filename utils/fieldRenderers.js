@@ -249,8 +249,9 @@ export function renderTableField(field) {
   const headRow = document.createElement("tr");
 
   columns.forEach((col) => {
+    const { label } = resolveOption(col);
     const th = document.createElement("th");
-    th.textContent = col;
+    th.textContent = label;
     headRow.appendChild(th);
   });
 
@@ -268,10 +269,12 @@ export function renderTableField(field) {
   function createRow(values = []) {
     const tr = document.createElement("tr");
 
-    columns.forEach((_, colIdx) => {
+    columns.forEach((col, colIdx) => {
+      const { value } = resolveOption(col);
       const td = document.createElement("td");
       const input = document.createElement("input");
       input.type = "text";
+      input.name = value;
       input.value = values[colIdx] || "";
       td.appendChild(input);
       tr.appendChild(td);
