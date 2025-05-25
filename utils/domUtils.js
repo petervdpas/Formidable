@@ -73,6 +73,25 @@ export function focusFirstInput(
   }, 0); // 🔁 defer until after DOM update
 }
 
+export function applyModalTypeClass(modal, typeKey, fieldTypes) {
+  if (!modal) return;
+
+  modal.classList.forEach((cls) => {
+    if (cls.startsWith("modal-") && cls !== "modal") {
+      modal.classList.remove(cls);
+    }
+  });
+
+  const typeDef = fieldTypes[typeKey];
+  if (typeDef?.cssClass) {
+    modal.classList.add(typeDef.cssClass);
+  } else {
+    EventBus.emit("logging:warning", [
+      `[applyModalTypeClass] Unknown type "${typeKey}"`,
+    ]);
+  }
+}
+
 export function applyFieldValues(container, fieldsOrKeys = [], data = {}) {
   if (!container || typeof container.querySelector !== "function") {
     EventBus.emit("logging:default", ["[applyFieldValues] Invalid container."]);

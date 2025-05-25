@@ -1,27 +1,7 @@
 // modules/templateFieldEdit.js
 
-import { EventBus } from "./eventBus.js";
+import { applyModalTypeClass } from "../utils/domUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
-
-function applyModalTypeClass(modal, typeKey) {
-  if (!modal) return;
-
-  // Remove existing modal-* classes except "modal"
-  modal.classList.forEach((cls) => {
-    if (cls.startsWith("modal-") && cls !== "modal") {
-      modal.classList.remove(cls);
-    }
-  });
-
-  const typeDef = fieldTypes[typeKey];
-  if (typeDef?.cssClass) {
-    modal.classList.add(typeDef.cssClass); // e.g., modal-text
-  } else {
-    EventBus.emit("logging:warning", [
-      `[FieldEditor] Unknown type "${typeKey}" passed to applyModalTypeClass.`,
-    ]);
-  }
-}
 
 function setupFieldEditor(container, onChange) {
   const state = {};
@@ -49,7 +29,7 @@ function setupFieldEditor(container, onChange) {
 
     // 🔥 Automatically apply modal CSS class
     const modal = container.closest(".modal");
-    applyModalTypeClass(modal, field.type || "text");
+    applyModalTypeClass(modal, field.type || "text", fieldTypes);
 
     onChange?.(structuredClone(state));
   }

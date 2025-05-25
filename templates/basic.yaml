@@ -320,7 +320,7 @@ fields:
   - key: radio
     label: Radio
     type: radio
-    default: DOG
+    default: BIRD
     description: A test description - two-column
     two_column: true
     options:

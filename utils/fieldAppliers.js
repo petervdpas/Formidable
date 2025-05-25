@@ -76,7 +76,7 @@ export function applyMultioptionField(container, key, value) {
 export function applyGenericField(input, key, value) {
   if (!input) {
     EventBus.emit("logging:warning", [
-      `[applyGenericField] applyFieldValues: Missing input for key "${key}".`,
+      `[applyGenericField] Missing input for key "${key}".`,
     ]);
     return;
   }
@@ -96,7 +96,7 @@ export function applyGenericField(input, key, value) {
     input.value = value ?? "";
   } else {
     EventBus.emit("logging:warning", [
-      `[applyGenericField] applyFieldValues: Unsupported input for key "${key}".`,
+      `[applyGenericField] Unsupported input for key "${key}".`,
     ]);
   }
 }

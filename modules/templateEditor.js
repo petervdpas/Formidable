@@ -13,7 +13,6 @@ import {
   getEditor,
   handleEditorKey,
   initCodeMirror,
-  getValue as getMarkdownTemplate,
 } from "./templateCodemirror.js";
 
 window.showConfirmModal = showConfirmModal;
