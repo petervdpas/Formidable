@@ -18,6 +18,8 @@
 
   --toast-bg-warn: #ff9800;
   --toast-fg-warn: #000;
+
+  --popup-option-height: 40px;
 }
 
 .editor-wrapper.fullscreen {

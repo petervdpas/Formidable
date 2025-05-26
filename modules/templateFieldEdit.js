@@ -23,7 +23,7 @@ function setupFieldEditor(container, onChange) {
 
     const containerRow = dom.options.closest(".modal-form-row");
     const currentType = dom.type?.value || "text";
-    const optionTypes = ["dropdown", "multioption", "radio", "table"];
+    const optionTypes = ["dropdown", "multioption", "radio",  "list", "table"];
 
     // Always hide raw <textarea> or JSON field
     dom.options.style.display = "none";

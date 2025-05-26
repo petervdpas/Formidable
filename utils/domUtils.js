@@ -118,7 +118,16 @@ export function applyFieldValues(container, fieldsOrKeys = [], data = {}) {
     }
 
     if (container.querySelector(`[data-list-field="${key}"]`)) {
-      applyListField(container, key, value);
+      const field = fieldsOrKeys.find(
+        (f) => typeof f === "object" && f?.key === key
+      );
+      if (field) {
+        applyListField(container, field, value);
+      } else {
+        EventBus.emit("logging:warning", [
+          `[applyFieldValues] Cannot find field definition for key "${key}"`,
+        ]);
+      }
       return;
     }
 

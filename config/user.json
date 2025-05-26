@@ -1,16 +1,16 @@
 {
-  "theme": "dark",
+  "theme": "light",
   "font_size": 14,
   "logging_enabled": true,
   "context_mode": "storage",
-  "templates_location": "./templates",
-  "storage_location": "./storage",
-  "selected_template": "basic.yaml",
-  "selected_data_file": "test-20250518.meta.json",
+  "templates_location": "C:\\Projects\\documentation\\Formidable\\templates",
+  "storage_location": "C:\\Projects\\documentation\\Formidable\\storage",
+  "selected_template": "process.yaml",
+  "selected_data_file": "test-20250526.meta.json",
   "window_bounds": {
-    "width": 1110,
-    "height": 820,
-    "x": 234,
-    "y": 94
+    "width": 946,
+    "height": 772,
+    "x": -1387,
+    "y": -128
   }
 }

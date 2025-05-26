@@ -1,6 +1,7 @@
 // utils/fieldRenderers.js
 
 import { wrapInputWithLabel } from "./elementBuilders.js";
+import { showOptionPopup } from "./popupUtils.js";
 
 function resolveOption(opt) {
   return typeof opt === "string"
@@ -190,16 +191,22 @@ export function renderListField(field) {
   const items = field.default || [];
 
   items.forEach((item) => {
-    const input = createListItem(item);
-    wrapper.appendChild(input);
+    const row = createListItem(item, field.options || []);
+    wrapper.appendChild(row);
   });
 
   const addBtn = document.createElement("button");
   addBtn.textContent = "+";
   addBtn.onclick = () => {
-    const input = createListItem("");
-    wrapper.insertBefore(input, addBtn);
+    const row = createListItem("", field.options || []);
+    wrapper.insertBefore(row, addBtn);
+    const input = row.querySelector("input");
+    if (input && input.readOnly && typeof input.onclick === "function") {
+      input.focus();
+      input.click();
+    }
   };
+
   wrapper.appendChild(addBtn);
 
   return wrapInputWithLabel(
@@ -210,6 +217,42 @@ export function renderListField(field) {
   );
 }
 
+function createListItem(value, options = []) {
+  const container = document.createElement("div");
+  container.className = "list-item";
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = value;
+  input.name = "list-item";
+  input.className = "list-input";
+
+  if (options.length > 0) {
+    input.readOnly = true;
+    input.onclick = () => showOptionPopup(input, options);
+
+    const isValid = options.some((opt) =>
+      typeof opt === "string" ? opt === value : opt.value === value
+    );
+
+    if (!isValid && value) {
+      input.classList.add("invalid-option");
+      input.placeholder = "⚠ Not in list";
+      input.title = "This value is not in the allowed options";
+    }
+  }
+
+  const removeBtn = document.createElement("button");
+  removeBtn.textContent = "-";
+  removeBtn.className = "remove-btn";
+  removeBtn.onclick = () => container.remove();
+
+  container.appendChild(input);
+  container.appendChild(removeBtn);
+  return container;
+}
+
+/*
 function createListItem(value) {
   const container = document.createElement("div");
   container.className = "list-item";
@@ -229,6 +272,7 @@ function createListItem(value) {
   container.appendChild(removeBtn);
   return container;
 }
+*/
 
 // ─────────────────────────────────────────────
 // Type: table

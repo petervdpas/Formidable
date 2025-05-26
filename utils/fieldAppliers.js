@@ -1,8 +1,12 @@
 // utils/fieldAppliers.js
 
 import { EventBus } from "../modules/eventBus.js";
+import { showOptionPopup } from "./popupUtils.js";
 
-export function applyListField(container, key, value) {
+export function applyListField(container, field, value) {
+  const key = field.key;
+  const options = field.options || [];
+
   const listWrapper = container.querySelector(`[data-list-field="${key}"]`);
   if (!listWrapper) return;
 
@@ -14,6 +18,29 @@ export function applyListField(container, key, value) {
     const input = document.createElement("input");
     input.type = "text";
     input.value = item;
+
+    // If options exist, activate popup behavior
+    if (options.length > 0) {
+      input.readOnly = true;
+      input.onclick = () => showOptionPopup(input, options);
+
+      // Check if value is in allowed options
+      const isValid = options.some((opt) =>
+        typeof opt === "string" ? opt === item : opt.value === item
+      );
+
+      if (!isValid) {
+        input.classList.add("invalid-option");
+        input.placeholder = "⚠ Not in list";
+        input.title = "This value is not in the allowed options";
+      }
+
+      if (!value) {
+        setTimeout(() => {
+          input.click();
+        }, 0);
+      }
+    }
 
     const wrapper = document.createElement("div");
     wrapper.style.display = "flex";

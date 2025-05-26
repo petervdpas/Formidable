@@ -181,3 +181,18 @@ label small,
 .dark-mode input[type="date"]::-webkit-calendar-picker-indicator:hover {
   background-color: #000;
 }
+
+.dark-mode .popup-selector {
+  background-color: var(--input-bg);
+  color: var(--input-fg);
+  border-color: var(--input-border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode .popup-option {
+  background-color: #2a2a2a;
+}
+
+.dark-mode .popup-option:hover {
+  background-color: #3a3a3a;
+}
