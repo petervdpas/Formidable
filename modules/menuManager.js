@@ -119,8 +119,9 @@ export async function handleMenuAction(action) {
           return;
         }
 
+        const templateDir = config.templates_location || "templates";
         const templatePath = await window.api.system.resolvePath(
-          "templates",
+          templateDir,
           templateName
         );
         const exists = await window.api.system.fileExists(templatePath);
