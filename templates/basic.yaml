@@ -265,3 +265,6 @@ fields:
         label: Column 2
       - value: col3
         label: Column 3
+  - key: design
+    label: Design
+    type: image

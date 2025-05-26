@@ -47,30 +47,29 @@ export function extractFieldDefinition({
   return field;
 }
 
-export function getFormData(container, template) {
+export async function getFormData(container, template) {
   const data = {};
   const fields = template.fields || [];
 
-  fields.forEach((field) => {
+  for (const field of fields) {
     const typeDef = fieldTypes[field.type];
     if (!typeDef || typeof typeDef.parseValue !== "function") {
       EventBus.emit("logging:warning", [
         `[getFormData] No parser for field type: ${field.type}`,
       ]);
-      return;
+      continue;
     }
 
     const el = resolveFieldElement(container, field);
-
     if (!el) {
       EventBus.emit("logging:warning", [
         `[getFormData] Missing input for: ${field.key}`,
       ]);
-      return;
+      continue;
     }
 
-    data[field.key] = typeDef.parseValue(el);
-  });
+    data[field.key] = await typeDef.parseValue(el, template);
+  }
 
   EventBus.emit("logging:default", [
     "[getFormData] Collected form data:",
@@ -89,6 +88,8 @@ function resolveFieldElement(container, field) {
       return container.querySelector(`[data-list-field="${field.key}"]`);
     case "table":
       return container.querySelector(`[data-table-field="${field.key}"]`);
+    case "image":
+      return container.querySelector(`[data-image-field="${field.key}"]`);
     default:
       return container.querySelector(`[name="${field.key}"]`);
   }
@@ -150,4 +151,3 @@ export function renderFieldElement(field) {
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
-

@@ -191,4 +191,61 @@ export const fieldTypes = {
     },
     parseValue: parsers.parseTableField,
   },
+
+  image: {
+    label: "Image Upload",
+    cssClass: "modal-image",
+    defaultValue: () => "",
+    renderInput(field, template) {
+      const wrapper = document.createElement("div");
+      wrapper.dataset.imageField = field.key;
+
+      if (template?.storage_location) {
+        wrapper.dataset.storageLocation = template.storage_location;
+      }
+
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/png, image/jpeg";
+      input.name = field.key;
+
+      const preview = document.createElement("img");
+      preview.style.maxWidth = "200px";
+      preview.style.maxHeight = "150px";
+      preview.style.display = "block";
+      preview.style.marginTop = "6px";
+
+      // Show preview if default filename is known
+      if (typeof field.default === "string" && field.default) {
+        const filename = field.default;
+        if (template?.storage_location) {
+          window.api.system
+            .resolvePath(template.storage_location, "images", filename)
+            .then((fullPath) => {
+              preview.src = `file://${fullPath}`;
+            })
+            .catch(() => {
+              preview.alt = "Image not found";
+            });
+        }
+      }
+
+      input.addEventListener("change", () => {
+        const file = input.files?.[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            preview.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      wrapper.appendChild(input);
+      wrapper.appendChild(preview);
+
+      return wrapper;
+    },
+    parseValue: parsers.parseImageField,
+  },
 };

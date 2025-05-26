@@ -80,6 +80,12 @@ function registerIpcHandlers() {
   registerIpc("save-form", (e, dir, file, data, fields) =>
     formManager.saveForm(dir, file, data, fields)
   );
+  registerIpc(
+    "save-image-file",
+    async (e, storageLocation, fileName, buffer) => {
+      return fileManager.saveImageFile(storageLocation, fileName, buffer);
+    }
+  );
   registerIpc("delete-form", (e, dir, file) =>
     formManager.deleteForm(dir, file)
   );

@@ -100,6 +100,43 @@ export function applyMultioptionField(container, key, value) {
   });
 }
 
+export function applyImageField(container, key, value, template) {
+  const wrapper = container.querySelector(`[data-image-field="${key}"]`);
+  const preview = wrapper?.querySelector("img");
+
+  if (!wrapper || !preview) {
+    EventBus.emit("logging:warning", [
+      `[applyImageField] Missing wrapper or image element for key "${key}"`,
+    ]);
+    return;
+  }
+
+  // If it's already a base64 URI
+  if (typeof value === "string" && value.startsWith("data:image")) {
+    preview.src = value;
+    return;
+  }
+
+  if (!template?.storage_location || !value) {
+    EventBus.emit("logging:warning", [
+      `[applyImageField] Missing storage_location or value`,
+    ]);
+    return;
+  }
+
+  window.api.system
+    .resolvePath(template.storage_location, "images", value)
+    .then((imgPath) => {
+      preview.src = `file://${imgPath.replace(/\\/g, "/")}`;
+    })
+    .catch((err) => {
+      EventBus.emit("logging:error", [
+        `[applyImageField] Failed to resolve image path: ${value}`,
+        err,
+      ]);
+    });
+}
+
 export function applyGenericField(input, key, value) {
   if (!input) {
     EventBus.emit("logging:warning", [

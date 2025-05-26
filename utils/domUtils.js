@@ -5,6 +5,7 @@ import {
   applyListField,
   applyTableField,
   applyMultioptionField,
+  applyImageField,
   applyGenericField,
 } from "./fieldAppliers.js";
 
@@ -92,24 +93,12 @@ export function applyModalTypeClass(modal, typeKey, fieldTypes) {
   }
 }
 
-export function applyFieldValues(container, fieldsOrKeys = [], data = {}) {
-  if (!container || typeof container.querySelector !== "function") {
-    EventBus.emit("logging:default", ["[applyFieldValues] Invalid container."]);
-    return;
-  }
+export function applyFieldValues(container, template, data = {}) {
+  if (!container || typeof container.querySelector !== "function") return;
+  const fields = template?.fields || [];
 
-  if (!data || typeof data !== "object") {
-    EventBus.emit("logging:default", [
-      "[applyFieldValues] No valid data object provided.",
-    ]);
-    return;
-  }
-
-  const keys = fieldsOrKeys
-    .map((f) => (typeof f === "string" ? f : f?.key))
-    .filter(Boolean);
-
-  keys.forEach((key) => {
+  fields.forEach((field) => {
+    const key = field.key;
     const value = data[key];
 
     if (container.querySelector(`[data-multioption-field="${key}"]`)) {
@@ -118,16 +107,7 @@ export function applyFieldValues(container, fieldsOrKeys = [], data = {}) {
     }
 
     if (container.querySelector(`[data-list-field="${key}"]`)) {
-      const field = fieldsOrKeys.find(
-        (f) => typeof f === "object" && f?.key === key
-      );
-      if (field) {
-        applyListField(container, field, value);
-      } else {
-        EventBus.emit("logging:warning", [
-          `[applyFieldValues] Cannot find field definition for key "${key}"`,
-        ]);
-      }
+      applyListField(container, field, value);
       return;
     }
 
@@ -136,7 +116,11 @@ export function applyFieldValues(container, fieldsOrKeys = [], data = {}) {
       return;
     }
 
-    // ✅ Handle radios here
+    if (container.querySelector(`[data-image-field="${key}"]`)) {
+      applyImageField(container, key, value, template);
+      return;
+    }
+
     const radioGroup = container.querySelector(`[data-radio-group="${key}"]`);
     if (radioGroup) {
       const radios = radioGroup.querySelectorAll(`input[type="radio"]`);
@@ -146,8 +130,9 @@ export function applyFieldValues(container, fieldsOrKeys = [], data = {}) {
       return;
     }
 
-    // Default
     const input = container.querySelector(`[name="${key}"]`);
+    if (input?.type === "file") return;
+
     applyGenericField(input, key, value);
   });
 

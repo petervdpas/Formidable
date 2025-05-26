@@ -21,6 +21,7 @@ const api = {
     "list-forms",
     "load-form",
     "save-form",
+    "save-image-file",
     "delete-form",
   ]),
   markdown: buildGroup([

@@ -252,28 +252,6 @@ function createListItem(value, options = []) {
   return container;
 }
 
-/*
-function createListItem(value) {
-  const container = document.createElement("div");
-  container.className = "list-item";
-
-  const input = document.createElement("input");
-  input.type = "text";
-  input.value = value;
-  input.name = "list-item";
-  input.className = "list-input";
-
-  const removeBtn = document.createElement("button");
-  removeBtn.textContent = "-";
-  removeBtn.className = "remove-btn";
-  removeBtn.onclick = () => container.remove();
-
-  container.appendChild(input);
-  container.appendChild(removeBtn);
-  return container;
-}
-*/
-
 // ─────────────────────────────────────────────
 // Type: table
 export function renderTableField(field) {
@@ -359,4 +337,43 @@ export function renderTableField(field) {
     field.description,
     field.two_column
   );
+}
+
+export function renderImageField(field, template) {
+  const wrapper = document.createElement("div");
+  wrapper.dataset.imageField = field.key;
+
+  if (template?.storage_location) {
+    wrapper.dataset.storageLocation = template.storage_location;
+  }
+
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/png, image/jpeg";
+  input.name = field.key;
+
+  const preview = document.createElement("img");
+  preview.style.maxWidth = "200px";
+  preview.style.marginTop = "8px";
+  preview.style.display = "block";
+
+  // Don't try to load base64; just set alt if no image
+  if (typeof field.default === "string" && field.default) {
+    preview.alt = "Image set: " + field.default;
+  }
+
+  input.addEventListener("change", () => {
+    const file = input.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        preview.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  wrapper.appendChild(input);
+  wrapper.appendChild(preview);
+  return wrapInputWithLabel(wrapper, field.label || "Image Upload", field.description);
 }

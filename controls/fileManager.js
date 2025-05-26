@@ -143,6 +143,22 @@ function saveFile(filepath, data, { format = "text", silent = false } = {}) {
   }
 }
 
+function saveImageFile(storageLocation, filename, buffer, { silent = false } = {}) {
+  try {
+    const imageDir = resolvePath(storageLocation, "images");
+    ensureDirectory(imageDir, { silent });
+    const targetPath = path.join(imageDir, filename);
+
+    fs.writeFileSync(targetPath, Buffer.from(buffer));
+    if (!silent) log(`[FileManager] Saved image to: ${targetPath}`);
+
+    return { success: true, path: targetPath };
+  } catch (err) {
+    if (!silent) error("[FileManager] Failed to save image file:", err);
+    return { success: false, error: err.message };
+  }
+}
+
 // Delete a file if it exists
 function deleteFile(filepath, { silent = false } = {}) {
   try {
@@ -172,5 +188,6 @@ module.exports = {
   fileExists,
   loadFile,
   saveFile,
+  saveImageFile,
   deleteFile,
 };

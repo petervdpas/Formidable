@@ -150,40 +150,46 @@
   border-left: 4px solid #ffccbc;
 }
 
+.field-list-item[data-type="image"] {
+  background-color: #bdbdbd;
+  /* Light Warm Gray */
+  border-left: 4px solid #cfd8dc;
+}
+
 /* ───── Field Type Color Badges ───── */
 .field-type.type-text {
   background-color: #1976d2;
   /* Slightly darker Blue */
-  color: white;
+  color: black;
 }
 
 .field-type.type-boolean {
   background-color: #43a047;
   /* Slightly darker Green */
-  color: white;
+  color: black;
 }
 
 .field-type.type-dropdown {
   background-color: #a05db5;
   /* Slightly darker Purple */
-  color: white;
+  color: black;
 }
 
 .field-type.type-multioption {
   background-color: #5bc0de;
-  color: white;
+  color: black;
 }
 
 .field-type.type-radio {
   background-color: #f46333;
   /* Slightly darker Orange */
-  color: white;
+  color: black;
 }
 
 .field-type.type-textarea {
   background-color: #8567b9;
   /* Slightly darker Violet */
-  color: white;
+  color: black;
 }
 
 .field-type.type-number {
@@ -207,6 +213,12 @@
 .field-type.type-table {
   background-color: #f5bfa9;
   /* Slightly darker Pale Peach */
+  color: black;
+}
+
+.field-type.type-image {
+  background-color: #cfd8dc;
+  /* Amber */
   color: black;
 }
 
@@ -265,6 +277,11 @@
 #field-edit-modal.modal-table {
   background-color: #f07b59;
   border-left: 6px solid #ffccbc;
+}
+
+#field-edit-modal.modal-image {
+  background-color: #e0e0e0;
+  border-left: 6px solid #cfd8dc;
 }
 
 /* ───── Dynamic Table ───── */

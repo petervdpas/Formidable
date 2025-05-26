@@ -113,7 +113,7 @@ export function createFormManager(containerId) {
       onDelete: deleteForm,
     });
 
-    applyFieldValues(container, currentTemplate.fields, metaData);
+    applyFieldValues(container, currentTemplate, metaData);
     focusFirstInput(container);
   }
 
@@ -130,7 +130,7 @@ export function createFormManager(containerId) {
       return;
     }
 
-    const formData = getFormData(container, currentTemplate);
+    const formData = await getFormData(container, currentTemplate);
     const datafileInput = container.querySelector("#meta-json-filename");
     const datafile = validateFilenameInput(datafileInput);
 

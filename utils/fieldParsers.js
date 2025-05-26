@@ -62,3 +62,37 @@ export function parseTableField(wrapper) {
 
   return data;
 }
+
+// Image
+export async function parseImageField(inputWrapper, template) {
+  if (!inputWrapper || !template?.storage_location) return "";
+
+  const fileInput = inputWrapper.querySelector("input[type='file']");
+  const file = fileInput?.files?.[0];
+  if (!file) return "";
+
+  const allowedTypes = ["image/png", "image/jpeg"];
+  if (!allowedTypes.includes(file.type)) return "";
+
+  try {
+    const buffer = await file.arrayBuffer();
+    const filename = file.name;
+
+    // Save image to storage/images using IPC
+    const result = await window.api.forms.saveImageFile(
+      template.storage_location,
+      filename,
+      Array.from(new Uint8Array(buffer)) // send as serializable array
+    );
+
+    if (result?.success) {
+      return filename; // Store just the name in metadata
+    } else {
+      console.error("Failed to save image:", result?.error);
+      return "";
+    }
+  } catch (err) {
+    console.error("parseImageField failed:", err);
+    return "";
+  }
+}
