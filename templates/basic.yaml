@@ -210,8 +210,6 @@ fields:
         label: Left
       - value: R
         label: Right
-      - value: M
-        label: Middle
   - key: multichoice
     label: Multiple Choice
     type: multioption
