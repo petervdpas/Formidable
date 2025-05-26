@@ -3,7 +3,7 @@
 import { setupModal } from "./modalManager.js";
 import { EventBus } from "./eventBus.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
-import { renderSettings } from "./settingsManager.js";
+import { renderSettings, getCachedConfig } from "./settingsManager.js";
 import { applyModalCssClass } from "../utils/modalUtils.js";
 import { extractFieldDefinition } from "../utils/formUtils.js";
 import { createDropdown } from "./dropdownManager.js";
@@ -42,6 +42,15 @@ export function setupTemplateModal() {
     backdropClick: true,
     width: "30em",
     height: "auto",
+    onOpen: async () => {
+      const modal = document.getElementById("template-modal");
+      const input = modal?.querySelector("input#template-dir");
+      if (!input) return;
+
+      const config =
+        getCachedConfig() || (await window.api.config.loadUserConfig());
+      input.value = config.storage_location || "./storage";
+    },
   });
 }
 

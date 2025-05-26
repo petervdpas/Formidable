@@ -5,11 +5,22 @@ import { initTabs } from "../utils/tabUtils.js";
 import { formatAsRelativePath } from "../utils/pathUtils.js";
 import { initThemeToggle } from "./themeToggle.js";
 
+let cachedConfig = null;
+
+export function getCachedConfig() {
+  return cachedConfig;
+}
+
+export function invalidateCachedConfig() {
+  cachedConfig = null;
+}
+
 export async function renderSettings() {
   const container = document.getElementById("settings-body");
   if (!container) return false;
 
-  const config = await window.api.config.loadUserConfig();
+  cachedConfig = await window.api.config.loadUserConfig();
+  const config = cachedConfig;
 
   container.innerHTML = `
     <div class="tab-buttons">
@@ -31,12 +42,12 @@ export async function renderSettings() {
     </div>
     <div class="tab-panel tab-dirs">
       ${createDirectoryPicker(
-        "template-dir",
+        "settings-template-dir",
         "Template Directory",
         config.templates_location || "./templates"
       )}
       ${createDirectoryPicker(
-        "storage-dir",
+        "settings-storage-dir",
         "Storage Directory",
         config.storage_location || "./storage"
       )}
@@ -103,6 +114,7 @@ function setupBindings(config) {
     loggingToggle.onchange = async () => {
       const enabled = loggingToggle.checked;
       await window.api.config.updateUserConfig({ logging_enabled: enabled });
+      cachedConfig = await window.api.config.loadUserConfig();
       EventBus.emit("logging:toggle", enabled);
       EventBus.emit(
         "status:update",
@@ -111,8 +123,8 @@ function setupBindings(config) {
     };
   }
 
-  bindDirButton("template-dir", "templates_location", "template:list:reload");
-  bindDirButton("storage-dir", "storage_location", "form:list:reload");
+  bindDirButton("settings-template-dir", "templates_location", "template:list:reload");
+  bindDirButton("settings-storage-dir", "storage_location", "form:list:reload");
 }
 
 function bindDirButton(fieldId, configKey, reloadEvent) {
@@ -129,6 +141,8 @@ function bindDirButton(fieldId, configKey, reloadEvent) {
 
     input.value = relative;
     await window.api.config.updateUserConfig({ [configKey]: relative });
+
+    cachedConfig = await window.api.config.loadUserConfig();
 
     EventBus.emit("status:update", `Updated ${configKey}: ${relative}`);
     if (reloadEvent) EventBus.emit(reloadEvent);
