@@ -26,7 +26,7 @@ export function setupFormButtons({ container, template, onSave, onDelete }) {
 
   renderBtn.addEventListener("click", async () => {
     EventBus.emit("logging:default", ["[Render] Collecting form data..."]);
-    const formData = getFormData(container, template);
+    const formData = await getFormData(container, template);
 
     EventBus.emit("logging:default", ["[Render] Rendering Markdown..."]);
     const markdown = await window.api.transform.renderMarkdownTemplate(
