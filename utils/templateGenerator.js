@@ -60,6 +60,9 @@ export function generateTemplateCode(fields = []) {
 
 {{/if}}`;
 
+          case "image":
+            return `{{#if (fieldRaw "${key}")}}\n![${label}]({{field "${key}"}})\n{{else}}\n_No image uploaded for ${label}_\n{{/if}}`;
+
           default:
             return `{{field "${key}"}}`;
         }

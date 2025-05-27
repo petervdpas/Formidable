@@ -128,6 +128,7 @@ export function applyImageField(container, key, value, template) {
     .resolvePath(template.storage_location, "images", value)
     .then((imgPath) => {
       preview.src = `file://${imgPath.replace(/\\/g, "/")}`;
+      wrapper.setAttribute("data-filename", value);
     })
     .catch((err) => {
       EventBus.emit("logging:error", [

@@ -1,6 +1,7 @@
 // controls/markdownRenderer.js
 
 const Handlebars = require("handlebars");
+const { resolvePath } = require("./fileManager");
 const { log, error } = require("./nodeLogger");
 
 const defaultRenderers = {
@@ -36,6 +37,13 @@ const defaultRenderers = {
     return v.map((val) => map.get(val) || val).join(", ");
   },
   textarea: (v) => v,
+  image: (filename, field, template) => {
+    if (!filename || typeof filename !== "string") return "";
+    const basePath = template?.storage_location || "";
+    const absPath = resolvePath(basePath, "images", filename);
+    const uri = `file://${absPath.replace(/\\/g, "/")}`; // normalize for Electron
+    return uri;
+  },
 };
 
 function registerHelpers() {
@@ -84,38 +92,47 @@ function registerHelpers() {
   Handlebars.registerHelper("field", function (key, mode = "label", options) {
     const context = options?.data?.root || this;
     const fields = context._fields || [];
+    const template = context._template || {};
     const field = fields.find((f) => f.key === key);
     const value = context[key];
 
+    // log(`[FieldHelper] key: ${key}, type: ${field?.type}, value: ${value}`);
+
     if (!field) return `(unknown field: ${key})`;
 
-    const isOptioned = ["dropdown", "radio", "multioption"].includes(
-      field.type
-    );
-    if (!isOptioned) {
-      const fn =
-        typeof field.render === "function"
-          ? field.render
-          : defaultRenderers[field.type] || defaultRenderers.text;
-      return fn(value, field);
-    }
-
-    const optionsList = field.options || [];
-    const optMap = new Map(
-      optionsList.map((opt) => {
-        const val = typeof opt === "string" ? opt : opt.value;
-        const label = typeof opt === "string" ? opt : opt.label ?? opt.value;
-        return [val, label];
-      })
-    );
-
+    // Handle multioption arrays with value/label distinction
     if (field.type === "multioption" && Array.isArray(value)) {
+      const optMap = new Map(
+        (field.options || []).map((opt) => {
+          const val = typeof opt === "string" ? opt : opt.value;
+          const label = typeof opt === "string" ? opt : opt.label ?? opt.value;
+          return [val, label];
+        })
+      );
       return value
         .map((val) => (mode === "value" ? val : optMap.get(val) || val))
         .join(", ");
     }
 
-    return mode === "value" ? value : optMap.get(value) || value;
+    // Handle dropdown, radio, table with simple value/label
+    if (["dropdown", "radio", "table"].includes(field.type)) {
+      const optMap = new Map(
+        (field.options || []).map((opt) => {
+          const val = typeof opt === "string" ? opt : opt.value;
+          const label = typeof opt === "string" ? opt : opt.label ?? opt.value;
+          return [val, label];
+        })
+      );
+      return mode === "value" ? value : optMap.get(value) || value;
+    }
+
+    // Use render function or default renderer
+    const fn =
+      typeof field.render === "function"
+        ? field.render
+        : defaultRenderers[field.type] || defaultRenderers.text;
+
+    return fn(value, field, template); // ✅ now template is defined
   });
 
   Handlebars.registerHelper("fieldRaw", function (key) {
@@ -146,10 +163,10 @@ function renderMarkdown(formData, templateYaml) {
 
   try {
     registerHelpers();
-
     const context = {
       ...formData,
       _fields: templateYaml.fields || [],
+      _template: templateYaml,
     };
 
     const tmpl = Handlebars.compile(templateYaml.markdown_template);

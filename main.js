@@ -39,6 +39,9 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
       enableRemoteModule: false,
+      // sandbox: true,
+      // webSecurity: true,
+      // allowRunningInsecureContent: false,
       preload: path.resolve(__dirname, "preload.js"),
     },
   });

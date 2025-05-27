@@ -69,7 +69,12 @@ export async function parseImageField(inputWrapper, template) {
 
   const fileInput = inputWrapper.querySelector("input[type='file']");
   const file = fileInput?.files?.[0];
-  if (!file) return "";
+
+  // 🟡 Geen nieuwe upload → return de bestaande filename
+  if (!file) {
+    const existing = inputWrapper.getAttribute("data-filename");
+    return existing?.trim() || "";
+  }
 
   const allowedTypes = ["image/png", "image/jpeg"];
   if (!allowedTypes.includes(file.type)) return "";
@@ -78,15 +83,16 @@ export async function parseImageField(inputWrapper, template) {
     const buffer = await file.arrayBuffer();
     const filename = file.name;
 
-    // Save image to storage/images using IPC
     const result = await window.api.forms.saveImageFile(
       template.storage_location,
       filename,
-      Array.from(new Uint8Array(buffer)) // send as serializable array
+      Array.from(new Uint8Array(buffer))
     );
 
     if (result?.success) {
-      return filename; // Store just the name in metadata
+      // ✅ Werk DOM bij zodat data-filename actueel is
+      inputWrapper.setAttribute("data-filename", filename);
+      return filename;
     } else {
       console.error("Failed to save image:", result?.error);
       return "";

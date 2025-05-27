@@ -187,6 +187,19 @@ markdown_template: |-
     {{/each}}
 
   {{/if}}
+
+  ---
+
+  ### Design
+
+  _{{fieldDescription "design"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "design")}}
+  ```
+
+  ![Design]({{field "design"}})
 fields:
   - key: test
     label: Test
@@ -268,3 +281,4 @@ fields:
   - key: design
     label: Design
     type: image
+    description: Printing an image
