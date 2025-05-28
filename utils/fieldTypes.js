@@ -3,6 +3,34 @@
 import * as parsers from "./fieldParsers.js";
 
 export const fieldTypes = {
+  loopstart: {
+    label: "Loop Start",
+    cssClass: "modal-loopstart",
+    disabledAttributes: ["description", "default", "options", "twoColumnRow"],
+    defaultValue: () => "",
+    renderInput(field) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "loop-control-block";
+      wrapper.textContent = `🔁 Loop Start → ${field.for || "(not set)"}`;
+      return wrapper;
+    },
+    parseValue: () => null, // Not a real input
+  },
+
+  loopstop: {
+    label: "Loop Stop",
+    cssClass: "modal-loopstop",
+    disabledAttributes: ["description", "default", "options", "twoColumnRow"],
+    defaultValue: () => "",
+    renderInput() {
+      const wrapper = document.createElement("div");
+      wrapper.className = "loop-control-block";
+      wrapper.textContent = "⏹ Loop End";
+      return wrapper;
+    },
+    parseValue: () => null,
+  },
+
   text: {
     label: "Text",
     cssClass: "modal-text",

@@ -282,3 +282,9 @@ fields:
     label: Design
     type: image
     description: Printing an image
+  - key: loop_start
+    label: Loop Start
+    type: loopstart
+  - key: loop_stop
+    label: Loop Stop
+    type: loopstop

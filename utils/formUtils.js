@@ -111,6 +111,26 @@ export function injectFieldDefaults(fields, metaData) {
   });
 }
 
+export function applyFieldAttributeDisabling(dom, fieldTypeKey) {
+  const typeDef = fieldTypes[fieldTypeKey];
+  const disabled = new Set(typeDef?.disabledAttributes || []);
+
+  Object.entries(dom).forEach(([key, el]) => {
+    if (!el) return;
+
+    // Handle custom row overrides like `twoColumnRow`
+    const container = el.classList.contains("modal-form-row") || el.classList.contains("switch-row")
+      ? el
+      : el.closest(".modal-form-row") || el.closest(".switch-row");
+
+    if (disabled.has(key)) {
+      if (container) container.style.display = "none";
+    } else {
+      if (container) container.style.display = "";
+    }
+  });
+}
+
 export function clearFormUI(
   container,
   label = "Select or create a data-file to begin."

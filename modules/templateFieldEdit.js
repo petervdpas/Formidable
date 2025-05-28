@@ -2,6 +2,7 @@
 
 import { applyModalTypeClass } from "../utils/domUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
+import { applyFieldAttributeDisabling } from "../utils/formUtils.js";
 
 function setupFieldEditor(container, onChange) {
   const state = {};
@@ -11,6 +12,9 @@ function setupFieldEditor(container, onChange) {
     label: container.querySelector("#edit-label"),
     description: container.querySelector("#edit-description"),
     twoColumn: container.querySelector("#edit-two-column"),
+    twoColumnRow: container
+      .querySelector("#edit-two-column")
+      ?.closest(".switch-row"),
     default: container.querySelector("#edit-default"),
     options: container.querySelector("#edit-options"),
     type: container.querySelector("#edit-type-container select"),
@@ -23,7 +27,7 @@ function setupFieldEditor(container, onChange) {
 
     const containerRow = dom.options.closest(".modal-form-row");
     const currentType = dom.type?.value || "text";
-    const optionTypes = ["dropdown", "multioption", "radio",  "list", "table"];
+    const optionTypes = ["dropdown", "multioption", "radio", "list", "table"];
 
     // Always hide raw <textarea> or JSON field
     dom.options.style.display = "none";
@@ -61,10 +65,35 @@ function setupFieldEditor(container, onChange) {
     dom.description.value = field.description || "";
     dom.twoColumn.checked = !!field.two_column;
     dom.default.value = field.default ?? "";
+
+    // 💡 Autofill label if empty, but disable if user edits manually
+    let labelLocked = !!field.label;
+
+    dom.key.addEventListener("input", () => {
+      const raw = dom.key.value.trim();
+      if (!labelLocked && raw) {
+        const humanLabel = raw
+          .replace(/[_\-]+/g, " ")
+          .replace(/\b\w/g, (m) => m.toUpperCase());
+        dom.label.value = humanLabel;
+      }
+    });
+
+    dom.label.addEventListener("input", () => {
+      labelLocked = dom.label.value.trim().length > 0;
+    });
+
     if (dom.type) {
       dom.type.value = field.type || "text";
       dom.type.onchange = () => {
         setupOptionsEditor(); // re-evaluate which editor/message should be shown
+        applyFieldAttributeDisabling(
+          {
+            ...dom,
+            twoColumnRow: dom.twoColumnRow,
+          },
+          dom.type.value
+        );
       };
     }
 
@@ -72,14 +101,20 @@ function setupFieldEditor(container, onChange) {
       dom.options.value = field.options ? JSON.stringify(field.options) : "";
     }
 
-    // 💡 Ensure we always re-setup the options editor when switching fields
+    applyFieldAttributeDisabling(
+      {
+        ...dom,
+        twoColumnRow: dom.twoColumnRow,
+      },
+      field.type
+    );
+
     setupOptionsEditor();
     if (optionsEditor) {
       optionsEditor.setValues([]);
       if (field.options) optionsEditor.setValues(field.options);
     }
 
-    // 🔥 Update modal styling
     const modal = container.closest(".modal");
     applyModalTypeClass(modal, field.type || "text", fieldTypes);
 

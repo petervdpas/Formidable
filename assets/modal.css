@@ -135,8 +135,9 @@
     text-align: right;
 }
 
-.modal-form-row.switch-row label.switch {
-    margin-left: 0;
+.modal-form-row.disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 /* ───── Modal Resizer ───── */
