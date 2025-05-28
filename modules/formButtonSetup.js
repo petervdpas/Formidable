@@ -48,14 +48,18 @@ export function setupFormButtons({ container, template, onSave, onDelete }) {
         navigator.clipboard
           .writeText(markdown)
           .then(() => {
-            EventBus.emit("logging:default", [
-              "✅ Markdown copied to clipboard",
-            ]);
-            showToast("Markdown copied", "success");
+            EventBus.emit("logging:default", ["Markdown copied to clipboard"]);
+            EventBus.emit("ui:toast", {
+              message: "Markdown copied",
+              variant: "success"
+            });
           })
           .catch((err) => {
-            EventBus.emit("logging:error", ["❌ Markdown copy failed", err]);
-            showToast("Failed to copy Markdown", "error");
+            EventBus.emit("logging:error", ["Markdown copy failed", err]);
+            EventBus.emit("ui:toast", {
+              message: "Failed to copy Markdown",
+              variant: "error"
+            });
           });
       };
     }
@@ -65,12 +69,18 @@ export function setupFormButtons({ container, template, onSave, onDelete }) {
         navigator.clipboard
           .writeText(html)
           .then(() => {
-            EventBus.emit("logging:default", ["✅ HTML copied to clipboard"]);
-            showToast("HTML copied", "success");
+            EventBus.emit("logging:default", ["HTML copied to clipboard"]);
+            EventBus.emit("ui:toast", {
+              message: "HTML copied",
+              variant: "success"
+            });
           })
           .catch((err) => {
             EventBus.emit("logging:error", ["❌ HTML copy failed", err]);
-            showToast("Failed to copy HTML", "error");
+            EventBus.emit("ui:toast", {
+              message: "Failed to copy HTML",
+              variant: "error"
+            });
           });
       };
     }

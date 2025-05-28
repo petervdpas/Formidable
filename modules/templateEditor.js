@@ -146,7 +146,10 @@ export function initTemplateEditor(containerId, onSaveCallback) {
   }
 
   function openEditModal(field) {
-    showFieldEditorModal(field);
+    const allKeys = currentData.fields
+      .map((f) => f.key)
+      .filter((k) => k != null);
+    showFieldEditorModal(field, allKeys);
   }
 
   function wireEvents() {

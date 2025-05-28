@@ -19,7 +19,8 @@ function getConfig() {
 function getConfigTemplatesDir() {
   try {
     const cfg = getConfig(); // uses cache
-    return typeof cfg.templates_location === "string" && cfg.templates_location.trim()
+    return typeof cfg.templates_location === "string" &&
+      cfg.templates_location.trim()
       ? cfg.templates_location
       : "./templates";
   } catch {
@@ -110,6 +111,77 @@ function getTemplateDescriptor(name) {
     yaml: data,
     storageLocation: data.storage_location,
   };
+}
+
+function checkDuplicateKeys(fields) {
+  const seen = new Set();
+  const duplicates = [];
+
+  for (const field of fields) {
+    if (seen.has(field.key)) {
+      duplicates.push(field.key);
+    } else {
+      seen.add(field.key);
+    }
+  }
+
+  return duplicates;
+}
+
+function checkLoopPairing(fields) {
+  const errors = [];
+  const stack = [];
+
+  fields.forEach((field, index) => {
+    if (field.type === "loopstart") {
+      stack.push({ field, index });
+    } else if (field.type === "loopstop") {
+      if (stack.length === 0) {
+        errors.push({
+          type: "unmatched-loopstop",
+          field,
+          index,
+        });
+      } else {
+        stack.pop(); // matched pair
+      }
+    }
+  });
+
+  // Any unmatched loopstarts left
+  while (stack.length > 0) {
+    const { field, index } = stack.pop();
+    errors.push({
+      type: "unmatched-loopstart",
+      field,
+      index,
+    });
+  }
+
+  return errors;
+}
+
+function validateTemplate(template) {
+  const errors = [];
+
+  if (!template || !Array.isArray(template.fields)) {
+    return [
+      { type: "invalid-template", message: "Missing or invalid fields array" },
+    ];
+  }
+
+  const duplicates = checkDuplicateKeys(template.fields);
+  if (duplicates.length > 0) {
+    errors.push({
+      type: "duplicate-keys",
+      keys: duplicates,
+    });
+  }
+
+  const loopErrors = checkLoopPairing(template.fields);
+  errors.push(...loopErrors);
+
+  return errors;
 }
 
 function createBasicTemplateIfMissing() {
@@ -212,13 +284,20 @@ function createBasicTemplateIfMissing() {
       ],
     };
 
-    const saved = fileManager.saveFile(getTemplatePath(basicYamlName), content, {
-      format: "yaml",
-      silent: false,
-    });
+    const saved = fileManager.saveFile(
+      getTemplatePath(basicYamlName),
+      content,
+      {
+        format: "yaml",
+        silent: false,
+      }
+    );
 
     if (saved) {
-      log("[TemplateManager] Created basic.yaml at:", getTemplatePath(basicYamlName));
+      log(
+        "[TemplateManager] Created basic.yaml at:",
+        getTemplatePath(basicYamlName)
+      );
     } else {
       error("[TemplateManager] Failed to create basic.yaml");
     }
@@ -233,6 +312,7 @@ module.exports = {
   loadTemplate,
   saveTemplate,
   deleteTemplate,
+  validateTemplate,
   getTemplateDescriptor,
   createBasicTemplateIfMissing,
 };

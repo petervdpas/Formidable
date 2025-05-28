@@ -4,7 +4,7 @@ import { applyModalTypeClass } from "../utils/domUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 import { applyFieldAttributeDisabling } from "../utils/formUtils.js";
 
-function setupFieldEditor(container, onChange) {
+function setupFieldEditor(container, onChange, allKeys = []) {
   const state = {};
 
   const dom = {
@@ -66,27 +66,38 @@ function setupFieldEditor(container, onChange) {
     dom.twoColumn.checked = !!field.two_column;
     dom.default.value = field.default ?? "";
 
-    // 💡 Autofill label if empty, but disable if user edits manually
     let labelLocked = !!field.label;
+    const originalKey = field.key?.trim();
 
-    dom.key.addEventListener("input", () => {
-      const raw = dom.key.value.trim();
-      if (!labelLocked && raw) {
-        const humanLabel = raw
-          .replace(/[_\-]+/g, " ")
-          .replace(/\b\w/g, (m) => m.toUpperCase());
-        dom.label.value = humanLabel;
-      }
-    });
+    // Attach listeners only once
+    if (!dom.key.__listenersAttached) {
+      dom.key.__listenersAttached = true;
 
-    dom.label.addEventListener("input", () => {
-      labelLocked = dom.label.value.trim().length > 0;
-    });
+      dom.label.addEventListener("input", () => {
+        labelLocked = dom.label.value.trim().length > 0;
+      });
+
+      dom.key.addEventListener("input", () => {
+        const raw = dom.key.value.trim();
+
+        // Autofill label
+        if (!labelLocked && raw) {
+          const humanLabel = raw
+            .replace(/[_\-]+/g, " ")
+            .replace(/\b\w/g, (m) => m.toUpperCase());
+          dom.label.value = humanLabel;
+        }
+
+        // Duplicate key check
+        const isDuplicate = allKeys.includes(raw) && raw !== originalKey;
+        dom.key.classList.toggle("input-error", isDuplicate);
+      });
+    }
 
     if (dom.type) {
       dom.type.value = field.type || "text";
       dom.type.onchange = () => {
-        setupOptionsEditor(); // re-evaluate which editor/message should be shown
+        setupOptionsEditor();
         applyFieldAttributeDisabling(
           {
             ...dom,
@@ -302,10 +313,10 @@ export function createEmptyField() {
   return { key: "", type: "text", label: "" };
 }
 
-export function showFieldEditorModal(field) {
+export function showFieldEditorModal(field, allKeys = []) {
   const modal = document.getElementById("field-edit-modal");
   const body = modal.querySelector(".modal-body");
-  const editor = setupFieldEditor(body);
+  const editor = setupFieldEditor(body, null, allKeys);
   editor.setField(field);
   modal.classList.add("show");
 }

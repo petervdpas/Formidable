@@ -14,6 +14,7 @@ const api = {
     "load-template",
     "save-template",
     "delete-template",
+    "validate-template",
     "get-template-descriptor",
   ]),
   forms: buildGroup([

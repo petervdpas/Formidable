@@ -11,6 +11,7 @@ import * as statusHandler from "./handlers/statusHandler.js";
 import * as loggingHandler from "./handlers/loggingHandler.js";
 import * as listHandlers from "./handlers/listHandlers.js";
 import * as editorHandler from "./handlers/editorHandler.js";
+import * as toastHandler from "./handlers/toastHandler.js";
 
 let routerInitialized = false;
 
@@ -26,10 +27,14 @@ export function initEventRouter() {
   EventBus.off("logging:warning", loggingHandler.handleLogWarning);
   EventBus.off("logging:error", loggingHandler.handleLogError);
 
+  EventBus.off("ui:toast", toastHandler.handleToast);
+
   EventBus.on("logging:toggle", loggingHandler.handleLoggingToggle);
   EventBus.on("logging:default", loggingHandler.handleLogDefault);
   EventBus.on("logging:warning", loggingHandler.handleLogWarning);
   EventBus.on("logging:error", loggingHandler.handleLogError);
+
+  EventBus.on("ui:toast", toastHandler.handleToast);
 
   // Core events
   EventBus.off("screen:fullscreen", screenHandlers.handleFullscreenToggle);

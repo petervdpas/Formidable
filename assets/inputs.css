@@ -40,3 +40,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 5px;
     cursor: pointer;
 }
+
+.input-error {
+  border: 2px solid #c00 !important;
+}

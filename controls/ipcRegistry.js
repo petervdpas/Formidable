@@ -62,6 +62,9 @@ function registerIpcHandlers() {
   registerIpc("delete-template", (e, name) =>
     templateManager.deleteTemplate(name)
   );
+  registerIpc("validate-template", (e, template) =>
+    templateManager.validateTemplate(template)
+  );
   registerIpc("get-template-descriptor", (e, name) =>
     templateManager.getTemplateDescriptor(name)
   );
