@@ -1,6 +1,6 @@
 // modules/uiButtons.js
 
-export function createButton({
+function createButton({
   text,
   className = "",
   identifier = "",
@@ -22,6 +22,15 @@ export function createButton({
   }
 
   return btn;
+}
+
+export function buildButtonGroup(...buttons) {
+  const group = document.createElement("div");
+  group.className = "button-group";
+  buttons.forEach((btn) => {
+    if (btn instanceof HTMLElement) group.appendChild(btn);
+  });
+  return group;
 }
 
 export function createFieldEditButton(idx, onClick) {
@@ -102,8 +111,6 @@ export function createTemplateGeneratorButton(onClick) {
   });
 }
 
-/* ------ Above this is applied, below is what needs to be done ... and now help me lower this comment!!!  ------ */
-
 export function createFormSaveButton(onClick) {
   return createButton({
     text: "Save",
@@ -130,6 +137,26 @@ export function createFormRenderButton(onClick) {
     onClick,
   });
 }
+
+export function createCopyMarkdownButton(onClick) {
+  return createButton({
+    text: "⧉",
+    className: "copy-btn",
+    identifier: "copy-markdown",
+    onClick,
+  });
+}
+
+export function createCopyPreviewButton(onClick) {
+  return createButton({
+    text: "⧉",
+    className: "copy-btn",
+    identifier: "copy-preview",
+    onClick,
+  });
+}
+
+/* ------ Above this is applied, below is what needs to be done ... and now help me lower this comment!!!  ------ */
 
 export function disableButton(btn, state = true) {
   if (btn instanceof HTMLElement) {

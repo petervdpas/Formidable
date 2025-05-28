@@ -200,3 +200,36 @@ export function syncScroll(el1, el2) {
   el1.addEventListener("scroll", sync(el1, el2));
   el2.addEventListener("scroll", sync(el2, el1));
 }
+
+export function copyToClipboard(
+  button,
+  contentFn,
+  {
+    successMessage = "Copied to clipboard",
+    errorMessage = "Failed to copy",
+  } = {}
+) {
+  if (!button) {
+    EventBus.emit("logging:warning", [
+      "[copyToClipboard] Missing button element",
+    ]);
+    return;
+  }
+
+  button.onclick = () =>
+    navigator.clipboard
+      .writeText(contentFn())
+      .then(() =>
+        EventBus.emit("ui:toast", {
+          message: successMessage,
+          variant: "success",
+        })
+      )
+      .catch((e) => {
+        EventBus.emit("logging:error", ["[Clipboard] Copy failed", e]);
+        EventBus.emit("ui:toast", {
+          message: errorMessage,
+          variant: "error",
+        });
+      });
+}

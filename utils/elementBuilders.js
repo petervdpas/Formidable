@@ -68,7 +68,6 @@ export function wrapInputWithLabel(
   descriptionText = "",
   layout = "single"
 ) {
-  
   const isTwoColumn = layout === true || layout === "two-column";
 
   const wrapper = document.createElement("div");
@@ -108,4 +107,14 @@ export function wrapInputWithLabel(
   }
 
   return wrapper;
+}
+
+export function buildReadOnlyInput(id, className, labelText, value = "") {
+  const input = document.createElement("input");
+  input.type = "text";
+  input.id = id;
+  input.readOnly = true;
+  input.value = value;
+  if (className) input.className = className;
+  return wrapInputWithLabel(input, labelText);
 }

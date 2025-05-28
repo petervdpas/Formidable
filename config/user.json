@@ -1,7 +1,7 @@
 {
   "theme": "light",
   "font_size": 14,
-  "logging_enabled": false,
+  "logging_enabled": true,
   "context_mode": "storage",
   "templates_location": "./templates",
   "storage_location": "./storage",
