@@ -3,25 +3,11 @@
 import { EventBus } from "../eventBus.js";
 import { getValue as getMarkdownTemplate } from "../templateCodemirror.js";
 
-function formatError(error) {
-  if (error.type === "duplicate-keys") {
-    return `🚫 Dubbele sleutels: ${error.keys.join(", ")}`;
-  }
-  if (error.type === "unmatched-loopstart") {
-    return `🔁 Ongepaarde loopstart bij: ${error.field?.key || "?"}`;
-  }
-  if (error.type === "unmatched-loopstop") {
-    return `🔁 Ongepaarde loopstop bij: ${error.field?.key || "?"}`;
-  }
-  if (error.type === "invalid-template") {
-    return `⚠️ Ongeldige template: ${error.message}`;
-  }
-  return `❓ Onbekende fout: ${JSON.stringify(error)}`;
-}
-
 export async function handleSaveTemplate({ container, fields, callback }) {
   const name = container.querySelector("#yaml-name").value.trim();
-  const storageLocation = container.querySelector("#storage-location").value.trim();
+  const storageLocation = container
+    .querySelector("#storage-location")
+    .value.trim();
   const markdownTemplate = getMarkdownTemplate();
 
   const updated = {
@@ -34,11 +20,11 @@ export async function handleSaveTemplate({ container, fields, callback }) {
   // 🔍 Validatie
   const validationErrors = await window.api.templates.validateTemplate(updated);
   if (validationErrors.length > 0) {
+    const messages = validationErrors.map(formatError);
     EventBus.emit("logging:error", [
       "[Validator] Template bevat fouten:",
-      ...validationErrors.map(formatError),
+      ...messages,
     ]);
-    EventBus.emit("status:update", "Template bevat fouten - niet opgeslagen.");
     return;
   }
 

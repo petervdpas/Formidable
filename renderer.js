@@ -129,15 +129,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
-      const success = await window.api.templates.saveTemplate(
-        template,
-        updatedYaml
-      );
-      if (success) {
-        EventBus.emit("status:update", `Saved: ${template}`);
-      } else {
-        EventBus.emit("status:update", "Failed to save template.");
-      }
+      await window.api.templates.saveTemplate(template, updatedYaml);
     }
   );
 

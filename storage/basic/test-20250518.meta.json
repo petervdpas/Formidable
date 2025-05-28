@@ -20,5 +20,7 @@
       "bla"
     ]
   ],
-  "design": "formidable.png"
+  "design": "formidable.png",
+  "loop_start": "",
+  "loop_stop": ""
 }

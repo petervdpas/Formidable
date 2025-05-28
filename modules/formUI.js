@@ -9,8 +9,12 @@ import {
 } from "../utils/formUtils.js";
 import { applyFieldValues, focusFirstInput } from "../utils/domUtils.js";
 import { renderForm } from "./formRenderer.js";
-import { setupFormButtons } from "./formButtonSetup.js";
-import { showConfirmModal } from "./modalSetup.js";
+import { showConfirmModal, setupRenderModal } from "./modalSetup.js";
+import {
+  createFormSaveButton,
+  createFormDeleteButton,
+  createFormRenderButton,
+} from "./uiButtons.js";
 
 export function createFormManager(containerId) {
   const container = document.getElementById(containerId);
@@ -49,15 +53,6 @@ export function createFormManager(containerId) {
   }
 
   async function loadFormData(metaData, datafile) {
-    /*
-    if (datafile === currentDatafile) {
-      EventBus.emit("logging:default", [
-        "[FormManager] Skipping re-render for same datafile:",
-        datafile,
-      ]);
-      return;
-    }
-      */
     currentDatafile = datafile;
 
     EventBus.emit("logging:default", [
@@ -90,13 +85,12 @@ export function createFormManager(containerId) {
 
     const isNewEntry = Object.keys(metaData).length === 0;
 
-    // ✅ Inject defaults before rendering (if creating a new entry)
-    // Use `field.default` if defined in the template; otherwise fall back to type default
+    // Inject defaults before rendering
     if (isNewEntry) {
       injectFieldDefaults(currentTemplate.fields, metaData);
     }
 
-    // ✅ Now render the form
+    // Now render the form
     container.innerHTML = "";
     renderForm(container, currentTemplate);
 
@@ -106,12 +100,17 @@ export function createFormManager(containerId) {
       filenameInput.value = datafile;
     }
 
-    setupFormButtons({
-      container,
-      template: currentTemplate,
-      onSave: saveForm,
-      onDelete: deleteForm,
-    });
+    // Setup buttons directly here
+    const saveBtn = createFormSaveButton(() => saveForm());
+    const deleteBtn = createFormDeleteButton(() => deleteForm(currentDatafile));
+    const renderBtn = createFormRenderButton(() => renderFormPreview());
+
+    const group = document.createElement("div");
+    group.className = "button-group";
+    group.append(saveBtn, deleteBtn, renderBtn);
+    container.appendChild(group);
+
+    EventBus.emit("logging:default", ["[FormButtons] Buttons initialized."]);
 
     applyFieldValues(container, currentTemplate, metaData);
     focusFirstInput(container);
@@ -173,7 +172,6 @@ export function createFormManager(containerId) {
       EventBus.emit("logging:warning", [
         "[createFormManager:deleteForm] No template selected for deletion.",
       ]);
-
       EventBus.emit("status:update", "Cannot delete: template not selected.");
       return;
     }
@@ -204,6 +202,68 @@ export function createFormManager(containerId) {
       ]);
       EventBus.emit("status:update", "Failed to delete metadata file.");
     }
+  }
+
+  async function renderFormPreview() {
+    const renderModal = setupRenderModal();
+
+    EventBus.emit("logging:default", ["[Render] Collecting form data..."]);
+    const formData = await getFormData(container, currentTemplate);
+
+    EventBus.emit("logging:default", ["[Render] Rendering Markdown..."]);
+    const markdown = await window.api.transform.renderMarkdownTemplate(
+      formData,
+      currentTemplate
+    );
+    document.getElementById("render-output").textContent = markdown;
+
+    EventBus.emit("logging:default", ["[Render] Rendering HTML preview..."]);
+    const html = await window.api.transform.renderHtmlPreview(markdown);
+    document.getElementById("render-preview").innerHTML = html;
+
+    const copyMarkdownBtn = document.getElementById("copy-markdown");
+    const copyPreviewBtn = document.getElementById("copy-preview");
+
+    if (copyMarkdownBtn) {
+      copyMarkdownBtn.onclick = () =>
+        navigator.clipboard
+          .writeText(markdown)
+          .then(() =>
+            EventBus.emit("ui:toast", {
+              message: "Markdown copied",
+              variant: "success",
+            })
+          )
+          .catch((err) => {
+            EventBus.emit("logging:error", ["Markdown copy failed", err]);
+            EventBus.emit("ui:toast", {
+              message: "Failed to copy Markdown",
+              variant: "error",
+            });
+          });
+    }
+
+    if (copyPreviewBtn) {
+      copyPreviewBtn.onclick = () =>
+        navigator.clipboard
+          .writeText(html)
+          .then(() =>
+            EventBus.emit("ui:toast", {
+              message: "HTML copied",
+              variant: "success",
+            })
+          )
+          .catch((err) => {
+            EventBus.emit("logging:error", ["HTML copy failed", err]);
+            EventBus.emit("ui:toast", {
+              message: "Failed to copy HTML",
+              variant: "error",
+            });
+          });
+    }
+
+    EventBus.emit("logging:default", ["[Render] Showing render modal..."]);
+    renderModal.show();
   }
 
   return {

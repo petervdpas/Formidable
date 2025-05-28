@@ -9,18 +9,25 @@ import {
   createEmptyField,
 } from "./templateFieldEdit.js";
 import { generateTemplateCode } from "../utils/templateGenerator.js";
+import { formatError } from "../utils/templateValidation.js";
 import {
   getEditor,
   handleEditorKey,
   initCodeMirror,
 } from "./templateCodemirror.js";
+import {
+  createTemplateAddFieldButton,
+  createTemplateSaveButton,
+  createTemplateDeleteButton,
+  createTemplateGeneratorButton,
+} from "./uiButtons.js";
 
 window.showConfirmModal = showConfirmModal;
 
 const Sortable = window.Sortable;
 
-let editorWrapper = null;
 let keyboardListenerAttached = false;
+let editorWrapper = null;
 let typeDropdown = null;
 
 export function initTemplateEditor(containerId, onSaveCallback) {
@@ -75,101 +82,112 @@ export function initTemplateEditor(containerId, onSaveCallback) {
             currentData.markdown_template || ""
           }</textarea>
         </div>
-        <div class="button-row">
-          <button id="generate-template" class="btn btn-info" style="display: none;">
-            Generate Template
-          </button>
-        </div>
+        <div class="button-row" id="template-generate-wrapper"></div>
       </div>
     </fieldset>
 
     <fieldset>
       <legend>Fields</legend>
       <ul id="fields-list" class="field-list"></ul>
-      <div class="field-add-row">
-        <button id="add-field" class="btn btn-info">+ Add Field</button>
-      </div>
+      <div class="field-add-row" id="field-add-row"></div>
     </fieldset>
 
-    <div class="button-group">
-      <button id="save-yaml" class="btn btn-warn">Save</button>
-      <button id="delete-yaml" class="btn btn-danger">Delete</button>
-    </div>
+    <div class="button-group" id="template-actions-row"></div>
   `;
 
-    wireEvents();
-    renderFieldListWrapper();
-
+    // Init CodeMirror
     const textarea = container.querySelector("#markdown-template");
     initCodeMirror(textarea, currentData.markdown_template || "");
-
-    setupGenerateTemplateButton(container, currentData.fields);
-
     editorWrapper = container.querySelector(".editor-wrapper");
 
-    if (keyboardListenerAttached) {
-      document.removeEventListener("keydown", handleEditorKey);
-    }
-    document.addEventListener("keydown", handleEditorKey);
-    keyboardListenerAttached = true;
-  }
-
-  function renderFieldListWrapper() {
-    const list = container.querySelector("#fields-list");
-    renderFieldList(list, currentData.fields, {
-      onEditIndex: (idx) => {
-        currentEditIndex = idx;
-      },
-      onOpenEditModal: openEditModal,
+    // ─── Dynamische Buttons ─────────────────────────────
+    const generateBtnWrapper = container.querySelector(
+      "#template-generate-wrapper"
+    );
+    const generateBtn = createTemplateGeneratorButton(() => {
+      const code = generateTemplateCode(currentData.fields);
+      getEditor().setValue(code);
+      generateBtnWrapper.style.display = "none";
     });
-  }
+    generateBtnWrapper.appendChild(generateBtn);
 
-  function setupGenerateTemplateButton(container, fields) {
-    const generateBtn = container.querySelector("#generate-template");
-    if (!generateBtn) return;
+    const addFieldRow = container.querySelector("#field-add-row");
+    addFieldRow.appendChild(
+      createTemplateAddFieldButton(() => {
+        currentEditIndex = null;
+        openEditModal(createEmptyField());
+      })
+    );
 
-    const editor = getEditor();
+    const actionsRow = container.querySelector("#template-actions-row");
 
-    const updateVisibility = () => {
-      const hasCode = editor.getValue().trim().length > 0;
-      generateBtn.style.display = hasCode ? "none" : "block";
-    };
+    const saveBtn = createTemplateSaveButton(async () => {
+      const fullTemplate = {
+        name: container.querySelector("#yaml-name")?.value.trim() || "Unnamed",
+        storage_location:
+          container.querySelector("#storage-location")?.value.trim() || "",
+        markdown_template: getEditor()?.getValue() || "",
+        fields: currentData.fields || [],
+      };
 
-    editor.on("change", updateVisibility);
-    updateVisibility(); // Initial check
+      const errors = await window.api.templates.validateTemplate(fullTemplate);
+      if (errors && errors.length > 0) {
+        const count = errors.length;
+        EventBus.emit("status:update", `Validation failed: ${count} error(s).`);
+        EventBus.emit("ui:toast", {
+          message: `Template contains ${count} error${count > 1 ? "s" : ""}.`,
+          variant: "error",
+        });
+        for (const err of errors) {
+          EventBus.emit("ui:toast", {
+            message: formatError(err),
+            variant: "error",
+          });
+        }
+        return;
+      }
 
-    generateBtn.onclick = () => {
-      const code = generateTemplateCode(fields);
-      editor.setValue(code);
-      generateBtn.style.display = "none";
-    };
-  }
-
-  function openEditModal(field) {
-    const allKeys = currentData.fields
-      .map((f) => f.key)
-      .filter((k) => k != null);
-    showFieldEditorModal(field, allKeys);
-  }
-
-  function wireEvents() {
-    container.querySelector("#add-field").onclick = () => {
-      currentEditIndex = null;
-      openEditModal(createEmptyField());
-    };
-
-    container.querySelector("#save-yaml").onclick = () => {
       EventBus.emit("editor:save", {
         container,
         fields: currentData.fields,
         callback: onSaveCallback,
       });
-    };
 
-    container.querySelector("#delete-yaml").onclick = () => {
+      const filename = window.currentSelectedTemplateName || "Unknown";
+      EventBus.emit("status:update", `Template saved: ${filename}`);
+      EventBus.emit("ui:toast", {
+        message: `Template saved successfully: ${filename}`,
+        variant: "success",
+      });
+    });
+
+    const deleteBtn = createTemplateDeleteButton(() => {
       EventBus.emit("editor:delete", container);
-    };
+    });
 
+    actionsRow.appendChild(saveBtn);
+    actionsRow.appendChild(deleteBtn);
+
+    // ─── Editor Change → Show/Hide Generate Button ─────
+    const editor = getEditor();
+    const updateVisibility = () => {
+      const hasCode = editor.getValue().trim().length > 0;
+      generateBtnWrapper.style.display = hasCode ? "none" : "block";
+    };
+    editor.on("change", updateVisibility);
+    updateVisibility();
+
+    // ─── Field List Rendering ───────────────────────────
+    renderFieldListWrapper();
+
+    // ─── Keyboard Shortcuts ─────────────────────────────
+    if (keyboardListenerAttached) {
+      document.removeEventListener("keydown", handleEditorKey);
+    }
+    document.addEventListener("keydown", handleEditorKey);
+    keyboardListenerAttached = true;
+
+    // ─── Field Edit Modal Setup ─────────────────────────
     if (!editModal) {
       const modalSetup = setupFieldEditModal((field) => {
         if (currentEditIndex != null) {
@@ -183,6 +201,23 @@ export function initTemplateEditor(containerId, onSaveCallback) {
       editModal = modalSetup.modal;
       typeDropdown = modalSetup.typeDropdown;
     }
+  }
+
+  function renderFieldListWrapper() {
+    const list = container.querySelector("#fields-list");
+    renderFieldList(list, currentData.fields, {
+      onEditIndex: (idx) => {
+        currentEditIndex = idx;
+      },
+      onOpenEditModal: openEditModal,
+    });
+  }
+
+  function openEditModal(field) {
+    const allKeys = currentData.fields
+      .map((f) => f.key)
+      .filter((k) => k != null);
+    showFieldEditorModal(field, allKeys);
   }
 
   return { render: renderEditor };

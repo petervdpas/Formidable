@@ -3,6 +3,12 @@
 import { applyModalTypeClass } from "../utils/domUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 import { applyFieldAttributeDisabling } from "../utils/formUtils.js";
+import {
+  createFieldEditButton,
+  createFieldDeleteButton,
+  createReorderUpButton,
+  createReorderDownButton,
+} from "./uiButtons.js";
 
 function setupFieldEditor(container, onChange, allKeys = []) {
   const state = {};
@@ -151,15 +157,6 @@ function setupFieldEditor(container, onChange, allKeys = []) {
   return { setField, getField };
 }
 
-function renderReorderButtons(idx, total) {
-  const upDisabled = idx === 0 ? "disabled" : "";
-  const downDisabled = idx === total - 1 ? "disabled" : "";
-  return `
-    <button class="btn btn-light action-up" data-idx="${idx}" ${upDisabled}>▲</button>
-    <button class="btn btn-light action-down" data-idx="${idx}" ${downDisabled}>▼</button>
-  `;
-}
-
 function listFields(
   listEl,
   fields,
@@ -182,47 +179,42 @@ function listFields(
   fields.forEach((field, idx) => {
     const item = document.createElement("li");
     item.className = "field-list-item";
-    item.innerHTML = `
-      <div class="field-label">
-        ${field.label}
-        <span class="field-type type-${field.type}">
-          (${field.type.toUpperCase()})
-        </span>
-      </div>
-      <div class="field-actions">
-        <!-- ${renderReorderButtons(idx, fields.length)}  -->
-        <button class="btn btn-warn action-edit" data-idx="${idx}">Edit</button>
-        <button class="btn btn-danger action-delete" data-idx="${idx}">Delete</button>
-      </div>
-    `;
     item.dataset.type = field.type;
-    listEl.appendChild(item);
-  });
 
-  listEl.querySelectorAll(".action-edit").forEach((btn) => {
-    btn.onclick = () => onEdit?.(+btn.dataset.idx);
-  });
+    // Label + type
+    const labelEl = document.createElement("div");
+    labelEl.className = "field-label";
+    labelEl.innerHTML = `
+      ${field.label}
+      <span class="field-type type-${field.type}">
+        (${field.type.toUpperCase()})
+      </span>
+    `;
 
-  listEl.querySelectorAll(".action-delete").forEach((btn) => {
-    btn.onclick = () => onDelete?.(+btn.dataset.idx);
-  });
+    // Acties
+    const actionsEl = document.createElement("div");
+    actionsEl.className = "field-actions";
 
-  listEl.querySelectorAll(".action-up").forEach((btn) => {
-    btn.onclick = () => {
-      const idx = +btn.dataset.idx;
-      if (idx > 0) {
-        onUp ? onUp(idx) : onReorder?.(idx, idx - 1);
-      }
-    };
-  });
-
-  listEl.querySelectorAll(".action-down").forEach((btn) => {
-    btn.onclick = () => {
-      const idx = +btn.dataset.idx;
-      if (idx < fields.length - 1) {
+    const btnEdit = createFieldEditButton(idx, () => onEdit?.(idx));
+    const btnDelete = createFieldDeleteButton(idx, () => onDelete?.(idx));
+    /*
+    const btnUp = createReorderUpButton(idx, idx === 0, () => {
+      if (idx > 0) onUp ? onUp(idx) : onReorder?.(idx, idx - 1);
+    });
+    const btnDown = createReorderDownButton(idx, fields.length, () => {
+      if (idx < fields.length - 1)
         onDown ? onDown(idx) : onReorder?.(idx, idx + 1);
-      }
-    };
+    });
+
+    actionsEl.appendChild(btnUp);
+    actionsEl.appendChild(btnDown);
+    */
+    actionsEl.appendChild(btnEdit);
+    actionsEl.appendChild(btnDelete);
+
+    item.appendChild(labelEl);
+    item.appendChild(actionsEl);
+    listEl.appendChild(item);
   });
 }
 

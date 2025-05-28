@@ -199,7 +199,37 @@ markdown_template: |-
   {{json (fieldRaw "design")}}
   ```
 
+  {{#if (fieldRaw "design")}}
   ![Design]({{field "design"}})
+  {{else}}
+  _No image uploaded for Design_
+  {{/if}}
+
+  ---
+
+  ### Loop Start
+
+  _{{fieldDescription "loop_start"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "loop_start")}}
+  ```
+
+  {{field "loop_start"}}
+
+  ---
+
+  ### Loop Stop
+
+  _{{fieldDescription "loop_stop"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "loop_stop")}}
+  ```
+
+  {{field "loop_stop"}}
 fields:
   - key: test
     label: Test
