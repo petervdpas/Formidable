@@ -6,6 +6,7 @@ import * as screenHandlers from "./handlers/screenHandlers.js";
 import * as contextHandlers from "./handlers/contextHandlers.js";
 import * as templateHandlers from "./handlers/templateHandlers.js";
 import * as formHandlers from "./handlers/formHandlers.js";
+import * as modalHandler from "./handlers/modalHandler.js";
 import * as themeHandler from "./handlers/themeHandler.js";
 import * as statusHandler from "./handlers/statusHandler.js";
 import * as loggingHandler from "./handlers/loggingHandler.js";
@@ -67,6 +68,9 @@ export function initEventRouter() {
   EventBus.off("form:list:itemClicked", listHandlers.handleListItemClicked);
   EventBus.off("form:list:highlighted", listHandlers.handleListHighlighted);
 
+  EventBus.off("modal:template:confirm", modalHandler.handleTemplateConfirm);
+  EventBus.off("modal:entry:confirm", modalHandler.handleEntryConfirm);
+
   EventBus.on("template:list:reload", () =>
     listHandlers.handleListReload({ listId: "template-list" })
   );
@@ -86,6 +90,9 @@ export function initEventRouter() {
   EventBus.on("form:list:highlighted", (name) =>
     listHandlers.handleListHighlighted({ listId: "storage-list", name })
   );
+
+  EventBus.on("modal:template:confirm", modalHandler.handleTemplateConfirm);
+  EventBus.on("modal:entry:confirm", modalHandler.handleEntryConfirm);
 
   EventBus.off("editor:save", editorHandler.handleSaveTemplate);
   EventBus.off("editor:delete", editorHandler.handleDeleteTemplate);
