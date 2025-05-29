@@ -122,6 +122,19 @@ export function setupFieldEditModal(onConfirm) {
     id: "field-edit-confirm",
     text: "Confirm",
     onClick: () => {
+      const keyInput = document.getElementById("edit-key");
+      const rawKey = keyInput?.value.trim();
+
+      if (!rawKey) {
+        keyInput.classList.add("input-error");
+        confirmBtn.disabled = true;
+        EventBus.emit("ui:toast", {
+          message: "Key cannot be empty.",
+          variant: "error",
+        });
+        return;
+      }
+
       try {
         const field = extractFieldDefinition({ typeDropdown });
         onConfirm(field);

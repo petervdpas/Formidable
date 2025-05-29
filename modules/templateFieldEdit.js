@@ -66,6 +66,12 @@ function setupFieldEditor(container, onChange, allKeys = []) {
   function setField(field) {
     Object.assign(state, field);
 
+    dom.key.classList.remove("input-error");
+    const confirmBtn = document.getElementById("btn-field-edit-confirm");
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+    }
+
     dom.key.value = field.key || "";
     dom.label.value = field.label || "";
     dom.description.value = field.description || "";
@@ -97,6 +103,11 @@ function setupFieldEditor(container, onChange, allKeys = []) {
         // Duplicate key check
         const isDuplicate = allKeys.includes(raw) && raw !== originalKey;
         dom.key.classList.toggle("input-error", isDuplicate);
+
+        const confirmBtn = document.getElementById("btn-field-edit-confirm");
+        if (confirmBtn) {
+          confirmBtn.disabled = isDuplicate || raw.length === 0;
+        } 
       });
     }
 

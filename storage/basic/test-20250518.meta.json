@@ -21,6 +21,6 @@
     ]
   ],
   "design": "formidable.png",
-  "loop_start": "",
-  "loop_stop": ""
+  "loop_start": null,
+  "loop_stop": null
 }
