@@ -174,7 +174,7 @@ export function createModalCloseButton({
   onClick = () => {},
   id = "modal-cancel",
   text = "✕",
-  className = "btn-light",
+  className = "btn-close",
 }) {
   return createButton({
     text,

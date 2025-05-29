@@ -58,6 +58,26 @@ button,
   background-color: #c82333;
 }
 
+/* ───── Close Button ───── */
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.2em;
+  line-height: 1;
+  color: var(--input-border-color); /* dynamic color for both themes */
+  padding: 2px 6px;
+  margin-left: auto;
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-close:hover,
+.btn-close:focus {
+  color: #000;
+  background-color: rgba(0, 0, 0, 0.05);
+  outline: none;
+}
+
 /* ───── Button Group ───── */
 
 .button-group {

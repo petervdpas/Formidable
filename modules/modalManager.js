@@ -2,6 +2,7 @@
 
 import { enableElementResizing } from "../utils/resizing.js";
 import { enableEscToClose } from "../utils/modalUtils.js";
+import { createModalCloseButton } from "./uiButtons.js";
 
 export function setupModal(
   modalId,
@@ -22,8 +23,20 @@ export function setupModal(
 
   const open =
     typeof openBtn === "string" ? document.getElementById(openBtn) : openBtn;
-  const close =
-    typeof closeBtn === "string" ? document.getElementById(closeBtn) : closeBtn;
+
+  let close = closeBtn;
+
+  // Dynamisch vervangen van hardcoded close buttons
+  if (typeof closeBtn === "string") {
+    const header = modal?.querySelector(".modal-header");
+    const newBtn = createModalCloseButton({
+      id: closeBtn,
+      onClick: () => hide(),
+    });
+
+    if (header) header.appendChild(newBtn);
+    close = newBtn; // update close reference
+  }
 
   if (!modal.classList.contains("large")) {
     modal.style.width = width;
@@ -69,4 +82,3 @@ export function setupModal(
 
   return { show, hide };
 }
-

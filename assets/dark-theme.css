@@ -7,7 +7,8 @@
   --readonly-fg: #ffffe0;
   --input-icon-bg: #3f3f3f;
 
-  --toast-bg-info: #1e1e1e;    /* darker than #333 */
+  --toast-bg-info: #1e1e1e;
+  /* darker than #333 */
   --toast-fg-info: #ddd;
 
   --toast-bg-success: #2e7d32;
@@ -195,4 +196,16 @@ label small,
 
 .dark-mode .popup-option:hover {
   background-color: #3a3a3a;
+}
+
+/* Dark mode override */
+.dark-mode .btn-close {
+  color: var(--readonly-fg);
+  /* often yellowish or bright */
+}
+
+.dark-mode .btn-close:hover,
+.dark-mode .btn-close:focus {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
 }
