@@ -22,6 +22,16 @@ button,
   background-color: #d5d5d5;
 }
 
+.btn-okay {
+  background-color: #28a745;
+  border-color: #218838;
+  color: #fff;
+}
+
+.btn-okay:hover {
+  background-color: #218838;
+}
+
 .btn-info {
   background-color: #cce5ff;
   border-color: #66b0ff;

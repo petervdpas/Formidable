@@ -158,6 +158,48 @@ export function createCopyPreviewButton(onClick) {
 
 /* ------ Above this is applied, below is what needs to be done ... and now help me lower this comment!!!  ------ */
 
+export function createModalCloseButton({
+  onClick = () => {},
+  id = "modal-cancel",
+  text = "✕",
+  className = "btn-light",
+}) {
+  return createButton({
+    text,
+    className,
+    identifier: id,
+    onClick,
+  });
+}
+
+export function createModalCancelButton({
+  text = "Cancel",
+  onClick = () => {},
+  id = "modal-cancel",
+  className = "btn-default",
+}) {
+  return createButton({
+    text,
+    className,
+    identifier: id,
+    onClick,
+  });
+}
+
+export function createModalConfirmButton({
+  text = "Confirm",
+  onClick = () => {},
+  id = "modal-confirm",
+  className = "btn-okay",
+}) {
+  return createButton({
+    text,
+    className,
+    identifier: id,
+    onClick,
+  });
+}
+
 export function disableButton(btn, state = true) {
   if (btn instanceof HTMLElement) {
     btn.disabled = state;
