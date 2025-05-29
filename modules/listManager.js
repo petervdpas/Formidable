@@ -49,12 +49,8 @@ export function createListManager({
         makeSelectableList(listItems, onItemClick);
       }
 
-      if (addButton) {
-        const btn = document.createElement("button");
-        btn.textContent = addButton.label || "+ Add New";
-        btn.className = "btn btn-default btn-add-item";
-        btn.addEventListener("click", addButton.onClick);
-        container.appendChild(btn);
+      if (addButton instanceof HTMLElement) {
+        container.appendChild(addButton);
       }
 
       EventBus.emit("status:update", `Loaded ${items.length} item(s).`);

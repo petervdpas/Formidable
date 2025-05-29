@@ -2,6 +2,7 @@
 
 import { EventBus } from "../modules/eventBus.js";
 import { fieldTypes } from "./fieldTypes.js";
+import { capitalize } from "./stringUtils.js";
 import * as renderers from "./fieldRenderers.js";
 
 export function extractFieldDefinition({
@@ -166,8 +167,4 @@ export function renderFieldElement(field) {
   }
 
   return fn(field);
-}
-
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
 }

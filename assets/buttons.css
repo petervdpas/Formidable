@@ -17,7 +17,6 @@ button,
   border-color: #bbb;
   color: #222;
 }
-
 .btn-default:hover {
   background-color: #d5d5d5;
 }
@@ -27,9 +26,9 @@ button,
   border-color: #218838;
   color: #fff;
 }
-
 .btn-okay:hover {
   background-color: #218838;
+  border-color: #1e7e34;
 }
 
 .btn-info {
@@ -37,7 +36,6 @@ button,
   border-color: #66b0ff;
   color: #004085;
 }
-
 .btn-info:hover {
   background-color: #b8dbff;
 }
@@ -47,7 +45,6 @@ button,
   border-color: #e0a800;
   color: #212529;
 }
-
 .btn-warn:hover {
   background-color: #e0a800;
 }
@@ -57,7 +54,6 @@ button,
   border-color: #c82333;
   color: #fff;
 }
-
 .btn-danger:hover {
   background-color: #c82333;
 }

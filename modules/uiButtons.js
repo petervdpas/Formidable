@@ -156,7 +156,19 @@ export function createCopyPreviewButton(onClick) {
   });
 }
 
-/* ------ Above this is applied, below is what needs to be done ... and now help me lower this comment!!!  ------ */
+export function createAddButton({
+  label = "+ Add",
+  onClick,
+  id = "",
+  className = "btn-okay",
+}) {
+  return createButton({
+    text: label,
+    className,
+    identifier: id || label.toLowerCase().replace(/\s+/g, "-"),
+    onClick,
+  });
+}
 
 export function createModalCloseButton({
   onClick = () => {},

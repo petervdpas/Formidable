@@ -3,7 +3,116 @@
 import { createListManager } from "./listManager.js";
 import { EventBus } from "./eventBus.js";
 import { stripMetaExtension } from "../utils/pathUtils.js";
-import { handleTemplateConfirm, handleEntryConfirm } from "./handlers.js";
+import { getCompactDate } from "../utils/dateUtils.js";
+import { sanitize } from "../utils/stringUtils.js";
+import {
+  createModalConfirmButton,
+  createModalCancelButton,
+  buildButtonGroup,
+  createAddButton,
+} from "./uiButtons.js";
+
+function injectWrapperButtons(wrapperId, confirmBtn, cancelBtn) {
+  const wrapper = document.getElementById(wrapperId);
+  wrapper.innerHTML = "";
+  wrapper.appendChild(buildButtonGroup(confirmBtn, cancelBtn));
+}
+
+function handleTemplateConfirm(modal, defaultStorageLocation, callback) {
+  const nameInput = document.getElementById("template-name");
+  const dirInput = document.getElementById("template-dir");
+
+  nameInput.value = "";
+  dirInput.value = defaultStorageLocation;
+
+  // ─── Sync dir input based on filename ───
+  function updateDirValue() {
+    const raw = nameInput.value.trim();
+    const safeName = sanitize(nameInput.value);
+    dirInput.value = safeName
+      ? `${defaultStorageLocation}/${safeName}`
+      : "./storage";
+  }
+
+  nameInput.removeEventListener("input", updateDirValue);
+  nameInput.addEventListener("input", updateDirValue);
+
+  // ─── Dynamisch confirm button bouwen ───
+  const confirmBtn = createModalConfirmButton({
+    id: "template-confirm",
+    text: "Create",
+    onClick: async () => {
+      const raw = nameInput.value.trim();
+      if (!raw) return;
+
+      const safeName = sanitize(raw);
+      const template = `${safeName}.yaml`;
+      const storage_location = dirInput.value.trim() || "markdown";
+
+      modal.hide();
+
+      callback({
+        template,
+        yaml: {
+          name: safeName,
+          storage_location,
+          markdown_template: "",
+          fields: [],
+        },
+      });
+    },
+  });
+
+  // ─── Optioneel: ook X-button dynamisch maken ───
+  const cancelBtn = createModalCancelButton({
+    id: "template-cancel",
+    onClick: () => modal.hide(),
+  });
+
+  injectWrapperButtons("template-modal-buttons-wrapper", confirmBtn, cancelBtn);
+
+  modal.show();
+  setTimeout(() => nameInput.focus(), 100);
+}
+
+function handleEntryConfirm(modal, callback) {
+  const input = document.getElementById("entry-name");
+  const checkbox = document.getElementById("entry-append-date");
+
+  input.value = "";
+  checkbox.checked = true;
+
+  const confirmBtn = createModalConfirmButton({
+    id: "entry-confirm",
+    text: "Confirm",
+    className: "btn-okay", // optioneel voor groene knop
+    onClick: () => {
+      const raw = input.value.trim();
+      if (!raw) return;
+
+      const sanitized = sanitize(raw).toLowerCase();
+      const appendDate = checkbox.checked;
+
+      let finalName = sanitized;
+      if (appendDate) {
+        finalName = `${sanitized}-${getCompactDate()}`;
+      }
+
+      modal.hide();
+      callback(finalName);
+    },
+  });
+
+  const cancelBtn = createModalCancelButton({
+    id: "entry-cancel",
+    onClick: () => modal.hide(),
+  });
+
+  injectWrapperButtons("entry-modal-buttons-wrapper", confirmBtn, cancelBtn);
+
+  modal.show();
+  setTimeout(() => input.focus(), 100);
+}
 
 // ─── Public Init Functions ───
 export function createTemplateListManager(
@@ -15,11 +124,10 @@ export function createTemplateListManager(
     elementId: "template-list",
     itemClass: "template-item",
     fetchListFunction: async () => await window.api.templates.listTemplates(),
-    onItemClick: (templateItem) => {
-      EventBus.emit("template:list:itemClicked", templateItem);
-    },
+    onItemClick: (templateItem) =>
+      EventBus.emit("template:list:itemClicked", templateItem),
     emptyMessage: "No template files found.",
-    addButton: {
+    addButton: createAddButton({
       label: "+ Add Template",
       onClick: async () => {
         handleTemplateConfirm(
@@ -38,7 +146,6 @@ export function createTemplateListManager(
                 name: template,
                 yaml,
               });
-
               EventBus.emit(
                 "status:update",
                 `Created new template: ${template}`
@@ -53,7 +160,7 @@ export function createTemplateListManager(
           }
         );
       },
-    },
+    }),
   });
 
   return {
@@ -92,11 +199,10 @@ export function createStorageListManager(formManager, modal) {
         value: fullName,
       }));
     },
-    onItemClick: (storageItem) => {
-      EventBus.emit("form:list:itemClicked", storageItem);
-    },
+    onItemClick: (storageItem) =>
+      EventBus.emit("form:list:itemClicked", storageItem),
     emptyMessage: "No metadata files found.",
-    addButton: {
+    addButton: createAddButton({
       label: "+ Add Entry",
       onClick: async () => {
         const template = window.currentSelectedTemplate;
@@ -117,7 +223,7 @@ export function createStorageListManager(formManager, modal) {
           EventBus.emit("status:update", "New metadata entry ready.");
         });
       },
-    },
+    }),
   });
 
   return {
