@@ -114,14 +114,25 @@ function getTemplateDescriptor(name) {
 }
 
 function checkDuplicateKeys(fields) {
-  const seen = new Set();
+  const seen = new Map(); // key → type
   const duplicates = [];
 
   for (const field of fields) {
-    if (seen.has(field.key)) {
-      duplicates.push(field.key);
+    const { key, type } = field;
+    if (!key) continue;
+
+    if (seen.has(key)) {
+      const existingType = seen.get(key);
+
+      const isLoopPair =
+        (type === "loopstart" && existingType === "loopstop") ||
+        (type === "loopstop" && existingType === "loopstart");
+
+      if (!isLoopPair) {
+        duplicates.push(key);
+      }
     } else {
-      seen.add(field.key);
+      seen.set(key, type);
     }
   }
 
@@ -141,20 +152,31 @@ function checkLoopPairing(fields) {
           type: "unmatched-loopstop",
           field,
           index,
+          message: "Unmatched loopstop without preceding loopstart",
         });
       } else {
-        stack.pop(); // matched pair
+        const start = stack.pop();
+        if (field.key !== start.field.key) {
+          errors.push({
+            type: "loop-key-mismatch",
+            field,
+            index,
+            expectedKey: start.field.key,
+            actualKey: field.key,
+            message: `Loopstop key '${field.key}' does not match loopstart key '${start.field.key}'`,
+          });
+        }
       }
     }
   });
 
-  // Any unmatched loopstarts left
   while (stack.length > 0) {
     const { field, index } = stack.pop();
     errors.push({
       type: "unmatched-loopstart",
       field,
       index,
+      message: "Unmatched loopstart without corresponding loopstop",
     });
   }
 

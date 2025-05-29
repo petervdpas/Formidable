@@ -11,7 +11,7 @@ import {
   createReorderDownButton,
 } from "./uiButtons.js";
 
-function setupFieldEditor(container, onChange, allKeys = []) {
+function setupFieldEditor(container, onChange, allFields = []) {
   const state = {};
 
   const dom = {
@@ -28,6 +28,7 @@ function setupFieldEditor(container, onChange, allKeys = []) {
   };
 
   let optionsEditor = null;
+  let labelLocked = false;
 
   function setupOptionsEditor() {
     if (!dom.options) return;
@@ -64,11 +65,15 @@ function setupFieldEditor(container, onChange, allKeys = []) {
     }
   }
 
+  let originalKey = "";
+  let confirmBtn = null;
+
   function setField(field) {
     Object.assign(state, field);
+    originalKey = field.key?.trim();
 
     dom.key.classList.remove("input-error");
-    const confirmBtn = document.getElementById("btn-field-edit-confirm");
+    confirmBtn = document.getElementById("btn-field-edit-confirm");
     if (confirmBtn) {
       confirmBtn.disabled = false;
     }
@@ -79,8 +84,8 @@ function setupFieldEditor(container, onChange, allKeys = []) {
     dom.twoColumn.checked = !!field.two_column;
     dom.default.value = field.default ?? "";
 
-    let labelLocked = !!field.label;
-    const originalKey = field.key?.trim();
+    labelLocked =
+      field.label?.trim().length > 0 && field.label !== field.key;
 
     // Attach listeners only once
     if (!dom.key.__listenersAttached) {
@@ -90,26 +95,7 @@ function setupFieldEditor(container, onChange, allKeys = []) {
         labelLocked = dom.label.value.trim().length > 0;
       });
 
-      dom.key.addEventListener("input", () => {
-        const raw = dom.key.value.trim();
-
-        // Autofill label
-        if (!labelLocked && raw) {
-          const humanLabel = raw
-            .replace(/[_\-]+/g, " ")
-            .replace(/\b\w/g, (m) => m.toUpperCase());
-          dom.label.value = humanLabel;
-        }
-
-        // Duplicate key check
-        const isDuplicate = allKeys.includes(raw) && raw !== originalKey;
-        dom.key.classList.toggle("input-error", isDuplicate);
-
-        const confirmBtn = document.getElementById("btn-field-edit-confirm");
-        if (confirmBtn) {
-          confirmBtn.disabled = isDuplicate || raw.length === 0;
-        } 
-      });
+      dom.key.addEventListener("input", validate);
     }
 
     if (dom.type) {
@@ -123,6 +109,8 @@ function setupFieldEditor(container, onChange, allKeys = []) {
           },
           dom.type.value
         );
+
+        validate();
       };
     }
 
@@ -148,6 +136,65 @@ function setupFieldEditor(container, onChange, allKeys = []) {
     applyModalTypeClass(modal, field.type || "text", fieldTypes);
 
     onChange?.(structuredClone(state));
+
+    validate(); // IMPORTANT: validate after setting all values!
+  }
+
+  function validate() {
+    const raw = dom.key.value.trim();
+    const currentType = dom.type.value;
+
+    // Autogenerate label if empty and user started typing
+    if (!labelLocked && raw.length > 0) {
+      const humanLabel = raw
+        .replace(/[_\-]+/g, " ")
+        .replace(/\b\w/g, (m) => m.toUpperCase());
+      dom.label.value = humanLabel;
+    }
+
+    const isEditingExisting = originalKey?.length > 0;
+    let isDuplicate = false;
+    let hasMatchingPartner = true;
+
+    if (["loopstart", "loopstop"].includes(currentType)) {
+      const expectedPartnerType =
+        currentType === "loopstart" ? "loopstop" : "loopstart";
+
+      isDuplicate = allFields.some(
+        (f) =>
+          f.key === raw &&
+          f.type === currentType &&
+          (!isEditingExisting ||
+            f.key !== originalKey ||
+            f.type !== currentType)
+      );
+
+      const hasAnyLoop = allFields.some(
+        (f) => f.key === raw && ["loopstart", "loopstop"].includes(f.type)
+      );
+
+      const hasPartner = allFields.some(
+        (f) =>
+          f.key === raw &&
+          f.type === expectedPartnerType &&
+          (!isEditingExisting ||
+            f.key !== originalKey ||
+            f.type !== currentType)
+      );
+
+      hasMatchingPartner = !hasAnyLoop || hasPartner;
+    } else {
+      isDuplicate = allFields.some(
+        (f) => f.key === raw && (!isEditingExisting || f.key !== originalKey)
+      );
+    }
+
+    dom.key.classList.toggle("input-error", isDuplicate);
+
+    if (confirmBtn) {
+      confirmBtn.disabled =
+        raw.length === 0 || isDuplicate || !hasMatchingPartner;
+    }
   }
 
   function getField() {
@@ -320,10 +367,10 @@ export function createEmptyField() {
 let cachedFieldEditModal = null;
 let cachedFieldEditSetup = null;
 
-export function showFieldEditorModal(field, allKeys = []) {
+export function showFieldEditorModal(field, allFields = [], onConfirm) {
   if (!cachedFieldEditSetup) {
     cachedFieldEditSetup = setupFieldEditModal((confirmedField) => {
-      // Confirm wordt nooit vanuit hier gebruikt — oké.
+      onConfirm?.(confirmedField);
     });
     cachedFieldEditModal = cachedFieldEditSetup.modal;
   }
@@ -334,7 +381,7 @@ export function showFieldEditorModal(field, allKeys = []) {
     return;
   }
 
-  const editor = setupFieldEditor(container, null, allKeys);
+  const editor = setupFieldEditor(container, null, allFields);
   editor.setField(field);
 
   cachedFieldEditModal.show(); // laat intern type styling toepassen via setup!

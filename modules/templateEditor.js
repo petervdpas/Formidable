@@ -214,10 +214,14 @@ export function initTemplateEditor(containerId, onSaveCallback) {
   }
 
   function openEditModal(field) {
-    const allKeys = currentData.fields
-      .map((f) => f.key)
-      .filter((k) => k != null);
-    showFieldEditorModal(field, allKeys);
+    showFieldEditorModal(field, currentData.fields, (confirmedField) => {
+      if (currentEditIndex != null) {
+        currentData.fields[currentEditIndex] = confirmedField;
+      } else {
+        currentData.fields.push(confirmedField);
+      }
+      renderFieldListWrapper();
+    });
   }
 
   return { render: renderEditor };

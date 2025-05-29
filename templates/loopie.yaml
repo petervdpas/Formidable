@@ -69,9 +69,6 @@ fields:
     label: Title
     type: text
     description: A title
-  - key: looper-on
-    label: Looper On
-    type: loopstart
   - key: sub_title
     label: Sub Title
     type: text
@@ -80,6 +77,9 @@ fields:
     label: Description
     type: textarea
     description: A Description
-  - key: looper-off
-    label: Looper Off
+  - key: looper
+    label: Looper
+    type: loopstart
+  - key: looper
+    label: Looper
     type: loopstop
