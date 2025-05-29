@@ -20,6 +20,10 @@
   --toast-fg-warn: #000;
 
   --popup-option-height: 40px;
+
+  --close-button-color: #888;
+  --close-hover-color: #000;
+  --close-hover-bg: rgba(0, 0, 0, 0.05);
 }
 
 .editor-wrapper.fullscreen {

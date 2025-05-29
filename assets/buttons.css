@@ -64,7 +64,7 @@ button,
   border: none;
   font-size: 1.2em;
   line-height: 1;
-  color: var(--input-border-color); /* dynamic color for both themes */
+  color: var(--close-button-color);
   padding: 2px 6px;
   margin-left: auto;
   cursor: pointer;
@@ -73,8 +73,8 @@ button,
 
 .btn-close:hover,
 .btn-close:focus {
-  color: #000;
-  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--close-hover-color);
+  background-color: var(--close-hover-bg);
   outline: none;
 }
 

@@ -8,6 +8,11 @@ import { applyModalCssClass } from "../utils/modalUtils.js";
 import { extractFieldDefinition } from "../utils/formUtils.js";
 import { createDropdown } from "./dropdownManager.js";
 import { syncScroll } from "../utils/domUtils.js";
+import {
+  createModalConfirmButton,
+  createModalCancelButton,
+  buildButtonGroup,
+} from "./uiButtons.js";
 
 export function setupSettingsModal() {
   return setupModal("settings-modal", {
@@ -113,21 +118,33 @@ export function setupFieldEditModal(onConfirm) {
     },
   });
 
-  const confirmBtn = document.getElementById("field-edit-confirm");
-  confirmBtn.onclick = () => {
-    try {
-      const field = extractFieldDefinition({ typeDropdown });
-      onConfirm(field);
-      modal.hide();
-    } catch (err) {
-      const optField = document.getElementById("edit-options");
-      if (optField) {
-        optField.style.border = "1px solid red";
-        optField.title = "Invalid JSON: " + err.message;
+  const confirmBtn = createModalConfirmButton({
+    id: "field-edit-confirm",
+    text: "Confirm",
+    onClick: () => {
+      try {
+        const field = extractFieldDefinition({ typeDropdown });
+        onConfirm(field);
+        modal.hide();
+      } catch (err) {
+        const optField = document.getElementById("edit-options");
+        if (optField) {
+          optField.style.border = "1px solid red";
+          optField.title = "Invalid JSON: " + err.message;
+        }
+        EventBus.emit("logging:warning", [
+          "Invalid JSON in Options field",
+          err,
+        ]);
       }
-      EventBus.emit("logging:warning", ["Invalid JSON in Options field", err]);
-    }
-  };
+    },
+  });
+
+  const wrapper = document.getElementById("field-edit-buttons-wrapper");
+  if (wrapper) {
+    wrapper.innerHTML = ""; // clean slate
+    wrapper.appendChild(buildButtonGroup(confirmBtn));
+  }
 
   return {
     modal,
@@ -148,24 +165,29 @@ export function showConfirmModal(message, { ...options } = {}) {
   });
 
   const messageEl = document.getElementById("confirm-message");
-  const okBtn = document.getElementById("confirm-ok");
-  const cancelBtn = document.getElementById("confirm-cancel");
+  const buttonWrapper = document.getElementById("confirm-buttons-wrapper");
 
   messageEl.textContent = message;
-  okBtn.textContent = options.okText || "OK";
-  cancelBtn.textContent = options.cancelText || "Cancel";
 
   return new Promise((resolve) => {
-    okBtn.onclick = () => {
-      modal.hide();
-      resolve(true);
-    };
+    const okBtn = createModalConfirmButton({
+      text: options.okText || "OK",
+      onClick: () => {
+        modal.hide();
+        resolve(true);
+      },
+    });
 
-    cancelBtn.onclick = () => {
-      modal.hide();
-      resolve(false);
-    };
+    const cancelBtn = createModalCancelButton({
+      text: options.cancelText || "Cancel",
+      onClick: () => {
+        modal.hide();
+        resolve(false);
+      },
+    });
 
+    buttonWrapper.innerHTML = "";
+    buttonWrapper.appendChild(buildButtonGroup(okBtn, cancelBtn));
     modal.show();
   });
 }

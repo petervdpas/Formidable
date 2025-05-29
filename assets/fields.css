@@ -309,6 +309,52 @@
   color: black;
 }
 
+/* ───── Per-Type Close Button Overrides ───── */
+
+#field-edit-modal.modal-loopstart .btn-close,
+#field-edit-modal.modal-loopstop .btn-close {
+  color: #333;
+}
+#field-edit-modal.modal-text .btn-close {
+  color: #ccc;
+}
+#field-edit-modal.modal-boolean .btn-close {
+  color: #ccc;
+}
+#field-edit-modal.modal-dropdown .btn-close {
+  color: #ccc;
+}
+#field-edit-modal.modal-multioption .btn-close {
+  color: #ccc;
+}
+#field-edit-modal.modal-radio .btn-close {
+  color: #ccc;
+}
+#field-edit-modal.modal-textarea .btn-close {
+  color: #ccc;
+}
+#field-edit-modal.modal-number .btn-close {
+  color: #ccc;
+}
+#field-edit-modal.modal-date .btn-close {
+  color: #ccc;
+}
+#field-edit-modal.modal-list .btn-close {
+  color: #ccc;
+}
+#field-edit-modal.modal-table .btn-close {
+  color: #000;
+}
+#field-edit-modal.modal-image .btn-close {
+  color: #000;
+}
+
+/* Optional hover enhancement for all: */
+#field-edit-modal[class*="modal-"] .btn-close:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+  color: #000;
+}
+
 /* ───── Dynamic Table ───── */
 .dynamic-table {
   width: 100%;
