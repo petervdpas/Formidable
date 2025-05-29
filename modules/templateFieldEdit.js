@@ -1,5 +1,6 @@
 // modules/templateFieldEdit.js
 
+import { setupFieldEditModal } from "./modalSetup.js";
 import { applyModalTypeClass } from "../utils/domUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 import { applyFieldAttributeDisabling } from "../utils/formUtils.js";
@@ -316,12 +317,27 @@ export function createEmptyField() {
   return { key: "", type: "text", label: "" };
 }
 
+let cachedFieldEditModal = null;
+let cachedFieldEditSetup = null;
+
 export function showFieldEditorModal(field, allKeys = []) {
-  const modal = document.getElementById("field-edit-modal");
-  const body = modal.querySelector(".modal-body");
-  const editor = setupFieldEditor(body, null, allKeys);
+  if (!cachedFieldEditSetup) {
+    cachedFieldEditSetup = setupFieldEditModal((confirmedField) => {
+      // Confirm wordt nooit vanuit hier gebruikt — oké.
+    });
+    cachedFieldEditModal = cachedFieldEditSetup.modal;
+  }
+
+  const container = document.querySelector("#field-edit-modal .modal-body");
+  if (!container) {
+    EventBus.emit("logging:error", ["Modal body not found"]);
+    return;
+  }
+
+  const editor = setupFieldEditor(container, null, allKeys);
   editor.setField(field);
-  modal.classList.add("show");
+
+  cachedFieldEditModal.show(); // laat intern type styling toepassen via setup!
 }
 
 export function renderFieldList(

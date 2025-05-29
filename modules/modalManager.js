@@ -29,13 +29,17 @@ export function setupModal(
   // Dynamisch vervangen van hardcoded close buttons
   if (typeof closeBtn === "string") {
     const header = modal?.querySelector(".modal-header");
+
+    // 🔥 Verwijder oude/sluitknoppen voordat je een nieuwe toevoegt
+    header?.querySelectorAll(".btn-close")?.forEach((el) => el.remove());
+
     const newBtn = createModalCloseButton({
       id: closeBtn,
       onClick: () => hide(),
     });
 
     if (header) header.appendChild(newBtn);
-    close = newBtn; // update close reference
+    close = newBtn;
   }
 
   if (!modal.classList.contains("large")) {

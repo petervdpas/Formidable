@@ -1,0 +1,85 @@
+name: loopie
+storage_location: ./storage/loopie
+markdown_template: |-
+  <!-- AUTO-GENERATED TEMPLATE - Only if Editor is empty! -->
+  ### Title
+
+  _{{fieldDescription "title"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "title")}}
+  ```
+
+  {{field "title"}}
+
+  ---
+
+  ### Looper On
+
+  _{{fieldDescription "looper-on"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "looper-on")}}
+  ```
+
+  {{field "looper-on"}}
+
+  ---
+
+  ### Sub Title
+
+  _{{fieldDescription "sub_title"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "sub_title")}}
+  ```
+
+  {{field "sub_title"}}
+
+  ---
+
+  ### Description
+
+  _{{fieldDescription "description"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "description")}}
+  ```
+
+  {{field "description"}}
+
+  ---
+
+  ### Looper Off
+
+  _{{fieldDescription "looper-off"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "looper-off")}}
+  ```
+
+  {{field "looper-off"}}
+fields:
+  - key: title
+    label: Title
+    type: text
+    description: A title
+  - key: looper-on
+    label: Looper On
+    type: loopstart
+  - key: sub_title
+    label: Sub Title
+    type: text
+    description: A Sub Title
+  - key: description
+    label: Description
+    type: textarea
+    description: A Description
+  - key: looper-off
+    label: Looper Off
+    type: loopstop
