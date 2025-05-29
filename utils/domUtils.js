@@ -57,21 +57,26 @@ export function highlightAndClickMatch(
 
 export function focusFirstInput(
   container,
-  selector = "input, select, textarea"
+  selector = "input, select, textarea",
+  retries = 5
 ) {
-  setTimeout(() => {
-    const firstInput = container.querySelector(selector);
-    if (firstInput) {
-      firstInput.focus();
+  function tryFocus(attempt) {
+    const input = container.querySelector(selector);
+    if (input) {
+      input.focus();
       EventBus.emit("logging:default", [
         "[focusFirstInput] Focused first input.",
       ]);
+    } else if (attempt < retries) {
+      requestAnimationFrame(() => tryFocus(attempt + 1));
     } else {
       EventBus.emit("logging:warning", [
-        "[focusFirstInput] No input to focus.",
+        "[focusFirstInput] No input to focus after retries.",
       ]);
     }
-  }, 0); // 🔁 defer until after DOM update
+  }
+
+  tryFocus(0);
 }
 
 export function applyModalTypeClass(modal, typeKey, fieldTypes) {

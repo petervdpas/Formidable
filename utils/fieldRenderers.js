@@ -13,6 +13,54 @@ function resolveOption(opt) {
 }
 
 // ─────────────────────────────────────────────
+// Type: loopstart
+export function renderLoopstartField(field) {
+  const container = document.createElement("div");
+  container.className = "loop-marker loop-start";
+  container.textContent = field.label || "Loop Start";
+
+  const hidden = document.createElement("input");
+  hidden.type = "hidden";
+  hidden.name = field.key;
+  hidden.value = "__loop_start__"; // of leeg
+
+  const wrapper = document.createElement("div");
+  wrapper.appendChild(container);
+  wrapper.appendChild(hidden);
+
+  return wrapInputWithLabel(
+    wrapper,
+    field.label,
+    field.description,
+    field.two_column
+  );
+}
+
+// ─────────────────────────────────────────────
+// Type: loopstop
+export function renderLoopstopField(field) {
+  const container = document.createElement("div");
+  container.className = "loop-marker loop-stop";
+  container.textContent = field.label || "Loop Stop";
+
+  const hidden = document.createElement("input");
+  hidden.type = "hidden";
+  hidden.name = field.key;
+  hidden.value = "__loop_stop__"; // of leeg
+
+  const wrapper = document.createElement("div");
+  wrapper.appendChild(container);
+  wrapper.appendChild(hidden);
+
+  return wrapInputWithLabel(
+    wrapper,
+    field.label,
+    field.description,
+    field.two_column
+  );
+}
+
+// ─────────────────────────────────────────────
 // Type: text
 export function renderTextField(field) {
   const input = document.createElement("input");
@@ -339,6 +387,8 @@ export function renderTableField(field) {
   );
 }
 
+// ─────────────────────────────────────────────
+// Type: image
 export function renderImageField(field, template) {
   const wrapper = document.createElement("div");
   wrapper.dataset.imageField = field.key;
@@ -375,5 +425,9 @@ export function renderImageField(field, template) {
 
   wrapper.appendChild(input);
   wrapper.appendChild(preview);
-  return wrapInputWithLabel(wrapper, field.label || "Image Upload", field.description);
+  return wrapInputWithLabel(
+    wrapper,
+    field.label || "Image Upload",
+    field.description
+  );
 }
