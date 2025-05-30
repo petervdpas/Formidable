@@ -29,6 +29,12 @@
   --modal-highlight-border: #aaa;
   --modal-highlight-text: #eee;
 
+  --sortable-bg: #2a2a2a;
+  --sortable-drag-bg: #888;
+  --sortable-border-color: #666;
+  --sortable-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  --sortable-hover-shadow: 0 0 12px rgba(0, 0, 0, 0.7);
+
   --loop-border-color: #444;
   --loop-bg: #1c1c1c;
   --loop-bg-secondary: #2a2a2a;

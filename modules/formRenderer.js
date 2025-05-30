@@ -65,6 +65,28 @@ function renderFieldsWithLoops(container, fields, metaData) {
         animation: 150,
         handle: ".drag-handle",
         ghostClass: "sortable-ghost",
+        chosenClass: "sortable-chosen",
+        dragClass: "sortable-drag",
+        group: "loop-items",
+        forceFallback: true,
+        fallbackOnBody: true,
+        fallbackTolerance: 3,
+        setPlaceholderSize: true,
+        onStart: (evt) => {
+          const original = evt.item;
+
+          setTimeout(() => {
+            const drag = document.querySelector(".sortable-drag");
+            if (drag && original) {
+              const style = getComputedStyle(original);
+              drag.style.height = `${original.offsetHeight}px`;
+              drag.style.width = `${original.offsetWidth}px`;
+              drag.style.padding = style.padding;
+              drag.style.margin = style.margin;
+              drag.style.borderRadius = style.borderRadius;
+            }
+          }, 0);
+        },
       });
     } else {
       if (loopGroupKeys.has(field.key)) {
