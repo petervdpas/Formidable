@@ -46,6 +46,30 @@ const defaultRenderers = {
   },
 };
 
+function buildLoopGroups(fields) {
+  const groups = {};
+  let i = 0;
+
+  while (i < fields.length) {
+    const field = fields[i];
+    if (field.type === "loopstart") {
+      const loopKey = field.key;
+      const group = [];
+      i++;
+
+      while (i < fields.length && fields[i].type !== "loopstop") {
+        group.push(fields[i]);
+        i++;
+      }
+
+      groups[loopKey] = group;
+    }
+    i++;
+  }
+
+  return groups;
+}
+
 function registerHelpers() {
   Handlebars.registerHelper("json", (value) => {
     return new Handlebars.SafeString(JSON.stringify(value, null, 2));
@@ -154,6 +178,27 @@ function registerHelpers() {
     const field = fields.find((f) => f.key === key);
     return field?.description || "";
   });
+
+  Handlebars.registerHelper("loop", function (key, options) {
+    const ctx = options?.data?.root || this;
+    const items = ctx[key];
+
+    if (!Array.isArray(items)) return "";
+
+    const loopGroups = buildLoopGroups(ctx._fields || []);
+    const groupFields = loopGroups[key] || [];
+
+    return items
+      .map((entry) => {
+        const subContext = {
+          ...entry,
+          _fields: groupFields,
+          _template: ctx._template,
+        };
+        return options.fn(subContext);
+      })
+      .join("\n");
+  });
 }
 
 function renderMarkdown(formData, templateYaml) {
@@ -169,6 +214,8 @@ function renderMarkdown(formData, templateYaml) {
       _template: templateYaml,
     };
 
+    context._loopGroups = buildLoopGroups(context._fields);
+    
     const tmpl = Handlebars.compile(templateYaml.markdown_template);
     const output = tmpl(context);
 

@@ -2,7 +2,7 @@ name: loopie
 storage_location: ./storage/loopie
 markdown_template: |-
   <!-- AUTO-GENERATED TEMPLATE - Only if Editor is empty! -->
-  ### Title
+  ## Title
 
   _{{fieldDescription "title"}}_
 
@@ -10,24 +10,13 @@ markdown_template: |-
   [LOG]
   {{json (fieldRaw "title")}}
   ```
-
   {{field "title"}}
-
   ---
 
-  ### Looper On
 
-  _{{fieldDescription "looper-on"}}_
+  ## Loop: looper
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "looper-on")}}
-  ```
-
-  {{field "looper-on"}}
-
-  ---
-
+  {{#loop "looper"}}
   ### Sub Title
 
   _{{fieldDescription "sub_title"}}_
@@ -36,9 +25,7 @@ markdown_template: |-
   [LOG]
   {{json (fieldRaw "sub_title")}}
   ```
-
   {{field "sub_title"}}
-
   ---
 
   ### Description
@@ -49,26 +36,13 @@ markdown_template: |-
   [LOG]
   {{json (fieldRaw "description")}}
   ```
-
   {{field "description"}}
-
-  ---
-
-  ### Looper Off
-
-  _{{fieldDescription "looper-off"}}_
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "looper-off")}}
-  ```
-
-  {{field "looper-off"}}
+  {{/loop}}
 fields:
   - key: title
     label: Title
     type: text
-    description: A title
+    description: This is just a title....
   - key: looper
     label: Looper
     type: loopstart
@@ -76,12 +50,12 @@ fields:
     label: Sub Title
     type: text
     default: Wauwie
-    description: A Sub Title
+    description: This is a subtitle inside the looper....
   - key: description
     label: Description
     type: textarea
     default: Describe wauw...
-    description: A Description
+    description: This is a description inside the the looper...
   - key: looper
     label: Looper
     type: loopstop
