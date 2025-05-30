@@ -1,13 +1,17 @@
 {
-  "title": "",
+  "title": "The absolute main title!",
   "looper": [
     {
-      "sub_title": "Cool",
-      "description": "Describe cool..."
+      "sub_title": "Once upon a time...",
+      "description": "Once upon a time there was a little princess... It was a tiny princess! You could hardly see her."
     },
     {
-      "sub_title": "Wauwie",
-      "description": "Describe wauw..."
+      "sub_title": "Then came a big foot",
+      "description": "The little princess was playing in the garden. And that day it happened... The big foot! She didn't see it. Splut!"
+    },
+    {
+      "sub_title": "A splut sound is never good news",
+      "description": "You guessed it... The princess was no more!"
     }
   ]
 }
