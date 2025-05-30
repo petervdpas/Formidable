@@ -212,6 +212,24 @@ export function createModalConfirmButton({
   });
 }
 
+export function createAddLoopItemButton(onClick) {
+  return createButton({
+    text: "+ Add Loop Item",
+    className: "btn-okay add-loop-item-btn",
+    identifier: "add-loop-item",
+    onClick,
+  });
+}
+
+export function createDeleteLoopItemButton(onClick, identifier = "") {
+  return createButton({
+    text: "✕",
+    className: "btn-danger btn-close loop-item-remove",
+    identifier: identifier || "loop-item-delete",
+    onClick,
+  });
+}
+
 export function disableButton(btn, state = true) {
   if (btn instanceof HTMLElement) {
     btn.disabled = state;

@@ -12,6 +12,8 @@ import {
   createFormSaveButton,
   createFormDeleteButton,
   createFormRenderButton,
+  createAddLoopItemButton,
+  createDeleteLoopItemButton,
   buildButtonGroup,
 } from "./uiButtons.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
@@ -43,12 +45,10 @@ function renderFieldsWithLoops(container, fields, metaData) {
         loopContainer.appendChild(itemWrapper);
       });
 
-      const addButton = document.createElement("button");
-      addButton.textContent = "+ Add Item";
-      addButton.onclick = () => {
+      const addButton = createAddLoopItemButton(() => {
         const newItem = createLoopItem(group, {});
         loopContainer.insertBefore(newItem, addButton);
-      };
+      });
 
       loopContainer.appendChild(addButton);
       container.appendChild(loopContainer);
@@ -69,11 +69,13 @@ function createLoopItem(groupFields, dataEntry = {}) {
   const itemWrapper = document.createElement("div");
   itemWrapper.className = "loop-item";
 
+  const removeBtn = createDeleteLoopItemButton(() => itemWrapper.remove());
+  itemWrapper.appendChild(removeBtn);
+
   groupFields.forEach((loopField) => {
     const fieldCopy = { ...loopField };
     const fieldKey = fieldCopy.key;
 
-    // Vul alleen aan als de key ontbreekt — géén default overschrijven!
     if (!Object.prototype.hasOwnProperty.call(dataEntry, fieldKey)) {
       const defFn = fieldTypes[fieldCopy.type]?.defaultValue;
       dataEntry[fieldKey] = fieldCopy.hasOwnProperty("default")
@@ -83,18 +85,11 @@ function createLoopItem(groupFields, dataEntry = {}) {
         : undefined;
     }
 
-    // Pas volledige entry toe (met expliciete en fallback waarden)
     const row = renderFieldElement(fieldCopy, {
       [fieldKey]: dataEntry[fieldKey],
     });
     if (row) itemWrapper.appendChild(row);
   });
-
-  const removeBtn = document.createElement("button");
-  removeBtn.textContent = "−";
-  removeBtn.className = "remove-btn";
-  removeBtn.onclick = () => itemWrapper.remove();
-  itemWrapper.appendChild(removeBtn);
 
   return itemWrapper;
 }
