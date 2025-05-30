@@ -146,7 +146,7 @@ export function applyGenericField(input, key, value) {
     return;
   }
 
-  // 🩹 Handle radio groups
+  // 🩹 Radio group (wrapped in field container)
   if (input.dataset?.radioGroup === key) {
     const radios = input.querySelectorAll(`input[type="radio"]`);
     radios.forEach((el) => {
@@ -155,13 +155,20 @@ export function applyGenericField(input, key, value) {
     return;
   }
 
+  // Checkbox
   if (input.type === "checkbox") {
     input.checked = value === true;
-  } else if ("value" in input) {
-    input.value = value ?? "";
-  } else {
-    EventBus.emit("logging:warning", [
-      `[applyGenericField] Unsupported input for key "${key}".`,
-    ]);
+    return;
   }
+
+  // Text, number, select, etc.
+  if ("value" in input) {
+    // Handle undefined/null safely: if null/undefined, leave default as-is
+    input.value = value != null ? String(value) : "";
+    return;
+  }
+
+  EventBus.emit("logging:warning", [
+    `[applyGenericField] Unsupported input element for key "${key}".`,
+  ]);
 }

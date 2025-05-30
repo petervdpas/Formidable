@@ -1,24 +1,23 @@
 {
-  "test": "A more distinct value",
+  "test": "Default value",
   "check": true,
-  "dropdown": "R",
+  "dropdown": "L",
   "multichoice": [
-    "B",
-    "C"
+    "B"
   ],
-  "radio": "DOG",
+  "radio": "BIRD",
   "mline": "A whole lot of prefab text...",
   "numpy": 17,
   "bday": "1968-12-23",
   "listy": [
-    "Talk is cheap"
+    "fghh"
   ],
   "datable": [
     [
-      "bli",
-      "blue",
-      "bla"
+      "fgh",
+      "gfh",
+      "fgh"
     ]
   ],
-  "design": "formidable.png"
+  "design": ""
 }

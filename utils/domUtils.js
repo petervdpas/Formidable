@@ -98,51 +98,81 @@ export function applyModalTypeClass(modal, typeKey, fieldTypes) {
   }
 }
 
+function applyValueToField(container, field, value, template) {
+  const key = field.key;
+
+  if (container.querySelector(`[data-multioption-field="${key}"]`)) {
+    applyMultioptionField(container, key, value);
+    return;
+  }
+
+  if (container.querySelector(`[data-list-field="${key}"]`)) {
+    applyListField(container, field, value);
+    return;
+  }
+
+  if (container.querySelector(`[data-table-field="${key}"]`)) {
+    applyTableField(container, key, value);
+    return;
+  }
+
+  if (container.querySelector(`[data-image-field="${key}"]`)) {
+    applyImageField(container, key, value, template);
+    return;
+  }
+
+  const radioGroup = container.querySelector(`[data-radio-group="${key}"]`);
+  if (radioGroup) {
+    const radios = radioGroup.querySelectorAll(`input[type="radio"]`);
+    radios.forEach((radio) => {
+      radio.checked = String(radio.value) === String(value);
+    });
+    return;
+  }
+
+  const input = container.querySelector(`[name="${key}"]`);
+  if (input?.type === "file") return;
+
+  applyGenericField(input, key, value);
+}
+
 export function applyFieldValues(container, template, data = {}) {
   if (!container || typeof container.querySelector !== "function") return;
   const fields = template?.fields || [];
 
-  fields.forEach((field) => {
+  let i = 0;
+  while (i < fields.length) {
+    const field = fields[i];
     const key = field.key;
     const value = data[key];
 
-    if (container.querySelector(`[data-multioption-field="${key}"]`)) {
-      applyMultioptionField(container, key, value);
-      return;
-    }
+    if (field.type === "loopstart") {
+      const loopKey = field.key;
+      const { group, stopIdx } = collectLoopGroup(fields, i + 1, loopKey);
+      i = stopIdx + 1;
 
-    if (container.querySelector(`[data-list-field="${key}"]`)) {
-      applyListField(container, field, value);
-      return;
-    }
+      const loopItems = container.querySelectorAll(
+        `.loop-container[data-loop-key="${loopKey}"] .loop-item`
+      );
 
-    if (container.querySelector(`[data-table-field="${key}"]`)) {
-      applyTableField(container, key, value);
-      return;
-    }
+      (data[loopKey] || []).forEach((entry, index) => {
+        const item = loopItems[index];
+        if (!item) return;
 
-    if (container.querySelector(`[data-image-field="${key}"]`)) {
-      applyImageField(container, key, value, template);
-      return;
-    }
-
-    const radioGroup = container.querySelector(`[data-radio-group="${key}"]`);
-    if (radioGroup) {
-      const radios = radioGroup.querySelectorAll(`input[type="radio"]`);
-      radios.forEach((radio) => {
-        radio.checked = String(radio.value) === String(value);
+        group.forEach((f) => {
+          applyValueToField(item, f, entry[f.key], template);
+        });
       });
-      return;
+
+      continue;
     }
 
-    const input = container.querySelector(`[name="${key}"]`);
-    if (input?.type === "file") return;
-
-    applyGenericField(input, key, value);
-  });
+    applyValueToField(container, field, value, template);
+    i++;
+  }
 
   EventBus.emit("logging:default", [
-    "[applyFieldValues] Applied field values.",
+    "[applyFieldValues] Applied field values including loop fields.",
   ]);
 }
 

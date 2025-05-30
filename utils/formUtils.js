@@ -48,37 +48,6 @@ export function extractFieldDefinition({
   return field;
 }
 
-export async function getFormData(container, template) {
-  const data = {};
-  const fields = template.fields || [];
-
-  for (const field of fields) {
-    const typeDef = fieldTypes[field.type];
-    if (!typeDef || typeof typeDef.parseValue !== "function") {
-      EventBus.emit("logging:warning", [
-        `[getFormData] No parser for field type: ${field.type}`,
-      ]);
-      continue;
-    }
-
-    const el = resolveFieldElement(container, field);
-    if (!el) {
-      EventBus.emit("logging:warning", [
-        `[getFormData] Missing input for: ${field.key}`,
-      ]);
-      continue;
-    }
-
-    data[field.key] = await typeDef.parseValue(el, template);
-  }
-
-  EventBus.emit("logging:default", [
-    "[getFormData] Collected form data:",
-    data,
-  ]);
-  return data;
-}
-
 function resolveFieldElement(container, field) {
   switch (field.type) {
     case "radio":
@@ -96,20 +65,169 @@ function resolveFieldElement(container, field) {
   }
 }
 
-export function injectFieldDefaults(fields, metaData) {
-  fields.forEach((field) => {
-    const key = field.key;
-    const type = field.type;
-    const defFn = fieldTypes[type]?.defaultValue;
+export function collectLoopGroup(fields, startIdx, loopKey) {
+  const group = [];
+  let i = startIdx;
+  while (
+    i < fields.length &&
+    !(fields[i].type === "loopstop" && fields[i].key === loopKey)
+  ) {
+    group.push(fields[i]);
+    i++;
+  }
+  return { group, stopIdx: i };
+}
 
-    if (!(key in metaData)) {
-      metaData[key] = field.hasOwnProperty("default")
-        ? field.default
-        : typeof defFn === "function"
-        ? defFn()
-        : undefined;
+export async function getFormData(container, template) {
+  const data = {};
+  const fields = template.fields || [];
+  const loopGroupKeys = new Set();
+
+  let i = 0;
+  while (i < fields.length) {
+    const field = fields[i];
+
+    if (field.type === "loopstart") {
+      const loopKey = field.key;
+      const { group, stopIdx } = collectLoopGroup(fields, i + 1, loopKey);
+      group.forEach((f) => loopGroupKeys.add(f.key));
+      i = stopIdx + 1;
+
+      const loopItems = container.querySelectorAll(
+        `.loop-container[data-loop-key="${loopKey}"] .loop-item`
+      );
+
+      const loopValues = [];
+      for (const item of loopItems) {
+        const entry = {};
+        for (const f of group) {
+          const def = fieldTypes[f.type];
+          if (!def || typeof def.parseValue !== "function") continue;
+
+          const el = resolveFieldElement(item, f);
+          if (!el) continue;
+
+          entry[f.key] = await def.parseValue(el, template);
+        }
+        loopValues.push(entry);
+      }
+
+      data[loopKey] = loopValues;
+    } else {
+      if (loopGroupKeys.has(field.key)) {
+        i++;
+        continue;
+      }
+
+      const typeDef = fieldTypes[field.type];
+      if (!typeDef || typeof typeDef.parseValue !== "function") {
+        EventBus.emit("logging:warning", [
+          `[getFormData] No parser for field type: ${field.type}`,
+        ]);
+        i++;
+        continue;
+      }
+
+      const el = resolveFieldElement(container, field);
+      if (!el) {
+        EventBus.emit("logging:warning", [
+          `[getFormData] Missing input for: ${field.key}`,
+        ]);
+        i++;
+        continue;
+      }
+
+      data[field.key] = await typeDef.parseValue(el, template);
+      i++;
     }
+  }
+
+  loopGroupKeys.forEach((key) => {
+    if (key in data) delete data[key];
   });
+
+  EventBus.emit("logging:default", [
+    "[getFormData] Collected form data:",
+    data,
+  ]);
+  return data;
+}
+
+export function createLoopDefaults(group) {
+  const entry = {};
+  for (const f of group) {
+    const defFn = fieldTypes[f.type]?.defaultValue;
+    entry[f.key] = f.hasOwnProperty("default")
+      ? f.default
+      : typeof defFn === "function"
+      ? defFn()
+      : undefined;
+  }
+  return entry;
+}
+
+export function injectFieldDefaults(fields, metaData) {
+  let i = 0;
+
+  while (i < fields.length) {
+    const field = fields[i];
+
+    if (field.type === "loopstart") {
+      const loopKey = field.key;
+      const { group, stopIdx } = collectLoopGroup(fields, i + 1, loopKey);
+      i = stopIdx + 1;
+
+      if (!Array.isArray(metaData[loopKey])) {
+        metaData[loopKey] = [createLoopDefaults(group)];
+      }
+
+      metaData[loopKey].forEach((entry) => {
+        group.forEach((f) => {
+          const key = f.key;
+          const defFn = fieldTypes[f.type]?.defaultValue;
+          if (!(key in entry)) {
+            entry[key] = f.hasOwnProperty("default")
+              ? f.default
+              : typeof defFn === "function"
+              ? defFn()
+              : undefined;
+          }
+        });
+      });
+
+      group.forEach((f) => delete metaData[f.key]);
+    } else {
+      const key = field.key;
+      const defFn = fieldTypes[field.type]?.defaultValue;
+
+      if (!(key in metaData)) {
+        metaData[key] = field.hasOwnProperty("default")
+          ? field.default
+          : typeof defFn === "function"
+          ? defFn()
+          : undefined;
+      }
+
+      i++;
+    }
+  }
+
+  // Final scrub: ensure all loop child keys are removed from root metadata
+  for (const field of fields) {
+    if (field.type === "loopstart") {
+      const loopKey = field.key;
+      const { group } = collectLoopGroup(
+        fields,
+        fields.indexOf(field) + 1,
+        loopKey
+      );
+      group.forEach((f) => {
+        if (metaData.hasOwnProperty(f.key)) {
+          delete metaData[f.key];
+        }
+      });
+    }
+  }
 }
 
 export function applyFieldAttributeDisabling(dom, fieldTypeKey) {
@@ -120,9 +238,11 @@ export function applyFieldAttributeDisabling(dom, fieldTypeKey) {
     if (!el) return;
 
     // Handle custom row overrides like `twoColumnRow`
-    const container = el.classList.contains("modal-form-row") || el.classList.contains("switch-row")
-      ? el
-      : el.closest(".modal-form-row") || el.closest(".switch-row");
+    const container =
+      el.classList.contains("modal-form-row") ||
+      el.classList.contains("switch-row")
+        ? el
+        : el.closest(".modal-form-row") || el.closest(".switch-row");
 
     if (disabled.has(key)) {
       if (container) container.style.display = "none";

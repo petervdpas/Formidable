@@ -69,17 +69,19 @@ fields:
     label: Title
     type: text
     description: A title
+  - key: looper
+    label: Looper
+    type: loopstart
   - key: sub_title
     label: Sub Title
     type: text
+    default: Wauwie
     description: A Sub Title
   - key: description
     label: Description
     type: textarea
+    default: Describe wauw...
     description: A Description
-  - key: looper
-    label: Looper
-    type: loopstart
   - key: looper
     label: Looper
     type: loopstop
