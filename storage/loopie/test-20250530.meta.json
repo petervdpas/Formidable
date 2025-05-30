@@ -2,12 +2,12 @@
   "title": "Main",
   "looper": [
     {
-      "sub_title": "Cool",
-      "description": "Describe cool..."
-    },
-    {
       "sub_title": "Wauwie",
       "description": "Describe wauw..."
+    },
+    {
+      "sub_title": "Cool",
+      "description": "Describe cool..."
     }
   ]
 }

@@ -40,19 +40,32 @@ function renderFieldsWithLoops(container, fields, metaData) {
       loopContainer.className = "loop-container";
       loopContainer.dataset.loopKey = loopKey;
 
+      // ─── Loop List (for Sortable) ─────
+      const loopList = document.createElement("div");
+      loopList.className = "loop-list";
       loopData.forEach((entry) => {
         const complete = { ...createLoopDefaults(group), ...entry };
         const itemWrapper = createLoopItem(group, complete);
-        loopContainer.appendChild(itemWrapper);
+        loopList.appendChild(itemWrapper);
       });
 
+      loopContainer.appendChild(loopList);
+
+      // ─── Add Button ─────
       const addButton = createAddLoopItemButton(() => {
         const newItem = createLoopItem(group, {});
-        loopContainer.insertBefore(newItem, addButton);
+        loopList.appendChild(newItem);
       });
 
       loopContainer.appendChild(addButton);
       container.appendChild(loopContainer);
+
+      // ─── Enable Sortable ─────
+      Sortable.create(loopList, {
+        animation: 150,
+        handle: ".drag-handle",
+        ghostClass: "sortable-ghost",
+      });
     } else {
       if (loopGroupKeys.has(field.key)) {
         i++;
@@ -70,6 +83,12 @@ function createLoopItem(groupFields, dataEntry = {}) {
   const itemWrapper = document.createElement("div");
   itemWrapper.className = "loop-item";
 
+  // ─── Drag Handle ─────
+  const dragHandle = document.createElement("div");
+  dragHandle.className = "drag-handle";
+  itemWrapper.appendChild(dragHandle);
+
+  // ─── Remove Button ─────
   const firstField = groupFields[0];
   const firstKey = firstField?.key || "(unknown)";
   const label = firstField?.label || firstKey;
@@ -91,6 +110,7 @@ function createLoopItem(groupFields, dataEntry = {}) {
 
   itemWrapper.appendChild(removeBtn);
 
+  // ─── Fields ─────
   groupFields.forEach((loopField) => {
     const fieldCopy = { ...loopField };
     const fieldKey = fieldCopy.key;
