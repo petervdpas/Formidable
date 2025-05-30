@@ -78,7 +78,7 @@ function createLoopItem(groupFields, dataEntry = {}) {
     const value = dataEntry[firstKey] || "(empty)";
     const confirmed = await showConfirmModal(
       `<div>Are you sure you want to remove this loop item?</div>
-     <div class="modal-message-highlight"><strong>${label}</strong>: <em>${value}</em></div>`,
+       <div class="modal-message-highlight"><strong>${label}</strong>: <em>${value}</em></div>`,
       {
         okText: "Delete",
         cancelText: "Cancel",

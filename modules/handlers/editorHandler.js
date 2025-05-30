@@ -46,8 +46,9 @@ export async function handleDeleteTemplate(container) {
     return;
   }
 
-  const confirmed = await window.showConfirmModal?.(
-    `Are you sure you want to delete template: ${template}?`,
+  const confirmed = await showConfirmModal(
+    `<div>Are you sure you want to delete this template?</div>
+     <div class="modal-message-highlight"><em>${template}</em></div>`,
     {
       okText: "Delete",
       cancelText: "Cancel",
