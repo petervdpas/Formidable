@@ -84,6 +84,9 @@ function renderFieldsWithLoops(container, fields, metaData) {
               drag.style.padding = style.padding;
               drag.style.margin = style.margin;
               drag.style.borderRadius = style.borderRadius;
+              // force desired appearance
+              drag.style.opacity = "0.95";
+              drag.style.background = "var(--sortable-drag-bg, #ffe082)";
             }
           }, 0);
         },
