@@ -1,23 +1,23 @@
 {
-  "test": "Default value",
+  "test": "A Lad in Sane",
   "check": true,
   "dropdown": "L",
   "multichoice": [
-    "B"
+    "A"
   ],
-  "radio": "BIRD",
+  "radio": "CAT",
   "mline": "A whole lot of prefab text...",
   "numpy": 17,
   "bday": "1968-12-23",
   "listy": [
-    "fghh"
+    "One"
   ],
   "datable": [
     [
-      "fgh",
-      "gfh",
-      "fgh"
+      "1",
+      "2",
+      "3"
     ]
   ],
-  "design": ""
+  "design": "formidable.png"
 }

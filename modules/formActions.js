@@ -52,19 +52,17 @@ export async function saveForm(container, template) {
       EventBus.emit("form:list:highlighted", datafile);
     }, 500);
 
-    // 🔁 Reload just-saved clean metadata
     const newMeta = await window.api.forms.loadForm(
       storageLocation,
       datafile,
       template.fields || []
     );
 
-    // 🔄 Re-render form with clean metadata
     const { renderFormUI } = await import("./formRenderer.js");
     renderFormUI(
       container,
       template,
-      { ...newMeta, _filename: datafile },
+      Object.assign(newMeta, { _filename: datafile }),
       () => saveForm(container, template),
       (filename) => deleteForm(container, template, filename),
       () => renderFormPreview(container, template)

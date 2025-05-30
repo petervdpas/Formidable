@@ -81,7 +81,6 @@ export function collectLoopGroup(fields, startIdx, loopKey) {
 export async function getFormData(container, template) {
   const data = {};
   const fields = template.fields || [];
-  const loopGroupKeys = new Set();
 
   let i = 0;
   while (i < fields.length) {
@@ -90,7 +89,6 @@ export async function getFormData(container, template) {
     if (field.type === "loopstart") {
       const loopKey = field.key;
       const { group, stopIdx } = collectLoopGroup(fields, i + 1, loopKey);
-      group.forEach((f) => loopGroupKeys.add(f.key));
       i = stopIdx + 1;
 
       const loopItems = container.querySelectorAll(
@@ -114,11 +112,6 @@ export async function getFormData(container, template) {
 
       data[loopKey] = loopValues;
     } else {
-      if (loopGroupKeys.has(field.key)) {
-        i++;
-        continue;
-      }
-
       const typeDef = fieldTypes[field.type];
       if (!typeDef || typeof typeDef.parseValue !== "function") {
         EventBus.emit("logging:warning", [
@@ -141,10 +134,6 @@ export async function getFormData(container, template) {
       i++;
     }
   }
-
-  loopGroupKeys.forEach((key) => {
-    if (key in data) delete data[key];
-  });
 
   EventBus.emit("logging:default", [
     "[getFormData] Collected form data:",
@@ -209,23 +198,6 @@ export function injectFieldDefaults(fields, metaData) {
       }
 
       i++;
-    }
-  }
-
-  // Final scrub: ensure all loop child keys are removed from root metadata
-  for (const field of fields) {
-    if (field.type === "loopstart") {
-      const loopKey = field.key;
-      const { group } = collectLoopGroup(
-        fields,
-        fields.indexOf(field) + 1,
-        loopKey
-      );
-      group.forEach((f) => {
-        if (metaData.hasOwnProperty(f.key)) {
-          delete metaData[f.key];
-        }
-      });
     }
   }
 }
