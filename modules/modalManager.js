@@ -26,11 +26,9 @@ export function setupModal(
 
   let close = closeBtn;
 
-  // Dynamisch vervangen van hardcoded close buttons
   if (typeof closeBtn === "string") {
     const header = modal?.querySelector(".modal-header");
 
-    // 🔥 Verwijder oude/sluitknoppen voordat je een nieuwe toevoegt
     header?.querySelectorAll(".btn-close")?.forEach((el) => el.remove());
 
     const newBtn = createModalCloseButton({

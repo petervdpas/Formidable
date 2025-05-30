@@ -3,9 +3,10 @@
   --input-border-color: #ccc;
   --input-bg: #fdfdfd;
   --input-fg: #111;
+  --input-icon-bg: #1d1d1d;
+
   --readonly-bg: #ffffe0;
   --readonly-fg: #888;
-  --input-icon-bg: #1d1d1d;
 
   --toast-bg-info: #333;
   --toast-fg-info: #fff;
@@ -19,11 +20,25 @@
   --toast-bg-warn: #ff9800;
   --toast-fg-warn: #000;
 
-  --popup-option-height: 40px;
-
   --close-button-color: #888;
   --close-hover-color: #000;
   --close-hover-bg: rgba(0, 0, 0, 0.05);
+
+  --modal-highlight-bg: #f1f3f5;
+  --modal-highlight-border: #ccc;
+  --modal-highlight-text: #333;
+
+  --loop-border-color: #ccc;
+  --loop-bg: #fff;
+  --loop-bg-secondary: #f9f9f9;
+
+  --loop-add-bg: #28a745;
+  --loop-add-bg-hover: #218838;
+  --loop-add-fg: #fff;
+
+  --loop-remove-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  --popup-option-height: 40px;
 }
 
 .editor-wrapper.fullscreen {

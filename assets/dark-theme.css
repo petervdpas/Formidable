@@ -3,11 +3,13 @@
   --input-border-color: #555;
   --input-bg: #1c1c1c;
   --input-fg: #eee;
-  --readonly-bg: #888;
-  --readonly-fg: #ffffe0;
   --input-icon-bg: #3f3f3f;
 
-  --toast-bg-info: #1e1e1e;    /* darker than #333 */
+  --readonly-bg: #888;
+  --readonly-fg: #ffffe0;
+
+  --toast-bg-info: #1e1e1e;
+  /* darker than #333 */
   --toast-fg-info: #ddd;
 
   --toast-bg-success: #2e7d32;
@@ -22,6 +24,20 @@
   --close-button-color: #ccc;
   --close-hover-color: #fff;
   --close-hover-bg: rgba(255, 255, 255, 0.1);
+
+  --modal-highlight-bg: #3b3b3b;
+  --modal-highlight-border: #aaa;
+  --modal-highlight-text: #eee;
+
+  --loop-border-color: #444;
+  --loop-bg: #1c1c1c;
+  --loop-bg-secondary: #2a2a2a;
+
+  --loop-add-bg: #28a745;
+  --loop-add-bg-hover: #1e7e34;
+  --loop-add-fg: #fff;
+
+  --loop-remove-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 .dark-mode body,

@@ -84,7 +84,8 @@ export async function deleteForm(container, template, datafile) {
   }
 
   const confirmed = await showConfirmModal(
-    `Are you sure you want to delete "${datafile}"?`,
+    `<div>Are you sure you want to delete this file?</div>
+    <div class="modal-message-highlight"><em>${datafile}</em></div>`,
     {
       okText: "Delete",
       cancelText: "Cancel",

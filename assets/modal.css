@@ -39,6 +39,16 @@
     pointer-events: auto;
 }
 
+.modal-message-highlight {
+  margin-top: 0.75em;
+  padding: 8px 12px;
+  background-color: var(--modal-highlight-bg, #f1f3f5);
+  border-left: 4px solid var(--modal-highlight-border, #ccc);
+  border-radius: 4px;
+  font-size: 0.95em;
+  color: var(--modal-highlight-text, #333);
+}
+
 /* ───── Modal Header ───── */
 .modal-header {
     display: flex;

@@ -17,6 +17,7 @@ import {
   buildButtonGroup,
 } from "./uiButtons.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
+import { showConfirmModal } from "./modalSetup.js";
 
 function renderFieldsWithLoops(container, fields, metaData) {
   const loopGroupKeys = new Set();
@@ -69,7 +70,25 @@ function createLoopItem(groupFields, dataEntry = {}) {
   const itemWrapper = document.createElement("div");
   itemWrapper.className = "loop-item";
 
-  const removeBtn = createDeleteLoopItemButton(() => itemWrapper.remove());
+  const firstField = groupFields[0];
+  const firstKey = firstField?.key || "(unknown)";
+  const label = firstField?.label || firstKey;
+
+  const removeBtn = createDeleteLoopItemButton(async () => {
+    const value = dataEntry[firstKey] || "(empty)";
+    const confirmed = await showConfirmModal(
+      `<div>Are you sure you want to remove this loop item?</div>
+     <div class="modal-message-highlight"><strong>${label}</strong>: <em>${value}</em></div>`,
+      {
+        okText: "Delete",
+        cancelText: "Cancel",
+        width: "auto",
+        height: "auto",
+      }
+    );
+    if (confirmed) itemWrapper.remove();
+  });
+
   itemWrapper.appendChild(removeBtn);
 
   groupFields.forEach((loopField) => {

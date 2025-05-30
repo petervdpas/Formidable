@@ -180,7 +180,7 @@ export function showConfirmModal(message, { ...options } = {}) {
   const messageEl = document.getElementById("confirm-message");
   const buttonWrapper = document.getElementById("confirm-buttons-wrapper");
 
-  messageEl.textContent = message;
+  messageEl.innerHTML = message;
 
   return new Promise((resolve) => {
     const okBtn = createModalConfirmButton({
