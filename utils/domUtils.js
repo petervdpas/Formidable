@@ -8,6 +8,7 @@ import {
   applyImageField,
   applyGenericField,
 } from "./fieldAppliers.js";
+import { collectLoopGroup } from "./formUtils.js";
 
 // Highlight + click match
 export function highlightAndClickMatch(
@@ -98,7 +99,7 @@ export function applyModalTypeClass(modal, typeKey, fieldTypes) {
   }
 }
 
-function applyValueToField(container, field, value, template) {
+export function applyValueToField(container, field, value, template) {
   const key = field.key;
 
   if (container.querySelector(`[data-multioption-field="${key}"]`)) {
@@ -140,6 +141,8 @@ export function applyFieldValues(container, template, data = {}) {
   if (!container || typeof container.querySelector !== "function") return;
   const fields = template?.fields || [];
 
+  const loopChildKeys = new Set(); // 🔒 verzamelt innerlijke velden
+
   let i = 0;
   while (i < fields.length) {
     const field = fields[i];
@@ -149,6 +152,7 @@ export function applyFieldValues(container, template, data = {}) {
     if (field.type === "loopstart") {
       const loopKey = field.key;
       const { group, stopIdx } = collectLoopGroup(fields, i + 1, loopKey);
+      group.forEach(f => loopChildKeys.add(f.key)); // 🧠 onthoud
       i = stopIdx + 1;
 
       const loopItems = container.querySelectorAll(
@@ -167,12 +171,18 @@ export function applyFieldValues(container, template, data = {}) {
       continue;
     }
 
+    // ⛔ skip loop child velden in root-toepassing
+    if (loopChildKeys.has(key)) {
+      i++;
+      continue;
+    }
+
     applyValueToField(container, field, value, template);
     i++;
   }
 
   EventBus.emit("logging:default", [
-    "[applyFieldValues] Applied field values including loop fields.",
+    "[applyFieldValues] Applied field values, skipping loop-child root keys.",
   ]);
 }
 

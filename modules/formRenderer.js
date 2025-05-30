@@ -65,24 +65,28 @@ function renderFieldsWithLoops(container, fields, metaData) {
   }
 }
 
-function createLoopItem(groupFields, dataEntry) {
+function createLoopItem(groupFields, dataEntry = {}) {
   const itemWrapper = document.createElement("div");
   itemWrapper.className = "loop-item";
 
   groupFields.forEach((loopField) => {
     const fieldCopy = { ...loopField };
+    const fieldKey = fieldCopy.key;
 
-    // Gebruik defaults als waarde ontbreekt
-    const defFn = fieldTypes[fieldCopy.type]?.defaultValue;
-    if (!Object.prototype.hasOwnProperty.call(dataEntry, fieldCopy.key)) {
-      dataEntry[fieldCopy.key] = fieldCopy.hasOwnProperty("default")
+    // Vul alleen aan als de key ontbreekt — géén default overschrijven!
+    if (!Object.prototype.hasOwnProperty.call(dataEntry, fieldKey)) {
+      const defFn = fieldTypes[fieldCopy.type]?.defaultValue;
+      dataEntry[fieldKey] = fieldCopy.hasOwnProperty("default")
         ? fieldCopy.default
         : typeof defFn === "function"
         ? defFn()
         : undefined;
     }
 
-    const row = renderFieldElement(fieldCopy, dataEntry); // ⬅️ gebruik volledige dataEntry
+    // Pas volledige entry toe (met expliciete en fallback waarden)
+    const row = renderFieldElement(fieldCopy, {
+      [fieldKey]: dataEntry[fieldKey],
+    });
     if (row) itemWrapper.appendChild(row);
   });
 
