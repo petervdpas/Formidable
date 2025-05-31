@@ -28,3 +28,4 @@ export async function selectLastOrFallback({
     if (onFallback) onFallback(fallback);
   }
 }
+

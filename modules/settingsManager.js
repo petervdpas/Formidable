@@ -4,6 +4,7 @@ import { EventBus } from "./eventBus.js";
 import { initTabs } from "../utils/tabUtils.js";
 import { formatAsRelativePath } from "../utils/pathUtils.js";
 import { initThemeToggle } from "./themeToggle.js";
+import { createSwitch } from "../utils/elementBuilders.js";
 
 let cachedConfig = null;
 
@@ -22,37 +23,53 @@ export async function renderSettings() {
   cachedConfig = await window.api.config.loadUserConfig();
   const config = cachedConfig;
 
-  container.innerHTML = `
-    <div class="tab-buttons">
-      <button class="tab-btn">General</button>
-      <button class="tab-btn">Directories</button>
-    </div>
-    <div class="tab-panel tab-general">
-      ${createSwitch("theme-toggle", "Dark Mode", config.theme === "dark")}
-      ${createSwitch(
-        "context-toggle",
-        "Context Mode",
-        config.context_mode === "template"
-      )}
-      ${createSwitch(
-        "logging-toggle",
-        "Enable Logging",
-        config.logging_enabled
-      )}
-    </div>
-    <div class="tab-panel tab-dirs">
-      ${createDirectoryPicker(
-        "settings-template-dir",
-        "Template Directory",
-        config.templates_location || "./templates"
-      )}
-      ${createDirectoryPicker(
-        "settings-storage-dir",
-        "Storage Directory",
-        config.storage_location || "./storage"
-      )}
-    </div>
-  `;
+  container.innerHTML = ""; // eerst leegmaken
+
+  // ─── Tabs ─────────────────────────────
+  const tabButtons = document.createElement("div");
+  tabButtons.className = "tab-buttons";
+  tabButtons.innerHTML = `
+  <button class="tab-btn">General</button>
+  <button class="tab-btn">Directories</button>`;
+
+  const tabGeneral = document.createElement("div");
+  tabGeneral.className = "tab-panel tab-general";
+
+  tabGeneral.appendChild(
+    createSwitch("theme-toggle", "Dark Mode", config.theme === "dark")
+  );
+  tabGeneral.appendChild(
+    createSwitch(
+      "context-toggle",
+      "Context Mode",
+      config.context_mode === "template"
+    )
+  );
+  tabGeneral.appendChild(
+    createSwitch(
+      "logging-toggle", 
+      "Enable Logging", 
+      config.logging_enabled)
+  );
+
+  const tabDirs = document.createElement("div");
+  tabDirs.className = "tab-panel tab-dirs";
+  tabDirs.innerHTML = `
+  ${createDirectoryPicker(
+    "settings-template-dir",
+    "Template Directory",
+    config.templates_location || "./templates"
+  )}
+  ${createDirectoryPicker(
+    "settings-storage-dir",
+    "Storage Directory",
+    config.storage_location || "./storage"
+  )}`;
+
+  // ─── Inject into container ────────────
+  container.appendChild(tabButtons);
+  container.appendChild(tabGeneral);
+  container.appendChild(tabDirs);
 
   initTabs("#settings-body", ".tab-btn", ".tab-panel", {
     activeClass: "active",
@@ -63,18 +80,6 @@ export async function renderSettings() {
 
   setupBindings(config);
   return true;
-}
-
-function createSwitch(id, label, checked) {
-  return `
-    <div class="modal-form-row switch-row">
-      <label for="${id}">${label}</label>
-      <label class="switch">
-        <input type="checkbox" id="${id}" ${checked ? "checked" : ""} />
-        <span class="slider"></span>
-      </label>
-    </div>
-  `;
 }
 
 function createDirectoryPicker(id, label, value) {
@@ -123,7 +128,11 @@ function setupBindings(config) {
     };
   }
 
-  bindDirButton("settings-template-dir", "templates_location", "template:list:reload");
+  bindDirButton(
+    "settings-template-dir",
+    "templates_location",
+    "template:list:reload"
+  );
   bindDirButton("settings-storage-dir", "storage_location", "form:list:reload");
 }
 

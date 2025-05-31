@@ -2,16 +2,13 @@
 
 import { EventBus } from "./eventBus.js";
 import { bindActionHandlers } from "../utils/domUtils.js";
+import { createSwitch } from "../utils/elementBuilders.js";
 
-export function buildMenu(containerId = "app-menu", commandHandler) {
+let cachedConfig = null;
+
+export async function buildMenu(containerId = "app-menu", commandHandler) {
   const container = document.getElementById(containerId);
-
-  if (!container) {
-    EventBus.emit("logging:warning", [
-      `[Menu] No element found with ID: "${containerId}"`,
-    ]);
-    return;
-  }
+  if (!container) return;
 
   if (typeof commandHandler !== "function") {
     EventBus.emit("logging:error", [
@@ -20,67 +17,82 @@ export function buildMenu(containerId = "app-menu", commandHandler) {
     return;
   }
 
-  EventBus.emit("logging:default", [
-    `[Menu] Building menu in container: #${containerId}`,
-  ]);
+  cachedConfig = cachedConfig || (await window.api.config.loadUserConfig());
 
-  container.innerHTML = `
-    <ul class="menu-bar">
-      <li class="menu-item">File
-        <ul class="submenu">
-          <li data-action="open-template-folder">Open Template Folder</li>
-          <li data-action="open-storage-folder">Open Storage Folder</li>
-          <li class="separator"></li>
-          <li data-action="quit">Quit</li>
-        </ul>
-      </li>
-      <li class="menu-item">Config
-        <ul class="submenu">
-          <li data-action="open-settings">Settings...</li>
-        </ul>
-      </li>
-      <li class="menu-item">View
-        <ul class="submenu">
-          <li data-action="reload">Reload</li>
-          <li data-action="devtools">Toggle DevTools</li>
-        </ul>
-      </li>
-      <li class="menu-item">Help
-        <ul class="submenu">
-          <li data-action="about">About</li>
-        </ul>
-      </li>
-      <li class="menu-item" id="menu-context-toggle" style="display: flex; align-items: center; gap: 6px;">
-        <span>Context Mode:</span>
-        <label class="switch" title="Toggle Form Input Mode">
-          <input type="checkbox" id="context-toggle-menu" />
-          <span class="slider"></span>
-        </label>
-      </li>
-    </ul>
-  `;
+  const menuBar = document.createElement("ul");
+  menuBar.className = "menu-bar";
+
+  // Menu structure
+  menuBar.append(
+    createMenuGroup("File", [
+      { label: "Open Template Folder", action: "open-template-folder" },
+      { label: "Open Storage Folder", action: "open-storage-folder" },
+      "separator",
+      { label: "Quit", action: "quit" },
+    ]),
+    createMenuGroup("Config", [
+      { label: "Settings...", action: "open-settings" },
+    ]),
+    createMenuGroup("View", [
+      { label: "Reload", action: "reload" },
+      { label: "Toggle DevTools", action: "devtools" },
+    ]),
+    createMenuGroup("Help", [{ label: "About", action: "about" }]),
+    createContextToggleItem()
+  );
+
+  container.innerHTML = "";
+  container.appendChild(menuBar);
 
   bindActionHandlers(container, "[data-action]", commandHandler);
 
-  const contextToggle = container.querySelector("#context-toggle-menu");
-  if (contextToggle) {
-    contextToggle.addEventListener("change", (e) => {
-      const isChecked = e.target.checked;
-      EventBus.emit("logging:default", [
-        `[Menu] Context toggle changed: ${isChecked}`,
-      ]);
-      EventBus.emit("context:toggle", isChecked);
-    });
+  EventBus.emit("logging:default", ["[Menu] Menu setup complete."]);
+}
 
-    // Initial config sync
-    window.api.config.loadUserConfig().then((config) => {
-      const mode = config.context_mode || "template";
-      const isChecked = mode === "storage";
-      contextToggle.checked = isChecked;
-    });
+function createMenuGroup(title, items) {
+  const li = document.createElement("li");
+  li.className = "menu-item";
+  li.textContent = title;
+
+  const submenu = document.createElement("ul");
+  submenu.className = "submenu";
+
+  for (const item of items) {
+    const child = document.createElement("li");
+    if (item === "separator") {
+      child.className = "separator";
+    } else {
+      child.textContent = item.label;
+      child.dataset.action = item.action;
+    }
+    submenu.appendChild(child);
   }
 
-  EventBus.emit("logging:default", ["[Menu] Menu setup complete."]);
+  li.appendChild(submenu);
+  return li;
+}
+
+function createContextToggleItem() {
+  const li = document.createElement("li");
+  li.className = "menu-item";
+  li.id = "menu-context-toggle";
+
+  const isStorage = cachedConfig?.context_mode === "storage";
+  const toggle = createSwitch(
+    "context-toggle-menu",
+    "Context Mode:",
+    isStorage,
+    (checked) => {
+      EventBus.emit("logging:default", [
+        `[Menu] Context toggle changed: ${checked}`,
+      ]);
+      EventBus.emit("context:toggle", checked);
+    },
+    "inline"
+  );
+
+  li.appendChild(toggle);
+  return li;
 }
 
 export async function handleMenuAction(action) {

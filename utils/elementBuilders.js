@@ -118,3 +118,59 @@ export function buildReadOnlyInput(id, className, labelText, value = "") {
   if (className) input.className = className;
   return wrapInputWithLabel(input, labelText);
 }
+
+export function createSwitch(
+  id,
+  label = "",
+  checked = false,
+  onFlip = null,
+  layout = "block" // or "inline"
+) {
+  const input = document.createElement("input");
+  input.type = "checkbox";
+  input.id = id;
+  input.checked = checked;
+
+  const slider = document.createElement("span");
+  slider.className = "slider";
+
+  if (typeof onFlip === "function") {
+    input.addEventListener("change", (e) => {
+      onFlip(e.target.checked);
+    });
+  }
+
+  const switchLabel = document.createElement("label");
+  switchLabel.className = "switch";
+  switchLabel.title = "Toggle Form Input Mode";
+  switchLabel.appendChild(input);
+  switchLabel.appendChild(slider);
+
+  if (layout === "inline") {
+    // ⏎ Gebruik inline switch (zoals in menubalk)
+    const container = document.createElement("label");
+    container.id = `label-${id}`;
+    container.style.display = "flex";
+    container.style.alignItems = "center";
+    container.style.gap = "6px";
+
+    const span = document.createElement("span");
+    span.textContent = label;
+
+    container.appendChild(span);
+    container.appendChild(switchLabel);
+    return container;
+  }
+
+  // 🧱 Normale layout (zoals in modals/forms)
+  const labelEl = document.createElement("label");
+  labelEl.htmlFor = id;
+  labelEl.textContent = label;
+
+  const container = document.createElement("div");
+  container.className = "modal-form-row switch-row";
+  container.appendChild(labelEl);
+  container.appendChild(switchLabel);
+  return container;
+}
+
