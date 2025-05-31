@@ -1,5 +1,6 @@
 /* ───── Light Theme (default) ───── */
 :root {
+  --text-color: #111;
   --input-border-color: #ccc;
   --input-bg: #fdfdfd;
   --input-fg: #111;

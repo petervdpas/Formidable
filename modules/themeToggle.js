@@ -23,7 +23,10 @@ export function setCodeMirrorTheme(mode) {
   const allEditors = document.querySelectorAll(".CodeMirror");
   allEditors.forEach((cmEl) => {
     const cm = cmEl.CodeMirror;
-    if (cm) cm.setOption("theme", mode === "dark" ? "monokai" : "eclipse");
+    if (cm) {
+      cm.setOption("theme", mode === "dark" ? "monokai" : "eclipse");
+      cm.refresh();
+    }
   });
   
   currentTheme = mode;

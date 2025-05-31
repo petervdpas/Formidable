@@ -1,5 +1,6 @@
 /* ───── Dark Theme ───── */
 .dark-mode {
+  --text-color: #eee;
   --input-border-color: #555;
   --input-bg: #1c1c1c;
   --input-fg: #eee;
@@ -221,4 +222,24 @@ label small,
 
 .dark-mode .popup-option:hover {
   background-color: #3a3a3a;
+}
+
+
+/* EasyMDE toolbar + statusbar dark mode support */
+.dark-mode .editor-toolbar {
+  background-color: #2a2a2a;
+  color: #ddd;
+  border-color: #444;
+}
+
+.dark-mode .editor-toolbar button {
+  color: #eee;
+}
+
+.dark-mode .editor-toolbar button:hover {
+  background-color: #444;
+}
+
+.dark-mode .EasyMDEContainer .CodeMirror {
+  border: 1px solid #444;
 }

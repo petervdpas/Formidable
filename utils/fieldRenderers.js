@@ -2,6 +2,7 @@
 
 import { wrapInputWithLabel } from "./elementBuilders.js";
 import { showOptionPopup } from "./popupUtils.js";
+import { getCurrentTheme } from "../modules/themeToggle.js";
 
 function resolveOption(opt) {
   return typeof opt === "string"
@@ -188,11 +189,74 @@ export function renderRadioField(field) {
 // ─────────────────────────────────────────────
 // Type: textarea
 export function renderTextareaField(field) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "markdown-editor-wrapper";
+
   const textarea = document.createElement("textarea");
   textarea.name = field.key;
-  textarea.value = "default" in field ? field.default : "";
+  textarea.value = field.default || "";
+  wrapper.appendChild(textarea);
+
+  requestAnimationFrame(() => {
+    let keystrokeCount = 0;
+
+    const editor = new EasyMDE({
+      element: textarea,
+      theme: getCurrentTheme() === "dark" ? "monokai" : "eclipse",
+      toolbar: [
+        "bold",
+        "italic",
+        "strikethrough",
+        "|",
+        "quote",
+        "unordered-list",
+        "ordered-list",
+        "|",
+        "horizontal-rule",
+        "code",
+      ],
+      status: [
+        "lines",
+        "words",
+        {
+          className: "characters",
+          defaultValue(el) {
+            el.innerHTML = "characters: 0";
+          },
+          onUpdate(el) {
+            const text = editor.value() || "";
+            el.innerHTML = `characters: ${text.length}`;
+          },
+        },
+        {
+          className: "keystrokes",
+          defaultValue(el) {
+            el.innerHTML = "0 Keystrokes";
+          },
+          onUpdate(el) {
+            el.innerHTML = `${keystrokeCount} Keystrokes`;
+          },
+        },
+      ],
+      spellChecker: false,
+      autoDownloadFontAwesome: false,
+      minHeight: "120px",
+    });
+
+    const cm = editor.codemirror;
+
+    cm.on("keydown", () => {
+      keystrokeCount++;
+    });
+
+    cm.on("change", () => {
+      textarea.value = editor.value();
+      editor.updateStatusBar(); // triggers all custom status updates
+    });
+  });
+
   return wrapInputWithLabel(
-    textarea,
+    wrapper,
     field.label,
     field.description,
     field.two_column

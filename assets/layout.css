@@ -99,3 +99,11 @@ body {
   margin-top: 20px;
   text-align: center;
 }
+
+.editor-toolbar button {
+  color: var(--text-color, black); /* fallback if var undefined */
+}
+
+.markdown-editor-wrapper {
+  width: inherit;
+}
