@@ -2,40 +2,13 @@ name: loopie
 storage_location: ./storage/loopie
 markdown_template: |-
   <!-- AUTO-GENERATED TEMPLATE - Only if Editor is empty! -->
-  ## Title
 
-  _{{fieldDescription "title"}}_
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "title")}}
-  ```
   {{field "title"}}
   ---
 
-
-  ## Loop: looper
-
   {{#loop "looper"}}
-  ### Sub Title
+  ### {{field "sub_title"}}
 
-  _{{fieldDescription "sub_title"}}_
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "sub_title")}}
-  ```
-  {{field "sub_title"}}
-  ---
-
-  ### Description
-
-  _{{fieldDescription "description"}}_
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "description")}}
-  ```
   {{field "description"}}
   {{/loop}}
 fields:

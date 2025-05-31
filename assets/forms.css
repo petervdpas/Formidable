@@ -76,6 +76,15 @@ label small {
   flex-direction: column;
 }
 
+.form-row.two-column > div:first-child {
+  flex: 0 0 40%;
+  max-width: 40%;
+}
+
+.form-row.two-column > div:last-child {
+  flex: 1 1 60%;
+}
+
 .form-row.two-column label {
   font-weight: bold;
   margin-bottom: 4px;
@@ -92,4 +101,15 @@ label small {
   flex-direction: row;
   gap: 0.8rem;
   align-items: center;
+}
+
+@media (max-width: 600px) {
+  .form-row.two-column {
+    flex-direction: column;
+  }
+
+  .form-row.two-column > div {
+    max-width: 100% !important;
+    flex: 1 1 100% !important;
+  }
 }

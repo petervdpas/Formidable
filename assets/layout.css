@@ -101,9 +101,23 @@ body {
 }
 
 .editor-toolbar button {
-  color: var(--text-color, black); /* fallback if var undefined */
+  color: var(--text-color, black);
+  /* fallback if var undefined */
 }
 
 .markdown-editor-wrapper {
   width: inherit;
+}
+
+@media (max-width: 720px) {
+
+  #template-sidebar,
+  #storage-sidebar {
+    display: none;
+  }
+
+  #template-splitter,
+  #storage-splitter {
+    display: none;
+  }
 }

@@ -16,6 +16,7 @@
   color: white;
   background-color: #1e1e1e;
   border-left: 6px solid #666;
+  height: auto;
 }
 
 /* ───── Field Label & Type ───── */
@@ -315,36 +316,47 @@
 #field-edit-modal.modal-loopstop .btn-close {
   color: #333;
 }
+
 #field-edit-modal.modal-text .btn-close {
   color: #ccc;
 }
+
 #field-edit-modal.modal-boolean .btn-close {
   color: #ccc;
 }
+
 #field-edit-modal.modal-dropdown .btn-close {
   color: #ccc;
 }
+
 #field-edit-modal.modal-multioption .btn-close {
   color: #ccc;
 }
+
 #field-edit-modal.modal-radio .btn-close {
   color: #ccc;
 }
+
 #field-edit-modal.modal-textarea .btn-close {
   color: #ccc;
 }
+
 #field-edit-modal.modal-number .btn-close {
   color: #ccc;
 }
+
 #field-edit-modal.modal-date .btn-close {
   color: #ccc;
 }
+
 #field-edit-modal.modal-list .btn-close {
   color: #ccc;
 }
+
 #field-edit-modal.modal-table .btn-close {
   color: #000;
 }
+
 #field-edit-modal.modal-image .btn-close {
   color: #000;
 }
@@ -381,4 +393,25 @@
   box-sizing: border-box;
   padding: 6px 10px;
   border-radius: 4px;
+}
+
+@media (max-width: 720px) {
+  .field-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    min-height: 40px;
+  }
+
+  .field-label {
+    font-size: 14px;
+    line-height: 1.2;
+  }
+
+  .field-actions button {
+    padding: 4px 8px;
+    font-size: 13px;
+    line-height: 1.2;
+  }
 }
