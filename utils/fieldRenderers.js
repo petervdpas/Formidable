@@ -1,6 +1,6 @@
 // utils/fieldRenderers.js
 
-import { wrapInputWithLabel } from "./elementBuilders.js";
+import { wrapInputWithLabel, createSwitch } from "./elementBuilders.js";
 import { showOptionPopup } from "./popupUtils.js";
 import { getCurrentTheme } from "../modules/themeToggle.js";
 
@@ -79,25 +79,12 @@ export function renderTextField(field) {
 // ─────────────────────────────────────────────
 // Type: boolean
 export function renderBooleanField(field) {
-  const wrapper = document.createElement("label");
-  wrapper.className = "switch";
-
-  const input = document.createElement("input");
-  input.type = "checkbox";
-  input.name = field.key;
-  input.checked = "default" in field ? field.default === true : false;
-
-  const slider = document.createElement("span");
-  slider.className = "slider";
-
-  wrapper.appendChild(input);
-  wrapper.appendChild(slider);
-
-  return wrapInputWithLabel(
-    wrapper,
+  return createSwitch(
+    field.key,
     field.label,
-    field.description,
-    field.two_column
+    field.default === true,
+    null,
+    field.two_column ? "two-column" : "block"
   );
 }
 

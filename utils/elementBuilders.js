@@ -124,7 +124,7 @@ export function createSwitch(
   label = "",
   checked = false,
   onFlip = null,
-  layout = "block" // or "inline"
+  layout = "block" // "inline", "block", or "two-column"
 ) {
   const input = document.createElement("input");
   input.type = "checkbox";
@@ -140,29 +140,48 @@ export function createSwitch(
     });
   }
 
-  const switchLabel = document.createElement("label");
-  switchLabel.className = "switch";
-  switchLabel.title = "Toggle Form Input Mode";
-  switchLabel.appendChild(input);
-  switchLabel.appendChild(slider);
+  const switchWrapper = document.createElement("label");
+  switchWrapper.className = "switch";
+  switchWrapper.appendChild(input);
+  switchWrapper.appendChild(slider);
 
   if (layout === "inline") {
-    // ⏎ Gebruik inline switch (zoals in menubalk)
-    const container = document.createElement("label");
-    container.id = `label-${id}`;
-    container.style.display = "flex";
-    container.style.alignItems = "center";
-    container.style.gap = "6px";
+    // menubalk: label naast switch
+    const inlineContainer = document.createElement("label");
+    inlineContainer.id = `label-${id}`;
+    inlineContainer.style.display = "flex";
+    inlineContainer.style.alignItems = "center";
+    inlineContainer.style.gap = "6px";
 
     const span = document.createElement("span");
     span.textContent = label;
 
-    container.appendChild(span);
-    container.appendChild(switchLabel);
-    return container;
+    inlineContainer.appendChild(span);
+    inlineContainer.appendChild(switchWrapper);
+    return inlineContainer;
   }
 
-  // 🧱 Normale layout (zoals in modals/forms)
+  if (layout === "two-column") {
+    // render als veld met label + switch in aparte kolommen
+    const wrapper = document.createElement("div");
+    wrapper.className = "form-row two-column";
+
+    const left = document.createElement("div");
+    const right = document.createElement("div");
+
+    const labelEl = document.createElement("label");
+    labelEl.htmlFor = id;
+    labelEl.textContent = label;
+
+    left.appendChild(labelEl);
+    right.appendChild(switchWrapper);
+    wrapper.appendChild(left);
+    wrapper.appendChild(right);
+
+    return wrapper;
+  }
+
+  // standard "block" layout
   const labelEl = document.createElement("label");
   labelEl.htmlFor = id;
   labelEl.textContent = label;
@@ -170,7 +189,7 @@ export function createSwitch(
   const container = document.createElement("div");
   container.className = "modal-form-row switch-row";
   container.appendChild(labelEl);
-  container.appendChild(switchLabel);
+  container.appendChild(switchWrapper);
+
   return container;
 }
-
