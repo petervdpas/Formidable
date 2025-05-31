@@ -1,6 +1,6 @@
 {
   "name": "formidable",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "description": "Template/Form editor in Electron",
   "main": "main.js",
   "scripts": {
