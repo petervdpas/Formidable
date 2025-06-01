@@ -7,10 +7,10 @@
 }
 
 .switch {
-  position: relative;
+  width: 42px;
+  height: 22px;
   display: inline-block;
-  width: 40px;
-  height: 20px;
+  position: relative;
 }
 
 .switch input {
@@ -22,30 +22,31 @@
 
 .switch .slider {
   position: absolute;
-  cursor: pointer;
-  top: 50%;
+  top: 0;
+  bottom: 0;
   left: 0;
   right: 0;
-  transform: translateY(-50%);
-  height: 20px;
   background-color: var(--color-switch-off);
   transition: background-color var(--switch-transition);
-  border-radius: 34px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  padding: 0 3px;
+  box-sizing: border-box;
 }
 
 .switch .slider::before {
   content: "";
   position: absolute;
-  height: 14px;
-  width: 14px;
+  height: 16px;
+  width: 16px;
   left: 3px;
-  bottom: 3px;
+  top: 3px;
   background-color: var(--switch-knob-color);
   border-radius: 50%;
   transition: transform var(--switch-transition);
 }
 
-/* ON State */
 .switch input:checked + .slider {
   background-color: var(--color-switch-on);
 }
@@ -54,16 +55,18 @@
   transform: translateX(20px);
 }
 
-/* Explicit OFF (optional, more robust) */
-.switch input:not(:checked) + .slider {
-  background-color: var(--color-switch-off);
+.switch-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.switch-wrapper {
-  display: flex;
+.trailing-label {
+  display: inline-flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 8px;
+  font-size: 0.85em;
+  white-space: nowrap;
+  line-height: 1;
 }
 
 /* Specifically for switch alignment rows */
@@ -71,19 +74,15 @@
     min-width: 10px;
 }
 
+.modal-form-row.switch-row .switch {
+    height: 20px;
+}
+
 .modal-form-row.switch-row {
     display: flex;
     align-items: flex-start;
     gap: 12px;
     margin-bottom: 6px;
-}
-
-.modal-form-row.switch-row .switch {
-    height: 32px;
-    /* ← input height */
-    display: inline-flex;
-    align-items: center;
-    /* centreren slider */
 }
 
 .modal-form-row.switch-row label:not(.switch) {
