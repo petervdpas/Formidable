@@ -179,10 +179,19 @@ window.addEventListener("DOMContentLoaded", async () => {
     templateDropdown.refresh?.() ?? Promise.resolve(),
   ]);
 
-  // ── Re-apply Last Selected Template ──
+  // ── Re-apply Last Selected Template and Form ──
   if (config.selected_template) {
     window.currentSelectedTemplateName = config.selected_template;
-    EventBus.emit("template:list:highlighted", config.selected_template);
+
+    EventBus.emit("template:list:itemClicked", config.selected_template);
+
+    // Ensure form is selected *after* the template is loaded
+    if (config.selected_data_file) {
+      // Delay ensures storage list is refreshed first
+      setTimeout(() => {
+        EventBus.emit("form:list:itemClicked", config.selected_data_file);
+      }, 100);
+    }
   }
 
   // ── Context & Theme Setup ──
