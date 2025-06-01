@@ -76,12 +76,12 @@
     margin-left: auto;
     display: flex;
     align-items: center;
-    height: 100%;
     gap: 8px;
 }
 
-#menu-context-toggle .switch {
-    margin-left: 2px;
+.menu-item .switch{
+    height: 22px;
+    padding: 0px;
 }
 
 .about-content {

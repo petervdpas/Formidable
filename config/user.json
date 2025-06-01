@@ -1,5 +1,5 @@
 {
-  "theme": "dark",
+  "theme": "light",
   "font_size": 14,
   "logging_enabled": false,
   "context_mode": "storage",
@@ -8,7 +8,7 @@
   "selected_template": "basic.yaml",
   "selected_data_file": "test-20250518.meta.json",
   "window_bounds": {
-    "width": 1118,
+    "width": 1495,
     "height": 883,
     "x": 220,
     "y": 72
