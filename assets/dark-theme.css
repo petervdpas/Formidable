@@ -9,6 +9,10 @@
   --readonly-bg: #888;
   --readonly-fg: #ffffe0;
 
+  --color-switch-on: #2196f3;
+  --color-switch-off: #555;
+  --switch-knob-color: #f5f5f5;
+
   --toast-bg-info: #1e1e1e;
   /* darker than #333 */
   --toast-fg-info: #ddd;

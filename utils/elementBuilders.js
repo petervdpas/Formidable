@@ -141,9 +141,7 @@ export function buildSwitchElement({
   switchWrapper.appendChild(slider);
 
   const container = document.createElement("div");
-  container.style.display = "flex";
-  container.style.alignItems = "center";
-  container.style.gap = "6px";
+  container.className = "switch-wrapper";
   container.appendChild(switchWrapper);
 
   let trailing = null;
