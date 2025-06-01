@@ -33,8 +33,6 @@ export async function handleFormSelected(datafile) {
   await formManager.loadFormData(null, datafile);
 
   // Always re-highlight the selected item
-  EventBus.emit("form:list:highlighted", {
-    listId: "storage-list",
-    name: datafile,
-  });
+  EventBus.emit("form:list:highlighted", datafile);
+
 }

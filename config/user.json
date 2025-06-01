@@ -6,7 +6,7 @@
   "templates_location": "./templates",
   "storage_location": "./storage",
   "selected_template": "basic.yaml",
-  "selected_data_file": "test-20250518.meta.json",
+  "selected_data_file": "sane-20250530.meta.json",
   "window_bounds": {
     "width": 1154,
     "height": 883,

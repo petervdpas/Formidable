@@ -231,10 +231,8 @@ function renderContextDropdown(isStorage, config) {
 
       if (isStorage) {
         EventBus.emit("form:list:itemClicked", val);
-        EventBus.emit("form:list:highlighted", val); // just the name
       } else {
         EventBus.emit("template:list:itemClicked", val);
-        //EventBus.emit("template:list:highlighted", val); // just the name
       }
     },
   });

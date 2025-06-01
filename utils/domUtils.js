@@ -10,56 +10,38 @@ import {
 } from "./fieldAppliers.js";
 import { collectLoopGroup } from "./formUtils.js";
 
+let lastSelected = null;
+
 // Highlight + click match
-export function highlightAndClickMatch(
-  container,
-  targetName,
-  onClickFallback = null
-) {
-  if (!container || typeof targetName !== "string") {
-    if (!container) {
-      EventBus.emit("logging:warning", [
-        "[highlightAndClickMatch] Missing container",
-      ]);
-    }
-    return; // silently skip invalid targetName type
-  }
+export function highlightAndClickMatch(container, targetName, onClickFallback = null) {
+  if (!container || typeof targetName !== "string") return;
 
-  const normalizedTarget = targetName
-    .replace(/\.meta\.json$|\.yaml$|\.md$/i, "")
-    .toLowerCase();
-
+  const normalizedTarget = targetName.replace(/\.meta\.json$|\.yaml$|\.md$/i, "").toLowerCase();
   const items = Array.from(container.children);
   const match =
-    items.find(
-      (el) =>
-        el.dataset?.value &&
-        el.dataset.value.toLowerCase() === targetName.toLowerCase()
-    ) ||
-    items.find(
-      (el) => el.textContent.trim().toLowerCase() === normalizedTarget
-    );
+    items.find((el) => el.dataset?.value?.toLowerCase() === targetName.toLowerCase()) ||
+    items.find((el) => el.textContent.trim().toLowerCase() === normalizedTarget);
 
-  if (!match) {
-    EventBus.emit("logging:warning", [
-      `[highlightAndClickMatch] No match found for: ${targetName}`,
-    ]);
-    return;
-  }
+  if (!match) return;
 
-  container.querySelectorAll(".selected").forEach((el) => {
-    el.classList.remove("selected");
-  });
+  // 🛑 Stop recursive bounce
+  if (match === lastSelected) return;
+
+  container.querySelectorAll(".selected").forEach((el) => el.classList.remove("selected"));
 
   match.classList.add("selected");
+  lastSelected = match;
+
+  // ⏳ Prevent loops via debounce
+  setTimeout(() => {
+    lastSelected = null;
+  }, 100);
+
   match.click();
 
   if (typeof onClickFallback === "function") {
     setTimeout(() => {
       if (!match.classList.contains("selected")) {
-        EventBus.emit("logging:warning", [
-          "[highlightAndClickMatch] Click failed, running fallback",
-        ]);
         onClickFallback(targetName);
       }
     }, 50);
