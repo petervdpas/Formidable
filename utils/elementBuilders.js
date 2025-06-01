@@ -119,14 +119,12 @@ export function buildReadOnlyInput(id, className, labelText, value = "") {
   return wrapInputWithLabel(input, labelText);
 }
 
-export function createSwitch(
+export function buildSwitchElement({
   id,
-  label = "",
   checked = false,
   onFlip = null,
-  layout = "block", // "inline", "block", or "two-column"
-  trailingLabel = null // optional trailing label for all layouts
-) {
+  trailingLabel = null,
+} = {}) {
   const input = document.createElement("input");
   input.type = "checkbox";
   input.id = id;
@@ -141,41 +139,58 @@ export function createSwitch(
   switchWrapper.appendChild(slider);
 
   let trailing = null;
-
-  // create trailing label if valid
   if (trailingLabel && Array.isArray(trailingLabel)) {
     trailing = document.createElement("div");
     trailing.className = "trailing-label";
     trailing.textContent = checked ? trailingLabel[0] : trailingLabel[1];
   }
 
-  // unified event listener
   input.addEventListener("change", (e) => {
-    if (typeof onFlip === "function") {
-      onFlip(e.target.checked);
-    }
-    if (trailing) {
+    if (typeof onFlip === "function") onFlip(e.target.checked);
+    if (trailing)
       trailing.textContent = e.target.checked
         ? trailingLabel[0]
         : trailingLabel[1];
-    }
+  });
+
+  const container = document.createElement("div");
+  container.style.display = "flex";
+  container.style.alignItems = "center";
+  container.style.gap = "6px";
+  container.appendChild(switchWrapper);
+  if (trailing) container.appendChild(trailing);
+
+  return { input, element: container };
+}
+
+export function createSwitch(
+  id,
+  label = "",
+  checked = false,
+  onFlip = null,
+  layout = "block",
+  trailingLabel = null
+) {
+  const { input, element: switchWithLabel } = buildSwitchElement({
+    id,
+    checked,
+    onFlip,
+    trailingLabel,
   });
 
   if (layout === "inline") {
-    const inlineContainer = document.createElement("label");
-    inlineContainer.id = `label-${id}`;
-    inlineContainer.style.display = "flex";
-    inlineContainer.style.alignItems = "center";
-    inlineContainer.style.gap = "6px";
+    const inline = document.createElement("label");
+    inline.id = `label-${id}`;
+    inline.style.display = "flex";
+    inline.style.alignItems = "center";
+    inline.style.gap = "6px";
 
     const span = document.createElement("span");
     span.textContent = label;
 
-    inlineContainer.appendChild(span);
-    inlineContainer.appendChild(switchWrapper);
-    if (trailing) inlineContainer.appendChild(trailing);
-
-    return inlineContainer;
+    inline.appendChild(span);
+    inline.appendChild(switchWithLabel);
+    return inline;
   }
 
   if (layout === "two-column") {
@@ -190,16 +205,13 @@ export function createSwitch(
     labelEl.textContent = label;
 
     left.appendChild(labelEl);
-    right.appendChild(switchWrapper);
-    if (trailing) right.appendChild(trailing);
-
+    right.appendChild(switchWithLabel);
     wrapper.appendChild(left);
     wrapper.appendChild(right);
-
     return wrapper;
   }
 
-  // default "block" layout
+  // default: block
   const labelEl = document.createElement("label");
   labelEl.htmlFor = id;
   labelEl.textContent = label;
@@ -207,15 +219,6 @@ export function createSwitch(
   const container = document.createElement("div");
   container.className = "modal-form-row switch-row";
   container.appendChild(labelEl);
-
-  const rightBlock = document.createElement("div");
-  rightBlock.style.display = "flex";
-  rightBlock.style.alignItems = "center";
-  rightBlock.style.gap = "6px";
-
-  rightBlock.appendChild(switchWrapper);
-  if (trailing) rightBlock.appendChild(trailing);
-
-  container.appendChild(rightBlock);
+  container.appendChild(switchWithLabel);
   return container;
 }
