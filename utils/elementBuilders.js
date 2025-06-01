@@ -121,6 +121,7 @@ export function buildReadOnlyInput(id, className, labelText, value = "") {
 
 export function buildSwitchElement({
   id,
+  name = null,
   checked = false,
   onFlip = null,
   trailingLabel = null,
@@ -129,6 +130,7 @@ export function buildSwitchElement({
   input.type = "checkbox";
   input.id = id;
   input.checked = checked;
+  if (name) input.name = name;
 
   const slider = document.createElement("span");
   slider.className = "slider";
@@ -138,27 +140,37 @@ export function buildSwitchElement({
   switchWrapper.appendChild(input);
   switchWrapper.appendChild(slider);
 
-  let trailing = null;
-  if (trailingLabel && Array.isArray(trailingLabel)) {
-    trailing = document.createElement("div");
-    trailing.className = "trailing-label";
-    trailing.textContent = checked ? trailingLabel[0] : trailingLabel[1];
-  }
-
-  input.addEventListener("change", (e) => {
-    if (typeof onFlip === "function") onFlip(e.target.checked);
-    if (trailing)
-      trailing.textContent = e.target.checked
-        ? trailingLabel[0]
-        : trailingLabel[1];
-  });
-
   const container = document.createElement("div");
   container.style.display = "flex";
   container.style.alignItems = "center";
   container.style.gap = "6px";
   container.appendChild(switchWrapper);
-  if (trailing) container.appendChild(trailing);
+
+  let trailing = null;
+  if (trailingLabel && Array.isArray(trailingLabel)) {
+    trailing = document.createElement("div");
+    trailing.className = "trailing-label";
+    container.appendChild(trailing); // append first
+  }
+
+  // listener AFTER elements exist
+  input.addEventListener("change", (e) => {
+    if (typeof onFlip === "function") onFlip(e.target.checked);
+    if (trailing) {
+      trailing.textContent = e.target.checked
+        ? trailingLabel[0]
+        : trailingLabel[1];
+    }
+  });
+
+  // force a label update NOW (after DOM is built)
+  queueMicrotask(() => {
+    if (trailing) {
+      trailing.textContent = input.checked
+        ? trailingLabel[0]
+        : trailingLabel[1];
+    }
+  });
 
   return { input, element: container };
 }
@@ -173,6 +185,7 @@ export function createSwitch(
 ) {
   const { input, element: switchWithLabel } = buildSwitchElement({
     id,
+    name: id,
     checked,
     onFlip,
     trailingLabel,

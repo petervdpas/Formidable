@@ -36,9 +36,9 @@ export function applyListField(container, field, value) {
       }
 
       if (!value) {
-        setTimeout(() => {
+        requestAnimationFrame(() => {
           input.click();
-        }, 0);
+        });
       }
     }
 

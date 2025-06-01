@@ -26,10 +26,10 @@ export function initCodeMirror(textarea, initialValue = "") {
 
   editor.setValue(initialValue);
 
-  setTimeout(() => {
+  requestAnimationFrame(() => {
     editor.refresh();
     editor.setSize("100%", "100%");
-  }, 50);
+  });
 
   editorWrapper = textarea.closest(".editor-wrapper");
 }

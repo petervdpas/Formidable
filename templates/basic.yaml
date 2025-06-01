@@ -191,6 +191,11 @@ fields:
     type: boolean
     description: Enable or disable this feature using a checkbox.
     two_column: true
+    options:
+      - value: 'on'
+        label: 'On'
+      - value: 'off'
+        label: 'Off'
   - key: dropdown
     label: Dropdown
     type: dropdown

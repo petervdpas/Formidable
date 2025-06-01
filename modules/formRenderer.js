@@ -75,7 +75,7 @@ function renderFieldsWithLoops(container, fields, metaData) {
         onStart: (evt) => {
           const original = evt.item;
 
-          setTimeout(() => {
+          requestAnimationFrame(() => {
             const drag = document.querySelector(".sortable-drag");
             if (drag && original) {
               const style = getComputedStyle(original);
@@ -88,7 +88,7 @@ function renderFieldsWithLoops(container, fields, metaData) {
               drag.style.opacity = "0.95";
               drag.style.background = "var(--sortable-drag-bg, #ffe082)";
             }
-          }, 0);
+          });
         },
       });
     } else {

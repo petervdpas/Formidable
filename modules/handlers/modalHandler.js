@@ -11,7 +11,11 @@ import { getCompactDate } from "../../utils/dateUtils.js";
 // ─────────────────────────────────────────────────────────────
 // Handle creation of a new template via modal
 // ─────────────────────────────────────────────────────────────
-export function handleTemplateConfirm({ modal, defaultStorageLocation, callback }) {
+export function handleTemplateConfirm({
+  modal,
+  defaultStorageLocation,
+  callback,
+}) {
   const nameInput = document.getElementById("template-name");
   const dirInput = document.getElementById("template-dir");
   const wrapper = document.getElementById("template-modal-buttons-wrapper");
@@ -59,7 +63,7 @@ export function handleTemplateConfirm({ modal, defaultStorageLocation, callback 
   wrapper.innerHTML = "";
   wrapper.appendChild(buildButtonGroup(confirmBtn, cancelBtn));
   modal.show();
-  setTimeout(() => nameInput.focus(), 100);
+  requestAnimationFrame(() => nameInput.focus());
 }
 
 // ─────────────────────────────────────────────────────────────

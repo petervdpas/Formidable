@@ -35,7 +35,14 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
     const containerRow = dom.options.closest(".modal-form-row");
     const currentType = dom.type?.value || "text";
-    const optionTypes = ["dropdown", "multioption", "radio", "list", "table"];
+    const optionTypes = [
+      "boolean",
+      "dropdown",
+      "multioption",
+      "radio",
+      "list",
+      "table",
+    ];
 
     // Always hide raw <textarea> or JSON field
     dom.options.style.display = "none";
@@ -84,8 +91,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
     dom.twoColumn.checked = !!field.two_column;
     dom.default.value = field.default ?? "";
 
-    labelLocked =
-      field.label?.trim().length > 0 && field.label !== field.key;
+    labelLocked = field.label?.trim().length > 0 && field.label !== field.key;
 
     // Attach listeners only once
     if (!dom.key.__listenersAttached) {

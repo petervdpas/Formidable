@@ -79,9 +79,22 @@ export function renderTextField(field) {
 // ─────────────────────────────────────────────
 // Type: boolean
 export function renderBooleanField(field) {
+  let trailingLabel = null;
+
+  if (Array.isArray(field.options) && field.options.length >= 2) {
+    const first = resolveOption(field.options[0]);
+    const second = resolveOption(field.options[1]);
+    trailingLabel = [first.label, second.label];
+  }
+
+  const isChecked = String(field.default).toLowerCase() === "true";
+
   const { element: toggle } = buildSwitchElement({
     id: field.key,
-    checked: field.default === true,
+    name: field.key,
+    checked: isChecked,
+    onFlip: null,
+    trailingLabel,
   });
 
   return wrapInputWithLabel(
