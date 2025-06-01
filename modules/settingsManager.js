@@ -22,6 +22,7 @@ export async function renderSettings() {
 
   cachedConfig = await window.api.config.loadUserConfig();
   const config = cachedConfig;
+  const isStorage = cachedConfig?.context_mode === "storage";
 
   container.innerHTML = ""; // eerst leegmaken
 
@@ -36,20 +37,34 @@ export async function renderSettings() {
   tabGeneral.className = "tab-panel tab-general";
 
   tabGeneral.appendChild(
-    createSwitch("theme-toggle", "Dark Mode", config.theme === "dark")
+    createSwitch(
+      "theme-toggle",
+      "Dark Mode",
+      config.theme === "dark",
+      null,
+      "block",
+      ["On", "Off"]
+    )
   );
   tabGeneral.appendChild(
     createSwitch(
       "context-toggle",
       "Context Mode",
-      config.context_mode === "template"
+      isStorage,
+      null,
+      "block",
+      ["Storage", "Template"]
     )
   );
   tabGeneral.appendChild(
     createSwitch(
-      "logging-toggle", 
-      "Enable Logging", 
-      config.logging_enabled)
+      "logging-toggle",
+      "Enable Logging",
+      config.logging_enabled,
+      null,
+      "block",
+      ["On", "Off"]
+    )
   );
 
   const tabDirs = document.createElement("div");

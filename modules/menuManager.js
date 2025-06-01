@@ -88,7 +88,8 @@ function createContextToggleItem() {
       ]);
       EventBus.emit("context:toggle", checked);
     },
-    "inline"
+    "inline",
+    ["Storage", "Template"],
   );
 
   li.appendChild(toggle);

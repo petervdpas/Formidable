@@ -124,7 +124,8 @@ export function createSwitch(
   label = "",
   checked = false,
   onFlip = null,
-  layout = "block" // "inline", "block", or "two-column"
+  layout = "block", // "inline", "block", or "two-column"
+  trailingLabel = null // optional trailing label for all layouts
 ) {
   const input = document.createElement("input");
   input.type = "checkbox";
@@ -134,19 +135,33 @@ export function createSwitch(
   const slider = document.createElement("span");
   slider.className = "slider";
 
-  if (typeof onFlip === "function") {
-    input.addEventListener("change", (e) => {
-      onFlip(e.target.checked);
-    });
-  }
-
   const switchWrapper = document.createElement("label");
   switchWrapper.className = "switch";
   switchWrapper.appendChild(input);
   switchWrapper.appendChild(slider);
 
+  let trailing = null;
+
+  // create trailing label if valid
+  if (trailingLabel && Array.isArray(trailingLabel)) {
+    trailing = document.createElement("div");
+    trailing.className = "trailing-label";
+    trailing.textContent = checked ? trailingLabel[0] : trailingLabel[1];
+  }
+
+  // unified event listener
+  input.addEventListener("change", (e) => {
+    if (typeof onFlip === "function") {
+      onFlip(e.target.checked);
+    }
+    if (trailing) {
+      trailing.textContent = e.target.checked
+        ? trailingLabel[0]
+        : trailingLabel[1];
+    }
+  });
+
   if (layout === "inline") {
-    // menubalk: label naast switch
     const inlineContainer = document.createElement("label");
     inlineContainer.id = `label-${id}`;
     inlineContainer.style.display = "flex";
@@ -158,11 +173,12 @@ export function createSwitch(
 
     inlineContainer.appendChild(span);
     inlineContainer.appendChild(switchWrapper);
+    if (trailing) inlineContainer.appendChild(trailing);
+
     return inlineContainer;
   }
 
   if (layout === "two-column") {
-    // render als veld met label + switch in aparte kolommen
     const wrapper = document.createElement("div");
     wrapper.className = "form-row two-column";
 
@@ -175,13 +191,15 @@ export function createSwitch(
 
     left.appendChild(labelEl);
     right.appendChild(switchWrapper);
+    if (trailing) right.appendChild(trailing);
+
     wrapper.appendChild(left);
     wrapper.appendChild(right);
 
     return wrapper;
   }
 
-  // standard "block" layout
+  // default "block" layout
   const labelEl = document.createElement("label");
   labelEl.htmlFor = id;
   labelEl.textContent = label;
@@ -189,7 +207,15 @@ export function createSwitch(
   const container = document.createElement("div");
   container.className = "modal-form-row switch-row";
   container.appendChild(labelEl);
-  container.appendChild(switchWrapper);
 
+  const rightBlock = document.createElement("div");
+  rightBlock.style.display = "flex";
+  rightBlock.style.alignItems = "center";
+  rightBlock.style.gap = "6px";
+
+  rightBlock.appendChild(switchWrapper);
+  if (trailing) rightBlock.appendChild(trailing);
+
+  container.appendChild(rightBlock);
   return container;
 }

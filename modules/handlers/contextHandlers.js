@@ -17,9 +17,14 @@ export async function handleContextToggle(isStorage) {
   const toggle = document.getElementById("context-toggle");
   const menuToggle = document.getElementById("context-toggle-menu");
 
-  if (toggle && toggle.checked !== isStorage) toggle.checked = isStorage;
-  if (menuToggle && menuToggle.checked !== isStorage)
+  if (toggle && toggle.checked !== isStorage) {
+    toggle.checked = isStorage;
+    toggle.dispatchEvent(new Event("change"));
+  }
+  if (menuToggle && menuToggle.checked !== isStorage) {
     menuToggle.checked = isStorage;
+    menuToggle.dispatchEvent(new Event("change"));
+  }
 
   setContextView(mode, containers);
   await window.api.config.updateUserConfig({ context_mode: mode });
