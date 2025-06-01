@@ -31,32 +31,26 @@ export async function handleTemplateSelected({ name, yaml }) {
 
   await window.api.config.updateUserConfig({ selected_template: name });
 
+  // Always highlight the correct sidebar item
+  EventBus.emit("template:list:highlighted", {
+    listId: "template-list",
+    name,
+  });
+
   if (templateChanged) {
     EventBus.emit("context:select:form", null);
-  }
-
-  const listItem = Array.from(
-    document.querySelectorAll("#template-list .template-item")
-  ).find(
-    (el) =>
-      el.textContent.trim().toLowerCase() ===
-      name.replace(/\.yaml$/, "").toLowerCase()
-  );
-
-  if (listItem) {
-    document
-      .querySelectorAll("#template-list .template-item.selected")
-      .forEach((el) => el.classList.remove("selected"));
-    listItem.classList.add("selected");
   }
 
   if (formManager && metaListManager) {
     await formManager.loadTemplate(yaml);
     await metaListManager.loadList();
 
-    const config = await window.api.config.loadUserConfig();
-    if (config.selected_data_file) {
-      EventBus.emit("form:list:highlighted", config.selected_data_file);
+    const updated = await window.api.config.loadUserConfig();
+    if (updated.selected_data_file) {
+      EventBus.emit("form:list:highlighted", {
+        listId: "storage-list",
+        name: updated.selected_data_file,
+      });
     }
   }
 }

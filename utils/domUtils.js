@@ -16,43 +16,53 @@ export function highlightAndClickMatch(
   targetName,
   onClickFallback = null
 ) {
-  if (!container || !targetName) {
-    EventBus.emit("logging:warning", [
-      "[highlightAndClickMatch] Missing container or targetName",
-    ]);
-    return;
+  if (!container || typeof targetName !== "string") {
+    if (!container) {
+      EventBus.emit("logging:warning", [
+        "[highlightAndClickMatch] Missing container",
+      ]);
+    }
+    return; // silently skip invalid targetName type
   }
 
   const normalizedTarget = targetName
     .replace(/\.meta\.json$|\.yaml$|\.md$/i, "")
     .toLowerCase();
 
-  const match = Array.from(container.children).find(
-    (el) => el.textContent.trim().toLowerCase() === normalizedTarget
-  );
+  const items = Array.from(container.children);
+  const match =
+    items.find(
+      (el) =>
+        el.dataset?.value &&
+        el.dataset.value.toLowerCase() === targetName.toLowerCase()
+    ) ||
+    items.find(
+      (el) => el.textContent.trim().toLowerCase() === normalizedTarget
+    );
 
-  if (match) {
-    container
-      .querySelectorAll(".selected")
-      .forEach((el) => el.classList.remove("selected"));
-    match.classList.add("selected");
-
-    match.click();
-
-    if (typeof onClickFallback === "function") {
-      setTimeout(() => {
-        if (!match.classList.contains("selected")) {
-          EventBus.emit("logging:warning", [
-            "[highlightAndClickMatch] Click failed, running fallback",
-          ]);
-          onClickFallback(targetName);
-        }
-      }, 50);
-    }
-  } else {
+  if (!match) {
     EventBus.emit("logging:warning", [
-      `[highlightAndClickMatch] No match found for: ${normalizedTarget}`,
+      `[highlightAndClickMatch] No match found for: ${targetName}`,
     ]);
+    return;
+  }
+
+  container.querySelectorAll(".selected").forEach((el) => {
+    el.classList.remove("selected");
+  });
+
+  match.classList.add("selected");
+  match.click();
+
+  if (typeof onClickFallback === "function") {
+    setTimeout(() => {
+      if (!match.classList.contains("selected")) {
+        EventBus.emit("logging:warning", [
+          "[highlightAndClickMatch] Click failed, running fallback",
+        ]);
+        onClickFallback(targetName);
+      }
+    }, 50);
   }
 }
 
@@ -152,7 +162,7 @@ export function applyFieldValues(container, template, data = {}) {
     if (field.type === "loopstart") {
       const loopKey = field.key;
       const { group, stopIdx } = collectLoopGroup(fields, i + 1, loopKey);
-      group.forEach(f => loopChildKeys.add(f.key)); // 🧠 onthoud
+      group.forEach((f) => loopChildKeys.add(f.key)); // 🧠 onthoud
       i = stopIdx + 1;
 
       const loopItems = container.querySelectorAll(
@@ -191,13 +201,14 @@ export function makeSelectableList(
   onSelect,
   selectedClass = "selected"
 ) {
-  let current = null;
-
   items.forEach(({ element, value }) => {
-    element.addEventListener("click", () => {
-      if (current) current.classList.remove(selectedClass);
-      element.classList.add(selectedClass);
-      current = element;
+    // Wipe old listeners: safest to clone
+    const clean = element.cloneNode(true);
+    element.replaceWith(clean);
+
+    clean.addEventListener("click", () => {
+      items.forEach(({ element }) => element.classList.remove(selectedClass));
+      clean.classList.add(selectedClass);
       onSelect(value);
     });
   });

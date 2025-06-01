@@ -15,16 +15,7 @@ export async function handleFormSelected(datafile) {
     "[Handler] context:select:form received:",
     datafile,
   ]);
-/*
-  if (datafile === window.currentSelectedFormName) {
-    EventBus.emit("logging:default", [
-      "[Handler] Skipping redundant form selection:",
-      datafile,
-    ]);
-    return;
-  }
-  window.currentSelectedFormName = datafile;
-*/
+
   await window.api.config.updateUserConfig({ selected_data_file: datafile });
 
   if (!formManager) {
@@ -35,9 +26,15 @@ export async function handleFormSelected(datafile) {
   }
 
   if (!datafile) {
-    formManager.clearForm(); // you'd expose this
+    formManager.clearForm();
     return;
   }
 
   await formManager.loadFormData(null, datafile);
+
+  // Always re-highlight the selected item
+  EventBus.emit("form:list:highlighted", {
+    listId: "storage-list",
+    name: datafile,
+  });
 }
