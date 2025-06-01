@@ -2,6 +2,8 @@
 
 import { EventBus } from "../eventBus.js";
 
+const messageTimestamps = new Map();
+
 let statusBar = null;
 let lastUpdateTime = 0;
 let lastMessage = "";
@@ -24,18 +26,14 @@ export function initStatusHandler(statusBarId) {
 
 export function handleStatusUpdate(message) {
   const now = Date.now();
+  const last = messageTimestamps.get(message) || 0;
 
-  // Prevent overwriting meaningful messages too quickly
-  const isRepeat = message === lastMessage;
-  const isTooSoon = now - lastUpdateTime < 500;
-
-  if (isTooSoon && !isRepeat) {
+  if (now - last < 500) {
     console.log("[StatusHandler] Skipped message (too soon):", message);
     return;
   }
 
-  lastUpdateTime = now;
-  lastMessage = message;
+  messageTimestamps.set(message, now);
 
   if (statusBar) {
     statusBar.textContent = message;

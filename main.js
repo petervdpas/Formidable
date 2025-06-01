@@ -51,8 +51,6 @@ function createWindow() {
 
   win.once("ready-to-show", () => win.show());
 
-  win.loadFile("index.html");
-
   win.webContents.on("did-finish-load", () => {
     const versionedTitle = `Formidable v${packageJson.version}`;
     win.setTitle(versionedTitle);
@@ -73,6 +71,9 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+
+  registerIpcHandlers();
+  
   const isPackaged = app.isPackaged;
   const root = isPackaged ? app.getAppPath() : process.cwd();
   fileManager.setAppRoot(root);
@@ -109,4 +110,3 @@ app.on("window-all-closed", () => {
   }
 });
 
-registerIpcHandlers();
