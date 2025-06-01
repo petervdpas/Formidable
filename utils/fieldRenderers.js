@@ -79,12 +79,25 @@ export function renderTextField(field) {
 // ─────────────────────────────────────────────
 // Type: boolean
 export function renderBooleanField(field) {
-  return createSwitch(
-    field.key,
+  const wrapper = document.createElement("label");
+  wrapper.className = "switch";
+
+  const input = document.createElement("input");
+  input.type = "checkbox";
+  input.name = field.key;
+  input.checked = "default" in field ? field.default === true : false;
+
+  const slider = document.createElement("span");
+  slider.className = "slider";
+
+  wrapper.appendChild(input);
+  wrapper.appendChild(slider);
+
+  return wrapInputWithLabel(
+    wrapper,
     field.label,
-    field.default === true,
-    null,
-    field.two_column ? "two-column" : "block"
+    field.description,
+    field.two_column
   );
 }
 

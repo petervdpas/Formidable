@@ -1,16 +1,16 @@
 {
-  "theme": "dark",
+  "theme": "light",
   "font_size": 14,
-  "logging_enabled": false,
+  "logging_enabled": true,
   "context_mode": "storage",
   "templates_location": "./templates",
   "storage_location": "./storage",
-  "selected_template": "loopie.yaml",
-  "selected_data_file": "test-20250530.meta.json",
+  "selected_template": "basic.yaml",
+  "selected_data_file": "sane-20250530.meta.json",
   "window_bounds": {
-    "width": 1077,
+    "width": 1066,
     "height": 921,
-    "x": 325,
-    "y": 34
+    "x": 111,
+    "y": 68
   }
 }
