@@ -29,17 +29,17 @@ export async function handleTemplateSelected({ name, yaml }) {
   const config = await window.api.config.loadUserConfig();
   const templateChanged = config.selected_template !== name;
 
-  await window.api.config.updateUserConfig({ selected_template: name });
-
-  // Always highlight the correct sidebar item
-  EventBus.emit("template:list:highlighted", name);
-
   if (templateChanged) {
+    await window.api.config.updateUserConfig({ selected_template: name });
     EventBus.emit("context:select:form", null);
   }
 
   if (formManager && metaListManager) {
     await formManager.loadTemplate(yaml);
     await metaListManager.loadList();
+  }
+
+  if (templateChanged) {
+    EventBus.emit("template:list:highlighted", name);
   }
 }

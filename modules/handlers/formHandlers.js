@@ -16,13 +16,18 @@ export async function handleFormSelected(datafile) {
     datafile,
   ]);
 
-  await window.api.config.updateUserConfig({ selected_data_file: datafile });
-
   if (!formManager) {
     EventBus.emit("logging:warning", [
       "[Handler] No formManager injected for context:select:form.",
     ]);
     return;
+  }
+
+  const config = await window.api.config.loadUserConfig();
+  const formChanged = config.selected_data_file !== datafile;
+
+  if (formChanged) {
+    await window.api.config.updateUserConfig({ selected_data_file: datafile });
   }
 
   if (!datafile) {
@@ -32,7 +37,7 @@ export async function handleFormSelected(datafile) {
 
   await formManager.loadFormData(null, datafile);
 
-  // Always re-highlight the selected item
-  EventBus.emit("form:list:highlighted", datafile);
-
+  if (formChanged) {
+    EventBus.emit("form:list:highlighted", datafile);
+  }
 }
