@@ -56,4 +56,12 @@ export const EventBus = {
       }
     }
   },
+
+  once(event, callback) {
+    const onceWrapper = (payload) => {
+      this.off(event, onceWrapper);
+      callback(payload);
+    };
+    this.on(event, onceWrapper);
+  }
 };

@@ -10,41 +10,45 @@ import {
 } from "./fieldAppliers.js";
 import { collectLoopGroup } from "./formUtils.js";
 
-let lastSelected = null;
-
 // Highlight + click match
 export function highlightAndClickMatch(container, targetName, onClickFallback = null) {
-  if (!container || typeof targetName !== "string") return;
+  if (!container || !targetName) {
+    EventBus.emit("logging:warning", [
+      "[highlightAndClickMatch] Missing container or targetName",
+    ]);
+    return;
+  }
 
-  const normalizedTarget = targetName.replace(/\.meta\.json$|\.yaml$|\.md$/i, "").toLowerCase();
-  const items = Array.from(container.children);
-  const match =
-    items.find((el) => el.dataset?.value?.toLowerCase() === targetName.toLowerCase()) ||
-    items.find((el) => el.textContent.trim().toLowerCase() === normalizedTarget);
+  const normalizedTarget = targetName
+    .replace(/\.meta\.json$|\.yaml$|\.md$/i, "")
+    .toLowerCase();
 
-  if (!match) return;
+  const match = Array.from(container.children).find(
+    (el) => el.textContent.trim().toLowerCase() === normalizedTarget ||
+            el.dataset?.value?.toLowerCase() === targetName.toLowerCase()
+  );
 
-  // 🛑 Stop recursive bounce
-  if (match === lastSelected) return;
+  if (match) {
+    container
+      .querySelectorAll(".selected")
+      .forEach((el) => el.classList.remove("selected"));
+    match.classList.add("selected");
+    match.click();
 
-  container.querySelectorAll(".selected").forEach((el) => el.classList.remove("selected"));
-
-  match.classList.add("selected");
-  lastSelected = match;
-
-  // ⏳ Prevent loops via debounce
-  setTimeout(() => {
-    lastSelected = null;
-  }, 100);
-
-  match.click();
-
-  if (typeof onClickFallback === "function") {
-    setTimeout(() => {
-      if (!match.classList.contains("selected")) {
-        onClickFallback(targetName);
-      }
-    }, 50);
+    if (typeof onClickFallback === "function") {
+      setTimeout(() => {
+        if (!match.classList.contains("selected")) {
+          EventBus.emit("logging:warning", [
+            "[highlightAndClickMatch] Click failed, running fallback",
+          ]);
+          onClickFallback(targetName);
+        }
+      }, 50);
+    }
+  } else {
+    EventBus.emit("logging:warning", [
+      `[highlightAndClickMatch] No match found for: ${normalizedTarget}`,
+    ]);
   }
 }
 

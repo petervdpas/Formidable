@@ -12,24 +12,17 @@ export async function selectTemplate(name) {
       "[SelectTemplate] Selecting template:",
       name,
     ]);
+
     const result = await window.api.templates.getTemplateDescriptor(name);
-    if (!result || !result.yaml) {
+    if (!result?.yaml) {
       throw new Error(`Template descriptor missing or malformed for: ${name}`);
     }
 
-    const yamlData = result.yaml;
-
+    // 🔁 Emit only → full logic is handled in templateHandlers.js
     EventBus.emit("context:select:template", {
       name,
-      yaml: yamlData,
+      yaml: result.yaml,
     });
-
-    await window.api.config.updateUserConfig({
-      selected_template: name,
-    });
-
-    await window.api.markdown.ensureMarkdownDir(result.storageLocation);
-    EventBus.emit("status:update", `Selected template: ${yamlData.name}`);
   } catch (err) {
     EventBus.emit("logging:error", ["[SelectTemplate] Error:", err]);
     EventBus.emit("status:update", "Error selecting template.");
@@ -52,9 +45,7 @@ export function createTemplateSelector({ templateDropdown }) {
       options: options.map((opt) => opt.value),
       lastSelected: config.selected_template,
       configKey: "selected_template",
-      onSelect: async (name) => {
-        await selectTemplate(name);
-      },
+      onSelect: selectTemplate,
       onFallback: (fallback) => {
         EventBus.emit("logging:default", [
           `[loadTemplateOptions] Falling back to: ${fallback}`,

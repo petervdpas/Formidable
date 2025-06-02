@@ -28,14 +28,37 @@ export function handleListHighlighted({ listId, name }) {
   if (!listId || !name) return;
 
   const container = document.getElementById(listId);
-  if (!container) {
-    EventBus.emit("logging:warning", [
-      `[ListHandler] Container not found: ${listId}`,
-    ]);
-    return;
+  if (!container) return;
+
+  const maxAttempts = 10;
+  const delay = 100;
+  let attempt = 0;
+
+  function tryHighlight() {
+    const items = Array.from(container.children);
+    const match =
+      items.find(
+        (el) =>
+          el.textContent.trim().toLowerCase() ===
+          name.toLowerCase().replace(/\.meta\.json$|\.yaml$|\.md$/i, "")
+      ) ||
+      items.find(
+        (el) => el.dataset?.value?.toLowerCase() === name.toLowerCase()
+      );
+
+    if (match) {
+      highlightAndClickMatch(container, name);
+    } else if (attempt < maxAttempts) {
+      attempt++;
+      setTimeout(tryHighlight, delay);
+    } else {
+      console.warn(
+        `[ListHighlight] Failed to find item "${name}" in #${listId}`
+      );
+    }
   }
 
-  highlightAndClickMatch(container, name);
+  tryHighlight();
 }
 
 export async function handleListItemClicked({ listId, name }) {

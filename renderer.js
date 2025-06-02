@@ -179,29 +179,13 @@ window.addEventListener("DOMContentLoaded", async () => {
     templateDropdown.refresh?.() ?? Promise.resolve(),
   ]);
 
-  // ── Re-apply Last Selected Template and Form ──
-  if (config.selected_template) {
-    window.currentSelectedTemplateName = config.selected_template;
-
-    EventBus.emit("template:list:itemClicked", config.selected_template);
-
-    // Ensure form is selected *after* the template is loaded
-    if (config.selected_data_file) {
-      // Delay ensures storage list is refreshed first
-      setTimeout(() => {
-        EventBus.emit("form:list:itemClicked", config.selected_data_file);
-      }, 100);
-    }
-  }
-
-  // ── Context & Theme Setup ──
+  // ── Force context view BEFORE selection (but no emit yet)
   setContextView(config.context_mode, {
     templateContainer,
     storageContainer,
   });
 
-  // ── EventBus Startup ──
-  EventBus.emit("context:toggle", config.context_mode === "storage");
-  EventBus.emit("logging:toggle", config.logging_enabled);
-  EventBus.emit("theme:toggle", config.theme);
+  // ── Initialize from Config ──
+  EventBus.emit("boot:initialize", config);
+
 });

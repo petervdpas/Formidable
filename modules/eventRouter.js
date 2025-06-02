@@ -2,6 +2,7 @@
 
 import { EventBus } from "./eventBus.js";
 
+import * as bootHandlers from "./handlers/bootHandlers.js";
 import * as screenHandlers from "./handlers/screenHandlers.js";
 import * as contextHandlers from "./handlers/contextHandlers.js";
 import * as templateHandlers from "./handlers/templateHandlers.js";
@@ -104,4 +105,9 @@ export function initEventRouter() {
   EventBus.on("editor:delete", (container) =>
     editorHandler.handleDeleteTemplate(container)
   );
+
+  EventBus.off("boot:initialize", bootHandlers.initializeFromConfig);
+  EventBus.on("boot:initialize", async (config) => {
+    await bootHandlers.initializeFromConfig(config);
+  });
 }
