@@ -68,7 +68,6 @@ Formidable/
 │   ├── formUI.js               # Form loader + handler
 │   ├── formRenderer.js         # Converts templates to field DOM
 │   ├── contextManager.js       # View switching: template vs from(storage)
-│   ├── templateSelector.js     # Dropdown sync for selected template
 │   ├── sidebarManager.js       # Lists for templates and entries
 │   ├── modalManager.js         # Modal control (ESC, sizing, etc)
 │   ├── menuManager.js          # In-app HTML menu bar logic

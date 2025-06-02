@@ -46,7 +46,7 @@ export async function handleContextToggle(isStorage) {
 
     // only if not already applied
     if (selectedTemplate && selectedTemplate !== config.selected_template) {
-      const { selectTemplate } = await import("../templateSelector.js");
+      const { selectTemplate } = await import("../utils/templateSelector.js");
       await selectTemplate(selectedTemplate);
     } else {
       EventBus.emit("logging:default", [

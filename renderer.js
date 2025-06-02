@@ -22,7 +22,7 @@ import {
   createStorageListManager,
 } from "./modules/sidebarManager.js";
 
-import { createTemplateSelector } from "./modules/templateSelector.js";
+import { createTemplateSelector } from "./utils/templateSelector.js";
 
 import { setContextView } from "./modules/contextManager.js";
 

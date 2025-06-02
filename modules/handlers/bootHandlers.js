@@ -30,7 +30,7 @@ export async function initializeFromConfig(config) {
       EventBus.emit("logging:default", [
         `[BootInit] Highlighting template: ${selected_template}`,
       ]);
-      EventBus.emit("template:list:highlighted", selected_template);
+      EventBus.emit("template:list:itemClicked", selected_template);
     } else {
       EventBus.emit("logging:warning", [
         "[BootInit] No selected_template found.",
@@ -44,7 +44,7 @@ export async function initializeFromConfig(config) {
         EventBus.emit("logging:default", [
           `[BootInit] Highlighting form: ${selected_data_file}`,
         ]);
-        EventBus.emit("form:list:highlighted", selected_data_file);
+        EventBus.emit("form:list:itemClicked", selected_data_file);
       } else {
         EventBus.emit("logging:warning", [
           "[BootInit] No selected_data_file provided.",
