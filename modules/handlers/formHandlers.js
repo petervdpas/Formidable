@@ -36,8 +36,4 @@ export async function handleFormSelected(datafile) {
   }
 
   await formManager.loadFormData(null, datafile);
-
-  if (formChanged) {
-    EventBus.emit("form:list:highlighted", datafile);
-  }
 }

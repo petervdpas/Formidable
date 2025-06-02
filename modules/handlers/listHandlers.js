@@ -1,5 +1,10 @@
+// modules/handlers/listHandlers.js
+
 import { EventBus } from "../eventBus.js";
-import { highlightAndClickMatch } from "../../utils/domUtils.js";
+import {
+  clearHighlighted,
+  highlightSelected
+} from "../../utils/domUtils.js";
 
 let templateList = null;
 let storageList = null;
@@ -25,36 +30,25 @@ export async function handleListReload({ listId }) {
 }
 
 export function handleListHighlighted({ listId, name }) {
-  if (!listId || !name) return;
-
   const container = document.getElementById(listId);
-  if (!container) return;
+  if (!container || !name) return;
 
   const maxAttempts = 10;
-  const delay = 100;
   let attempt = 0;
 
   function tryHighlight() {
     const items = Array.from(container.children);
+    const normalized = name.toLowerCase().replace(/\.meta\.json$|\.yaml$|\.md$/i, "");
+
     const match =
-      items.find(
-        (el) =>
-          el.textContent.trim().toLowerCase() ===
-          name.toLowerCase().replace(/\.meta\.json$|\.yaml$|\.md$/i, "")
-      ) ||
-      items.find(
-        (el) => el.dataset?.value?.toLowerCase() === name.toLowerCase()
-      );
+      items.find((el) => el.textContent.trim().toLowerCase() === normalized) ||
+      items.find((el) => el.dataset?.value?.toLowerCase() === name.toLowerCase());
 
     if (match) {
-      highlightAndClickMatch(container, name);
-    } else if (attempt < maxAttempts) {
-      attempt++;
-      setTimeout(tryHighlight, delay);
-    } else {
-      console.warn(
-        `[ListHighlight] Failed to find item "${name}" in #${listId}`
-      );
+      clearHighlighted(container); // 🧼 first clear anything with matching data-list-id
+      highlightSelected(container, name);
+    } else if (attempt++ < maxAttempts) {
+      setTimeout(tryHighlight, 100);
     }
   }
 

@@ -5,11 +5,11 @@
   "context_mode": "template",
   "templates_location": "./templates",
   "storage_location": "./storage",
-  "selected_template": "basic.yaml",
-  "selected_data_file": "sane-20250530.meta.json",
+  "selected_template": "loopie.yaml",
+  "selected_data_file": null,
   "window_bounds": {
-    "width": 1226,
-    "height": 755,
+    "width": 1429,
+    "height": 922,
     "x": 88,
     "y": 37
   }

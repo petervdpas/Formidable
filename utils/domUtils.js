@@ -10,11 +10,30 @@ import {
 } from "./fieldAppliers.js";
 import { collectLoopGroup } from "./formUtils.js";
 
-// Highlight + click match
-export function highlightAndClickMatch(container, targetName, onClickFallback = null) {
+export function clearHighlighted(container) {
+  if (!container) return;
+
+  const listId = container.id;
+
+  const selectedEls = document.querySelectorAll(
+    `.selected[data-list-id="${listId}"]`
+  );
+
+  EventBus.emit("logging:default", [
+    `[clearHighlighted] Found ${selectedEls.length} .selected in [data-list-id="${listId}"]`,
+  ]);
+
+  selectedEls.forEach((el) => el.classList.remove("selected"));
+}
+
+export function highlightSelected(
+  container,
+  targetName,
+  onClickFallback = null
+) {
   if (!container || !targetName) {
     EventBus.emit("logging:warning", [
-      "[highlightAndClickMatch] Missing container or targetName",
+      "[highlightMatch] Missing container or targetName",
     ]);
     return;
   }
@@ -23,32 +42,35 @@ export function highlightAndClickMatch(container, targetName, onClickFallback = 
     .replace(/\.meta\.json$|\.yaml$|\.md$/i, "")
     .toLowerCase();
 
-  const match = Array.from(container.children).find(
-    (el) => el.textContent.trim().toLowerCase() === normalizedTarget ||
-            el.dataset?.value?.toLowerCase() === targetName.toLowerCase()
-  );
+  const items = Array.from(container.querySelectorAll("[data-value]"));
 
-  if (match) {
-    container
-      .querySelectorAll(".selected")
-      .forEach((el) => el.classList.remove("selected"));
-    match.classList.add("selected");
-    match.click();
+  const match =
+    items.find(
+      (el) => el.textContent.trim().toLowerCase() === normalizedTarget
+    ) ||
+    items.find(
+      (el) => el.dataset?.value?.toLowerCase() === targetName.toLowerCase()
+    );
 
-    if (typeof onClickFallback === "function") {
-      setTimeout(() => {
-        if (!match.classList.contains("selected")) {
-          EventBus.emit("logging:warning", [
-            "[highlightAndClickMatch] Click failed, running fallback",
-          ]);
-          onClickFallback(targetName);
-        }
-      }, 50);
-    }
-  } else {
+  if (!match) {
     EventBus.emit("logging:warning", [
-      `[highlightAndClickMatch] No match found for: ${normalizedTarget}`,
+      `[highlightMatch] No match found for: ${normalizedTarget}`,
     ]);
+    return;
+  }
+
+  match.classList.add("selected");
+  match.click();
+
+  if (typeof onClickFallback === "function") {
+    setTimeout(() => {
+      if (!match.classList.contains("selected")) {
+        EventBus.emit("logging:warning", [
+          "[highlightMatch] Click failed, running fallback",
+        ]);
+        onClickFallback(targetName);
+      }
+    }, 50);
   }
 }
 
@@ -187,15 +209,23 @@ export function makeSelectableList(
   onSelect,
   selectedClass = "selected"
 ) {
-  items.forEach(({ element, value }) => {
-    // Wipe old listeners: safest to clone
-    const clean = element.cloneNode(true);
-    element.replaceWith(clean);
+  items.forEach((item, index) => {
+    const oldElement = item.element;
+    const clean = oldElement.cloneNode(true);
+
+    // 🛠 Restore dataset
+    clean.dataset.value = oldElement.dataset.value;
+    clean.dataset.listId = oldElement.dataset.listId;
+
+    oldElement.replaceWith(clean);
+
+    // 🔄 Replace the reference inside the array!
+    items[index].element = clean;
 
     clean.addEventListener("click", () => {
       items.forEach(({ element }) => element.classList.remove(selectedClass));
       clean.classList.add(selectedClass);
-      onSelect(value);
+      onSelect(item.value);
     });
   });
 }

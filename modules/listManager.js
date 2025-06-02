@@ -42,6 +42,7 @@ export function createListManager({
           item.className = itemClass;
           item.textContent = display;
           item.dataset.value = value;
+          item.dataset.listId = elementId;
 
           container.appendChild(item);
           return { element: item, value };

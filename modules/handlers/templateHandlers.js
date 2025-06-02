@@ -42,9 +42,17 @@ export async function handleTemplateSelected({ name, yaml }) {
   if (formManager && metaListManager) {
     await formManager.loadTemplate(yaml);
     await metaListManager.loadList();
+
+    const config = await window.api.config.loadUserConfig();
+    const lastDataFile = config.selected_data_file;
+
+    if (lastDataFile) {
+      EventBus.emit("form:list:highlighted", lastDataFile);
+    }
   }
 
-  if (templateChanged) {
+  const el = document.querySelector(`#template-list [data-value="${name}"]`);
+  if (!el || !el.classList.contains("selected")) {
     EventBus.emit("template:list:highlighted", name);
   }
 }
