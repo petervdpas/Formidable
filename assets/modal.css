@@ -56,35 +56,40 @@
 
 /* ───── Modal Header ───── */
 .modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end; /* Changed from center to bottom-align the content */
-  padding: 10px 0;        /* Reduce vertical padding */
-  margin-bottom: 12px;
-  border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    /* Changed from center to bottom-align the content */
+    padding: 10px 0;
+    /* Reduce vertical padding */
+    margin-bottom: 12px;
+    border-bottom: 1px solid #ddd;
 }
 
 .modal-title-row {
-  display: flex;
-  align-items: flex-end; /* Align baseline of text with line */
-  gap: 12px;
-  flex-wrap: wrap;
-  flex-grow: 1;
-  padding-bottom: 2px;   /* Brings line closer without pushing title too high */
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding-bottom: 4px;
+    /* Optional: if line spacing looks off */
 }
 
 .modal-title-row h2 {
-  margin: 0;
-  font-size: 1.25em;
-  line-height: 1.1;
+    margin: 0;
+    font-size: 1.25em;
+    line-height: 1.1;
 }
 
 .modal-header .btn-close {
-  flex-shrink: 0;
-  margin-left: auto;
-  margin-right: -4px; /* Pull tight to the edge */
-  padding: 6px;
+    flex-shrink: 0;
+    margin-left: auto;
+    margin-right: -4px;
+    /* Pull tight to the edge */
+    padding: 6px;
 }
+
 
 /* ───── Modal Body ───── */
 .modal-body {

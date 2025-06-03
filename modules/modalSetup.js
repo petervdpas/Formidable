@@ -108,7 +108,7 @@ export function setupRenderModal() {
 
       const rawHeader = rawPane?.querySelector(".pane-header");
       const htmlHeader = htmlPane?.querySelector(".pane-header");
-      const modalHeader = modal?.querySelector(".modal-header");
+      const titleRow = modal?.querySelector(".modal-title-row");
 
       const showRawBtn = createShowMarkdownButton(() => {
         rawPane.style.display = "flex";
@@ -124,28 +124,23 @@ export function setupRenderModal() {
         showHtmlBtn.style.display = "none";
       });
 
-      // ⬅️ Insert button group inline next to the title
-      if (modalHeader && !modalHeader.querySelector("#btn-show-markdown")) {
-        const titleEl = modalHeader.querySelector("h2");
+      // Inject toggle buttons into title row
+      if (titleRow && !titleRow.querySelector("#btn-show-markdown")) {
         const toggleGroup = buildButtonGroup(showRawBtn, showHtmlBtn);
         toggleGroup.style.marginLeft = "auto";
         toggleGroup.style.display = "flex";
         toggleGroup.style.gap = "6px";
-
-        modalHeader.appendChild(toggleGroup);
-        modalHeader.style.display = "flex";
-        modalHeader.style.alignItems = "center";
-        modalHeader.style.justifyContent = "space-between";
+        titleRow.appendChild(toggleGroup);
       }
 
-      // Toggle visibility based on current state
+      // Set initial visibility
       const rawHidden = window.getComputedStyle(rawPane).display === "none";
       const htmlHidden = window.getComputedStyle(htmlPane).display === "none";
 
       showRawBtn.style.display = rawHidden ? "inline-block" : "none";
       showHtmlBtn.style.display = htmlHidden ? "inline-block" : "none";
 
-      // ✖️ Close buttons per pane
+      // Close buttons for individual panes
       if (rawHeader && !rawHeader.querySelector(".btn-close-pane")) {
         rawHeader.appendChild(
           createPaneCloseButton("raw-pane", () => {
@@ -166,7 +161,7 @@ export function setupRenderModal() {
         );
       }
 
-      // ↕ Scroll sync
+      // Enable scroll sync
       const output = document.getElementById("render-output");
       const preview = document.getElementById("render-preview");
 

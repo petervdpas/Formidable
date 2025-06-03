@@ -141,7 +141,7 @@ export function createFormRenderButton(onClick) {
 export function createShowMarkdownButton(onClick) {
   return createButton({
     text: "🡐 Markdown",
-    className: "btn-light",
+    className: "modal-header-button",
     identifier: "show-markdown",
     onClick,
   });
@@ -150,7 +150,7 @@ export function createShowMarkdownButton(onClick) {
 export function createShowPreviewButton(onClick) {
   return createButton({
     text: "Preview 🡒",
-    className: "btn-light",
+    className: "modal-header-button",
     identifier: "show-preview",
     onClick,
   });
