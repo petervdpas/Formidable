@@ -88,12 +88,22 @@ button:disabled,
   outline: none;
 }
 
+.btn-close-pane {
+  background: none;
+  border: none;
+  color: var(--close-button-color);
+  cursor: pointer;
+  font-size: 1.2em;
+  padding: 0 6px;
+  margin-left: auto;
+}
+
 /* ───── Button Group ───── */
 
 .button-group {
   display: flex;
   gap: 4px;
-  margin-top: 1em;
+  margin-top: 0.2em;
   justify-content: flex-start;
 }
 
@@ -118,4 +128,9 @@ button:disabled,
 .copy-btn:focus {
   color: #000;
   outline: none;
+}
+
+.toggle-buttons-inline button {
+  padding: 4px 10px;
+  font-size: 0.9em;
 }

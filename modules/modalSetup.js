@@ -12,6 +12,9 @@ import { syncScroll } from "../utils/domUtils.js";
 import {
   createModalConfirmButton,
   createModalCancelButton,
+  createShowMarkdownButton,
+  createShowPreviewButton,
+  createPaneCloseButton,
   buildButtonGroup,
 } from "./uiButtons.js";
 
@@ -100,11 +103,75 @@ export function setupRenderModal() {
       const modal = document.getElementById("render-modal");
       if (modal) modal.classList.add("large");
 
-      const rawPane = document.getElementById("render-output");
-      const htmlPane = document.getElementById("render-preview");
+      const rawPane = document.querySelector(".raw-pane");
+      const htmlPane = document.querySelector(".html-pane");
 
-      if (rawPane && htmlPane) {
-        syncScroll(rawPane, htmlPane);
+      const rawHeader = rawPane?.querySelector(".pane-header");
+      const htmlHeader = htmlPane?.querySelector(".pane-header");
+      const modalHeader = modal?.querySelector(".modal-header");
+
+      const showRawBtn = createShowMarkdownButton(() => {
+        rawPane.style.display = "flex";
+        rawPane.style.flex = "1 1 0";
+        htmlPane.style.flex = "1 1 0";
+        showRawBtn.style.display = "none";
+      });
+
+      const showHtmlBtn = createShowPreviewButton(() => {
+        htmlPane.style.display = "flex";
+        htmlPane.style.flex = "1 1 0";
+        rawPane.style.flex = "1 1 0";
+        showHtmlBtn.style.display = "none";
+      });
+
+      // ⬅️ Insert button group inline next to the title
+      if (modalHeader && !modalHeader.querySelector("#btn-show-markdown")) {
+        const titleEl = modalHeader.querySelector("h2");
+        const toggleGroup = buildButtonGroup(showRawBtn, showHtmlBtn);
+        toggleGroup.style.marginLeft = "auto";
+        toggleGroup.style.display = "flex";
+        toggleGroup.style.gap = "6px";
+
+        modalHeader.appendChild(toggleGroup);
+        modalHeader.style.display = "flex";
+        modalHeader.style.alignItems = "center";
+        modalHeader.style.justifyContent = "space-between";
+      }
+
+      // Toggle visibility based on current state
+      const rawHidden = window.getComputedStyle(rawPane).display === "none";
+      const htmlHidden = window.getComputedStyle(htmlPane).display === "none";
+
+      showRawBtn.style.display = rawHidden ? "inline-block" : "none";
+      showHtmlBtn.style.display = htmlHidden ? "inline-block" : "none";
+
+      // ✖️ Close buttons per pane
+      if (rawHeader && !rawHeader.querySelector(".btn-close-pane")) {
+        rawHeader.appendChild(
+          createPaneCloseButton("raw-pane", () => {
+            rawPane.style.display = "none";
+            htmlPane.style.flex = "1 1 auto";
+            showRawBtn.style.display = "inline-block";
+          })
+        );
+      }
+
+      if (htmlHeader && !htmlHeader.querySelector(".btn-close-pane")) {
+        htmlHeader.appendChild(
+          createPaneCloseButton("html-pane", () => {
+            htmlPane.style.display = "none";
+            rawPane.style.flex = "1 1 auto";
+            showHtmlBtn.style.display = "inline-block";
+          })
+        );
+      }
+
+      // ↕ Scroll sync
+      const output = document.getElementById("render-output");
+      const preview = document.getElementById("render-preview");
+
+      if (output && preview) {
+        syncScroll(output, preview);
       }
     },
   });

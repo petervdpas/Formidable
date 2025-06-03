@@ -36,7 +36,15 @@ export function setupModal(
       onClick: () => hide(),
     });
 
-    if (header) header.appendChild(newBtn);
+    const titleRow = header?.querySelector(".modal-title-row");
+    if (titleRow) {
+      // Insert close button after the title row (preferred layout)
+      header.appendChild(newBtn);
+    } else if (header) {
+      // Fallback if no title row is defined
+      header.appendChild(newBtn);
+    }
+
     close = newBtn;
   }
 

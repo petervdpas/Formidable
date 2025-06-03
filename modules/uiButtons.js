@@ -138,6 +138,24 @@ export function createFormRenderButton(onClick) {
   });
 }
 
+export function createShowMarkdownButton(onClick) {
+  return createButton({
+    text: "🡐 Markdown",
+    className: "btn-light",
+    identifier: "show-markdown",
+    onClick,
+  });
+}
+
+export function createShowPreviewButton(onClick) {
+  return createButton({
+    text: "Preview 🡒",
+    className: "btn-light",
+    identifier: "show-preview",
+    onClick,
+  });
+}
+
 export function createCopyMarkdownButton(onClick) {
   return createButton({
     text: "⧉",
@@ -153,6 +171,16 @@ export function createCopyPreviewButton(onClick) {
     className: "copy-btn",
     identifier: "copy-preview",
     onClick,
+  });
+}
+
+export function createPaneCloseButton(targetPaneClass, onClick) {
+  return createButton({
+    text: "✕",
+    className: "btn-close-pane",
+    identifier: `close-${targetPaneClass}`,
+    onClick,
+    attributes: { "data-target-pane": targetPaneClass }
   });
 }
 
