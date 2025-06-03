@@ -4,6 +4,7 @@ import { setupModal } from "./modalManager.js";
 import { EventBus } from "./eventBus.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 import { renderSettings, getCachedConfig } from "./settingsManager.js";
+import { renderWorkspaceModal } from "./contextManager.js";
 import { applyModalCssClass } from "../utils/modalUtils.js";
 import { extractFieldDefinition } from "../utils/formUtils.js";
 import { createDropdown } from "./dropdownManager.js";
@@ -26,6 +27,23 @@ export function setupSettingsModal() {
       const ok = await renderSettings();
       if (!ok)
         EventBus.emit("logging:warning", ["Settings container not found"]);
+    },
+  });
+}
+
+export function setupWorkspaceModal() {
+  return setupModal("workspace-modal", {
+    closeBtn: "workspace-close",
+    escToClose: true,
+    backdropClick: true,
+    resizable: true,
+    width: "30em",
+    height: "auto",
+    onOpen: async () => {
+      const ok = await renderWorkspaceModal();
+      if (!ok) {
+        EventBus.emit("logging:warning", ["Workspace container not found"]);
+      }
     },
   });
 }

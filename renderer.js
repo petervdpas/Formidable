@@ -12,6 +12,7 @@ import { createFormManager } from "./modules/formUI.js";
 
 import {
   setupSettingsModal,
+  setupWorkspaceModal,
   setupEntryModal,
   setupTemplateModal,
   setupAboutModal,
@@ -73,11 +74,13 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // ── Modals ──
   const settings = setupSettingsModal();
+  const workspaceModal = setupWorkspaceModal();
   const entryInputModal = setupEntryModal();
   const templateModal = setupTemplateModal();
   const aboutModal = setupAboutModal();
 
   window.openSettingsModal = settings.show;
+  window.openWorkspaceModal = workspaceModal.show;
   window.openAboutModal = aboutModal.show;
 
   // ── Form System ──
@@ -187,5 +190,4 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // ── Initialize from Config ──
   EventBus.emit("boot:initialize", config);
-
 });

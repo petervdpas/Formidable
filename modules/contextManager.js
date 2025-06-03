@@ -2,6 +2,8 @@
 
 import { EventBus } from "./eventBus.js";
 import { setupSplitter } from "../utils/resizing.js";
+import { createSwitch } from "../utils/elementBuilders.js";
+import { createDropdown } from "./dropdownManager.js";
 
 let templateSplitterInitialized = false;
 let storageSplitterInitialized = false;
@@ -43,4 +45,111 @@ export function initContextToggle({ toggleElement }) {
     const isStorage = e.target.checked;
     EventBus.emit("context:toggle", isStorage);
   });
+}
+
+let cachedConfig = null;
+
+export async function renderWorkspaceModal() {
+  const container = document.getElementById("workspace-body");
+  if (!container) return false;
+
+  cachedConfig = await window.api.config.loadUserConfig();
+  const config = cachedConfig;
+  const isStorage = config.context_mode === "storage";
+
+  container.innerHTML = "";
+
+  // Context toggle
+  const contextSwitch = createSwitch(
+    "context-toggle",
+    "Context Mode",
+    isStorage,
+    (checked) => {
+      const contextMode = checked ? "storage" : "template";
+      EventBus.emit("logging:default", [
+        `[Workspace] Context toggle changed: ${contextMode}`,
+      ]);
+      EventBus.emit("context:toggle", checked);
+      window.api.config.updateUserConfig({ context_mode: contextMode });
+      renderContextDropdown(checked, {
+        ...cachedConfig,
+        selected_template: window.currentSelectedTemplateName,
+      });
+    },
+    "block",
+    ["Storage", "Template"]
+  );
+  container.appendChild(contextSwitch);
+
+  // Dropdown wrapper
+  const contextWrapper = document.createElement("div");
+  contextWrapper.id = "context-selection-wrapper";
+  contextWrapper.className = "context-wrapper";
+  contextWrapper.style.marginTop = "12px";
+  contextWrapper.innerHTML = `
+    <div style="font-size: 0.9em; color: var(--input-fg); opacity: 0.8;">
+      This section will show available forms or templates depending on context mode.
+    </div>
+  `;
+  container.appendChild(contextWrapper);
+
+  // Initial dropdown render
+  renderContextDropdown(isStorage, {
+    ...cachedConfig,
+    selected_template: window.currentSelectedTemplateName,
+  });
+}
+
+function renderContextDropdown(isStorage, config) {
+  const wrapper = document.getElementById("context-selection-wrapper");
+  if (!wrapper) return;
+
+  wrapper.innerHTML = "";
+
+  const dropdown = createDropdown({
+    containerId: "context-selection-wrapper",
+    labelText: isStorage ? "Available Forms" : "Available Templates",
+    selectedValue: isStorage
+      ? window.currentSelectedFormName
+      : window.currentSelectedTemplateName,
+    options: [],
+    onRefresh: async () => {
+      try {
+        if (isStorage) {
+          const template = window.currentSelectedTemplate;
+          if (!template?.storage_location) return [];
+          const files = await window.api.forms.listForms(
+            template.storage_location
+          );
+          return files.map((f) => ({
+            value: f,
+            label: f.replace(/\.meta\.json$/, ""),
+          }));
+        } else {
+          const templates = await window.api.templates.listTemplates();
+          return templates.map((t) => ({
+            value: t,
+            label: t.replace(/\.yaml$/, ""),
+          }));
+        }
+      } catch (err) {
+        EventBus.emit("logging:error", [
+          "[Workspace] Failed to reload dropdown:",
+          err,
+        ]);
+        return [];
+      }
+    },
+    onChange: async (val) => {
+      if (!val) return;
+
+      if (isStorage) {
+        EventBus.emit("form:list:highlighted", val);
+      } else {
+        EventBus.emit("template:list:highlighted", val);
+      }
+    },
+  });
+
+  dropdown?.refresh();
 }

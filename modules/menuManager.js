@@ -32,6 +32,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
     ]),
     createMenuGroup("Config", [
       { label: "Settings...", action: "open-settings" },
+      { label: "Workspace...", action: "open-workspace-settings" },
     ]),
     createMenuGroup("View", [
       { label: "Reload", action: "reload" },
@@ -89,7 +90,7 @@ function createContextToggleItem() {
       EventBus.emit("context:toggle", checked);
     },
     "inline",
-    ["Storage", "Template"],
+    ["Storage", "Template"]
   );
 
   li.appendChild(toggle);
@@ -191,6 +192,11 @@ export async function handleMenuAction(action) {
     case "devtools":
       EventBus.emit("logging:default", ["[Menu] Toggling devtools..."]);
       window.electron.devtools.toggle();
+      break;
+
+    case "open-workspace-settings":
+      EventBus.emit("logging:default", ["[Menu] Opening workspace modal..."]);
+      window.openWorkspaceModal?.();
       break;
 
     case "about":
