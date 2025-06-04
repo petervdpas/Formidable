@@ -1,8 +1,8 @@
 .meta-section {
   position: relative;
-  float: left;
-  min-width: 360px;
-  max-width: 360px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
   background-color: var(--meta-section-bg);
   border: 1px solid var(--meta-section-border);
   border-radius: 6px;
@@ -12,16 +12,17 @@
   font-size: var(--meta-section-font-size);
   font-family: monospace, monospace;
   white-space: pre-line;
-  clear: both;
 }
 
 .meta-section p {
+  flex: 1 1 auto;
   margin: 0;
   line-height: 1.4;
+  overflow-wrap: break-word;
 }
 
 .meta-section .flagged-toggle-container {
   position: absolute;
   top: 0px;
-  right: 4px;
+  right: 0px;
 }
