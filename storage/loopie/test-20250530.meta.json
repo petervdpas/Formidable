@@ -1,17 +1,26 @@
 {
-  "title": "The absolute main title!",
-  "looper": [
-    {
-      "sub_title": "A splut sound is never good news",
-      "description": "You guessed it... ~~The princess was no more!~~ That does it!"
-    },
-    {
-      "sub_title": "Once upon a time...",
-      "description": "**Once upon a time** there was a ~~little~~ princess... It was a tiny princess! You could hardly see her.\n\n1.  One\n2.  Two\n3.  Three\n\n-----"
-    },
-    {
-      "sub_title": "Then came a big foot",
-      "description": "The little princess was **playing** in the garden. And that day it happened... The big foot! She didn't see it. Splut! \n\nA good day to you!"
-    }
-  ]
+  "meta": {
+    "author": "Peter van de Pas",
+    "author_email": "peter.vdpas@gmail.com",
+    "template": "loopie.yaml",
+    "created": "2025-06-04T13:30:38.187Z",
+    "updated": "2025-06-04T15:37:39.623Z"
+  },
+  "data": {
+    "title": "The absolute main title!",
+    "looper": [
+      {
+        "sub_title": "Once upon a time...",
+        "description": "**Once upon a time** there was a ~~little~~ princess... It was a tiny princess! You could hardly see her.\n\n1.  One\n2.  Two\n3.  Three\n\n-----"
+      },
+      {
+        "sub_title": "Then came a big foot",
+        "description": "The little princess was **playing** in the garden. And that day it happened... The big foot! She didn't see it. Splut! \n\nA good day to you!"
+      },
+      {
+        "sub_title": "A splut sound is never good news",
+        "description": "You guessed it... ~~The princess was no more!~~ That does it!"
+      }
+    ]
+  }
 }

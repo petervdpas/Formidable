@@ -1,23 +1,32 @@
 {
-  "test": "A Lad in Sane",
-  "check": false,
-  "dropdown": "L",
-  "multichoice": [
-    "A"
-  ],
-  "radio": "CAT",
-  "mline": "A whole lot of prefab text...",
-  "numpy": 17,
-  "bday": "1968-12-23",
-  "listy": [
-    "One"
-  ],
-  "datable": [
-    [
-      "1",
-      "2",
-      "3"
-    ]
-  ],
-  "design": "formidable.png"
+  "meta": {
+    "author": "Peter van de Pas",
+    "author_email": "peter.vdpas@gmail.com",
+    "template": "basic.yaml",
+    "created": "2025-06-04T13:22:47.470Z",
+    "updated": "2025-06-04T15:37:49.783Z"
+  },
+  "data": {
+    "test": "Default value",
+    "check": true,
+    "dropdown": "R",
+    "multichoice": [
+      "B"
+    ],
+    "radio": "BIRD",
+    "mline": "I dont like this one bit",
+    "numpy": 17,
+    "bday": "1968-12-23",
+    "listy": [
+      "A single list item"
+    ],
+    "datable": [
+      [
+        "Butter",
+        "Cheese",
+        "Eggs"
+      ]
+    ],
+    "design": "formidable.png"
+  }
 }

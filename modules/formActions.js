@@ -18,61 +18,56 @@ const warn = (...args) => EventBus.emit("logging:warning", args);
 const err = (...args) => EventBus.emit("logging:error", args);
 
 export async function saveForm(container, template) {
-  EventBus.emit("logging:default", ["[saveForm] Save triggered."]);
-
-  if (!template || !template.storage_location) {
-    warn("[saveForm] No template selected.");
+  if (!template?.storage_location) {
     EventBus.emit("status:update", "No template selected.");
     return;
   }
 
-  const formData = await getFormData(container, template);
-  const datafileInput = container.querySelector("#meta-json-filename");
-  const datafile = validateFilenameInput(datafileInput);
-
+  const datafile = validateFilenameInput(
+    container.querySelector("#meta-json-filename")
+  );
   if (!datafile) {
-    warn("[saveForm] No datafile provided.");
     EventBus.emit("status:update", "Please enter a filename for datafile.");
     return;
   }
 
-  const storageLocation = template.storage_location;
-  const saveResult = await window.api.forms.saveForm(
-    storageLocation,
+  // → bestaande `created` ophalen
+  let created = null;
+  try {
+    const existing = await window.api.forms.loadForm(
+      template.storage_location,
+      datafile
+    );
+    created = existing?.meta?.created || null;
+  } catch {}
+
+  const rawData = await getFormData(container, template);
+  const userConfig = await window.api.config.loadUserConfig();
+
+  const payload = {
+    ...rawData,
+    _meta: {
+      author: userConfig.author_name || "unknown",
+      author_email: userConfig.author_email || "unknown@example.com",
+      template: template.filename || "unknown",
+      created, // → alleen als die er was
+      updated: new Date().toISOString(),
+    },
+  };
+
+  const result = await window.api.forms.saveForm(
+    template.storage_location,
     datafile,
-    formData,
+    payload,
     template.fields || []
   );
 
-  if (saveResult.success) {
-    EventBus.emit("status:update", `Saved metadata: ${saveResult.path}`);
+  if (result.success) {
+    EventBus.emit("status:update", `Saved: ${result.path}`);
     EventBus.emit("form:list:reload");
-
-    setTimeout(() => {
-      EventBus.emit("form:list:highlighted", datafile);
-    }, 500);
-
-    const newMeta = await window.api.forms.loadForm(
-      storageLocation,
-      datafile,
-      template.fields || []
-    );
-
-    const { renderFormUI } = await import("./formRenderer.js");
-    renderFormUI(
-      container,
-      template,
-      Object.assign(newMeta, { _filename: datafile }),
-      () => saveForm(container, template),
-      (filename) => deleteForm(container, template, filename),
-      () => renderFormPreview(container, template)
-    );
+    setTimeout(() => EventBus.emit("form:list:highlighted", datafile), 500);
   } else {
-    err("[saveForm] Save failed:", saveResult.error);
-    EventBus.emit(
-      "status:update",
-      `Failed to save metadata: ${saveResult.error}`
-    );
+    EventBus.emit("status:update", `Failed to save: ${result.error}`);
   }
 }
 

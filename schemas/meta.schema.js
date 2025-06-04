@@ -1,53 +1,84 @@
-// modules/meta.schema.js
+// schemas/meta.schema.js
 
 module.exports = {
-  sanitize(raw = {}, templateFields = []) {
+  sanitize(
+    raw = {},
+    templateFields = [],
+    {
+      templateName = "unknown",
+      author = "unknown",
+      author_email = "unknown@example.com",
+      created = null,
+      updated = null,
+    } = {}
+  ) {
+    const rawData = raw.data || raw;
+    const rawMeta = raw.meta || {};
+    const injected = raw._meta || {};
+
     const result = {};
-    const skipKeys = new Set();
+    const skip = new Set();
 
     for (let i = 0; i < templateFields.length; i++) {
-      const field = templateFields[i];
-
-      if (field.type === "loopstart") {
-        const loopKey = field.key;
-        result[loopKey] = raw[loopKey] || [];
-
-        // Verzamel child keys zodat we ze niet per ongeluk in root meenemen
-        const group = [];
-        let j = i + 1;
-        while (
-          j < templateFields.length &&
-          !(
-            templateFields[j].type === "loopstop" &&
-            templateFields[j].key === loopKey
-          )
-        ) {
-          group.push(templateFields[j]);
-          skipKeys.add(templateFields[j].key);
-          j++;
-        }
-
-        i = j; // overslaan tot en met loopstop
-      } else if (!skipKeys.has(field.key)) {
-        const fallback = field.default ?? getDefaultForType(field.type);
-        result[field.key] =
-          raw[field.key] !== undefined ? raw[field.key] : fallback;
+      const f = templateFields[i];
+      if (f.type === "loopstart") {
+        const loopKey = f.key;
+        result[loopKey] = rawData[loopKey] || [];
+        const { keys, endIndex } = extractLoopGroup(
+          templateFields,
+          i + 1,
+          loopKey
+        );
+        keys.forEach((k) => skip.add(k));
+        i = endIndex;
+      } else if (!skip.has(f.key)) {
+        const fallback = f.default ?? getDefaultForType(f.type);
+        result[f.key] =
+          rawData[f.key] !== undefined ? rawData[f.key] : fallback;
       }
     }
 
-    return result;
+    return {
+      meta: {
+        author: rawMeta.author || injected.author || author,
+        author_email:
+          rawMeta.author_email || injected.author_email || author_email,
+        template: rawMeta.template || injected.template || templateName,
+        created:
+          rawMeta.created ||
+          injected.created ||
+          created ||
+          new Date().toISOString(),
+        updated: updated || injected.updated || new Date().toISOString(),
+      },
+      data: result,
+    };
   },
 };
 
-// Optional helper for smarter fallback defaults based on type
+function extractLoopGroup(fields, start, loopKey) {
+  const keys = [];
+  let end = start;
+  while (
+    end < fields.length &&
+    !(fields[end].type === "loopstop" && fields[end].key === loopKey)
+  ) {
+    keys.push(fields[end].key);
+    end++;
+  }
+  return { keys, endIndex: end };
+}
+
 function getDefaultForType(type) {
   switch (type) {
     case "boolean":
       return false;
-    case "dropdown":
-      return "";
-    case "text":
-      return "";
+    case "number":
+      return 0;
+    case "multioption":
+    case "list":
+    case "table":
+      return [];
     default:
       return "";
   }

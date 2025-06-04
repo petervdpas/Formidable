@@ -4,7 +4,7 @@ import { EventBus } from "./eventBus.js";
 import { initTabs } from "../utils/tabUtils.js";
 import { formatAsRelativePath } from "../utils/pathUtils.js";
 import { initThemeToggle } from "./themeToggle.js";
-import { createSwitch } from "../utils/elementBuilders.js";
+import { createSwitch, createSettingsInput } from "../utils/elementBuilders.js";
 
 let cachedConfig = null;
 
@@ -36,6 +36,29 @@ export async function renderSettings() {
   const tabGeneral = document.createElement("div");
   tabGeneral.className = "tab-panel tab-general";
 
+  // Author fields via helper
+  tabGeneral.appendChild(
+    createSettingsInput({
+      id: "author-name",
+      label: "Author Name",
+      value: config.author_name,
+      placeholder: "Your full name",
+      configKey: "author_name",
+    })
+  );
+
+  tabGeneral.appendChild(
+    createSettingsInput({
+      id: "author-email",
+      label: "Author Email",
+      value: config.author_email,
+      placeholder: "you@example.com",
+      type: "email",
+      configKey: "author_email",
+    })
+  );
+
+  // Theme + Logging switches
   tabGeneral.appendChild(
     createSwitch(
       "theme-toggle",
@@ -57,6 +80,7 @@ export async function renderSettings() {
     )
   );
 
+  // ─── Directories ──────────────────────
   const tabDirs = document.createElement("div");
   tabDirs.className = "tab-panel tab-dirs";
   tabDirs.innerHTML = `
@@ -72,7 +96,7 @@ export async function renderSettings() {
     )}
   `;
 
-  // ─── Inject into container ────────────
+  // Inject tabs
   container.appendChild(tabButtons);
   container.appendChild(tabGeneral);
   container.appendChild(tabDirs);

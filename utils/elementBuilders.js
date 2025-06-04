@@ -43,6 +43,43 @@ export function createStyledSelect({
   return select;
 }
 
+export function createSettingsInput({
+  id,
+  label,
+  value,
+  placeholder = "",
+  type = "text",
+  configKey = id,
+  onSave = null,
+}) {
+  const row = document.createElement("div");
+  row.className = "modal-form-row";
+
+  const labelEl = document.createElement("label");
+  labelEl.setAttribute("for", id);
+  labelEl.textContent = label;
+
+  const input = document.createElement("input");
+  input.type = type;
+  input.id = id;
+  input.name = configKey;
+  input.value = value || "";
+  input.placeholder = placeholder;
+
+  input.onchange = async () => {
+    const newVal = input.value.trim();
+    await window.api.config.updateUserConfig({ [configKey]: newVal });
+    cachedConfig = await window.api.config.loadUserConfig();
+
+    if (onSave) onSave(newVal);
+    else EventBus.emit("status:update", `${label} set to ${newVal}`);
+  };
+
+  row.appendChild(labelEl);
+  row.appendChild(input);
+  return row;
+}
+
 export function populateSelectOptions(
   selectElement,
   options = [],

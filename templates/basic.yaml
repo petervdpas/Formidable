@@ -1,4 +1,5 @@
 name: Basic Form
+filename: basic.yaml
 storage_location: ./storage/basic
 markdown_template: |-
   <!-- AUTO-GENERATED TEMPLATE - Only if Editor is empty! -->

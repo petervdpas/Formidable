@@ -35,7 +35,10 @@ export function createFormManager(containerId) {
     EventBus.emit("logging:default", [
       "[createFormManager:loadTemplate] Loading template:",
       templateYaml.name,
+      "→ filename:",
+      templateYaml.filename || "<missing>",
     ]);
+
     currentTemplate = templateYaml;
     clearFormUI(container);
   }
@@ -64,12 +67,13 @@ export function createFormManager(containerId) {
       return;
     }
 
-    injectFieldDefaults(currentTemplate.fields, metaData);
+    const formData = metaData.data || metaData;
+    injectFieldDefaults(currentTemplate.fields, formData);
 
     renderFormUI(
       container,
       currentTemplate,
-      { ...metaData, _filename: datafile },
+      { ...formData, _filename: datafile },
       () => saveForm(container, currentTemplate),
       (filename) => deleteForm(container, currentTemplate, filename),
       () => renderFormPreview(container, currentTemplate)

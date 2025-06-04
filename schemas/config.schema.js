@@ -1,4 +1,4 @@
-// modules/config.schema.js
+// schemas/config.schema.js
 
 module.exports = {
   defaults: {
@@ -10,6 +10,8 @@ module.exports = {
     storage_location: "./storage",
     selected_template: "basic.yaml",
     selected_data_file: "",
+    author_name: "unknown",
+    author_email: "unknown@example.com",
     window_bounds: {
       width: 1024,
       height: 800,

@@ -52,7 +52,7 @@ function loadTemplate(name) {
   const filePath = getTemplatePath(name);
   try {
     const raw = fileManager.loadFile(filePath, { format: "yaml" });
-    const sanitized = schema.sanitize(raw);
+    const sanitized = schema.sanitize(raw, name); // filename = bestandsnaam
     return sanitized;
   } catch (err) {
     error("[TemplateManager] Failed to load:", filePath, err);
@@ -66,8 +66,30 @@ function saveTemplate(name, data) {
       data.storage_location = data.storage_location.replace(/\\/g, "/");
     }
 
+    // Voeg filename toe als die nog niet bestaat
+    if (!data.filename) {
+      data.filename = name;
+    }
+
+    // Bouw een nieuw object met keys in de juiste volgorde
+    const ordered = {};
+
+    // Zet name en filename eerst (in die volgorde)
+    ordered.name = data.name || "";
+    ordered.filename = data.filename;
+
+    // Voeg de rest toe, behalve name en filename
+    for (const key of Object.keys(data)) {
+      if (key !== "name" && key !== "filename") {
+        ordered[key] = data[key];
+      }
+    }
+
     const filePath = getTemplatePath(name);
-    const saved = fileManager.saveFile(filePath, data, { format: "yaml" });
+
+    // Hier moet je fileManager.saveFile zo aanpassen dat het
+    // de keys in deze volgorde serialiseert (of, je gebruikt een YAML-lib die dat kan)
+    const saved = fileManager.saveFile(filePath, ordered, { format: "yaml" });
 
     if (saved) {
       log("[TemplateManager] Saved template:", filePath);

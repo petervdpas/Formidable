@@ -1,4 +1,5 @@
 name: loopie
+filename: loopie.yaml
 storage_location: ./storage/loopie
 markdown_template: |-
   <!-- AUTO-GENERATED TEMPLATE - Only if Editor is empty! -->
