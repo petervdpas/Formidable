@@ -1,10 +1,10 @@
 {
   "meta": {
-    "author": "Peter van de Pas",
+    "author_name": "Peter van de Pas",
     "author_email": "peter.vdpas@gmail.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-06-04T15:37:49.783Z"
+    "updated": "2025-06-04T15:42:16.359Z"
   },
   "data": {
     "test": "Default value",

@@ -6,7 +6,7 @@ module.exports = {
     templateFields = [],
     {
       templateName = "unknown",
-      author = "unknown",
+      author_name = "unknown",
       author_email = "unknown@example.com",
       created = null,
       updated = null,
@@ -40,7 +40,7 @@ module.exports = {
 
     return {
       meta: {
-        author: rawMeta.author || injected.author || author,
+        author_name: rawMeta.author_name || injected.author_name || author_name,
         author_email:
           rawMeta.author_email || injected.author_email || author_email,
         template: rawMeta.template || injected.template || templateName,

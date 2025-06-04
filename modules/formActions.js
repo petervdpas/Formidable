@@ -47,7 +47,7 @@ export async function saveForm(container, template) {
   const payload = {
     ...rawData,
     _meta: {
-      author: userConfig.author_name || "unknown",
+      author_name: userConfig.author_name || "unknown",
       author_email: userConfig.author_email || "unknown@example.com",
       template: template.filename || "unknown",
       created, // → alleen als die er was
