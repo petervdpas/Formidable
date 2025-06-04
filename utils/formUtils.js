@@ -80,6 +80,8 @@ export function collectLoopGroup(fields, startIdx, loopKey) {
 
 export async function getFormData(container, template) {
   const data = {};
+  const meta = {};
+
   const fields = template.fields || [];
 
   let i = 0;
@@ -135,11 +137,23 @@ export async function getFormData(container, template) {
     }
   }
 
+  // Read hidden inputs for _filename and flagged
+  const filenameInput = container.querySelector("#meta-json-filename");
+  if (filenameInput) {
+    meta._filename = filenameInput.value.trim();
+  }
+
+  const flaggedInput = container.querySelector("#meta-flagged");
+  if (flaggedInput) {
+    meta.flagged = flaggedInput.value === "true";
+  }
+
   EventBus.emit("logging:default", [
     "[getFormData] Collected form data:",
-    data,
+    { data, meta },
   ]);
-  return data;
+
+  return { data, meta };
 }
 
 export function createLoopDefaults(group) {

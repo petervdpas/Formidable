@@ -41,16 +41,17 @@ export async function saveForm(container, template) {
     created = existing?.meta?.created || null;
   } catch {}
 
-  const rawData = await getFormData(container, template);
+  const { data, meta } = await getFormData(container, template);
   const userConfig = await window.api.config.loadUserConfig();
 
   const payload = {
-    ...rawData,
+    ...data,
     _meta: {
+      ...meta,
       author_name: userConfig.author_name || "unknown",
       author_email: userConfig.author_email || "unknown@example.com",
       template: template.filename || "unknown",
-      created, // → alleen als die er was
+      created,
       updated: new Date().toISOString(),
     },
   };
@@ -109,15 +110,15 @@ export async function renderFormPreview(container, template) {
   const renderModal = setupRenderModal();
 
   log("[Render] Collecting form data...");
-  const formData = await getFormData(container, template);
-  if (!formData || typeof formData !== "object") {
-    err("[Render] Invalid formData:", formData);
+  const { data, meta } = await getFormData(container, template);
+  if (!data || typeof data !== "object") {
+    err("[Render] Invalid formData:", data);
     return;
   }
 
   log("[Render] Rendering Markdown...");
   const markdown = await window.api.transform.renderMarkdownTemplate(
-    formData,
+    data,
     template
   );
   document.getElementById("render-output").textContent = markdown;

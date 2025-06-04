@@ -9,6 +9,7 @@ import {
 } from "../utils/formUtils.js";
 import { applyFieldValues, focusFirstInput } from "../utils/domUtils.js";
 import {
+  createFlaggedToggleButton,
   createFormSaveButton,
   createFormDeleteButton,
   createFormRenderButton,
@@ -210,17 +211,28 @@ export function renderFormUI(
 ) {
   container.innerHTML = "";
 
-  // Use hidden input for filename so it is in DOM but not visible
+  // Hidden filename input (for saving)
   const filenameInput = buildHiddenInput(
     "meta-json-filename",
     metaData._filename || ""
   );
   container.appendChild(filenameInput);
 
-  // Add meta info section (without flagged toggle callback)
+  // Hidden flagged input (for saving)
+  const flaggedInput = buildHiddenInput(
+    "meta-flagged",
+    metaData.meta?.flagged ? "true" : "false"
+  );
+  container.appendChild(flaggedInput);
+
+  // Meta info section with flagged toggle, updating hidden input on change
   const metaSection = buildMetaSection(
     metaData.meta || {},
-    metaData._filename || ""
+    metaData._filename || "",
+    metaData.meta?.flagged || false,
+    (newFlagged) => {
+      flaggedInput.value = newFlagged ? "true" : "false";
+    }
   );
   container.appendChild(metaSection);
 

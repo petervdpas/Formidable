@@ -302,7 +302,7 @@ export function renderDateField(field) {
 export function renderListField(field) {
   const wrapper = document.createElement("div");
   wrapper.dataset.type = "list";
-  wrapper.dataset.listField = field.key; // ✅ this is crucial for getFormData()
+  wrapper.dataset.listField = field.key; // this is crucial for getFormData()
 
   const items = field.default || [];
 
