@@ -1,5 +1,5 @@
 {
-  "theme": "dark",
+  "theme": "light",
   "font_size": 14,
   "logging_enabled": true,
   "context_mode": "storage",
@@ -10,9 +10,9 @@
   "author_name": "Peter van de Pas",
   "author_email": "peter.vdpas@gmail.com",
   "window_bounds": {
-    "width": 1198,
-    "height": 983,
+    "width": 1206,
+    "height": 970,
     "x": 88,
-    "y": 37
+    "y": 50
   }
 }

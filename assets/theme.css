@@ -54,6 +54,9 @@
   --meta-section-text-color: #333;
   --meta-section-font-size: 0.8rem;
 
+  --flagged-color: #28a745;
+  --unflagged-color: #ccc;
+
   --popup-option-height: 40px;
 }
 

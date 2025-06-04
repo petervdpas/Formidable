@@ -24,6 +24,41 @@ function createButton({
   return btn;
 }
 
+export function createIconButton({
+  iconClass = "",        // bv. "fa fa-flag"
+  className = "",
+  identifier = "",
+  onClick = () => {},
+  disabled = false,
+  attributes = {},
+  ariaLabel = "",       // belangrijk voor toegankelijkheid
+}) {
+  const btn = document.createElement("button");
+  btn.id = identifier
+    ? `btn-${identifier}`
+    : `btn-icon-button`;
+  btn.className = `btn icon-button ${className}`.trim();
+  btn.disabled = disabled;
+  btn.onclick = onClick;
+
+  if (ariaLabel) {
+    btn.setAttribute("aria-label", ariaLabel);
+    btn.setAttribute("role", "button");
+  }
+
+  // Icon element
+  const icon = document.createElement("i");
+  icon.className = iconClass;
+  btn.appendChild(icon);
+
+  // Set extra attributes
+  for (const [key, value] of Object.entries(attributes)) {
+    btn.setAttribute(key, value);
+  }
+
+  return btn;
+}
+
 export function buildButtonGroup(...buttons) {
   const group = document.createElement("div");
   group.className = "button-group";
@@ -138,13 +173,31 @@ export function createFormRenderButton(onClick) {
   });
 }
 
-export function createFlaggedToggleButton(flagged, onClick) {
-  return createButton({
-    text: flagged ? "Unflag" : "Flag",
-    className: flagged ? "btn-flagged" : "btn-unflagged",
+export function createFlaggedToggleButton(initialFlagged, onClick) {
+  const btn = createIconButton({
+    iconClass: "fa fa-flag",
+    className: initialFlagged ? "btn-flagged" : "btn-unflagged",
     identifier: "form-flagged-toggle",
-    onClick,
+    ariaLabel: initialFlagged ? "Unflag item" : "Flag item",
   });
+
+  btn._flagged = initialFlagged;
+
+  btn.onclick = () => {
+    btn._flagged = !btn._flagged;
+
+    // Toggle classes zonder inhoud te verwijderen
+    btn.classList.toggle("btn-flagged", btn._flagged);
+    btn.classList.toggle("btn-unflagged", !btn._flagged);
+
+    btn.setAttribute("aria-label", btn._flagged ? "Unflag item" : "Flag item");
+
+    if (typeof onClick === "function") {
+      onClick(btn._flagged);
+    }
+  };
+
+  return btn;
 }
 
 export function createShowMarkdownButton(onClick) {

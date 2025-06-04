@@ -167,11 +167,30 @@ function buildMetaSection(
 ) {
   const section = document.createElement("div");
   section.className = "meta-section";
+  section.style.position = "relative"; // nodig voor absolute knop
 
-  // Meta info as paragraph with line breaks
+  if (typeof onFlagChange === "function") {
+    let flagged = flaggedInitial;
+
+    const flaggedBtn = createFlaggedToggleButton(flagged, () => {
+      flagged = !flagged;
+      flaggedBtn.classList.toggle("btn-flagged", flagged);
+      flaggedBtn.classList.toggle("btn-unflagged", !flagged);
+      onFlagChange(flagged);
+    });
+
+    const flaggedContainer = document.createElement("div");
+    flaggedContainer.className = "flagged-toggle-container";
+    flaggedContainer.appendChild(flaggedBtn);
+
+    // Eerst toevoegen (zodat knop boven tekst komt)
+    section.appendChild(flaggedContainer);
+  }
+
+  // Meta info
   const p = document.createElement("p");
   p.style.whiteSpace = "pre-line";
-  p.style.marginBottom = "10px";
+  p.style.marginTop = "0"; // geen extra ruimte bovenaan
   p.textContent =
     `Filename: ${filename || ""}\n` +
     `Author: ${meta.author_name || ""}\n` +
@@ -179,24 +198,8 @@ function buildMetaSection(
     `Template: ${meta.template || ""}\n` +
     `Created: ${meta.created || ""}\n` +
     `Updated: ${meta.updated || ""}`;
+
   section.appendChild(p);
-
-  if (typeof onFlagChange === "function") {
-    // Flagged toggle as button
-    let flagged = flaggedInitial;
-
-    const flaggedBtn = createFlaggedToggleButton(flagged, () => {
-      flagged = !flagged;
-      flaggedBtn.textContent = flagged ? "Unflag" : "Flag";
-      flaggedBtn.className = flagged ? "btn btn-flagged" : "btn btn-unflagged";
-      onFlagChange(flagged);
-    });
-
-    const flaggedRow = document.createElement("div");
-    flaggedRow.className = "form-row toggle-row";
-    flaggedRow.appendChild(flaggedBtn);
-    section.appendChild(flaggedRow);
-  }
 
   return section;
 }

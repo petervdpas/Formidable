@@ -68,6 +68,38 @@ button:disabled,
   background-color: #c82333;
 }
 
+.btn.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: 48px;
+  height: 48px;
+  font-size: 1.8em;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+  color: inherit; /* kleur overnemen van omgeving */
+  transition: opacity 0.2s ease;
+}
+
+.btn.icon-button:hover {
+  opacity: 0.75;
+}
+
+.btn.icon-button i {
+  pointer-events: none; /* klik niet op icoon zelf */
+}
+
+.btn.icon-button.btn-flagged {
+  color: var(--flagged-color, #d9534f);
+}
+
+.btn.icon-button.btn-unflagged {
+  color: var(--unflagged-color, #5bc0de);
+}
+
 /* ───── Close Button ───── */
 .btn-close {
   background: none;
@@ -155,26 +187,4 @@ button:disabled,
 .modal-header-button:focus {
   outline: none;
   border-color: #666;
-}
-
-.btn-flagged {
-  background-color: #d9534f; /* bootstrap danger red */
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-}
-
-.btn-unflagged {
-  background-color: #5bc0de; /* bootstrap info blue */
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-}
-
-.btn-flagged:hover,
-.btn-unflagged:hover {
-  opacity: 0.85;
-  cursor: pointer;
 }

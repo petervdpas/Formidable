@@ -54,6 +54,9 @@
   --meta-section-border: #555;
   --meta-section-text-color: #ccc;
   --meta-section-font-size: 0.75rem;
+
+  --flagged-color: #4caf50;
+  --unflagged-color: #555;
 }
 
 .dark-mode body,

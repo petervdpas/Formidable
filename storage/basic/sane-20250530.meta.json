@@ -4,8 +4,8 @@
     "author_email": "peter.vdpas@gmail.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-06-04T20:54:48.323Z",
-    "flagged": true
+    "updated": "2025-06-04T22:10:49.046Z",
+    "flagged": false
   },
   "data": {
     "test": "Default value",
