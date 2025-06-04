@@ -1,6 +1,6 @@
 // modules/formRenderer.js
 
-import { buildReadOnlyInput } from "../utils/elementBuilders.js";
+import { buildHiddenInput } from "../utils/elementBuilders.js";
 import {
   renderFieldElement,
   injectFieldDefaults,
@@ -158,6 +158,48 @@ function createLoopItem(groupFields, dataEntry = {}) {
   return itemWrapper;
 }
 
+function buildMetaSection(
+  meta,
+  filename,
+  flaggedInitial = false,
+  onFlagChange = null
+) {
+  const section = document.createElement("div");
+  section.className = "meta-section";
+
+  // Meta info as paragraph with line breaks
+  const p = document.createElement("p");
+  p.style.whiteSpace = "pre-line";
+  p.style.marginBottom = "10px";
+  p.textContent =
+    `Filename: ${filename || ""}\n` +
+    `Author: ${meta.author_name || ""}\n` +
+    `Email: ${meta.author_email || ""}\n` +
+    `Template: ${meta.template || ""}\n` +
+    `Created: ${meta.created || ""}\n` +
+    `Updated: ${meta.updated || ""}`;
+  section.appendChild(p);
+
+  if (typeof onFlagChange === "function") {
+    // Flagged toggle as button
+    let flagged = flaggedInitial;
+
+    const flaggedBtn = createFlaggedToggleButton(flagged, () => {
+      flagged = !flagged;
+      flaggedBtn.textContent = flagged ? "Unflag" : "Flag";
+      flaggedBtn.className = flagged ? "btn btn-flagged" : "btn btn-unflagged";
+      onFlagChange(flagged);
+    });
+
+    const flaggedRow = document.createElement("div");
+    flaggedRow.className = "form-row toggle-row";
+    flaggedRow.appendChild(flaggedBtn);
+    section.appendChild(flaggedRow);
+  }
+
+  return section;
+}
+
 export function renderFormUI(
   container,
   template,
@@ -168,14 +210,19 @@ export function renderFormUI(
 ) {
   container.innerHTML = "";
 
-  // Filename field
-  const filenameRow = buildReadOnlyInput(
+  // Use hidden input for filename so it is in DOM but not visible
+  const filenameInput = buildHiddenInput(
     "meta-json-filename",
-    "readonly-input",
-    "Filename",
     metaData._filename || ""
   );
-  container.appendChild(filenameRow);
+  container.appendChild(filenameInput);
+
+  // Add meta info section (without flagged toggle callback)
+  const metaSection = buildMetaSection(
+    metaData.meta || {},
+    metaData._filename || ""
+  );
+  container.appendChild(metaSection);
 
   // Fields
   const fields = template.fields || [];

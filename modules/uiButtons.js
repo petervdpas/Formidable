@@ -138,6 +138,15 @@ export function createFormRenderButton(onClick) {
   });
 }
 
+export function createFlaggedToggleButton(flagged, onClick) {
+  return createButton({
+    text: flagged ? "Unflag" : "Flag",
+    className: flagged ? "btn-flagged" : "btn-unflagged",
+    identifier: "form-flagged-toggle",
+    onClick,
+  });
+}
+
 export function createShowMarkdownButton(onClick) {
   return createButton({
     text: "🡐 Markdown",

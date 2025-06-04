@@ -73,7 +73,7 @@ export function createFormManager(containerId) {
     renderFormUI(
       container,
       currentTemplate,
-      { ...formData, _filename: datafile },
+      { ...formData, _filename: datafile, meta: metaData.meta },
       () => saveForm(container, currentTemplate),
       (filename) => deleteForm(container, currentTemplate, filename),
       () => renderFormPreview(container, currentTemplate)

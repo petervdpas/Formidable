@@ -49,6 +49,11 @@
 
   --loop-remove-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
+  --meta-section-bg: #f9f9f9;
+  --meta-section-border: #ccc;
+  --meta-section-text-color: #333;
+  --meta-section-font-size: 0.8rem;
+
   --popup-option-height: 40px;
 }
 

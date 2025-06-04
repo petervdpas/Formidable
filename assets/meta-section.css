@@ -1,0 +1,28 @@
+.meta-section {
+  background-color: var(--meta-section-bg);
+  border: 1px solid var(--meta-section-border);
+  border-radius: 6px;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  max-width: 400px;
+  color: var(--meta-section-text-color);
+  font-size: var(--meta-section-font-size);
+  font-family: monospace, monospace;
+  white-space: pre-line;
+}
+
+.meta-section p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.meta-section .toggle-row {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meta-section .toggle-row input[type="checkbox"] {
+  cursor: pointer;
+}

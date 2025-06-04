@@ -146,6 +146,15 @@ export function wrapInputWithLabel(
   return wrapper;
 }
 
+export function buildHiddenInput(id, value = "") {
+  const input = document.createElement("input");
+  input.type = "hidden";
+  input.id = id;
+  input.name = id;
+  input.value = value;
+  return input;
+}
+
 export function buildReadOnlyInput(id, className, labelText, value = "") {
   const input = document.createElement("input");
   input.type = "text";

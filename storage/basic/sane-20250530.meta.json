@@ -4,7 +4,8 @@
     "author_email": "peter.vdpas@gmail.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-06-04T15:42:16.359Z"
+    "updated": "2025-06-04T20:07:14.202Z",
+    "flagged": false
   },
   "data": {
     "test": "Default value",
@@ -13,7 +14,7 @@
     "multichoice": [
       "B"
     ],
-    "radio": "BIRD",
+    "radio": "CAT",
     "mline": "I dont like this one bit",
     "numpy": 17,
     "bday": "1968-12-23",

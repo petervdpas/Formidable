@@ -49,6 +49,11 @@
   --loop-add-fg: #fff;
 
   --loop-remove-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+
+  --meta-section-bg: #2a2a2a;
+  --meta-section-border: #555;
+  --meta-section-text-color: #ccc;
+  --meta-section-font-size: 0.75rem;
 }
 
 .dark-mode body,

@@ -156,3 +156,25 @@ button:disabled,
   outline: none;
   border-color: #666;
 }
+
+.btn-flagged {
+  background-color: #d9534f; /* bootstrap danger red */
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+.btn-unflagged {
+  background-color: #5bc0de; /* bootstrap info blue */
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+.btn-flagged:hover,
+.btn-unflagged:hover {
+  opacity: 0.85;
+  cursor: pointer;
+}

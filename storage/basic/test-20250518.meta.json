@@ -4,7 +4,8 @@
     "author_email": "peter.vdpas@gmail.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:19:38.103Z",
-    "updated": "2025-06-04T15:42:19.470Z"
+    "updated": "2025-06-04T19:37:37.390Z",
+    "flagged": false
   },
   "data": {
     "test": "Default value",
@@ -14,7 +15,7 @@
       "A",
       "B"
     ],
-    "radio": "BIRD",
+    "radio": "CAT",
     "mline": "A whole lot of prefab text...",
     "numpy": 23,
     "bday": "1968-12-29",

@@ -10,6 +10,7 @@ module.exports = {
       author_email = "unknown@example.com",
       created = null,
       updated = null,
+      flagged = false,
     } = {}
   ) {
     const rawData = raw.data || raw;
@@ -50,6 +51,7 @@ module.exports = {
           created ||
           new Date().toISOString(),
         updated: updated || injected.updated || new Date().toISOString(),
+        flagged: rawMeta.flagged ?? injected.flagged ?? flagged,
       },
       data: result,
     };
