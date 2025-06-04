@@ -27,6 +27,7 @@ button:disabled,
   border-color: #bbb;
   color: #222;
 }
+
 .btn-default:hover {
   background-color: #d5d5d5;
 }
@@ -36,6 +37,7 @@ button:disabled,
   border-color: #218838;
   color: #fff;
 }
+
 .btn-okay:hover {
   background-color: #218838;
   border-color: #1e7e34;
@@ -46,6 +48,7 @@ button:disabled,
   border-color: #66b0ff;
   color: #004085;
 }
+
 .btn-info:hover {
   background-color: #b8dbff;
 }
@@ -55,6 +58,7 @@ button:disabled,
   border-color: #e0a800;
   color: #212529;
 }
+
 .btn-warn:hover {
   background-color: #e0a800;
 }
@@ -64,6 +68,7 @@ button:disabled,
   border-color: #c82333;
   color: #fff;
 }
+
 .btn-danger:hover {
   background-color: #c82333;
 }
@@ -80,7 +85,7 @@ button:disabled,
   border: none;
   cursor: pointer;
   background-color: transparent;
-  color: inherit; /* kleur overnemen van omgeving */
+  color: inherit;
   transition: opacity 0.2s ease;
 }
 
@@ -89,7 +94,15 @@ button:disabled,
 }
 
 .btn.icon-button i {
-  pointer-events: none; /* klik niet op icoon zelf */
+  pointer-events: none;
+}
+
+.btn.icon-button i {
+  pointer-events: none;
+  text-shadow:
+    1px -1px 1px rgba(255, 255, 255, 0.8),
+    -1px 1px 1px rgba(0, 0, 0, 0.6),
+    0 0 2px rgba(0, 0, 0, 0.2);
 }
 
 .btn.icon-button.btn-flagged {
@@ -141,7 +154,7 @@ button:disabled,
 
 /* ───── Button Hover ───── */
 .modal-actions button:hover {
-    background-color: #f0f0f0;
+  background-color: #f0f0f0;
 }
 
 .copy-btn {

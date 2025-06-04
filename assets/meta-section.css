@@ -1,21 +1,23 @@
 .meta-section {
-  position: relative;  /* nodigt de absoluut gepositioneerde knop uit */
+  position: relative;
+  float: left;
+  min-width: 360px;
+  max-width: 360px;
   background-color: var(--meta-section-bg);
   border: 1px solid var(--meta-section-border);
   border-radius: 6px;
   padding: 10px 15px;
   margin-bottom: 15px;
-  max-width: 400px;
   color: var(--meta-section-text-color);
   font-size: var(--meta-section-font-size);
   font-family: monospace, monospace;
   white-space: pre-line;
+  clear: both;
 }
 
 .meta-section p {
   margin: 0;
   line-height: 1.4;
-  /* geen margin-top! */
 }
 
 .meta-section .flagged-toggle-container {
