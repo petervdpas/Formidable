@@ -5,8 +5,8 @@
   "context_mode": "storage",
   "templates_location": "./templates",
   "storage_location": "./storage",
-  "selected_template": "basic.yaml",
-  "selected_data_file": "sane-20250530.meta.json",
+  "selected_template": "loopie.yaml",
+  "selected_data_file": "test-20250530.meta.json",
   "author_name": "Peter van de Pas",
   "author_email": "peter.vdpas@gmail.com",
   "window_bounds": {
