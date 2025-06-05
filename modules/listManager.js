@@ -10,6 +10,7 @@ export function createListManager({
   onItemClick,
   emptyMessage = "No items.",
   addButton = null,
+  renderItemExtra = null, // nieuwe callback optie
 }) {
   const container = document.getElementById(elementId);
   if (!container) {
@@ -40,9 +41,17 @@ export function createListManager({
 
           const item = document.createElement("div");
           item.className = itemClass;
-          item.textContent = display;
           item.dataset.value = value;
           item.dataset.listId = elementId;
+
+          // Voeg eerst de tekst toe
+          const textNode = document.createTextNode(display);
+          item.appendChild(textNode);
+
+          // Daarna extra content zoals vlag
+          if (typeof renderItemExtra === "function") {
+            renderItemExtra(item, raw);
+          }
 
           container.appendChild(item);
           return { element: item, value };

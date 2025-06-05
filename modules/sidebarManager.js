@@ -34,7 +34,10 @@ export function createTemplateListManager(
                 name: template,
                 yaml,
               });
-              EventBus.emit("status:update", `Created new template: ${template}`);
+              EventBus.emit(
+                "status:update",
+                `Created new template: ${template}`
+              );
             } catch (err) {
               EventBus.emit("logging:error", [
                 "[AddTemplate] Failed to save:",
@@ -70,16 +73,30 @@ export function createStorageListManager(formManager, modal) {
         EventBus.emit("logging:warning", [
           "[MetaList] No storage location field.",
         ]);
-        EventBus.emit("status:update", "Template missing storage location field.");
+        EventBus.emit(
+          "status:update",
+          "Template missing storage location field."
+        );
         return [];
       }
 
       await window.api.forms.ensureFormDir(template.storage_location);
       const files = await window.api.forms.listForms(template.storage_location);
-      return files.map((fullName) => ({
-        display: stripMetaExtension(fullName),
-        value: fullName,
-      }));
+
+      const items = [];
+      for (const fullName of files) {
+        const meta = await window.api.forms.loadForm(
+          template.storage_location,
+          fullName
+        );
+        items.push({
+          display: stripMetaExtension(fullName),
+          value: fullName,
+          flagged: meta?.meta?.flagged || false,
+        });
+      }
+
+      return items;
     },
     onItemClick: (storageItem) =>
       EventBus.emit("form:list:itemClicked", storageItem),
@@ -109,6 +126,19 @@ export function createStorageListManager(formManager, modal) {
         });
       },
     }),
+    renderItemExtra: (item, raw) => {
+      if (raw.flagged) {
+        const wrapper = document.createElement("span");
+        wrapper.className = "flag-icon-wrapper";
+
+        const flagIcon = document.createElement("i");
+        flagIcon.className = "fa fa-flag";
+        flagIcon.style.pointerEvents = "none";
+
+        wrapper.appendChild(flagIcon);
+        item.appendChild(wrapper);
+      }
+    },
   });
 
   return {

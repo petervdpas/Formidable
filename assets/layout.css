@@ -68,9 +68,39 @@ body {
 /* ───── List Items ───── */
 .template-item,
 .storage-item {
-  padding: 8px;
+  padding: 4px 8px;
   margin-bottom: 5px;
   cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 10px;
+  min-height: 36px;
+  box-sizing: border-box;
+}
+
+.flag-icon-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--flagged-circle-bg);
+  margin-left: 12px;
+  flex-shrink: 0;
+}
+
+.flag-icon-wrapper i {
+  color: var(--flagged-color) !important;
+  font-size: 16px;
+  line-height: 1;
+  font-style: normal !important;
+  margin: 0 !important;
+  text-align: center;
+  padding: 0;
+  position: relative;
+  top: 0px;
 }
 
 #default-dir {
