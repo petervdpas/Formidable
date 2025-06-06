@@ -4,7 +4,11 @@ import { EventBus } from "./eventBus.js";
 import { initTabs } from "../utils/tabUtils.js";
 import { formatAsRelativePath } from "../utils/pathUtils.js";
 import { initThemeToggle } from "./themeToggle.js";
-import { createSwitch, createSettingsInput } from "../utils/elementBuilders.js";
+import {
+  createDirectoryPicker,
+  createSwitch,
+  createSettingsInput,
+} from "../utils/elementBuilders.js";
 
 let cachedConfig = null;
 
@@ -84,16 +88,16 @@ export async function renderSettings() {
   const tabDirs = document.createElement("div");
   tabDirs.className = "tab-panel tab-dirs";
   tabDirs.innerHTML = `
-    ${createDirectoryPicker(
-      "settings-template-dir",
-      "Template Directory",
-      config.templates_location || "./templates"
-    )}
-    ${createDirectoryPicker(
-      "settings-storage-dir",
-      "Storage Directory",
-      config.storage_location || "./storage"
-    )}
+    ${createDirectoryPicker({
+      id: "settings-template-dir",
+      label: "Template Directory",
+      value: config.templates_location || "./templates",
+    })}
+    ${createDirectoryPicker({
+      id: "settings-storage-dir",
+      label: "Storage Directory",
+      value: config.storage_location || "./storage",
+    })}
   `;
 
   // Inject tabs
@@ -110,18 +114,6 @@ export async function renderSettings() {
 
   setupBindings(config);
   return true;
-}
-
-function createDirectoryPicker(id, label, value) {
-  return `
-    <div class="modal-form-row directory-picker">
-      <label for="${id}">${label}</label>
-      <div style="display: flex; gap: 6px; flex: 1">
-        <input type="text" id="${id}" value="${value}" readonly />
-        <button id="choose-${id}" class="btn btn-default">Browse</button>
-      </div>
-    </div>
-  `;
 }
 
 function setupBindings(config) {

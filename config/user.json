@@ -2,17 +2,17 @@
   "theme": "light",
   "font_size": 14,
   "logging_enabled": true,
-  "context_mode": "storage",
+  "context_mode": "template",
   "templates_location": "./templates",
   "storage_location": "./storage",
   "selected_template": "basic.yaml",
-  "selected_data_file": "sane-20250530.meta.json",
+  "selected_data_file": null,
   "author_name": "Peter van de Pas",
   "author_email": "peter.vdpas@gmail.com",
   "window_bounds": {
-    "width": 1188,
+    "width": 1666,
     "height": 923,
-    "x": 142,
-    "y": 95
+    "x": 253,
+    "y": 150
   }
 }

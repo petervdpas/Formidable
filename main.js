@@ -46,7 +46,8 @@ function createWindow() {
     },
   });
 
-  //Menu.setApplicationMenu(null);
+  Menu.setApplicationMenu(null);
+  
   win.loadFile("index.html");
 
   win.once("ready-to-show", () => win.show());
