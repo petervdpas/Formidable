@@ -32,10 +32,7 @@ const api = {
     "save-markdown",
     "delete-markdown",
   ]),
-  transform: buildGroup([
-    "render-markdown-template",
-    "render-html-preview", 
-  ]),
+  transform: buildGroup(["render-markdown-template", "render-html-preview"]),
   system: {
     getAppRoot: () => ipcRenderer.invoke("get-app-root"),
     resolvePath: (...args) => ipcRenderer.invoke("resolve-path", ...args),
@@ -67,6 +64,15 @@ const electronAPI = {
   clipboard: {
     writeText: (text) => ipcRenderer.invoke("clipboard-write", text),
     readText: () => ipcRenderer.invoke("clipboard-read"),
+  },
+  sfr: {
+    listFiles: (dir) => ipcRenderer.invoke("sfr:listFiles", dir),
+    loadFromBase: (dir, file, opts) =>
+      ipcRenderer.invoke("sfr:loadFromBase", dir, file, opts),
+    saveFromBase: (dir, file, data, opts) =>
+      ipcRenderer.invoke("sfr:saveFromBase", dir, file, data, opts),
+    deleteFromBase: (dir, file, opts) =>
+      ipcRenderer.invoke("sfr:deleteFromBase", dir, file, opts),
   },
 };
 

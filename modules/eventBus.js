@@ -39,22 +39,26 @@ export const EventBus = {
     }
   },
 
-  emit(event, payload) {
+  async emit(event, payload) {
     const cbs = listeners[event];
     if (!cbs || cbs.length === 0) {
       if (debug) {
-        console.log(`[EventBus] Emitted "${event}" but no listeners were registered.`);
+        console.log(
+          `[EventBus] Emitted "${event}" but no listeners were registered.`
+        );
       }
       return;
     }
 
-    for (const cb of cbs) {
+    const promises = cbs.map(async (cb) => {
       try {
-        cb(payload);
+        return await cb(payload);
       } catch (err) {
         console.error(`[EventBus] Error in listener for "${event}":`, err);
       }
-    }
+    });
+
+    await Promise.all(promises);
   },
 
   once(event, callback) {
@@ -63,5 +67,5 @@ export const EventBus = {
       callback(payload);
     };
     this.on(event, onceWrapper);
-  }
+  },
 };

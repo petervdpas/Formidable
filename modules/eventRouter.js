@@ -2,6 +2,7 @@
 
 import { EventBus } from "./eventBus.js";
 
+import * as cacheHandler from "./handlers/cacheHandler.js";
 import * as bootHandlers from "./handlers/bootHandlers.js";
 import * as screenHandlers from "./handlers/screenHandlers.js";
 import * as contextHandlers from "./handlers/contextHandlers.js";
@@ -105,6 +106,30 @@ export function initEventRouter() {
   EventBus.on("editor:delete", (container) =>
     editorHandler.handleDeleteTemplate(container)
   );
+
+  EventBus.off("cache:init", cacheHandler.initCache);
+  EventBus.off("cache:loadFromDisk", cacheHandler.handleCacheLoadFromDisk);
+  EventBus.off("cache:saveToDisk", cacheHandler.handleCacheSaveToDisk);
+  EventBus.off("cache:deleteFromDisk", cacheHandler.handleCacheDeleteFromDisk);
+  EventBus.off("cache:add", cacheHandler.handleCacheAdd);
+  EventBus.off("cache:put", cacheHandler.handleCachePut);
+  EventBus.off("cache:get", cacheHandler.handleCacheGet);
+  EventBus.off("cache:getAll", cacheHandler.handleCacheGetAll);
+  EventBus.off("cache:delete", cacheHandler.handleCacheDelete);
+  EventBus.off("cache:clear", cacheHandler.handleCacheClear);
+
+  EventBus.on("cache:init", async ({ dbName, version, stores }) => {
+    await cacheHandler.initCache(dbName, version, stores);
+  });
+  EventBus.on("cache:loadFromDisk", cacheHandler.handleCacheLoadFromDisk);
+  EventBus.on("cache:saveToDisk", cacheHandler.handleCacheSaveToDisk);
+  EventBus.on("cache:deleteFromDisk", cacheHandler.handleCacheDeleteFromDisk);
+  EventBus.on("cache:add", cacheHandler.handleCacheAdd);
+  EventBus.on("cache:put", cacheHandler.handleCachePut);
+  EventBus.on("cache:get", cacheHandler.handleCacheGet);
+  EventBus.on("cache:getAll", cacheHandler.handleCacheGetAll);
+  EventBus.on("cache:delete", cacheHandler.handleCacheDelete);
+  EventBus.on("cache:clear", cacheHandler.handleCacheClear);
 
   EventBus.off("boot:initialize", bootHandlers.initializeFromConfig);
   EventBus.on("boot:initialize", async (config) => {

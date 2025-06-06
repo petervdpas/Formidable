@@ -8,6 +8,8 @@ const {
   BrowserWindow,
 } = require("electron");
 const { registerIpc } = require("./ipcRoutes");
+const { SingleFileRepository } = require("./sfr");
+
 const packageJson = require("../package.json");
 const fileManager = require("./fileManager");
 const templateManager = require("./templateManager");
@@ -16,6 +18,8 @@ const configManager = require("./configManager");
 const markdownManager = require("./markdownManager");
 const markdownRenderer = require("./markdownRenderer");
 const htmlRenderer = require("./htmlRenderer");
+
+const sfr = new SingleFileRepository();
 
 function registerIpcHandlers() {
   // System
@@ -27,6 +31,17 @@ function registerIpcHandlers() {
       wc.isDevToolsOpened() ? wc.closeDevTools() : wc.openDevTools();
     }
   });
+
+  ipcMain.handle("sfr:listFiles", (e, dir) => sfr.listFiles(dir));
+  ipcMain.handle("sfr:loadFromBase", (e, dir, file, opts) =>
+    sfr.loadFromBase(dir, file, opts)
+  );
+  ipcMain.handle("sfr:saveFromBase", (e, dir, file, data, opts) =>
+    sfr.saveFromBase(dir, file, data, opts)
+  );
+  ipcMain.handle("sfr:deleteFromBase", (e, dir, file, opts) =>
+    sfr.deleteFromBase(dir, file, opts)
+  );
 
   ipcMain.on("window-reload", (e) =>
     BrowserWindow.fromWebContents(e.sender)?.reload()
