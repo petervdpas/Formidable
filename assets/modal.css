@@ -230,9 +230,11 @@
 }
 
 .modal-form-row.directory-picker {
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
+    gap: 0.2em;
+}
+
+.modal-form-row.directory-picker label {
+    margin-right: 12px;
 }
 
 .pane {

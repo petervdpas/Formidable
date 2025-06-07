@@ -113,6 +113,10 @@ button:disabled,
   color: var(--unflagged-color, #5bc0de);
 }
 
+.directory-picker button.btn {
+  height: 36px !important;
+}
+
 /* ───── Close Button ───── */
 .btn-close {
   background: none;

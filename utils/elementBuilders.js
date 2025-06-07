@@ -86,16 +86,13 @@ export function createDirectoryPicker({
   value = "",
   buttonText = "Browse",
   outerClass = "modal-form-row",
-  innerStyle = "display: flex; gap: 6px; flex: 1",
   placeholder = "",
   readOnly = true,
 }) {
-  const styleAttr = innerStyle ? ` style="${innerStyle}"` : "";
 
   return `
     <div class="${outerClass} directory-picker">
       <label for="${id}">${label}</label>
-      <div${styleAttr}>
         <input
           type="text"
           id="${id}"
@@ -103,8 +100,7 @@ export function createDirectoryPicker({
           ${placeholder ? `placeholder="${placeholder}"` : ""}
           ${readOnly ? "readonly" : ""}
         />
-        <button id="choose-${id}" class="btn btn-default">${buttonText}</button>
-      </div>
+        <button id="choose-${id}" class="btn btn-info">${buttonText}</button>
     </div>
   `;
 }
