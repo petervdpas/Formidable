@@ -3,6 +3,7 @@
   "font_size": 14,
   "logging_enabled": true,
   "context_mode": "storage",
+  "context_folder": "E:\\Projects\\documentation\\Formidable",
   "templates_location": "./templates",
   "storage_location": "./storage",
   "selected_template": "basic.yaml",
@@ -10,7 +11,7 @@
   "author_name": "Peter van de Pas",
   "author_email": "peter.vdpas@gmail.com",
   "window_bounds": {
-    "width": 1599,
+    "width": 1191,
     "height": 903,
     "x": 197,
     "y": 91

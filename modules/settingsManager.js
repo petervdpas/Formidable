@@ -89,6 +89,11 @@ export async function renderSettings() {
   tabDirs.className = "tab-panel tab-dirs";
   tabDirs.innerHTML = `
     ${createDirectoryPicker({
+      id: "settings-context-folder",
+      label: "Context Folder",
+      value: config.context_folder || "./",
+    })}
+    ${createDirectoryPicker({
       id: "settings-template-dir",
       label: "Template Directory",
       value: config.templates_location || "./templates",
@@ -138,6 +143,11 @@ function setupBindings(config) {
     };
   }
 
+  bindDirButton(
+    "settings-context-folder",
+    "context_folder",
+    "context:folder:changed"
+  );
   bindDirButton(
     "settings-template-dir",
     "templates_location",
