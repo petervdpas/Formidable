@@ -143,8 +143,17 @@ function registerIpcHandlers() {
   registerIpc("get-storage-folder", () =>
     configManager.getContextStoragePath()
   );
+  registerIpc("get-template-storage-info", (e, templateFilename) =>
+    configManager.getTemplateStorageInfo(templateFilename)
+  );
   registerIpc("get-template-storage-folder", (e, templateFilename) =>
     configManager.getTemplateStoragePath(templateFilename)
+  );
+  registerIpc("get-template-meta-files", (e, templateFilename) =>
+    configManager.getTemplateMetaFiles(templateFilename)
+  );
+  registerIpc("get-template-image-files", (e, templateFilename) =>
+    configManager.getTemplateImageFiles(templateFilename)
   );
 
   // Render

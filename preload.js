@@ -12,7 +12,10 @@ const api = {
     "get-context-path",
     "get-templates-folder",
     "get-storage-folder",
+    "get-template-storage-info",
     "get-template-storage-folder",
+    "get-template-meta-files",
+    "get-template-image-files",
   ]),
   templates: buildGroup([
     "list-templates",

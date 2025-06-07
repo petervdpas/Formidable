@@ -81,22 +81,29 @@ function resolvePath(...segments) {
   return path.isAbsolute(flat) ? flat : path.resolve(getAppRoot(), flat);
 }
 
-// List files by extension
-function listFilesByExtension(directory, extension, { silent = false } = {}) {
+function listFiles(dir, { silent = false, filter = null } = {}) {
   try {
-    const files = fs
-      .readdirSync(directory)
-      .filter((f) => f.endsWith(extension));
-    if (!silent)
-      log(
-        `[FileManager] Found ${files.length} "${extension}" files in ${directory}`
-      );
+    let files = fs.readdirSync(dir).filter((f) =>
+      fs.statSync(path.join(dir, f)).isFile()
+    );
+
+    if (typeof filter === "function") {
+      files = files.filter(filter);
+    }
+
     return files;
   } catch (err) {
-    if (!silent)
-      error(`[FileManager] Failed to list files in ${directory}:`, err);
+    if (!silent) console.error("[FileManager] Failed to list files:", err);
     return [];
   }
+}
+
+// preserve API
+function listFilesByExtension(dir, ext, opts = {}) {
+  return listFiles(dir, {
+    ...opts,
+    filter: (f) => f.endsWith(ext),
+  });
 }
 
 // Check if a file exists
@@ -184,6 +191,7 @@ module.exports = {
   buildFilePath,
   resolvePath,
   joinPath,
+  listFiles,
   listFilesByExtension,
   fileExists,
   loadFile,

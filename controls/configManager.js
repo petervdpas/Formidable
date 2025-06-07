@@ -19,27 +19,59 @@ function buildVirtualStructure(config) {
   const templatesPath = fileManager.joinPath(base, "templates");
   const storagePath = fileManager.joinPath(base, "storage");
 
-  fileManager.ensureDirectory(templatesPath, { label: "Templates", silent: true });
-  fileManager.ensureDirectory(storagePath, { label: "Storage", silent: true });
-
-  const templateFiles = fileManager.listFilesByExtension(templatesPath, ".yaml", {
+  fileManager.ensureDirectory(templatesPath, {
+    label: "Templates",
     silent: true,
   });
+  fileManager.ensureDirectory(storagePath, { label: "Storage", silent: true });
 
-  const storageMap = {};
+  const templateFiles = fileManager.listFilesByExtension(
+    templatesPath,
+    ".yaml",
+    {
+      silent: true,
+    }
+  );
+
+  const templateStorageFolders = {};
 
   for (const file of templateFiles) {
     const name = file.replace(/\.yaml$/, "");
-    const fullPath = fileManager.joinPath(storagePath, name);
-    fileManager.ensureDirectory(fullPath, { label: `Storage<${name}>`, silent: true });
-    storageMap[name] = fullPath;
+    const templateStoragePath = fileManager.joinPath(storagePath, name);
+    const imagesPath = fileManager.joinPath(templateStoragePath, "images");
+
+    fileManager.ensureDirectory(templateStoragePath, {
+      label: `Storage<${name}>`,
+      silent: true,
+    });
+
+    fileManager.ensureDirectory(imagesPath, {
+      label: `Images<${name}>`,
+      silent: true,
+    });
+
+    const metaFiles = fileManager.listFilesByExtension(
+      templateStoragePath,
+      ".meta.json",
+      {
+        silent: true,
+      }
+    );
+
+    const imageFiles = fileManager.listFiles(imagesPath, { silent: true });
+
+    templateStorageFolders[name] = {
+      path: templateStoragePath,
+      metaFiles,
+      imageFiles,
+    };
   }
 
   return {
     context: base,
     templates: templatesPath,
     storage: storagePath,
-    templateStorageFolders: storageMap,
+    templateStorageFolders,
   };
 }
 
@@ -48,7 +80,10 @@ function buildVirtualStructure(config) {
 // ─────────────────────────────────────────────
 function ensureConfigFile() {
   const fullPath = fileManager.resolvePath("config");
-  fileManager.ensureDirectory(fullPath, { label: "ConfigManager", silent: true });
+  fileManager.ensureDirectory(fullPath, {
+    label: "ConfigManager",
+    silent: true,
+  });
 
   if (!fileManager.fileExists(configPath)) {
     fileManager.saveFile(configPath, schema.defaults, {
@@ -144,21 +179,8 @@ function invalidateConfigCache() {
 function getVirtualStructure() {
   if (!cachedConfig || !virtualStructure) loadUserConfig();
 
-  // Always resync to reflect added/removed .yaml files
-  const templateFiles = fileManager.listFilesByExtension(virtualStructure.templates, ".yaml", {
-    silent: true,
-  });
-
-  const updatedMap = {};
-
-  for (const file of templateFiles) {
-    const name = file.replace(/\.yaml$/, "");
-    const fullPath = fileManager.joinPath(virtualStructure.storage, name);
-    fileManager.ensureDirectory(fullPath, { label: `Storage<${name}>`, silent: true });
-    updatedMap[name] = fullPath;
-  }
-
-  virtualStructure.templateStorageFolders = updatedMap;
+  // Fully rebuild every time to stay in sync with filesystem
+  virtualStructure = buildVirtualStructure(cachedConfig);
   return virtualStructure;
 }
 
@@ -180,11 +202,25 @@ function getContextStoragePath() {
   return getVirtualStructure().storage;
 }
 
-function getTemplateStoragePath(templateFilename) {
+function getTemplateStorageInfo(templateFilename) {
   if (!templateFilename || typeof templateFilename !== "string") return null;
-
   const name = templateFilename.replace(/\.yaml$/, "");
   return getVirtualStructure().templateStorageFolders[name] || null;
+}
+
+function getTemplateStoragePath(templateFilename) {
+  const info = getTemplateStorageInfo(templateFilename);
+  return info?.path || null;
+}
+
+function getTemplateMetaFiles(templateFilename) {
+  const info = getTemplateStorageInfo(templateFilename);
+  return info?.metaFiles || [];
+}
+
+function getTemplateImageFiles(templateFilename) {
+  const info = getTemplateStorageInfo(templateFilename);
+  return info?.imageFiles || [];
 }
 
 // ─────────────────────────────────────────────
@@ -199,5 +235,8 @@ module.exports = {
   getContextPath,
   getContextTemplatesPath,
   getContextStoragePath,
+  getTemplateStorageInfo,
   getTemplateStoragePath,
+  getTemplateMetaFiles,
+  getTemplateImageFiles,
 };

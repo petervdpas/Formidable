@@ -12,7 +12,10 @@ const { getSafeBounds } = require("./controls/windowBounds");
 const { log, warn, error } = nodeLogger;
 
 const userConfig = configManager.loadUserConfig();
-log("[Main] Virtual structure:", configManager.getVirtualStructure());
+log(
+  "[Main] Virtual structure:",
+  JSON.stringify(configManager.getVirtualStructure(), null, 2)
+);
 
 if (process.platform === "win32") {
   const portableDataPath = path.join(process.cwd(), "user-data");
@@ -49,7 +52,7 @@ function createWindow() {
   });
 
   Menu.setApplicationMenu(null);
-  
+
   win.loadFile("index.html");
 
   win.once("ready-to-show", () => win.show());
@@ -74,9 +77,8 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-
   registerIpcHandlers();
-  
+
   const isPackaged = app.isPackaged;
   const root = isPackaged ? app.getAppPath() : process.cwd();
   fileManager.setAppRoot(root);
@@ -111,4 +113,3 @@ app.on("window-all-closed", () => {
     app.quit();
   }
 });
-
