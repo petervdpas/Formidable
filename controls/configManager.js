@@ -23,7 +23,10 @@ function buildVirtualStructure(config) {
     label: "Templates",
     silent: true,
   });
-  fileManager.ensureDirectory(storagePath, { label: "Storage", silent: true });
+  fileManager.ensureDirectory(storagePath, {
+    label: "Storage",
+    silent: true,
+  });
 
   const templateFiles = fileManager.listFilesByExtension(
     templatesPath,
@@ -61,6 +64,8 @@ function buildVirtualStructure(config) {
     const imageFiles = fileManager.listFiles(imagesPath, { silent: true });
 
     templateStorageFolders[name] = {
+      name, // e.g. "basic"
+      filename: file, // e.g. "basic.yaml"
       path: templateStoragePath,
       metaFiles,
       imageFiles,

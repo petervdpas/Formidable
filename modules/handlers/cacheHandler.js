@@ -6,8 +6,34 @@ import IndexedDBController from "../cacheController.js";
 let cache = null;
 
 export async function initCache(dbName, version, stores) {
+  // 🔥 Always delete the DB before initializing (DEV MODE)
+  const deleteRequest = indexedDB.deleteDatabase(dbName);
+
+  deleteRequest.onsuccess = () => {
+    EventBus.emit("logging:default", [
+      `[CacheHandler] Deleted existing IndexedDB: "${dbName}"`,
+    ]);
+  };
+
+  deleteRequest.onerror = (e) => {
+    EventBus.emit("logging:error", [
+      `[CacheHandler] Failed to delete IndexedDB: "${dbName}"`,
+      e,
+    ]);
+  };
+
+  deleteRequest.onblocked = () => {
+    EventBus.emit("logging:warning", [
+      `[CacheHandler] Delete blocked for IndexedDB: "${dbName}"`,
+    ]);
+  };
+
+  // Wait a tiny bit to ensure it's cleared before re-opening
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
   cache = new IndexedDBController(dbName, version);
   await cache.open(stores);
+
   EventBus.emit("status:update", "Cache initialized.");
   EventBus.emit("logging:default", [
     "[CacheHandler] Cache initialized with DB:",

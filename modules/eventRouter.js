@@ -3,6 +3,7 @@
 import { EventBus } from "./eventBus.js";
 
 import * as cacheHandler from "./handlers/cacheHandler.js";
+import * as vfsHandler from "./handlers/vfsHandler.js";
 import * as bootHandlers from "./handlers/bootHandlers.js";
 import * as screenHandlers from "./handlers/screenHandlers.js";
 import * as contextHandlers from "./handlers/contextHandlers.js";
@@ -130,6 +131,18 @@ export function initEventRouter() {
   EventBus.on("cache:getAll", cacheHandler.handleCacheGetAll);
   EventBus.on("cache:delete", cacheHandler.handleCacheDelete);
   EventBus.on("cache:clear", cacheHandler.handleCacheClear);
+
+  EventBus.off("vfs:init", vfsHandler.initVFS);
+  EventBus.off("vfs:clear", vfsHandler.clearVFS);
+  EventBus.off("vfs:reload", vfsHandler.reloadVFS);
+  EventBus.off("vfs:update", vfsHandler.updateVFSKey);
+  EventBus.off("vfs:delete", vfsHandler.deleteVFSKey);
+
+  EventBus.on("vfs:init", vfsHandler.initVFS);
+  EventBus.on("vfs:clear", vfsHandler.clearVFS);
+  EventBus.on("vfs:reload", vfsHandler.reloadVFS);
+  EventBus.on("vfs:update", vfsHandler.updateVFSKey);
+  EventBus.on("vfs:delete", vfsHandler.deleteVFSKey);
 
   EventBus.off("boot:initialize", bootHandlers.initializeFromConfig);
   EventBus.on("boot:initialize", async (config) => {

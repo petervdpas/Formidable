@@ -60,6 +60,8 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // ── EventBus Init
   initEventRouter();
+  window.EventBus = EventBus;
+  console.log("[Renderer] EventBus exposed to DevTools.");
 
   // ── Menu ──
   buildMenu("app-menu", handleMenuAction);

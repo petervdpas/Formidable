@@ -12,10 +12,6 @@ const { getSafeBounds } = require("./controls/windowBounds");
 const { log, warn, error } = nodeLogger;
 
 const userConfig = configManager.loadUserConfig();
-log(
-  "[Main] Virtual structure:",
-  JSON.stringify(configManager.getVirtualStructure(), null, 2)
-);
 
 if (process.platform === "win32") {
   const portableDataPath = path.join(process.cwd(), "user-data");

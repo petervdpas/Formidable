@@ -2,20 +2,6 @@
 
 import { EventBus } from "../eventBus.js";
 
-async function insertTestData(storeName) {
-  const testItems = [
-    { id: "1", naam: "Test item 1", waarde: 100 },
-    { id: "2", naam: "Test item 2", waarde: 200 },
-  ];
-
-  for (const item of testItems) {
-    await new Promise((resolve) => {
-      EventBus.emit("cache:put", { storeName, item });
-      setTimeout(resolve, 50);
-    });
-  }
-}
-
 export async function initializeFromConfig(config) {
   const {
     selected_template,
@@ -42,14 +28,10 @@ export async function initializeFromConfig(config) {
   await EventBus.emit("cache:init", {
     dbName: "formidable-db",
     version: 1,
-    stores: [
-      { name: "testStore", keyPath: "id" },
-      // ... voeg hier je andere stores toe
-    ],
+    stores: [{ name: "vfs", keyPath: "id" }],
   });
 
-  // ─── Voeg testdata toe in IndexedDB in store "testStore" ───
-  await insertTestData("testStore");
+  await EventBus.emit("vfs:init");
 
   // ─── Wait for list to be loaded, then highlight (instead of click) ───
   EventBus.once("template-list:loaded", () => {
