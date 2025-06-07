@@ -6,8 +6,13 @@ const { contextBridge, ipcRenderer, dialog } = require("electron");
 const api = {
   config: buildGroup([
     "load-user-config",
-    "save-user-config",
     "update-user-config",
+    "invalidate-config-cache",
+    "get-virtual-structure",
+    "get-context-path",
+    "get-templates-folder",
+    "get-storage-folder",
+    "get-template-storage-folder",
   ]),
   templates: buildGroup([
     "list-templates",

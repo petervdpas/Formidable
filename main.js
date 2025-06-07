@@ -11,6 +11,9 @@ const { registerIpcHandlers } = require("./controls/ipcRegistry");
 const { getSafeBounds } = require("./controls/windowBounds");
 const { log, warn, error } = nodeLogger;
 
+const userConfig = configManager.loadUserConfig();
+log("[Main] Virtual structure:", configManager.getVirtualStructure());
+
 if (process.platform === "win32") {
   const portableDataPath = path.join(process.cwd(), "user-data");
   app.setPath("userData", portableDataPath);
@@ -21,7 +24,6 @@ const iconPath = app.isPackaged
   : path.join(__dirname, "assets", "formidable.ico");
 
 function createWindow() {
-  const userConfig = configManager.loadUserConfig();
   const bounds = getSafeBounds(userConfig.window_bounds);
 
   const win = new BrowserWindow({
@@ -92,7 +94,6 @@ app.whenReady().then(() => {
   templateManager.ensureTemplateDirectory();
   templateManager.createBasicTemplateIfMissing();
 
-  const userConfig = configManager.loadUserConfig();
   nodeLogger.setLoggingEnabled(!!userConfig.logging_enabled);
   nodeLogger.setWriteEnabled(!!userConfig.logging_enabled);
 

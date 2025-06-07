@@ -127,11 +127,24 @@ function registerIpcHandlers() {
 
   // Config
   registerIpc("load-user-config", () => configManager.loadUserConfig());
-  registerIpc("save-user-config", (e, cfg) =>
-    configManager.saveUserConfig(cfg)
-  );
   registerIpc("update-user-config", (e, partial) =>
     configManager.updateUserConfig(partial)
+  );
+  registerIpc("invalidate-config-cache", () =>
+    configManager.invalidateConfigCache()
+  );
+  registerIpc("get-virtual-structure", () =>
+    configManager.getVirtualStructure()
+  );
+  registerIpc("get-context-path", () => configManager.getContextPath());
+  registerIpc("get-templates-folder", () =>
+    configManager.getContextTemplatesPath()
+  );
+  registerIpc("get-storage-folder", () =>
+    configManager.getContextStoragePath()
+  );
+  registerIpc("get-template-storage-folder", (e, templateFilename) =>
+    configManager.getTemplateStoragePath(templateFilename)
   );
 
   // Render
