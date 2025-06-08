@@ -8,10 +8,10 @@
 
 > Deze versie van Formidable is een **pre-release** bedoeld voor testen en feedback.
 > Mogelijk ontbreken er nog functies of treden bugs op. Gebruik op eigen risico.
-> Zie de [release notes](https://github.com/petervdpas/Formidable/releases/tag/v1.2.6-pre) voor details.
+> Zie de [release notes](https://github.com/petervdpas/Formidable/releases/tag/v1.2.8-pre) voor details.
 
 **Latest Windows Installer**:  
-👉 [Formidable Setup.exe (Pre-release)](https://github.com/petervdpas/Formidable/releases/download/v1.2.6-pre/Formidable.Setup.exe)
+👉 [Formidable Setup.exe (Pre-release)](https://github.com/petervdpas/Formidable/releases/download/v1.2.8-pre/Formidable.Setup.exe)
 
 ---
 
@@ -159,13 +159,21 @@ Saved to `./config/user.json`:
 
 ```json
 {
-  "selected_template": "basic.yaml",
-  "selected_data_file": "",
-  "theme": "dark",
+  "theme": "light",
   "font_size": 14,
-  "context_mode": "template",
+  "logging_enabled": true,
+  "context_mode": "storage",
   "context_folder": "./",
-  "window_bounds": { "width": 1024, "height": 800 }
+  "selected_template": "basic.yaml",
+  "selected_data_file": "sane-20250530.meta.json",
+  "author_name": "Peter van de Pas",
+  "author_email": "peter.vdpas@gmail.com",
+  "window_bounds": {
+    "width": 1290,
+    "height": 903,
+    "x": 197,
+    "y": 91
+  }
 }
 ```
 
