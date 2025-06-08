@@ -6,8 +6,8 @@
 
 ## ⚠️ Pre-release
 
-> This version of Formidable is a pre-release for testing and feedback. 
-> There may be missing features or bugs. Use at your own risk. 
+> This version of Formidable is a pre-release for testing and feedback.
+> There may be missing features or bugs. Use at your own risk.
 > See the [release notes](https://github.com/petervdpas/Formidable/releases/tag/v1.4.0-pre) for details.
 
 **Latest Windows Installer**:  
