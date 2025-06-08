@@ -8,10 +8,10 @@
 
 > Deze versie van Formidable is een **pre-release** bedoeld voor testen en feedback.
 > Mogelijk ontbreken er nog functies of treden bugs op. Gebruik op eigen risico.
-> Zie de [release notes](https://github.com/petervdpas/Formidable/releases/tag/v1.2.8-pre) voor details.
+> Zie de [release notes](https://github.com/petervdpas/Formidable/releases/tag/v1.4.0-pre) voor details.
 
 **Latest Windows Installer**:  
-👉 [Formidable Setup.exe (Pre-release)](https://github.com/petervdpas/Formidable/releases/download/v1.2.8-pre/Formidable.Setup.exe)
+👉 [Formidable Setup.exe (Pre-release)](https://github.com/petervdpas/Formidable/releases/download/v1.4.0-pre/Formidable.Setup.exe)
 
 ---
 
@@ -42,62 +42,6 @@
 - **🧠 Event-Driven Architecture**
   - Built on a custom global EventBus (`modules/eventBus.js`) to decouple logic.
   - Dynamic context switching, menu events, and form/template syncing.
-
----
-
-## 🧱 Folder Structure
-
-```bash
-Formidable/
-├── index.html                  # Main HTML
-├── renderer.js                 # App entrypoint (wires UI + EventBus)
-├── main.js                     # Electron main process (IPC + shell)
-│
-├── assets/                     # All styles, icons, and CodeMirror themes
-│   ├── layout.css              # Layout grid and panels
-│   ├── theme.css               # Light theme
-│   ├── dark-theme.css          # Dark mode overrides
-│   ├── buttons.css             # Button appearance
-│   ├── forms.css               # Field layout rules
-│   ├── modal.css               # Modal positioning + resizing
-│   ├── codemirror/             # Editor themes + YAML mode
-│   └── sortable/               # SortableJS for drag-and-drop fields
-│
-├── modules/                    # Core UI + behavior modules
-│   ├── yaml_editor.js          # Template editor UI (CodeMirror + fields)
-│   ├── formUI.js               # Form loader + handler
-│   ├── formRenderer.js         # Converts templates to field DOM
-│   ├── contextManager.js       # View switching: template vs from(storage)
-│   ├── sidebarManager.js       # Lists for templates and entries
-│   ├── modalManager.js         # Modal control (ESC, sizing, etc)
-│   ├── menuManager.js          # In-app HTML menu bar logic
-│   ├── eventBus.js             # Global publish/subscribe hub
-│   └── handlers/               # Event handlers for template, form, context, etc.
-│
-├── controls/                   # App-level config and file logic
-│   ├── configManager.js        # Persistent user settings (theme, context, etc)
-│   ├── fileManager.js          # YAML, JSON, text I/O (safe + relative)
-│   └── nodeLogger.js           # Safe logging with silent toggle
-│
-├── schemas/                    # Structural validation/sanitization
-│   ├── config.schema.js        # `user.json` structure and defaults
-│   ├── template.schema.js      # Safe YAML template sanitizer
-│   └── meta.schema.js          # Markdown metadata fallback/defaults
-│
-├── utils/                      # Shared rendering and parsing logic
-│   ├── fieldRenderers.js       # Render DOM inputs by type
-│   ├── fieldParsers.js         # Parse DOM inputs to JS values
-│   ├── formUtils.js            # Template → form → data mapping
-│   ├── configUtils.js          # Config fallback selector
-│   ├── pathUtils.js            # Filename helpers and normalization
-│   ├── modalUtils.js           # ESC close and type highlighting
-│   ├── resizing.js             # Splitter + modal resizer logic
-│   ├── elementBuilders.js      # Labeled input/textarea/select generators
-│   └── uiBehaviors.js          # Field highlighting, focus, and event bindings
-│
-├── scripts/
-│   └── patch-icon.js           # Windows icon patch using `rcedit`
-````
 
 ---
 
@@ -166,13 +110,13 @@ Saved to `./config/user.json`:
   "context_folder": "./",
   "selected_template": "basic.yaml",
   "selected_data_file": "sane-20250530.meta.json",
-  "author_name": "Peter van de Pas",
-  "author_email": "peter.vdpas@gmail.com",
+  "author_name": "Regular user",
+  "author_email": "regular@example.com",
   "window_bounds": {
-    "width": 1290,
+    "width": 1130,
     "height": 903,
-    "x": 197,
-    "y": 91
+    "x": 108,
+    "y": 93
   }
 }
 ```
