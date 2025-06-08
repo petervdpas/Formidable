@@ -1,7 +1,7 @@
 // modules/fieldTypes.js
 
 import * as parsers from "./fieldParsers.js";
-import { setValueAtKey } from "./transformationUtils.js";
+import { ensureVirtualLocation } from "./vfsUtils.js";
 import { applyDatasetMapping } from "./domUtils.js";
 
 export const fieldTypes = {
@@ -227,11 +227,7 @@ export const fieldTypes = {
     cssClass: "modal-image",
     defaultValue: () => "",
     renderInput(field, template) {
-      template = setValueAtKey(
-        template,
-        "virtualLocation",
-        template?.storage_location || ""
-      );
+      template = ensureVirtualLocation(template);
 
       const wrapper = document.createElement("div");
 
@@ -240,7 +236,6 @@ export const fieldTypes = {
         [field, template],
         [
           { from: "key", to: "imageField" },
-          { from: "storage_location", to: "storageLocation" },
           { from: "virtualLocation", to: "virtualLocation" },
         ]
       );

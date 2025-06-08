@@ -1,6 +1,6 @@
 // utils/fieldRenderers.js
 
-import { setValueAtKey } from "./transformationUtils.js";
+import { ensureVirtualLocation } from "./vfsUtils.js";
 import { wrapInputWithLabel, buildSwitchElement } from "./elementBuilders.js";
 import { applyDatasetMapping } from "./domUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
@@ -460,11 +460,7 @@ export function renderTableField(field) {
 // ─────────────────────────────────────────────
 // Type: image
 export function renderImageField(field, template) {
-  template = setValueAtKey(
-    template,
-    "virtualLocation",
-    template?.storage_location || ""
-  );
+  template = ensureVirtualLocation(template);
 
   const wrapper = document.createElement("div");
 
@@ -473,7 +469,6 @@ export function renderImageField(field, template) {
     [field, template],
     [
       { from: "key", to: "imageField" },
-      { from: "storage_location", to: "storageLocation" },
       { from: "virtualLocation", to: "virtualLocation" },
     ]
   );

@@ -1,6 +1,7 @@
 // utils/fieldAppliers.js
 
 import { EventBus } from "../modules/eventBus.js";
+import { ensureVirtualLocation } from "./vfsUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 
 export function applyListField(container, field, value) {
@@ -101,6 +102,7 @@ export function applyMultioptionField(container, key, value) {
 }
 
 export function applyImageField(container, key, value, template) {
+  template = ensureVirtualLocation(template);
   const wrapper = container.querySelector(`[data-image-field="${key}"]`);
   const preview = wrapper?.querySelector("img");
 
@@ -117,15 +119,15 @@ export function applyImageField(container, key, value, template) {
     return;
   }
 
-  if (!template?.storage_location || !value) {
+  if (!template?.virtualLocation || !value) {
     EventBus.emit("logging:warning", [
-      `[applyImageField] Missing storage_location or value`,
+      `[applyImageField] Missing virtualLocation or value`,
     ]);
     return;
   }
 
   window.api.system
-    .resolvePath(template.storage_location, "images", value)
+    .resolvePath(template.virtualLocation, "images", value)
     .then((imgPath) => {
       preview.src = `file://${imgPath.replace(/\\/g, "/")}`;
       wrapper.setAttribute("data-filename", value);

@@ -1,6 +1,6 @@
 // utils/fieldParsers.js
 
-import { setValueAtKey } from "./transformationUtils.js";
+import { ensureVirtualLocation } from "./vfsUtils.js";
 
 // Text
 export function parseTextField(input) {
@@ -67,11 +67,7 @@ export function parseTableField(wrapper) {
 
 // Image
 export async function parseImageField(inputWrapper, template) {
-  template = setValueAtKey(
-    template,
-    "virtualLocation",
-    template?.storage_location || ""
-  );
+  template = ensureVirtualLocation(template);
 
   if (!inputWrapper || !template?.virtualLocation) return "";
 
