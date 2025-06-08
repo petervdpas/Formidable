@@ -1,6 +1,7 @@
 // utils/fieldRenderers.js
 
 import { wrapInputWithLabel, buildSwitchElement } from "./elementBuilders.js";
+import { applyDatasetMapping } from "./domUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 import { getCurrentTheme } from "../modules/themeToggle.js";
 
@@ -459,11 +460,15 @@ export function renderTableField(field) {
 // Type: image
 export function renderImageField(field, template) {
   const wrapper = document.createElement("div");
-  wrapper.dataset.imageField = field.key;
 
-  if (template?.storage_location) {
-    wrapper.dataset.storageLocation = template.storage_location;
-  }
+  applyDatasetMapping(
+    wrapper,
+    [field, template],
+    [
+      { from: "key", to: "imageField" },
+      { from: "storage_location", to: "storageLocation" },
+    ]
+  );
 
   const input = document.createElement("input");
   input.type = "file";

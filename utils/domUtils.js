@@ -74,6 +74,23 @@ export function highlightSelected(
   }
 }
 
+export function applyDatasetMapping(el, sources, mappings = []) {
+  if (!el || typeof el.dataset === "undefined") return;
+  if (!Array.isArray(sources)) sources = [sources];
+
+  mappings.forEach(({ from, to }) => {
+    for (const source of sources) {
+      if (source && source[from] != null && source[from] !== "") {
+        el.dataset[to] = source[from];
+        EventBus.emit("logging:default", [
+          `[applyDatasetMapping] Set data-${to} = ${source[from]}`,
+        ]);
+        break; // Stop at first valid match
+      }
+    }
+  });
+}
+
 export function focusFirstInput(
   container,
   selector = "input, select, textarea",

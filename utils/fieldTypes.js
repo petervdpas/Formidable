@@ -1,6 +1,7 @@
 // modules/fieldTypes.js
 
 import * as parsers from "./fieldParsers.js";
+import { applyDatasetMapping } from "./domUtils.js";
 
 export const fieldTypes = {
   loopstart: {
@@ -225,12 +226,17 @@ export const fieldTypes = {
     cssClass: "modal-image",
     defaultValue: () => "",
     renderInput(field, template) {
+      
       const wrapper = document.createElement("div");
-      wrapper.dataset.imageField = field.key;
 
-      if (template?.storage_location) {
-        wrapper.dataset.storageLocation = template.storage_location;
-      }
+      applyDatasetMapping(
+        wrapper,
+        [field, template],
+        [
+          { from: "key", to: "imageField" },
+          { from: "storage_location", to: "storageLocation" },
+        ]
+      );
 
       const input = document.createElement("input");
       input.type = "file";
