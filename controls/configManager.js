@@ -6,10 +6,49 @@ const { log, error } = nodeLogger;
 const fileManager = require("./fileManager");
 const schema = require("../schemas/config.schema");
 
-const configPath = fileManager.resolvePath("config", "user.json");
+const bootSchema = require("../schemas/boot.schema");
+const BOOT_PATH = fileManager.resolvePath("config", "boot.json");
 
+let configPath = null;
 let cachedConfig = null;
 let virtualStructure = null;
+
+function resolveBootProfile() {
+  const configDir = fileManager.resolvePath("config");
+  fileManager.ensureDirectory(configDir, { label: "Boot", silent: true });
+
+  if (!fileManager.fileExists(BOOT_PATH)) {
+    fileManager.saveFile(BOOT_PATH, bootSchema.defaults, { format: "json" });
+  }
+
+  const raw = fileManager.loadFile(BOOT_PATH, { format: "json" });
+  const { boot, changed } = bootSchema.sanitize(raw);
+
+  if (changed) {
+    fileManager.saveFile(BOOT_PATH, boot, { format: "json" });
+  }
+
+  return boot.active_profile;
+}
+
+function setUserConfigPath(profileFilename) {
+  configPath = fileManager.resolvePath("config", profileFilename);
+  invalidateConfigCache();
+  log(`[ConfigManager] Using config path: ${configPath}`);
+}
+
+setUserConfigPath(resolveBootProfile());
+
+// ─────────────────────────────────────────────
+// Switch user profile and reload config
+// ─────────────────────────────────────────────
+function switchUserProfile(profileFilename) {
+  const bootData = { active_profile: profileFilename };
+  fileManager.saveFile(BOOT_PATH, bootData, { format: "json" });
+
+  setUserConfigPath(profileFilename);
+  return loadUserConfig(); // Refresh config and virtual structure
+}
 
 // ─────────────────────────────────────────────
 // Build virtual folder structure from disk
@@ -232,6 +271,7 @@ function getTemplateImageFiles(templateFilename) {
 // Exports
 // ─────────────────────────────────────────────
 module.exports = {
+  switchUserProfile,
   ensureConfigFile,
   loadUserConfig,
   updateUserConfig,

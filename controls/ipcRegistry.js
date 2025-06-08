@@ -126,6 +126,9 @@ function registerIpcHandlers() {
   );
 
   // Config
+  registerIpc("switch-user-profile", (e, profileFilename) =>
+    configManager.switchUserProfile(profileFilename)
+  );
   registerIpc("load-user-config", () => configManager.loadUserConfig());
   registerIpc("update-user-config", (e, partial) =>
     configManager.updateUserConfig(partial)

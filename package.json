@@ -1,7 +1,7 @@
 {
   "name": "formidable",
-  "version": "1.2.8",
-  "description": "Template/Form editor in Electron",
+  "version": "1.4.0",
+  "description": "Formidable is an Electron-based editor for templates and forms",
   "main": "main.js",
   "scripts": {
     "start": "electron .",

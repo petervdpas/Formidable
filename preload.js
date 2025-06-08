@@ -5,6 +5,7 @@ const { contextBridge, ipcRenderer, dialog } = require("electron");
 // ---------- IPC Method Groups ----------
 const api = {
   config: buildGroup([
+    "switch-user-profile",
     "load-user-config",
     "update-user-config",
     "invalidate-config-cache",
