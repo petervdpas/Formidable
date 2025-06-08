@@ -9,7 +9,11 @@ export function getValueAtKey(source, keyPath) {
 
   return keyPath
     .split(".")
-    .reduce((obj, key) => (obj && obj[key] !== undefined ? obj[key] : undefined), source);
+    .reduce(
+      (obj, key) =>
+        obj && typeof obj === "object" && key in obj ? obj[key] : undefined,
+      source
+    );
 }
 
 /**
@@ -27,10 +31,11 @@ export function hasKeyPath(source, keyPath) {
  * @param {string} keyPath
  * @param {*} value
  * @param {string} [mode="replace"] - "replace" or "preserve"
+ * @returns {Object} The modified source (or a new object if input was invalid)
  */
 export function setValueAtKey(source, keyPath, value, mode = "replace") {
-  if (!source || typeof source !== "object") return source;
-  if (typeof keyPath !== "string" || keyPath.trim() === "") return source;
+  if (typeof keyPath !== "string" || keyPath.trim() === "") return source ?? {};
+  if (!source || typeof source !== "object") source = {};
 
   const keys = keyPath.split(".");
   let current = source;
@@ -39,7 +44,8 @@ export function setValueAtKey(source, keyPath, value, mode = "replace") {
     const key = keys[i];
 
     if (i === keys.length - 1) {
-      if (mode === "preserve" && hasKeyPath(current, key)) {
+      const exists = key in current;
+      if (mode === "preserve" && exists && current[key] !== undefined) {
         return source;
       }
       current[key] = value;
@@ -75,4 +81,3 @@ export function removeKeyAtPath(source, keyPath) {
 
   return source;
 }
-

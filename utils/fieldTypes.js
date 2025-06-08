@@ -1,6 +1,7 @@
 // modules/fieldTypes.js
 
 import * as parsers from "./fieldParsers.js";
+import { setValueAtKey } from "./transformationUtils.js";
 import { applyDatasetMapping } from "./domUtils.js";
 
 export const fieldTypes = {
@@ -226,7 +227,12 @@ export const fieldTypes = {
     cssClass: "modal-image",
     defaultValue: () => "",
     renderInput(field, template) {
-      
+      template = setValueAtKey(
+        template,
+        "virtualLocation",
+        template?.storage_location || ""
+      );
+
       const wrapper = document.createElement("div");
 
       applyDatasetMapping(
@@ -235,6 +241,7 @@ export const fieldTypes = {
         [
           { from: "key", to: "imageField" },
           { from: "storage_location", to: "storageLocation" },
+          { from: "virtualLocation", to: "virtualLocation" },
         ]
       );
 
@@ -252,9 +259,9 @@ export const fieldTypes = {
       // Show preview if default filename is known
       if (typeof field.default === "string" && field.default) {
         const filename = field.default;
-        if (template?.storage_location) {
+        if (template?.virtualLocation) {
           window.api.system
-            .resolvePath(template.storage_location, "images", filename)
+            .resolvePath(template.virtualLocation, "images", filename)
             .then((fullPath) => {
               preview.src = `file://${fullPath}`;
             })

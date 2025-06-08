@@ -1,5 +1,6 @@
 // utils/fieldRenderers.js
 
+import { setValueAtKey } from "./transformationUtils.js";
 import { wrapInputWithLabel, buildSwitchElement } from "./elementBuilders.js";
 import { applyDatasetMapping } from "./domUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
@@ -175,7 +176,7 @@ export function renderRadioField(field) {
     input.name = field.key;
     input.value = value;
 
-    // ✅ Compare to correct default value
+    // Compare to correct default value
     if (String(field.default) === String(value)) input.checked = true;
 
     labelEl.appendChild(input);
@@ -459,6 +460,12 @@ export function renderTableField(field) {
 // ─────────────────────────────────────────────
 // Type: image
 export function renderImageField(field, template) {
+  template = setValueAtKey(
+    template,
+    "virtualLocation",
+    template?.storage_location || ""
+  );
+
   const wrapper = document.createElement("div");
 
   applyDatasetMapping(
@@ -467,6 +474,7 @@ export function renderImageField(field, template) {
     [
       { from: "key", to: "imageField" },
       { from: "storage_location", to: "storageLocation" },
+      { from: "virtualLocation", to: "virtualLocation" },
     ]
   );
 

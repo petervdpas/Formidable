@@ -1,5 +1,7 @@
 // utils/fieldParsers.js
 
+import { setValueAtKey } from "./transformationUtils.js";
+
 // Text
 export function parseTextField(input) {
   return input.value.trim();
@@ -65,7 +67,13 @@ export function parseTableField(wrapper) {
 
 // Image
 export async function parseImageField(inputWrapper, template) {
-  if (!inputWrapper || !template?.storage_location) return "";
+  template = setValueAtKey(
+    template,
+    "virtualLocation",
+    template?.storage_location || ""
+  );
+
+  if (!inputWrapper || !template?.virtualLocation) return "";
 
   const fileInput = inputWrapper.querySelector("input[type='file']");
   const file = fileInput?.files?.[0];
@@ -84,7 +92,7 @@ export async function parseImageField(inputWrapper, template) {
     const filename = file.name;
 
     const result = await window.api.forms.saveImageFile(
-      template.storage_location,
+      template.virtualLocation,
       filename,
       Array.from(new Uint8Array(buffer))
     );
