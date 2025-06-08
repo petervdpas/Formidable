@@ -1,7 +1,8 @@
 // /modules/sidebarManager.js
 
-import { createListManager } from "./listManager.js";
 import { EventBus } from "./eventBus.js";
+import { ensureVirtualLocation } from "../utils/vfsUtils.js";
+import { createListManager } from "./listManager.js";
 import { stripMetaExtension } from "../utils/pathUtils.js";
 import { createAddButton } from "./uiButtons.js";
 
@@ -62,14 +63,14 @@ export function createStorageListManager(formManager, modal) {
     elementId: "storage-list",
     itemClass: "storage-item",
     fetchListFunction: async () => {
-      const template = window.currentSelectedTemplate;
+      const template = ensureVirtualLocation(window.currentSelectedTemplate);
       if (!template) {
         EventBus.emit("logging:warning", ["[MetaList] No selected template."]);
         EventBus.emit("status:update", "No template selected.");
         return [];
       }
 
-      if (!template.storage_location) {
+      if (!template.virtualLocation) {
         EventBus.emit("logging:warning", [
           "[MetaList] No storage location field.",
         ]);
@@ -80,13 +81,13 @@ export function createStorageListManager(formManager, modal) {
         return [];
       }
 
-      await window.api.forms.ensureFormDir(template.storage_location);
-      const files = await window.api.forms.listForms(template.storage_location);
+      await window.api.forms.ensureFormDir(template.virtualLocation);
+      const files = await window.api.forms.listForms(template.virtualLocation);
 
       const items = [];
       for (const fullName of files) {
         const meta = await window.api.forms.loadForm(
-          template.storage_location,
+          template.virtualLocation,
           fullName
         );
         items.push({
