@@ -229,11 +229,11 @@
     color: white;
 }
 
-.modal-form-row.directory-picker {
-    gap: 0.2em;
+.modal-form-row.tight-gap {
+  gap: 0.3em;
 }
 
-.modal-form-row.directory-picker label {
+.modal-form-row.tight-gap label {
     margin-right: 12px;
 }
 

@@ -31,6 +31,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
       { label: "Quit", action: "quit" },
     ]),
     createMenuGroup("Config", [
+      { label: "Switch Profile...", action: "open-profile-switcher" },
       { label: "Settings...", action: "open-settings" },
       { label: "Workspace...", action: "open-workspace-settings" },
     ]),
@@ -168,6 +169,13 @@ export async function handleMenuAction(action) {
     case "open-settings":
       EventBus.emit("logging:default", ["[Menu] Opening settings modal..."]);
       window.openSettingsModal?.();
+      break;
+
+    case "open-profile-switcher":
+      EventBus.emit("logging:default", [
+        "[Menu] Opening profile switcher modal...",
+      ]);
+      window.openProfileModal?.();
       break;
 
     case "reload":

@@ -29,11 +29,11 @@ export function clearHighlighted(container) {
 export function highlightSelected(
   container,
   targetName,
-  onClickFallback = null
+  { click = false, onClickFallback = null } = {}
 ) {
   if (!container || !targetName) {
     EventBus.emit("logging:warning", [
-      "[highlightMatch] Missing container or targetName",
+      "[highlightSelected] Missing container or targetName",
     ]);
     return;
   }
@@ -54,23 +54,26 @@ export function highlightSelected(
 
   if (!match) {
     EventBus.emit("logging:warning", [
-      `[highlightMatch] No match found for: ${normalizedTarget}`,
+      `[highlightSelected] No match found for: ${normalizedTarget}`,
     ]);
     return;
   }
 
   match.classList.add("selected");
-  match.click();
 
-  if (typeof onClickFallback === "function") {
-    setTimeout(() => {
-      if (!match.classList.contains("selected")) {
-        EventBus.emit("logging:warning", [
-          "[highlightMatch] Click failed, running fallback",
-        ]);
-        onClickFallback(targetName);
-      }
-    }, 50);
+  if (click) {
+    match.click();
+
+    if (typeof onClickFallback === "function") {
+      setTimeout(() => {
+        if (!match.classList.contains("selected")) {
+          EventBus.emit("logging:warning", [
+            "[highlightSelected] Click failed, running fallback",
+          ]);
+          onClickFallback(targetName);
+        }
+      }, 50);
+    }
   }
 }
 

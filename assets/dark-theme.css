@@ -58,6 +58,8 @@
   --flagged-circle-bg: #2a2a2a;
   --flagged-color: #4caf50;
   --unflagged-color: #555;
+
+  --profile-list-bg: #1c1c1c;
 }
 
 .dark-mode body,
@@ -85,17 +87,20 @@
 }
 
 .dark-mode .template-item,
-.dark-mode .storage-item {
+.dark-mode .storage-item,
+.dark-mode .profile-item {
   background-color: #2a2a2a;
 }
 
 .dark-mode .template-item:hover,
-.dark-mode .storage-item:hover {
+.dark-mode .storage-item:hover,
+.dark-mode .profile-item:hover {
   background-color: #3a3a3a;
 }
 
 .dark-mode .template-item.selected,
-.dark-mode .storage-item.selected {
+.dark-mode .storage-item.selected,
+.dark-mode .profile-item.selected {
   background-color: #2196f3;
   color: white;
   font-weight: bold;

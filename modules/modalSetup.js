@@ -9,6 +9,7 @@ import { applyModalCssClass } from "../utils/modalUtils.js";
 import { extractFieldDefinition } from "../utils/formUtils.js";
 import { createDropdown } from "./dropdownManager.js";
 import { syncScroll } from "../utils/domUtils.js";
+import { createProfileListManager } from "./profileManager.js";
 import {
   createModalConfirmButton,
   createModalCancelButton,
@@ -17,6 +18,39 @@ import {
   createPaneCloseButton,
   buildButtonGroup,
 } from "./uiButtons.js";
+
+export function setupProfileModal() {
+  return setupModal("profile-modal", {
+    closeBtn: "profile-close",
+    escToClose: true,
+    backdropClick: true,
+    width: "30em",
+    height: "auto",
+    onOpen: async () => {
+      const container = document.getElementById("profile-body");
+      if (!container) return;
+
+      container.innerHTML = `<div id="profile-list"></div>`;
+
+      const manager = createProfileListManager();
+      await manager.reloadList();
+
+      const currentProfile = await window.api.config.currentProfileFilename();
+
+      console.log(
+        `[ProfileModal] Current profile: ${currentProfile || "None"}`
+      );
+      if (currentProfile) {
+        EventBus.emit("profile:list:highlighted", {
+          listId: "profile-list",
+          name: currentProfile,
+        });
+      }
+
+      container.appendChild(manager.addNewRow);
+    },
+  });
+}
 
 export function setupSettingsModal() {
   return setupModal("settings-modal", {

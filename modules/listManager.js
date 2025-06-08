@@ -27,7 +27,7 @@ export function createListManager({
     container.innerHTML = "";
     try {
       const items = await fetchListFunction();
-      EventBus.emit("logging:default", ["[ListManager] Items:", items]);
+      // EventBus.emit("logging:default", ["[ListManager] Items:", items]);
 
       if (!items || items.length === 0) {
         container.innerHTML = `<div class="empty-message">${emptyMessage}</div>`;

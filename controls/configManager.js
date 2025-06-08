@@ -13,6 +13,9 @@ let configPath = null;
 let cachedConfig = null;
 let virtualStructure = null;
 
+// ─────────────────────────────────────────────
+// Resolve boot profile and ensure boot.json exists
+// ─────────────────────────────────────────────
 function resolveBootProfile() {
   const configDir = fileManager.resolvePath("config");
   fileManager.ensureDirectory(configDir, { label: "Boot", silent: true });
@@ -31,6 +34,9 @@ function resolveBootProfile() {
   return boot.active_profile;
 }
 
+// ─────────────────────────────────────────────
+// Set user config path based on the active profile
+// ─────────────────────────────────────────────
 function setUserConfigPath(profileFilename) {
   configPath = fileManager.resolvePath("config", profileFilename);
   invalidateConfigCache();
@@ -48,6 +54,24 @@ function switchUserProfile(profileFilename) {
 
   setUserConfigPath(profileFilename);
   return loadUserConfig(); // Refresh config and virtual structure
+}
+
+// ─────────────────────────────────────────────
+// List available user profiles in the config directory
+// ─────────────────────────────────────────────
+function listAvailableProfiles() {
+  return fileManager
+    .listFilesByExtension(fileManager.resolvePath("config"), ".json", {
+      silent: true,
+    })
+    .filter((f) => f !== "boot.json"); // Exclude boot.json
+}
+
+// ─────────────────────────────────────────────
+// Get the current profile filename
+// ─────────────────────────────────────────────
+function getCurrentProfileFilename() {
+  return configPath ? path.basename(configPath) : null;
 }
 
 // ─────────────────────────────────────────────
@@ -272,6 +296,8 @@ function getTemplateImageFiles(templateFilename) {
 // ─────────────────────────────────────────────
 module.exports = {
   switchUserProfile,
+  listAvailableProfiles,
+  getCurrentProfileFilename,
   ensureConfigFile,
   loadUserConfig,
   updateUserConfig,

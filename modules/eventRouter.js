@@ -6,6 +6,7 @@ import * as cacheHandler from "./handlers/cacheHandler.js";
 import * as vfsHandler from "./handlers/vfsHandler.js";
 import * as bootHandlers from "./handlers/bootHandlers.js";
 import * as screenHandlers from "./handlers/screenHandlers.js";
+import * as profileHandler from "./handlers/profileHandler.js";
 import * as contextHandlers from "./handlers/contextHandlers.js";
 import * as templateHandlers from "./handlers/templateHandlers.js";
 import * as formHandlers from "./handlers/formHandlers.js";
@@ -48,6 +49,15 @@ export function initEventRouter() {
   EventBus.on("screen:fullscreen", screenHandlers.handleFullscreenToggle);
   EventBus.on("theme:toggle", themeHandler.handleThemeToggle);
   EventBus.on("status:update", statusHandler.handleStatusUpdate);
+
+  EventBus.off(
+    "profile:list:highlighted",
+    profileHandler.handleProfileHighlighted
+  );
+  EventBus.on(
+    "profile:list:highlighted",
+    profileHandler.handleProfileHighlighted
+  );
 
   EventBus.off("context:toggle", contextHandlers.handleContextToggle);
   EventBus.off(

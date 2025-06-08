@@ -11,6 +11,7 @@ import { initTemplateEditor } from "./modules/templateEditor.js";
 import { createFormManager } from "./modules/formUI.js";
 
 import {
+  setupProfileModal,
   setupSettingsModal,
   setupWorkspaceModal,
   setupEntryModal,
@@ -75,12 +76,14 @@ window.addEventListener("DOMContentLoaded", async () => {
   const config = await window.api.config.loadUserConfig();
 
   // ── Modals ──
+  const profile = setupProfileModal();
   const settings = setupSettingsModal();
   const workspaceModal = setupWorkspaceModal();
   const entryInputModal = setupEntryModal();
   const templateModal = setupTemplateModal();
   const aboutModal = setupAboutModal();
 
+  window.openProfileModal = profile.show;
   window.openSettingsModal = settings.show;
   window.openWorkspaceModal = workspaceModal.show;
   window.openAboutModal = aboutModal.show;

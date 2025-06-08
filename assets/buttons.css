@@ -113,9 +113,12 @@ button:disabled,
   color: var(--unflagged-color, #5bc0de);
 }
 
-.directory-picker button.btn {
+.btn-input-height {
   height: 36px !important;
+  padding: 4px 10px;
+  font-size: 13px;
 }
+
 
 /* ───── Close Button ───── */
 .btn-close {

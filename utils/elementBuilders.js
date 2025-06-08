@@ -85,7 +85,7 @@ export function createDirectoryPicker({
   label,
   value = "",
   buttonText = "Browse",
-  outerClass = "modal-form-row",
+  outerClass = "modal-form-row tight-gap",
   placeholder = "",
   readOnly = true,
 }) {
@@ -100,7 +100,7 @@ export function createDirectoryPicker({
           ${placeholder ? `placeholder="${placeholder}"` : ""}
           ${readOnly ? "readonly" : ""}
         />
-        <button id="choose-${id}" class="btn btn-info">${buttonText}</button>
+        <button id="choose-${id}" class="btn btn-info btn-input-height">${buttonText}</button>
     </div>
   `;
 }

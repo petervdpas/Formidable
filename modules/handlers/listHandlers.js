@@ -46,8 +46,8 @@ export function handleListHighlighted({ listId, name }) {
       items.find((el) => el.dataset?.value?.toLowerCase() === name.toLowerCase());
 
     if (match) {
-      clearHighlighted(container); // 🧼 first clear anything with matching data-list-id
-      highlightSelected(container, name);
+      clearHighlighted(container); // first clear anything with matching data-list-id
+      highlightSelected(container, name, { click: true });
     } else if (attempt++ < maxAttempts) {
       setTimeout(tryHighlight, 100);
     }

@@ -6,6 +6,8 @@ const { contextBridge, ipcRenderer, dialog } = require("electron");
 const api = {
   config: buildGroup([
     "switch-user-profile",
+    "list-user-profiles",
+    "current-profile-filename",
     "load-user-config",
     "update-user-config",
     "invalidate-config-cache",

@@ -58,6 +58,8 @@
   --flagged-color: #28a745;
   --unflagged-color: #ccc;
 
+  --profile-list-bg: #f0f0f0;
+  
   --popup-option-height: 40px;
 }
 
@@ -93,17 +95,20 @@ body {
 }
 
 .template-item,
-.storage-item {
+.storage-item,
+.profile-item {
   background-color: #e0e0e0;
 }
 
 .template-item:hover,
-.storage-item:hover {
+.storage-item:hover,
+.profile-item:hover {
   background-color: #d0d0d0;
 }
 
 .template-item.selected,
-.storage-item.selected {
+.storage-item.selected,
+.profile-item.selected {
   background-color: #2196f3 !important;
   color: white;
   font-weight: bold;

@@ -68,6 +68,15 @@ export function buildButtonGroup(...buttons) {
   return group;
 }
 
+export function createProfileAddButton(onClick) {
+  return createButton({
+    text: "Create",
+    className: "btn-info btn-input-height",
+    identifier: "create-profile",
+    onClick,
+  });
+}
+
 export function createFieldEditButton(idx, onClick) {
   return createButton({
     text: "Edit",

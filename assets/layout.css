@@ -65,9 +65,19 @@ body {
   overflow-y: auto;
 }
 
+#profile-list {
+  background-color: var(--profile-list-bg); /* or #f0f0f0 if undefined */
+  padding: 8px;
+  border-radius: 4px;
+  margin-bottom: 1em;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
 /* ───── List Items ───── */
 .template-item,
-.storage-item {
+.storage-item,
+.profile-item {
   padding: 4px 8px;
   margin-bottom: 5px;
   cursor: pointer;
