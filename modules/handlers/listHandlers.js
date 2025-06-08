@@ -1,6 +1,7 @@
 // modules/handlers/listHandlers.js
 
 import { EventBus } from "../eventBus.js";
+import { ensureVirtualLocation } from "../../utils/vfsUtils.js";
 import {
   clearHighlighted,
   highlightSelected
@@ -84,10 +85,9 @@ export async function handleListItemClicked({ listId, name }) {
         return;
       }
 
-      const template = window.currentSelectedTemplate;
-      const dir = template.storage_location;
+      const template = await ensureVirtualLocation(window.currentSelectedTemplate);
       const data = await window.api.forms.loadForm(
-        dir,
+        template.filename,
         name,
         template.fields || []
       );

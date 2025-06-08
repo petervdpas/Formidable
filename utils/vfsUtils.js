@@ -2,16 +2,23 @@
 import { setValueAtKey } from "./transformationUtils.js";
 
 /**
- * Assigns template.virtualLocation based on legacy storage_location.
- * Intended as an interim step while phasing out storage_location.
+ * Assigns template.virtualLocation
  *
  * @param {Object} template
  * @returns {Object} The same template object with virtualLocation set.
  */
-export function ensureVirtualLocation(template) {
+export async function ensureVirtualLocation(template) {
+  if (!template || typeof template !== "object") {
+    return template; // No-op if template is not an object
+  }
+
+  const storageLocation = await window.api.config.getTemplateStorageFolder(
+    template.filename
+  );
+
   return setValueAtKey(
     template,
     "virtualLocation",
-    template?.storage_location || ""
+    storageLocation || ""
   );
 }

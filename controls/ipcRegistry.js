@@ -87,25 +87,25 @@ function registerIpcHandlers() {
     templateManager.createBasicTemplateIfMissing()
   );
 
-  // Forms
-  registerIpc("ensure-form-dir", (e, dir) =>
-    formManager.ensureFormDirectory(dir)
+  // Forms (refactored for template-based VFS)
+  registerIpc("ensure-form-dir", (e, templateFilename) =>
+    formManager.ensureFormDirectory(templateFilename)
   );
-  registerIpc("list-forms", (e, dir) => formManager.listForms(dir));
-  registerIpc("load-form", (e, dir, file, fields) =>
-    formManager.loadForm(dir, file, fields)
+  registerIpc("list-forms", (e, templateFilename) =>
+    formManager.listForms(templateFilename)
   );
-  registerIpc("save-form", (e, dir, file, data, fields) =>
-    formManager.saveForm(dir, file, data, fields)
+  registerIpc("load-form", (e, templateFilename, dataFile, fields) =>
+    formManager.loadForm(templateFilename, dataFile, fields)
   );
-  registerIpc(
-    "save-image-file",
-    async (e, storageLocation, fileName, buffer) => {
-      return fileManager.saveImageFile(storageLocation, fileName, buffer);
-    }
+  registerIpc("save-form", (e, templateFilename, dataFile, data, fields) =>
+    formManager.saveForm(templateFilename, dataFile, data, fields)
   );
-  registerIpc("delete-form", (e, dir, file) =>
-    formManager.deleteForm(dir, file)
+  registerIpc("delete-form", (e, templateFilename, dataFile) =>
+    formManager.deleteForm(templateFilename, dataFile)
+  );
+  // This one still uses raw storageLocation (not templateFilename), so leave as-is for now:
+  registerIpc("save-image-file", async (e, storageLocation, fileName, buffer) =>
+    fileManager.saveImageFile(storageLocation, fileName, buffer)
   );
 
   // Markdown

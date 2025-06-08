@@ -10,7 +10,7 @@ export const fieldTypes = {
     cssClass: "modal-loopstart",
     disabledAttributes: ["description", "default", "options", "twoColumnRow"],
     defaultValue: () => "",
-    renderInput(field) {
+    renderInput: async function (field) {
       const wrapper = document.createElement("div");
       wrapper.className = "loop-control-block";
       wrapper.textContent = `🔁 Loop Start → ${field.for || "(not set)"}`;
@@ -24,7 +24,7 @@ export const fieldTypes = {
     cssClass: "modal-loopstop",
     disabledAttributes: ["description", "default", "options", "twoColumnRow"],
     defaultValue: () => "",
-    renderInput() {
+    renderInput: async function () {
       const wrapper = document.createElement("div");
       wrapper.className = "loop-control-block";
       wrapper.textContent = "⏹ Loop End";
@@ -37,7 +37,7 @@ export const fieldTypes = {
     label: "Text",
     cssClass: "modal-text",
     defaultValue: () => "",
-    renderInput(field) {
+    renderInput: async function (field) {
       const input = document.createElement("input");
       input.type = "text";
       input.value = field.default || "";
@@ -51,7 +51,7 @@ export const fieldTypes = {
     label: "Checkbox",
     cssClass: "modal-boolean",
     defaultValue: () => false,
-    renderInput(field) {
+    renderInput: async function (field) {
       const input = document.createElement("input");
       input.type = "checkbox";
       input.checked = field.default === true;
@@ -65,7 +65,7 @@ export const fieldTypes = {
     label: "Dropdown",
     cssClass: "modal-dropdown",
     defaultValue: () => "",
-    renderInput(field) {
+    renderInput: async function (field) {
       const select = document.createElement("select");
       (field.options || []).forEach((opt) => {
         const option = document.createElement("option");
@@ -84,7 +84,7 @@ export const fieldTypes = {
     label: "Multiple Choice",
     cssClass: "modal-multioption",
     defaultValue: () => [],
-    renderInput(field) {
+    renderInput: async function (field) {
       const wrapper = document.createElement("div");
       (field.options || []).forEach((opt) => {
         const label = document.createElement("label");
@@ -114,7 +114,7 @@ export const fieldTypes = {
     label: "Radio Buttons",
     cssClass: "modal-radio",
     defaultValue: () => "",
-    renderInput(field) {
+    renderInput: async function (field) {
       const wrapper = document.createElement("div");
 
       (field.options || []).forEach((opt) => {
@@ -152,7 +152,7 @@ export const fieldTypes = {
     label: "Multiline Text",
     cssClass: "modal-textarea",
     defaultValue: () => "",
-    renderInput(field) {
+    renderInput: async function (field) {
       const textarea = document.createElement("textarea");
       textarea.value = field.default || "";
       textarea.name = field.key;
@@ -165,7 +165,7 @@ export const fieldTypes = {
     label: "Number",
     cssClass: "modal-number",
     defaultValue: () => 0,
-    renderInput(field) {
+    renderInput: async function (field) {
       const input = document.createElement("input");
       input.type = "number";
       input.value = field.default ?? 0;
@@ -179,7 +179,7 @@ export const fieldTypes = {
     label: "Date",
     cssClass: "modal-date",
     defaultValue: () => "",
-    renderInput(field) {
+    renderInput: async function (field) {
       const input = document.createElement("input");
       input.type = "date";
       input.value = field.default || "";
@@ -193,7 +193,7 @@ export const fieldTypes = {
     label: "List",
     cssClass: "modal-list",
     defaultValue: () => [],
-    renderInput(field) {
+    renderInput: async function (field) {
       const input = document.createElement("input");
       input.type = "text";
       input.value = (field.default || []).join(", ");
@@ -208,7 +208,7 @@ export const fieldTypes = {
     label: "Table",
     cssClass: "modal-table",
     defaultValue: () => [],
-    renderInput(field) {
+    renderInput: async function (field) {
       const textarea = document.createElement("textarea");
       textarea.name = field.key;
       textarea.rows = 5;
@@ -226,8 +226,8 @@ export const fieldTypes = {
     label: "Image Upload",
     cssClass: "modal-image",
     defaultValue: () => "",
-    renderInput(field, template) {
-      template = ensureVirtualLocation(template);
+    renderInput: async function (field, template) {
+      template = await ensureVirtualLocation(template);
 
       const wrapper = document.createElement("div");
 

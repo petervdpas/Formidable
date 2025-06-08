@@ -17,7 +17,7 @@ function resolveOption(opt) {
 
 // ─────────────────────────────────────────────
 // Type: loopstart
-export function renderLoopstartField(field) {
+export async function renderLoopstartField(field) {
   const container = document.createElement("div");
   container.className = "loop-marker loop-start";
   container.textContent = field.label || "Loop Start";
@@ -41,7 +41,7 @@ export function renderLoopstartField(field) {
 
 // ─────────────────────────────────────────────
 // Type: loopstop
-export function renderLoopstopField(field) {
+export async function renderLoopstopField(field) {
   const container = document.createElement("div");
   container.className = "loop-marker loop-stop";
   container.textContent = field.label || "Loop Stop";
@@ -65,7 +65,7 @@ export function renderLoopstopField(field) {
 
 // ─────────────────────────────────────────────
 // Type: text
-export function renderTextField(field) {
+export async function renderTextField(field) {
   const input = document.createElement("input");
   input.type = "text";
   input.name = field.key;
@@ -80,7 +80,7 @@ export function renderTextField(field) {
 
 // ─────────────────────────────────────────────
 // Type: boolean
-export function renderBooleanField(field) {
+export async function renderBooleanField(field) {
   let trailingLabel = null;
 
   if (Array.isArray(field.options) && field.options.length >= 2) {
@@ -109,7 +109,7 @@ export function renderBooleanField(field) {
 
 // ─────────────────────────────────────────────
 // Type: dropdown
-export function renderDropdownField(field) {
+export async function renderDropdownField(field) {
   const select = document.createElement("select");
   (field.options || []).forEach((opt) => {
     const { value, label } = resolveOption(opt);
@@ -131,7 +131,7 @@ export function renderDropdownField(field) {
 
 // ─────────────────────────────────────────────
 // Type: multioption
-export function renderMultioptionField(field) {
+export async function renderMultioptionField(field) {
   const wrapper = document.createElement("div");
   wrapper.dataset.multioptionField = field.key;
 
@@ -161,7 +161,7 @@ export function renderMultioptionField(field) {
 
 // ─────────────────────────────────────────────
 // Type: radio
-export function renderRadioField(field) {
+export async function renderRadioField(field) {
   const wrapper = document.createElement("div");
   wrapper.dataset.radioGroup = field.key;
 
@@ -194,7 +194,7 @@ export function renderRadioField(field) {
 
 // ─────────────────────────────────────────────
 // Type: textarea
-export function renderTextareaField(field) {
+export async function renderTextareaField(field) {
   const wrapper = document.createElement("div");
   wrapper.className = "markdown-editor-wrapper";
 
@@ -271,7 +271,7 @@ export function renderTextareaField(field) {
 
 // ─────────────────────────────────────────────
 // Type: number
-export function renderNumberField(field) {
+export async function renderNumberField(field) {
   const input = document.createElement("input");
   input.type = "number";
   input.name = field.key;
@@ -286,7 +286,7 @@ export function renderNumberField(field) {
 
 // ─────────────────────────────────────────────
 // Type: date
-export function renderDateField(field) {
+export async function renderDateField(field) {
   const input = document.createElement("input");
   input.type = "date";
   input.name = field.key;
@@ -301,29 +301,32 @@ export function renderDateField(field) {
 
 // ─────────────────────────────────────────────
 // Type: list (dynamic add/remove)
-export function renderListField(field) {
+// ─────────────────────────────────────────────
+// Type: list (dynamic add/remove)
+export async function renderListField(field) {
   const wrapper = document.createElement("div");
   wrapper.dataset.type = "list";
-  wrapper.dataset.listField = field.key; // this is crucial for getFormData()
+  wrapper.dataset.listField = field.key; // crucial for getFormData()
 
   const items = field.default || [];
 
-  items.forEach((item) => {
-    const row = createListItem(item, field.options || []);
+  for (const item of items) {
+    const row = await createListItem(item, field.options || []);
     wrapper.appendChild(row);
-  });
+  }
 
   const addBtn = document.createElement("button");
   addBtn.textContent = "+";
-  addBtn.onclick = () => {
-    const row = createListItem("", field.options || []);
+  addBtn.type = "button"; // Prevent form submission if inside <form>
+  addBtn.addEventListener("click", async () => {
+    const row = await createListItem("", field.options || []);
     wrapper.insertBefore(row, addBtn);
     const input = row.querySelector("input");
     if (input && input.readOnly && typeof input.onclick === "function") {
       input.focus();
       input.click();
     }
-  };
+  });
 
   wrapper.appendChild(addBtn);
 
@@ -335,7 +338,7 @@ export function renderListField(field) {
   );
 }
 
-function createListItem(value, options = []) {
+async function createListItem(value, options = []) {
   const container = document.createElement("div");
   container.className = "list-item";
 
@@ -363,6 +366,7 @@ function createListItem(value, options = []) {
   const removeBtn = document.createElement("button");
   removeBtn.textContent = "-";
   removeBtn.className = "remove-btn";
+  removeBtn.type = "button";
   removeBtn.onclick = () => container.remove();
 
   container.appendChild(input);
@@ -372,7 +376,7 @@ function createListItem(value, options = []) {
 
 // ─────────────────────────────────────────────
 // Type: table
-export function renderTableField(field) {
+export async function renderTableField(field) {
   const wrapper = document.createElement("div");
   wrapper.className = "table-wrapper";
   wrapper.dataset.type = "table";
@@ -459,8 +463,8 @@ export function renderTableField(field) {
 
 // ─────────────────────────────────────────────
 // Type: image
-export function renderImageField(field, template) {
-  template = ensureVirtualLocation(template);
+export async function renderImageField(field, template) {
+  template = await ensureVirtualLocation(template);
 
   const wrapper = document.createElement("div");
 

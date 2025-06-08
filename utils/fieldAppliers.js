@@ -102,7 +102,12 @@ export function applyMultioptionField(container, key, value) {
 }
 
 export function applyImageField(container, key, value, template) {
-  template = ensureVirtualLocation(template);
+  ensureVirtualLocation(template).then((resolvedTemplate) => {
+    applyImageLogic(container, key, value, resolvedTemplate);
+  });
+}
+
+function applyImageLogic(container, key, value, template) {
   const wrapper = container.querySelector(`[data-image-field="${key}"]`);
   const preview = wrapper?.querySelector("img");
 

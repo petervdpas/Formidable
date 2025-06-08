@@ -70,12 +70,12 @@ export function setupTemplateModal() {
     height: "auto",
     onOpen: async () => {
       const modal = document.getElementById("template-modal");
-      const input = modal?.querySelector("input#template-dir");
+      const input = modal?.querySelector("input#context-folder");
       if (!input) return;
 
       const config =
         getCachedConfig() || (await window.api.config.loadUserConfig());
-      input.value = config.storage_location || "./storage";
+      input.value = config.context_folder || "./";
     },
   });
 }

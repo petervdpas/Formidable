@@ -33,7 +33,7 @@ export async function handleTemplateSelected({ name, yaml }) {
     await window.api.config.updateUserConfig({ selected_template: name });
 
     // Only needed when entering storage mode for the first time
-    await window.api.markdown.ensureMarkdownDir(yaml.storage_location);
+    // await window.api.markdown.ensureMarkdownDir(yaml.storage_location);
 
     // Clear form selection when switching template
     EventBus.emit("context:select:form", null);

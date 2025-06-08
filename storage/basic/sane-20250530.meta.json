@@ -4,7 +4,7 @@
     "author_email": "peter.vdpas@gmail.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-06-08T11:18:14.169Z",
+    "updated": "2025-06-08T18:12:30.944Z",
     "flagged": true
   },
   "data": {
@@ -12,6 +12,7 @@
     "check": true,
     "dropdown": "R",
     "multichoice": [
+      "A",
       "B"
     ],
     "radio": "CAT",

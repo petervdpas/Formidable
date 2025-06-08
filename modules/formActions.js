@@ -19,7 +19,7 @@ const warn = (...args) => EventBus.emit("logging:warning", args);
 const err = (...args) => EventBus.emit("logging:error", args);
 
 export async function saveForm(container, template) {
-  template = ensureVirtualLocation(template);
+  template = await ensureVirtualLocation(template);
   if (!template?.virtualLocation) {
     EventBus.emit("status:update", "No template selected.");
     return;
@@ -37,7 +37,7 @@ export async function saveForm(container, template) {
   let created = null;
   try {
     const existing = await window.api.forms.loadForm(
-      template.virtualLocation,
+      template.filename,
       datafile
     );
     created = existing?.meta?.created || null;
@@ -59,7 +59,7 @@ export async function saveForm(container, template) {
   };
 
   const result = await window.api.forms.saveForm(
-    template.virtualLocation,
+    template.filename,
     datafile,
     payload,
     template.fields || []
@@ -75,7 +75,7 @@ export async function saveForm(container, template) {
 }
 
 export async function deleteForm(container, template, datafile) {
-  template = ensureVirtualLocation(template);
+  template = await ensureVirtualLocation(template);
   if (!template || !template.virtualLocation) {
     warn("[deleteForm] No template selected for deletion.");
     EventBus.emit("status:update", "Cannot delete: template not selected.");
@@ -95,7 +95,7 @@ export async function deleteForm(container, template, datafile) {
   if (!confirmed) return;
 
   const result = await window.api.forms.deleteForm(
-    template.virtualLocation,
+    template.filename,
     datafile
   );
 

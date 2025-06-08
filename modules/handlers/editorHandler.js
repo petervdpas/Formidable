@@ -5,14 +5,10 @@ import { getValue as getMarkdownTemplate } from "../templateCodemirror.js";
 
 export async function handleSaveTemplate({ container, fields, callback }) {
   const name = container.querySelector("#yaml-name").value.trim();
-  const storageLocation = container
-    .querySelector("#storage-location")
-    .value.trim();
   const markdownTemplate = getMarkdownTemplate();
 
   const updated = {
     name,
-    storage_location: storageLocation,
     markdown_template: markdownTemplate,
     fields,
   };

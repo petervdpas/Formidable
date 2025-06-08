@@ -255,7 +255,7 @@ export function validateFilenameInput(inputEl) {
   return name || null;
 }
 
-export function renderFieldElement(field) {
+export async function renderFieldElement(field, template = null) {
   const type = field.type;
   const fn = renderers[`render${capitalize(type)}Field`];
   const typeDef = fieldTypes[type];
@@ -272,5 +272,5 @@ export function renderFieldElement(field) {
     field.default = typeDef.defaultValue();
   }
 
-  return fn(field);
+  return await fn(field, template);
 }

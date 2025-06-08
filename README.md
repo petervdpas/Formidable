@@ -164,7 +164,7 @@ Saved to `./config/user.json`:
   "theme": "dark",
   "font_size": 14,
   "context_mode": "template",
-  "storage_location": "./storage",
+  "context_folder": "./",
   "window_bounds": { "width": 1024, "height": 800 }
 }
 ```

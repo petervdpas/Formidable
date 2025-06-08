@@ -13,23 +13,12 @@ import { getCompactDate } from "../../utils/dateUtils.js";
 // ─────────────────────────────────────────────────────────────
 export function handleTemplateConfirm({
   modal,
-  defaultStorageLocation,
   callback,
 }) {
   const nameInput = document.getElementById("template-name");
-  const dirInput = document.getElementById("template-dir");
   const wrapper = document.getElementById("template-modal-buttons-wrapper");
 
   nameInput.value = "";
-  dirInput.value = defaultStorageLocation;
-
-  const updateDir = () => {
-    const safe = sanitize(nameInput.value);
-    dirInput.value = safe ? `${defaultStorageLocation}/${safe}` : "./storage";
-  };
-
-  nameInput.removeEventListener("input", updateDir);
-  nameInput.addEventListener("input", updateDir);
 
   const confirmBtn = createModalConfirmButton({
     id: "template-confirm",
@@ -40,14 +29,12 @@ export function handleTemplateConfirm({
 
       const safe = sanitize(raw);
       const template = `${safe}.yaml`;
-      const storage_location = dirInput.value.trim() || "markdown";
 
       modal.hide();
       callback({
         template,
         yaml: {
           name: safe,
-          storage_location,
           markdown_template: "",
           fields: [],
         },

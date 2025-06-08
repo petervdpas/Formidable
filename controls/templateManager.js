@@ -2,43 +2,21 @@
 
 const fileManager = require("./fileManager");
 const configManager = require("./configManager");
-const { log, warn, error } = require("./nodeLogger");
 const schema = require("../schemas/template.schema");
+const { log, warn, error } = require("./nodeLogger");
 
 const basicYamlName = "basic.yaml";
 
-let cachedConfig = null;
-
-function getConfig() {
-  if (!cachedConfig) {
-    cachedConfig = configManager.loadUserConfig();
-  }
-  return cachedConfig;
-}
-
-function getConfigTemplatesDir() {
-  try {
-    const cfg = getConfig(); // uses cache
-    return typeof cfg.templates_location === "string" &&
-      cfg.templates_location.trim()
-      ? cfg.templates_location
-      : "./templates";
-  } catch {
-    return "./templates";
-  }
-}
-
 function getTemplatesDir() {
-  return fileManager.joinPath(getConfigTemplatesDir());
+  return configManager.getContextTemplatesPath();
 }
 
 function getTemplatePath(name = "") {
-  return fileManager.joinPath(getConfigTemplatesDir(), name);
+  return fileManager.joinPath(getTemplatesDir(), name);
 }
 
 function ensureTemplateDirectory() {
-  const fullPath = fileManager.resolvePath(getTemplatesDir());
-  return fileManager.ensureDirectory(fullPath, {
+  return fileManager.ensureDirectory(getTemplatesDir(), {
     label: "TemplateManager",
     silent: true,
   });
@@ -52,8 +30,7 @@ function loadTemplate(name) {
   const filePath = getTemplatePath(name);
   try {
     const raw = fileManager.loadFile(filePath, { format: "yaml" });
-    const sanitized = schema.sanitize(raw, name); // filename = bestandsnaam
-    return sanitized;
+    return schema.sanitize(raw, name);
   } catch (err) {
     error("[TemplateManager] Failed to load:", filePath, err);
     return null;
@@ -62,33 +39,20 @@ function loadTemplate(name) {
 
 function saveTemplate(name, data) {
   try {
-    if (typeof data.storage_location === "string") {
-      data.storage_location = data.storage_location.replace(/\\/g, "/");
-    }
+    if (!data.filename) data.filename = name;
 
-    // Voeg filename toe als die nog niet bestaat
-    if (!data.filename) {
-      data.filename = name;
-    }
+    const ordered = {
+      name: data.name || "",
+      filename: data.filename,
+    };
 
-    // Bouw een nieuw object met keys in de juiste volgorde
-    const ordered = {};
-
-    // Zet name en filename eerst (in die volgorde)
-    ordered.name = data.name || "";
-    ordered.filename = data.filename;
-
-    // Voeg de rest toe, behalve name en filename
     for (const key of Object.keys(data)) {
-      if (key !== "name" && key !== "filename") {
+      if (!["name", "filename"].includes(key)) {
         ordered[key] = data[key];
       }
     }
 
     const filePath = getTemplatePath(name);
-
-    // Hier moet je fileManager.saveFile zo aanpassen dat het
-    // de keys in deze volgorde serialiseert (of, je gebruikt een YAML-lib die dat kan)
     const saved = fileManager.saveFile(filePath, ordered, { format: "yaml" });
 
     if (saved) {
@@ -105,8 +69,8 @@ function saveTemplate(name, data) {
 }
 
 function deleteTemplate(name) {
+  const filePath = getTemplatePath(name);
   try {
-    const filePath = getTemplatePath(name);
     const deleted = fileManager.deleteFile(filePath);
     if (deleted) {
       log("[TemplateManager] Deleted template:", filePath);
@@ -123,7 +87,6 @@ function deleteTemplate(name) {
 
 function getTemplateDescriptor(name) {
   const data = loadTemplate(name);
-
   if (!data) {
     throw new Error(`Template descriptor missing or malformed for: ${name}`);
   }
@@ -131,28 +94,22 @@ function getTemplateDescriptor(name) {
   return {
     name,
     yaml: data,
-    storageLocation: data.storage_location,
+    storageLocation: configManager.getTemplateStoragePath(name),
   };
 }
 
 function checkDuplicateKeys(fields) {
-  const seen = new Map(); // key → type
+  const seen = new Map();
   const duplicates = [];
 
-  for (const field of fields) {
-    const { key, type } = field;
+  for (const { key, type } of fields) {
     if (!key) continue;
-
     if (seen.has(key)) {
       const existingType = seen.get(key);
-
       const isLoopPair =
         (type === "loopstart" && existingType === "loopstop") ||
         (type === "loopstop" && existingType === "loopstart");
-
-      if (!isLoopPair) {
-        duplicates.push(key);
-      }
+      if (!isLoopPair) duplicates.push(key);
     } else {
       seen.set(key, type);
     }
@@ -206,56 +163,35 @@ function checkLoopPairing(fields) {
 }
 
 function validateTemplate(template) {
-  const errors = [];
-
   if (!template || !Array.isArray(template.fields)) {
-    return [
-      { type: "invalid-template", message: "Missing or invalid fields array" },
-    ];
+    return [{ type: "invalid-template", message: "Missing or invalid fields array" }];
   }
 
+  const errors = [];
   const duplicates = checkDuplicateKeys(template.fields);
   if (duplicates.length > 0) {
-    errors.push({
-      type: "duplicate-keys",
-      keys: duplicates,
-    });
+    errors.push({ type: "duplicate-keys", keys: duplicates });
   }
 
-  const loopErrors = checkLoopPairing(template.fields);
-  errors.push(...loopErrors);
-
+  errors.push(...checkLoopPairing(template.fields));
   return errors;
 }
 
 function createBasicTemplateIfMissing() {
-  if (!fileManager.fileExists(getTemplatePath(basicYamlName))) {
+  const path = getTemplatePath(basicYamlName);
+  if (!fileManager.fileExists(path)) {
     const content = {
       name: "Basic Form",
-      storage_location: "./storage/basic",
+      filename: basicYamlName,
       markdown_template: ``,
       fields: [
-        {
-          key: "test",
-          label: "Test",
-          type: "text",
-          default: "Default value",
-          description: "A basic text input for demonstration purposes.",
-          two_column: true,
-        },
-        {
-          key: "check",
-          label: "Check",
-          type: "boolean",
-          description: "Enable or disable this feature using a checkbox.",
-          two_column: true,
-        },
+        { key: "test", label: "Test", type: "text", default: "Default value", two_column: true },
+        { key: "check", label: "Check", type: "boolean", two_column: true },
         {
           key: "dropdown",
           label: "Dropdown",
           type: "dropdown",
           default: "R",
-          description: "Select a single value from a dropdown menu.",
           two_column: true,
           options: [
             { value: "L", label: "Left" },
@@ -266,7 +202,6 @@ function createBasicTemplateIfMissing() {
           key: "multichoice",
           label: "Multiple Choice",
           type: "multioption",
-          description: "Choose one or more options from a list of checkboxes.",
           two_column: true,
           options: [
             { value: "A", label: "Option A" },
@@ -279,7 +214,6 @@ function createBasicTemplateIfMissing() {
           label: "Radio",
           type: "radio",
           default: "DOG",
-          description: "Pick one option using radio buttons.",
           two_column: true,
           options: [
             { value: "CAT", label: "Cat" },
@@ -292,33 +226,28 @@ function createBasicTemplateIfMissing() {
           label: "Mline",
           type: "textarea",
           default: "A whole lot of prefab text...",
-          description: "Enter longer text, such as notes or paragraphs.",
         },
         {
           key: "numpy",
           label: "Numpy",
           type: "number",
           default: "17",
-          description: "A numeric input field. Only accepts numbers.",
         },
         {
           key: "bday",
           label: "Birthday",
           type: "date",
           default: "1968-12-23",
-          description: "Select a date from the calendar picker.",
         },
         {
           key: "listy",
           label: "Listy",
           type: "list",
-          description: "Add multiple short entries in list format.",
         },
         {
           key: "datable",
           label: "Table",
           type: "table",
-          description: "Enter rows of structured data using defined columns.",
           options: [
             { value: "col1", label: "Column 1" },
             { value: "col2", label: "Column 2" },
@@ -328,20 +257,13 @@ function createBasicTemplateIfMissing() {
       ],
     };
 
-    const saved = fileManager.saveFile(
-      getTemplatePath(basicYamlName),
-      content,
-      {
-        format: "yaml",
-        silent: false,
-      }
-    );
+    const saved = fileManager.saveFile(path, content, {
+      format: "yaml",
+      silent: false,
+    });
 
     if (saved) {
-      log(
-        "[TemplateManager] Created basic.yaml at:",
-        getTemplatePath(basicYamlName)
-      );
+      log("[TemplateManager] Created basic.yaml at:", path);
     } else {
       error("[TemplateManager] Failed to create basic.yaml");
     }

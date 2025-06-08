@@ -1,6 +1,7 @@
 // controls/formManager.js
 
 const { SingleFileRepository } = require("./sfr");
+const configManager = require("./configManager");
 const fileManager = require("./fileManager");
 const metaSchema = require("../schemas/meta.schema");
 const { log, warn, error } = require("./nodeLogger");
@@ -11,21 +12,23 @@ const metaRepo = new SingleFileRepository({
   silent: false,
 });
 
-function ensureFormDirectory(storageLocation) {
-  const fullPath = fileManager.resolvePath(storageLocation);
-  return fileManager.ensureDirectory(fullPath, {
+function ensureFormDirectory(templateFilename) {
+  const storagePath = configManager.getTemplateStoragePath(templateFilename);
+  return fileManager.ensureDirectory(storagePath, {
     label: "FormManager",
     silent: true,
   });
 }
 
-function listForms(storageLocation) {
-  return metaRepo.listFiles(storageLocation);
+function listForms(templateFilename) {
+  const storagePath = configManager.getTemplateStoragePath(templateFilename);
+  return metaRepo.listFiles(storagePath);
 }
 
-function loadForm(storageLocation, datafile, templateFields = []) {
+function loadForm(templateFilename, datafile, templateFields = []) {
+  const storagePath = configManager.getTemplateStoragePath(templateFilename);
   try {
-    const raw = metaRepo.loadFromBase(storageLocation, datafile);
+    const raw = metaRepo.loadFromBase(storagePath, datafile);
     if (!raw) return null;
 
     const sanitized = metaSchema.sanitize(raw, templateFields);
@@ -37,10 +40,11 @@ function loadForm(storageLocation, datafile, templateFields = []) {
   }
 }
 
-function saveForm(storageLocation, datafile, data, templateFields = []) {
+function saveForm(templateFilename, datafile, data, templateFields = []) {
+  const storagePath = configManager.getTemplateStoragePath(templateFilename);
   try {
     const sanitized = metaSchema.sanitize(data, templateFields);
-    const result = metaRepo.saveFromBase(storageLocation, datafile, sanitized);
+    const result = metaRepo.saveFromBase(storagePath, datafile, sanitized);
     if (result.success) {
       log("[FormManager] Saved form:", result.path);
     } else {
@@ -53,8 +57,9 @@ function saveForm(storageLocation, datafile, data, templateFields = []) {
   }
 }
 
-function deleteForm(storageLocation, datafile) {
-  return metaRepo.deleteFromBase(storageLocation, datafile);
+function deleteForm(templateFilename, datafile) {
+  const storagePath = configManager.getTemplateStoragePath(templateFilename);
+  return metaRepo.deleteFromBase(storagePath, datafile);
 }
 
 module.exports = {

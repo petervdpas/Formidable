@@ -93,16 +93,6 @@ export async function renderSettings() {
       label: "Context Folder",
       value: config.context_folder || "./",
     })}
-    ${createDirectoryPicker({
-      id: "settings-template-dir",
-      label: "Template Directory",
-      value: config.templates_location || "./templates",
-    })}
-    ${createDirectoryPicker({
-      id: "settings-storage-dir",
-      label: "Storage Directory",
-      value: config.storage_location || "./storage",
-    })}
   `;
 
   // Inject tabs
@@ -148,12 +138,6 @@ function setupBindings(config) {
     "context_folder",
     "context:folder:changed"
   );
-  bindDirButton(
-    "settings-template-dir",
-    "templates_location",
-    "template:list:reload"
-  );
-  bindDirButton("settings-storage-dir", "storage_location", "form:list:reload");
 }
 
 function bindDirButton(fieldId, configKey, reloadEvent) {

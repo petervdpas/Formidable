@@ -117,10 +117,12 @@ function renderContextDropdown(isStorage, config) {
     onRefresh: async () => {
       try {
         if (isStorage) {
-          const template = ensureVirtualLocation(window.currentSelectedTemplate);
+          const template = await ensureVirtualLocation(window.currentSelectedTemplate);
+          console.log(
+            "[PAY ATTETION] Reloading forms for template:", template);
           if (!template?.virtualLocation) return [];
           const files = await window.api.forms.listForms(
-            template.virtualLocation
+            template.filename
           );
           return files.map((f) => ({
             value: f,

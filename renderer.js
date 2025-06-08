@@ -141,7 +141,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   // ── Sidebars ──
   window.templateListManager = createTemplateListManager(
     templateModal,
-    config.storage_location,
     templateDropdown
   );
 

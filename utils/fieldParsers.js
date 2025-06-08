@@ -67,7 +67,7 @@ export function parseTableField(wrapper) {
 
 // Image
 export async function parseImageField(inputWrapper, template) {
-  template = ensureVirtualLocation(template);
+  template = await ensureVirtualLocation(template);
 
   if (!inputWrapper || !template?.virtualLocation) return "";
 

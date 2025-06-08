@@ -10,6 +10,7 @@ import {
 } from "./templateFieldEdit.js";
 import { generateTemplateCode } from "../utils/templateGenerator.js";
 import { formatError } from "../utils/templateValidation.js";
+import { ensureVirtualLocation } from "../utils/vfsUtils.js";
 import {
   getEditor,
   handleEditorKey,
@@ -48,13 +49,18 @@ export function initTemplateEditor(containerId, onSaveCallback) {
   let editModal,
     currentEditIndex = null;
 
-  function renderEditor(data) {
+  async function renderEditor(data) {
     if (!data) {
       EventBus.emit("logging:warning", [
         "[YamlEditor] renderEditor() called with null data",
       ]);
       return;
     }
+
+    data = await ensureVirtualLocation(data);
+
+    console.log("[YamlEditor] Rendering editor with data:", data);
+
 
     currentData = structuredClone(data);
     EventBus.emit("logging:default", [
@@ -69,16 +75,10 @@ export function initTemplateEditor(containerId, onSaveCallback) {
         <label for="yaml-name">Name</label>
         <input type="text" id="yaml-name" value="${currentData.name || ""}" />
       </div>
-      <div class="modal-form-row">
-        <label for="storage-location">Storage Directory</label>
-        <input type="text" id="storage-location" value="${
-          currentData.storage_location || ""
-        }" />
-      </div>
       <div class="modal-form-row full-editor-row">
         <label for="markdown-template">Template Code <small>CTRL+ENTER for full screen</small></label>
         <div class="editor-wrapper">
-          <textarea id="markdown-template" rows="4">${
+          <textarea id="markdown-template" rows="7">${
             currentData.markdown_template || ""
           }</textarea>
         </div>
@@ -124,8 +124,6 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     const saveBtn = createTemplateSaveButton(async () => {
       const fullTemplate = {
         name: container.querySelector("#yaml-name")?.value.trim() || "Unnamed",
-        storage_location:
-          container.querySelector("#storage-location")?.value.trim() || "",
         markdown_template: getEditor()?.getValue() || "",
         fields: currentData.fields || [],
       };

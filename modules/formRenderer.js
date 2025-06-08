@@ -20,7 +20,7 @@ import {
 import { fieldTypes } from "../utils/fieldTypes.js";
 import { showConfirmModal } from "./modalSetup.js";
 
-function renderFieldsWithLoops(container, fields, metaData) {
+async function renderFieldsWithLoops(container, fields, metaData) {
   const loopGroupKeys = new Set();
   let i = 0;
 
@@ -41,27 +41,25 @@ function renderFieldsWithLoops(container, fields, metaData) {
       loopContainer.className = "loop-container";
       loopContainer.dataset.loopKey = loopKey;
 
-      // ─── Loop List (for Sortable) ─────
       const loopList = document.createElement("div");
       loopList.className = "loop-list";
-      loopData.forEach((entry) => {
+
+      for (const entry of loopData) {
         const complete = { ...createLoopDefaults(group), ...entry };
-        const itemWrapper = createLoopItem(group, complete);
+        const itemWrapper = await createLoopItem(group, complete);
         loopList.appendChild(itemWrapper);
-      });
+      }
 
       loopContainer.appendChild(loopList);
 
-      // ─── Add Button ─────
-      const addButton = createAddLoopItemButton(() => {
-        const newItem = createLoopItem(group, {});
+      const addButton = createAddLoopItemButton(async () => {
+        const newItem = await createLoopItem(group, {});
         loopList.appendChild(newItem);
       });
 
       loopContainer.appendChild(addButton);
       container.appendChild(loopContainer);
 
-      // ─── Enable Sortable ─────
       Sortable.create(loopList, {
         animation: 150,
         handle: ".drag-handle",
@@ -75,7 +73,6 @@ function renderFieldsWithLoops(container, fields, metaData) {
         setPlaceholderSize: true,
         onStart: (evt) => {
           const original = evt.item;
-
           requestAnimationFrame(() => {
             const drag = document.querySelector(".sortable-drag");
             if (drag && original) {
@@ -85,7 +82,6 @@ function renderFieldsWithLoops(container, fields, metaData) {
               drag.style.padding = style.padding;
               drag.style.margin = style.margin;
               drag.style.borderRadius = style.borderRadius;
-              // force desired appearance
               drag.style.opacity = "0.95";
               drag.style.background = "var(--sortable-drag-bg, #ffe082)";
             }
@@ -98,23 +94,21 @@ function renderFieldsWithLoops(container, fields, metaData) {
         continue;
       }
 
-      const row = renderFieldElement(field, metaData);
+      const row = await renderFieldElement(field, metaData);
       if (row) container.appendChild(row);
       i++;
     }
   }
 }
 
-function createLoopItem(groupFields, dataEntry = {}) {
+async function createLoopItem(groupFields, dataEntry = {}) {
   const itemWrapper = document.createElement("div");
   itemWrapper.className = "loop-item";
 
-  // ─── Drag Handle ─────
   const dragHandle = document.createElement("div");
   dragHandle.className = "drag-handle";
   itemWrapper.appendChild(dragHandle);
 
-  // ─── Remove Button ─────
   const firstField = groupFields[0];
   const firstKey = firstField?.key || "(unknown)";
   const label = firstField?.label || firstKey;
@@ -136,8 +130,7 @@ function createLoopItem(groupFields, dataEntry = {}) {
 
   itemWrapper.appendChild(removeBtn);
 
-  // ─── Fields ─────
-  groupFields.forEach((loopField) => {
+  for (const loopField of groupFields) {
     const fieldCopy = { ...loopField };
     const fieldKey = fieldCopy.key;
 
@@ -150,11 +143,11 @@ function createLoopItem(groupFields, dataEntry = {}) {
         : undefined;
     }
 
-    const row = renderFieldElement(fieldCopy, {
+    const row = await renderFieldElement(fieldCopy, {
       [fieldKey]: dataEntry[fieldKey],
     });
     if (row) itemWrapper.appendChild(row);
-  });
+  }
 
   return itemWrapper;
 }
@@ -167,7 +160,7 @@ function buildMetaSection(
 ) {
   const section = document.createElement("div");
   section.className = "meta-section";
-  section.style.position = "relative"; // nodig voor absolute knop
+  section.style.position = "relative";
 
   if (typeof onFlagChange === "function") {
     let flagged = flaggedInitial;
@@ -182,15 +175,12 @@ function buildMetaSection(
     const flaggedContainer = document.createElement("div");
     flaggedContainer.className = "flagged-toggle-container";
     flaggedContainer.appendChild(flaggedBtn);
-
-    // Eerst toevoegen (zodat knop boven tekst komt)
     section.appendChild(flaggedContainer);
   }
 
-  // Meta info
   const p = document.createElement("p");
   p.style.whiteSpace = "pre-line";
-  p.style.marginTop = "0"; // geen extra ruimte bovenaan
+  p.style.marginTop = "0";
   p.textContent =
     `Filename: ${filename || ""}\n` +
     `Author: ${meta.author_name || ""}\n` +
@@ -204,7 +194,7 @@ function buildMetaSection(
   return section;
 }
 
-export function renderFormUI(
+export async function renderFormUI(
   container,
   template,
   metaData,
@@ -214,21 +204,18 @@ export function renderFormUI(
 ) {
   container.innerHTML = "";
 
-  // Hidden filename input (for saving)
   const filenameInput = buildHiddenInput(
     "meta-json-filename",
     metaData._filename || ""
   );
   container.appendChild(filenameInput);
 
-  // Hidden flagged input (for saving)
   const flaggedInput = buildHiddenInput(
     "meta-flagged",
     metaData.meta?.flagged ? "true" : "false"
   );
   container.appendChild(flaggedInput);
 
-  // Meta info section with flagged toggle, updating hidden input on change
   const metaSection = buildMetaSection(
     metaData.meta || {},
     metaData._filename || "",
@@ -239,13 +226,11 @@ export function renderFormUI(
   );
   container.appendChild(metaSection);
 
-  // Fields
   const fields = template.fields || [];
   injectFieldDefaults(fields, metaData);
 
-  renderFieldsWithLoops(container, fields, metaData);
+  await renderFieldsWithLoops(container, fields, metaData);
 
-  // Buttons
   const saveBtn = createFormSaveButton(onSave);
   const deleteBtn = createFormDeleteButton(() => onDelete(metaData._filename));
   const renderBtn = createFormRenderButton(onRender);

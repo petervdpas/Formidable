@@ -100,14 +100,11 @@ function createContextToggleItem() {
 export async function handleMenuAction(action) {
   EventBus.emit("logging:default", [`[Menu] Handling menu action: ${action}`]);
 
+  const templatesLocation = await window.api.config.getTemplatesFolder();
+
   switch (action) {
     case "open-template-folder": {
-      const config = await window.api.config.loadUserConfig();
-      const resolved = await window.api.system.resolvePath(
-        config.templates_location || "templates"
-      );
-      await window.api.markdown.ensureMarkdownDir?.(resolved);
-      const result = await window.electron.shell.openPath(resolved);
+      const result = await window.electron.shell.openPath(templatesLocation);
       if (result) {
         EventBus.emit("logging:error", [
           "[Shell] Failed to open template folder:",
@@ -126,34 +123,23 @@ export async function handleMenuAction(action) {
       try {
         const config = await window.api.config.loadUserConfig();
         const templateName = config.selected_template;
+        // TODO: Reevaluate if virtualstructure is needed here
         if (!templateName) {
           EventBus.emit("logging:warning", [
             "[Menu] No selected_template entry found.",
           ]);
+          EventBus.emit("ui:toast", {
+            message: "No template selected. Please select a template first.",
+            variant: "warning",
+          });
           return;
         }
 
-        const templateDir = config.templates_location || "templates";
-        const templatePath = await window.api.system.resolvePath(
-          templateDir,
-          templateName
+        const templateStorageLocation =
+          await window.api.config.getTemplateStorageFolder(templateName);
+        const result = await window.electron.shell.openPath(
+          templateStorageLocation
         );
-        const exists = await window.api.system.fileExists(templatePath);
-        if (!exists) {
-          EventBus.emit("logging:error", [
-            "[Menu] Template not found:",
-            templatePath,
-          ]);
-          return;
-        }
-
-        const yaml = await window.api.templates.loadTemplate(templateName);
-        const targetPath = await window.api.system.resolvePath(
-          yaml.storage_location
-        );
-        await window.api.forms.ensureFormDir?.(targetPath);
-
-        const result = await window.electron.shell.openPath(targetPath);
         if (result) {
           EventBus.emit("logging:error", [
             "[Shell] Failed to open storage folder:",

@@ -8,7 +8,6 @@ import { createAddButton } from "./uiButtons.js";
 
 export function createTemplateListManager(
   modal,
-  defaultStorageLocation = "./storage",
   dropdown = null
 ) {
   const listManager = createListManager({
@@ -23,7 +22,6 @@ export function createTemplateListManager(
       onClick: async () => {
         EventBus.emit("modal:template:confirm", {
           modal,
-          defaultStorageLocation,
           callback: async ({ template, yaml }) => {
             try {
               await window.api.templates.saveTemplate(template, yaml);
@@ -63,7 +61,7 @@ export function createStorageListManager(formManager, modal) {
     elementId: "storage-list",
     itemClass: "storage-item",
     fetchListFunction: async () => {
-      const template = ensureVirtualLocation(window.currentSelectedTemplate);
+      const template = await ensureVirtualLocation(window.currentSelectedTemplate);
       if (!template) {
         EventBus.emit("logging:warning", ["[MetaList] No selected template."]);
         EventBus.emit("status:update", "No template selected.");
@@ -81,13 +79,13 @@ export function createStorageListManager(formManager, modal) {
         return [];
       }
 
-      await window.api.forms.ensureFormDir(template.virtualLocation);
-      const files = await window.api.forms.listForms(template.virtualLocation);
+      await window.api.forms.ensureFormDir(template.filename);
+      const files = await window.api.forms.listForms(template.filename);
 
       const items = [];
       for (const fullName of files) {
         const meta = await window.api.forms.loadForm(
-          template.virtualLocation,
+          template.filename,
           fullName
         );
         items.push({

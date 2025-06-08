@@ -1,6 +1,7 @@
 // controls/markdownRenderer.js
 
 const Handlebars = require("handlebars");
+const configManager = require("./configManager");
 const { resolvePath } = require("./fileManager");
 const { log, error } = require("./nodeLogger");
 
@@ -39,7 +40,7 @@ const defaultRenderers = {
   textarea: (v) => v,
   image: (filename, field, template) => {
     if (!filename || typeof filename !== "string") return "";
-    const basePath = template?.storage_location || "";
+    const basePath = configManager.getTemplateStoragePath(template?.filename) || "";
     const absPath = resolvePath(basePath, "images", filename);
     const uri = `file://${absPath.replace(/\\/g, "/")}`; // normalize for Electron
     return uri;

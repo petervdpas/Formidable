@@ -40,7 +40,7 @@ export function createFormManager(containerId) {
       templateYaml.filename || "<missing>",
     ]);
 
-    currentTemplate = ensureVirtualLocation(templateYaml);
+    currentTemplate = await ensureVirtualLocation(templateYaml);
     clearFormUI(container);
   }
 
@@ -50,7 +50,7 @@ export function createFormManager(containerId) {
 
     if (!metaData && currentTemplate?.virtualLocation && currentDatafile) {
       metaData = await window.api.forms.loadForm(
-        currentTemplate.virtualLocation,
+        currentTemplate.filename,
         currentDatafile,
         currentTemplate.fields || []
       );
@@ -71,7 +71,7 @@ export function createFormManager(containerId) {
     const formData = metaData.data || metaData;
     injectFieldDefaults(currentTemplate.fields, formData);
 
-    renderFormUI(
+    await renderFormUI(
       container,
       currentTemplate,
       { ...formData, _filename: datafile, meta: metaData.meta },
