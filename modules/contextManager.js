@@ -1,6 +1,7 @@
 // modules/contextManager.js
 
 import { EventBus } from "./eventBus.js";
+import { ensureVirtualLocation } from "../utils/vfsUtils.js";
 import { setupSplitter } from "../utils/resizing.js";
 import { createSwitch } from "../utils/elementBuilders.js";
 import { createDropdown } from "./dropdownManager.js";
@@ -116,10 +117,10 @@ function renderContextDropdown(isStorage, config) {
     onRefresh: async () => {
       try {
         if (isStorage) {
-          const template = window.currentSelectedTemplate;
-          if (!template?.storage_location) return [];
+          const template = ensureVirtualLocation(window.currentSelectedTemplate);
+          if (!template?.virtualLocation) return [];
           const files = await window.api.forms.listForms(
-            template.storage_location
+            template.virtualLocation
           );
           return files.map((f) => ({
             value: f,

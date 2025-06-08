@@ -1,6 +1,7 @@
 // modules/formUI.js
 
 import { EventBus } from "./eventBus.js";
+import { ensureVirtualLocation } from "../utils/vfsUtils.js";
 import { renderFormUI } from "./formRenderer.js";
 import { saveForm, deleteForm, renderFormPreview } from "./formActions.js";
 import { injectFieldDefaults, clearFormUI } from "../utils/formUtils.js";
@@ -39,7 +40,7 @@ export function createFormManager(containerId) {
       templateYaml.filename || "<missing>",
     ]);
 
-    currentTemplate = templateYaml;
+    currentTemplate = ensureVirtualLocation(templateYaml);
     clearFormUI(container);
   }
 
@@ -47,9 +48,9 @@ export function createFormManager(containerId) {
     currentDatafile = datafile;
     EventBus.emit("logging:default", ["[loadFormData] datafile:", datafile]);
 
-    if (!metaData && currentTemplate?.storage_location && currentDatafile) {
+    if (!metaData && currentTemplate?.virtualLocation && currentDatafile) {
       metaData = await window.api.forms.loadForm(
-        currentTemplate.storage_location,
+        currentTemplate.virtualLocation,
         currentDatafile,
         currentTemplate.fields || []
       );
