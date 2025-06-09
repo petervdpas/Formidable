@@ -89,7 +89,6 @@ export function createDirectoryPicker({
   placeholder = "",
   readOnly = true,
 }) {
-
   return `
     <div class="${outerClass} directory-picker">
       <label for="${id}">${label}</label>
@@ -219,25 +218,24 @@ export function buildSwitchElement({
   if (trailingLabel && Array.isArray(trailingLabel)) {
     trailing = document.createElement("div");
     trailing.className = "trailing-label";
-    container.appendChild(trailing); // append first
+    container.appendChild(trailing);
   }
 
-  // listener AFTER elements exist
+  // ⚠ wait for DOM attachment before resolving label
+  requestAnimationFrame(() => {
+    if (trailing) {
+      trailing.textContent = input.checked
+        ? trailingLabel?.[0]
+        : trailingLabel?.[1];
+    }
+  });
+
   input.addEventListener("change", (e) => {
     if (typeof onFlip === "function") onFlip(e.target.checked);
     if (trailing) {
       trailing.textContent = e.target.checked
-        ? trailingLabel[0]
-        : trailingLabel[1];
-    }
-  });
-
-  // force a label update NOW (after DOM is built)
-  requestAnimationFrame(() => {
-    if (trailing) {
-      trailing.textContent = input.checked
-        ? trailingLabel[0]
-        : trailingLabel[1];
+        ? trailingLabel?.[0]
+        : trailingLabel?.[1];
     }
   });
 

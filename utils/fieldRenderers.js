@@ -89,7 +89,9 @@ export async function renderBooleanField(field) {
     trailingLabel = [first.label, second.label];
   }
 
-  const isChecked = String(field.default).toLowerCase() === "true";
+  // Normalize true/false strictly
+  const normalized = String(field.default).trim().toLowerCase();
+  const isChecked = normalized === "true" || normalized === "1";
 
   const { element: toggle } = buildSwitchElement({
     id: field.key,
