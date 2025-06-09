@@ -2,14 +2,13 @@
 
 import { EventBus } from "./eventBus.js";
 import { ensureVirtualLocation } from "../utils/vfsUtils.js";
-import { createListManager } from "./listManager.js";
 import { stripMetaExtension } from "../utils/pathUtils.js";
+import { buildSwitchElement } from "../utils/elementBuilders.js";
+import { createListManager } from "./listManager.js";
 import { createAddButton } from "./uiButtons.js";
 
-export function createTemplateListManager(
-  modal,
-  dropdown = null
-) {
+
+export function createTemplateListManager(modal, dropdown = null) {
   const listManager = createListManager({
     elementId: "template-list",
     itemClass: "template-item",
@@ -57,74 +56,60 @@ export function createTemplateListManager(
 }
 
 export function createStorageListManager(formManager, modal) {
+  const { input: toggle, element: wrapper } = buildSwitchElement({
+    id: "flagged-toggle",
+    checked: false,
+    trailingLabel: ["Show only flagged", "Show all"],
+    onFlip: (value) => {
+      showOnlyFlagged = value;
+
+      const config = window.api?.config?.loadUserConfig
+        ? window.api.config.loadUserConfig()
+        : Promise.resolve({});
+
+      Promise.resolve(config).then((cfg) => {
+        const name = window.currentSelectedDataFile || cfg?.selected_data_file;
+
+        listManager.renderList(undefined, () => {
+          if (name) {
+            EventBus.emit("form:list:highlighted", name);
+          }
+        });
+      });
+    },
+  });
+
+  let showOnlyFlagged = false;
+
   const listManager = createListManager({
     elementId: "storage-list",
     itemClass: "storage-item",
     fetchListFunction: async () => {
-      const template = await ensureVirtualLocation(window.currentSelectedTemplate);
-      if (!template) {
-        EventBus.emit("logging:warning", ["[MetaList] No selected template."]);
-        EventBus.emit("status:update", "No template selected.");
-        return [];
-      }
-
-      if (!template.virtualLocation) {
-        EventBus.emit("logging:warning", [
-          "[MetaList] No storage location field.",
-        ]);
-        EventBus.emit(
-          "status:update",
-          "Template missing storage location field."
-        );
-        return [];
-      }
+      const template = await ensureVirtualLocation(
+        window.currentSelectedTemplate
+      );
+      if (!template || !template.virtualLocation) return [];
 
       await window.api.forms.ensureFormDir(template.filename);
       const files = await window.api.forms.listForms(template.filename);
 
-      const items = [];
-      for (const fullName of files) {
-        const meta = await window.api.forms.loadForm(
-          template.filename,
-          fullName
-        );
-        items.push({
-          display: stripMetaExtension(fullName),
-          value: fullName,
-          flagged: meta?.meta?.flagged || false,
-        });
-      }
-
-      return items;
+      return Promise.all(
+        files.map(async (fullName) => {
+          const meta = await window.api.forms.loadForm(
+            template.filename,
+            fullName
+          );
+          return {
+            display: stripMetaExtension(fullName),
+            value: fullName,
+            flagged: meta?.meta?.flagged || false,
+          };
+        })
+      );
     },
     onItemClick: (storageItem) =>
       EventBus.emit("form:list:itemClicked", storageItem),
     emptyMessage: "No metadata files found.",
-    addButton: createAddButton({
-      label: "+ Add Entry",
-      onClick: async () => {
-        const template = window.currentSelectedTemplate;
-        if (!template) {
-          EventBus.emit("logging:warning", [
-            "[AddMarkdown] No template selected.",
-          ]);
-          EventBus.emit("status:update", "Please select a template first.");
-          return;
-        }
-
-        EventBus.emit("modal:entry:confirm", {
-          modal,
-          callback: async (datafile) => {
-            EventBus.emit("logging:default", [
-              "[AddMarkdown] Creating new entry:",
-              datafile,
-            ]);
-            await formManager.loadFormData({}, datafile);
-            EventBus.emit("status:update", "New metadata entry ready.");
-          },
-        });
-      },
-    }),
     renderItemExtra: (item, raw) => {
       if (raw.flagged) {
         const wrapper = document.createElement("span");
@@ -138,6 +123,39 @@ export function createStorageListManager(formManager, modal) {
         item.appendChild(wrapper);
       }
     },
+    filterFunction: (item) => !showOnlyFlagged || item.flagged,
+    filterUI: wrapper,
+    addButton: createAddButton({
+      label: "+ Add Entry",
+      onClick: async () => {
+        const template = window.currentSelectedTemplate;
+        if (!template) {
+          EventBus.emit("status:update", "Please select a template first.");
+          return;
+        }
+
+        EventBus.emit("modal:entry:confirm", {
+          modal,
+          callback: async (datafile) => {
+            await formManager.loadFormData({}, datafile);
+            EventBus.emit("status:update", "New metadata entry ready.");
+          },
+        });
+      },
+    }),
+  });
+
+  toggle.addEventListener("change", async () => {
+    showOnlyFlagged = toggle.checked;
+
+    const config = await window.api.config.loadUserConfig();
+    const name = window.currentSelectedDataFile || config?.selected_data_file;
+
+    listManager.renderList(undefined, () => {
+      if (name) {
+        EventBus.emit("form:list:highlighted", name);
+      }
+    });
   });
 
   return {

@@ -2,10 +2,7 @@
 
 import { EventBus } from "../eventBus.js";
 import { ensureVirtualLocation } from "../../utils/vfsUtils.js";
-import {
-  clearHighlighted,
-  highlightSelected
-} from "../../utils/domUtils.js";
+import { clearHighlighted, highlightSelected } from "../../utils/domUtils.js";
 
 let templateList = null;
 let storageList = null;
@@ -38,12 +35,19 @@ export function handleListHighlighted({ listId, name }) {
   let attempt = 0;
 
   function tryHighlight() {
-    const items = Array.from(container.children);
-    const normalized = name.toLowerCase().replace(/\.meta\.json$|\.yaml$|\.md$/i, "");
+    const items =
+      listId === "storage-list"
+        ? Array.from(container.querySelectorAll(".storage-item"))
+        : Array.from(container.querySelectorAll(".template-item"));
+    const normalized = name
+      .toLowerCase()
+      .replace(/\.meta\.json$|\.yaml$|\.md$/i, "");
 
     const match =
       items.find((el) => el.textContent.trim().toLowerCase() === normalized) ||
-      items.find((el) => el.dataset?.value?.toLowerCase() === name.toLowerCase());
+      items.find(
+        (el) => el.dataset?.value?.toLowerCase() === name.toLowerCase()
+      );
 
     if (match) {
       clearHighlighted(container); // first clear anything with matching data-list-id
@@ -85,7 +89,9 @@ export async function handleListItemClicked({ listId, name }) {
         return;
       }
 
-      const template = await ensureVirtualLocation(window.currentSelectedTemplate);
+      const template = await ensureVirtualLocation(
+        window.currentSelectedTemplate
+      );
       const data = await window.api.forms.loadForm(
         template.filename,
         name,

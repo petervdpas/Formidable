@@ -233,7 +233,7 @@ export function buildSwitchElement({
   });
 
   // force a label update NOW (after DOM is built)
-  queueMicrotask(() => {
+  requestAnimationFrame(() => {
     if (trailing) {
       trailing.textContent = input.checked
         ? trailingLabel[0]
