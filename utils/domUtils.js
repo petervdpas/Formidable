@@ -6,6 +6,7 @@ import {
   applyTableField,
   applyMultioptionField,
   applyImageField,
+  applyRangeField,
   applyGenericField,
 } from "./fieldAppliers.js";
 import { collectLoopGroup } from "./formUtils.js";
@@ -166,6 +167,11 @@ export function applyValueToField(container, field, value, template) {
     radios.forEach((radio) => {
       radio.checked = String(radio.value) === String(value);
     });
+    return;
+  }
+
+  if (container.querySelector(`[data-range-field="${key}"]`)) {
+    applyRangeField(container, field, value);
     return;
   }
 

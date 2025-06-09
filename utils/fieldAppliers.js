@@ -4,6 +4,42 @@ import { EventBus } from "../modules/eventBus.js";
 import { ensureVirtualLocation } from "./vfsUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 
+export function applyRangeField(container, field, value) {
+  const key = field.key;
+
+  const rangeWrapper = container.querySelector(`[data-range-field="${key}"]`);
+  if (!rangeWrapper) return;
+
+  const input = rangeWrapper.querySelector(
+    `input[type="range"][name="${key}"]`
+  );
+  const display = rangeWrapper.querySelector(".range-display");
+
+  if (!input) {
+    EventBus.emit("logging:warning", [
+      `[applyRangeField] Input not found for key "${key}".`,
+    ]);
+    return;
+  }
+
+  // Extract config from options
+  const optMap = Object.fromEntries(
+    (field.options || []).map((pair) =>
+      Array.isArray(pair) ? pair : [pair, pair]
+    )
+  );
+
+  if ("min" in optMap) input.min = optMap.min;
+  if ("max" in optMap) input.max = optMap.max;
+  if ("step" in optMap) input.step = optMap.step;
+
+  input.value = value;
+
+  if (display) {
+    display.textContent = value;
+  }
+}
+
 export function applyListField(container, field, value) {
   const key = field.key;
   const options = field.options || [];
@@ -153,7 +189,7 @@ export function applyGenericField(input, key, value) {
     return;
   }
 
-  // 🩹 Radio group (wrapped in field container)
+  // Radio group (wrapped in field container)
   if (input.dataset?.radioGroup === key) {
     const radios = input.querySelectorAll(`input[type="radio"]`);
     radios.forEach((el) => {

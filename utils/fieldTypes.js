@@ -175,6 +175,56 @@ export const fieldTypes = {
     parseValue: parsers.parseNumberField,
   },
 
+  range: {
+    label: "Range Slider",
+    cssClass: "modal-range",
+    defaultValue: () => 50,
+
+    renderInput: async function (field) {
+      const wrapper = document.createElement("div");
+      wrapper.dataset.rangeField = field.key;
+
+      // Parse options like [["min", "0"], ["max", "100"], ["step", "5"]]
+      const optMap = Object.fromEntries(
+        (field.options || []).map((pair) =>
+          Array.isArray(pair) ? pair : [pair, pair]
+        )
+      );
+
+      const min = parseFloat(optMap.min ?? field.min ?? 0);
+      const max = parseFloat(optMap.max ?? field.max ?? 100);
+      const step = parseFloat(optMap.step ?? field.step ?? 1);
+      const value = field.default ?? (min + max) / 2;
+
+      const input = document.createElement("input");
+      input.type = "range";
+      input.name = field.key;
+      input.min = min;
+      input.max = max;
+      input.step = step;
+      input.value = value;
+
+      const display = document.createElement("span");
+      display.className = "range-display";
+      display.textContent = input.value;
+      display.style.marginLeft = "10px";
+
+      input.addEventListener("input", () => {
+        display.textContent = input.value;
+      });
+
+      wrapper.appendChild(input);
+      wrapper.appendChild(display);
+
+      return wrapper;
+    },
+
+    parseValue(wrapper) {
+      const input = wrapper.querySelector("input[type='range']");
+      return input ? Number(input.value) : null;
+    },
+  },
+
   date: {
     label: "Date",
     cssClass: "modal-date",

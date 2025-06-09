@@ -6,7 +6,7 @@ module.exports = {
     templateFields = [],
     {
       templateName = "unknown",
-      author_name = "unknown",
+      author_name = "Unknown",
       author_email = "unknown@example.com",
       created = null,
       updated = null,
@@ -77,6 +77,8 @@ function getDefaultForType(type) {
       return false;
     case "number":
       return 0;
+    case "range":
+      return 50;
     case "multioption":
     case "list":
     case "table":

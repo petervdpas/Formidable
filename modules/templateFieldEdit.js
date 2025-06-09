@@ -40,6 +40,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
       "dropdown",
       "multioption",
       "radio",
+      "range",
       "list",
       "table",
     ];

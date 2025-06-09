@@ -242,6 +242,17 @@ fields:
     type: number
     default: '17'
     description: A numeric input field. Only accepts numbers.
+  - key: rangie
+    label: Rangie
+    type: range
+    description: A Range slider. Values are set by sliding the value
+    options:
+      - value: min
+        label: '0'
+      - value: max
+        label: '100'
+      - value: step
+        label: '5'
   - key: bday
     label: Birthday
     type: date

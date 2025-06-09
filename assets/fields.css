@@ -140,6 +140,12 @@
   border-left: 4px solid #64b5f6;
 }
 
+.field-list-item[data-type="range"] {
+  background-color: #3c3f77;
+  /* Deep Indigo */
+  border-left: 4px solid #7986cb;
+}
+
 .field-list-item[data-type="date"] {
   background-color: #229388;
   /* Darker Aqua Green */
@@ -209,6 +215,12 @@
 .field-type.type-number {
   background-color: #5aaae9;
   /* Slightly darker Light Blue */
+  color: black;
+}
+
+.field-type.type-range {
+  background-color: #7986cb;
+  /* Light Indigo */
   color: black;
 }
 
@@ -289,6 +301,11 @@
   border-left: 6px solid #64b5f6;
 }
 
+#field-edit-modal.modal-range {
+  background-color: #2c2f5e;
+  border-left: 6px solid #7986cb;
+}
+
 #field-edit-modal.modal-date {
   background-color: #007e72;
   border-left: 6px solid #4dd0e1;
@@ -342,6 +359,10 @@
 }
 
 #field-edit-modal.modal-number .btn-close {
+  color: #ccc;
+}
+
+#field-edit-modal.modal-range .btn-close {
   color: #ccc;
 }
 
