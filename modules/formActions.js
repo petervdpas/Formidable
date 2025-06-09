@@ -58,6 +58,8 @@ export async function saveForm(container, template) {
     },
   };
 
+  console.log("[DEBUG] Form payload:", JSON.stringify(payload, null, 2));
+
   const result = await window.api.forms.saveForm(
     template.filename,
     datafile,

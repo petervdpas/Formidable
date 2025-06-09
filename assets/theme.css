@@ -1,10 +1,20 @@
 /* ───── Light Theme (default) ───── */
 :root {
   --text-color: #111;
+  --text-description: #666;
   --input-border-color: #ccc;
   --input-bg: #fdfdfd;
   --input-fg: #111;
   --input-icon-bg: #1d1d1d;
+
+  /* ───── Range Slider ───── */
+  --range-track-height: 6px;
+  --range-track-bg: #ccc;
+
+  --range-thumb-size: 18px;
+  --range-thumb-bg: #2196f3;
+  --range-thumb-border: #1565c0;
+  --range-thumb-hover-shadow: rgba(33, 150, 243, 0.2);
 
   --readonly-bg: #ffffe0;
   --readonly-fg: #888;
@@ -61,7 +71,7 @@
   --unflagged-color: #ccc;
 
   --profile-list-bg: #f0f0f0;
-  
+
   --popup-option-height: 40px;
 }
 

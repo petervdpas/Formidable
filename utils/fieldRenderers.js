@@ -287,6 +287,53 @@ export async function renderNumberField(field) {
 }
 
 // ─────────────────────────────────────────────
+// Type: range
+export async function renderRangeField(field) {
+  const wrapper = document.createElement("div");
+  wrapper.dataset.rangeField = field.key;
+
+  const optMap = Object.fromEntries(
+    (field.options || []).map((pair) =>
+      Array.isArray(pair)
+        ? [pair[0], pair[1]]
+        : [pair.value ?? pair, pair.label ?? pair]
+    )
+  );
+
+  const min = parseFloat(optMap.min ?? field.min ?? 0);
+  const max = parseFloat(optMap.max ?? field.max ?? 100);
+  const step = parseFloat(optMap.step ?? field.step ?? 1);
+  const value = field.default ?? (min + max) / 2;
+
+  const input = document.createElement("input");
+  input.type = "range";
+  input.name = field.key;
+  input.min = min;
+  input.max = max;
+  input.step = step;
+  input.value = value;
+
+  const display = document.createElement("span");
+  display.className = "range-display";
+  display.textContent = input.value;
+  display.style.marginLeft = "10px";
+
+  input.addEventListener("input", () => {
+    display.textContent = input.value;
+  });
+
+  wrapper.appendChild(input);
+  wrapper.appendChild(display);
+
+  return wrapInputWithLabel(
+    wrapper,
+    field.label,
+    field.description,
+    field.two_column
+  );
+}
+
+// ─────────────────────────────────────────────
 // Type: date
 export async function renderDateField(field) {
   const input = document.createElement("input");

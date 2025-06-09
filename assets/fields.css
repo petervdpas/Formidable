@@ -40,9 +40,9 @@
 
 .field-description {
   font-size: 0.85em;
-  color: #888;
-  margin-top: -6px;
-  margin-bottom: 6px;
+  color: var(--text-description, #aaa);
+  margin-top: 2px;
+  margin-bottom: 4px;
 }
 
 .field-type {
@@ -59,7 +59,13 @@
   gap: 8px;
 }
 
-/* Ensure list item rows span full width including the remove button */
+[data-radio-group] {
+  display: flex;
+  flex-direction: row;
+  gap: 0.8rem;
+  align-items: center;
+}
+
 [data-list-field] {
   width: 100%;
 }
@@ -87,6 +93,27 @@
   border: none;
   border-radius: 0 4px 4px 0;
   cursor: pointer;
+}
+
+[data-range-field] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding-top: 6px;
+  padding-bottom: 10px;
+}
+
+[data-range-field] input[type="range"] {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+[data-range-field] .range-value {
+  min-width: 2.5em;
+  text-align: right;
+  font-weight: bold;
+  color: var(--input-fg);
 }
 
 /* ───── Field Type Color Themes ───── */

@@ -11,6 +11,12 @@ legend {
   padding: 0 6px;
 }
 
+label {
+  font-weight: bold;
+  margin: 6px 0;
+  display: block;
+}
+
 label small {
   font-weight: normal;
   font-size: 0.65em;
@@ -21,22 +27,10 @@ label small {
 .form-row {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 2px 10px;
+  margin-bottom: 6px;
   width: 100%;
   box-sizing: border-box;
-}
-
-.form-row label {
-  font-weight: bold;
-  margin: 2px 0;
-  display: block;
-}
-
-.form-row .field-description {
-  font-size: 0.85em;
-  margin-top: -4px;
-  margin-bottom: 4px;
 }
 
 /* ───── Inputs and Selects ───── */
@@ -70,24 +64,19 @@ label small {
   gap: 12px;
 }
 
-.form-row.two-column > div {
+.form-row.two-column>div {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-.form-row.two-column > div:first-child {
+.form-row.two-column>div:first-child {
   flex: 0 0 40%;
   max-width: 40%;
 }
 
-.form-row.two-column > div:last-child {
+.form-row.two-column>div:last-child {
   flex: 1 1 60%;
-}
-
-.form-row.two-column label {
-  font-weight: bold;
-  margin-bottom: 4px;
 }
 
 /* ───── Single Column Fallback ───── */
@@ -108,7 +97,7 @@ label small {
     flex-direction: column;
   }
 
-  .form-row.two-column > div {
+  .form-row.two-column>div {
     max-width: 100% !important;
     flex: 1 1 100% !important;
   }

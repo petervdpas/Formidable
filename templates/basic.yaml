@@ -245,7 +245,9 @@ fields:
   - key: rangie
     label: Rangie
     type: range
+    default: '20'
     description: A Range slider. Values are set by sliding the value
+    two_column: true
     options:
       - value: min
         label: '0'

@@ -35,6 +35,13 @@ export function parseNumberField(input) {
   return parseFloat(input.value) || 0;
 }
 
+// Range
+export function parseRangeField(wrapper) {
+  const input = wrapper.querySelector(`input[type="range"]`);
+  if (!input) return 0;
+  return parseFloat(input.value) || 0;
+}
+
 // Date
 export function parseDateField(input) {
   return input.value;
@@ -94,7 +101,6 @@ export async function parseImageField(inputWrapper, template) {
     );
 
     if (result?.success) {
-      // ✅ Werk DOM bij zodat data-filename actueel is
       inputWrapper.setAttribute("data-filename", filename);
       return filename;
     } else {

@@ -6,7 +6,6 @@ import { showOptionPopup } from "./popupUtils.js";
 
 export function applyRangeField(container, field, value) {
   const key = field.key;
-
   const rangeWrapper = container.querySelector(`[data-range-field="${key}"]`);
   if (!rangeWrapper) return;
 
@@ -22,22 +21,28 @@ export function applyRangeField(container, field, value) {
     return;
   }
 
-  // Extract config from options
+  // Safely coerce to float
+  const val = parseFloat(value);
+  if (!isFinite(val)) {
+    EventBus.emit("logging:warning", [
+      `[applyRangeField] Invalid value: ${value} for key "${key}".`,
+    ]);
+    return;
+  }
+
+  // Optional: parse and apply min/max/step if present in options
   const optMap = Object.fromEntries(
     (field.options || []).map((pair) =>
       Array.isArray(pair) ? pair : [pair, pair]
     )
   );
 
-  if ("min" in optMap) input.min = optMap.min;
-  if ("max" in optMap) input.max = optMap.max;
-  if ("step" in optMap) input.step = optMap.step;
+  if ("min" in optMap) input.min = String(optMap.min);
+  if ("max" in optMap) input.max = String(optMap.max);
+  if ("step" in optMap) input.step = String(optMap.step);
 
-  input.value = value;
-
-  if (display) {
-    display.textContent = value;
-  }
+  input.value = String(val);
+  if (display) display.textContent = String(val);
 }
 
 export function applyListField(container, field, value) {

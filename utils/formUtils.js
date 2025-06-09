@@ -50,6 +50,8 @@ export function extractFieldDefinition({
 
 function resolveFieldElement(container, field) {
   switch (field.type) {
+    case "range":
+      return container.querySelector(`[data-range-field="${field.key}"]`);
     case "radio":
       return container.querySelector(`[data-radio-group="${field.key}"]`);
     case "multioption":

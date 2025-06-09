@@ -4,7 +4,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-06-08T22:44:49.972Z",
+    "updated": "2025-06-09T18:11:02.152Z",
     "flagged": true
   },
   "data": {
@@ -18,6 +18,7 @@
     "radio": "CAT",
     "mline": "I dont like this one bit",
     "numpy": 17,
+    "rangie": 75,
     "bday": "1968-12-23",
     "listy": [
       "A single list item"

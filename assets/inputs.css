@@ -41,6 +41,40 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
 }
 
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: var(--range-track-height);
+  border-radius: 3px;
+  background: var(--range-track-bg);
+  outline: none;
+  margin: 6px 0;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: var(--range-thumb-size);
+  height: var(--range-thumb-size);
+  border-radius: 50%;
+  background: var(--range-thumb-bg);
+  border: 2px solid var(--range-thumb-border);
+  cursor: pointer;
+  transform: translateY(calc((var(--range-track-height) - var(--range-thumb-size)) / 2));
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  background: var(--range-track-bg);
+  height: var(--range-track-height);
+  border-radius: 3px;
+}
+
+input[type="range"]:hover::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px var(--range-thumb-hover-shadow);
+}
+
 .input-error {
   border: 2px solid #c00 !important;
 }

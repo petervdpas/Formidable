@@ -184,10 +184,11 @@ export const fieldTypes = {
       const wrapper = document.createElement("div");
       wrapper.dataset.rangeField = field.key;
 
-      // Parse options like [["min", "0"], ["max", "100"], ["step", "5"]]
       const optMap = Object.fromEntries(
         (field.options || []).map((pair) =>
-          Array.isArray(pair) ? pair : [pair, pair]
+          Array.isArray(pair)
+            ? [pair[0], pair[1]]
+            : [pair.value ?? pair, pair.label ?? pair]
         )
       );
 
@@ -219,10 +220,7 @@ export const fieldTypes = {
       return wrapper;
     },
 
-    parseValue(wrapper) {
-      const input = wrapper.querySelector("input[type='range']");
-      return input ? Number(input.value) : null;
-    },
+    parseValue: parsers.parseRangeField,
   },
 
   date: {

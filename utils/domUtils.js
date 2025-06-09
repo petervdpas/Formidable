@@ -215,7 +215,6 @@ export function applyFieldValues(container, template, data = {}) {
       continue;
     }
 
-    // ⛔ skip loop child velden in root-toepassing
     if (loopChildKeys.has(key)) {
       i++;
       continue;
