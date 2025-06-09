@@ -20,9 +20,13 @@ export function createProfileListManager() {
 
   const button = createProfileAddButton(async () => {
     const name = input.value.trim();
-    if (!name || !name.endsWith(".json")) {
+
+    // Validation: lowercase letters, numbers, hyphens, ends with .json
+    const valid = /^[a-z0-9-]+\.json$/.test(name);
+
+    if (!valid) {
       EventBus.emit("ui:toast", {
-        message: "Filename must end in .json",
+        message: "Use lowercase, hyphens, and end with .json",
         variant: "error",
       });
       return;
@@ -50,9 +54,23 @@ export function createProfileListManager() {
     elementId: "profile-list",
     itemClass: "profile-item",
     fetchListFunction: async () => await window.api.config.listUserProfiles(),
-    onItemClick: async (profile) => {
-      await window.api.config.switchUserProfile(profile);
+    onItemClick: async (profileFilename) => {
+      await window.api.config.switchUserProfile(profileFilename);
       window.electron.window.reload();
+    },
+    renderItemExtra: (element, raw) => {
+      const subtitle = document.createElement("small");
+      subtitle.textContent = `[${raw.value}]`;
+
+      Object.assign(subtitle.style, {
+        opacity: "0.5",
+        fontSize: "0.75em",
+        marginLeft: "0.5em",
+        fontStyle: "italic",
+        pointerEvents: "none",
+      });
+
+      element.appendChild(subtitle);
     },
     emptyMessage: "No profiles found.",
   });

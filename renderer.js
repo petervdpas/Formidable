@@ -3,7 +3,10 @@
 // ───── Imports ──────────────────────────────
 import { EventBus } from "./modules/eventBus.js";
 import { initEventRouter } from "./modules/eventRouter.js";
-import { initStatusHandler } from "./modules/handlers/statusHandler.js";
+import {
+  initStatusHandler,
+  setStatusInfo,
+} from "./modules/handlers/statusHandler.js";
 
 import { buildMenu, handleMenuAction } from "./modules/menuManager.js";
 import { createDropdown } from "./modules/dropdownManager.js";
@@ -74,6 +77,10 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // ── Emit config stuff ──
   const config = await window.api.config.loadUserConfig();
+
+  if (config?.author_name) {
+    setStatusInfo(`User Profile: ${config.author_name}`);
+  }
 
   // ── Modals ──
   const profile = setupProfileModal();

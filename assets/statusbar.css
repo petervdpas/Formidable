@@ -1,4 +1,5 @@
 /* ───── Status Bar ───── */
+
 #status-bar {
   position: fixed;
   bottom: 0;
@@ -6,15 +7,39 @@
   right: 0;
   height: 24px;
   z-index: 999;
-
   border-top: 1px solid;
   padding: 4px 10px;
   font-size: 12px;
   font-style: italic;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#status-bar-message {
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+#status-bar-info {
+  flex-shrink: 0;
+  margin-left: 12px;
+  padding-left: 12px;
+  white-space: nowrap;
+  font-style: normal;
+  font-weight: 500;
+  opacity: 0.8;
+  border-left: 1px solid var(--status-info-divider);
+  height: 100%;
   display: flex;
   align-items: center;
 }
 
 #main-wrapper {
-  height: calc(100vh - 28px); /* minus status bar + 4 */
+  height: calc(100vh - 28px);
+  /* minus status bar + 4 */
 }

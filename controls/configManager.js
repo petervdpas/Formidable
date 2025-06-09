@@ -60,11 +60,27 @@ function switchUserProfile(profileFilename) {
 // List available user profiles in the config directory
 // ─────────────────────────────────────────────
 function listAvailableProfiles() {
+  const configDir = fileManager.resolvePath("config");
+
   return fileManager
-    .listFilesByExtension(fileManager.resolvePath("config"), ".json", {
-      silent: true,
-    })
-    .filter((f) => f !== "boot.json"); // Exclude boot.json
+    .listFilesByExtension(configDir, ".json", { silent: true })
+    .filter((f) => f !== "boot.json")
+    .map((filename) => {
+      const fullPath = fileManager.resolvePath("config", filename);
+      let authorName = "(unknown)";
+
+      try {
+        const raw = fileManager.loadFile(fullPath, { format: "json", silent: true });
+        const { config } = schema.sanitize(raw);
+        authorName = config?.author_name?.trim() || "(unnamed)";
+      } catch (err) {
+        log(`[ConfigManager] Could not read ${filename}: ${err.message}`);
+      }
+
+      return {
+        value: filename,
+        display: `${authorName}`      };
+    });
 }
 
 // ─────────────────────────────────────────────

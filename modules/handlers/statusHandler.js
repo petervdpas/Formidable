@@ -4,24 +4,34 @@ import { EventBus } from "../eventBus.js";
 
 const messageTimestamps = new Map();
 
-let statusBar = null;
-let lastUpdateTime = 0;
-let lastMessage = "";
+let messageEl = null;
+let infoEl = null;
 
 export function initStatusHandler(statusBarId) {
-  statusBar = document.getElementById(statusBarId);
-  if (!statusBar) {
+  const container = document.getElementById(statusBarId);
+  if (!container) {
     EventBus.emit("logging:warning", [
       `[StatusHandler] Element #${statusBarId} not found.`,
     ]);
     return;
   }
 
-  console.log("Status bar element:", statusBar);
+  messageEl = container.querySelector("#status-bar-message");
+  infoEl = container.querySelector("#status-bar-info");
 
-  EventBus.emit("logging:default", [
-    `[StatusHandler] Bound to #${statusBarId}`,
-  ]);
+  if (!messageEl) {
+    EventBus.emit("logging:warning", [
+      `[StatusHandler] Missing #status-bar-message inside #${statusBarId}.`,
+    ]);
+  }
+
+  if (!infoEl) {
+    EventBus.emit("logging:warning", [
+      `[StatusHandler] Missing #status-bar-info inside #${statusBarId}.`,
+    ]);
+  }
+
+  EventBus.emit("logging:default", [`[StatusHandler] Initialized.`]);
 }
 
 export function handleStatusUpdate(message) {
@@ -35,14 +45,25 @@ export function handleStatusUpdate(message) {
 
   messageTimestamps.set(message, now);
 
-  if (statusBar) {
-    statusBar.textContent = message;
+  if (messageEl) {
+    messageEl.textContent = message;
     EventBus.emit("logging:default", [
-      `[StatusHandler] Status updated: "${message}"`,
+      `[StatusHandler] Status message updated: "${message}"`,
     ]);
   } else {
     EventBus.emit("logging:warning", [
-      `[StatusHandler] No status bar initialized.`,
+      `[StatusHandler] No status message element available.`,
+    ]);
+  }
+}
+
+export function setStatusInfo(text) {
+  if (infoEl) {
+    infoEl.textContent = text;
+    EventBus.emit("logging:default", [`[StatusHandler] Info set: "${text}"`]);
+  } else {
+    EventBus.emit("logging:warning", [
+      `[StatusHandler] No info element available.`,
     ]);
   }
 }
