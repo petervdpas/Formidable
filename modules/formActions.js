@@ -58,8 +58,6 @@ export async function saveForm(container, template) {
     },
   };
 
-  console.log("[DEBUG] Form payload:", JSON.stringify(payload, null, 2));
-
   const result = await window.api.forms.saveForm(
     template.filename,
     datafile,
@@ -67,12 +65,26 @@ export async function saveForm(container, template) {
     template.fields || []
   );
 
+  const shortName =
+    datafile || result.path?.split(/[/\\]/).pop() || "unknown.json";
+
   if (result.success) {
     EventBus.emit("status:update", `Saved: ${result.path}`);
+
+    EventBus.emit("ui:toast", {
+      message: `Successfully saved data: ${shortName}`,
+      variant: "success",
+    });
+
     EventBus.emit("form:list:reload");
     setTimeout(() => EventBus.emit("form:list:highlighted", datafile), 500);
   } else {
     EventBus.emit("status:update", `Failed to save: ${result.error}`);
+
+    EventBus.emit("ui:toast", {
+      message: `Failed to save data: ${shortName}`,
+      variant: "error",
+    });
   }
 }
 
@@ -96,10 +108,7 @@ export async function deleteForm(container, template, datafile) {
   );
   if (!confirmed) return;
 
-  const result = await window.api.forms.deleteForm(
-    template.filename,
-    datafile
-  );
+  const result = await window.api.forms.deleteForm(template.filename, datafile);
 
   if (result) {
     EventBus.emit("status:update", `Deleted: ${datafile}`);

@@ -107,6 +107,17 @@ markdown_template: |-
   {{field "numpy"}}
   ---
 
+  ## Rangie
+
+  _{{fieldDescription "rangie"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "rangie")}}
+  ```
+  {{field "rangie"}}
+  ---
+
   ## Birthday
 
   _{{fieldDescription "bday"}}_
@@ -192,9 +203,9 @@ fields:
     description: Enable or disable this feature using a checkbox.
     two_column: true
     options:
-      - value: 'on'
+      - value: true
         label: 'On'
-      - value: 'off'
+      - value: false
         label: 'Off'
   - key: dropdown
     label: Dropdown

@@ -39,6 +39,38 @@ export function extractFieldDefinition({
     }
   }
 
+  // Enforce exactly two boolean options: true and false
+  if (type === "boolean") {
+    const normalized = { true: null, false: null };
+
+    for (const opt of options) {
+      const val = typeof opt === "object" && opt !== null ? opt.value : opt;
+      const strVal = String(val).toLowerCase();
+
+      if (strVal === "true") {
+        normalized.true = {
+          value: true,
+          label: typeof opt === "object" && opt.label ? opt.label : "On",
+        };
+      } else if (strVal === "false") {
+        normalized.false = {
+          value: false,
+          label: typeof opt === "object" && opt.label ? opt.label : "Off",
+        };
+      }
+    }
+
+    // Fill in missing options
+    if (!normalized.true) {
+      normalized.true = { value: true, label: "True" };
+    }
+    if (!normalized.false) {
+      normalized.false = { value: false, label: "False" };
+    }
+
+    options = [normalized.true, normalized.false];
+  }
+
   const field = { key, label, type };
   if (def) field.default = def;
   if (description) field.description = description;

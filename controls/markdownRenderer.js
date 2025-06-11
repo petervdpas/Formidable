@@ -10,30 +10,22 @@ const defaultRenderers = {
   table: (value = []) =>
     value.map((row) => `| ${row.join(" | ")} |`).join("\n"),
   boolean: (v, field) => {
-    if (Array.isArray(field.options) && field.options.length >= 2) {
-      const value = String(v).trim().toLowerCase();
-      const first = field.options[0];
-      const second = field.options[1];
+    const value = Boolean(v); // force to real boolean
 
-      const value1 =
-        typeof first === "string"
-          ? first.toLowerCase()
-          : first.value?.toLowerCase();
+    // If custom options are defined (e.g., ["on", "off"] or [{value, label}])
+    if (Array.isArray(field.options) && field.options.length >= 2) {
+      const [first, second] = field.options;
+
       const label1 =
         typeof first === "string" ? first : first.label || first.value;
-
-      const value2 =
-        typeof second === "string"
-          ? second.toLowerCase()
-          : second.value?.toLowerCase();
       const label2 =
         typeof second === "string" ? second : second.label || second.value;
 
-      if (value === value1) return label1;
-      if (value === value2) return label2;
+      return value ? label1 : label2;
     }
 
-    return v ? "True" : "False";
+    // Fallback default
+    return value ? "True" : "False";
   },
   text: (v) => v || "",
   number: (v) => `${v}`,
@@ -179,12 +171,16 @@ function registerHelpers() {
     }
 
     // Use render function or default renderer
-    const fn =
-      typeof field.render === "function"
-        ? field.render
-        : defaultRenderers[field.type] || defaultRenderers.text;
+    let fn = defaultRenderers.text;
 
-    return fn(value, field, template); // ✅ now template is defined
+    if (typeof field.render === "function") {
+      fn = field.render;
+    } else if (field.type in defaultRenderers) {
+      fn = defaultRenderers[field.type];
+    }
+
+    const rendered = fn(value, field, template);
+    return typeof rendered === "string" ? rendered : `${rendered}`;
   });
 
   Handlebars.registerHelper("fieldRaw", function (key) {

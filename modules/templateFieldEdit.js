@@ -441,7 +441,7 @@ export function renderFieldList(
 
       fields.splice(idx, 1);
 
-      // 🧠 If it's a loopstart or loopstop, remove its partner
+      // If it's a loopstart or loopstop, remove its partner
       if (["loopstart", "loopstop"].includes(removedType)) {
         const partnerType =
           removedType === "loopstart" ? "loopstop" : "loopstart";
