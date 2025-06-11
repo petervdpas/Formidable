@@ -115,6 +115,7 @@
 
 /* ───── Field Type Color Themes ───── */
 /* Sidebar Field List Items */
+.field-list-item[data-type="looper"],
 .field-list-item[data-type="loopstart"],
 .field-list-item[data-type="loopstop"] {
   background-color: #b9e2c0;
@@ -195,6 +196,7 @@
 }
 
 /* ───── Field Type Color Badges ───── */
+.field-type.type-looper,
 .field-type.type-loopstart,
 .field-type.type-loopstop {
   background-color: #999;
@@ -283,6 +285,7 @@
 }
 
 /* ───── Modal Field Edit Styling ───── */
+#field-edit-modal.modal-looper,
 #field-edit-modal.modal-loopstart,
 #field-edit-modal.modal-loopstop {
   background-color: #c6eccc;

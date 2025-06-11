@@ -387,7 +387,28 @@ let cachedFieldEditSetup = null;
 export function showFieldEditorModal(field, allFields = [], onConfirm) {
   if (!cachedFieldEditSetup) {
     cachedFieldEditSetup = setupFieldEditModal((confirmedField) => {
-      onConfirm?.(confirmedField);
+      if (confirmedField.type === "looper") {
+        const loopKey = confirmedField.key;
+        const loopLabel = confirmedField.label || loopKey;
+
+        // Create loopstart and loopstop
+        const loopStart = {
+          key: loopKey,
+          label: loopLabel,
+          type: "loopstart",
+        };
+
+        const loopStop = {
+          key: loopKey,
+          label: loopLabel,
+          type: "loopstop",
+        };
+
+        onConfirm?.(loopStart);
+        onConfirm?.(loopStop);
+      } else {
+        onConfirm?.(confirmedField);
+      }
     });
     cachedFieldEditModal = cachedFieldEditSetup.modal;
   }
@@ -400,8 +421,7 @@ export function showFieldEditorModal(field, allFields = [], onConfirm) {
 
   const editor = setupFieldEditor(container, null, allFields);
   editor.setField(field);
-
-  cachedFieldEditModal.show(); // laat intern type styling toepassen via setup!
+  cachedFieldEditModal.show();
 }
 
 export function renderFieldList(
@@ -415,7 +435,26 @@ export function renderFieldList(
       onOpenEditModal(fields[idx]);
     },
     onDelete: (idx) => {
+      const removed = fields[idx];
+      const removedKey = removed.key;
+      const removedType = removed.type;
+
       fields.splice(idx, 1);
+
+      // 🧠 If it's a loopstart or loopstop, remove its partner
+      if (["loopstart", "loopstop"].includes(removedType)) {
+        const partnerType =
+          removedType === "loopstart" ? "loopstop" : "loopstart";
+
+        const partnerIdx = fields.findIndex(
+          (f) => f.key === removedKey && f.type === partnerType
+        );
+
+        if (partnerIdx !== -1) {
+          fields.splice(partnerIdx, 1);
+        }
+      }
+
       renderFieldList(listEl, fields, { onEditIndex, onOpenEditModal });
     },
     onReorder: (from, to) => {

@@ -218,7 +218,11 @@ export function setupFieldEditModal(onConfirm) {
   const typeOptions = Object.entries(fieldTypes).map(([key, def]) => ({
     value: key,
     label: def.label,
+    disabled: def.metaOnly && key !== "looper",
   }));
+
+  // Sort: Looper first
+  typeOptions.sort((a, b) => (a.value === "looper" ? -1 : 1));
 
   const typeDropdown = createDropdown({
     containerId: "edit-type-container",
