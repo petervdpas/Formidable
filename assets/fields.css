@@ -31,11 +31,8 @@
   cursor: grab;
 }
 
-.field-label::before {
-  content: "☰";
+.field-label .drag-handle {
   display: inline-block;
-  margin-right: 6px;
-  opacity: 0.6;
 }
 
 .field-description {

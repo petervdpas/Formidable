@@ -49,17 +49,10 @@
 }
 
 .loop-item .drag-handle {
-  cursor: grab;
   position: absolute;
   left: 8px;
   top: 10px;
-  font-size: 16px;
-  opacity: 0.4;
-  user-select: none;
-}
-
-.loop-item .drag-handle::before {
-  content: "⠿"; /* or "☰" or any drag icon */
+  line-height: 1;
 }
 
 .loop-list .sortable-placeholder {

@@ -9,9 +9,35 @@ const defaultRenderers = {
   list: (value) => (value || []).map((v) => `- ${v}`).join("\n"),
   table: (value = []) =>
     value.map((row) => `| ${row.join(" | ")} |`).join("\n"),
-  boolean: (v) => (v ? "✅ Yes" : "❌ No"),
+  boolean: (v, field) => {
+    if (Array.isArray(field.options) && field.options.length >= 2) {
+      const value = String(v).trim().toLowerCase();
+      const first = field.options[0];
+      const second = field.options[1];
+
+      const value1 =
+        typeof first === "string"
+          ? first.toLowerCase()
+          : first.value?.toLowerCase();
+      const label1 =
+        typeof first === "string" ? first : first.label || first.value;
+
+      const value2 =
+        typeof second === "string"
+          ? second.toLowerCase()
+          : second.value?.toLowerCase();
+      const label2 =
+        typeof second === "string" ? second : second.label || second.value;
+
+      if (value === value1) return label1;
+      if (value === value2) return label2;
+    }
+
+    return v ? "True" : "False";
+  },
   text: (v) => v || "",
   number: (v) => `${v}`,
+  range: (v) => `${v}`,
   date: (v) => `${v}`,
   dropdown: (v, field) => {
     const opt = (field.options || []).find((o) =>
@@ -40,7 +66,8 @@ const defaultRenderers = {
   textarea: (v) => v,
   image: (filename, field, template) => {
     if (!filename || typeof filename !== "string") return "";
-    const basePath = configManager.getTemplateStoragePath(template?.filename) || "";
+    const basePath =
+      configManager.getTemplateStoragePath(template?.filename) || "";
     const absPath = resolvePath(basePath, "images", filename);
     const uri = `file://${absPath.replace(/\\/g, "/")}`; // normalize for Electron
     return uri;
@@ -216,7 +243,7 @@ function renderMarkdown(formData, templateYaml) {
     };
 
     context._loopGroups = buildLoopGroups(context._fields);
-    
+
     const tmpl = Handlebars.compile(templateYaml.markdown_template);
     const output = tmpl(context);
 

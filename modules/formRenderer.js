@@ -107,6 +107,7 @@ async function createLoopItem(groupFields, dataEntry = {}) {
 
   const dragHandle = document.createElement("div");
   dragHandle.className = "drag-handle";
+  dragHandle.textContent = "⠿";
   itemWrapper.appendChild(dragHandle);
 
   const firstField = groupFields[0];

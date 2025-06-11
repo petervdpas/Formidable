@@ -7,8 +7,8 @@ import { applyFieldAttributeDisabling } from "../utils/formUtils.js";
 import {
   createFieldEditButton,
   createFieldDeleteButton,
-  createReorderUpButton,
-  createReorderDownButton,
+  // createReorderUpButton,
+  // createReorderDownButton,
 } from "./uiButtons.js";
 
 function setupFieldEditor(container, onChange, allFields = []) {
@@ -250,12 +250,22 @@ function listFields(
     // Label + type
     const labelEl = document.createElement("div");
     labelEl.className = "field-label";
-    labelEl.innerHTML = `
-      ${field.label}
-      <span class="field-type type-${field.type}">
-        (${field.type.toUpperCase()})
-      </span>
-    `;
+
+    // Drag handle
+    const dragSpan = document.createElement("span");
+    dragSpan.className = "drag-handle";
+    dragSpan.textContent = "☰"; // or "⠿" if preferred
+    labelEl.appendChild(dragSpan);
+
+    // Label text
+    const textNode = document.createTextNode(` ${field.label} `);
+    labelEl.appendChild(textNode);
+
+    // Field type
+    const typeSpan = document.createElement("span");
+    typeSpan.className = `field-type type-${field.type}`;
+    typeSpan.textContent = `(${field.type.toUpperCase()})`;
+    labelEl.appendChild(typeSpan);
 
     // Acties
     const actionsEl = document.createElement("div");
