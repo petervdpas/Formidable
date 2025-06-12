@@ -27,7 +27,7 @@ export async function handleContextToggle(isStorage) {
   }
 
   setContextView(mode, containers);
-  await window.api.config.updateUserConfig({ context_mode: mode });
+  EventBus.emit("config:update", { context_mode: mode });
 
   if (mode === "storage") {
     await dropdown?.refresh?.();

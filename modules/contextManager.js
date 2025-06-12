@@ -73,7 +73,6 @@ export async function renderWorkspaceModal() {
         `[Workspace] Context toggle changed: ${contextMode}`,
       ]);
       EventBus.emit("context:toggle", checked);
-      EventBus.emit("config:update", { context_mode: contextMode });
 
       renderContextDropdown(checked, {
         ...cachedConfig,
