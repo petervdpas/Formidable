@@ -105,7 +105,9 @@ function createContextToggleItem() {
 export async function handleMenuAction(action) {
   EventBus.emit("logging:default", [`[Menu] Handling menu action: ${action}`]);
 
-  const templatesLocation = await window.api.config.getTemplatesFolder();
+  const { templatesPath: templatesLocation } = await new Promise((resolve) => {
+    EventBus.emit("config:context:paths", { callback: resolve });
+  });
 
   switch (action) {
     case "open-template-folder": {
@@ -118,7 +120,7 @@ export async function handleMenuAction(action) {
       } else {
         EventBus.emit("logging:default", [
           "[Shell] Opened template folder:",
-          resolved,
+          templatesLocation,
         ]);
       }
       break;
@@ -142,8 +144,12 @@ export async function handleMenuAction(action) {
           return;
         }
 
-        const templateStorageLocation =
-          await window.api.config.getTemplateStorageFolder(templateName);
+        const templateStorageLocation = await new Promise((resolve) => {
+          EventBus.emit("config:template:storagePath", {
+            templateFilename: templateName,
+            callback: resolve,
+          });
+        });
         const result = await window.electron.shell.openPath(
           templateStorageLocation
         );

@@ -35,7 +35,9 @@ export function setupProfileModal() {
       const manager = createProfileListManager();
       await manager.reloadList();
 
-      const currentProfile = await window.api.config.currentProfileFilename();
+      const currentProfile = await new Promise((resolve) => {
+        EventBus.emit("config:profile:current", { callback: resolve });
+      });
 
       console.log(
         `[ProfileModal] Current profile: ${currentProfile || "None"}`

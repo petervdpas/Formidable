@@ -34,6 +34,7 @@ export function createProfileListManager() {
 
     const fullPath = await window.api.system.resolvePath("config", name);
     const exists = await window.api.system.fileExists(fullPath);
+
     if (exists) {
       EventBus.emit("ui:toast", {
         message: "Profile already exists.",
@@ -42,8 +43,21 @@ export function createProfileListManager() {
       return;
     }
 
-    await window.api.config.switchUserProfile(name);
-    window.electron.window.reload();
+    const success = await new Promise((resolve) => {
+      EventBus.emit("config:profiles:switch", {
+        filename: name,
+        callback: resolve,
+      });
+    });
+
+    if (success) {
+      window.electron.window.reload();
+    } else {
+      EventBus.emit("ui:toast", {
+        message: "Failed to switch profile.",
+        variant: "error",
+      });
+    }
   });
 
   addNewRow.appendChild(label);
@@ -53,11 +67,30 @@ export function createProfileListManager() {
   const listManager = createListManager({
     elementId: "profile-list",
     itemClass: "profile-item",
-    fetchListFunction: async () => await window.api.config.listUserProfiles(),
+
+    fetchListFunction: async () =>
+      await new Promise((resolve) => {
+        EventBus.emit("config:profiles:list", { callback: resolve });
+      }),
+
     onItemClick: async (profileFilename) => {
-      await window.api.config.switchUserProfile(profileFilename);
-      window.electron.window.reload();
+      const success = await new Promise((resolve) => {
+        EventBus.emit("config:profiles:switch", {
+          filename: profileFilename,
+          callback: resolve,
+        });
+      });
+
+      if (success) {
+        window.electron.window.reload();
+      } else {
+        EventBus.emit("ui:toast", {
+          message: "Failed to switch profile.",
+          variant: "error",
+        });
+      }
     },
+
     renderItemExtra: (element, raw) => {
       const subtitle = document.createElement("small");
       subtitle.textContent = `[${raw.value}]`;
@@ -72,6 +105,7 @@ export function createProfileListManager() {
 
       element.appendChild(subtitle);
     },
+
     emptyMessage: "No profiles found.",
   });
 

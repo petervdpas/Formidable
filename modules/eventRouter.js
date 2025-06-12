@@ -60,11 +60,35 @@ export function initEventRouter() {
     profileHandler.handleProfileHighlighted
   );
 
+  // Config events
   EventBus.off("config:load", configHandler.handleConfigLoad);
   EventBus.off("config:update", configHandler.handleConfigUpdate);
   EventBus.on("config:update", configHandler.handleConfigUpdate);
   EventBus.on("config:load", configHandler.handleConfigLoad);
+  EventBus.off("config:context:paths", configHandler.handleGetContextPaths);
+  EventBus.on("config:context:paths", configHandler.handleGetContextPaths);
+  EventBus.off(
+    "config:template:storagePath",
+    configHandler.handleGetTemplateStoragePath
+  );
+  EventBus.on(
+    "config:template:storagePath",
+    configHandler.handleGetTemplateStoragePath
+  );
+  EventBus.off(
+    "config:profile:current",
+    configHandler.handleGetCurrentProfileFilename
+  );
+  EventBus.on(
+    "config:profile:current",
+    configHandler.handleGetCurrentProfileFilename
+  );
+  EventBus.off("config:profiles:list", configHandler.handleListProfiles);
+  EventBus.on("config:profiles:list", configHandler.handleListProfiles);
+  EventBus.off("config:profiles:switch", configHandler.handleProfileSwitch);
+  EventBus.on("config:profiles:switch", configHandler.handleProfileSwitch);
 
+  // Profile events
   EventBus.off("context:toggle", contextHandlers.handleContextToggle);
   EventBus.off(
     "context:select:template",

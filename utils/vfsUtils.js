@@ -1,4 +1,6 @@
 // utils/vfsUtils.js
+
+import { EventBus } from "../modules/eventBus.js";
 import { setValueAtKey } from "./transformationUtils.js";
 
 /**
@@ -12,9 +14,12 @@ export async function ensureVirtualLocation(template) {
     return template; // No-op if template is not an object
   }
 
-  const storageLocation = await window.api.config.getTemplateStorageFolder(
-    template.filename
-  );
+  const storageLocation = await new Promise((resolve) => {
+    EventBus.emit("config:template:storagePath", {
+      templateFilename: template.filename,
+      callback: resolve,
+    });
+  });
 
   return setValueAtKey(
     template,
