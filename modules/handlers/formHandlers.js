@@ -23,11 +23,13 @@ export async function handleFormSelected(datafile) {
     return;
   }
 
-  const config = await window.api.config.loadUserConfig();
+  const config = await new Promise((resolve) => {
+    EventBus.emit("config:load", (cfg) => resolve(cfg));
+  });
   const formChanged = config.selected_data_file !== datafile;
 
   if (formChanged) {
-    await window.api.config.updateUserConfig({ selected_data_file: datafile });
+    EventBus.emit("config:update", { selected_data_file: datafile });
   }
 
   if (!datafile) {

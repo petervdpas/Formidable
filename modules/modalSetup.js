@@ -108,7 +108,10 @@ export function setupTemplateModal() {
       if (!input) return;
 
       const config =
-        getCachedConfig() || (await window.api.config.loadUserConfig());
+        getCachedConfig() ||
+        (await new Promise((resolve) => {
+          EventBus.emit("config:load", (cfg) => resolve(cfg));
+        }));
       input.value = config.context_folder || "./";
     },
   });

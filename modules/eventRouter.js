@@ -5,6 +5,7 @@ import { EventBus } from "./eventBus.js";
 import * as cacheHandler from "./handlers/cacheHandler.js";
 import * as vfsHandler from "./handlers/vfsHandler.js";
 import * as bootHandlers from "./handlers/bootHandlers.js";
+import * as configHandler from "./handlers/configHandler.js";
 import * as screenHandlers from "./handlers/screenHandlers.js";
 import * as profileHandler from "./handlers/profileHandler.js";
 import * as contextHandlers from "./handlers/contextHandlers.js";
@@ -58,6 +59,11 @@ export function initEventRouter() {
     "profile:list:highlighted",
     profileHandler.handleProfileHighlighted
   );
+
+  EventBus.off("config:load", configHandler.handleConfigLoad);
+  EventBus.off("config:update", configHandler.handleConfigUpdate);
+  EventBus.on("config:update", configHandler.handleConfigUpdate);
+  EventBus.on("config:load", configHandler.handleConfigLoad);
 
   EventBus.off("context:toggle", contextHandlers.handleContextToggle);
   EventBus.off(

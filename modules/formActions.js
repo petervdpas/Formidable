@@ -44,7 +44,9 @@ export async function saveForm(container, template) {
   } catch {}
 
   const { data, meta } = await getFormData(container, template);
-  const userConfig = await window.api.config.loadUserConfig();
+  const userConfig = await new Promise((resolve) => {
+    EventBus.emit("config:load", (cfg) => resolve(cfg));
+  });
 
   const payload = {
     ...data,

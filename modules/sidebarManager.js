@@ -7,7 +7,6 @@ import { buildSwitchElement } from "../utils/elementBuilders.js";
 import { createListManager } from "./listManager.js";
 import { createAddButton } from "./uiButtons.js";
 
-
 export function createTemplateListManager(modal, dropdown = null) {
   const listManager = createListManager({
     elementId: "template-list",
@@ -63,11 +62,9 @@ export function createStorageListManager(formManager, modal) {
     onFlip: (value) => {
       showOnlyFlagged = value;
 
-      const config = window.api?.config?.loadUserConfig
-        ? window.api.config.loadUserConfig()
-        : Promise.resolve({});
-
-      Promise.resolve(config).then((cfg) => {
+      new Promise((resolve) =>
+        EventBus.emit("config:load", (cfg) => resolve(cfg))
+      ).then((cfg) => {
         const name = window.currentSelectedDataFile || cfg?.selected_data_file;
 
         listManager.renderList(undefined, () => {
@@ -148,7 +145,9 @@ export function createStorageListManager(formManager, modal) {
   toggle.addEventListener("change", async () => {
     showOnlyFlagged = toggle.checked;
 
-    const config = await window.api.config.loadUserConfig();
+    const config = await new Promise((resolve) => {
+      EventBus.emit("config:load", (cfg) => resolve(cfg));
+    });
     const name = window.currentSelectedDataFile || config?.selected_data_file;
 
     listManager.renderList(undefined, () => {

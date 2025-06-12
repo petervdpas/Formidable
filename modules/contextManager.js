@@ -54,7 +54,9 @@ export async function renderWorkspaceModal() {
   const container = document.getElementById("workspace-body");
   if (!container) return false;
 
-  cachedConfig = await window.api.config.loadUserConfig();
+  cachedConfig = await new Promise((resolve) => {
+    EventBus.emit("config:load", (cfg) => resolve(cfg));
+  });
   const config = cachedConfig;
   const isStorage = config.context_mode === "storage";
 
@@ -71,7 +73,8 @@ export async function renderWorkspaceModal() {
         `[Workspace] Context toggle changed: ${contextMode}`,
       ]);
       EventBus.emit("context:toggle", checked);
-      window.api.config.updateUserConfig({ context_mode: contextMode });
+      EventBus.emit("config:update", { context_mode: contextMode });
+
       renderContextDropdown(checked, {
         ...cachedConfig,
         selected_template: window.currentSelectedTemplateName,
@@ -117,13 +120,11 @@ function renderContextDropdown(isStorage, config) {
     onRefresh: async () => {
       try {
         if (isStorage) {
-          const template = await ensureVirtualLocation(window.currentSelectedTemplate);
-          console.log(
-            "[PAY ATTETION] Reloading forms for template:", template);
-          if (!template?.virtualLocation) return [];
-          const files = await window.api.forms.listForms(
-            template.filename
+          const template = await ensureVirtualLocation(
+            window.currentSelectedTemplate
           );
+          if (!template?.virtualLocation) return [];
+          const files = await window.api.forms.listForms(template.filename);
           return files.map((f) => ({
             value: f,
             label: f.replace(/\.meta\.json$/, ""),

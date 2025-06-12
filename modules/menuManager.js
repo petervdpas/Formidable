@@ -17,7 +17,11 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
     return;
   }
 
-  cachedConfig = cachedConfig || (await window.api.config.loadUserConfig());
+  cachedConfig =
+    cachedConfig ||
+    (await new Promise((resolve) => {
+      EventBus.emit("config:load", (cfg) => resolve(cfg));
+    }));
 
   const menuBar = document.createElement("ul");
   menuBar.className = "menu-bar";
@@ -122,7 +126,9 @@ export async function handleMenuAction(action) {
 
     case "open-storage-folder": {
       try {
-        const config = await window.api.config.loadUserConfig();
+        const config = await new Promise((resolve) => {
+          EventBus.emit("config:load", (cfg) => resolve(cfg));
+        });
         const templateName = config.selected_template;
         // TODO: Reevaluate if virtualstructure is needed here
         if (!templateName) {

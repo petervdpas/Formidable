@@ -39,7 +39,9 @@ export function createTemplateSelector({ templateDropdown }) {
 
     templateDropdown.updateOptions(options);
 
-    const config = await window.api.config.loadUserConfig();
+    const config = await new Promise((resolve) => {
+      EventBus.emit("config:load", (cfg) => resolve(cfg));
+    });
 
     await selectLastOrFallback({
       options: options.map((opt) => opt.value),

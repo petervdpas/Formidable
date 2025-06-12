@@ -42,7 +42,9 @@ export async function handleContextToggle(isStorage) {
     const selectedTemplate = window.currentSelectedTemplateName;
 
     // Avoid refiring if it's already applied (idempotent)
-    const config = await window.api.config.loadUserConfig();
+    const config = await new Promise((resolve) => {
+      EventBus.emit("config:load", (cfg) => resolve(cfg));
+    });
 
     // only if not already applied
     if (selectedTemplate && selectedTemplate !== config.selected_template) {

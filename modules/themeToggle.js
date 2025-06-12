@@ -28,7 +28,7 @@ export function setCodeMirrorTheme(mode) {
       cm.refresh();
     }
   });
-  
+
   currentTheme = mode;
 }
 

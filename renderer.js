@@ -76,7 +76,9 @@ window.addEventListener("DOMContentLoaded", async () => {
   const storageContainer = document.getElementById("storage-container");
 
   // ── Emit config stuff ──
-  const config = await window.api.config.loadUserConfig();
+  const config = await new Promise((resolve) => {
+    EventBus.emit("config:load", (cfg) => resolve(cfg));
+  });
 
   if (config?.author_name) {
     setStatusInfo(`User Profile: ${config.author_name}`);

@@ -68,8 +68,7 @@ export function createSettingsInput({
 
   input.onchange = async () => {
     const newVal = input.value.trim();
-    await window.api.config.updateUserConfig({ [configKey]: newVal });
-    cachedConfig = await window.api.config.loadUserConfig();
+    EventBus.emit("config:update", { [configKey]: newVal });
 
     if (onSave) onSave(newVal);
     else EventBus.emit("status:update", `${label} set to ${newVal}`);

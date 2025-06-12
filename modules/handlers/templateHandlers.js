@@ -26,11 +26,13 @@ export async function handleTemplateSelected({ name, yaml }) {
     templateEditor.render(yaml);
   }
 
-  const config = await window.api.config.loadUserConfig();
+  const config = await new Promise((resolve) => {
+    EventBus.emit("config:load", (cfg) => resolve(cfg));
+  });
   const templateChanged = config.selected_template !== name;
 
   if (templateChanged) {
-    await window.api.config.updateUserConfig({ selected_template: name });
+    EventBus.emit("config:update", { selected_template: name });
 
     // Only needed when entering storage mode for the first time
     // await window.api.markdown.ensureMarkdownDir(yaml.storage_location);
@@ -43,7 +45,9 @@ export async function handleTemplateSelected({ name, yaml }) {
     await formManager.loadTemplate(yaml);
     await metaListManager.loadList();
 
-    const config = await window.api.config.loadUserConfig();
+    const config = await new Promise((resolve) => {
+      EventBus.emit("config:load", (cfg) => resolve(cfg));
+    });
     const lastDataFile = config.selected_data_file;
 
     if (lastDataFile) {

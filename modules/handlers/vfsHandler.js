@@ -4,6 +4,98 @@ import { EventBus } from "../eventBus.js";
 
 let vfsInitialized = false;
 
+// ─────────────────────────────────────────────
+// Load base context paths (context, templates, storage)
+// ─────────────────────────────────────────────
+async function loadContextPaths() {
+  const vfs = await window.api.config.getVirtualStructure();
+
+  await EventBus.emit("cache:put", {
+    storeName: "vfs",
+    item: { id: "contextPath", value: vfs.context },
+  });
+
+  await EventBus.emit("cache:put", {
+    storeName: "vfs",
+    item: { id: "templatesPath", value: vfs.templates },
+  });
+
+  await EventBus.emit("cache:put", {
+    storeName: "vfs",
+    item: { id: "storagePath", value: vfs.storage },
+  });
+
+  EventBus.emit("logging:default", ["[VFSHandler] Cached context paths."]);
+}
+
+// ─────────────────────────────────────────────
+// Load all templates and their associated folders/files
+// ─────────────────────────────────────────────
+async function loadTemplateEntries() {
+  const vfs = await window.api.config.getVirtualStructure();
+
+  const entries = Object.entries(vfs.templateStorageFolders);
+  for (const [templateName, info] of entries) {
+    const entry = {
+      id: `template:${templateName}`,
+      name: templateName,
+      filename: `${templateName}.yaml`,
+      ...info,
+    };
+
+    await EventBus.emit("cache:put", { storeName: "vfs", item: entry });
+  }
+
+  EventBus.emit("logging:default", [
+    `[VFSHandler] Cached ${entries.length} template entries.`,
+  ]);
+}
+
+// ─────────────────────────────────────────────
+// Load selected template, selected form, context mode
+// ─────────────────────────────────────────────
+async function loadUserSelections() {
+  const config = await new Promise((resolve) => {
+    EventBus.emit("config:load", (cfg) => resolve(cfg));
+  });
+
+  await EventBus.emit("cache:put", {
+    storeName: "vfs",
+    item: { id: "selected:template", value: config.selected_template },
+  });
+
+  await EventBus.emit("cache:put", {
+    storeName: "vfs",
+    item: { id: "selected:datafile", value: config.selected_data_file },
+  });
+
+  await EventBus.emit("cache:put", {
+    storeName: "vfs",
+    item: { id: "context:mode", value: config.context_mode },
+  });
+
+  EventBus.emit("logging:default", ["[VFSHandler] Cached user selections."]);
+}
+
+// ─────────────────────────────────────────────
+// Optionally cache full user config object
+// ─────────────────────────────────────────────
+async function loadUserConfigCache() {
+  const config = await new Promise((resolve) => {
+    EventBus.emit("config:load", (cfg) => resolve(cfg));
+  });
+
+  await EventBus.emit("cache:put", {
+    storeName: "vfs",
+    item: { id: "user:config", value: config },
+  });
+
+  EventBus.emit("logging:default", ["[VFSHandler] Cached full user config."]);
+}
+
+// ─────────────────────────────────────────────
+// Initialize and populate the virtual file system cache
+// ─────────────────────────────────────────────
 export async function initVFS() {
   if (vfsInitialized) {
     EventBus.emit("logging:warning", [
@@ -16,48 +108,34 @@ export async function initVFS() {
   await reloadVFS();
 }
 
+// ─────────────────────────────────────────────
+// Rebuild VFS: clear, then repopulate all caches
+// ─────────────────────────────────────────────
 export async function reloadVFS() {
   try {
-    await EventBus.emit("cache:clear", { storeName: "vfs" });
+    await clearVFS();
 
-    const vfsObject = await window.api.config.getVirtualStructure();
+    await loadContextPaths();
+    await loadTemplateEntries();
+    await loadUserSelections();
+    await loadUserConfigCache();
 
-    const entries = [
-      { id: "contextPath", value: vfsObject.context },
-      { id: "templatesPath", value: vfsObject.templates },
-      { id: "storagePath", value: vfsObject.storage },
-      ...Object.entries(vfsObject.templateStorageFolders).map(
-        ([templateName, info]) => ({
-          id: `template:${templateName}`,
-          name: templateName,
-          filename: `${templateName}.yaml`,
-          ...info,
-        })
-      ),
-    ];
-
-    for (const entry of entries) {
-      await EventBus.emit("cache:put", {
-        storeName: "vfs",
-        item: entry,
-      });
-    }
-
-    EventBus.emit("logging:default", [
-      `[VFSHandler] Reloaded VFS with ${entries.length} entries.`,
-    ]);
+    EventBus.emit("logging:default", ["[VFSHandler] Reloaded VFS."]);
   } catch (err) {
     EventBus.emit("logging:error", ["[VFSHandler] Failed to reload VFS:", err]);
   }
 }
 
-export async function updateVFSKey(id, value) {
+// ─────────────────────────────────────────────
+// Utility: Update a single VFS key/value
+// ─────────────────────────────────────────────
+export async function updateVFSKey({ id, value }) {
+  console.log("[VFSHandler] updateVFSKey called:", id, value);
   try {
     await EventBus.emit("cache:put", {
       storeName: "vfs",
       item: { id, value },
     });
-
     EventBus.emit("logging:default", [
       `[VFSHandler] Updated key "${id}" in VFS.`,
     ]);
@@ -69,6 +147,9 @@ export async function updateVFSKey(id, value) {
   }
 }
 
+// ─────────────────────────────────────────────
+// Utility: Delete a VFS key
+// ─────────────────────────────────────────────
 export async function deleteVFSKey(id) {
   try {
     await EventBus.emit("cache:delete", {
@@ -87,6 +168,9 @@ export async function deleteVFSKey(id) {
   }
 }
 
+// ─────────────────────────────────────────────
+// Utility: Clear all VFS cache entries
+// ─────────────────────────────────────────────
 export async function clearVFS() {
   try {
     await EventBus.emit("cache:clear", { storeName: "vfs" });

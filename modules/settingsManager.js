@@ -24,7 +24,9 @@ export async function renderSettings() {
   const container = document.getElementById("settings-body");
   if (!container) return false;
 
-  cachedConfig = await window.api.config.loadUserConfig();
+  cachedConfig = await new Promise((resolve) => {
+    EventBus.emit("config:load", (cfg) => resolve(cfg));
+  });
   const config = cachedConfig;
 
   container.innerHTML = "";
@@ -123,8 +125,10 @@ function setupBindings(config) {
   if (loggingToggle) {
     loggingToggle.onchange = async () => {
       const enabled = loggingToggle.checked;
-      await window.api.config.updateUserConfig({ logging_enabled: enabled });
-      cachedConfig = await window.api.config.loadUserConfig();
+      EventBus.emit("config:update", { logging_enabled: enabled });
+      cachedConfig = await new Promise((resolve) => {
+        EventBus.emit("config:load", (cfg) => resolve(cfg));
+      });
       EventBus.emit("logging:toggle", enabled);
       EventBus.emit(
         "status:update",
@@ -153,9 +157,12 @@ function bindDirButton(fieldId, configKey, reloadEvent) {
     const relative = formatAsRelativePath(selected, appRoot);
 
     input.value = relative;
-    await window.api.config.updateUserConfig({ [configKey]: relative });
 
-    cachedConfig = await window.api.config.loadUserConfig();
+    EventBus.emit("config:update", { [configKey]: relative });
+
+    cachedConfig = await new Promise((resolve) => {
+      EventBus.emit("config:load", (cfg) => resolve(cfg));
+    });
 
     EventBus.emit("status:update", `Updated ${configKey}: ${relative}`);
     if (reloadEvent) EventBus.emit(reloadEvent);
