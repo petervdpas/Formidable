@@ -90,29 +90,35 @@ export function initEventRouter() {
 
   // Profile events
   EventBus.off("context:toggle", contextHandlers.handleContextToggle);
-  EventBus.off(
-    "context:select:template",
-    templateHandlers.handleTemplateSelected
-  );
-  EventBus.off("context:select:form", formHandlers.handleFormSelected);
-
   EventBus.on("context:toggle", contextHandlers.handleContextToggle);
-  EventBus.on(
-    "context:select:template",
-    templateHandlers.handleTemplateSelected
+
+  EventBus.off("template:selected", templateHandlers.handleTemplateSelected);
+  EventBus.off("template:list", templateHandlers.handleListTemplates);
+  EventBus.off("template:load", templateHandlers.handleLoadTemplate);
+  EventBus.off("template:save", templateHandlers.handleSaveTemplate);
+  EventBus.off("template:delete", templateHandlers.handleDeleteTemplate);
+  EventBus.off("template:validate", templateHandlers.handleValidateTemplate);
+  EventBus.off(
+    "template:descriptor",
+    templateHandlers.handleGetTemplateDescriptor
   );
-  EventBus.on("context:select:form", formHandlers.handleFormSelected);
+  EventBus.on("template:selected", templateHandlers.handleTemplateSelected);
+  EventBus.on("template:list", templateHandlers.handleListTemplates);
+  EventBus.on("template:load", templateHandlers.handleLoadTemplate);
+  EventBus.on("template:save", templateHandlers.handleSaveTemplate);
+  EventBus.on("template:delete", templateHandlers.handleDeleteTemplate);
+  EventBus.on("template:validate", templateHandlers.handleValidateTemplate);
+  EventBus.on(
+    "template:descriptor",
+    templateHandlers.handleGetTemplateDescriptor
+  );
+
+  EventBus.off("form:selected", formHandlers.handleFormSelected);
+  EventBus.on("form:selected", formHandlers.handleFormSelected);
 
   EventBus.off("template:list:reload", listHandlers.handleListReload);
   EventBus.off("template:list:itemClicked", listHandlers.handleListItemClicked);
   EventBus.off("template:list:highlighted", listHandlers.handleListHighlighted);
-
-  EventBus.off("form:list:reload", formHandlers.handleListReload);
-  EventBus.off("form:list:itemClicked", listHandlers.handleListItemClicked);
-  EventBus.off("form:list:highlighted", listHandlers.handleListHighlighted);
-
-  EventBus.off("modal:template:confirm", modalHandler.handleTemplateConfirm);
-  EventBus.off("modal:entry:confirm", modalHandler.handleEntryConfirm);
 
   EventBus.on("template:list:reload", () =>
     listHandlers.handleListReload({ listId: "template-list" })
@@ -124,6 +130,10 @@ export function initEventRouter() {
     listHandlers.handleListHighlighted({ listId: "template-list", name })
   );
 
+  EventBus.off("form:list:reload", formHandlers.handleListReload);
+  EventBus.off("form:list:itemClicked", listHandlers.handleListItemClicked);
+  EventBus.off("form:list:highlighted", listHandlers.handleListHighlighted);
+
   EventBus.on("form:list:reload", () =>
     listHandlers.handleListReload({ listId: "storage-list" })
   );
@@ -133,6 +143,9 @@ export function initEventRouter() {
   EventBus.on("form:list:highlighted", (name) =>
     listHandlers.handleListHighlighted({ listId: "storage-list", name })
   );
+
+  EventBus.off("modal:template:confirm", modalHandler.handleTemplateConfirm);
+  EventBus.off("modal:entry:confirm", modalHandler.handleEntryConfirm);
 
   EventBus.on("modal:template:confirm", modalHandler.handleTemplateConfirm);
   EventBus.on("modal:entry:confirm", modalHandler.handleEntryConfirm);

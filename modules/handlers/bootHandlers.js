@@ -16,14 +16,6 @@ export async function initializeFromConfig(config) {
     JSON.stringify(config, null, 2),
   ]);
 
-  // ─── Apply visual & logging config first ───
-  EventBus.emit("theme:toggle", theme);
-  EventBus.emit("logging:toggle", logging_enabled);
-
-  // ─── Toggle context view and await it ───
-  const isStorage = context_mode === "storage";
-  await EventBus.emit("context:toggle", isStorage);
-
   // Initialiseer de cache met stores
   await EventBus.emit("cache:init", {
     dbName: "formidable-db",
@@ -32,6 +24,14 @@ export async function initializeFromConfig(config) {
   });
 
   await EventBus.emit("vfs:init");
+
+    // ─── Apply visual & logging config first ───
+  EventBus.emit("theme:toggle", theme);
+  EventBus.emit("logging:toggle", logging_enabled);
+  
+  // ─── Toggle context view and await it ───
+  const isStorage = context_mode === "storage";
+  await EventBus.emit("context:toggle", isStorage);
 
   // ─── Wait for list to be loaded, then highlight (instead of click) ───
   EventBus.once("template-list:loaded", () => {

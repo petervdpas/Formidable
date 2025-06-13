@@ -27,6 +27,7 @@ export async function handleContextToggle(isStorage) {
   }
 
   setContextView(mode, containers);
+
   EventBus.emit("config:update", { context_mode: mode });
 
   if (mode === "storage") {

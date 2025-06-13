@@ -123,13 +123,18 @@ function renderContextDropdown(isStorage, config) {
             window.currentSelectedTemplate
           );
           if (!template?.virtualLocation) return [];
+
           const files = await window.api.forms.listForms(template.filename);
           return files.map((f) => ({
             value: f,
             label: f.replace(/\.meta\.json$/, ""),
           }));
         } else {
-          const templates = await window.api.templates.listTemplates();
+          // ✅ Use EventBus to list templates
+          const templates = await new Promise((resolve) => {
+            EventBus.emit("template:list", { callback: resolve });
+          });
+
           return templates.map((t) => ({
             value: t,
             label: t.replace(/\.yaml$/, ""),

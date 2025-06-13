@@ -110,7 +110,12 @@ export async function handleCacheDeleteFromDisk({ baseDir, filenames }) {
 }
 
 export async function handleCacheAdd({ storeName, item }) {
-  if (!cache) throw new Error("Cache not initialized");
+  if (!cache) {
+    EventBus.emit("logging:warning", [
+      "[CacheHandler] Cache not initialized. Skipping ADD operation.",
+    ]);
+    return;
+  }
   try {
     const id = await cache.add(storeName, item);
     EventBus.emit("logging:default", [
@@ -126,7 +131,12 @@ export async function handleCacheAdd({ storeName, item }) {
 }
 
 export async function handleCachePut({ storeName, item }) {
-  if (!cache) throw new Error("Cache not initialized");
+  if (!cache) {
+    EventBus.emit("logging:warning", [
+      "[CacheHandler] Cache not initialized. Skipping PUT operation.",
+    ]);
+    return;
+  }
   try {
     const id = await cache.put(storeName, item);
     EventBus.emit("logging:default", [
@@ -142,7 +152,12 @@ export async function handleCachePut({ storeName, item }) {
 }
 
 export async function handleCacheGet({ storeName, key }) {
-  if (!cache) throw new Error("Cache not initialized");
+  if (!cache) {
+    EventBus.emit("logging:warning", [
+      "[CacheHandler] Cache not initialized. Skipping GET operation.",
+    ]);
+    return;
+  }
   try {
     const item = await cache.get(storeName, key);
     EventBus.emit("logging:default", [
@@ -158,7 +173,12 @@ export async function handleCacheGet({ storeName, key }) {
 }
 
 export async function handleCacheGetAll({ storeName }) {
-  if (!cache) throw new Error("Cache not initialized");
+  if (!cache) {
+    EventBus.emit("logging:warning", [
+      "[CacheHandler] Cache not initialized. Skipping GET-ALL operation.",
+    ]);
+    return;
+  }
   try {
     const items = await cache.getAll(storeName);
     EventBus.emit("logging:default", [
@@ -174,7 +194,12 @@ export async function handleCacheGetAll({ storeName }) {
 }
 
 export async function handleCacheDelete({ storeName, key }) {
-  if (!cache) throw new Error("Cache not initialized");
+  if (!cache) {
+    EventBus.emit("logging:warning", [
+      "[CacheHandler] Cache not initialized. Skipping DELETE operation.",
+    ]);
+    return;
+  }
   try {
     await cache.delete(storeName, key);
     EventBus.emit("logging:default", [
@@ -189,7 +214,12 @@ export async function handleCacheDelete({ storeName, key }) {
 }
 
 export async function handleCacheClear({ storeName }) {
-  if (!cache) throw new Error("Cache not initialized");
+  if (!cache) {
+    EventBus.emit("logging:warning", [
+      "[CacheHandler] Cache not initialized. Skipping CLEAR operation.",
+    ]);
+    return;
+  }
   try {
     await cache.clear(storeName);
     EventBus.emit("logging:default", [

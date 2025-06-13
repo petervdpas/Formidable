@@ -12,13 +12,13 @@ export function bindFormDependencies(deps) {
 
 export async function handleFormSelected(datafile) {
   EventBus.emit("logging:default", [
-    "[Handler] context:select:form received:",
+    "[Handler] form:selected received:",
     datafile,
   ]);
 
   if (!formManager) {
     EventBus.emit("logging:warning", [
-      "[Handler] No formManager injected for context:select:form.",
+      "[Handler] No formManager injected for form:selected.",
     ]);
     return;
   }

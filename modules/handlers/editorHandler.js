@@ -2,6 +2,7 @@
 
 import { EventBus } from "../eventBus.js";
 import { getValue as getMarkdownTemplate } from "../templateCodemirror.js";
+import { showConfirmModal } from "../modalSetup.js";
 
 export async function handleSaveTemplate({ container, fields, callback }) {
   const name = container.querySelector("#yaml-name").value.trim();
@@ -14,7 +15,9 @@ export async function handleSaveTemplate({ container, fields, callback }) {
   };
 
   // 🔍 Validatie
-  const validationErrors = await window.api.templates.validateTemplate(updated);
+  const validationErrors = await new Promise((resolve) => {
+    EventBus.emit("template:validate", { data: updated, callback: resolve });
+  });
   if (validationErrors.length > 0) {
     const messages = validationErrors.map(formatError);
     EventBus.emit("logging:error", [
@@ -55,7 +58,10 @@ export async function handleDeleteTemplate(container) {
 
   if (!confirmed) return;
 
-  const success = await window.api.templates.deleteTemplate(template);
+  const success = await new Promise((resolve) => {
+    EventBus.emit("template:delete", { name: template, callback: resolve });
+  });
+  
   if (success) {
     container.innerHTML = "<div class='empty-message'>Template deleted.</div>";
     EventBus.emit("status:update", `Deleted template: ${template}`);

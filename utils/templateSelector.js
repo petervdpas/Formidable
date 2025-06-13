@@ -13,13 +13,18 @@ export async function selectTemplate(name) {
       name,
     ]);
 
-    const result = await window.api.templates.getTemplateDescriptor(name);
+    const result = await new Promise((resolve) => {
+      EventBus.emit("template:descriptor", {
+        name,
+        callback: resolve,
+      });
+    });
+
     if (!result?.yaml) {
       throw new Error(`Template descriptor missing or malformed for: ${name}`);
     }
 
-    // 🔁 Emit only → full logic is handled in templateHandlers.js
-    EventBus.emit("context:select:template", {
+    EventBus.emit("template:selected", {
       name,
       yaml: result.yaml,
     });
@@ -31,7 +36,9 @@ export async function selectTemplate(name) {
 
 export function createTemplateSelector({ templateDropdown }) {
   async function loadTemplateOptions() {
-    const templateFiles = await window.api.templates.listTemplates();
+    const templateFiles = await new Promise((resolve) => {
+      EventBus.emit("template:list", { callback: resolve });
+    });
     const options = templateFiles.map((name) => ({
       value: name,
       label: stripYamlExtension(name),

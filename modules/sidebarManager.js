@@ -11,10 +11,19 @@ export function createTemplateListManager(modal, dropdown = null) {
   const listManager = createListManager({
     elementId: "template-list",
     itemClass: "template-item",
-    fetchListFunction: async () => await window.api.templates.listTemplates(),
+
+    // 🔁 Use EventBus for fetching templates
+    fetchListFunction: async () => {
+      return await new Promise((resolve) => {
+        EventBus.emit("template:list", { callback: resolve });
+      });
+    },
+
     onItemClick: (templateItem) =>
       EventBus.emit("template:list:itemClicked", templateItem),
+
     emptyMessage: "No template files found.",
+
     addButton: createAddButton({
       label: "+ Add Template",
       onClick: async () => {
@@ -22,15 +31,26 @@ export function createTemplateListManager(modal, dropdown = null) {
           modal,
           callback: async ({ template, yaml }) => {
             try {
-              await window.api.templates.saveTemplate(template, yaml);
+              // Save template via EventBus
+              const success = await new Promise((resolve) => {
+                EventBus.emit("template:save", {
+                  name: template,
+                  data: yaml,
+                  callback: resolve,
+                });
+              });
+
+              if (!success) throw new Error("Save failed");
+
               await listManager.loadList();
 
               if (dropdown?.refresh) await dropdown.refresh();
 
-              EventBus.emit("context:select:template", {
+              EventBus.emit("template:selected", {
                 name: template,
                 yaml,
               });
+
               EventBus.emit(
                 "status:update",
                 `Created new template: ${template}`

@@ -114,7 +114,10 @@ window.addEventListener("DOMContentLoaded", async () => {
       await selectTemplate(selectedName); // wired below
     },
     onRefresh: async () => {
-      const templates = await window.api.templates.listTemplates();
+      const templates = await new Promise((resolve) => {
+        EventBus.emit("template:list", { callback: resolve });
+      });
+
       return templates.map((name) => ({
         value: name,
         label: name.replace(/\.yaml$/, ""),
@@ -146,7 +149,19 @@ window.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
-      await window.api.templates.saveTemplate(template, updatedYaml);
+      const success = await new Promise((resolve) => {
+        EventBus.emit("template:save", {
+          name: template,
+          data: updatedYaml,
+          callback: resolve,
+        });
+      });
+
+      if (success) {
+        EventBus.emit("status:update", `Saved: ${template}`);
+      } else {
+        EventBus.emit("status:update", `Failed to save: ${template}`);
+      }
     }
   );
 

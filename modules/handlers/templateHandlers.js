@@ -13,9 +13,10 @@ export function bindTemplateDependencies(deps) {
   templateEditor = deps.templateEditor;
 }
 
+// SELECTED
 export async function handleTemplateSelected({ name, yaml }) {
   EventBus.emit("logging:default", [
-    "[Handler] context:select:template received:",
+    "[Handler] template:selected received:",
     name,
   ]);
 
@@ -38,7 +39,7 @@ export async function handleTemplateSelected({ name, yaml }) {
     // await window.api.markdown.ensureMarkdownDir(yaml.storage_location);
 
     // Clear form selection when switching template
-    EventBus.emit("context:select:form", null);
+    EventBus.emit("form:selected", null);
   }
 
   if (formManager && metaListManager) {
@@ -58,5 +59,89 @@ export async function handleTemplateSelected({ name, yaml }) {
   const el = document.querySelector(`#template-list [data-value="${name}"]`);
   if (!el || !el.classList.contains("selected")) {
     EventBus.emit("template:list:highlighted", name);
+  }
+}
+
+// LIST
+export async function handleListTemplates({ callback }) {
+  try {
+    const result = await window.api.templates.listTemplates();
+    callback?.(result);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      "[TemplateHandler] Failed to list templates:",
+      err,
+    ]);
+    callback?.([]);
+  }
+}
+
+// LOAD
+export async function handleLoadTemplate({ name, callback }) {
+  try {
+    const result = await window.api.templates.loadTemplate(name);
+    callback?.(result);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[TemplateHandler] Failed to load template "${name}":`,
+      err,
+    ]);
+    callback?.(null);
+  }
+}
+
+// SAVE
+export async function handleSaveTemplate({ name, data, callback }) {
+  try {
+    const result = await window.api.templates.saveTemplate(name, data);
+    callback?.(result);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[TemplateHandler] Failed to save template "${name}":`,
+      err,
+    ]);
+    callback?.(false);
+  }
+}
+
+// DELETE
+export async function handleDeleteTemplate({ name, callback }) {
+  try {
+    const result = await window.api.templates.deleteTemplate(name);
+    callback?.(result);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[TemplateHandler] Failed to delete template "${name}":`,
+      err,
+    ]);
+    callback?.(false);
+  }
+}
+
+// VALIDATE
+export async function handleValidateTemplate({ data, callback }) {
+  try {
+    const result = await window.api.templates.validateTemplate(data);
+    callback?.(result);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[TemplateHandler] Failed to validate template`,
+      err,
+    ]);
+    callback?.([]);
+  }
+}
+
+// DESCRIPTOR
+export async function handleGetTemplateDescriptor({ name, callback }) {
+  try {
+    const result = await window.api.templates.getTemplateDescriptor(name);
+    callback?.(result);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[TemplateHandler] Failed to get descriptor for "${name}":`,
+      err,
+    ]);
+    callback?.(null);
   }
 }

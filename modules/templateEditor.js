@@ -61,7 +61,6 @@ export function initTemplateEditor(containerId, onSaveCallback) {
 
     console.log("[YamlEditor] Rendering editor with data:", data);
 
-
     currentData = structuredClone(data);
     EventBus.emit("logging:default", [
       "[YamlEditor] Rendering editor for:",
@@ -127,8 +126,13 @@ export function initTemplateEditor(containerId, onSaveCallback) {
         markdown_template: getEditor()?.getValue() || "",
         fields: currentData.fields || [],
       };
+      const errors = await new Promise((resolve) => {
+        EventBus.emit("template:validate", {
+          data: fullTemplate,
+          callback: resolve,
+        });
+      });
 
-      const errors = await window.api.templates.validateTemplate(fullTemplate);
       if (errors && errors.length > 0) {
         const count = errors.length;
         EventBus.emit("status:update", `Validation failed: ${count} error(s).`);

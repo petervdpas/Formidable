@@ -75,8 +75,11 @@ export async function handleListItemClicked({ listId, name }) {
         return;
       }
 
-      const data = await window.api.templates.loadTemplate(name);
-      EventBus.emit("context:select:template", { name, yaml: data });
+      const data = await new Promise((resolve) => {
+        EventBus.emit("template:load", { name, callback: resolve });
+      });
+
+      EventBus.emit("template:selected", { name, yaml: data });
       EventBus.emit("status:update", `Loaded Template: ${name}`);
     }
 
@@ -112,7 +115,7 @@ export async function handleListItemClicked({ listId, name }) {
 
       await formManager.loadFormData(data, name);
 
-      EventBus.emit("context:select:form", name);
+      EventBus.emit("form:selected", name);
       EventBus.emit("status:update", `Loaded metadata: ${name}`);
     }
   } catch (err) {
