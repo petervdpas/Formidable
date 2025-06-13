@@ -81,7 +81,6 @@ export async function parseImageField(inputWrapper, template) {
   const fileInput = inputWrapper.querySelector("input[type='file']");
   const file = fileInput?.files?.[0];
 
-  // 🟡 Geen nieuwe upload → return de bestaande filename
   if (!file) {
     const existing = inputWrapper.getAttribute("data-filename");
     return existing?.trim() || "";
@@ -94,11 +93,11 @@ export async function parseImageField(inputWrapper, template) {
     const buffer = await file.arrayBuffer();
     const filename = file.name;
 
-    const result = await window.api.forms.saveImageFile(
-      template.virtualLocation,
+    const result = await EventBus.emitWithResponse("form:saveImage", {
+      virtualLocation: template.virtualLocation,
       filename,
-      Array.from(new Uint8Array(buffer))
-    );
+      buffer: Array.from(new Uint8Array(buffer)),
+    });
 
     if (result?.success) {
       inputWrapper.setAttribute("data-filename", filename);

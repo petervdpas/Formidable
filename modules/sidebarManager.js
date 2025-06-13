@@ -107,18 +107,24 @@ export function createStorageListManager(formManager, modal) {
       );
       if (!template || !template.virtualLocation) return [];
 
-      await window.api.forms.ensureFormDir(template.filename);
-      const files = await window.api.forms.listForms(template.filename);
+      await EventBus.emitWithResponse("form:ensureDir", template.filename);
+
+      const files = await new Promise((resolve) => {
+        EventBus.emit("form:list", {
+          templateFilename: template.filename,
+          callback: resolve,
+        });
+      });
 
       return Promise.all(
-        files.map(async (fullName) => {
-          const meta = await window.api.forms.loadForm(
-            template.filename,
-            fullName
-          );
+        files.map(async (dataFile) => {
+          const meta = await EventBus.emitWithResponse("form:load", {
+            templateFilename: template.filename,
+            datafile: dataFile,
+          });
           return {
-            display: stripMetaExtension(fullName),
-            value: fullName,
+            display: stripMetaExtension(dataFile),
+            value: dataFile,
             flagged: meta?.meta?.flagged || false,
           };
         })

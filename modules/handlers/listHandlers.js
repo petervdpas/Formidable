@@ -95,11 +95,13 @@ export async function handleListItemClicked({ listId, name }) {
       const template = await ensureVirtualLocation(
         window.currentSelectedTemplate
       );
-      const data = await window.api.forms.loadForm(
-        template.filename,
-        name,
-        template.fields || []
-      );
+
+      const data = await EventBus.emitWithResponse("form:load", {
+        templateFilename: template.filename,
+        datafile: name,
+        fields: template.fields || [],
+      });
+
       if (!data) {
         EventBus.emit("status:update", "Failed to load metadata entry.");
         return;

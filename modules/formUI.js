@@ -49,13 +49,20 @@ export function createFormManager(containerId) {
     EventBus.emit("logging:default", ["[loadFormData] datafile:", datafile]);
 
     if (!metaData && currentTemplate?.virtualLocation && currentDatafile) {
-      metaData = await window.api.forms.loadForm(
-        currentTemplate.filename,
-        currentDatafile,
-        currentTemplate.fields || []
-      );
+      metaData = await new Promise((resolve) => {
+        EventBus.emit(
+          "form:load",
+          {
+            templateFilename: currentTemplate.filename,
+            datafile: currentDatafile,
+            fields: currentTemplate.fields || [],
+          },
+          resolve
+        );
+      });
+
       EventBus.emit("logging:default", [
-        "[loadFormData] loaded metaData from API:",
+        "[loadFormData] loaded metaData from EventBus:",
         metaData,
       ]);
     }

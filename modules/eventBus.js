@@ -61,6 +61,31 @@ export const EventBus = {
     await Promise.all(promises);
   },
 
+  emitWithResponse(event, payload) {
+    const cbs = listeners[event];
+    if (!cbs || cbs.length === 0) {
+      if (debug) {
+        console.log(
+          `[EventBus] emitWithResponse("${event}") had no listeners.`
+        );
+      }
+      return Promise.resolve(null);
+    }
+
+    return new Promise((resolve) => {
+      // Call only the first listener and give it a callback to resolve the promise
+      try {
+        cbs[0](payload, resolve);
+      } catch (err) {
+        console.error(
+          `[EventBus] Error in emitWithResponse for "${event}":`,
+          err
+        );
+        resolve(null);
+      }
+    });
+  },
+
   once(event, callback) {
     const onceWrapper = (payload) => {
       this.off(event, onceWrapper);

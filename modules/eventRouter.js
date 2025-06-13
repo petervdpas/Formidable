@@ -113,9 +113,6 @@ export function initEventRouter() {
     templateHandlers.handleGetTemplateDescriptor
   );
 
-  EventBus.off("form:selected", formHandlers.handleFormSelected);
-  EventBus.on("form:selected", formHandlers.handleFormSelected);
-
   EventBus.off("template:list:reload", listHandlers.handleListReload);
   EventBus.off("template:list:itemClicked", listHandlers.handleListItemClicked);
   EventBus.off("template:list:highlighted", listHandlers.handleListHighlighted);
@@ -129,6 +126,22 @@ export function initEventRouter() {
   EventBus.on("template:list:highlighted", (name) =>
     listHandlers.handleListHighlighted({ listId: "template-list", name })
   );
+
+  EventBus.off("form:selected", formHandlers.handleFormSelected);
+  EventBus.off("form:list", formHandlers.handleListForms);
+  EventBus.off("form:load", formHandlers.handleLoadForm);
+  EventBus.off("form:save", formHandlers.handleSaveForm);
+  EventBus.off("form:delete", formHandlers.handleDeleteForm);
+  EventBus.off("form:ensureDir", formHandlers.handleEnsureFormDir);
+  EventBus.off("form:saveImage", formHandlers.handleSaveImageFile);
+
+  EventBus.on("form:selected", formHandlers.handleFormSelected);
+  EventBus.on("form:list", formHandlers.handleListForms);
+  EventBus.on("form:load", formHandlers.handleLoadForm);
+  EventBus.on("form:save", formHandlers.handleSaveForm);
+  EventBus.on("form:delete", formHandlers.handleDeleteForm);
+  EventBus.on("form:ensureDir", formHandlers.handleEnsureFormDir);
+  EventBus.on("form:saveImage", formHandlers.handleSaveImageFile);
 
   EventBus.off("form:list:reload", formHandlers.handleListReload);
   EventBus.off("form:list:itemClicked", listHandlers.handleListItemClicked);

@@ -36,10 +36,11 @@ export async function saveForm(container, template) {
   // → bestaande `created` ophalen
   let created = null;
   try {
-    const existing = await window.api.forms.loadForm(
-      template.filename,
-      datafile
-    );
+    const existing = await EventBus.emitWithResponse("form:load", {
+      templateFilename: template.filename,
+      datafile: datafile,
+    });
+
     created = existing?.meta?.created || null;
   } catch {}
 
@@ -60,12 +61,12 @@ export async function saveForm(container, template) {
     },
   };
 
-  const result = await window.api.forms.saveForm(
-    template.filename,
-    datafile,
-    payload,
-    template.fields || []
-  );
+  const result = await EventBus.emitWithResponse("form:save", {
+    templateFilename: template.filename,
+    datafile: datafile,
+    payload: payload,
+    fields: template.fields || [],
+  });
 
   const shortName =
     datafile || result.path?.split(/[/\\]/).pop() || "unknown.json";
@@ -110,7 +111,10 @@ export async function deleteForm(container, template, datafile) {
   );
   if (!confirmed) return;
 
-  const result = await window.api.forms.deleteForm(template.filename, datafile);
+  const result = await EventBus.emitWithResponse("form:delete", {
+    templateFilename: template.filename,
+    datafile: datafile,
+  });
 
   if (result) {
     EventBus.emit("status:update", `Deleted: ${datafile}`);
