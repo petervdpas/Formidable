@@ -61,7 +61,7 @@ export const EventBus = {
     await Promise.all(promises);
   },
 
-  emitWithResponse(event, payload) {
+  async emitWithResponse(event, payload) {
     const cbs = listeners[event];
     if (!cbs || cbs.length === 0) {
       if (debug) {
@@ -69,21 +69,31 @@ export const EventBus = {
           `[EventBus] emitWithResponse("${event}") had no listeners.`
         );
       }
-      return Promise.resolve(null);
+      return null;
     }
 
-    return new Promise((resolve) => {
-      // Call only the first listener and give it a callback to resolve the promise
+    const handler = cbs[0];
+
+    // Dual mode: supports async-return and callback-style
+    if (handler.length >= 2) {
+      // expects: (payload, callback)
+      return new Promise((resolve) => {
+        try {
+          handler(payload, resolve);
+        } catch (err) {
+          console.error(`[EventBus] emitWithResponse callback error:`, err);
+          resolve(null);
+        }
+      });
+    } else {
+      // expects: async function(payload)
       try {
-        cbs[0](payload, resolve);
+        return await handler(payload);
       } catch (err) {
-        console.error(
-          `[EventBus] Error in emitWithResponse for "${event}":`,
-          err
-        );
-        resolve(null);
+        console.error(`[EventBus] emitWithResponse async error:`, err);
+        return null;
       }
-    });
+    }
   },
 
   once(event, callback) {
