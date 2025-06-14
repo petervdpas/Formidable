@@ -272,12 +272,12 @@ export function applyFieldAttributeDisabling(dom, fieldTypeKey) {
   });
 }
 
-export function clearFormUI(
+export function clearContainerUI(
   container,
-  label = "Select or create a data-file to begin."
+  label = "Select or create a form-file to begin."
 ) {
-  container.innerHTML = `<p>${label}</p>`;
-  EventBus.emit("logging:default", ["[clearFormUI] Form UI cleared."]);
+  container.innerHTML = `<p class="clearform-message">${label}</p>`;
+  EventBus.emit("logging:default", ["[clearContainerUI] Form UI cleared."]);
 }
 
 export function stripMarkdownExtension(filename = "") {

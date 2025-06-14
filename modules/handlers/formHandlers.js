@@ -1,6 +1,7 @@
 // modules/handlers/formHandlers.js
 
 import { EventBus } from "../eventBus.js";
+import { clearContainerUI } from "../../utils/formUtils.js";
 
 let formManager = null;
 let metaListManager = null;
@@ -77,16 +78,41 @@ export async function handleLoadForm(
 }
 
 // SAVE
-export function handleSaveForm(payload, respond) {
+export async function handleSaveForm(payload, respond) {
   const { templateFilename, datafile, payload: data, fields = [] } = payload;
 
   try {
-    const result = window.api.forms.saveForm(
+    const result = await window.api.forms.saveForm(
       templateFilename,
       datafile,
       data,
       fields
     );
+
+    const shortName =
+      datafile || result.path?.split(/[/\\]/).pop() || "unknown.json";
+
+    if (result.success) {
+      EventBus.emit("status:update", `Saved data: ${shortName}`);
+
+      EventBus.emit("ui:toast", {
+        message: `Successfully saved data: ${shortName}`,
+        variant: "success",
+        duration: 4000,
+      });
+
+      EventBus.emit("form:list:reload");
+      setTimeout(() => EventBus.emit("form:list:highlighted", datafile), 500);
+    } else {
+      EventBus.emit("status:update", `Failed to save: ${result.error}`);
+
+      EventBus.emit("ui:toast", {
+        message: `Failed to save data: ${shortName}`,
+        variant: "error",
+        duration: 4000,
+      });
+    }
+
     respond?.(result);
   } catch (err) {
     EventBus.emit("logging:error", [
@@ -99,7 +125,7 @@ export function handleSaveForm(payload, respond) {
 
 // DELETE
 export async function handleDeleteForm(
-  { templateFilename, datafile },
+  { templateFilename, datafile, container = null },
   callback
 ) {
   try {
@@ -107,6 +133,18 @@ export async function handleDeleteForm(
       templateFilename,
       datafile
     );
+
+    if (result) {
+      EventBus.emit("status:update", `Deleted data: ${datafile}`);
+      EventBus.emit("form:list:reload");
+
+      if (container) {
+        clearContainerUI(container);
+      }
+    } else {
+      EventBus.emit("status:update", "Failed to delete data file.");
+    }
+
     callback?.(result);
   } catch (err) {
     EventBus.emit("logging:error", [

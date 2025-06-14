@@ -4,7 +4,7 @@ import { EventBus } from "./eventBus.js";
 import { ensureVirtualLocation } from "../utils/vfsUtils.js";
 import { renderFormUI } from "./formRenderer.js";
 import { saveForm, deleteForm, renderFormPreview } from "./formActions.js";
-import { injectFieldDefaults, clearFormUI } from "../utils/formUtils.js";
+import { injectFieldDefaults, clearContainerUI } from "../utils/formUtils.js";
 
 export function createFormManager(containerId) {
   const container = document.getElementById(containerId);
@@ -41,7 +41,7 @@ export function createFormManager(containerId) {
     ]);
 
     currentTemplate = await ensureVirtualLocation(templateYaml);
-    clearFormUI(container);
+    clearContainerUI(container);
   }
 
   async function loadFormData(metaData, datafile) {
@@ -94,7 +94,7 @@ export function createFormManager(containerId) {
     saveForm: () => saveForm(container, currentTemplate),
     clearForm: () => {
       currentDatafile = null;
-      clearFormUI(container);
+      clearContainerUI(container);
     },
   };
 }

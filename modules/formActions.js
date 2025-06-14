@@ -2,11 +2,7 @@
 
 import { EventBus } from "./eventBus.js";
 import { ensureVirtualLocation } from "../utils/vfsUtils.js";
-import {
-  getFormData,
-  validateFilenameInput,
-  clearFormUI,
-} from "../utils/formUtils.js";
+import { getFormData, validateFilenameInput } from "../utils/formUtils.js";
 import { showConfirmModal, setupRenderModal } from "./modalSetup.js";
 import { copyToClipboard } from "../utils/domUtils.js";
 import {
@@ -33,7 +29,6 @@ export async function saveForm(container, template) {
     return;
   }
 
-  // → bestaande `created` ophalen
   let created = null;
   try {
     const existing = await EventBus.emitWithResponse("form:load", {
@@ -61,34 +56,12 @@ export async function saveForm(container, template) {
     },
   };
 
-  const result = await EventBus.emitWithResponse("form:save", {
+  await EventBus.emitWithResponse("form:save", {
     templateFilename: template.filename,
     datafile: datafile,
     payload: payload,
     fields: template.fields || [],
   });
-
-  const shortName =
-    datafile || result.path?.split(/[/\\]/).pop() || "unknown.json";
-
-  if (result.success) {
-    EventBus.emit("status:update", `Saved: ${result.path}`);
-
-    EventBus.emit("ui:toast", {
-      message: `Successfully saved data: ${shortName}`,
-      variant: "success",
-    });
-
-    EventBus.emit("form:list:reload");
-    setTimeout(() => EventBus.emit("form:list:highlighted", datafile), 500);
-  } else {
-    EventBus.emit("status:update", `Failed to save: ${result.error}`);
-
-    EventBus.emit("ui:toast", {
-      message: `Failed to save data: ${shortName}`,
-      variant: "error",
-    });
-  }
 }
 
 export async function deleteForm(container, template, datafile) {
@@ -111,19 +84,11 @@ export async function deleteForm(container, template, datafile) {
   );
   if (!confirmed) return;
 
-  const result = await EventBus.emitWithResponse("form:delete", {
+  await EventBus.emitWithResponse("form:delete", {
     templateFilename: template.filename,
     datafile: datafile,
+    container: container,
   });
-
-  if (result) {
-    EventBus.emit("status:update", `Deleted: ${datafile}`);
-    EventBus.emit("form:list:reload");
-    clearFormUI(container);
-  } else {
-    err("[deleteForm] Deletion failed.");
-    EventBus.emit("status:update", "Failed to delete metadata file.");
-  }
 }
 
 export async function renderFormPreview(container, template) {
@@ -136,15 +101,15 @@ export async function renderFormPreview(container, template) {
     return;
   }
 
-  log("[Render] Rendering Markdown...");
-  const markdown = await window.api.transform.renderMarkdownTemplate(
+  const markdown = await EventBus.emitWithResponse("transform:markdown", {
     data,
-    template
-  );
+    template,
+  });
+
   document.getElementById("render-output").textContent = markdown;
 
-  log("[Render] Rendering HTML preview...");
-  const html = await window.api.transform.renderHtmlPreview(markdown);
+  const html = await EventBus.emitWithResponse("transform:html", markdown);
+
   document.getElementById("render-preview").innerHTML = html;
 
   const markdownWrapper = document.getElementById(

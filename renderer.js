@@ -149,19 +149,13 @@ window.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
-      const success = await new Promise((resolve) => {
+      await new Promise((resolve) => {
         EventBus.emit("template:save", {
           name: template,
           data: updatedYaml,
           callback: resolve,
         });
       });
-
-      if (success) {
-        EventBus.emit("status:update", `Saved: ${template}`);
-      } else {
-        EventBus.emit("status:update", `Failed to save: ${template}`);
-      }
     }
   );
 

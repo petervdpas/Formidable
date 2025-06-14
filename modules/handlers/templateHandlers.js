@@ -94,6 +94,13 @@ export async function handleLoadTemplate({ name, callback }) {
 export async function handleSaveTemplate({ name, data, callback }) {
   try {
     const result = await window.api.templates.saveTemplate(name, data);
+
+    if (result) {
+      EventBus.emit("status:update", `Saved template: ${name}`);
+    } else {
+      EventBus.emit("status:update", `Failed to save template: ${name}`);
+    }
+
     callback?.(result);
   } catch (err) {
     EventBus.emit("logging:error", [

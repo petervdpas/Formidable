@@ -16,6 +16,7 @@ import * as themeHandler from "./handlers/themeHandler.js";
 import * as statusHandler from "./handlers/statusHandler.js";
 import * as loggingHandler from "./handlers/loggingHandler.js";
 import * as listHandlers from "./handlers/listHandlers.js";
+import * as transformHandler from "./handlers/transformHandler.js";
 import * as editorHandler from "./handlers/editorHandler.js";
 import * as toastHandler from "./handlers/toastHandler.js";
 
@@ -173,6 +174,11 @@ export function initEventRouter() {
   EventBus.on("editor:delete", (container) =>
     editorHandler.handleDeleteTemplate(container)
   );
+
+  EventBus.off("transform:markdown", transformHandler.handleRenderMarkdown);
+  EventBus.off("transform:html", transformHandler.handleRenderHtml);
+  EventBus.on("transform:markdown", transformHandler.handleRenderMarkdown);
+  EventBus.on("transform:html", transformHandler.handleRenderHtml);
 
   EventBus.off("cache:init", cacheHandler.initCache);
   EventBus.off("cache:loadFromDisk", cacheHandler.handleCacheLoadFromDisk);
