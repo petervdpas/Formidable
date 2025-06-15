@@ -21,11 +21,10 @@ button:active,
   box-shadow: var(--generic-shadow-active);
 }
 
-/* ───── Icon Buttons: No border/shadow ───── */
-.btn.icon-button {
-  border: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
+.btn-input-height {
+  height: 36px !important;
+  padding: 4px 10px;
+  font-size: 13px;
 }
 
 /* ───── Button Variants ───── */
@@ -90,48 +89,91 @@ button:active,
   color: var(--generic-fg-error-hover);
 }
 
+/* ───── Icon Buttons ───── */
 .btn.icon-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-width: 38px;
+  height: 38px;
   padding: 0;
-  font-size: 1.8em;
-  border-radius: 4px;
-  border: none;
+  font-size: 2.6em;
+  border-radius: 6px;
+  line-height: 1;
   cursor: pointer;
   background-color: transparent;
-  color: inherit;
-  transition: opacity 0.2s ease;
+  border: none;
+  transition: filter 0.15s ease, transform 0.15s ease;
+  box-shadow: none !important;
+  /* fully remove container shadow */
 }
 
+/* Hover feedback */
 .btn.icon-button:hover {
-  opacity: 0.75;
+  filter: brightness(1.1);
+  transform: scale(1.05);
 }
 
-.btn.icon-button i {
-  pointer-events: none;
+.btn.icon-button:active {
+  filter: brightness(0.95);
+  transform: scale(0.98);
 }
 
+/* ───── Remove default visuals if no color class is present ───── */
+.btn.icon-button:not(.btn-warn):not(.btn-danger):not(.btn-info):not(.btn-okay):not(.btn-default):not(.btn-icon-warn):not(.btn-icon-danger):not(.btn-icon-info):not(.btn-icon-okay):not(.btn-icon-default):not(.btn-flagged):not(.btn-unflagged) {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: inherit;
+}
+
+/* ───── Icon Color Variants ───── */
+.btn-icon-warn {
+  color: var(--generic-border-warn);
+}
+
+.btn-icon-danger {
+  color: var(--generic-border-error);
+}
+
+.btn-icon-info {
+  color: var(--generic-border-info);
+}
+
+.btn-icon-okay {
+  color: var(--generic-border-success);
+}
+
+.btn-icon-default {
+  color: var(--generic-border-default);
+}
+
+/* ───── Text Shadow on the icon itself ───── */
 .btn.icon-button i {
   pointer-events: none;
   text-shadow:
     1px -1px 1px rgba(255, 255, 255, 0.8),
     -1px 1px 1px rgba(0, 0, 0, 0.6),
-    0 0 2px rgba(0, 0, 0, 0.2);
+    0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+/* ───── Flagged Buttons: Small, No Shadow, Distinct Color ───── */
+.btn.icon-button.btn-flagged,
+.btn.icon-button.btn-unflagged {
+  font-size: 1.6em !important;
+  min-width: 32px;
+  height: 32px;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .btn.icon-button.btn-flagged {
-  color: var(--flagged-color, #d9534f);
+  color: var(--flagged-color, #d9534f) !important;
 }
 
 .btn.icon-button.btn-unflagged {
-  color: var(--unflagged-color, #5bc0de);
-}
-
-.btn-input-height {
-  height: 36px !important;
-  padding: 4px 10px;
-  font-size: 13px;
+  color: var(--unflagged-color, #5bc0de) !important;
 }
 
 /* ───── Close Button ───── */
@@ -156,7 +198,6 @@ button:active,
 }
 
 /* ───── Special Close Button ───── */
-
 .btn-close-special {
   background: none;
   border: none;
@@ -166,6 +207,10 @@ button:active,
   padding: 0 6px;
   margin-left: auto;
   margin-right: 4px;
+  transition: color 0.2s ease;
+}
+
+.btn-close-special {
   box-shadow: var(--close-button-shadow, 0 1px 3px rgba(0, 0, 0, 0.1));
 }
 
@@ -174,6 +219,27 @@ button:active,
   color: var(--close-hover-color);
   background-color: var(--close-hover-bg);
   outline: none;
+}
+
+.copy-btn {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--close-button-color);
+  cursor: pointer;
+  font-size: 1.1em;
+  padding: 0 6px;
+  margin-left: auto;
+  margin-right: 4px;
+  transition: color 0.2s ease;
+}
+
+.copy-btn:hover,
+.copy-btn:focus {
+  color: var(--close-hover-color);
+  background-color: transparent !important;
+  outline: none;
+  box-shadow: none !important;
 }
 
 /* ───── Remove Image Button ───── */
@@ -213,24 +279,6 @@ button.btn-remove-image:active,
 /* ───── Button Hover ───── */
 .modal-actions button:hover {
   background-color: #f0f0f0;
-}
-
-.copy-btn {
-  background: none;
-  border: none;
-  font-size: 1.1em;
-  padding: 2px;
-  margin: 0;
-  line-height: 1;
-  cursor: pointer;
-  color: #666;
-  transition: color 0.2s ease;
-}
-
-.copy-btn:hover,
-.copy-btn:focus {
-  color: #000;
-  outline: none;
 }
 
 .toggle-buttons-inline button {

@@ -7,6 +7,7 @@ function createButton({
   onClick = () => {},
   disabled = false,
   attributes = {},
+  ariaLabel = "",
 }) {
   const btn = document.createElement("button");
   btn.textContent = text;
@@ -17,6 +18,12 @@ function createButton({
   btn.disabled = disabled;
   btn.onclick = onClick;
 
+  if (ariaLabel) {
+    btn.setAttribute("aria-label", ariaLabel);
+    btn.setAttribute("role", "button");
+    btn.setAttribute("data-tooltip", ariaLabel);
+  }
+
   for (const [key, value] of Object.entries(attributes)) {
     btn.setAttribute(key, value);
   }
@@ -25,18 +32,16 @@ function createButton({
 }
 
 export function createIconButton({
-  iconClass = "",        // bv. "fa fa-flag"
+  iconClass = "", // ie. "fa fa-flag"
   className = "",
   identifier = "",
   onClick = () => {},
   disabled = false,
   attributes = {},
-  ariaLabel = "",       // belangrijk voor toegankelijkheid
+  ariaLabel = "",
 }) {
   const btn = document.createElement("button");
-  btn.id = identifier
-    ? `btn-${identifier}`
-    : `btn-icon-button`;
+  btn.id = identifier ? `btn-${identifier}` : `btn-icon-button`;
   btn.className = `btn icon-button ${className}`.trim();
   btn.disabled = disabled;
   btn.onclick = onClick;
@@ -44,6 +49,7 @@ export function createIconButton({
   if (ariaLabel) {
     btn.setAttribute("aria-label", ariaLabel);
     btn.setAttribute("role", "button");
+    btn.setAttribute("data-tooltip", ariaLabel);
   }
 
   // Icon element
@@ -171,6 +177,16 @@ export function createFormSaveButton(onClick) {
   });
 }
 
+export function createFormSaveIconButton(onClick) {
+  return createIconButton({
+    iconClass: "fa fa-save",
+    className: "btn-icon btn-icon-warn",
+    identifier: "form-save-icon",
+    onClick,
+    ariaLabel: "Save form",
+  });
+}
+
 export function createFormDeleteButton(onClick) {
   return createButton({
     text: "Delete",
@@ -180,12 +196,32 @@ export function createFormDeleteButton(onClick) {
   });
 }
 
+export function createFormDeleteIconButton(onClick) {
+  return createIconButton({
+    iconClass: "fa fa-trash",
+    className: "btn-icon btn-icon-danger",
+    identifier: "form-delete-icon",
+    onClick,
+    ariaLabel: "Delete form",
+  });
+}
+
 export function createFormRenderButton(onClick) {
   return createButton({
     text: "Render",
     className: "btn-default btn-info",
     identifier: "form-render",
     onClick,
+  });
+}
+
+export function createFormRenderIconButton(onClick) {
+  return createIconButton({
+    iconClass: "fa fa-eye",
+    className: "btn-icon btn-icon-info",
+    identifier: "form-render-icon",
+    onClick,
+    ariaLabel: "Render form",
   });
 }
 
@@ -240,6 +276,7 @@ export function createCopyMarkdownButton(onClick) {
     className: "copy-btn",
     identifier: "copy-markdown",
     onClick,
+    ariaLabel: "Copy Markdown",
   });
 }
 
@@ -249,6 +286,7 @@ export function createCopyPreviewButton(onClick) {
     className: "copy-btn",
     identifier: "copy-preview",
     onClick,
+    ariaLabel: "Copy HTML",
   });
 }
 
@@ -258,7 +296,7 @@ export function createPaneCloseButton(targetPaneClass, onClick) {
     className: "btn-close-special",
     identifier: `close-${targetPaneClass}`,
     onClick,
-    attributes: { "data-target-pane": targetPaneClass }
+    attributes: { "data-target-pane": targetPaneClass },
   });
 }
 

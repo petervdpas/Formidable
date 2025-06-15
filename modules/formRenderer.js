@@ -10,9 +10,9 @@ import {
 import { applyFieldValues, focusFirstInput } from "../utils/domUtils.js";
 import {
   createFlaggedToggleButton,
-  createFormSaveButton,
-  createFormDeleteButton,
-  createFormRenderButton,
+  createFormSaveIconButton,
+  createFormDeleteIconButton,
+  createFormRenderIconButton,
   createAddLoopItemButton,
   createDeleteLoopItemButton,
   buildButtonGroup,
@@ -200,9 +200,9 @@ function buildMetaSection(
   section.appendChild(metaText);
 
   // Inject Save/Delete/Render buttons directly
-  const saveBtn = createFormSaveButton(onSave);
-  const deleteBtn = createFormDeleteButton(() => onDelete(filename));
-  const renderBtn = createFormRenderButton(onRender);
+  const saveBtn = createFormSaveIconButton(onSave);
+  const deleteBtn = createFormDeleteIconButton(() => onDelete(filename));
+  const renderBtn = createFormRenderIconButton(onRender);
 
   // Wrap text + buttons in row layout
   const wrapper = document.createElement("div");

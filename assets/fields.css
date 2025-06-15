@@ -76,7 +76,7 @@
 [data-list-field] .list-input {
   flex-grow: 1;
   min-width: 0;
-  /* ✅ Allow shrinking when needed */
+  /* Allow shrinking when needed */
   padding: 6px 10px;
   border: 1px solid #ccc;
   border-radius: 4px 0 0 4px;
@@ -130,7 +130,35 @@
   position: absolute;
   bottom: 0px;
   left: 0px;
-  z-index: 10;
+  z-index: 99;
+}
+
+/* ───── Tooltip Styling ───── */
+
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 100%; /* above the element */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 6px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 9800;
+}
+
+[data-tooltip]:hover::after {
+  opacity: 1;
 }
 
 /* ───── Field Type Color Themes ───── */

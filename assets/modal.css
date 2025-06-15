@@ -7,7 +7,7 @@
     transform: translate(-50%, -50%);
     max-height: calc(100vh - 60px);
     margin: 0 auto;
-    z-index: 1000;
+    z-index: 999;
     background-color: var(--input-bg);
     border-color: var(--input-border-color);
     color: var(--input-fg);
@@ -405,7 +405,7 @@
 
     .modal-body.two-pane {
         flex-direction: column;
-        gap: 12px;
+        gap: 6px;
     }
 
     .modal-body.two-pane>.pane:first-child {

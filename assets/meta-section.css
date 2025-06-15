@@ -1,7 +1,7 @@
 .meta-section {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 99;
   background-color: var(--meta-section-bg);
   border: 1px solid var(--meta-section-border);
   border-radius: 6px;
@@ -10,7 +10,7 @@
   color: var(--meta-section-text-color);
   font-size: var(--meta-section-font-size);
   font-family: monospace, monospace;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--generic-box-shadow);
 }
 
 .meta-wrapper {
