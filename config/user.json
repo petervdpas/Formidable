@@ -9,9 +9,9 @@
   "author_name": "Regular user",
   "author_email": "regular@example.com",
   "window_bounds": {
-    "width": 1733,
+    "width": 1215,
     "height": 944,
-    "x": 108,
-    "y": 12
+    "x": 115,
+    "y": 16
   }
 }

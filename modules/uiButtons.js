@@ -59,12 +59,19 @@ export function createIconButton({
   return btn;
 }
 
-export function buildButtonGroup(...buttons) {
+export function buildButtonGroup(...args) {
+  let extraClass = "";
+  if (typeof args[args.length - 1] === "string") {
+    extraClass = args.pop();
+  }
+
   const group = document.createElement("div");
-  group.className = "button-group";
-  buttons.forEach((btn) => {
+  group.className = `button-group${extraClass ? " " + extraClass : ""}`;
+
+  args.forEach((btn) => {
     if (btn instanceof HTMLElement) group.appendChild(btn);
   });
+
   return group;
 }
 

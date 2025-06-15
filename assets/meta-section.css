@@ -1,8 +1,7 @@
 .meta-section {
-  position: relative;
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-start;
+  position: sticky;
+  top: 0;
+  z-index: 10;
   background-color: var(--meta-section-bg);
   border: 1px solid var(--meta-section-border);
   border-radius: 6px;
@@ -11,18 +10,28 @@
   color: var(--meta-section-text-color);
   font-size: var(--meta-section-font-size);
   font-family: monospace, monospace;
-  white-space: pre-line;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.meta-section p {
-  flex: 1 1 auto;
-  margin: 0;
+.meta-wrapper {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 16px;
+}
+
+.meta-text > div {
   line-height: 1.4;
   overflow-wrap: break-word;
 }
 
+.meta-actions {
+  display: flex;
+  gap: 8px;
+}
+
 .meta-section .flagged-toggle-container {
   position: absolute;
-  top: 0px;
-  right: 0px;
+  top: 10px;
+  right: 14px;
 }

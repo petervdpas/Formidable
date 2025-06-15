@@ -533,9 +533,7 @@ export async function renderImageField(field, template) {
   input.name = field.key;
 
   const preview = document.createElement("img");
-  preview.style.maxWidth = "200px";
-  preview.style.marginTop = "8px";
-  preview.style.display = "block";
+  //preview.style.display = "none";
 
   const deleteBtn = createRemoveImageButton(() => {
     clearImage();

@@ -113,6 +113,26 @@
   color: var(--input-fg);
 }
 
+[data-image-field] {
+  position: relative;
+  display: inline-block;
+}
+
+[data-image-field] img {
+  display: block;
+  max-width: 200px;
+  border-radius: 4px;
+  padding: 8px;
+  padding-top: 16px;
+}
+
+[data-image-field] .btn-remove-image {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  z-index: 10;
+}
+
 /* ───── Field Type Color Themes ───── */
 /* Sidebar Field List Items */
 .field-list-item[data-type="looper"],

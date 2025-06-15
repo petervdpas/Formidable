@@ -157,11 +157,13 @@ function buildMetaSection(
   meta,
   filename,
   flaggedInitial = false,
-  onFlagChange = null
+  onFlagChange = null,
+  onSave,
+  onDelete,
+  onRender
 ) {
   const section = document.createElement("div");
   section.className = "meta-section";
-  section.style.position = "relative";
 
   if (typeof onFlagChange === "function") {
     let flagged = flaggedInitial;
@@ -179,18 +181,38 @@ function buildMetaSection(
     section.appendChild(flaggedContainer);
   }
 
-  const p = document.createElement("p");
-  p.style.whiteSpace = "pre-line";
-  p.style.marginTop = "0";
-  p.textContent =
-    `Filename: ${filename || ""}\n` +
-    `Author: ${meta.author_name || ""}\n` +
-    `Email: ${meta.author_email || ""}\n` +
-    `Template: ${meta.template || ""}\n` +
-    `Created: ${meta.created || ""}\n` +
-    `Updated: ${meta.updated || ""}`;
+  const metaText = document.createElement("div");
+  metaText.className = "meta-text";
 
-  section.appendChild(p);
+  [
+    `Filename: ${filename || ""}`,
+    `Author: ${meta.author_name || ""}`,
+    `Email: ${meta.author_email || ""}`,
+    `Template: ${meta.template || ""}`,
+    `Created: ${meta.created || ""}`,
+    `Updated: ${meta.updated || ""}`,
+  ].forEach((line) => {
+    const div = document.createElement("div");
+    div.textContent = line;
+    metaText.appendChild(div);
+  });
+
+  section.appendChild(metaText);
+
+  // Inject Save/Delete/Render buttons directly
+  const saveBtn = createFormSaveButton(onSave);
+  const deleteBtn = createFormDeleteButton(() => onDelete(filename));
+  const renderBtn = createFormRenderButton(onRender);
+
+  // Wrap text + buttons in row layout
+  const wrapper = document.createElement("div");
+  wrapper.className = "meta-wrapper";
+  wrapper.appendChild(metaText);
+  wrapper.appendChild(
+    buildButtonGroup(saveBtn, deleteBtn, renderBtn, "meta-actions")
+  );
+
+  section.appendChild(wrapper);
 
   return section;
 }
@@ -205,38 +227,35 @@ export async function renderFormUI(
 ) {
   container.innerHTML = "";
 
-  const filenameInput = buildHiddenInput(
-    "meta-json-filename",
-    metaData._filename || ""
-  );
+  const filename = metaData._filename || "";
+  const flagged = metaData.meta?.flagged || false;
+
+  const filenameInput = buildHiddenInput("meta-json-filename", filename);
   container.appendChild(filenameInput);
 
   const flaggedInput = buildHiddenInput(
     "meta-flagged",
-    metaData.meta?.flagged ? "true" : "false"
+    flagged ? "true" : "false"
   );
   container.appendChild(flaggedInput);
 
   const metaSection = buildMetaSection(
     metaData.meta || {},
-    metaData._filename || "",
-    metaData.meta?.flagged || false,
+    filename,
+    flagged,
     (newFlagged) => {
       flaggedInput.value = newFlagged ? "true" : "false";
-    }
+    },
+    onSave,
+    () => onDelete(filename),
+    onRender
   );
   container.appendChild(metaSection);
 
   const fields = template.fields || [];
   injectFieldDefaults(fields, metaData);
-
   await renderFieldsWithLoops(container, fields, metaData);
 
-  const saveBtn = createFormSaveButton(onSave);
-  const deleteBtn = createFormDeleteButton(() => onDelete(metaData._filename));
-  const renderBtn = createFormRenderButton(onRender);
-
-  container.appendChild(buildButtonGroup(saveBtn, deleteBtn, renderBtn));
   applyFieldValues(container, template, metaData);
   focusFirstInput(container);
 }
