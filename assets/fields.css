@@ -9,7 +9,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 14px;
+  padding: 6px 8px 8px 8px;
   border-radius: 6px;
   margin-bottom: 4px;
   font-size: 14px;
@@ -50,12 +50,7 @@
   text-transform: uppercase;
 }
 
-/* ───── Action Button Wrapper ───── */
-.field-actions {
-  display: flex;
-  gap: 8px;
-}
-
+/* ───── Field Type Specific Styles ───── */
 [data-radio-group] {
   display: flex;
   flex-direction: row;
@@ -494,22 +489,9 @@
 }
 
 @media (max-width: 720px) {
-  .field-list-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 10px;
-    min-height: 40px;
-  }
 
   .field-label {
     font-size: 14px;
-    line-height: 1.2;
-  }
-
-  .field-actions button {
-    padding: 4px 8px;
-    font-size: 13px;
     line-height: 1.2;
   }
 }

@@ -12,6 +12,7 @@ import {
   createFieldDeleteIconButton,
   // createReorderUpButton,
   // createReorderDownButton,
+  buildButtonGroup,
 } from "./uiButtons.js";
 
 function setupFieldEditor(container, onChange, allFields = []) {
@@ -271,8 +272,8 @@ async function listFields(
     labelEl.appendChild(typeSpan);
 
     // Acties
-    const actionsEl = document.createElement("div");
-    actionsEl.className = "field-actions";
+    const actionsWrapper = document.createElement("div");
+    actionsWrapper.className = "actions-wrapper";
 
     const fieldButtons = await createToggleButtons(
       {
@@ -304,11 +305,12 @@ async function listFields(
     actionsEl.appendChild(btnDown);
     */
 
-    actionsEl.appendChild(fieldButtons.edit);
-    actionsEl.appendChild(fieldButtons.delete);
+    actionsWrapper.appendChild(
+      buildButtonGroup(fieldButtons.edit, fieldButtons.delete, "field-actions")
+    );
 
     item.appendChild(labelEl);
-    item.appendChild(actionsEl);
+    item.appendChild(actionsWrapper);
     listEl.appendChild(item);
   }
 }

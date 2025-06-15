@@ -92,7 +92,7 @@ export function createProfileAddButton(onClick) {
 
 export function createFieldEditIconButton(idx, onClick) {
   return createIconButton({
-    iconClass: "fa fa-edit",
+    iconClass: "fa fa-pencil",
     className: "btn-icon btn-icon-warn",
     identifier: "field-edit-${idx}",
     onClick,
@@ -113,7 +113,7 @@ export function createFieldEditButton(idx, onClick) {
 
 export function createFieldDeleteIconButton(idx, onClick) {
   return createIconButton({
-    iconClass: "fa fa-trash",
+    iconClass: "fa fa-trash-o",
     className: "btn-icon btn-icon-danger",
     identifier: `field-delete-${idx}`,
     onClick,
@@ -165,7 +165,7 @@ export function createTemplateAddFieldButton(onClick) {
 
 export function createTemplateSaveIconButton(onClick) {
   return createIconButton({
-    iconClass: "fa fa-save",
+    iconClass: "fa fa-floppy-o",
     className: "btn-icon btn-icon-warn",
     identifier: "template-save",
     onClick,
@@ -184,7 +184,7 @@ export function createTemplateSaveButton(onClick) {
 
 export function createTemplateDeleteIconButton(onClick) {
   return createIconButton({
-    iconClass: "fa fa-trash",
+    iconClass: "fa fa-trash-o",
     className: "btn-icon btn-icon-danger",
     identifier: "template-delete",
     onClick,
@@ -221,7 +221,7 @@ export function createFormSaveButton(onClick) {
 
 export function createFormSaveIconButton(onClick) {
   return createIconButton({
-    iconClass: "fa fa-save",
+    iconClass: "fa fa-floppy-o",
     className: "btn-icon btn-icon-warn",
     identifier: "form-save-icon",
     onClick,
@@ -240,7 +240,7 @@ export function createFormDeleteButton(onClick) {
 
 export function createFormDeleteIconButton(onClick) {
   return createIconButton({
-    iconClass: "fa fa-trash",
+    iconClass: "fa fa-trash-o",
     className: "btn-icon btn-icon-danger",
     identifier: "form-delete-icon",
     onClick,
