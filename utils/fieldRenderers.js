@@ -536,9 +536,48 @@ export async function renderImageField(field, template) {
   preview.style.marginTop = "8px";
   preview.style.display = "block";
 
-  // Don't try to load base64; just set alt if no image
+  const deleteBtn = document.createElement("button");
+  deleteBtn.textContent = "×";
+  deleteBtn.className = "delete-image-btn";
+  deleteBtn.style.marginTop = "4px";
+  deleteBtn.style.display = "none";
+  deleteBtn.style.background = "#e74c3c";
+  deleteBtn.style.color = "white";
+  deleteBtn.style.border = "none";
+  deleteBtn.style.padding = "4px 8px";
+  deleteBtn.style.cursor = "pointer";
+  deleteBtn.style.borderRadius = "4px";
+
+  const setImage = (src, filename = "") => {
+    preview.src = src;
+    preview.style.display = "block";
+    deleteBtn.style.display = "inline-block";
+    wrapper.setAttribute("data-filename", filename);
+  };
+
+  const clearImage = () => {
+    preview.src = "";
+    preview.alt = "";
+    preview.style.display = "none";
+    input.value = "";
+    deleteBtn.style.display = "none";
+    wrapper.removeAttribute("data-filename");
+  };
+
+  // Load initial preview if filename is present
   if (typeof field.default === "string" && field.default) {
-    preview.alt = "Image set: " + field.default;
+    wrapper.setAttribute("data-filename", field.default);
+    if (template?.virtualLocation) {
+      window.api.system
+        .resolvePath(template.virtualLocation, "images", field.default)
+        .then((fullPath) => {
+          setImage(`file://${fullPath.replace(/\\/g, "/")}`, field.default);
+        })
+        .catch(() => {
+          preview.alt = "Image not found";
+          preview.style.display = "none";
+        });
+    }
   }
 
   input.addEventListener("change", () => {
@@ -546,14 +585,28 @@ export async function renderImageField(field, template) {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        preview.src = e.target.result;
+        setImage(e.target.result, file.name);
       };
       reader.readAsDataURL(file);
     }
   });
 
+  deleteBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    clearImage();
+  });
+
+  requestAnimationFrame(() => {
+    const existing = wrapper.getAttribute("data-filename");
+    if (existing) {
+      deleteBtn.style.display = "inline-block";
+    }
+  });
+
   wrapper.appendChild(input);
   wrapper.appendChild(preview);
+  wrapper.appendChild(deleteBtn);
+
   return wrapInputWithLabel(
     wrapper,
     field.label || "Image Upload",

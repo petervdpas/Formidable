@@ -159,24 +159,23 @@ function applyImageLogic(container, key, value, template) {
     return;
   }
 
-  // If it's already a base64 URI
   if (typeof value === "string" && value.startsWith("data:image")) {
     preview.src = value;
+    wrapper.setAttribute("data-filename", ""); // or some hash
+    const btn = wrapper.querySelector(".delete-image-btn");
+    if (btn) btn.style.display = "inline-block";
     return;
   }
 
-  if (!template?.virtualLocation || !value) {
-    EventBus.emit("logging:warning", [
-      `[applyImageField] Missing virtualLocation or value`,
-    ]);
-    return;
-  }
+  if (!template?.virtualLocation || !value) return;
 
   window.api.system
     .resolvePath(template.virtualLocation, "images", value)
     .then((imgPath) => {
       preview.src = `file://${imgPath.replace(/\\/g, "/")}`;
       wrapper.setAttribute("data-filename", value);
+      const btn = wrapper.querySelector(".delete-image-btn");
+      if (btn) btn.style.display = "inline-block";
     })
     .catch((err) => {
       EventBus.emit("logging:error", [
