@@ -7,70 +7,87 @@ button,
   border: 1px solid;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--generic-shadow);
 }
 
-/* ───── Disabled Button State ───── */
-button:disabled,
-.btn:disabled {
-  background-color: #ccc !important;
-  border-color: #aaa !important;
-  color: #666 !important;
-  cursor: not-allowed;
-  opacity: 0.6;
+button:hover,
+.btn:hover {
+  box-shadow: var(--generic-shadow-hover);
+}
+
+button:active,
+.btn:active {
+  box-shadow: var(--generic-shadow-active);
+}
+
+/* ───── Icon Buttons: No border/shadow ───── */
+.btn.icon-button {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }
 
 /* ───── Button Variants ───── */
 
 .btn-default {
-  background-color: #e0e0e0;
-  border-color: #bbb;
-  color: #222;
+  background-color: var(--generic-bg-default);
+  border-color: var(--generic-border-default);
+  color: var(--generic-fg-default);
 }
 
 .btn-default:hover {
-  background-color: #d5d5d5;
+  background-color: var(--generic-bg-default-hover);
+  border-color: var(--generic-border-default-hover);
+  color: var(--generic-fg-default-hover);
 }
 
 .btn-okay {
-  background-color: #28a745;
-  border-color: #218838;
-  color: #fff;
+  background-color: var(--generic-bg-success);
+  border-color: var(--generic-border-success);
+  color: var(--generic-fg-success);
 }
 
 .btn-okay:hover {
-  background-color: #218838;
-  border-color: #1e7e34;
+  background-color: var(--generic-bg-success-hover);
+  border-color: var(--generic-border-success-hover);
+  color: var(--generic-fg-success-hover);
 }
 
 .btn-info {
-  background-color: #cce5ff;
-  border-color: #66b0ff;
-  color: #004085;
+  background-color: var(--generic-bg-info);
+  border-color: var(--generic-border-info);
+  color: var(--generic-fg-info);
 }
 
 .btn-info:hover {
-  background-color: #b8dbff;
+  background-color: var(--generic-bg-info-hover);
+  border-color: var(--generic-border-info-hover);
+  color: var(--generic-fg-info-hover);
 }
 
 .btn-warn {
-  background-color: #ffc107;
-  border-color: #e0a800;
-  color: #212529;
+  background-color: var(--generic-bg-warn);
+  border-color: var(--generic-border-warn);
+  color: var(--generic-fg-warn);
 }
 
 .btn-warn:hover {
-  background-color: #e0a800;
+  background-color: var(--generic-bg-warn-hover);
+  border-color: var(--generic-border-warn-hover);
+  color: var(--generic-fg-warn-hover);
 }
 
 .btn-danger {
-  background-color: #dc3545;
-  border-color: #c82333;
-  color: #fff;
+  background-color: var(--generic-bg-error);
+  border-color: var(--generic-border-error);
+  color: var(--generic-fg-error);
 }
 
 .btn-danger:hover {
-  background-color: #c82333;
+  background-color: var(--generic-bg-error-hover);
+  border-color: var(--generic-border-error-hover);
+  color: var(--generic-fg-error-hover);
 }
 
 .btn.icon-button {
@@ -119,15 +136,15 @@ button:disabled,
   font-size: 13px;
 }
 
-
 /* ───── Close Button ───── */
 .btn-close {
   background: none;
   border: none;
+  border-radius: 4px;
   font-size: 1.2em;
   line-height: 1;
   color: var(--close-button-color);
-  padding: 2px 6px;
+  padding: 4px 8px;
   margin-left: auto;
   cursor: pointer;
   transition: color 0.2s ease, background-color 0.2s ease;
@@ -140,14 +157,50 @@ button:disabled,
   outline: none;
 }
 
-.btn-close-pane {
+/* ───── Special Close Button ───── */
+
+.btn-close-special {
   background: none;
   border: none;
   color: var(--close-button-color);
   cursor: pointer;
-  font-size: 1.2em;
+  font-size: 1.1em;
   padding: 0 6px;
   margin-left: auto;
+  margin-right: 4px;
+  box-shadow: var(--close-button-shadow, 0 1px 3px rgba(0, 0, 0, 0.1));
+}
+
+.btn-close-special:hover,
+.btn-close-special:focus {
+  color: var(--close-hover-color);
+  background-color: var(--close-hover-bg);
+  outline: none;
+}
+
+/* ───── Remove Image Button ───── */
+
+button.btn-remove-image,
+.btn.btn-remove-image {
+  background-color: var(--generic-bg-error);
+  border: 1px solid var(--generic-border-error);
+  color: var(--generic-fg-error);
+  cursor: pointer;
+  box-shadow: var(--generic-shadow);
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+button.btn-remove-image:hover,
+.btn.btn-remove-image:hover {
+  background-color: var(--generic-bg-error-hover);
+  border-color: var(--generic-border-error-hover);
+  color: var(--generic-fg-error-hover);
+  box-shadow: var(--generic-shadow-hover);
+}
+
+button.btn-remove-image:active,
+.btn.btn-remove-image:active {
+  box-shadow: var(--generic-shadow-active);
 }
 
 /* ───── Button Group ───── */

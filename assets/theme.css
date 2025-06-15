@@ -6,6 +6,8 @@
   --input-bg: #fdfdfd;
   --input-fg: #111;
   --input-icon-bg: #1d1d1d;
+  --accent-color: #007bff;
+  --hover-bg: #f0f0f0;
 
   /* ───── Range Slider ───── */
   --range-track-height: 6px;
@@ -25,19 +27,54 @@
 
   --status-info-divider: #ccc;
 
-  --toast-bg-info: #333;
-  --toast-fg-info: #fff;
+  /* ───── Generic Shadows ───── */
+  --generic-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --generic-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.35);
+  --generic-shadow-active: inset 0 1px 2px rgba(0, 0, 0, 0.4);
 
-  --toast-bg-success: #4caf50;
-  --toast-fg-success: #fff;
+  /* ───── Default ───── */
+  --generic-bg-default: #e0e0e0;
+  --generic-bg-default-hover: #d5d5d5;
+  --generic-border-default: #bbb;
+  --generic-border-default-hover: #999;
+  --generic-fg-default: #222;
+  --generic-fg-default-hover: #111;
 
-  --toast-bg-error: #f44336;
-  --toast-fg-error: #fff;
+  /* ───── Info ───── */
+  --generic-border-info: #66b0ff;
+  --generic-border-info-hover: #559ce6;
+  --generic-bg-info: #cce5ff;
+  --generic-bg-info-hover: #b8dbff;
+  --generic-fg-info: #004085;
+  --generic-fg-info-hover: #003166;
 
-  --toast-bg-warn: #ff9800;
-  --toast-fg-warn: #000;
+  /* ───── Success ───── */
+  --generic-border-success: #218838;
+  --generic-border-success-hover: #1e7e34;
+  --generic-bg-success: #4caf50;
+  --generic-bg-success-hover: #388e3c;
+  --generic-fg-success: #fff;
+  --generic-fg-success-hover: #fff;
+
+  /* ───── Error / Danger ───── */
+  --generic-border-error: #c82333;
+  --generic-border-error-hover: #a71d2a;
+  --generic-bg-error: #f44336;
+  --generic-bg-error-hover: #d32f2f;
+  --generic-fg-error: #fff;
+  --generic-fg-error-hover: #fff;
+
+  /* ───── Warning ───── */
+  --generic-border-warn: #e0a800;
+  --generic-border-warn-hover: #c69500;
+  --generic-bg-warn: #ff9800;
+  --generic-bg-warn-hover: #fb8c00;
+  --generic-fg-warn: #000;
+  --generic-fg-warn-hover: #000;
+
 
   --close-button-color: #888;
+  --close-button-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   --close-hover-color: #000;
   --close-hover-bg: rgba(0, 0, 0, 0.05);
 
@@ -58,8 +95,6 @@
   --loop-add-bg: #28a745;
   --loop-add-bg-hover: #218838;
   --loop-add-fg: #fff;
-
-  --loop-remove-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
   --meta-section-bg: #f9f9f9;
   --meta-section-border: #ccc;

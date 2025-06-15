@@ -17,16 +17,13 @@
   background-color: var(--loop-bg, #fff);
 }
 
+
+
 /* ─── Remove Button ────────────────────────────── */
 .loop-item .loop-item-remove {
   position: absolute;
   top: 6px;
-  right: 6px;
-  padding: 2px 6px;
-  font-size: 13px;
-  line-height: 1;
-  border-radius: 4px;
-  box-shadow: var(--loop-remove-shadow, 0 1px 3px rgba(0, 0, 0, 0.1));
+  right: 2px;
 }
 
 /* ─── Add Button at Bottom ─────────────────────── */

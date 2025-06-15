@@ -248,7 +248,7 @@ export function createCopyPreviewButton(onClick) {
 export function createPaneCloseButton(targetPaneClass, onClick) {
   return createButton({
     text: "✕",
-    className: "btn-close-pane",
+    className: "btn-close-special",
     identifier: `close-${targetPaneClass}`,
     onClick,
     attributes: { "data-target-pane": targetPaneClass }
@@ -323,8 +323,17 @@ export function createAddLoopItemButton(onClick) {
 export function createDeleteLoopItemButton(onClick, identifier = "") {
   return createButton({
     text: "✕",
-    className: "btn-danger btn-close loop-item-remove",
+    className: "btn-close-special btn-danger loop-item-remove",
     identifier: identifier || "loop-item-delete",
+    onClick,
+  });
+}
+
+export function createRemoveImageButton(onClick, identifier = "") {
+  return createButton({
+    text: "✕",
+    className: "btn-close-special btn-remove-image",
+    identifier: identifier || "remove-image",
     onClick,
   });
 }

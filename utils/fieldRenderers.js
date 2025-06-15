@@ -5,6 +5,7 @@ import { wrapInputWithLabel, buildSwitchElement } from "./elementBuilders.js";
 import { applyDatasetMapping } from "./domUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 import { getCurrentTheme } from "../modules/themeToggle.js";
+import { createRemoveImageButton } from "../modules/uiButtons.js";
 
 function resolveOption(opt) {
   return typeof opt === "string"
@@ -536,17 +537,11 @@ export async function renderImageField(field, template) {
   preview.style.marginTop = "8px";
   preview.style.display = "block";
 
-  const deleteBtn = document.createElement("button");
-  deleteBtn.textContent = "×";
-  deleteBtn.className = "delete-image-btn";
-  deleteBtn.style.marginTop = "4px";
+  const deleteBtn = createRemoveImageButton(() => {
+    clearImage();
+  }, `delete-${field.key}`);
+
   deleteBtn.style.display = "none";
-  deleteBtn.style.background = "#e74c3c";
-  deleteBtn.style.color = "white";
-  deleteBtn.style.border = "none";
-  deleteBtn.style.padding = "4px 8px";
-  deleteBtn.style.cursor = "pointer";
-  deleteBtn.style.borderRadius = "4px";
 
   const setImage = (src, filename = "") => {
     preview.src = src;
@@ -589,11 +584,6 @@ export async function renderImageField(field, template) {
       };
       reader.readAsDataURL(file);
     }
-  });
-
-  deleteBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    clearImage();
   });
 
   requestAnimationFrame(() => {

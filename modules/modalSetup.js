@@ -180,7 +180,7 @@ export function setupRenderModal() {
       showHtmlBtn.style.display = htmlHidden ? "inline-block" : "none";
 
       // Close buttons for individual panes
-      if (rawHeader && !rawHeader.querySelector(".btn-close-pane")) {
+      if (rawHeader && !rawHeader.querySelector(".btn-close-special")) {
         rawHeader.appendChild(
           createPaneCloseButton("raw-pane", () => {
             rawPane.style.display = "none";
@@ -190,7 +190,7 @@ export function setupRenderModal() {
         );
       }
 
-      if (htmlHeader && !htmlHeader.querySelector(".btn-close-pane")) {
+      if (htmlHeader && !htmlHeader.querySelector(".btn-close-special")) {
         htmlHeader.appendChild(
           createPaneCloseButton("html-pane", () => {
             htmlPane.style.display = "none";

@@ -16,10 +16,11 @@
   cursor: pointer;
   font-weight: bold;
   transition: all 0.2s ease;
+  box-shadow: none !important;
 }
 
 .tab-btn:hover {
-  background-color: var(--hover-bg);
+  background-color: var(--hover-bg); 
 }
 
 .tab-btn.active {

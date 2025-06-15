@@ -162,7 +162,7 @@ function applyImageLogic(container, key, value, template) {
   if (typeof value === "string" && value.startsWith("data:image")) {
     preview.src = value;
     wrapper.setAttribute("data-filename", ""); // or some hash
-    const btn = wrapper.querySelector(".delete-image-btn");
+    const btn = wrapper.querySelector(".btn-remove-image");
     if (btn) btn.style.display = "inline-block";
     return;
   }
@@ -174,7 +174,7 @@ function applyImageLogic(container, key, value, template) {
     .then((imgPath) => {
       preview.src = `file://${imgPath.replace(/\\/g, "/")}`;
       wrapper.setAttribute("data-filename", value);
-      const btn = wrapper.querySelector(".delete-image-btn");
+      const btn = wrapper.querySelector(".btn-remove-image");
       if (btn) btn.style.display = "inline-block";
     })
     .catch((err) => {

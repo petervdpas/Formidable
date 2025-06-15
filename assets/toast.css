@@ -19,23 +19,23 @@
 
 /* Base + variants */
 .toast.info {
-  background-color: var(--toast-bg-info);
-  color: var(--toast-fg-info);
+  background-color: var(--generic-bg-info);
+  color: var(--generic-fg-info);
 }
 
 .toast.success {
-  background-color: var(--toast-bg-success);
-  color: var(--toast-fg-success);
+  background-color: var(--generic-bg-success);
+  color: var(--generic-fg-success);
 }
 
 .toast.error {
-  background-color: var(--toast-bg-error);
-  color: var(--toast-fg-error);
+  background-color: var(--generic-bg-error);
+  color: var(--generic-fg-error);
 }
 
 .toast.warn {
-  background-color: var(--toast-bg-warn);
-  color: var(--toast-fg-warn);
+  background-color: var(--generic-bg-warn);
+  color: var(--generic-fg-warn);
 }
 
 .toast.show {
