@@ -11,6 +11,7 @@ import {
 import { generateTemplateCode } from "../utils/templateGenerator.js";
 import { formatError } from "../utils/templateValidation.js";
 import { ensureVirtualLocation } from "../utils/vfsUtils.js";
+import { createToggleButtons } from "../utils/iconButtonToggle.js";
 import {
   getEditor,
   handleEditorKey,
@@ -19,7 +20,9 @@ import {
 import {
   createTemplateAddFieldButton,
   createTemplateSaveButton,
+  createTemplateSaveIconButton,
   createTemplateDeleteButton,
+  createTemplateDeleteIconButton,
   createTemplateGeneratorButton,
 } from "./uiButtons.js";
 
@@ -58,8 +61,6 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     }
 
     data = await ensureVirtualLocation(data);
-
-    console.log("[YamlEditor] Rendering editor with data:", data);
 
     currentData = structuredClone(data);
     EventBus.emit("logging:default", [
@@ -120,55 +121,68 @@ export function initTemplateEditor(containerId, onSaveCallback) {
 
     const actionsRow = container.querySelector("#template-actions-row");
 
-    const saveBtn = createTemplateSaveButton(async () => {
-      const fullTemplate = {
-        name: container.querySelector("#yaml-name")?.value.trim() || "Unnamed",
-        markdown_template: getEditor()?.getValue() || "",
-        fields: currentData.fields || [],
-      };
-      const errors = await new Promise((resolve) => {
-        EventBus.emit("template:validate", {
-          data: fullTemplate,
-          callback: resolve,
-        });
-      });
+    const { save, delete: del } = await createToggleButtons(
+      {
+        save: async () => {
+          const fullTemplate = {
+            name:
+              container.querySelector("#yaml-name")?.value.trim() || "Unnamed",
+            markdown_template: getEditor()?.getValue() || "",
+            fields: currentData.fields || [],
+          };
 
-      if (errors && errors.length > 0) {
-        const count = errors.length;
-        EventBus.emit("status:update", `Validation failed: ${count} error(s).`);
-        EventBus.emit("ui:toast", {
-          message: `Template contains ${count} error${count > 1 ? "s" : ""}.`,
-          variant: "error",
-        });
-        for (const err of errors) {
-          EventBus.emit("ui:toast", {
-            message: formatError(err),
-            variant: "error",
+          const errors = await new Promise((resolve) => {
+            EventBus.emit("template:validate", {
+              data: fullTemplate,
+              callback: resolve,
+            });
           });
-        }
-        return;
+
+          if (errors?.length > 0) {
+            EventBus.emit(
+              "status:update",
+              `Validation failed: ${errors.length} error(s).`
+            );
+            errors.forEach((err) =>
+              EventBus.emit("ui:toast", {
+                message: formatError(err),
+                variant: "error",
+              })
+            );
+            return;
+          }
+
+          EventBus.emit("editor:save", {
+            container,
+            fields: currentData.fields,
+            callback: onSaveCallback,
+          });
+
+          const filename = window.currentSelectedTemplateName || "Unknown";
+          EventBus.emit("status:update", `Template saved: ${filename}`);
+          EventBus.emit("ui:toast", {
+            message: `Template saved successfully: ${filename}`,
+            variant: "success",
+          });
+        },
+        delete: () => {
+          EventBus.emit("editor:delete", container);
+        },
+      },
+      {
+        icon: {
+          save: createTemplateSaveIconButton,
+          delete: createTemplateDeleteIconButton,
+        },
+        label: {
+          save: createTemplateSaveButton,
+          delete: createTemplateDeleteButton,
+        },
       }
+    );
 
-      EventBus.emit("editor:save", {
-        container,
-        fields: currentData.fields,
-        callback: onSaveCallback,
-      });
-
-      const filename = window.currentSelectedTemplateName || "Unknown";
-      EventBus.emit("status:update", `Template saved: ${filename}`);
-      EventBus.emit("ui:toast", {
-        message: `Template saved successfully: ${filename}`,
-        variant: "success",
-      });
-    });
-
-    const deleteBtn = createTemplateDeleteButton(() => {
-      EventBus.emit("editor:delete", container);
-    });
-
-    actionsRow.appendChild(saveBtn);
-    actionsRow.appendChild(deleteBtn);
+    actionsRow.appendChild(save);
+    actionsRow.appendChild(del);
 
     // ─── Editor Change → Show/Hide Generate Button ─────
     const editor = getEditor();

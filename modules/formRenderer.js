@@ -8,16 +8,20 @@ import {
   createLoopDefaults,
 } from "../utils/formUtils.js";
 import { applyFieldValues, focusFirstInput } from "../utils/domUtils.js";
+import { fieldTypes } from "../utils/fieldTypes.js";
+import { createToggleButtons } from "../utils/iconButtonToggle.js";
 import {
   createFlaggedToggleButton,
+  createFormSaveButton,
   createFormSaveIconButton,
+  createFormDeleteButton,
   createFormDeleteIconButton,
+  createFormRenderButton,
   createFormRenderIconButton,
   createAddLoopItemButton,
   createDeleteLoopItemButton,
   buildButtonGroup,
 } from "./uiButtons.js";
-import { fieldTypes } from "../utils/fieldTypes.js";
 import { showConfirmModal } from "./modalSetup.js";
 
 async function renderFieldsWithLoops(container, fields, metaData) {
@@ -153,7 +157,7 @@ async function createLoopItem(groupFields, dataEntry = {}) {
   return itemWrapper;
 }
 
-function buildMetaSection(
+async function buildMetaSection(
   meta,
   filename,
   flaggedInitial = false,
@@ -199,17 +203,37 @@ function buildMetaSection(
 
   section.appendChild(metaText);
 
-  // Inject Save/Delete/Render buttons directly
-  const saveBtn = createFormSaveIconButton(onSave);
-  const deleteBtn = createFormDeleteIconButton(() => onDelete(filename));
-  const renderBtn = createFormRenderIconButton(onRender);
+  const buttons = await createToggleButtons(
+    {
+      save: onSave,
+      delete: () => onDelete(filename),
+      render: onRender,
+    },
+    {
+      icon: {
+        save: createFormSaveIconButton,
+        delete: createFormDeleteIconButton,
+        render: createFormRenderIconButton,
+      },
+      label: {
+        save: createFormSaveButton,
+        delete: createFormDeleteButton,
+        render: createFormRenderButton,
+      },
+    }
+  );
 
   // Wrap text + buttons in row layout
   const wrapper = document.createElement("div");
   wrapper.className = "meta-wrapper";
   wrapper.appendChild(metaText);
   wrapper.appendChild(
-    buildButtonGroup(saveBtn, deleteBtn, renderBtn, "meta-actions")
+    buildButtonGroup(
+      buttons.save,
+      buttons.delete,
+      buttons.render,
+      "meta-actions"
+    )
   );
 
   section.appendChild(wrapper);
@@ -239,7 +263,7 @@ export async function renderFormUI(
   );
   container.appendChild(flaggedInput);
 
-  const metaSection = buildMetaSection(
+  const metaSection = await buildMetaSection(
     metaData.meta || {},
     filename,
     flagged,

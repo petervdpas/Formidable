@@ -3,6 +3,7 @@
 module.exports = {
   defaults: {
     theme: "light",
+    show_icon_buttons: false,
     font_size: 14,
     logging_enabled: true,
     context_mode: "template",

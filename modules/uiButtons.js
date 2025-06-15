@@ -90,13 +90,35 @@ export function createProfileAddButton(onClick) {
   });
 }
 
+export function createFieldEditIconButton(idx, onClick) {
+  return createIconButton({
+    iconClass: "fa fa-edit",
+    className: "btn-icon btn-icon-warn",
+    identifier: "field-edit-${idx}",
+    onClick,
+    attributes: { "data-idx": idx, "data-action": "edit" },
+    ariaLabel: "Edit",
+  });
+}
+
 export function createFieldEditButton(idx, onClick) {
   return createButton({
     text: "Edit",
     className: "btn-warn",
     identifier: `field-edit-${idx}`,
     onClick,
-    attributes: { "data-idx": idx, "data-action": "edit" },
+    
+  });
+}
+
+export function createFieldDeleteIconButton(idx, onClick) {
+  return createIconButton({
+    iconClass: "fa fa-trash",
+    className: "btn-icon btn-icon-danger",
+    identifier: `field-delete-${idx}`,
+    onClick,
+    attributes: { "data-idx": idx, "data-action": "delete" },
+    ariaLabel: "Delete",
   });
 }
 
@@ -141,12 +163,32 @@ export function createTemplateAddFieldButton(onClick) {
   });
 }
 
+export function createTemplateSaveIconButton(onClick) {
+  return createIconButton({
+    iconClass: "fa fa-save",
+    className: "btn-icon btn-icon-warn",
+    identifier: "template-save",
+    onClick,
+    ariaLabel: "Save",
+  });
+}
+
 export function createTemplateSaveButton(onClick) {
   return createButton({
     text: "Save",
     className: "btn-default btn-warn",
     identifier: "template-save",
     onClick,
+  });
+}
+
+export function createTemplateDeleteIconButton(onClick) {
+  return createIconButton({
+    iconClass: "fa fa-trash",
+    className: "btn-icon btn-icon-danger",
+    identifier: "template-delete",
+    onClick,
+    ariaLabel: "Delete",
   });
 }
 
@@ -183,7 +225,7 @@ export function createFormSaveIconButton(onClick) {
     className: "btn-icon btn-icon-warn",
     identifier: "form-save-icon",
     onClick,
-    ariaLabel: "Save form",
+    ariaLabel: "Save",
   });
 }
 
@@ -202,7 +244,7 @@ export function createFormDeleteIconButton(onClick) {
     className: "btn-icon btn-icon-danger",
     identifier: "form-delete-icon",
     onClick,
-    ariaLabel: "Delete form",
+    ariaLabel: "Delete",
   });
 }
 
@@ -221,7 +263,7 @@ export function createFormRenderIconButton(onClick) {
     className: "btn-icon btn-icon-info",
     identifier: "form-render-icon",
     onClick,
-    ariaLabel: "Render form",
+    ariaLabel: "Render",
   });
 }
 
@@ -230,7 +272,7 @@ export function createFlaggedToggleButton(initialFlagged, onClick) {
     iconClass: "fa fa-flag",
     className: initialFlagged ? "btn-flagged" : "btn-unflagged",
     identifier: "form-flagged-toggle",
-    ariaLabel: initialFlagged ? "Unflag item" : "Flag item",
+    ariaLabel: initialFlagged ? "Unflag" : "Flag",
   });
 
   btn._flagged = initialFlagged;
@@ -242,7 +284,7 @@ export function createFlaggedToggleButton(initialFlagged, onClick) {
     btn.classList.toggle("btn-flagged", btn._flagged);
     btn.classList.toggle("btn-unflagged", !btn._flagged);
 
-    btn.setAttribute("aria-label", btn._flagged ? "Unflag item" : "Flag item");
+    btn.setAttribute("aria-label", btn._flagged ? "Unflag" : "Flag");
 
     if (typeof onClick === "function") {
       onClick(btn._flagged);

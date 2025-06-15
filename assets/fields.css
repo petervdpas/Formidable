@@ -135,6 +135,7 @@
 
 /* ───── Tooltip Styling ───── */
 
+/*
 [data-tooltip] {
   position: relative;
 }
@@ -142,7 +143,7 @@
 [data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
-  top: 100%; /* above the element */
+  bottom: -75%;
   left: 50%;
   transform: translateX(-50%);
   background-color: #333;
@@ -154,12 +155,13 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;
-  z-index: 9800;
+  z-index: 9999;
 }
 
 [data-tooltip]:hover::after {
   opacity: 1;
 }
+*/
 
 /* ───── Field Type Color Themes ───── */
 /* Sidebar Field List Items */

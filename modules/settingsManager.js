@@ -77,6 +77,16 @@ export async function renderSettings() {
   );
   tabGeneral.appendChild(
     createSwitch(
+      "show-icons-toggle",
+      "Icon Buttons",
+      config.show_icon_buttons ?? true,
+      null,
+      "block",
+      ["On (Experimental)", "Off"]
+    )
+  );
+  tabGeneral.appendChild(
+    createSwitch(
       "logging-toggle",
       "Enable Logging",
       config.logging_enabled,
@@ -115,12 +125,24 @@ export async function renderSettings() {
 
 function setupBindings(config) {
   const themeToggle = document.getElementById("theme-toggle");
+  const showIconsToggle = document.getElementById("show-icons-toggle");
   const loggingToggle = document.getElementById("logging-toggle");
 
   if (themeToggle) {
     initThemeToggle(themeToggle);
     EventBus.emit("theme:toggle", themeToggle.checked ? "dark" : "light");
   }
+
+  if (showIconsToggle) {
+  showIconsToggle.onchange = async () => {
+    const enabled = showIconsToggle.checked;
+    EventBus.emit("config:update", { show_icon_buttons: enabled });
+    cachedConfig = await new Promise((resolve) => {
+      EventBus.emit("config:load", (cfg) => resolve(cfg));
+    });
+    EventBus.emit("status:update", `Icon buttons ${enabled ? "enabled" : "disabled"}`);
+  };
+}
 
   if (loggingToggle) {
     loggingToggle.onchange = async () => {

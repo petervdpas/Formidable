@@ -4,9 +4,12 @@ import { setupFieldEditModal } from "./modalSetup.js";
 import { applyModalTypeClass } from "../utils/domUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 import { applyFieldAttributeDisabling } from "../utils/formUtils.js";
+import { createToggleButtons } from "../utils/iconButtonToggle.js";
 import {
   createFieldEditButton,
+  createFieldEditIconButton,
   createFieldDeleteButton,
+  createFieldDeleteIconButton,
   // createReorderUpButton,
   // createReorderDownButton,
 } from "./uiButtons.js";
@@ -223,7 +226,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
   return { setField, getField };
 }
 
-function listFields(
+async function listFields(
   listEl,
   fields,
   { onEdit, onDelete, onReorder, onUp, onDown }
@@ -242,7 +245,7 @@ function listFields(
     });
   }
 
-  fields.forEach((field, idx) => {
+  for (const [idx, field] of fields.entries()) {
     const item = document.createElement("li");
     item.className = "field-list-item";
     item.dataset.type = field.type;
@@ -271,8 +274,23 @@ function listFields(
     const actionsEl = document.createElement("div");
     actionsEl.className = "field-actions";
 
-    const btnEdit = createFieldEditButton(idx, () => onEdit?.(idx));
-    const btnDelete = createFieldDeleteButton(idx, () => onDelete?.(idx));
+    const fieldButtons = await createToggleButtons(
+      {
+        edit: () => onEdit?.(idx),
+        delete: () => onDelete?.(idx),
+      },
+      {
+        icon: {
+          edit: (cb) => createFieldEditIconButton(idx, cb),
+          delete: (cb) => createFieldDeleteIconButton(idx, cb),
+        },
+        label: {
+          edit: (cb) => createFieldEditButton(idx, cb),
+          delete: (cb) => createFieldDeleteButton(idx, cb),
+        },
+      }
+    );
+
     /*
     const btnUp = createReorderUpButton(idx, idx === 0, () => {
       if (idx > 0) onUp ? onUp(idx) : onReorder?.(idx, idx - 1);
@@ -285,13 +303,14 @@ function listFields(
     actionsEl.appendChild(btnUp);
     actionsEl.appendChild(btnDown);
     */
-    actionsEl.appendChild(btnEdit);
-    actionsEl.appendChild(btnDelete);
+
+    actionsEl.appendChild(fieldButtons.edit);
+    actionsEl.appendChild(fieldButtons.delete);
 
     item.appendChild(labelEl);
     item.appendChild(actionsEl);
     listEl.appendChild(item);
-  });
+  }
 }
 
 function createOptionsEditor(container, onChange) {

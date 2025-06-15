@@ -1,5 +1,6 @@
 {
   "theme": "light",
+  "show_icon_buttons": false,
   "font_size": 14,
   "logging_enabled": true,
   "context_mode": "storage",
@@ -9,7 +10,7 @@
   "author_name": "Regular user",
   "author_email": "regular@example.com",
   "window_bounds": {
-    "width": 1246,
+    "width": 1189,
     "height": 923,
     "x": 351,
     "y": 33
