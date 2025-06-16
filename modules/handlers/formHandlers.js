@@ -103,6 +103,9 @@ export async function handleSaveForm(payload, respond) {
 
       EventBus.emit("form:list:reload");
       setTimeout(() => EventBus.emit("form:list:highlighted", datafile), 500);
+
+      const templateName = (templateFilename || "").replace(/\.yaml$/, "");
+      EventBus.emit("vfs:refreshTemplate", { templateName: templateName });
     } else {
       EventBus.emit("status:update", `Failed to save: ${result.error}`);
 
@@ -141,6 +144,9 @@ export async function handleDeleteForm(
       if (container) {
         clearContainerUI(container);
       }
+
+      const templateName = (templateFilename || "").replace(/\.yaml$/, "");
+      EventBus.emit("vfs:refreshTemplate", { templateName: templateName });
     } else {
       EventBus.emit("status:update", "Failed to delete data file.");
     }
