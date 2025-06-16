@@ -9,8 +9,8 @@
   "selected_data_file": "sane-20250530.meta.json",
   "author_name": "Regular user",
   "author_email": "regular@example.com",
-  "use_git": true,
-  "git_root": "./",
+  "use_git": false,
+  "git_root": "",
   "window_bounds": {
     "width": 1033,
     "height": 923,
