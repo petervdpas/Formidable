@@ -21,6 +21,15 @@ button:active,
   box-shadow: var(--generic-shadow-active);
 }
 
+button:disabled,
+.btn:disabled {
+  background-color: #ddd !important;
+  border-color: #bbb !important;
+  color: #777 !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .btn-input-height {
   height: 36px !important;
   padding: 4px 10px;

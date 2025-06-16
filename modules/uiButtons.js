@@ -267,6 +267,64 @@ export function createFormRenderIconButton(onClick) {
   });
 }
 
+export function createGitCommitButton(folderPath, enabled, getMessage) {
+  return createButton({
+    text: "Commit",
+    className: "btn-info",
+    identifier: "git-commit",
+    disabled: !enabled,
+    onClick: () => {
+      const message = typeof getMessage === "function" ? getMessage() : "";
+      if (!message?.trim()) {
+        EventBus.emit("status:update", "Cannot commit: no message.");
+        return;
+      }
+
+      EventBus.emit("git:commit", {
+        folderPath,
+        message,
+        callback: (result) => {
+          EventBus.emit("status:update", result || "Commit done.");
+        },
+      });
+    },
+  });
+}
+
+export function createGitPushButton(folderPath, enabled) {
+  return createButton({
+    text: "Push",
+    className: "btn-info",
+    identifier: "git-push",
+    disabled: !enabled,
+    onClick: () => {
+      EventBus.emit("git:push", {
+        folderPath,
+        callback: (result) => {
+          EventBus.emit("status:update", result || "Push complete.");
+        },
+      });
+    },
+  });
+}
+
+export function createGitPullButton(folderPath, enabled) {
+  return createButton({
+    text: "Pull",
+    className: "btn-info",
+    identifier: "git-pull",
+    disabled: !enabled,
+    onClick: () => {
+      EventBus.emit("git:pull", {
+        folderPath,
+        callback: (result) => {
+          EventBus.emit("status:update", result || "Pull complete.");
+        },
+      });
+    },
+  });
+}
+
 export function createFlaggedToggleButton(initialFlagged, onClick) {
   const btn = createIconButton({
     iconClass: "fa fa-flag",

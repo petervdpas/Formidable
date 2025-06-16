@@ -43,7 +43,7 @@ export function createStyledSelect({
   return select;
 }
 
-export function createSettingsInput({
+export function createFormRowInput({
   id,
   label,
   value,
@@ -51,6 +51,7 @@ export function createSettingsInput({
   type = "text",
   configKey = id,
   onSave = null,
+  multiline = false,
 }) {
   const row = document.createElement("div");
   row.className = "modal-form-row";
@@ -59,8 +60,12 @@ export function createSettingsInput({
   labelEl.setAttribute("for", id);
   labelEl.textContent = label;
 
-  const input = document.createElement("input");
-  input.type = type;
+  const input = multiline
+    ? document.createElement("textarea")
+    : document.createElement("input");
+
+  if (!multiline) input.type = type;
+
   input.id = id;
   input.name = configKey;
   input.value = value || "";

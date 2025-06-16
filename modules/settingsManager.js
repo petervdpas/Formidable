@@ -7,7 +7,7 @@ import { initThemeToggle } from "./themeToggle.js";
 import {
   createDirectoryPicker,
   createSwitch,
-  createSettingsInput,
+  createFormRowInput,
 } from "../utils/elementBuilders.js";
 
 let cachedConfig = null;
@@ -43,7 +43,7 @@ export async function renderSettings() {
   tabGeneral.className = "tab-panel tab-general";
 
   tabGeneral.appendChild(
-    createSettingsInput({
+    createFormRowInput({
       id: "author-name",
       label: "Author Name",
       value: config.author_name,
@@ -53,7 +53,7 @@ export async function renderSettings() {
   );
 
   tabGeneral.appendChild(
-    createSettingsInput({
+    createFormRowInput({
       id: "author-email",
       label: "Author Email",
       value: config.author_email,
