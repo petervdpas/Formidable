@@ -170,8 +170,15 @@ export async function renderGitStatus(container) {
         EventBus.emit("git:push", {
           folderPath: absGitPath,
           callback: (result) => {
+            console.log("[GitPushResult]", result);
+
             EventBus.emit("ui:toast", {
-              message: result || "Push complete.",
+              message:
+                typeof result === "string"
+                  ? result
+                  : result?.summary
+                  ? `Pushed: ${result.summary.changes ?? "✓"} change(s)`
+                  : "Push complete.",
               variant: "success",
             });
             refresh();
@@ -183,8 +190,15 @@ export async function renderGitStatus(container) {
         EventBus.emit("git:pull", {
           folderPath: absGitPath,
           callback: (result) => {
+            console.log("[GitPullResult]", result);
+
             EventBus.emit("ui:toast", {
-              message: result || "Pull complete.",
+              message:
+                typeof result === "string"
+                  ? result
+                  : result?.files?.length
+                  ? `Pulled: ${result.files.length} file(s)`
+                  : "Pull complete.",
               variant: "success",
             });
             refresh();

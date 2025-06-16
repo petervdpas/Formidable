@@ -12,10 +12,10 @@
   "use_git": true,
   "git_root": "./",
   "window_bounds": {
-    "width": 988,
+    "width": 1374,
     "height": 923,
     "x": 153,
     "y": 37
   },
-  "git-commit-message": "Attempt 2..."
+  "git-commit-message": "Attempt 3..."
 }
