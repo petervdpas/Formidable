@@ -150,8 +150,15 @@ export async function renderGitStatus(container) {
           folderPath: absGitPath,
           message: commitMessage,
           callback: (result) => {
+            console.log("[GitResult]", result);
+
             EventBus.emit("ui:toast", {
-              message: result || "Commit complete.",
+              message:
+                typeof result === "string"
+                  ? result
+                  : result?.summary
+                  ? `Committed: ${result.summary.changes} change(s)`
+                  : "Git operation complete.",
               variant: "success",
             });
             refresh();
