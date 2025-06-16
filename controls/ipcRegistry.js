@@ -12,6 +12,7 @@ const { SingleFileRepository } = require("./sfr");
 
 const packageJson = require("../package.json");
 const fileManager = require("./fileManager");
+const gitManager = require("./gitManager");
 const templateManager = require("./templateManager");
 const formManager = require("./formManager");
 const configManager = require("./configManager");
@@ -67,6 +68,16 @@ function registerIpcHandlers() {
       version: packageJson.version,
     };
   });
+
+  // Git
+  registerIpc("is-git-repo", (e, folder) => gitManager.isGitRepo(folder));
+  registerIpc("get-git-root", (e, folder) => gitManager.getGitRoot(folder));
+  registerIpc("git-status", (e, folder) => gitManager.gitStatus(folder));
+  registerIpc("git-pull", (e, folder) => gitManager.gitPull(folder));
+  registerIpc("git-push", (e, folder) => gitManager.gitPush(folder));
+  registerIpc("git-commit", (e, folder, msg) =>
+    gitManager.gitCommit(folder, msg)
+  );
 
   // Templates
   registerIpc("list-templates", () => templateManager.listTemplates());

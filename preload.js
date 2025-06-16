@@ -4,6 +4,14 @@ const { contextBridge, ipcRenderer, dialog } = require("electron");
 
 // ---------- IPC Method Groups ----------
 const api = {
+  git: buildGroup([
+    "is-git-repo",
+    "get-git-root",
+    "git-status",
+    "git-pull",
+    "git-push",
+    "git-commit",
+  ]),
   config: buildGroup([
     "switch-user-profile",
     "list-user-profiles",

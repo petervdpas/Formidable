@@ -12,6 +12,8 @@ module.exports = {
     selected_data_file: "",
     author_name: "unknown",
     author_email: "unknown@example.com",
+    use_git: false,
+    git_root: "",
     window_bounds: {
       width: 1024,
       height: 800,

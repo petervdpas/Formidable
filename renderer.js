@@ -84,6 +84,21 @@ window.addEventListener("DOMContentLoaded", async () => {
     setStatusInfo(`User Profile: ${config.author_name}`);
   }
 
+  // ── Git Test ──
+  const contextPath = "E:/Projects/Formidable"; // is an actual git-repo!!!
+  const isRepo = await window.api.git.isGitRepo(contextPath);
+  console.log("[GitTest] isGitRepo:", isRepo);
+
+  if (isRepo) {
+    const root = await window.api.git.getGitRoot(contextPath);
+    console.log("[GitTest] Git root:", root);
+
+    const status = await window.api.git.gitStatus(contextPath);
+    console.log("[GitTest] Git status:", status);
+  } else {
+    console.warn("[GitTest] Not a Git repo");
+  }
+
   // ── Modals ──
   const profile = setupProfileModal();
   const settings = setupSettingsModal();
