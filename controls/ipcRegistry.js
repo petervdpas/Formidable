@@ -73,6 +73,9 @@ function registerIpcHandlers() {
   registerIpc("is-git-repo", (e, folder) => gitManager.isGitRepo(folder));
   registerIpc("get-git-root", (e, folder) => gitManager.getGitRoot(folder));
   registerIpc("git-status", (e, folder) => gitManager.gitStatus(folder));
+  registerIpc("git-remote-info", (e, folder) =>
+    gitManager.getRemoteInfo(folder)
+  );
   registerIpc("git-pull", (e, folder) => gitManager.gitPull(folder));
   registerIpc("git-push", (e, folder) => gitManager.gitPush(folder));
   registerIpc("git-commit", (e, folder, msg) =>

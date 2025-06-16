@@ -12,10 +12,10 @@
   "use_git": true,
   "git_root": "./",
   "window_bounds": {
-    "width": 1113,
+    "width": 988,
     "height": 923,
     "x": 153,
     "y": 37
   },
-  "git-commit-message": "New try from app itself"
+  "git-commit-message": "Again committing from withing the app"
 }

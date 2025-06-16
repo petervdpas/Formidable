@@ -41,6 +41,19 @@ export async function handleGitStatus({ folderPath, callback }) {
   }
 }
 
+export async function handleGitRemoteInfo({ folderPath, callback }) {
+  try {
+    const info = await window.api.git.gitRemoteInfo(folderPath);
+    callback?.(info);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      "[GitHandler] Failed to get remote Git info:",
+      err,
+    ]);
+    callback?.(null);
+  }
+}
+
 export async function handleGitPull({ folderPath, callback }) {
   try {
     const result = await window.api.git.gitPull(folderPath);

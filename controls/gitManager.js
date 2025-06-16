@@ -65,6 +65,13 @@ async function gitStatus(folderPath) {
   }
 }
 
+async function getRemoteInfo(folderPath) {
+  const git = simpleGit(folderPath);
+  const remotes = await git.getRemotes(true); // with URLs
+  const branches = await git.branch(['-r']); // list remote branches
+  return { remotes, remoteBranches: branches.all };
+}
+
 async function gitPull(folderPath) {
   try {
     const root = await getGitRoot(folderPath);
@@ -106,6 +113,7 @@ module.exports = {
   isGitRepo,
   getGitRoot,
   gitStatus,
+  getRemoteInfo,
   gitPull,
   gitPush,
   gitCommit,

@@ -1,0 +1,19 @@
+.git-plain-changes {
+  max-height: 140px;
+  overflow-y: auto;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  font-family: monospace;
+  font-size: 13px;
+  line-height: 1.4;
+  white-space: pre;
+  margin: 4px 0 6px;
+}
+
+.git-plain-changes .git-change-line.added     { color: green; }
+.git-plain-changes .git-change-line.deleted   { color: red; }
+.git-plain-changes .git-change-line.modified  { color: goldenrod; }
+.git-plain-changes .git-change-line.renamed   { color: #b58900; }
+.git-plain-changes .git-change-line.untracked { color: gray; }
+.git-plain-changes .git-change-line.unknown   { color: darkgray; }

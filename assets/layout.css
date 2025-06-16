@@ -101,6 +101,13 @@ body {
   overflow-y: auto;
 }
 
+.scroll-box {
+  max-height: 140px;
+  overflow-y: auto;
+  padding-left: 1em;
+  margin-bottom: 1em;
+}
+
 /* ───── List Items ───── */
 .template-item,
 .storage-item,

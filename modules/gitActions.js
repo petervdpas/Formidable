@@ -10,6 +10,31 @@ import {
 
 import { createFormRowInput } from "../utils/elementBuilders.js";
 
+// ─── Git Line Formatter ─────────────────────────────────────
+function formatGitStatusLine(file) {
+  const symbol = `${file.index || " "}${file.working_dir || " "}`.trim();
+  console.log("formatGitStatusLine", file, "→", symbol);
+
+  const cssClass =
+    symbol === "A" || symbol === "A " || symbol === " A"
+      ? "added"
+      : symbol === "D" || symbol === "D " || symbol === " D"
+      ? "deleted"
+      : symbol === "M" || symbol === "M " || symbol === " M"
+      ? "modified"
+      : symbol === "R"
+      ? "renamed"
+      : symbol === "??"
+      ? "untracked"
+      : "unknown";
+
+  const line = document.createElement("div");
+  line.className = `git-change-line ${cssClass}`;
+  line.textContent = `${symbol.padEnd(2)} ${file.path}`;
+  return line;
+}
+
+// ─── Main Git Status Renderer ───────────────────────────────
 export async function renderGitStatus(container) {
   container.innerHTML = "Loading Git status...";
 
@@ -21,7 +46,7 @@ export async function renderGitStatus(container) {
   const gitRoot = config.git_root || ".";
   const absGitPath = await window.api.system.resolvePath(appRoot, gitRoot);
 
-  const refresh = () => renderGitStatus(container); // reuse after commit/push
+  const refresh = () => renderGitStatus(container);
 
   EventBus.emit("git:status", {
     folderPath: absGitPath,
@@ -31,24 +56,64 @@ export async function renderGitStatus(container) {
         return;
       }
 
-      // ─── Git Status Summary ─────────────────────────────
+      container.innerHTML = "";
+
+      // ─── Summary ────────────────────────────────────────
       const summary = document.createElement("div");
       summary.className = "git-status-summary";
       summary.innerHTML = `
-        <p><strong>Branch:</strong> ${status.current}</p>
-        <p><strong>Tracking:</strong> ${status.tracking || "(none)"}</p>
-        <p><strong>Changes:</strong> ${status.files.length} file(s)</p>
-        <ul>
-          ${status.files
-            .map((f) => `<li>${f.path} (${f.index}/${f.working_dir})</li>`)
-            .join("")}
-        </ul>
+        <p style="margin-bottom: 0.3em;"><strong>Branch:</strong> ${
+          status.current
+        }</p>
+        <p style="margin-bottom: 0.3em;"><strong>Tracking:</strong> ${
+          status.tracking || "(none)"
+        }</p>
+        <p style="margin-bottom: 0.3em;"><strong>Changes:</strong> ${
+          status.files.length
+        } file(s)</p>
       `;
-
-      container.innerHTML = "";
       container.appendChild(summary);
 
-      // ─── Commit Message Input ───────────────────────────
+      // ─── Changes Section (Colored) ───────────────────────
+      const changesWrapper = document.createElement("div");
+      changesWrapper.className = "git-plain-changes";
+
+      if (status.files.length) {
+        for (const file of status.files) {
+          changesWrapper.appendChild(formatGitStatusLine(file));
+        }
+      } else {
+        changesWrapper.textContent = "(No changes)";
+      }
+
+      container.appendChild(changesWrapper);
+
+      // ─── Remotes Info ───────────────────────────────────
+      const remoteBox = document.createElement("div");
+      remoteBox.className = "git-remote-info";
+      remoteBox.innerHTML = `<p style="margin-bottom: 0.3em;"><strong>Remotes:</strong> <em>Loading...</em></p>`;
+      container.appendChild(remoteBox);
+
+      EventBus.emit("git:remote-info", {
+        folderPath: absGitPath,
+        callback: (info) => {
+          if (!info || !info.remotes.length) {
+            remoteBox.innerHTML = `<p><strong>Remotes:</strong> None found</p>`;
+            return;
+          }
+
+          const remoteList = info.remotes
+            .map((r) => `${r.name}: ${r.refs.fetch}`)
+            .join("<br>");
+
+          remoteBox.innerHTML = `
+            <p style="margin-bottom: 0.3em;"><strong>Remotes:</strong></p>
+            <p style="font-family: monospace; font-size: 13px; margin: 0;">${remoteList}</p>
+          `;
+        },
+      });
+
+      // ─── Commit Message Input + Buttons ─────────────────
       let commitMessage = "";
       const hasChanges = status.files.length > 0;
       const canPush = status.ahead > 0 && !hasChanges;
@@ -58,6 +123,8 @@ export async function renderGitStatus(container) {
         id: "git-commit-message",
         label: "Commit Message",
         value: "",
+        type: "textarea",
+        multiline: true,
         placeholder: "e.g. Update README and fix typos",
         onSave: (msg) => {
           commitMessage = msg.trim();
@@ -65,14 +132,13 @@ export async function renderGitStatus(container) {
         },
       });
 
-      const inputField = inputRow.querySelector("input");
+      const inputField = inputRow.querySelector("input, textarea");
       inputField.addEventListener("input", () => {
         commitMessage = inputField.value.trim();
         commitBtn.disabled = !(hasChanges && commitMessage);
       });
 
-      // ─── Buttons with external logic ─────────────────────
-      const commitBtn = createGitCommitButton(async () => {
+      const commitBtn = createGitCommitButton(() => {
         if (!commitMessage) {
           EventBus.emit("status:update", "Cannot commit: no message.");
           return;
@@ -82,7 +148,7 @@ export async function renderGitStatus(container) {
           message: commitMessage,
           callback: (result) => {
             EventBus.emit("status:update", result || "Commit complete.");
-            refresh(); // reload status
+            refresh();
           },
         });
       }, !(hasChanges && commitMessage));
@@ -92,7 +158,7 @@ export async function renderGitStatus(container) {
           folderPath: absGitPath,
           callback: (result) => {
             EventBus.emit("status:update", result || "Push complete.");
-            refresh(); // reload status
+            refresh();
           },
         });
       }, !canPush);
@@ -102,7 +168,7 @@ export async function renderGitStatus(container) {
           folderPath: absGitPath,
           callback: (result) => {
             EventBus.emit("status:update", result || "Pull complete.");
-            refresh(); // reload status
+            refresh();
           },
         });
       }, !canPull);
