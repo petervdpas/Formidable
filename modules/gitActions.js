@@ -21,6 +21,8 @@ export async function renderGitStatus(container) {
   const gitRoot = config.git_root || ".";
   const absGitPath = await window.api.system.resolvePath(appRoot, gitRoot);
 
+  const refresh = () => renderGitStatus(container); // reuse after commit/push
+
   EventBus.emit("git:status", {
     folderPath: absGitPath,
     callback: (status) => {
@@ -42,6 +44,7 @@ export async function renderGitStatus(container) {
             .join("")}
         </ul>
       `;
+
       container.innerHTML = "";
       container.appendChild(summary);
 
@@ -51,17 +54,14 @@ export async function renderGitStatus(container) {
       const canPush = status.ahead > 0 && !hasChanges;
       const canPull = status.behind > 0;
 
-      const commitBtn = createGitCommitButton(absGitPath, false, () => commitMessage);
-      const pushBtn = createGitPushButton(absGitPath, canPush);
-      const pullBtn = createGitPullButton(absGitPath, canPull);
-
       const inputRow = createFormRowInput({
         id: "git-commit-message",
         label: "Commit Message",
         value: "",
         placeholder: "e.g. Update README and fix typos",
         onSave: (msg) => {
-          commitMessage = msg;
+          commitMessage = msg.trim();
+          commitBtn.disabled = !(hasChanges && commitMessage);
         },
       });
 
@@ -70,6 +70,42 @@ export async function renderGitStatus(container) {
         commitMessage = inputField.value.trim();
         commitBtn.disabled = !(hasChanges && commitMessage);
       });
+
+      // ─── Buttons with external logic ─────────────────────
+      const commitBtn = createGitCommitButton(async () => {
+        if (!commitMessage) {
+          EventBus.emit("status:update", "Cannot commit: no message.");
+          return;
+        }
+        EventBus.emit("git:commit", {
+          folderPath: absGitPath,
+          message: commitMessage,
+          callback: (result) => {
+            EventBus.emit("status:update", result || "Commit complete.");
+            refresh(); // reload status
+          },
+        });
+      }, !(hasChanges && commitMessage));
+
+      const pushBtn = createGitPushButton(() => {
+        EventBus.emit("git:push", {
+          folderPath: absGitPath,
+          callback: (result) => {
+            EventBus.emit("status:update", result || "Push complete.");
+            refresh(); // reload status
+          },
+        });
+      }, !canPush);
+
+      const pullBtn = createGitPullButton(() => {
+        EventBus.emit("git:pull", {
+          folderPath: absGitPath,
+          callback: (result) => {
+            EventBus.emit("status:update", result || "Pull complete.");
+            refresh(); // reload status
+          },
+        });
+      }, !canPull);
 
       container.appendChild(inputRow);
       container.appendChild(buildButtonGroup(commitBtn, pushBtn, pullBtn));

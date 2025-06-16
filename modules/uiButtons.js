@@ -267,61 +267,36 @@ export function createFormRenderIconButton(onClick) {
   });
 }
 
-export function createGitCommitButton(folderPath, enabled, getMessage) {
+export function createGitCommitButton(onClick, disabled = false) {
   return createButton({
     text: "Commit",
     className: "btn-info",
     identifier: "git-commit",
-    disabled: !enabled,
-    onClick: () => {
-      const message = typeof getMessage === "function" ? getMessage() : "";
-      if (!message?.trim()) {
-        EventBus.emit("status:update", "Cannot commit: no message.");
-        return;
-      }
-
-      EventBus.emit("git:commit", {
-        folderPath,
-        message,
-        callback: (result) => {
-          EventBus.emit("status:update", result || "Commit done.");
-        },
-      });
-    },
+    onClick,
+    disabled,
+    ariaLabel: "Commit changes",
   });
 }
 
-export function createGitPushButton(folderPath, enabled) {
+export function createGitPushButton(onClick, disabled = false) {
   return createButton({
     text: "Push",
     className: "btn-info",
     identifier: "git-push",
-    disabled: !enabled,
-    onClick: () => {
-      EventBus.emit("git:push", {
-        folderPath,
-        callback: (result) => {
-          EventBus.emit("status:update", result || "Push complete.");
-        },
-      });
-    },
+    onClick,
+    disabled,
+    ariaLabel: "Push to remote",
   });
 }
 
-export function createGitPullButton(folderPath, enabled) {
+export function createGitPullButton(onClick, disabled = false) {
   return createButton({
     text: "Pull",
     className: "btn-info",
     identifier: "git-pull",
-    disabled: !enabled,
-    onClick: () => {
-      EventBus.emit("git:pull", {
-        folderPath,
-        callback: (result) => {
-          EventBus.emit("status:update", result || "Pull complete.");
-        },
-      });
-    },
+    onClick,
+    disabled,
+    ariaLabel: "Pull from remote",
   });
 }
 
