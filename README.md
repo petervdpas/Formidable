@@ -42,7 +42,7 @@
 - **🧠 Event-Driven Architecture**
   - Built on a custom global EventBus (`modules/eventBus.js`) to decouple logic.
   - Dynamic context switching, menu events, and form/template syncing.
-
+--Git
 ---
 
 ## 🧠 Template Syntax
