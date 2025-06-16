@@ -12,10 +12,10 @@
   "use_git": true,
   "git_root": "./",
   "window_bounds": {
-    "width": 1374,
+    "width": 1033,
     "height": 923,
     "x": 153,
     "y": 37
   },
-  "git-commit-message": "Attempt 3..."
+  "git-commit-message": "Tested pull from git actions in Formidable... works!"
 }

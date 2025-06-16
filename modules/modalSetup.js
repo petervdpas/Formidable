@@ -93,7 +93,7 @@ export function setupGitModal() {
     closeBtn: "git-actions-close",
     escToClose: true,
     backdropClick: true,
-    width: "30em",
+    width: "40em",
     height: "auto",
     onOpen: async () => {
       const container = document.getElementById("git-modal-body");
