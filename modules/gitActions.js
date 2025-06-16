@@ -140,14 +140,20 @@ export async function renderGitStatus(container) {
 
       const commitBtn = createGitCommitButton(() => {
         if (!commitMessage) {
-          EventBus.emit("status:update", "Cannot commit: no message.");
+          EventBus.emit("ui:toast", {
+            message: "Cannot commit: no message.",
+            variant: "warning",
+          });
           return;
         }
         EventBus.emit("git:commit", {
           folderPath: absGitPath,
           message: commitMessage,
           callback: (result) => {
-            EventBus.emit("status:update", result || "Commit complete.");
+            EventBus.emit("ui:toast", {
+              message: result || "Commit complete.",
+              variant: "success",
+            });
             refresh();
           },
         });
@@ -157,7 +163,10 @@ export async function renderGitStatus(container) {
         EventBus.emit("git:push", {
           folderPath: absGitPath,
           callback: (result) => {
-            EventBus.emit("status:update", result || "Push complete.");
+            EventBus.emit("ui:toast", {
+              message: result || "Push complete.",
+              variant: "success",
+            });
             refresh();
           },
         });
@@ -167,7 +176,10 @@ export async function renderGitStatus(container) {
         EventBus.emit("git:pull", {
           folderPath: absGitPath,
           callback: (result) => {
-            EventBus.emit("status:update", result || "Pull complete.");
+            EventBus.emit("ui:toast", {
+              message: result || "Pull complete.",
+              variant: "success",
+            });
             refresh();
           },
         });
