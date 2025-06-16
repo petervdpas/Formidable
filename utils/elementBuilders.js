@@ -73,8 +73,6 @@ export function createFormRowInput({
 
   input.onchange = async () => {
     const newVal = input.value.trim();
-    EventBus.emit("config:update", { [configKey]: newVal });
-
     if (onSave) onSave(newVal);
     else EventBus.emit("status:update", `${label} set to ${newVal}`);
   };
