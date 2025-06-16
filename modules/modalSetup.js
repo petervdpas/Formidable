@@ -87,6 +87,55 @@ export function setupWorkspaceModal() {
   });
 }
 
+export function setupGitModal() {
+  return setupModal("git-modal", {
+    closeBtn: "git-close",
+    escToClose: true,
+    backdropClick: true,
+    width: "30em",
+    height: "auto",
+    onOpen: async () => {
+      const container = document.getElementById("git-modal-body");
+      if (!container) return;
+
+      container.innerHTML = "Loading Git status...";
+
+      const config = await new Promise((resolve) => {
+        EventBus.emit("config:load", (cfg) => resolve(cfg));
+      });
+
+      const appRoot = await window.api.system.getAppRoot?.();
+      const gitRoot = config.git_root || ".";
+      const absGitPath = await window.api.system.resolvePath(appRoot, gitRoot);
+
+      EventBus.emit("git:status", {
+        folderPath: absGitPath,
+        callback: (status) => {
+          if (!status) {
+            container.innerHTML = `<p>⚠️ Failed to fetch Git status.</p>`;
+            return;
+          }
+
+          container.innerHTML = `
+            <div class="git-status-summary">
+              <p><strong>Branch:</strong> ${status.current}</p>
+              <p><strong>Tracking:</strong> ${status.tracking || "(none)"}</p>
+              <p><strong>Changes:</strong> ${status.files.length} file(s)</p>
+              <ul>
+                ${status.files
+                  .map(
+                    (f) => `<li>${f.path} (${f.index}/${f.working_dir})</li>`
+                  )
+                  .join("")}
+              </ul>
+            </div>
+          `;
+        },
+      });
+    },
+  });
+}
+
 export function setupEntryModal() {
   return setupModal("entry-modal", {
     closeBtn: "entry-cancel",

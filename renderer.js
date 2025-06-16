@@ -19,6 +19,7 @@ import {
   setupWorkspaceModal,
   setupEntryModal,
   setupTemplateModal,
+  setupGitModal,
   setupAboutModal,
 } from "./modules/modalSetup.js";
 
@@ -105,11 +106,13 @@ window.addEventListener("DOMContentLoaded", async () => {
   const workspaceModal = setupWorkspaceModal();
   const entryInputModal = setupEntryModal();
   const templateModal = setupTemplateModal();
+  const gitModal = setupGitModal();
   const aboutModal = setupAboutModal();
 
   window.openProfileModal = profile.show;
   window.openSettingsModal = settings.show;
   window.openWorkspaceModal = workspaceModal.show;
+  window.openGitModal = gitModal.show;
   window.openAboutModal = aboutModal.show;
 
   // ── Form System ──

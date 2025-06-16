@@ -4,6 +4,7 @@ import { EventBus } from "./eventBus.js";
 
 import * as cacheHandler from "./handlers/cacheHandler.js";
 import * as vfsHandler from "./handlers/vfsHandler.js";
+import * as gitHandler from "./handlers/gitHandler.js";
 import * as bootHandlers from "./handlers/bootHandlers.js";
 import * as configHandler from "./handlers/configHandler.js";
 import * as screenHandlers from "./handlers/screenHandlers.js";
@@ -188,6 +189,22 @@ export function initEventRouter() {
   EventBus.on("transform:markdown", transformHandler.handleRenderMarkdown);
   EventBus.on("transform:html", transformHandler.handleRenderHtml);
 
+  // Git events
+  EventBus.off("git:check", gitHandler.handleGitCheckRepo);
+  EventBus.off("git:root", gitHandler.handleGitGetRoot);
+  EventBus.off("git:status", gitHandler.handleGitStatus);
+  EventBus.off("git:pull", gitHandler.handleGitPull);
+  EventBus.off("git:push", gitHandler.handleGitPush);
+  EventBus.off("git:commit", gitHandler.handleGitCommit);
+
+  EventBus.on("git:check", gitHandler.handleGitCheckRepo);
+  EventBus.on("git:root", gitHandler.handleGitGetRoot);
+  EventBus.on("git:status", gitHandler.handleGitStatus);
+  EventBus.on("git:pull", gitHandler.handleGitPull);
+  EventBus.on("git:push", gitHandler.handleGitPush);
+  EventBus.on("git:commit", gitHandler.handleGitCommit);
+
+  // Cache events
   EventBus.off("cache:init", cacheHandler.initCache);
   EventBus.off("cache:loadFromDisk", cacheHandler.handleCacheLoadFromDisk);
   EventBus.off("cache:saveToDisk", cacheHandler.handleCacheSaveToDisk);
@@ -212,6 +229,7 @@ export function initEventRouter() {
   EventBus.on("cache:delete", cacheHandler.handleCacheDelete);
   EventBus.on("cache:clear", cacheHandler.handleCacheClear);
 
+  // VFS events
   EventBus.off("vfs:init", vfsHandler.initVFS);
   EventBus.off("vfs:clear", vfsHandler.clearVFS);
   EventBus.off("vfs:reload", vfsHandler.reloadVFS);

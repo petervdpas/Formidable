@@ -26,7 +26,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   const menuBar = document.createElement("ul");
   menuBar.className = "menu-bar";
 
-  // Menu structure
+  // Base menu items
   menuBar.append(
     createMenuGroup("File", [
       { label: "Open Template Folder", action: "open-template-folder" },
@@ -38,14 +38,29 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
       { label: "Switch Profile...", action: "open-profile-switcher" },
       { label: "Settings...", action: "open-settings" },
       { label: "Workspace...", action: "open-workspace-settings" },
-    ]),
+    ])
+  );
+
+  // Add Git menu option before Help (if enabled)
+  if (cachedConfig.use_git) {
+    menuBar.append(
+      createMenuGroup("Git", [
+        { label: "Git Actions...", action: "open-git-modal" },
+      ])
+    );
+  }
+
+  // Append View and Help last
+  menuBar.append(
     createMenuGroup("View", [
       { label: "Reload", action: "reload" },
       { label: "Toggle DevTools", action: "devtools" },
     ]),
-    createMenuGroup("Help", [{ label: "About", action: "about" }]),
-    createContextToggleItem()
+    createMenuGroup("Help", [{ label: "About", action: "about" }])
   );
+
+  // Always add the context mode toggle
+  menuBar.append(createContextToggleItem());
 
   container.innerHTML = "";
   container.appendChild(menuBar);
@@ -203,6 +218,11 @@ export async function handleMenuAction(action) {
     case "open-workspace-settings":
       EventBus.emit("logging:default", ["[Menu] Opening workspace modal..."]);
       window.openWorkspaceModal?.();
+      break;
+
+    case "open-git-modal":
+      EventBus.emit("logging:default", ["[Menu] Opening Git modal..."]);
+      window.openGitModal?.();
       break;
 
     case "about":
