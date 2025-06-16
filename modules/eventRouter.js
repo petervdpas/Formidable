@@ -77,6 +77,14 @@ export function initEventRouter() {
     configHandler.handleGetTemplateStoragePath
   );
   EventBus.off(
+    "config:template:singleEntry",
+    configHandler.handleGetSingleTemplateEntry
+  );
+  EventBus.on(
+    "config:template:singleEntry",
+    configHandler.handleGetSingleTemplateEntry
+  );
+  EventBus.off(
     "config:profile:current",
     configHandler.handleGetCurrentProfileFilename
   );
@@ -209,12 +217,14 @@ export function initEventRouter() {
   EventBus.off("vfs:reload", vfsHandler.reloadVFS);
   EventBus.off("vfs:update", vfsHandler.updateVFSKey);
   EventBus.off("vfs:delete", vfsHandler.deleteVFSKey);
+  EventBus.off("vfs:refreshTemplate", vfsHandler.refreshTemplateEntry);
 
   EventBus.on("vfs:init", vfsHandler.initVFS);
   EventBus.on("vfs:clear", vfsHandler.clearVFS);
   EventBus.on("vfs:reload", vfsHandler.reloadVFS);
   EventBus.on("vfs:update", vfsHandler.updateVFSKey);
   EventBus.on("vfs:delete", vfsHandler.deleteVFSKey);
+  EventBus.on("vfs:refreshTemplate", vfsHandler.refreshTemplateEntry);
 
   EventBus.off("boot:initialize", bootHandlers.initializeFromConfig);
   EventBus.on("boot:initialize", async (config) => {

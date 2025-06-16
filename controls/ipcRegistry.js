@@ -164,6 +164,9 @@ function registerIpcHandlers() {
   registerIpc("get-template-image-files", (e, templateFilename) =>
     configManager.getTemplateImageFiles(templateFilename)
   );
+  registerIpc("get-single-template-entry", (e, templateFilename) =>
+    configManager.getSingleTemplateEntry(templateFilename)
+  );
 
   // Render
   registerIpc("render-markdown-template", (e, data, yaml) =>

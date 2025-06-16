@@ -307,6 +307,41 @@ function getTemplateImageFiles(templateFilename) {
   return info?.imageFiles || [];
 }
 
+function getSingleTemplateEntry(templateName) {
+  if (!templateName) return null;
+
+  const config = loadUserConfig();
+  const base = fileManager.resolvePath(config.context_folder || "./");
+  const storagePath = fileManager.joinPath(base, "storage");
+  const templateStoragePath = fileManager.joinPath(storagePath, templateName);
+  const imagesPath = fileManager.joinPath(templateStoragePath, "images");
+
+  fileManager.ensureDirectory(templateStoragePath, {
+    label: `Storage<${templateName}>`,
+    silent: true,
+  });
+
+  fileManager.ensureDirectory(imagesPath, {
+    label: `Images<${templateName}>`,
+    silent: true,
+  });
+
+  const metaFiles = fileManager.listFilesByExtension(templateStoragePath, ".meta.json", {
+    silent: true,
+  });
+
+  const imageFiles = fileManager.listFiles(imagesPath, { silent: true });
+
+  return {
+    id: `template:${templateName}`,
+    name: templateName,
+    filename: `${templateName}.yaml`,
+    path: templateStoragePath,
+    metaFiles,
+    imageFiles,
+  };
+}
+
 // ─────────────────────────────────────────────
 // Exports
 // ─────────────────────────────────────────────
@@ -326,4 +361,5 @@ module.exports = {
   getTemplateStoragePath,
   getTemplateMetaFiles,
   getTemplateImageFiles,
+  getSingleTemplateEntry,
 };

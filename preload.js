@@ -19,6 +19,7 @@ const api = {
     "get-template-storage-folder",
     "get-template-meta-files",
     "get-template-image-files",
+    "get-single-template-entry",
   ]),
   templates: buildGroup([
     "list-templates",

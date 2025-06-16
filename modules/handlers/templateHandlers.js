@@ -94,13 +94,14 @@ export async function handleLoadTemplate({ name, callback }) {
 export async function handleSaveTemplate({ name, data, callback }) {
   try {
     const result = await window.api.templates.saveTemplate(name, data);
-
     if (result) {
       EventBus.emit("status:update", `Saved template: ${name}`);
+
+      const templateName = name.replace(/\.yaml$/, "");
+      EventBus.emit("vfs:refreshTemplate", { templateName });
     } else {
       EventBus.emit("status:update", `Failed to save template: ${name}`);
     }
-
     callback?.(result);
   } catch (err) {
     EventBus.emit("logging:error", [
@@ -115,6 +116,13 @@ export async function handleSaveTemplate({ name, data, callback }) {
 export async function handleDeleteTemplate({ name, callback }) {
   try {
     const result = await window.api.templates.deleteTemplate(name);
+    if (result) {
+      const templateName = name.replace(/\.yaml$/, "");
+      EventBus.emit("cache:delete", {
+        storeName: "vfs",
+        key: `template:${templateName}`,
+      });
+    }
     callback?.(result);
   } catch (err) {
     EventBus.emit("logging:error", [

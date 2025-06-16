@@ -182,3 +182,45 @@ export async function clearVFS() {
     EventBus.emit("logging:error", ["[VFSHandler] Failed to clear VFS:", err]);
   }
 }
+
+// ─────────────────────────────────────────────
+// Specialized: Refresh a single template entry
+// ─────────────────────────────────────────────
+export async function refreshTemplateEntry({ templateName }) {
+  if (!templateName) {
+    EventBus.emit("logging:warning", [
+      "[VFSHandler] refreshTemplateEntry called without templateName.",
+    ]);
+    return;
+  }
+
+  try {
+    const entry = await new Promise((resolve) => {
+      EventBus.emit("config:template:singleEntry", {
+        templateName,
+        callback: resolve,
+      });
+    });
+
+    if (!entry) {
+      EventBus.emit("logging:warning", [
+        `[VFSHandler] No entry returned for template "${templateName}".`,
+      ]);
+      return;
+    }
+
+    await EventBus.emit("cache:put", {
+      storeName: "vfs",
+      item: entry,
+    });
+
+    EventBus.emit("logging:default", [
+      `[VFSHandler] Refreshed VFS entry: template:${templateName}`,
+    ]);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[VFSHandler] Failed to refresh template entry "${templateName}":`,
+      err,
+    ]);
+  }
+}

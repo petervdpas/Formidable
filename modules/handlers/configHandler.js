@@ -96,6 +96,19 @@ export async function handleGetTemplateStoragePath({
   }
 }
 
+export async function handleGetSingleTemplateEntry({ templateName, callback }) {
+  try {
+    const entry = await window.api.config.getSingleTemplateEntry(templateName);
+    callback?.(entry);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[ConfigHandler] Failed to get single template entry: ${templateName}`,
+      err,
+    ]);
+    callback?.(null);
+  }
+}
+
 export async function handleListProfiles({ callback }) {
   try {
     const profiles = await window.api.config.listUserProfiles();
