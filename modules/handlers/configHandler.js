@@ -51,6 +51,20 @@ export async function handleConfigUpdate(partial) {
       });
     }
 
+    if (partial.context_folder) {
+      await EventBus.emit("vfs:update", {
+        id: "context:folder",
+        value: partial.context_folder,
+      });
+    }
+
+    if (partial.git_root) {
+      await EventBus.emit("vfs:update", {
+        id: "git:root",
+        value: partial.git_root,
+      });
+    }
+
     if (partial.theme) {
       EventBus.emit("theme:toggle", partial.theme);
     }

@@ -87,20 +87,35 @@ export function createDirectoryPicker({
   outerClass = "modal-form-row tight-gap",
   placeholder = "",
   readOnly = true,
+  enabled = true,
 }) {
-  return `
-    <div class="${outerClass} directory-picker">
-      <label for="${id}">${label}</label>
-        <input
-          type="text"
-          id="${id}"
-          value="${value}"
-          ${placeholder ? `placeholder="${placeholder}"` : ""}
-          ${readOnly ? "readonly" : ""}
-        />
-        <button id="choose-${id}" class="btn btn-info btn-input-height">${buttonText}</button>
-    </div>
-  `;
+  const wrapper = document.createElement("div");
+  wrapper.className = `${outerClass} directory-picker`;
+  if (!enabled) wrapper.classList.add("disabled");
+
+  const labelEl = document.createElement("label");
+  labelEl.setAttribute("for", id);
+  labelEl.textContent = label;
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.id = id;
+  input.value = value;
+  if (placeholder) input.placeholder = placeholder;
+  if (readOnly) input.readOnly = true;
+  input.disabled = !enabled;
+
+  const button = document.createElement("button");
+  button.id = `choose-${id}`;
+  button.className = "btn btn-info btn-input-height";
+  button.textContent = buttonText;
+  button.disabled = !enabled;
+
+  wrapper.appendChild(labelEl);
+  wrapper.appendChild(input);
+  wrapper.appendChild(button);
+
+  return { element: wrapper, input, button };
 }
 
 export function populateSelectOptions(
@@ -220,7 +235,7 @@ export function buildSwitchElement({
     container.appendChild(trailing);
   }
 
-  // ⚠ wait for DOM attachment before resolving label
+  // wait for DOM attachment before resolving label
   requestAnimationFrame(() => {
     if (trailing) {
       trailing.textContent = input.checked

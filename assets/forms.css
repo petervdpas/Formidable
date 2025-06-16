@@ -92,6 +92,27 @@ label small {
   align-items: center;
 }
 
+/* ───── Directory Picker ───── */
+.directory-picker.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.directory-picker.disabled input,
+.directory-picker.disabled button {
+  cursor: not-allowed;
+}
+
+.directory-picker.disabled input {
+  background-color: #f2f2f2;
+  color: #aaa;
+}
+
+.directory-picker.disabled button {
+  background-color: #ddd;
+  border-color: #ccc;
+}
+
 @media (max-width: 600px) {
   .form-row.two-column {
     flex-direction: column;

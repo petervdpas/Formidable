@@ -42,7 +42,6 @@ export async function renderSettings() {
   const tabGeneral = document.createElement("div");
   tabGeneral.className = "tab-panel tab-general";
 
-  // Author fields via helper
   tabGeneral.appendChild(
     createSettingsInput({
       id: "author-name",
@@ -64,7 +63,6 @@ export async function renderSettings() {
     })
   );
 
-  // Theme + Logging switches
   tabGeneral.appendChild(
     createSwitch(
       "theme-toggle",
@@ -75,6 +73,7 @@ export async function renderSettings() {
       ["On", "Off"]
     )
   );
+
   tabGeneral.appendChild(
     createSwitch(
       "show-icons-toggle",
@@ -85,6 +84,7 @@ export async function renderSettings() {
       ["On (Experimental)", "Off"]
     )
   );
+
   tabGeneral.appendChild(
     createSwitch(
       "logging-toggle",
@@ -99,15 +99,38 @@ export async function renderSettings() {
   // ─── Directories ──────────────────────
   const tabDirs = document.createElement("div");
   tabDirs.className = "tab-panel tab-dirs";
-  tabDirs.innerHTML = `
-    ${createDirectoryPicker({
-      id: "settings-context-folder",
-      label: "Context Folder",
-      value: config.context_folder || "./",
-    })}
-  `;
 
-  // Inject tabs
+  const contextFolderPicker = createDirectoryPicker({
+    id: "settings-context-folder",
+    label: "Context Folder",
+    value: config.context_folder || "./",
+  });
+  tabDirs.appendChild(contextFolderPicker.element);
+
+  const useGitSwitch = createSwitch(
+    "settings-use-git",
+    "Use Git Repository",
+    config.use_git ?? false,
+    null,
+    "block",
+    ["Enabled", "Disabled"]
+  );
+  tabDirs.appendChild(useGitSwitch);
+
+  const gitRootPicker = createDirectoryPicker({
+    id: "settings-git-root",
+    label: "Git Root Directory",
+    value: config.git_root || "",
+  });
+  tabDirs.appendChild(gitRootPicker.element);
+
+  // Disable Git picker initially if not enabled
+  const isGitEnabled = config.use_git === true;
+  gitRootPicker.input.disabled = !isGitEnabled;
+  gitRootPicker.button.disabled = !isGitEnabled;
+  gitRootPicker.element.classList.toggle("disabled", !isGitEnabled);
+
+  // Inject tabs and setup bindings
   container.appendChild(tabButtons);
   container.appendChild(tabGeneral);
   container.appendChild(tabDirs);
@@ -119,38 +142,36 @@ export async function renderSettings() {
     },
   });
 
-  setupBindings(config);
+  setupBindings(config, gitRootPicker);
   return true;
 }
 
-function setupBindings(config) {
+function setupBindings(config, gitRootPicker) {
   const themeToggle = document.getElementById("theme-toggle");
-  const showIconsToggle = document.getElementById("show-icons-toggle");
-  const loggingToggle = document.getElementById("logging-toggle");
-
   if (themeToggle) {
     initThemeToggle(themeToggle);
     EventBus.emit("theme:toggle", themeToggle.checked ? "dark" : "light");
   }
 
+  const showIconsToggle = document.getElementById("show-icons-toggle");
   if (showIconsToggle) {
-  showIconsToggle.onchange = async () => {
-    const enabled = showIconsToggle.checked;
-    EventBus.emit("config:update", { show_icon_buttons: enabled });
-    cachedConfig = await new Promise((resolve) => {
-      EventBus.emit("config:load", (cfg) => resolve(cfg));
-    });
-    EventBus.emit("status:update", `Icon buttons ${enabled ? "enabled" : "disabled"}`);
-  };
-}
+    showIconsToggle.onchange = async () => {
+      const enabled = showIconsToggle.checked;
+      EventBus.emit("config:update", { show_icon_buttons: enabled });
+      cachedConfig = await reloadConfig();
+      EventBus.emit(
+        "status:update",
+        `Icon buttons ${enabled ? "enabled" : "disabled"}`
+      );
+    };
+  }
 
+  const loggingToggle = document.getElementById("logging-toggle");
   if (loggingToggle) {
     loggingToggle.onchange = async () => {
       const enabled = loggingToggle.checked;
       EventBus.emit("config:update", { logging_enabled: enabled });
-      cachedConfig = await new Promise((resolve) => {
-        EventBus.emit("config:load", (cfg) => resolve(cfg));
-      });
+      cachedConfig = await reloadConfig();
       EventBus.emit("logging:toggle", enabled);
       EventBus.emit(
         "status:update",
@@ -159,14 +180,39 @@ function setupBindings(config) {
     };
   }
 
-  bindDirButton(
-    "settings-context-folder",
-    "context_folder",
-    "context:folder:changed"
-  );
+  const useGitToggle = document.getElementById("settings-use-git");
+  if (useGitToggle) {
+    useGitToggle.onchange = async () => {
+      const enabled = useGitToggle.checked;
+      await EventBus.emit("config:update", { use_git: enabled });
+      if (!enabled) {
+        gitRootPicker.input.value = "";
+        await EventBus.emit("config:update", { git_root: "" });
+      }
+
+      gitRootPicker.input.disabled = !enabled;
+      gitRootPicker.button.disabled = !enabled;
+      gitRootPicker.element.classList.toggle("disabled", !enabled);
+
+      cachedConfig = await reloadConfig();
+      EventBus.emit(
+        "status:update",
+        `Git usage ${enabled ? "enabled" : "disabled"}`
+      );
+    };
+  }
+
+  bindDirButton("settings-context-folder", "context_folder");
+  bindDirButton("settings-git-root", "git_root");
 }
 
-function bindDirButton(fieldId, configKey, reloadEvent) {
+async function reloadConfig() {
+  return new Promise((resolve) => {
+    EventBus.emit("config:load", (cfg) => resolve(cfg));
+  });
+}
+
+function bindDirButton(fieldId, configKey) {
   const input = document.getElementById(fieldId);
   const button = document.getElementById(`choose-${fieldId}`);
   if (!input || !button) return;
@@ -179,14 +225,9 @@ function bindDirButton(fieldId, configKey, reloadEvent) {
     const relative = formatAsRelativePath(selected, appRoot);
 
     input.value = relative;
-
-    EventBus.emit("config:update", { [configKey]: relative });
-
-    cachedConfig = await new Promise((resolve) => {
-      EventBus.emit("config:load", (cfg) => resolve(cfg));
-    });
+    await EventBus.emit("config:update", { [configKey]: relative });
+    cachedConfig = await reloadConfig();
 
     EventBus.emit("status:update", `Updated ${configKey}: ${relative}`);
-    if (reloadEvent) EventBus.emit(reloadEvent);
   };
 }
