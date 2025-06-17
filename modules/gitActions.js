@@ -42,14 +42,12 @@ export async function renderGitStatus(container) {
     EventBus.emit("config:load", (cfg) => resolve(cfg));
   });
 
-  const appRoot = await window.api.system.getAppRoot?.();
-  const gitRoot = config.git_root || ".";
-  const absGitPath = await window.api.system.resolvePath(appRoot, gitRoot);
+  const gitPath = config.git_root || ".";
 
   const refresh = () => renderGitStatus(container);
 
   EventBus.emit("git:status", {
-    folderPath: absGitPath,
+    folderPath: gitPath,
     callback: (status) => {
       if (!status) {
         container.innerHTML = `<p>⚠️ Failed to fetch Git status.</p>`;
@@ -95,7 +93,7 @@ export async function renderGitStatus(container) {
       container.appendChild(remoteBox);
 
       EventBus.emit("git:remote-info", {
-        folderPath: absGitPath,
+        folderPath: gitPath,
         callback: (info) => {
           if (!info || !info.remotes.length) {
             remoteBox.innerHTML = `<p><strong>Remotes:</strong> None found</p>`;
@@ -147,7 +145,7 @@ export async function renderGitStatus(container) {
           return;
         }
         EventBus.emit("git:commit", {
-          folderPath: absGitPath,
+          folderPath: gitPath,
           message: commitMessage,
           callback: (result) => {
             console.log("[GitResult]", result);
@@ -168,7 +166,7 @@ export async function renderGitStatus(container) {
 
       const pushBtn = createGitPushButton(() => {
         EventBus.emit("git:push", {
-          folderPath: absGitPath,
+          folderPath: gitPath,
           callback: (result) => {
             console.log("[GitPushResult]", result);
 
@@ -188,7 +186,7 @@ export async function renderGitStatus(container) {
 
       const pullBtn = createGitPullButton(() => {
         EventBus.emit("git:pull", {
-          folderPath: absGitPath,
+          folderPath: gitPath,
           callback: (result) => {
             console.log("[GitPullResult]", result);
 

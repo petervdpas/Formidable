@@ -8,6 +8,8 @@ const gitConfigCache = new Set();
 
 async function getGitInstance(folderPath) {
   const absPath = fileManager.resolvePath(folderPath);
+  log("[GitManager] getGitInstance for:", folderPath, " > ", absPath);
+
   const git = simpleGit(absPath);
 
   if (!gitConfigCache.has(absPath)) {
@@ -63,7 +65,7 @@ async function gitStatus(folderPath) {
       current: status.current,
       ahead: status.ahead,
       behind: status.behind,
-      files: status.files.map(f => ({
+      files: status.files.map((f) => ({
         path: f.path,
         index: f.index,
         working_dir: f.working_dir,
