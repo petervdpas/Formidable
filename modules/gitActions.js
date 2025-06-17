@@ -101,7 +101,10 @@ export async function renderGitStatus(container) {
           }
 
           const remoteList = info.remotes
-            .map((r) => `${r.name}: ${r.refs.fetch}`)
+            .map((r) => {
+              const decodedUrl = decodeURIComponent(r.refs.fetch);
+              return `${r.name}: ${decodedUrl}`;
+            })
             .join("<br>");
 
           remoteBox.innerHTML = `

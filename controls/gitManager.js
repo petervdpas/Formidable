@@ -8,8 +8,6 @@ const gitConfigCache = new Set();
 
 async function getGitInstance(folderPath) {
   const absPath = fileManager.resolvePath(folderPath);
-  log("[GitManager] getGitInstance for:", folderPath, " > ", absPath);
-
   const git = simpleGit(absPath);
 
   if (!gitConfigCache.has(absPath)) {
