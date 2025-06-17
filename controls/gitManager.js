@@ -4,10 +4,20 @@ const fileManager = require("./fileManager");
 const simpleGit = require("simple-git");
 const { log, warn, error } = require("./nodeLogger");
 
+function getGitInstance(folderPath) {
+  const absPath = fileManager.resolvePath(folderPath);
+  const git = simpleGit(absPath);
+
+  // Inject proper Azure DevOps auth support
+  git.addConfig('credential.helper', 'manager-core');
+  git.addConfig('credential.useHttpPath', 'true');
+
+  return git;
+}
+
 async function isGitRepo(folderPath) {
   try {
-    const absPath = fileManager.resolvePath(folderPath);
-    const git = simpleGit(absPath);
+    const git = getGitInstance(folderPath);
     return await git.checkIsRepo("root");
   } catch (err) {
     warn("[GitManager] Git check failed:", err);
@@ -17,19 +27,13 @@ async function isGitRepo(folderPath) {
 
 async function getGitRoot(folderPath) {
   try {
-    const absPath = fileManager.resolvePath(folderPath);
-    const git = simpleGit(absPath);
+    const git = getGitInstance(folderPath);
     const root = await git.revparse(["--show-toplevel"]);
     return root.trim();
   } catch (err) {
     warn("[GitManager] Could not resolve Git root:", err);
     return null;
   }
-}
-
-function getGitInstance(folderPath) {
-  const absPath = fileManager.resolvePath(folderPath);
-  return simpleGit(absPath);
 }
 
 async function gitStatus(folderPath) {
@@ -66,7 +70,7 @@ async function gitStatus(folderPath) {
 }
 
 async function getRemoteInfo(folderPath) {
-  const git = simpleGit(folderPath);
+  const git = getGitInstance(folderPath);
   const remotes = await git.getRemotes(true); // with URLs
   const branches = await git.branch(['-r']); // list remote branches
   return { remotes, remoteBranches: branches.all };
