@@ -425,8 +425,10 @@ export function showFieldEditorModal(field, allFields = [], onConfirm) {
           type: "loopstop",
         };
 
-        onConfirm?.(loopStart);
-        onConfirm?.(loopStop);
+        onConfirm?.([loopStart, loopStop]);
+
+        //onConfirm?.(loopStart);
+        //onConfirm?.(loopStop);
       } else {
         onConfirm?.(confirmedField);
       }

@@ -230,11 +230,12 @@ export function initTemplateEditor(containerId, onSaveCallback) {
   }
 
   function openEditModal(field) {
-    showFieldEditorModal(field, currentData.fields, (confirmedField) => {
+    showFieldEditorModal(field, currentData.fields, (confirmed) => {
+      const newFields = Array.isArray(confirmed) ? confirmed : [confirmed];
       if (currentEditIndex != null) {
-        currentData.fields[currentEditIndex] = confirmedField;
+        currentData.fields.splice(currentEditIndex, 1, ...newFields);
       } else {
-        currentData.fields.push(confirmedField);
+        currentData.fields.push(...newFields);
       }
       renderFieldListWrapper();
     });
