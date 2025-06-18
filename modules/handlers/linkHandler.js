@@ -1,6 +1,15 @@
 // modules/handlers/linkHandler.js
 
 import { EventBus } from "../eventBus.js";
+import { highlightAndClickForm } from "../../utils/domUtils.js";
+
+let dropdown = null;
+let selectTemplateFn = null;
+
+export function bindLinkDependencies(deps) {
+  dropdown = deps.dropdown;
+  selectTemplateFn = deps.selectTemplate;
+}
 
 // ─── External Link ────────────────────────────────────────────
 export function handleExternalLinkOpen(url) {
@@ -21,7 +30,7 @@ export function handleExternalLinkOpen(url) {
 }
 
 // ─── Formidable Navigate Link ─────────────────────────────────
-export function handleFormidableNavigate(data) {
+export async function handleFormidableNavigate(data) {
   if (!data || typeof data !== "object") return;
 
   const { link, template, entry } = data;
@@ -29,11 +38,25 @@ export function handleFormidableNavigate(data) {
   EventBus.emit("logging:default", [
     "[LinkHandler] Navigating formidable link:",
     link,
-    "→ template:", template,
-    "→ entry:", entry,
+    "→ template:",
+    template,
+    "→ entry:",
+    entry,
   ]);
 
-  // You can emit your navigation logic here:
-  EventBus.emit("template:selected", template);
-  EventBus.emit("form:selected", entry);
+  // Load the template first
+  const yaml = await new Promise((resolve) => {
+    EventBus.emit("template:load", { name: template, callback: resolve });
+  });
+
+  if (!yaml) {
+    EventBus.emit("status:update", `Failed to load template: ${template}`);
+    return;
+  }
+
+  await selectTemplateFn(template);
+
+  if (entry) {
+    highlightAndClickForm(entry);
+  }
 }

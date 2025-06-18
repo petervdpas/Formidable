@@ -79,6 +79,15 @@ export function highlightSelected(
   }
 }
 
+export function highlightAndClickForm(entry, delay = 500) {
+  if (!entry) return;
+
+  setTimeout(() => {
+    EventBus.emit("form:list:itemClicked", entry);
+    EventBus.emit("form:list:highlighted", entry);
+  }, delay);
+}
+
 export function applyDatasetMapping(el, sources, mappings = []) {
   if (!el || typeof el.dataset === "undefined") return;
   if (!Array.isArray(sources)) sources = [sources];

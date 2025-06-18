@@ -36,6 +36,7 @@ import { bindContextDependencies } from "./modules/handlers/contextHandlers.js";
 import { bindTemplateDependencies } from "./modules/handlers/templateHandlers.js";
 import { bindFormDependencies } from "./modules/handlers/formHandlers.js";
 import { bindListDependencies } from "./modules/handlers/listHandlers.js";
+import { bindLinkDependencies } from "./modules/handlers/linkHandler.js";
 
 // ───── DOM Ready ──────────────────────────────
 window.addEventListener("DOMContentLoaded", async () => {
@@ -84,7 +85,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   if (config?.author_name) {
     setStatusInfo(`User Profile: ${config.author_name}`);
   }
-  
+
   // ── Modals ──
   const profile = setupProfileModal();
   const settings = setupSettingsModal();
@@ -198,6 +199,11 @@ window.addEventListener("DOMContentLoaded", async () => {
   bindListDependencies({
     templateListManager: window.templateListManager,
     metaListManager,
+  });
+
+  bindLinkDependencies({
+    dropdown: templateDropdown,
+    selectTemplate, // pass this!
   });
 
   // ── Initial Data Load ──
