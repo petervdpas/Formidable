@@ -8,10 +8,10 @@
 
 > This version of Formidable is a pre-release for testing and feedback.
 > There may be missing features or bugs. Use at your own risk.
-> See the [release notes](https://github.com/petervdpas/Formidable/releases/tag/v1.6.0-pre) for details.
+> See the [release notes](https://github.com/petervdpas/Formidable/releases/tag/v1.6.2-pre) for details.
 
 **Latest Windows Installer**:  
-👉 [Formidable Setup.exe (Pre-release)](https://github.com/petervdpas/Formidable/releases/download/v1.6.0-pre/Formidable.Setup.exe)
+👉 [Formidable Setup.exe (Pre-release)](https://github.com/petervdpas/Formidable/releases/download/v1.6.2-pre/Formidable.Setup.exe)
 
 ---
 
