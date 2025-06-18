@@ -2,8 +2,8 @@ name: Build Formidable (Pre-Release)
 
 on:
   push:
-    branches:
-      - pre-release/*
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -52,9 +52,8 @@ jobs:
       - name: Set version-based release metadata
         shell: pwsh
         run: |
-          $version = (Get-Content package.json | ConvertFrom-Json).version
-          echo "TAG_NAME=v$version-pre" >> $env:GITHUB_ENV
-          echo "RELEASE_NAME=Formidable v$version Pre-Release" >> $env:GITHUB_ENV
+          echo "TAG_NAME=${{ github.ref_name }}" >> $env:GITHUB_ENV
+          echo "RELEASE_NAME=Formidable ${{ github.ref_name }}" >> $env:GITHUB_ENV
 
       - name: Create GitHub Pre-Release
         uses: softprops/action-gh-release@v1
