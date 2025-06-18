@@ -203,7 +203,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   // ── Initial Data Load ──
   await Promise.all([
     loadTemplateOptions(),
-    templateListManager.loadList(),
+    window.templateListManager.loadList(),
     templateDropdown.refresh?.() ?? Promise.resolve(),
   ]);
 

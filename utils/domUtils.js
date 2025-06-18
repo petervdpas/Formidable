@@ -7,6 +7,7 @@ import {
   applyMultioptionField,
   applyImageField,
   applyRangeField,
+  applyLinkField,
   applyGenericField,
 } from "./fieldAppliers.js";
 import { collectLoopGroup } from "./formUtils.js";
@@ -138,7 +139,7 @@ export function applyModalTypeClass(modal, typeKey, fieldTypes) {
   }
 }
 
-export function applyValueToField(container, field, value, template) {
+export async function applyValueToField(container, field, value, template, vfsFunctions = {}) {
   const key = field.key;
 
   if (container.querySelector(`[data-multioption-field="${key}"]`)) {
@@ -158,6 +159,11 @@ export function applyValueToField(container, field, value, template) {
 
   if (container.querySelector(`[data-image-field="${key}"]`)) {
     applyImageField(container, key, value, template);
+    return;
+  }
+
+  if (container.querySelector(`[data-link-field="${key}"]`)) {
+    await applyLinkField(container, field, value, vfsFunctions);
     return;
   }
 
@@ -181,11 +187,11 @@ export function applyValueToField(container, field, value, template) {
   applyGenericField(input, key, value);
 }
 
-export function applyFieldValues(container, template, data = {}) {
+export async function applyFieldValues(container, template, data = {}, vfsFunctions = {}) {
   if (!container || typeof container.querySelector !== "function") return;
   const fields = template?.fields || [];
 
-  const loopChildKeys = new Set(); // 🔒 verzamelt innerlijke velden
+  const loopChildKeys = new Set();
 
   let i = 0;
   while (i < fields.length) {
@@ -196,21 +202,24 @@ export function applyFieldValues(container, template, data = {}) {
     if (field.type === "loopstart") {
       const loopKey = field.key;
       const { group, stopIdx } = collectLoopGroup(fields, i + 1, loopKey);
-      group.forEach((f) => loopChildKeys.add(f.key)); // 🧠 onthoud
+      group.forEach((f) => loopChildKeys.add(f.key));
       i = stopIdx + 1;
 
       const loopItems = container.querySelectorAll(
         `.loop-container[data-loop-key="${loopKey}"] .loop-item`
       );
 
-      (data[loopKey] || []).forEach((entry, index) => {
-        const item = loopItems[index];
-        if (!item) return;
+      const loopData = data[loopKey] || [];
 
-        group.forEach((f) => {
-          applyValueToField(item, f, entry[f.key], template);
-        });
-      });
+      for (let index = 0; index < loopData.length; index++) {
+        const entry = loopData[index];
+        const item = loopItems[index];
+        if (!item) continue;
+
+        for (const f of group) {
+          await applyValueToField(item, f, entry[f.key], template, vfsFunctions);
+        }
+      }
 
       continue;
     }
@@ -220,7 +229,7 @@ export function applyFieldValues(container, template, data = {}) {
       continue;
     }
 
-    applyValueToField(container, field, value, template);
+    await applyValueToField(container, field, value, template, vfsFunctions);
     i++;
   }
 

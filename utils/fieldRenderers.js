@@ -601,3 +601,149 @@ export async function renderImageField(field, template) {
     field.description
   );
 }
+
+// ─────────────────────────────────────────────
+// Type: link
+export async function renderLinkField(
+  field,
+  currentTemplate,
+  { fetchTemplates, fetchMetaFiles }
+) {
+  const wrapper = document.createElement("div");
+  wrapper.style.display = "flex";
+  wrapper.style.flexWrap = "wrap";
+  wrapper.style.alignItems = "center";
+  wrapper.style.gap = "8px";
+
+  wrapper.dataset.linkField = field.key;
+
+  // HIDDEN actual input
+  const input = document.createElement("input");
+  input.type = "hidden";
+  input.name = field.key;
+  input.value = field.default || "";
+
+  // Format dropdown
+  const formatSelect = document.createElement("select");
+  ["regular", "formidable"].forEach((opt) => {
+    const o = document.createElement("option");
+    o.value = opt;
+    o.textContent = opt;
+    formatSelect.appendChild(o);
+  });
+
+  // Template dropdown (for formidable)
+  const templateSelect = document.createElement("select");
+  templateSelect.style.display = "none";
+
+  // Entry dropdown
+  const entrySelect = document.createElement("select");
+  entrySelect.style.display = "none";
+
+  // URL input (for regular)
+  const urlInput = document.createElement("input");
+  urlInput.type = "text";
+  urlInput.placeholder = "Enter URL";
+  urlInput.style.flex = "1";
+  urlInput.style.display = "none";
+
+  // BUILD actual value
+  function updateValue() {
+    const format = formatSelect.value;
+
+    if (format === "regular") {
+      input.value = urlInput.value.trim();
+    } else if (format === "formidable") {
+      const tpl = templateSelect.value;
+      const entry = entrySelect.value;
+      if (tpl && entry) {
+        input.value = `formidable://${tpl}:${entry}`;
+      } else {
+        input.value = "";
+      }
+    } else {
+      input.value = "";
+    }
+  }
+
+  // HANDLERS
+  formatSelect.addEventListener("change", async () => {
+    const fmt = formatSelect.value;
+
+    if (fmt === "regular") {
+      templateSelect.style.display = "none";
+      entrySelect.style.display = "none";
+      urlInput.style.display = "block";
+    } else {
+      templateSelect.style.display = "inline-block";
+      entrySelect.style.display = "inline-block";
+      urlInput.style.display = "none";
+
+      await fillTemplateDropdown();
+      await fillEntryDropdownForSelectedTemplate();
+    }
+    updateValue();
+  });
+
+  templateSelect.addEventListener("change", async () => {
+    await fillEntryDropdownForSelectedTemplate();
+    updateValue();
+  });
+
+  entrySelect.addEventListener("change", updateValue);
+  urlInput.addEventListener("input", updateValue);
+
+  // CALLBACK: fillTemplateDropdown
+  async function fillTemplateDropdown() {
+    const templates = await fetchTemplates();
+
+    templateSelect.innerHTML = "";
+    templates.forEach((tpl) => {
+      const o = document.createElement("option");
+      o.value = tpl.filename;
+      o.textContent = tpl.filename;
+      templateSelect.appendChild(o);
+    });
+
+    // Pre-select current template
+    templateSelect.value = currentTemplate;
+  }
+
+  // CALLBACK: fillEntryDropdownForSelectedTemplate
+  async function fillEntryDropdownForSelectedTemplate() {
+    const tpl = templateSelect.value;
+    if (!tpl) return;
+    const metaFiles = await fetchMetaFiles(tpl);
+    fillEntryDropdown(metaFiles);
+  }
+
+  // Helper
+  function fillEntryDropdown(metaFiles) {
+    entrySelect.innerHTML = "";
+    metaFiles.forEach((file) => {
+      const o = document.createElement("option");
+      o.value = file;
+      o.textContent = file;
+      entrySelect.appendChild(o);
+    });
+  }
+
+  // Init state
+  formatSelect.value = "regular";
+  urlInput.value = field.default || "";
+  updateValue();
+
+  // Assemble horizontal layout
+  wrapper.appendChild(formatSelect);
+  wrapper.appendChild(templateSelect);
+  wrapper.appendChild(entrySelect);
+  wrapper.appendChild(urlInput);
+  wrapper.appendChild(input);
+
+  return wrapInputWithLabel(
+    wrapper,
+    field.label,
+    field.description,
+    field.two_column
+  );
+}

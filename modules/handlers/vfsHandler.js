@@ -224,3 +224,40 @@ export async function refreshTemplateEntry({ templateName }) {
     ]);
   }
 }
+
+// ─────────────────────────────────────────────
+// Specialized: Handle list templates for UI
+// ─────────────────────────────────────────────
+export async function handleListTemplates(_, callback) {
+  try {
+    const vfs = await window.api.config.getVirtualStructure();
+    const list = Object.keys(vfs.templateStorageFolders).map((name) => ({
+      name,
+      filename: vfs.templateStorageFolders[name].filename,
+    }));
+    callback(list);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[VFSHandler] Error in handleListTemplates:`,
+      err,
+    ]);
+    callback([]); // fallback empty list
+  }
+}
+
+// ─────────────────────────────────────────────
+// Specialized: Get template meta files for UI
+// ─────────────────────────────────────────────
+export async function handleGetTemplateMetaFiles({ templateName }, callback) {
+  try {
+    const cleanName = templateName.replace(/\.yaml$/i, "");
+    const metaFiles = await window.api.config.getTemplateMetaFiles(`${cleanName}.yaml`);
+    callback(metaFiles);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[VFSHandler] Error in handleGetTemplateMetaFiles for "${templateName}":`,
+      err,
+    ]);
+    callback([]); 
+  }
+}

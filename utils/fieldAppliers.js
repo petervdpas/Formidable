@@ -185,6 +185,78 @@ function applyImageLogic(container, key, value, template) {
     });
 }
 
+export async function applyLinkField(
+  container,
+  field,
+  value,
+  vfsFunctions = {}
+) {
+  const key = field.key;
+  const wrapper = container.querySelector(`[data-link-field="${key}"]`);
+  if (!wrapper) return;
+
+  const formatSelect = wrapper.querySelector("select");
+  const templateSelect = wrapper.querySelector("select:nth-of-type(2)");
+  const entrySelect = wrapper.querySelector("select:nth-of-type(3)");
+  const urlInput = wrapper.querySelector('input[type="text"]');
+
+  const fetchTemplates =
+    vfsFunctions.fetchTemplates || (() => Promise.resolve([]));
+  const fetchMetaFiles =
+    vfsFunctions.fetchMetaFiles || (() => Promise.resolve([]));
+
+  if (typeof value !== "string" || value.trim() === "") {
+    formatSelect.value = "regular";
+    urlInput.value = "";
+    urlInput.style.display = "block";
+    templateSelect.style.display = "none";
+    entrySelect.style.display = "none";
+    return;
+  }
+
+  if (value.startsWith("formidable://")) {
+    formatSelect.value = "formidable";
+
+    const parts = value.replace("formidable://", "").split(":");
+    const tpl = parts[0];
+    const entry = parts[1] || "";
+
+    // Populate templates
+    const templates = await fetchTemplates();
+    templateSelect.innerHTML = "";
+    templates.forEach((t) => {
+      const o = document.createElement("option");
+      o.value = t.filename;
+      o.textContent = t.filename;
+      templateSelect.appendChild(o);
+    });
+
+    templateSelect.value = tpl;
+
+    // Populate entries
+    const metaFiles = await fetchMetaFiles(tpl);
+    entrySelect.innerHTML = "";
+    metaFiles.forEach((file) => {
+      const o = document.createElement("option");
+      o.value = file;
+      o.textContent = file;
+      entrySelect.appendChild(o);
+    });
+
+    entrySelect.value = entry;
+
+    templateSelect.style.display = "inline-block";
+    entrySelect.style.display = "inline-block";
+    urlInput.style.display = "none";
+  } else {
+    formatSelect.value = "regular";
+    urlInput.value = value;
+    urlInput.style.display = "block";
+    templateSelect.style.display = "none";
+    entrySelect.style.display = "none";
+  }
+}
+
 export function applyGenericField(input, key, value) {
   if (!input) {
     EventBus.emit("logging:warning", [

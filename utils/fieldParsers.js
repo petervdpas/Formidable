@@ -111,3 +111,8 @@ export async function parseImageField(inputWrapper, template) {
     return "";
   }
 }
+
+// Link
+export function parseLinkField(input) {
+  return input.value.trim();
+}

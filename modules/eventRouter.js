@@ -238,6 +238,11 @@ export function initEventRouter() {
   EventBus.off("vfs:update", vfsHandler.updateVFSKey);
   EventBus.off("vfs:delete", vfsHandler.deleteVFSKey);
   EventBus.off("vfs:refreshTemplate", vfsHandler.refreshTemplateEntry);
+  EventBus.off("vfs:listTemplates", vfsHandler.handleListTemplates);
+  EventBus.off(
+    "vfs:getTemplateMetaFiles",
+    vfsHandler.handleGetTemplateMetaFiles
+  );
 
   EventBus.on("vfs:init", vfsHandler.initVFS);
   EventBus.on("vfs:clear", vfsHandler.clearVFS);
@@ -245,6 +250,11 @@ export function initEventRouter() {
   EventBus.on("vfs:update", vfsHandler.updateVFSKey);
   EventBus.on("vfs:delete", vfsHandler.deleteVFSKey);
   EventBus.on("vfs:refreshTemplate", vfsHandler.refreshTemplateEntry);
+  EventBus.on("vfs:listTemplates", vfsHandler.handleListTemplates);
+  EventBus.on(
+    "vfs:getTemplateMetaFiles",
+    vfsHandler.handleGetTemplateMetaFiles
+  );
 
   EventBus.off("boot:initialize", bootHandlers.initializeFromConfig);
   EventBus.on("boot:initialize", async (config) => {

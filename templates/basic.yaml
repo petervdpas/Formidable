@@ -290,3 +290,7 @@ fields:
     label: Design
     type: image
     description: Printing an image
+  - key: linktest
+    label: Linktest
+    type: link
+    description: A link test

@@ -1,16 +1,16 @@
 /* ─── Dragged Placeholder ───────────────────────── */
 .sortable-ghost {
-    all: unset;
-    display: block;
-    opacity: 0.5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background: var(--sortable-bg, #fff);
     border: 2px dashed var(--sortable-border-color, #999);
-    padding: 12px 12px 12px 28px;
-    margin: 0 0 12px 28px;
-    border-radius: 4px;
+    padding: 6px 8px 8px 8px;
+    border-radius: 6px;
     box-sizing: border-box;
-    transition: opacity 0.1s ease;
     min-height: 48px;
+    opacity: 0.5;
+    margin-bottom: 4px;
     pointer-events: none;
 }
 

@@ -341,4 +341,22 @@ export const fieldTypes = {
     },
     parseValue: parsers.parseImageField,
   },
+
+  link: {
+    label: "Link",
+    cssClass: "modal-link",
+    defaultValue: () => "",
+
+    renderInput: async function (field) {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.name = field.key;
+      input.value = field.default || "";
+      input.placeholder = "Enter link or URL";
+
+      return input;
+    },
+
+    parseValue: parsers.parseLinkField,
+  },
 };

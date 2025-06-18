@@ -289,7 +289,7 @@ export function validateFilenameInput(inputEl) {
   return name || null;
 }
 
-export async function renderFieldElement(field, template = null) {
+export async function renderFieldElement(field, template = null, options = {}) {
   const type = field.type;
   const fn = renderers[`render${capitalize(type)}Field`];
   const typeDef = fieldTypes[type];
@@ -301,10 +301,9 @@ export async function renderFieldElement(field, template = null) {
     return null;
   }
 
-  // Ensure default is set if not explicitly provided
   if (!Object.prototype.hasOwnProperty.call(field, "default")) {
     field.default = typeDef.defaultValue();
   }
 
-  return await fn(field, template);
+  return await fn(field, template, options);
 }

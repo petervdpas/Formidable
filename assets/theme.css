@@ -206,6 +206,7 @@ input:checked+.slider {
 }
 
 .dark-mode .form-row input[type="text"],
+.dark-mode .form-row input[type="url"],
 .dark-mode .form-row select,
 .dark-mode .form-row textarea {
   border-color: var(--input-border-color);

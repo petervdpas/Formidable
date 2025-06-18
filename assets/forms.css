@@ -35,6 +35,7 @@ label small {
 
 /* ───── Inputs and Selects ───── */
 .form-row input[type="text"],
+.form-row input[type="url"],
 .form-row select {
   flex: 1;
   width: 100%;

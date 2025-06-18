@@ -240,6 +240,12 @@
   border-left: 4px solid #cfd8dc;
 }
 
+.field-list-item[data-type="link"] {
+  background-color: #7b1e3a;
+  /* Bordeaux */
+  border-left: 4px solid #d46a85;
+}
+
 /* ───── Field Type Color Badges ───── */
 .field-type.type-looper,
 .field-type.type-loopstart,
@@ -316,6 +322,11 @@
 .field-type.type-image {
   background-color: #cfd8dc;
   /* Amber */
+  color: black;
+}
+
+.field-type.type-link {
+  background-color: #d46a85;
   color: black;
 }
 
@@ -399,6 +410,11 @@
   color: black;
 }
 
+#field-edit-modal.modal-link {
+  background-color: #7b1e3a;
+  border-left: 6px solid #d46a85;
+}
+
 /* ───── Per-Type Close Button Overrides ───── */
 
 #field-edit-modal.modal-loopstart .btn-close,
@@ -452,6 +468,10 @@
 
 #field-edit-modal.modal-image .btn-close {
   color: #000;
+}
+
+#field-edit-modal.modal-link .btn-close {
+  color: #f9dbe0;
 }
 
 /* Optional hover enhancement for all: */

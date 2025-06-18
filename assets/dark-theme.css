@@ -231,6 +231,7 @@ label small,
 }
 
 .form-row input[type="text"],
+.form-row input[type="url"],
 .form-row select,
 .form-row textarea {
   border-color: var(--input-border-color);
