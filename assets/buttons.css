@@ -36,6 +36,16 @@ button:disabled,
   font-size: 13px;
 }
 
+/* ───── Small Button Patch ───── */
+.btn-small {
+  font-size: 0.85em;
+  padding: 4px 8px;
+  line-height: 1.2;
+  height: auto;
+  min-width: auto;
+  margin-top: 0.3em;
+}
+
 /* ───── Button Variants ───── */
 
 .btn-default {

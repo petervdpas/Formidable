@@ -139,7 +139,7 @@ export function applyModalTypeClass(modal, typeKey, fieldTypes) {
   }
 }
 
-export async function applyValueToField(container, field, value, template, vfsFunctions = {}) {
+export async function applyValueToField(container, field, value, template, eventFunctions = {}) {
   const key = field.key;
 
   if (container.querySelector(`[data-multioption-field="${key}"]`)) {
@@ -163,7 +163,7 @@ export async function applyValueToField(container, field, value, template, vfsFu
   }
 
   if (container.querySelector(`[data-link-field="${key}"]`)) {
-    await applyLinkField(container, field, value, vfsFunctions);
+    await applyLinkField(container, field, value, eventFunctions);
     return;
   }
 
@@ -187,7 +187,7 @@ export async function applyValueToField(container, field, value, template, vfsFu
   applyGenericField(input, key, value);
 }
 
-export async function applyFieldValues(container, template, data = {}, vfsFunctions = {}) {
+export async function applyFieldValues(container, template, data = {}, eventFunctions = {}) {
   if (!container || typeof container.querySelector !== "function") return;
   const fields = template?.fields || [];
 
@@ -217,7 +217,7 @@ export async function applyFieldValues(container, template, data = {}, vfsFuncti
         if (!item) continue;
 
         for (const f of group) {
-          await applyValueToField(item, f, entry[f.key], template, vfsFunctions);
+          await applyValueToField(item, f, entry[f.key], template, eventFunctions);
         }
       }
 
@@ -229,7 +229,7 @@ export async function applyFieldValues(container, template, data = {}, vfsFuncti
       continue;
     }
 
-    await applyValueToField(container, field, value, template, vfsFunctions);
+    await applyValueToField(container, field, value, template, eventFunctions);
     i++;
   }
 

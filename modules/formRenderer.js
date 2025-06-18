@@ -25,9 +25,9 @@ import {
 import { showConfirmModal } from "./modalSetup.js";
 
 // ─────────────────────────────────────────────
-// Generic VFS helper
+// Generic Events helper
 // ─────────────────────────────────────────────
-function getVfsFunctions() {
+function getEventFunctions() {
   return {
     fetchTemplates: async () => {
       return await EventBus.emitWithResponse("vfs:listTemplates", null);
@@ -40,7 +40,12 @@ function getVfsFunctions() {
   };
 }
 
-async function renderFieldsWithLoops(container, fields, metaData, vfsFunctions) {
+async function renderFieldsWithLoops(
+  container,
+  fields,
+  metaData,
+  eventFunctions = {}
+) {
   const loopGroupKeys = new Set();
   let i = 0;
 
@@ -66,14 +71,18 @@ async function renderFieldsWithLoops(container, fields, metaData, vfsFunctions) 
 
       for (const entry of loopData) {
         const complete = { ...createLoopDefaults(group), ...entry };
-        const itemWrapper = await createLoopItem(group, complete, vfsFunctions);
+        const itemWrapper = await createLoopItem(
+          group,
+          complete,
+          eventFunctions
+        );
         loopList.appendChild(itemWrapper);
       }
 
       loopContainer.appendChild(loopList);
 
       const addButton = createAddLoopItemButton(async () => {
-        const newItem = await createLoopItem(group, {}, vfsFunctions);
+        const newItem = await createLoopItem(group, {}, eventFunctions);
         loopList.appendChild(newItem);
       });
 
@@ -114,14 +123,18 @@ async function renderFieldsWithLoops(container, fields, metaData, vfsFunctions) 
         continue;
       }
 
-      const row = await renderFieldElement(field, metaData, vfsFunctions);
+      const row = await renderFieldElement(field, metaData, eventFunctions);
       if (row) container.appendChild(row);
       i++;
     }
   }
 }
 
-async function createLoopItem(groupFields, dataEntry = {}, vfsFunctions = {}) {
+async function createLoopItem(
+  groupFields,
+  dataEntry = {},
+  eventFunctions = {}
+) {
   const itemWrapper = document.createElement("div");
   itemWrapper.className = "loop-item";
 
@@ -164,7 +177,7 @@ async function createLoopItem(groupFields, dataEntry = {}, vfsFunctions = {}) {
         : undefined;
     }
 
-    const row = await renderFieldElement(fieldCopy, dataEntry, vfsFunctions);
+    const row = await renderFieldElement(fieldCopy, dataEntry, eventFunctions);
     if (row) itemWrapper.appendChild(row);
   }
 
@@ -263,7 +276,7 @@ export async function renderFormUI(
   onDelete,
   onRender
 ) {
-  const vfsFunctions = getVfsFunctions();
+  const eventFunctions = getEventFunctions();
 
   container.innerHTML = "";
 
@@ -294,8 +307,8 @@ export async function renderFormUI(
 
   const fields = template.fields || [];
   injectFieldDefaults(fields, metaData);
-  await renderFieldsWithLoops(container, fields, metaData, vfsFunctions);
+  await renderFieldsWithLoops(container, fields, metaData, eventFunctions);
 
-  await applyFieldValues(container, template, metaData, vfsFunctions);
+  await applyFieldValues(container, template, metaData, eventFunctions);
   focusFirstInput(container);
 }

@@ -458,6 +458,17 @@ export function createRemoveImageButton(onClick, identifier = "") {
   });
 }
 
+export function createLinkOpenButton(linkText, onClick, disabled = false) {
+  return createButton({
+    text: linkText,
+    className: "btn-link",
+    identifier: "link-open",
+    onClick,
+    disabled,
+    ariaLabel: `Open ${linkText}`,
+  });
+}
+
 export function disableButton(btn, state = true) {
   if (btn instanceof HTMLElement) {
     btn.disabled = state;

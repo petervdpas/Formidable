@@ -4,7 +4,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-06-18T19:58:13.652Z",
+    "updated": "2025-06-18T20:46:48.031Z",
     "flagged": true
   },
   "data": {
@@ -31,6 +31,6 @@
       ]
     ],
     "design": "formidable.png",
-    "linktest": "formidable://basic.yaml:test-20250518.meta.json"
+    "linktest": "formidable://loopie.yaml:test-20250530.meta.json"
   }
 }

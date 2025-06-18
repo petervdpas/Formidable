@@ -58,6 +58,7 @@ const api = {
     getAppRoot: () => ipcRenderer.invoke("get-app-root"),
     resolvePath: (...args) => ipcRenderer.invoke("resolve-path", ...args),
     fileExists: (path) => ipcRenderer.invoke("file-exists", path),
+    openExternal: (url) => ipcRenderer.invoke("shell-open-external", url),
   },
   dialog: {
     chooseDirectory: () => ipcRenderer.invoke("dialog-choose-directory"),

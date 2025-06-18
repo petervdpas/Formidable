@@ -1,6 +1,7 @@
 // utils/fieldAppliers.js
 
 import { EventBus } from "../modules/eventBus.js";
+import { createLinkOpenButton } from "../modules/uiButtons.js";
 import { ensureVirtualLocation } from "./vfsUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 
@@ -189,7 +190,7 @@ export async function applyLinkField(
   container,
   field,
   value,
-  vfsFunctions = {}
+  eventFunctions = {}
 ) {
   const key = field.key;
   const wrapper = container.querySelector(`[data-link-field="${key}"]`);
@@ -201,9 +202,56 @@ export async function applyLinkField(
   const urlInput = wrapper.querySelector('input[type="text"]');
 
   const fetchTemplates =
-    vfsFunctions.fetchTemplates || (() => Promise.resolve([]));
+    eventFunctions.fetchTemplates || (() => Promise.resolve([]));
   const fetchMetaFiles =
-    vfsFunctions.fetchMetaFiles || (() => Promise.resolve([]));
+    eventFunctions.fetchMetaFiles || (() => Promise.resolve([]));
+
+  // Ensure only 1 button container instance
+  let buttonContainer = wrapper.nextElementSibling;
+  let actionButton = null;
+
+  if (
+    !buttonContainer ||
+    !buttonContainer.classList.contains("link-action-container")
+  ) {
+    buttonContainer = document.createElement("div");
+    buttonContainer.className = "link-action-container";
+    buttonContainer.style.marginTop = "0.4em";
+
+    function onLinkClick() {
+      const href = actionButton?.dataset.href || "";
+      if (href.startsWith("formidable://")) {
+        const tpl = templateSelect.value;
+        const entry = entrySelect.value;
+        EventBus.emit("link:formidable:navigate", {
+          link: href,
+          template: tpl,
+          entry,
+        });
+      } else if (href.startsWith("http://") || href.startsWith("https://")) {
+        EventBus.emit("link:external:open", href);
+      } else {
+        EventBus.emit("logging:warning", [
+          "[applyLinkField] Unknown link format:",
+          href,
+        ]);
+      }
+    }
+
+    actionButton = createLinkOpenButton(value || "(no link)", onLinkClick);
+    buttonContainer.appendChild(actionButton);
+
+    // INSERT AFTER wrapper (outside flex row)
+    wrapper.parentElement.insertBefore(buttonContainer, wrapper.nextSibling);
+  } else {
+    actionButton = buttonContainer.querySelector("#btn-link-open");
+  }
+
+  function updateHref(href) {
+    actionButton.dataset.href = href;
+    actionButton.textContent = href || "(no link)";
+    actionButton.disabled = !href || href.trim() === "";
+  }
 
   if (typeof value !== "string" || value.trim() === "") {
     formatSelect.value = "regular";
@@ -211,6 +259,7 @@ export async function applyLinkField(
     urlInput.style.display = "block";
     templateSelect.style.display = "none";
     entrySelect.style.display = "none";
+    updateHref("");
     return;
   }
 
@@ -221,7 +270,6 @@ export async function applyLinkField(
     const tpl = parts[0];
     const entry = parts[1] || "";
 
-    // Populate templates
     const templates = await fetchTemplates();
     templateSelect.innerHTML = "";
     templates.forEach((t) => {
@@ -230,10 +278,8 @@ export async function applyLinkField(
       o.textContent = t.filename;
       templateSelect.appendChild(o);
     });
-
     templateSelect.value = tpl;
 
-    // Populate entries
     const metaFiles = await fetchMetaFiles(tpl);
     entrySelect.innerHTML = "";
     metaFiles.forEach((file) => {
@@ -242,18 +288,21 @@ export async function applyLinkField(
       o.textContent = file;
       entrySelect.appendChild(o);
     });
-
     entrySelect.value = entry;
 
     templateSelect.style.display = "inline-block";
     entrySelect.style.display = "inline-block";
     urlInput.style.display = "none";
+
+    updateHref(`formidable://${tpl}:${entry}`);
   } else {
     formatSelect.value = "regular";
     urlInput.value = value;
     urlInput.style.display = "block";
     templateSelect.style.display = "none";
     entrySelect.style.display = "none";
+
+    updateHref(value);
   }
 }
 

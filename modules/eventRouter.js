@@ -19,6 +19,7 @@ import * as loggingHandler from "./handlers/loggingHandler.js";
 import * as listHandlers from "./handlers/listHandlers.js";
 import * as transformHandler from "./handlers/transformHandler.js";
 import * as editorHandler from "./handlers/editorHandler.js";
+import * as linkHandler from "./handlers/linkHandler.js";
 import * as toastHandler from "./handlers/toastHandler.js";
 
 let routerInitialized = false;
@@ -102,6 +103,7 @@ export function initEventRouter() {
   EventBus.off("context:toggle", contextHandlers.handleContextToggle);
   EventBus.on("context:toggle", contextHandlers.handleContextToggle);
 
+  // Template events
   EventBus.off("template:selected", templateHandlers.handleTemplateSelected);
   EventBus.off("template:list", templateHandlers.handleListTemplates);
   EventBus.off("template:load", templateHandlers.handleLoadTemplate);
@@ -137,6 +139,7 @@ export function initEventRouter() {
     listHandlers.handleListHighlighted({ listId: "template-list", name })
   );
 
+  // Form events
   EventBus.off("form:selected", formHandlers.handleFormSelected);
   EventBus.off("form:list", formHandlers.handleListForms);
   EventBus.off("form:load", formHandlers.handleLoadForm);
@@ -167,23 +170,32 @@ export function initEventRouter() {
     listHandlers.handleListHighlighted({ listId: "storage-list", name })
   );
 
+  // Modal events
   EventBus.off("modal:template:confirm", modalHandler.handleTemplateConfirm);
   EventBus.off("modal:entry:confirm", modalHandler.handleEntryConfirm);
-
   EventBus.on("modal:template:confirm", modalHandler.handleTemplateConfirm);
   EventBus.on("modal:entry:confirm", modalHandler.handleEntryConfirm);
 
+  // Editor events
   EventBus.off("editor:save", editorHandler.handleSaveTemplate);
   EventBus.off("editor:delete", editorHandler.handleDeleteTemplate);
-
   EventBus.on("editor:save", ({ container, fields, callback }) =>
     editorHandler.handleSaveTemplate({ container, fields, callback })
   );
-
   EventBus.on("editor:delete", (container) =>
     editorHandler.handleDeleteTemplate(container)
   );
 
+  // Link events
+  EventBus.off("link:external:open", linkHandler.handleExternalLinkOpen);
+  EventBus.off(
+    "link:formidable:navigate",
+    linkHandler.handleFormidableNavigate
+  );
+  EventBus.on("link:external:open", linkHandler.handleExternalLinkOpen);
+  EventBus.on("link:formidable:navigate", linkHandler.handleFormidableNavigate);
+
+  // Transform events
   EventBus.off("transform:markdown", transformHandler.handleRenderMarkdown);
   EventBus.off("transform:html", transformHandler.handleRenderHtml);
   EventBus.on("transform:markdown", transformHandler.handleRenderMarkdown);
