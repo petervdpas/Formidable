@@ -9,6 +9,8 @@ export async function initializeFromConfig(config) {
     context_mode,
     logging_enabled,
     theme,
+    enable_internal_server,
+    internal_server_port,
   } = config;
 
   EventBus.emit("logging:default", [
@@ -16,7 +18,7 @@ export async function initializeFromConfig(config) {
     JSON.stringify(config, null, 2),
   ]);
 
-  // Initialiseer de cache met stores
+  // ─── Stage 1: Init cache & VFS ───
   await EventBus.emit("cache:init", {
     dbName: "formidable-db",
     version: 1,
@@ -25,15 +27,20 @@ export async function initializeFromConfig(config) {
 
   await EventBus.emit("vfs:init");
 
-    // ─── Apply visual & logging config first ───
+  // ─── Stage 2: Visual & logging settings ───
   EventBus.emit("theme:toggle", theme);
   EventBus.emit("logging:toggle", logging_enabled);
-  
-  // ─── Toggle context view and await it ───
+
+  // ─── Stage 3: Start internal server if needed ───
+  if (enable_internal_server) {
+    EventBus.emit("server:start", { port: internal_server_port || 8383 });
+  }
+
+  // ─── Stage 4: Toggle context view ───
   const isStorage = context_mode === "storage";
   await EventBus.emit("context:toggle", isStorage);
 
-  // ─── Wait for list to be loaded, then highlight (instead of click) ───
+  // ─── Stage 5: Handle template list highlighting ───
   EventBus.once("template-list:loaded", () => {
     if (selected_template) {
       EventBus.emit("logging:default", [
@@ -47,6 +54,7 @@ export async function initializeFromConfig(config) {
     }
   });
 
+  // ─── Stage 6: Handle form list highlighting ───
   if (isStorage) {
     EventBus.once("storage-list:loaded", () => {
       if (selected_data_file) {

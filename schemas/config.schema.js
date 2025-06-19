@@ -14,6 +14,8 @@ module.exports = {
     author_email: "unknown@example.com",
     use_git: false,
     git_root: "",
+    enable_internal_server: false,
+    internal_server_port: 8383,
     window_bounds: {
       width: 1024,
       height: 800,

@@ -50,6 +50,17 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
     );
   }
 
+  // Add internal server options if enabled
+  if (cachedConfig.enable_internal_server) {
+    menuBar.append(
+      createMenuGroup("Server", [
+        { label: "Start Server", action: "start-internal-server" },
+        { label: "Stop Server", action: "stop-internal-server" },
+        { label: "Server Status", action: "get-internal-server-status" },
+      ])
+    );
+  }
+
   // Append View and Help last
   menuBar.append(
     createMenuGroup("View", [
@@ -223,6 +234,36 @@ export async function handleMenuAction(action) {
     case "open-git-modal":
       EventBus.emit("logging:default", ["[Menu] Opening Git modal..."]);
       window.openGitModal?.();
+      break;
+
+    case "start-internal-server":
+      EventBus.emit("logging:default", ["[Menu] Starting internal server..."]);
+      {
+        const port = cachedConfig?.internal_server_port || 8383;
+        EventBus.emit("server:start", { port });
+      }
+      break;
+
+    case "stop-internal-server":
+      EventBus.emit("logging:default", ["[Menu] Stopping internal server..."]);
+      EventBus.emit("server:stop");
+      break;
+
+    case "get-internal-server-status":
+      EventBus.emit("logging:default", [
+        "[Menu] Getting internal server status...",
+      ]);
+      EventBus.emit("server:status", {
+        callback: (server) => {
+          console.log("[Menu] Server status:", server);
+          EventBus.emit("ui:toast", {
+            message: `Server: ${
+              server.running ? "Running" : "Stopped"
+            } on port ${server.port || "-"}`,
+            variant: server.running ? "success" : "info",
+          });
+        },
+      });
       break;
 
     case "about":

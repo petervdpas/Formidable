@@ -37,8 +37,10 @@ export async function renderSettings() {
   tabButtons.innerHTML = `
     <button class="tab-btn">General</button>
     <button class="tab-btn">Directories</button>
+    <button class="tab-btn">Internal Server</button>
   `;
 
+  // ─── General Settings ─────────────────
   const tabGeneral = document.createElement("div");
   tabGeneral.className = "tab-panel tab-general";
 
@@ -83,7 +85,7 @@ export async function renderSettings() {
     )
   );
 
-  // ─── Directories ──────────────────────
+  // ─── Directories & Git ───────────────
   const tabDirs = document.createElement("div");
   tabDirs.className = "tab-panel tab-dirs";
 
@@ -117,10 +119,30 @@ export async function renderSettings() {
   gitRootPicker.button.disabled = !isGitEnabled;
   gitRootPicker.element.classList.toggle("disabled", !isGitEnabled);
 
+  // ─── Internal Server ──────────────────────
+  const tabServer = document.createElement("div");
+  tabServer.className = "tab-panel tab-server";
+
+  tabServer.appendChild(
+    createSwitch(
+      "internal-server-toggle",
+      "Internal Server",
+      config.enable_internal_server ?? false,
+      null,
+      "block",
+      ["On", "Off"]
+    )
+  );
+
+  tabServer.appendChild(
+    bindFormInput("internal-server-port", "internal_server_port", "Server Port")
+  );
+
   // Inject tabs and setup bindings
   container.appendChild(tabButtons);
   container.appendChild(tabGeneral);
   container.appendChild(tabDirs);
+  container.appendChild(tabServer);
 
   initTabs("#settings-body", ".tab-btn", ".tab-panel", {
     activeClass: "active",
@@ -149,6 +171,8 @@ function setupBindings(config, gitRootPicker) {
       EventBus.emit("config:update", { git_root: "" });
     }
   });
+
+  bindToggleSwitch("internal-server-toggle", "enable_internal_server");
 
   bindDirButton("settings-context-folder", "context_folder");
   bindDirButton("settings-git-root", "git_root");

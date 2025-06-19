@@ -4,6 +4,11 @@ const { contextBridge, ipcRenderer, dialog } = require("electron");
 
 // ---------- IPC Method Groups ----------
 const api = {
+  internalServer: buildGroup([
+    "start-internal-server",
+    "stop-internal-server",
+    "get-internal-server-status",
+  ]),
   git: buildGroup([
     "is-git-repo",
     "get-git-root",

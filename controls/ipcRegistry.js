@@ -10,6 +10,7 @@ const {
 const { registerIpc } = require("./ipcRoutes");
 const { SingleFileRepository } = require("./sfr");
 
+const internalServer = require("./internalServer");
 const packageJson = require("../package.json");
 const fileManager = require("./fileManager");
 const gitManager = require("./gitManager");
@@ -68,6 +69,15 @@ function registerIpcHandlers() {
       version: packageJson.version,
     };
   });
+
+  // Internal Server
+  registerIpc("start-internal-server", (e, port) =>
+    internalServer.startInternalServer(port)
+  );
+  registerIpc("stop-internal-server", () =>
+    internalServer.stopInternalServer()
+  );
+  registerIpc("get-internal-server-status", () => internalServer.getStatus());
 
   // Git
   registerIpc("is-git-repo", (e, folder) => gitManager.isGitRepo(folder));

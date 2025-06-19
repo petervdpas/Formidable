@@ -69,7 +69,7 @@ export async function handleConfigUpdate(partial) {
       EventBus.emit("theme:toggle", partial.theme);
     }
 
-       // 🟢 FINAL STEP: Always update user:config VFS key!
+    // FINAL STEP: Always update user:config VFS key!
     const fullConfig = await window.api.config.loadUserConfig();
     console.log("[ConfigHandler] Full user config:", fullConfig);
     await EventBus.emit("vfs:update", {

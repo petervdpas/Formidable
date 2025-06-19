@@ -2,6 +2,7 @@
 
 import { EventBus } from "./eventBus.js";
 
+import * as serverHandler from "./handlers/serverHandler.js";
 import * as cacheHandler from "./handlers/cacheHandler.js";
 import * as vfsHandler from "./handlers/vfsHandler.js";
 import * as gitHandler from "./handlers/gitHandler.js";
@@ -29,6 +30,15 @@ export function initEventRouter() {
   routerInitialized = true;
 
   console.log("[EventRouter] Initializing global event listeners...");
+
+  // Internal Server
+  EventBus.off("server:start", serverHandler.handleStartServer);
+  EventBus.off("server:stop", serverHandler.handleStopServer);
+  EventBus.off("server:status", serverHandler.handleGetServerStatus);
+
+  EventBus.on("server:start", serverHandler.handleStartServer);
+  EventBus.on("server:stop", serverHandler.handleStopServer);
+  EventBus.on("server:status", serverHandler.handleGetServerStatus);
 
   // Logging
   EventBus.off("logging:toggle", loggingHandler.handleLoggingToggle);
