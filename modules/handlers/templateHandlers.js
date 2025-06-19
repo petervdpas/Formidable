@@ -6,6 +6,10 @@ let formManager = null;
 let metaListManager = null;
 let templateEditor = null;
 
+let lastSelectedTemplate = null;
+let lastSelectedTime = 0;
+let isRenderingTemplate = false;
+
 // 🔗 Inject dependencies from renderer.js
 export function bindTemplateDependencies(deps) {
   formManager = deps.formManager;
@@ -15,50 +19,69 @@ export function bindTemplateDependencies(deps) {
 
 // SELECTED
 export async function handleTemplateSelected({ name, yaml }) {
-  EventBus.emit("logging:default", [
-    "[Handler] template:selected received:",
-    name,
-  ]);
+  const now = Date.now();
 
-  window.currentSelectedTemplateName = name;
-  window.currentSelectedTemplate = yaml;
-
-  if (templateEditor) {
-    templateEditor.render(yaml);
+  if (isRenderingTemplate) {
+    EventBus.emit("logging:warning", [
+      "[Handler] Already rendering template, ignoring:", name
+    ]);
+    return;
   }
 
-  const config = await new Promise((resolve) => {
-    EventBus.emit("config:load", (cfg) => resolve(cfg));
-  });
-  const templateChanged = config.selected_template !== name;
-
-  if (templateChanged) {
-    EventBus.emit("config:update", { selected_template: name });
-
-    // Only needed when entering storage mode for the first time
-    // await window.api.markdown.ensureMarkdownDir(yaml.storage_location);
-
-    // Clear form selection when switching template
-    EventBus.emit("form:selected", null);
+  if (name === lastSelectedTemplate && (now - lastSelectedTime) < 2000) {
+    EventBus.emit("logging:warning", [
+      "[Handler] Duplicate template:selected ignored:", name
+    ]);
+    return;
   }
 
-  if (formManager && metaListManager) {
-    await formManager.loadTemplate(yaml);
-    await metaListManager.loadList();
+  lastSelectedTemplate = name;
+  lastSelectedTime = now;
+  isRenderingTemplate = true;
+
+  try {
+    EventBus.emit("logging:default", [
+      "[Handler] template:selected received:", name
+    ]);
+
+    window.currentSelectedTemplateName = name;
+    window.currentSelectedTemplate = yaml;
+
+    if (templateEditor) {
+      templateEditor.render(yaml);
+    }
 
     const config = await new Promise((resolve) => {
       EventBus.emit("config:load", (cfg) => resolve(cfg));
     });
-    const lastDataFile = config.selected_data_file;
 
-    if (lastDataFile) {
-      EventBus.emit("form:list:highlighted", lastDataFile);
+    const templateChanged = config.selected_template !== name;
+
+    if (templateChanged) {
+      EventBus.emit("config:update", { selected_template: name });
+      EventBus.emit("form:selected", null); // clear form selection
     }
-  }
 
-  const el = document.querySelector(`#template-list [data-value="${name}"]`);
-  if (!el || !el.classList.contains("selected")) {
-    EventBus.emit("template:list:highlighted", name);
+    if (formManager && metaListManager) {
+      await formManager.loadTemplate(yaml);
+      await metaListManager.loadList();
+
+      const config = await new Promise((resolve) => {
+        EventBus.emit("config:load", (cfg) => resolve(cfg));
+      });
+      const lastDataFile = config.selected_data_file;
+
+      if (lastDataFile) {
+        EventBus.emit("form:list:highlighted", lastDataFile);
+      }
+    }
+
+    const el = document.querySelector(`#template-list [data-value="${name}"]`);
+    if (!el || !el.classList.contains("selected")) {
+      EventBus.emit("template:list:highlighted", name);
+    }
+  } finally {
+    isRenderingTemplate = false;
   }
 }
 

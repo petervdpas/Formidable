@@ -6,6 +6,10 @@ import { clearContainerUI } from "../../utils/formUtils.js";
 let formManager = null;
 let metaListManager = null;
 
+let lastSelectedForm = null;
+let lastSelectedTime = 0;
+let isLoadingForm = false;
+
 export function bindFormDependencies(deps) {
   formManager = deps.formManager;
   metaListManager = deps.metaListManager;
@@ -13,6 +17,8 @@ export function bindFormDependencies(deps) {
 
 // SELECTED
 export async function handleFormSelected(datafile) {
+  const now = Date.now();
+
   EventBus.emit("logging:default", [
     "[Handler] form:selected received:",
     datafile,
@@ -28,18 +34,47 @@ export async function handleFormSelected(datafile) {
   const config = await new Promise((resolve) => {
     EventBus.emit("config:load", (cfg) => resolve(cfg));
   });
+
   const formChanged = config.selected_data_file !== datafile;
 
+  // Always update config — even if duplicate
   if (formChanged) {
     EventBus.emit("config:update", { selected_data_file: datafile });
   }
 
+  // If no datafile → just clear
   if (!datafile) {
     formManager.clearForm();
     return;
   }
 
-  await formManager.loadFormData(null, datafile);
+  // Duplicate or already loading → skip UI reload but config already updated
+  if (isLoadingForm) {
+    EventBus.emit("logging:warning", [
+      "[Handler] Already loading a form, ignoring reload for:",
+      datafile,
+    ]);
+    return;
+  }
+
+  if (datafile === lastSelectedForm && now - lastSelectedTime < 2000) {
+    EventBus.emit("logging:warning", [
+      "[Handler] Duplicate form:selected ignored for reload:",
+      datafile,
+    ]);
+    return;
+  }
+
+  // Track last selection
+  lastSelectedForm = datafile;
+  lastSelectedTime = now;
+  isLoadingForm = true;
+
+  try {
+    await formManager.loadFormData(null, datafile);
+  } finally {
+    isLoadingForm = false;
+  }
 }
 
 // LIST

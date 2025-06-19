@@ -2,7 +2,6 @@
 
 import { EventBus } from "./eventBus.js";
 import { showConfirmModal } from "./modalSetup.js";
-import { setupFieldEditModal } from "./modalSetup.js";
 import {
   renderFieldList,
   showFieldEditorModal,
@@ -203,20 +202,6 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     document.addEventListener("keydown", handleEditorKey);
     keyboardListenerAttached = true;
 
-    // ─── Field Edit Modal Setup ─────────────────────────
-    if (!editModal) {
-      const modalSetup = setupFieldEditModal((field) => {
-        if (currentEditIndex != null) {
-          currentData.fields[currentEditIndex] = field;
-        } else {
-          currentData.fields.push(field);
-        }
-        renderFieldListWrapper();
-      });
-
-      editModal = modalSetup.modal;
-      typeDropdown = modalSetup.typeDropdown;
-    }
   }
 
   function renderFieldListWrapper() {

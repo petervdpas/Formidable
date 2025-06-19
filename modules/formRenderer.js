@@ -279,6 +279,7 @@ export async function renderFormUI(
   const eventFunctions = getEventFunctions();
 
   container.innerHTML = "";
+  await new Promise((resolve) => requestAnimationFrame(resolve));
 
   const filename = metaData._filename || "";
   const flagged = metaData.meta?.flagged || false;
