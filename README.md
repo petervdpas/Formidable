@@ -1,53 +1,67 @@
-# 🧾 Formidable - a template designer
+# 🧾 Formidable — The Dynamic Form & Template Designer
 
-**Formidable** is a dual-context desktop application for managing structured Markdown content through YAML-based templates. Built with Electron, it combines a full YAML editor with a form-based Markdown generator, offering a flexible and powerful editing experience.
+**Formidable** is a modular Electron desktop application for creating, managing, and rendering dynamic forms and Markdown documents from YAML-based templates. It combines a visual form editor with a powerful Handlebars-style rendering engine, a built-in virtual file system (VFS), and optional Git integration — designed for professionals who need structured content management, versioning, and auditability.
 
 ---
 
 ## ⚠️ Pre-release
 
 > This version of Formidable is a pre-release for testing and feedback.
-> There may be missing features or bugs. Use at your own risk.
+> Expect missing features or bugs. Use at your own risk.
 > See the [release notes](https://github.com/petervdpas/Formidable/releases/tag/v1.6.0-pre) for details.
 
-**Latest Windows Installer**:  
+**Latest Windows Installer**:
 👉 [Formidable Setup.exe (Pre-release)](https://github.com/petervdpas/Formidable/releases/download/v1.6.0-pre/Formidable.Setup.exe)
 
 ---
 
 ## ✨ Key Features
 
-- **🔧 Dual Editing Modes**
-  - **Template Mode**: Define YAML-based form structures with fields, types, and layout.
-  - **Markdown Mode**: Fill out metadata forms to render templated Markdown documents.
+* **⚙️ Dynamic Template & Form System**
 
-- **📄 YAML Template Editor**
-  - Rich UI for adding, editing, reordering, and deleting form fields.
-  - Field types include: text, checkbox, dropdown, radio, textarea, number, date, list, and table.
-  - Live Handlebars-style preview rendering.
+  * YAML-based templates with async field renderers
+  * Visual form editor with live preview
+  * Full Markdown renderer using Handlebars-style syntax
 
-- **🧩 Dynamic Form Renderer**
-  - Forms are generated from YAML templates and populate data into a structured interface.
-  - Automatically injects defaults from the template if no metadata exists.
+* **🧩 Modular Event Architecture**
 
-- **🖱️ Full GUI**
-  - Modal-based dialogs for field editing, entry creation, and template management.
-  - Split-view resizable layout for both template and form (storage) modes.
-  - CodeMirror-based template editor with fullscreen support.
+  * Custom global EventBus for decoupled module interaction
+  * Dynamic context switching (template + storage)
+  * Profile-based configuration
 
-- **🎨 Theming + Persistence**
-  - Light/Dark mode toggle with persisted config.
-  - Settings stored in `user.json` with fallback validation and repair.
+* **📁 Virtual File System (VFS)**
 
-- **🧠 Event-Driven Architecture**
-  - Built on a custom global EventBus (`modules/eventBus.js`) to decouple logic.
-  - Dynamic context switching, menu events, and form/template syncing.
+  * Organized storage by context and template
+  * Full control over storage folders, paths, and metadata
+  * Auto-synced view of the VFS in the sidebar
+
+* **🔀 Git Integration (Optional)**
+
+  * Commit, push, pull from the UI
+  * Git remote info and branch listing
+  * Supports Azure DevOps workflows (credential.helper + useHttpPath)
+
+* **🖥️ Clean, Modern UI**
+
+  * Modal-based dialogs (template edit, form edit, Git actions)
+  * Independently closable and resizable Markdown/Preview panes
+  * Full light/dark theming, configurable icon or label buttons
+
+* **🔗 Internal Linking & Wiki Support**
+
+  * Support for internal form links (`formIdLink` fields)
+  * Future-proof architecture for internal wiki server (localhost)
+
+* **🔎 Designed for Auditability**
+
+  * "Auditability by Design" approach: trackable metadata, version control, profiles
+  * Suitable for regulated environments
 
 ---
 
 ## 🧠 Template Syntax
 
-Templates use a Handlebars-inspired syntax to insert and conditionally render fields:
+Formidable uses a Handlebars-inspired syntax for rendering:
 
 ```handlebars
 # {{field "title"}}
@@ -73,55 +87,62 @@ Templates use a Handlebars-inspired syntax to insert and conditionally render fi
 {{/if}}
 ```
 
-Field references:
+Reference helpers:
 
-- `{{field "key"}}` — formatted value
-- `{{fieldRaw "key"}}` — raw JS value (array, boolean, etc.)
-- `{{fieldMeta "key" "property"}}` — access to template metadata (e.g., column headers)
+* `{{field "key"}}` → formatted value
+* `{{fieldRaw "key"}}` → raw JS value
+* `{{fieldMeta "key" "property"}}` → field metadata access
 
 ---
 
-## 🧪 Field Types Supported
+## 📋 Supported Field Types
 
-| Type       | Description          | Supported Features                |
-| ---------- | -------------------- | --------------------------------- |
-| `text`     | Single-line input    | Defaults                          |
-| `textarea` | Multi-line input     | Scrollable text block             |
-| `boolean`  | Checkbox toggle      | Checkbox or conditional logic     |
-| `dropdown` | Select from list     | Static options                    |
-| `radio`    | Choose one option    | Field-level layout                |
-| `number`   | Numeric input        | Step input, default, numeric cast |
-| `date`     | Date picker          | ISO-style formatting              |
-| `list`     | Dynamic input list   | Add/remove items                  |
-| `table`    | Dynamic table editor | Multi-column row editing          |
+| Type                     | Description            |
+| ------------------------ | ---------------------- |
+| `text`                   | Single-line input      |
+| `textarea`               | Multi-line text block  |
+| `boolean`                | Checkbox toggle        |
+| `dropdown`               | Select from list       |
+| `radio`                  | Radio button group     |
+| `number`                 | Numeric input          |
+| `date`                   | ISO-style date picker  |
+| `list`                   | Dynamic list input     |
+| `table`                  | Editable table grid    |
+| `image`                  | Upload & preview image |
+| `link`                   | Link to external or another form   |
+| `loopstart` / `loopstop` | Define loop sections   |
 
 ---
 
 ## ⚙️ Configuration (user.json)
 
-Saved to `./config/user.json`:
+Saved to: `./config/user.json`
 
 ```json
 {
-  "theme": "light",
+  "theme": "dark",
   "font_size": 14,
   "logging_enabled": true,
   "context_mode": "storage",
   "context_folder": "./",
-  "selected_template": "basic.yaml",
-  "selected_data_file": "sane-20250530.meta.json",
-  "author_name": "Regular user",
+  "selected_template": "my-template.yaml",
+  "selected_data_file": "example.meta.json",
+  "author_name": "Regular User",
   "author_email": "regular@example.com",
+  "use_git": true,
+  "git_root": "./",
+  "show_icon_buttons": true,
   "window_bounds": {
-    "width": 1130,
-    "height": 903,
-    "x": 108,
-    "y": 93
+    "width": 1280,
+    "height": 900,
+    "x": 100,
+    "y": 80
   }
 }
 ```
 
-All config values are validated and auto-repaired on load. Partial writes (e.g. via UI) merge with existing config safely.
+* Values are validated and auto-repaired on load.
+* UI updates are event-driven (`config:update`).
 
 ---
 
@@ -134,23 +155,24 @@ npm install
 npm start
 ```
 
-To build the Windows executable (and optionally patch the icon):
+To build the Windows executable:
 
 ```bash
 npm run build
 ```
 
-> **Note**: This assumes you're running on Windows. The icon will be patched into `dist/win-unpacked/Formidable.exe` before packaging using `rcedit`, which is bundled with `electron-builder`. No global install is required.
-> Linux and Mac builds need to be added. The current build process is pretty much Windows-specific.
+> **Note:** Current packaging targets Windows.
+> Linux and Mac packaging will be added in future.
 
 ---
 
-## 🧪 Development Notes
+## 🧑‍💻 Development Notes
 
-- Use `CTRL+ENTER` to toggle fullscreen on the template editor.
-- All data is stored locally using `yaml` (templates), `meta.json` (data files), and relative paths.
-- Template fields support drag-and-drop reordering via Sortable.js.
-- Modals are resizable and ESC-closable with backdrop click.
+* **CTRL+ENTER** → toggle fullscreen on template editor
+* Templates = `.yaml`, Data = `.meta.json`, Images = `.jpg`/`.png`
+* VFS auto-updates on create/save/delete
+* Modals: resizable, ESC-closable, backdrop click dismiss
+* Git config per repo is cached
 
 ---
 
