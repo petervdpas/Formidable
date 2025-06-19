@@ -6,6 +6,7 @@ const { renderPage } = require("./pageGenerator");
 const {
   getVirtualStructure,
   loadAndRenderForm,
+  loadTemplateYaml,
 } = require("./serverDataProvider");
 const configManager = require("./configManager");
 
@@ -32,16 +33,22 @@ function startInternalServer(port = 8383) {
     const vfs = await getVirtualStructure();
     const templates = Object.keys(vfs.templateStorageFolders || {});
 
-    const templateLinks = templates
-      .map(
-        (t) => `<li><a href="/template/${encodeURIComponent(t)}">${t}</a></li>`
-      )
-      .join("");
+    const templateLinks = await Promise.all(
+      templates.map(async (t) => {
+        const templateInfo = vfs.templateStorageFolders?.[t];
+        const yaml = await loadTemplateYaml(templateInfo?.filename);
+        const displayName = yaml?.name?.trim() || t;
+
+        return `<li><a href="/template/${encodeURIComponent(
+          t
+        )}">${displayName}</a></li>`;
+      })
+    );
 
     const body = `
       <p>Welcome to the Formidable Internal Server.</p>
       <h2>Available Templates</h2>
-      <ul>${templateLinks}</ul>
+      <ul>${templateLinks.join("")}</ul>
       <p><a href="/virtual">View Virtual Structure (JSON)</a></p>
     `;
 
@@ -54,10 +61,11 @@ function startInternalServer(port = 8383) {
     );
   });
 
-  // JSON - Virtual Structure
+  // JSON - Virtual Structure (pretty printed)
   app.get("/virtual", async (req, res) => {
     const vfs = await getVirtualStructure();
-    res.json(vfs);
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    res.send(JSON.stringify(vfs, null, 2));
   });
 
   // HTML - Template List of Forms
