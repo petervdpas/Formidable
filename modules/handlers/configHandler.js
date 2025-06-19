@@ -68,6 +68,15 @@ export async function handleConfigUpdate(partial) {
     if (partial.theme) {
       EventBus.emit("theme:toggle", partial.theme);
     }
+
+       // 🟢 FINAL STEP: Always update user:config VFS key!
+    const fullConfig = await window.api.config.loadUserConfig();
+    console.log("[ConfigHandler] Full user config:", fullConfig);
+    await EventBus.emit("vfs:update", {
+      id: "user:config",
+      value: fullConfig,
+    });
+
   } catch (err) {
     EventBus.emit("logging:error", [
       "[ConfigHandler] Failed to update user config:",

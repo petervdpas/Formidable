@@ -43,24 +43,11 @@ export async function renderSettings() {
   tabGeneral.className = "tab-panel tab-general";
 
   tabGeneral.appendChild(
-    createFormRowInput({
-      id: "author-name",
-      label: "Author Name",
-      value: config.author_name,
-      placeholder: "Your full name",
-      configKey: "author_name",
-    })
+    bindFormInput("author-name", "author_name", "Author Name")
   );
 
   tabGeneral.appendChild(
-    createFormRowInput({
-      id: "author-email",
-      label: "Author Email",
-      value: config.author_email,
-      placeholder: "you@example.com",
-      type: "email",
-      configKey: "author_email",
-    })
+    bindFormInput("author-email", "author_email", "Author Email")
   );
 
   tabGeneral.appendChild(
@@ -147,60 +134,21 @@ export async function renderSettings() {
 }
 
 function setupBindings(config, gitRootPicker) {
-  const themeToggle = document.getElementById("theme-toggle");
-  if (themeToggle) {
-    initThemeToggle(themeToggle);
-    EventBus.emit("theme:toggle", themeToggle.checked ? "dark" : "light");
-  }
+  bindThemeSwitch("theme-toggle", "theme");
 
-  const showIconsToggle = document.getElementById("show-icons-toggle");
-  if (showIconsToggle) {
-    showIconsToggle.onchange = async () => {
-      const enabled = showIconsToggle.checked;
-      EventBus.emit("config:update", { show_icon_buttons: enabled });
-      cachedConfig = await reloadConfig();
-      EventBus.emit(
-        "status:update",
-        `Icon buttons ${enabled ? "enabled" : "disabled"}`
-      );
-    };
-  }
-
-  const loggingToggle = document.getElementById("logging-toggle");
-  if (loggingToggle) {
-    loggingToggle.onchange = async () => {
-      const enabled = loggingToggle.checked;
-      EventBus.emit("config:update", { logging_enabled: enabled });
-      cachedConfig = await reloadConfig();
-      EventBus.emit("logging:toggle", enabled);
-      EventBus.emit(
-        "status:update",
-        `Logging ${enabled ? "enabled" : "disabled"}`
-      );
-    };
-  }
-
-  const useGitToggle = document.getElementById("settings-use-git");
-  if (useGitToggle) {
-    useGitToggle.onchange = async () => {
-      const enabled = useGitToggle.checked;
-      await EventBus.emit("config:update", { use_git: enabled });
-      if (!enabled) {
-        gitRootPicker.input.value = "";
-        await EventBus.emit("config:update", { git_root: "" });
-      }
-
-      gitRootPicker.input.disabled = !enabled;
-      gitRootPicker.button.disabled = !enabled;
-      gitRootPicker.element.classList.toggle("disabled", !enabled);
-
-      cachedConfig = await reloadConfig();
-      EventBus.emit(
-        "status:update",
-        `Git usage ${enabled ? "enabled" : "disabled"}`
-      );
-    };
-  }
+  bindToggleSwitch("show-icons-toggle", "show_icon_buttons");
+  bindToggleSwitch("logging-toggle", "logging_enabled", (enabled) =>
+    EventBus.emit("logging:toggle", enabled)
+  );
+  bindToggleSwitch("settings-use-git", "use_git", (enabled) => {
+    gitRootPicker.input.disabled = !enabled;
+    gitRootPicker.button.disabled = !enabled;
+    gitRootPicker.element.classList.toggle("disabled", !enabled);
+    if (!enabled) {
+      gitRootPicker.input.value = "";
+      EventBus.emit("config:update", { git_root: "" });
+    }
+  });
 
   bindDirButton("settings-context-folder", "context_folder");
   bindDirButton("settings-git-root", "git_root");
@@ -209,6 +157,52 @@ function setupBindings(config, gitRootPicker) {
 async function reloadConfig() {
   return new Promise((resolve) => {
     EventBus.emit("config:load", (cfg) => resolve(cfg));
+  });
+}
+
+function bindThemeSwitch(switchId, configKey) {
+  const el = document.getElementById(switchId);
+  if (!el) return;
+
+  initThemeToggle(el); // keep your logic
+  EventBus.emit("theme:toggle", el.checked ? "dark" : "light");
+
+  el.onchange = async () => {
+    const theme = el.checked ? "dark" : "light";
+    await EventBus.emit("config:update", { [configKey]: theme });
+    cachedConfig = await reloadConfig();
+    EventBus.emit("theme:toggle", theme);
+    EventBus.emit("status:update", `Theme set to ${theme}`);
+  };
+}
+
+function bindToggleSwitch(switchId, configKey, onExtra = null) {
+  const el = document.getElementById(switchId);
+  if (!el) return;
+
+  el.onchange = async () => {
+    const enabled = el.checked;
+    await EventBus.emit("config:update", { [configKey]: enabled });
+    if (typeof onExtra === "function") await onExtra(enabled);
+    cachedConfig = await reloadConfig();
+    EventBus.emit(
+      "status:update",
+      `${configKey.replace(/_/g, " ")} ${enabled ? "enabled" : "disabled"}`
+    );
+  };
+}
+
+function bindFormInput(id, configKey, label) {
+  return createFormRowInput({
+    id,
+    label,
+    value: cachedConfig[configKey],
+    configKey,
+    onSave: async (val) => {
+      EventBus.emit("config:update", { [configKey]: val });
+      cachedConfig = await reloadConfig();
+      EventBus.emit("status:update", `${label} set to ${val}`);
+    },
   });
 }
 
