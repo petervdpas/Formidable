@@ -1,6 +1,8 @@
 # 🧾 Formidable — The Dynamic Form & Template Designer
 
-**Formidable** is a modular Electron desktop application for creating, managing, and rendering dynamic forms and Markdown documents from YAML-based templates. It combines a visual form editor with a powerful Handlebars-style rendering engine, a built-in virtual file system (VFS), and optional Git integration — designed for professionals who need structured content management, versioning, and auditability.
+**Formidable** is a modular Electron desktop application for creating, managing, and rendering dynamic forms and Markdown documents from YAML-based templates. It combines a visual form editor with a powerful Handlebars-style rendering engine, a built-in virtual file system (VFS), profile switching, and optional Git integration — designed for professionals who need structured content management, versioning, and auditability.
+
+![Formidable](assets/formidable.png)
 
 ---
 
@@ -27,7 +29,13 @@
 
   * Custom global EventBus for decoupled module interaction
   * Dynamic context switching (template + storage)
-  * Profile-based configuration
+  * Profile switching with per-profile configuration
+
+* **👥 Profile Switching**
+
+  * Easily switch between multiple user profiles
+  * Profiles store their own author name, email, context folder, preferences
+  * Supports collaborative and multi-project use
 
 * **📁 Virtual File System (VFS)**
 
@@ -44,8 +52,9 @@
 * **🖥️ Clean, Modern UI**
 
   * Modal-based dialogs (template edit, form edit, Git actions)
-  * Independently closable and resizable Markdown/Preview panes
+  * **Markdown & Preview modal** — live output with split/closable panes
   * Full light/dark theming, configurable icon or label buttons
+  * Split-view for template editing and form data
 
 * **🔗 Internal Linking & Wiki Support**
 
@@ -54,8 +63,8 @@
 
 * **🔎 Designed for Auditability**
 
-  * "Auditability by Design" approach: trackable metadata, version control, profiles
-  * Suitable for regulated environments
+  * "Auditability by Design" approach: trackable metadata, version control, profile isolation
+  * Suitable for regulated environments, audit preparation, compliance
 
 ---
 
@@ -97,20 +106,24 @@ Reference helpers:
 
 ## 📋 Supported Field Types
 
-| Type                     | Description            |
-| ------------------------ | ---------------------- |
-| `text`                   | Single-line input      |
-| `textarea`               | Multi-line text block  |
-| `boolean`                | Checkbox toggle        |
-| `dropdown`               | Select from list       |
-| `radio`                  | Radio button group     |
-| `number`                 | Numeric input          |
-| `date`                   | ISO-style date picker  |
-| `list`                   | Dynamic list input     |
-| `table`                  | Editable table grid    |
-| `image`                  | Upload & preview image |
-| `link`                   | Link to external or another form   |
-| `loopstart` / `loopstop` | Define loop sections   |
+| Type                     | Description                      |
+| ------------------------ | -------------------------------- |
+| `text`                   | Single-line input                |
+| `textarea`               | Multi-line text block            |
+| `boolean`                | Checkbox toggle                  |
+| `dropdown`               | Select from list                 |
+| `multioption`            | Multiple choice (checkbox group) |
+| `radio`                  | Radio button group               |
+| `number`                 | Numeric input                    |
+| `range`                  | Range slider                     |
+| `date`                   | ISO-style date picker            |
+| `list`                   | Dynamic list input               |
+| `table`                  | Editable table grid (JSON)       |
+| `image`                  | Upload & preview image           |
+| `link`                   | Text input for URL or link       |
+| `formidable://` link     | Internal form link (formIdLink)  |
+| `loopstart` / `loopstop` | Define loop sections             |
+| `looper`                 | Looper meta block (inserts loop) |
 
 ---
 
@@ -171,6 +184,8 @@ npm run build
 * **CTRL+ENTER** → toggle fullscreen on template editor
 * Templates = `.yaml`, Data = `.meta.json`, Images = `.jpg`/`.png`
 * VFS auto-updates on create/save/delete
+* Profile switching triggers full config refresh and context rehydration
+* Markdown & Preview modal: supports split view and pane closing
 * Modals: resizable, ESC-closable, backdrop click dismiss
 * Git config per repo is cached
 
