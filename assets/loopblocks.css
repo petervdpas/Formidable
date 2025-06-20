@@ -7,6 +7,13 @@
   background-color: var(--loop-bg-secondary, #f9f9f9);
 }
 
+.loop-container .loop-label {
+  font-weight: bold;
+  font-size: larger;
+  display: block;
+  margin-bottom: 8px;
+}
+
 /* ─── Loop Item ────────────────────────────────── */
 .loop-container .loop-item {
   position: relative;

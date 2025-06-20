@@ -24,9 +24,10 @@ export function generateTemplateCode(fields = []) {
         i++;
       }
 
-      const loopContent = loopFields
-        .map((f) => generateSingleFieldBlock(f, 3)) // H3 inside loop
-        .join("\n---\n\n");
+      const loopContent = [
+        `### LoopIndex: {{loop_index.value}}\n`,
+        ...loopFields.map((f) => generateSingleFieldBlock(f, 3)),
+      ].join("\n---\n\n");
 
       bodyParts.push(
         `\n## Loop: ${loopKey}\n\n{{#loop "${loopKey}"}}\n${loopContent}\n{{/loop}}\n`

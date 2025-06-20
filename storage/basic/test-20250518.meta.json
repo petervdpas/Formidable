@@ -4,7 +4,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:19:38.103Z",
-    "updated": "2025-06-18T20:13:33.930Z",
+    "updated": "2025-06-20T20:52:58.753Z",
     "flagged": false
   },
   "data": {
@@ -18,12 +18,9 @@
     "radio": "CAT",
     "mline": "A whole lot of prefab text...",
     "numpy": 23,
-    "rangie": 45,
+    "rangie": 80,
     "bday": "1968-12-29",
-    "listy": [
-      "One",
-      "Two"
-    ],
+    "listy": [],
     "datable": [
       [
         "Three",
@@ -32,6 +29,6 @@
       ]
     ],
     "design": "GreenSignWhiteArrowPersonRunning.png",
-    "linktest": "https://google.com"
+    "linktest": "formidable://basic.yaml:sane-20250530.meta.json"
   }
 }

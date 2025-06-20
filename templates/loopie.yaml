@@ -2,13 +2,44 @@ name: Looper example
 filename: loopie.yaml
 markdown_template: |-
   <!-- AUTO-GENERATED TEMPLATE - Only if Editor is empty! -->
+  ## Title
 
+  _{{fieldDescription "title"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "title")}}
+  ```
   {{field "title"}}
   ---
 
-  {{#loop "looper"}}
-  ### {{field "sub_title"}}
 
+  ## Loop: looper
+
+  {{#loop "looper"}}
+  ### LoopIndex: {{loop_index.value}}
+
+  ---
+
+  ### Sub Title
+
+  _{{fieldDescription "sub_title"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "sub_title")}}
+  ```
+  {{field "sub_title"}}
+  ---
+
+  ### Description
+
+  _{{fieldDescription "description"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "description")}}
+  ```
   {{field "description"}}
   {{/loop}}
 fields:
@@ -17,7 +48,7 @@ fields:
     type: text
     description: This is just a title....
   - key: looper
-    label: Looper
+    label: Chapters
     type: loopstart
   - key: sub_title
     label: Sub Title

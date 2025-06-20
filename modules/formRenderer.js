@@ -1,6 +1,9 @@
 // modules/formRenderer.js
 
-import { buildHiddenInput } from "../utils/elementBuilders.js";
+import {
+  buildHiddenInput,
+  addContainerElement,
+} from "../utils/elementBuilders.js";
 import {
   renderFieldElement,
   injectFieldDefaults,
@@ -65,6 +68,13 @@ async function renderFieldsWithLoops(
       const loopContainer = document.createElement("div");
       loopContainer.className = "loop-container";
       loopContainer.dataset.loopKey = loopKey;
+
+      addContainerElement({
+        parent: loopContainer,
+        tag: "div",
+        className: "loop-label",
+        textContent: field?.label || "Unnamed Loop",
+      });
 
       const loopList = document.createElement("div");
       loopList.className = "loop-list";

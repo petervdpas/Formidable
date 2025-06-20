@@ -1,7 +1,11 @@
 // utils/fieldRenderers.js
 
 import { ensureVirtualLocation } from "./vfsUtils.js";
-import { wrapInputWithLabel, buildSwitchElement } from "./elementBuilders.js";
+import {
+  wrapInputWithLabel,
+  buildSwitchElement,
+  addContainerElement,
+} from "./elementBuilders.js";
 import { applyDatasetMapping } from "./domUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 import { getCurrentTheme } from "../modules/themeToggle.js";
@@ -19,18 +23,24 @@ function resolveOption(opt) {
 // ─────────────────────────────────────────────
 // Type: loopstart
 export async function renderLoopstartField(field) {
-  const container = document.createElement("div");
-  container.className = "loop-marker loop-start";
-  container.textContent = field.label || "Loop Start";
-
-  const hidden = document.createElement("input");
-  hidden.type = "hidden";
-  hidden.name = field.key;
-  hidden.value = "__loop_start__"; // of leeg
-
   const wrapper = document.createElement("div");
-  wrapper.appendChild(container);
-  wrapper.appendChild(hidden);
+
+  addContainerElement({
+    parent: wrapper,
+    tag: "div",
+    className: "loop-marker loop-start",
+    textContent: field.label || "Loop Start",
+  });
+
+  addContainerElement({
+    parent: wrapper,
+    tag: "input",
+    attributes: {
+      type: "hidden",
+      name: field.key,
+      value: "__loop_start__",
+    },
+  });
 
   return wrapInputWithLabel(
     wrapper,
@@ -43,18 +53,24 @@ export async function renderLoopstartField(field) {
 // ─────────────────────────────────────────────
 // Type: loopstop
 export async function renderLoopstopField(field) {
-  const container = document.createElement("div");
-  container.className = "loop-marker loop-stop";
-  container.textContent = field.label || "Loop Stop";
-
-  const hidden = document.createElement("input");
-  hidden.type = "hidden";
-  hidden.name = field.key;
-  hidden.value = "__loop_stop__"; // of leeg
-
   const wrapper = document.createElement("div");
-  wrapper.appendChild(container);
-  wrapper.appendChild(hidden);
+
+  addContainerElement({
+    parent: wrapper,
+    tag: "div",
+    className: "loop-marker loop-stop",
+    textContent: field.label || "Loop Stop",
+  });
+
+  addContainerElement({
+    parent: wrapper,
+    tag: "input",
+    attributes: {
+      type: "hidden",
+      name: field.key,
+      value: "__loop_stop__",
+    },
+  });
 
   return wrapInputWithLabel(
     wrapper,
@@ -141,17 +157,28 @@ export async function renderMultioptionField(field) {
   (field.options || []).forEach((opt) => {
     const { value, label } = resolveOption(opt);
 
-    const input = document.createElement("input");
-    input.type = "checkbox";
-    input.name = field.key;
-    input.value = value;
-    input.checked = (field.default || []).includes(value);
-
-    const labelEl = document.createElement("label");
+    const labelEl = addContainerElement({
+      parent: wrapper,
+      tag: "label",
+    });
     labelEl.style.display = "block";
-    labelEl.appendChild(input);
+
+    addContainerElement({
+      parent: labelEl,
+      tag: "input",
+      attributes: {
+        type: "checkbox",
+        name: field.key,
+        value: value,
+      },
+      callback: (el) => {
+        if ((field.default || []).includes(value)) {
+          el.checked = true;
+        }
+      },
+    });
+
     labelEl.appendChild(document.createTextNode(" " + label));
-    wrapper.appendChild(labelEl);
   });
 
   return wrapInputWithLabel(
@@ -169,22 +196,30 @@ export async function renderRadioField(field) {
   wrapper.dataset.radioGroup = field.key;
 
   (field.options || []).forEach((opt) => {
-    const { value, label } = resolveOption(opt); // ✅ Structured parsing
+    const { value, label } = resolveOption(opt);
 
-    const labelEl = document.createElement("label");
+    const labelEl = addContainerElement({
+      parent: wrapper,
+      tag: "label",
+    });
     labelEl.style.display = "block";
 
-    const input = document.createElement("input");
-    input.type = "radio";
-    input.name = field.key;
-    input.value = value;
+    addContainerElement({
+      parent: labelEl,
+      tag: "input",
+      attributes: {
+        type: "radio",
+        name: field.key,
+        value: value,
+      },
+      callback: (el) => {
+        if (String(field.default) === String(value)) {
+          el.checked = true;
+        }
+      },
+    });
 
-    // Compare to correct default value
-    if (String(field.default) === String(value)) input.checked = true;
-
-    labelEl.appendChild(input);
     labelEl.appendChild(document.createTextNode(" " + label));
-    wrapper.appendChild(labelEl);
   });
 
   return wrapInputWithLabel(
@@ -201,16 +236,19 @@ export async function renderTextareaField(field) {
   const wrapper = document.createElement("div");
   wrapper.className = "markdown-editor-wrapper";
 
-  const textarea = document.createElement("textarea");
-  textarea.name = field.key;
+  const textarea = addContainerElement({
+    parent: wrapper,
+    tag: "textarea",
+    attributes: { name: field.key },
+  });
   textarea.value = field.default || "";
-  wrapper.appendChild(textarea);
 
   requestAnimationFrame(() => {
     let keystrokeCount = 0;
 
     const editor = new EasyMDE({
       element: textarea,
+      minHeight: "80px",
       theme: getCurrentTheme() === "dark" ? "monokai" : "eclipse",
       toolbar: [
         "bold",
@@ -249,7 +287,6 @@ export async function renderTextareaField(field) {
       ],
       spellChecker: false,
       autoDownloadFontAwesome: false,
-      minHeight: "120px",
     });
 
     const cm = editor.codemirror;
@@ -306,25 +343,34 @@ export async function renderRangeField(field) {
   const step = parseFloat(optMap.step ?? field.step ?? 1);
   const value = field.default ?? (min + max) / 2;
 
-  const input = document.createElement("input");
-  input.type = "range";
-  input.name = field.key;
-  input.min = min;
-  input.max = max;
-  input.step = step;
-  input.value = value;
+  const input = addContainerElement({
+    parent: wrapper,
+    tag: "input",
+    attributes: {
+      type: "range",
+      name: field.key,
+      min: min,
+      max: max,
+      step: step,
+    },
+    callback: (el) => {
+      el.value = value;
+    },
+  });
 
-  const display = document.createElement("span");
-  display.className = "range-display";
-  display.textContent = input.value;
-  display.style.marginLeft = "10px";
+  const display = addContainerElement({
+    parent: wrapper,
+    tag: "span",
+    className: "range-display",
+    textContent: value,
+    attributes: {
+      style: "margin-left: 10px;",
+    },
+  });
 
   input.addEventListener("input", () => {
     display.textContent = input.value;
   });
-
-  wrapper.appendChild(input);
-  wrapper.appendChild(display);
 
   return wrapInputWithLabel(
     wrapper,
@@ -351,12 +397,10 @@ export async function renderDateField(field) {
 
 // ─────────────────────────────────────────────
 // Type: list (dynamic add/remove)
-// ─────────────────────────────────────────────
-// Type: list (dynamic add/remove)
 export async function renderListField(field) {
   const wrapper = document.createElement("div");
   wrapper.dataset.type = "list";
-  wrapper.dataset.listField = field.key; // crucial for getFormData()
+  wrapper.dataset.listField = field.key;
 
   const items = field.default || [];
 
@@ -365,9 +409,15 @@ export async function renderListField(field) {
     wrapper.appendChild(row);
   }
 
-  const addBtn = document.createElement("button");
-  addBtn.textContent = "+";
-  addBtn.type = "button"; // Prevent form submission if inside <form>
+  const addBtn = addContainerElement({
+    parent: wrapper,
+    tag: "button",
+    textContent: "+",
+    attributes: {
+      type: "button",
+    },
+  });
+
   addBtn.addEventListener("click", async () => {
     const row = await createListItem("", field.options || []);
     wrapper.insertBefore(row, addBtn);
@@ -378,8 +428,6 @@ export async function renderListField(field) {
     }
   });
 
-  wrapper.appendChild(addBtn);
-
   return wrapInputWithLabel(
     wrapper,
     field.label,
@@ -389,14 +437,23 @@ export async function renderListField(field) {
 }
 
 async function createListItem(value, options = []) {
-  const container = document.createElement("div");
-  container.className = "list-item";
+  const container = addContainerElement({
+    tag: "div",
+    className: "list-item",
+  });
 
-  const input = document.createElement("input");
-  input.type = "text";
-  input.value = value;
-  input.name = "list-item";
-  input.className = "list-input";
+  const input = addContainerElement({
+    parent: container,
+    tag: "input",
+    attributes: {
+      type: "text",
+      name: "list-item",
+      class: "list-input",
+    },
+    callback: (el) => {
+      el.value = value;
+    },
+  });
 
   if (options.length > 0) {
     input.readOnly = true;
@@ -413,14 +470,18 @@ async function createListItem(value, options = []) {
     }
   }
 
-  const removeBtn = document.createElement("button");
-  removeBtn.textContent = "-";
-  removeBtn.className = "remove-btn";
-  removeBtn.type = "button";
+  const removeBtn = addContainerElement({
+    parent: container,
+    tag: "button",
+    textContent: "-",
+    className: "remove-btn",
+    attributes: {
+      type: "button",
+    },
+  });
+
   removeBtn.onclick = () => container.remove();
 
-  container.appendChild(input);
-  container.appendChild(removeBtn);
   return container;
 }
 
@@ -435,53 +496,85 @@ export async function renderTableField(field) {
   const columns = field.options || [];
   const rows = field.default || [];
 
-  const table = document.createElement("table");
-  table.className = "dynamic-table";
+  const table = addContainerElement({
+    parent: wrapper,
+    tag: "table",
+    className: "dynamic-table",
+  });
 
   // Header
-  const thead = document.createElement("thead");
-  const headRow = document.createElement("tr");
+  const thead = addContainerElement({
+    parent: table,
+    tag: "thead",
+  });
+
+  const headRow = addContainerElement({
+    parent: thead,
+    tag: "tr",
+  });
 
   columns.forEach((col) => {
     const { label } = resolveOption(col);
-    const th = document.createElement("th");
-    th.textContent = label;
-    headRow.appendChild(th);
+    addContainerElement({
+      parent: headRow,
+      tag: "th",
+      textContent: label,
+    });
   });
 
   // Add a header cell for the remove button
-  const thRemove = document.createElement("th");
-  thRemove.textContent = ""; // for remove column
-  headRow.appendChild(thRemove);
-
-  thead.appendChild(headRow);
-  table.appendChild(thead);
+  addContainerElement({
+    parent: headRow,
+    tag: "th",
+    textContent: "", // remove column header
+  });
 
   // Body
-  const tbody = document.createElement("tbody");
+  const tbody = addContainerElement({
+    parent: table,
+    tag: "tbody",
+  });
 
   function createRow(values = []) {
-    const tr = document.createElement("tr");
+    const tr = addContainerElement({
+      tag: "tr",
+    });
 
     columns.forEach((col, colIdx) => {
       const { value } = resolveOption(col);
-      const td = document.createElement("td");
-      const input = document.createElement("input");
-      input.type = "text";
-      input.name = value;
-      input.value = values[colIdx] || "";
-      td.appendChild(input);
-      tr.appendChild(td);
+
+      const td = addContainerElement({
+        parent: tr,
+        tag: "td",
+      });
+
+      const input = addContainerElement({
+        parent: td,
+        tag: "input",
+        attributes: {
+          type: "text",
+          name: value,
+        },
+        callback: (el) => {
+          el.value = values[colIdx] || "";
+        },
+      });
     });
 
     // Remove button cell
-    const tdRemove = document.createElement("td");
-    const removeBtn = document.createElement("button");
-    removeBtn.textContent = "-";
-    removeBtn.className = "remove-btn";
+    const tdRemove = addContainerElement({
+      parent: tr,
+      tag: "td",
+    });
+
+    const removeBtn = addContainerElement({
+      parent: tdRemove,
+      tag: "button",
+      textContent: "-",
+      className: "remove-btn",
+    });
+
     removeBtn.onclick = () => tr.remove();
-    tdRemove.appendChild(removeBtn);
-    tr.appendChild(tdRemove);
 
     return tr;
   }
@@ -490,18 +583,17 @@ export async function renderTableField(field) {
     tbody.appendChild(createRow(row));
   });
 
-  table.appendChild(tbody);
-
   // Add Row Button
-  const addBtn = document.createElement("button");
-  addBtn.textContent = "+";
+  const addBtn = addContainerElement({
+    parent: wrapper,
+    tag: "button",
+    textContent: "+",
+  });
+
   addBtn.onclick = () => {
     const newRow = createRow();
     tbody.appendChild(newRow);
   };
-
-  wrapper.appendChild(table);
-  wrapper.appendChild(addBtn);
 
   return wrapInputWithLabel(
     wrapper,
@@ -527,13 +619,21 @@ export async function renderImageField(field, template) {
     ]
   );
 
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "image/png, image/jpeg";
-  input.name = field.key;
+  const input = addContainerElement({
+    parent: wrapper,
+    tag: "input",
+    attributes: {
+      type: "file",
+      name: field.key,
+      accept: "image/png, image/jpeg",
+    },
+  });
 
-  const preview = document.createElement("img");
-  //preview.style.display = "none";
+  const preview = addContainerElement({
+    parent: wrapper,
+    tag: "img",
+  });
+  // preview.style.display = "none";
 
   const deleteBtn = createRemoveImageButton(() => {
     clearImage();
@@ -591,8 +691,6 @@ export async function renderImageField(field, template) {
     }
   });
 
-  wrapper.appendChild(input);
-  wrapper.appendChild(preview);
   wrapper.appendChild(deleteBtn);
 
   return wrapInputWithLabel(
@@ -609,22 +707,35 @@ export async function renderLinkField(
   currentTemplate,
   { fetchTemplates, fetchMetaFiles }
 ) {
-  const wrapper = document.createElement("div");
-  wrapper.style.display = "flex";
-  wrapper.style.flexWrap = "wrap";
-  wrapper.style.alignItems = "center";
-  wrapper.style.gap = "8px";
-
-  wrapper.dataset.linkField = field.key;
+  const wrapper = addContainerElement({
+    tag: "div",
+    attributes: {
+      style: "display: flex; flex-wrap: wrap; align-items: center; gap: 8px;",
+    },
+    callback: (el) => {
+      el.dataset.linkField = field.key;
+    },
+  });
 
   // HIDDEN actual input
-  const input = document.createElement("input");
-  input.type = "hidden";
-  input.name = field.key;
-  input.value = field.default || "";
+  const input = addContainerElement({
+    parent: wrapper,
+    tag: "input",
+    attributes: {
+      type: "hidden",
+      name: field.key,
+    },
+    callback: (el) => {
+      el.value = field.default || "";
+    },
+  });
 
   // Format dropdown
-  const formatSelect = document.createElement("select");
+  const formatSelect = addContainerElement({
+    parent: wrapper,
+    tag: "select",
+  });
+
   ["regular", "formidable"].forEach((opt) => {
     const o = document.createElement("option");
     o.value = opt;
@@ -633,19 +744,33 @@ export async function renderLinkField(
   });
 
   // Template dropdown (for formidable)
-  const templateSelect = document.createElement("select");
-  templateSelect.style.display = "none";
+  const templateSelect = addContainerElement({
+    parent: wrapper,
+    tag: "select",
+    attributes: {
+      style: "display: none;",
+    },
+  });
 
   // Entry dropdown
-  const entrySelect = document.createElement("select");
-  entrySelect.style.display = "none";
+  const entrySelect = addContainerElement({
+    parent: wrapper,
+    tag: "select",
+    attributes: {
+      style: "display: none;",
+    },
+  });
 
   // URL input (for regular)
-  const urlInput = document.createElement("input");
-  urlInput.type = "text";
-  urlInput.placeholder = "Enter URL";
-  urlInput.style.flex = "1";
-  urlInput.style.display = "none";
+  const urlInput = addContainerElement({
+    parent: wrapper,
+    tag: "input",
+    attributes: {
+      type: "text",
+      placeholder: "Enter URL",
+      style: "flex: 1; display: none;",
+    },
+  });
 
   // BUILD actual value
   function updateValue() {
@@ -732,13 +857,6 @@ export async function renderLinkField(
   formatSelect.value = "regular";
   urlInput.value = field.default || "";
   updateValue();
-
-  // Assemble horizontal layout
-  wrapper.appendChild(formatSelect);
-  wrapper.appendChild(templateSelect);
-  wrapper.appendChild(entrySelect);
-  wrapper.appendChild(urlInput);
-  wrapper.appendChild(input);
 
   return wrapInputWithLabel(
     wrapper,

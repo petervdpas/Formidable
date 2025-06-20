@@ -4,7 +4,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-06-18T21:51:16.108Z",
+    "updated": "2025-06-20T20:52:26.202Z",
     "flagged": true
   },
   "data": {
@@ -15,10 +15,10 @@
       "A",
       "B"
     ],
-    "radio": "CAT",
+    "radio": "BIRD",
     "mline": "I dont like this one bit",
     "numpy": 17,
-    "rangie": 75,
+    "rangie": 45,
     "bday": "1968-12-23",
     "listy": [
       "A single list item"
@@ -31,6 +31,6 @@
       ]
     ],
     "design": "formidable.png",
-    "linktest": "formidable://loopie.yaml:test-20250530.meta.json"
+    "linktest": "formidable://basic.yaml:test-20250518.meta.json"
   }
 }

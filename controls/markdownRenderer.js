@@ -213,9 +213,11 @@ function registerHelpers() {
     const groupFields = loopGroups[key] || [];
 
     return items
-      .map((entry) => {
+      .map((entry, index) => {
+        const indexValue = `${index + 1}`;
         const subContext = {
           ...entry,
+          loop_index: { key : "loop_index", value: indexValue, type: "text" },
           _fields: groupFields,
           _template: ctx._template,
         };

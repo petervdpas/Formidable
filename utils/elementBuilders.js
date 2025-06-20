@@ -43,6 +43,35 @@ export function createStyledSelect({
   return select;
 }
 
+export function addContainerElement({
+  parent = null,
+  tag = "div",
+  className = "",
+  textContent = "",
+  attributes = {},
+  callback = null,
+} = {}) {
+  const el = document.createElement(tag);
+
+  if (className) el.className = className;
+  if (textContent) el.textContent = textContent;
+
+  // Add attributes
+  Object.entries(attributes).forEach(([key, value]) => {
+    el.setAttribute(key, value);
+  });
+
+  // Run optional callback to set properties
+  if (typeof callback === "function") {
+    callback(el);
+  }
+
+  // Append if parent is provided
+  if (parent) parent.appendChild(el);
+
+  return el;
+}
+
 export function createFormRowInput({
   id,
   label,
