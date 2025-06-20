@@ -2,7 +2,7 @@
   "theme": "light",
   "show_icon_buttons": false,
   "font_size": 14,
-  "logging_enabled": false,
+  "logging_enabled": true,
   "context_mode": "storage",
   "context_folder": "./",
   "selected_template": "basic.yaml",
@@ -14,7 +14,7 @@
   "enable_internal_server": false,
   "internal_server_port": 8383,
   "window_bounds": {
-    "width": 1195,
+    "width": 1210,
     "height": 923,
     "x": 142,
     "y": 34

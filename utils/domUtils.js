@@ -79,11 +79,10 @@ export function highlightSelected(
   }
 }
 
-export function highlightAndClickForm(entry, delay = 500) {
+export function highlightAndClickForm(entry, delay = 100) {
   if (!entry) return;
 
   setTimeout(() => {
-    EventBus.emit("form:list:itemClicked", entry);
     EventBus.emit("form:list:highlighted", entry);
   }, delay);
 }
