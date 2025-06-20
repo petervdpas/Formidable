@@ -195,6 +195,7 @@ fields:
     label: Test
     type: text
     default: Default value
+    primary_key: true
     description: A basic text input for demonstration purposes.
     two_column: true
   - key: check

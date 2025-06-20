@@ -98,6 +98,18 @@ function getTemplateDescriptor(name) {
   };
 }
 
+function checkPrimaryKey(fields) {
+  const pkFields = fields.filter((f) => f.primary_key);
+  if (pkFields.length > 1) {
+    return {
+      type: "multiple-primary-keys",
+      keys: pkFields.map((f) => f.key),
+      message: `Multiple primary keys found: ${pkFields.map((f) => f.key).join(", ")}`,
+    };
+  }
+  return null;
+}
+
 function checkDuplicateKeys(fields) {
   const seen = new Map();
   const duplicates = [];
@@ -168,12 +180,19 @@ function validateTemplate(template) {
   }
 
   const errors = [];
+
   const duplicates = checkDuplicateKeys(template.fields);
   if (duplicates.length > 0) {
     errors.push({ type: "duplicate-keys", keys: duplicates });
   }
 
+  const pkError = checkPrimaryKey(template.fields);
+  if (pkError) {
+    errors.push(pkError);
+  }
+
   errors.push(...checkLoopPairing(template.fields));
+
   return errors;
 }
 

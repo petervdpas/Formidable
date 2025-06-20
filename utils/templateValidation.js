@@ -10,6 +10,9 @@ export function formatError(error) {
   if (error.type === "unmatched-loopstop") {
     return `Unmatched loop stop at: ${error.field?.key || "?"}`;
   }
+  if (error.type === "multiple-primary-keys") {
+    return `Multiple primary keys: ${error.keys.join(", ")}`;
+  }
   if (error.type === "invalid-template") {
     return `Invalid template: ${error.message}`;
   }
