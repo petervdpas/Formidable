@@ -82,7 +82,6 @@
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    margin-bottom: 6px;
 }
 
 .modal-form-row.switch-row label:not(.switch) {

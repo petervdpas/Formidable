@@ -3,6 +3,7 @@
 import { setupFieldEditModal } from "./modalSetup.js";
 import { applyModalTypeClass } from "../utils/domUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
+import { validateField } from "../utils/templateValidation.js";
 import { applyFieldAttributeDisabling } from "../utils/formUtils.js";
 import { createToggleButtons } from "../utils/iconButtonToggle.js";
 import {
@@ -25,6 +26,10 @@ function setupFieldEditor(container, onChange, allFields = []) {
     twoColumn: container.querySelector("#edit-two-column"),
     twoColumnRow: container
       .querySelector("#edit-two-column")
+      ?.closest(".switch-row"),
+    primaryKey: container.querySelector("#edit-primary-key"),
+    primaryKeyRow: container
+      .querySelector("#edit-primary-key")
       ?.closest(".switch-row"),
     default: container.querySelector("#edit-default"),
     options: container.querySelector("#edit-options"),
@@ -57,7 +62,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
     containerRow.querySelector(".options-message")?.remove();
 
     if (!optionTypes.includes(currentType)) {
-      // ➤ Add fallback message if unsupported
+      // Add fallback message if unsupported
       const msg = document.createElement("div");
       msg.className = "options-message";
       msg.textContent = "Options not available!";
@@ -98,7 +103,14 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
     labelLocked = field.label?.trim().length > 0 && field.label !== field.key;
 
-    // Attach listeners only once
+    // ── Crucial Reset Before Attach ──
+    dom.key.__listenersAttached = false;
+    if (dom.primaryKey) {
+      dom.primaryKey.checked = !!field.primary_key;
+      dom.primaryKey.__listenersAttached = false;
+    }
+
+    // ── Key input listeners ──
     if (!dom.key.__listenersAttached) {
       dom.key.__listenersAttached = true;
 
@@ -106,9 +118,34 @@ function setupFieldEditor(container, onChange, allFields = []) {
         labelLocked = dom.label.value.trim().length > 0;
       });
 
-      dom.key.addEventListener("input", validate);
+      dom.key.addEventListener("input", () => {
+        const raw = dom.key.value.trim();
+
+        if (!labelLocked && raw.length > 0) {
+          const humanLabel = raw
+            .replace(/[_\-]+/g, " ")
+            .replace(/(^\w|\s\w)/g, (m) => m.toUpperCase());
+          dom.label.value = humanLabel;
+        }
+
+        labelLocked =
+          dom.label.value.trim().length > 0 &&
+          dom.label.value.toLowerCase() !== dom.key.value.toLowerCase();
+
+        validate();
+      });
     }
 
+    // ── Primary Key listener ──
+    if (dom.primaryKey && !dom.primaryKey.__listenersAttached) {
+      dom.primaryKey.__listenersAttached = true;
+
+      dom.primaryKey.addEventListener("change", () => {
+        validate();
+      });
+    }
+
+    // ── Type change ──
     if (dom.type) {
       dom.type.value = field.type || "text";
       dom.type.onchange = () => {
@@ -117,6 +154,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
           {
             ...dom,
             twoColumnRow: dom.twoColumnRow,
+            primaryKeyRow: dom.primaryKeyRow,
           },
           dom.type.value
         );
@@ -133,6 +171,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
       {
         ...dom,
         twoColumnRow: dom.twoColumnRow,
+        primaryKeyRow: dom.primaryKeyRow,
       },
       field.type
     );
@@ -152,59 +191,15 @@ function setupFieldEditor(container, onChange, allFields = []) {
   }
 
   function validate() {
-    const raw = dom.key.value.trim();
-    const currentType = dom.type.value;
+    const field = getField();
+    field._originalKey = originalKey;
 
-    // Autogenerate label if empty and user started typing
-    if (!labelLocked && raw.length > 0) {
-      const humanLabel = raw
-        .replace(/[_\-]+/g, " ")
-        .replace(/\b\w/g, (m) => m.toUpperCase());
-      dom.label.value = humanLabel;
-    }
+    const result = validateField(field, allFields);
 
-    const isEditingExisting = originalKey?.length > 0;
-    let isDuplicate = false;
-    let hasMatchingPartner = true;
-
-    if (["loopstart", "loopstop"].includes(currentType)) {
-      const expectedPartnerType =
-        currentType === "loopstart" ? "loopstop" : "loopstart";
-
-      isDuplicate = allFields.some(
-        (f) =>
-          f.key === raw &&
-          f.type === currentType &&
-          (!isEditingExisting ||
-            f.key !== originalKey ||
-            f.type !== currentType)
-      );
-
-      const hasAnyLoop = allFields.some(
-        (f) => f.key === raw && ["loopstart", "loopstop"].includes(f.type)
-      );
-
-      const hasPartner = allFields.some(
-        (f) =>
-          f.key === raw &&
-          f.type === expectedPartnerType &&
-          (!isEditingExisting ||
-            f.key !== originalKey ||
-            f.type !== currentType)
-      );
-
-      hasMatchingPartner = !hasAnyLoop || hasPartner;
-    } else {
-      isDuplicate = allFields.some(
-        (f) => f.key === raw && (!isEditingExisting || f.key !== originalKey)
-      );
-    }
-
-    dom.key.classList.toggle("input-error", isDuplicate);
+    dom.key.classList.toggle("input-error", !result.valid);
 
     if (confirmBtn) {
-      confirmBtn.disabled =
-        raw.length === 0 || isDuplicate || !hasMatchingPartner;
+      confirmBtn.disabled = !result.valid;
     }
   }
 
@@ -218,6 +213,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
       label: dom.label.value.trim(),
       description: dom.description.value.trim(),
       two_column: dom.twoColumn.checked,
+      primary_key: dom.primaryKey ? dom.primaryKey.checked : false,
       default: dom.default.value,
       options,
       type: dom.type?.value || "text",

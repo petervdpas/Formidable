@@ -7,6 +7,7 @@ import * as renderers from "./fieldRenderers.js";
 
 export function extractFieldDefinition({
   keyId = "edit-key",
+  primaryKeyId = "edit-primary-key",
   twoColumnId = "edit-two-column",
   labelId = "edit-label",
   descriptionId = "edit-description",
@@ -15,6 +16,7 @@ export function extractFieldDefinition({
   optionsId = "edit-options",
 }) {
   const key = document.getElementById(keyId)?.value.trim();
+  const primaryKey = document.getElementById(primaryKeyId)?.checked || false;
   const twoColumn = document.getElementById(twoColumnId)?.checked || false;
   const label = document.getElementById(labelId)?.value.trim();
   const description = document.getElementById(descriptionId)?.value.trim();
@@ -73,6 +75,7 @@ export function extractFieldDefinition({
 
   const field = { key, label, type };
   if (def) field.default = def;
+  if (primaryKey) field.primary_key = true;
   if (description) field.description = description;
   if (twoColumn) field.two_column = true;
   if (options.length > 0) field.options = options;
