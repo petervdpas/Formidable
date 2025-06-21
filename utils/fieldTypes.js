@@ -5,18 +5,46 @@ import { ensureVirtualLocation } from "./vfsUtils.js";
 import { applyDatasetMapping } from "./domUtils.js";
 
 export const fieldTypes = {
+  guid: {
+    type: "guid",
+    label: "Guid",
+    cssClass: "modal-guid",
+    disabledAttributes: [
+      "listDisplay",
+      "twoColumnRow",
+      "primaryKeyRow",
+      "label",
+      "description",
+      "default",
+      "options",
+    ],
+    defaultValue: () => "",
+  },
+
   looper: {
     label: "Looper",
     metaOnly: true,
     cssClass: "modal-looper",
-    disabledAttributes: ["primaryKeyRow", "description", "default", "options", "twoColumnRow"],
+    disabledAttributes: [
+      "listDisplay",
+      "description",
+      "default",
+      "options",
+      "twoColumnRow",
+    ],
   },
 
   loopstart: {
     label: "Loop Start",
     metaOnly: true,
     cssClass: "modal-loopstart",
-    disabledAttributes: ["primaryKeyRow", "description", "default", "options", "twoColumnRow"],
+    disabledAttributes: [
+      "listDisplay",
+      "description",
+      "default",
+      "options",
+      "twoColumnRow",
+    ],
     defaultValue: () => "",
     renderInput: async function (field) {
       const wrapper = document.createElement("div");
@@ -31,7 +59,13 @@ export const fieldTypes = {
     label: "Loop Stop",
     metaOnly: true,
     cssClass: "modal-loopstop",
-    disabledAttributes: ["primaryKeyRow", "description", "default", "options", "twoColumnRow"],
+    disabledAttributes: [
+      "listDisplay",
+      "description",
+      "default",
+      "options",
+      "twoColumnRow",
+    ],
     defaultValue: () => "",
     renderInput: async function () {
       const wrapper = document.createElement("div");

@@ -234,6 +234,11 @@
   color: white;
 }
 
+.modal-guid {
+  background-color: #444c54;
+  color: white;
+}
+
 .modal-form-row.tight-gap {
   gap: 0.3em;
 }

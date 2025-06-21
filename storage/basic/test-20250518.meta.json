@@ -4,31 +4,23 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:19:38.103Z",
-    "updated": "2025-06-20T21:20:58.835Z",
+    "updated": "2025-06-21T11:34:58.797Z",
     "flagged": false
   },
   "data": {
+    "MyId": "",
     "test": "Default value",
     "check": false,
-    "dropdown": "L",
-    "multichoice": [
-      "A",
-      "B"
-    ],
-    "radio": "CAT",
+    "dropdown": "R",
+    "multichoice": [],
+    "radio": "DOG",
     "mline": "A whole lot of prefab text...",
-    "numpy": 23,
-    "rangie": 80,
-    "bday": "1968-12-29",
+    "numpy": 17,
+    "rangie": 20,
+    "bday": "1968-12-23",
     "listy": [],
-    "datable": [
-      [
-        "Three",
-        "Four",
-        "Five"
-      ]
-    ],
-    "design": "GreenSignWhiteArrowPersonRunning.png",
-    "linktest": "formidable://basic.yaml:sane-20250530.meta.json"
+    "datable": [],
+    "design": "",
+    "linktest": ""
   }
 }

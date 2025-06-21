@@ -6,7 +6,7 @@
   "context_mode": "template",
   "context_folder": "./",
   "selected_template": "basic.yaml",
-  "selected_data_file": null,
+  "selected_data_file": "test-20250518.meta.json",
   "author_name": "Regular user",
   "author_email": "regular@example.com",
   "use_git": false,

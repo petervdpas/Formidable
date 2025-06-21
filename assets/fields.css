@@ -246,6 +246,12 @@
   border-left: 4px solid #d46a85;
 }
 
+.field-list-item[data-type="guid"] {
+  background-color: #444c54;
+  /* Darker Gray */
+  border-left: 4px solid #888c95;
+}
+
 /* ───── Field Type Color Badges ───── */
 .field-type.type-looper,
 .field-type.type-loopstart,
@@ -327,6 +333,13 @@
 
 .field-type.type-link {
   background-color: #d46a85;
+  /* Slightly darker Bordeaux */
+  color: black;
+}
+
+.field-type.type-guid {
+  background-color: #888c95;
+  /* Slightly darker Gray */
   color: black;
 }
 
@@ -415,6 +428,11 @@
   border-left: 6px solid #d46a85;
 }
 
+#field-edit-modal.modal-guid {
+  background-color: #444c54;
+  border-left: 6px solid #888c95;
+}
+
 /* ───── Per-Type Close Button Overrides ───── */
 
 #field-edit-modal.modal-loopstart .btn-close,
@@ -472,6 +490,10 @@
 
 #field-edit-modal.modal-link .btn-close {
   color: #f9dbe0;
+}
+
+#field-edit-modal.modal-guid .btn-close {
+  color: #ccc;
 }
 
 /* Optional hover enhancement for all: */

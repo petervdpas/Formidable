@@ -20,6 +20,35 @@ function resolveOption(opt) {
       };
 }
 
+function generateGuid() {
+  return crypto.randomUUID();
+}
+
+// ─────────────────────────────────────────────
+// Type: guid
+export async function renderGuidField(field) {
+  const container = document.createElement("div");
+  container.className = "meta-field guid-field";
+
+  const label = document.createElement("label");
+  label.textContent = field.label || "GUID";
+  container.appendChild(label);
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.readOnly = true;
+  input.value = field.default || generateGuid();
+  input.classList.add("input-guid");
+
+  input.addEventListener("input", () => {
+    field.default = input.value;
+  });
+
+  container.appendChild(input);
+  return container;
+}
+
+
 // ─────────────────────────────────────────────
 // Type: loopstart
 export async function renderLoopstartField(field) {

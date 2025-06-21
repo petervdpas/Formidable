@@ -21,15 +21,15 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
   const dom = {
     key: container.querySelector("#edit-key"),
+    primaryKey: container.querySelector("#edit-primary-key"),
     label: container.querySelector("#edit-label"),
     description: container.querySelector("#edit-description"),
     twoColumn: container.querySelector("#edit-two-column"),
     twoColumnRow: container
       .querySelector("#edit-two-column")
       ?.closest(".switch-row"),
-    primaryKey: container.querySelector("#edit-primary-key"),
-    primaryKeyRow: container
-      .querySelector("#edit-primary-key")
+    listDisplay: container
+      .querySelector("#edit-list-display")
       ?.closest(".switch-row"),
     default: container.querySelector("#edit-default"),
     options: container.querySelector("#edit-options"),
@@ -96,19 +96,26 @@ function setupFieldEditor(container, onChange, allFields = []) {
     }
 
     dom.key.value = field.key || "";
-    dom.label.value = field.label || "";
+
+    if (dom.primaryKey) {
+      dom.primaryKey.value = field.primary_key ? "true" : "false";
+    }
+
+    if (field.type === "guid") {
+      dom.label.value = "GUID";
+    } else {
+      dom.label.value = field.label || "";
+    }
+
     dom.description.value = field.description || "";
     dom.twoColumn.checked = !!field.two_column;
+    dom.listDisplay.checked = !!field.list_display;
     dom.default.value = field.default ?? "";
 
     labelLocked = field.label?.trim().length > 0 && field.label !== field.key;
 
     // ── Crucial Reset Before Attach ──
     dom.key.__listenersAttached = false;
-    if (dom.primaryKey) {
-      dom.primaryKey.checked = !!field.primary_key;
-      dom.primaryKey.__listenersAttached = false;
-    }
 
     // ── Key input listeners ──
     if (!dom.key.__listenersAttached) {
@@ -136,15 +143,6 @@ function setupFieldEditor(container, onChange, allFields = []) {
       });
     }
 
-    // ── Primary Key listener ──
-    if (dom.primaryKey && !dom.primaryKey.__listenersAttached) {
-      dom.primaryKey.__listenersAttached = true;
-
-      dom.primaryKey.addEventListener("change", () => {
-        validate();
-      });
-    }
-
     // ── Type change ──
     if (dom.type) {
       dom.type.value = field.type || "text";
@@ -154,7 +152,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
           {
             ...dom,
             twoColumnRow: dom.twoColumnRow,
-            primaryKeyRow: dom.primaryKeyRow,
+            listDisplay: dom.listDisplay,
           },
           dom.type.value
         );
@@ -171,7 +169,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
       {
         ...dom,
         twoColumnRow: dom.twoColumnRow,
-        primaryKeyRow: dom.primaryKeyRow,
+        listDisplay: dom.listDisplay,
       },
       field.type
     );
@@ -208,16 +206,24 @@ function setupFieldEditor(container, onChange, allFields = []) {
       optionsEditor?.getValues() ||
       (dom.options.value ? JSON.parse(dom.options.value) : undefined);
 
-    return {
+    const field = {
       key: dom.key.value.trim(),
+      primary_key: dom.primaryKey?.value === "true",
       label: dom.label.value.trim(),
       description: dom.description.value.trim(),
       two_column: dom.twoColumn.checked,
-      primary_key: dom.primaryKey ? dom.primaryKey.checked : false,
+      list_display: dom.listDisplay.checked,
       default: dom.default.value,
       options,
       type: dom.type?.value || "text",
     };
+
+    if (field.type === "guid") {
+      field.label = "GUID";
+      field.primary_key = true;
+    }
+
+    return field;
   }
 
   return { setField, getField };
@@ -422,9 +428,6 @@ export function showFieldEditorModal(field, allFields = [], onConfirm) {
         };
 
         onConfirm?.([loopStart, loopStop]);
-
-        //onConfirm?.(loopStart);
-        //onConfirm?.(loopStop);
       } else {
         onConfirm?.(confirmedField);
       }

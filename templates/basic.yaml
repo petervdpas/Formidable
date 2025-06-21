@@ -191,13 +191,16 @@ markdown_template: |-
   _No image uploaded for Design_
   {{/if}}
 fields:
+  - key: MyId
+    label: GUID
+    type: guid
   - key: test
     label: Test
     type: text
     default: Default value
-    primary_key: true
-    description: A basic text input for demonstration purposes.
+    list_display: true
     two_column: true
+    description: A basic text input for demonstration purposes.
   - key: check
     label: Check
     type: boolean
