@@ -10,13 +10,13 @@ export const fieldTypes = {
     label: "Guid",
     cssClass: "modal-guid",
     disabledAttributes: [
-      "listDisplay",
-      "twoColumnRow",
       "primaryKeyRow",
       "label",
       "description",
       "default",
       "options",
+      "twoColumnRow",
+      "sidebarItemRow",
     ],
     defaultValue: () => generateGuid(),
     renderInput: async function (field, template, value = "") {
@@ -24,12 +24,12 @@ export const fieldTypes = {
         value?.trim?.() || field.default?.trim?.() || generateGuid();
       const input = document.createElement("input");
       input.type = "hidden";
-      input.name = "id"
+      input.name = "id";
       input.value = guidValue;
       input.dataset.guidField = field.key;
       return input;
     },
-    parseValue: parsers.parseGuidField
+    parseValue: parsers.parseGuidField,
   },
 
   looper: {
@@ -37,11 +37,11 @@ export const fieldTypes = {
     metaOnly: true,
     cssClass: "modal-looper",
     disabledAttributes: [
-      "listDisplay",
       "description",
       "default",
       "options",
       "twoColumnRow",
+      "sidebarItemRow",
     ],
   },
 
@@ -50,11 +50,11 @@ export const fieldTypes = {
     metaOnly: true,
     cssClass: "modal-loopstart",
     disabledAttributes: [
-      "listDisplay",
       "description",
       "default",
       "options",
       "twoColumnRow",
+      "sidebarItemRow",
     ],
     defaultValue: () => "",
     renderInput: async function (field) {
@@ -71,11 +71,11 @@ export const fieldTypes = {
     metaOnly: true,
     cssClass: "modal-loopstop",
     disabledAttributes: [
-      "listDisplay",
       "description",
       "default",
       "options",
       "twoColumnRow",
+      "sidebarItemRow",
     ],
     defaultValue: () => "",
     renderInput: async function () {

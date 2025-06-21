@@ -200,7 +200,7 @@ fields:
     type: text
     description: A basic text input for demonstration purposes.
     two_column: true
-    list_display: true
+    sidebar_item: true
     default: Default value
   - key: check
     label: Check

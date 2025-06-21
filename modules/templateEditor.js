@@ -51,8 +51,8 @@ function sanitizeField(f) {
     field.two_column = true;
   }
 
-  if (f.list_display) {
-    field.list_display = true;
+  if (f.sidebar_item) {
+    field.sidebar_item = true;
   }
 
   if (

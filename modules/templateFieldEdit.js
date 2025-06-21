@@ -28,8 +28,9 @@ function setupFieldEditor(container, onChange, allFields = []) {
     twoColumnRow: container
       .querySelector("#edit-two-column")
       ?.closest(".switch-row"),
-    listDisplay: container
-      .querySelector("#edit-list-display")
+    sidebarItem: container.querySelector("#edit-sidebar-item"),
+    sidebarItemRow: container
+      .querySelector("#edit-sidebar-item")
       ?.closest(".switch-row"),
     default: container.querySelector("#edit-default"),
     options: container.querySelector("#edit-options"),
@@ -108,7 +109,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
     dom.description.value = field.description || "";
     dom.twoColumn.checked = !!field.two_column;
-    dom.listDisplay.checked = !!field.list_display;
+    dom.sidebarItem.checked = !!field.sidebar_item;
     dom.default.value = field.default ?? "";
 
     labelLocked = field.label?.trim().length > 0 && field.label !== field.key;
@@ -159,7 +160,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
           {
             ...dom,
             twoColumnRow: dom.twoColumnRow,
-            listDisplay: dom.listDisplay,
+            sidebarItemRow: dom.sidebarItemRow,
           },
           currentType
         );
@@ -176,7 +177,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
       {
         ...dom,
         twoColumnRow: dom.twoColumnRow,
-        listDisplay: dom.listDisplay,
+        sidebarItemRow: dom.sidebarItemRow,
       },
       field.type
     );
@@ -220,7 +221,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
       label: isGuid ? "GUID" : dom.label.value.trim(),
       description: dom.description.value.trim(),
       two_column: dom.twoColumn.checked,
-      list_display: dom.listDisplay.checked,
+      sidebar_item: dom.sidebarItem.checked,
       default: dom.default.value,
       options,
       type: dom.type?.value || "text",

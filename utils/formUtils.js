@@ -7,7 +7,7 @@ import * as renderers from "./fieldRenderers.js";
 
 export function extractFieldDefinition({
   keyId = "edit-key",
-  listDisplayId = "edit-list-display",
+  sidebarItemId = "edit-sidebar-item",
   twoColumnId = "edit-two-column",
   labelId = "edit-label",
   descriptionId = "edit-description",
@@ -16,7 +16,7 @@ export function extractFieldDefinition({
   optionsId = "edit-options",
 }) {
   const key = document.getElementById(keyId)?.value.trim();
-  const listDisplay = document.getElementById(listDisplayId)?.checked || false;
+  const sidebarItem = document.getElementById(sidebarItemId)?.checked || false;
   const twoColumn = document.getElementById(twoColumnId)?.checked || false;
   const label = document.getElementById(labelId)?.value.trim();
   const description = document.getElementById(descriptionId)?.value.trim();
@@ -75,7 +75,7 @@ export function extractFieldDefinition({
 
   const field = { key, label, type };
   if (def) field.default = def;
-  if (listDisplay) field.list_display = true;
+  if (sidebarItem) field.sidebar_item = true;
   if (twoColumn) field.two_column = true;
   if (description) field.description = description;
   if (options.length > 0) field.options = options;
@@ -262,7 +262,6 @@ export function applyFieldAttributeDisabling(dom, fieldTypeKey) {
   Object.entries(dom).forEach(([key, el]) => {
     if (!el) return;
 
-    // Handle custom row overrides like `twoColumnRow`
     const container =
       el.classList.contains("modal-form-row") ||
       el.classList.contains("switch-row")
