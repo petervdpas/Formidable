@@ -30,6 +30,11 @@ export function validateField(field, allFields = []) {
     return { valid: false, reason: "missing-key" };
   }
 
+  // Rule: GUID key must be 'id'
+  if (currentType === "guid" && rawKey !== "id") {
+    return { valid: false, reason: "guid-key-must-be-id", key: rawKey };
+  }
+
   // Rule: Duplicate key
   const isDuplicate = allFields.some(
     (f) => f.key === rawKey && (!isEditingExisting || f.key !== originalKey)

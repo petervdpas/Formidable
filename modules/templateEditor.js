@@ -37,7 +37,7 @@ function sanitizeField(f) {
   const isGuid = f.type === "guid";
 
   const field = {
-    key: f.key?.trim(),
+    key: isGuid ? "id" : f.key?.trim(),
     label: isGuid ? "GUID" : f.label?.trim(),
     type: f.type || "text",
     ...(isGuid ? { primary_key: true } : {}),

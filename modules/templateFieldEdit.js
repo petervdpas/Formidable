@@ -95,17 +95,16 @@ function setupFieldEditor(container, onChange, allFields = []) {
       confirmBtn.disabled = false;
     }
 
-    dom.key.value = field.key || "";
+    const isGuid = field.type === "guid";
+
+    dom.key.value = isGuid ? "id" : field.key || "";
+    dom.key.disabled = isGuid;
 
     if (dom.primaryKey) {
-      dom.primaryKey.value = field.type === "guid" ? "true" : "false";
+      dom.primaryKey.value = isGuid ? "true" : "false";
     }
 
-    if (field.type === "guid") {
-      dom.label.value = "GUID";
-    } else {
-      dom.label.value = field.label || "";
-    }
+    dom.label.value = isGuid ? "GUID" : field.label || "";
 
     dom.description.value = field.description || "";
     dom.twoColumn.checked = !!field.two_column;
@@ -147,6 +146,14 @@ function setupFieldEditor(container, onChange, allFields = []) {
     if (dom.type) {
       dom.type.value = field.type || "text";
       dom.type.onchange = () => {
+        const currentType = dom.type.value;
+        const isGuidType = currentType === "guid";
+
+        dom.key.value = isGuidType ? "id" : state.key || "";
+        dom.key.disabled = isGuidType;
+
+        dom.label.value = isGuidType ? "GUID" : state.label || "";
+
         setupOptionsEditor();
         applyFieldAttributeDisabling(
           {
@@ -154,7 +161,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
             twoColumnRow: dom.twoColumnRow,
             listDisplay: dom.listDisplay,
           },
-          dom.type.value
+          currentType
         );
 
         validate();
@@ -209,7 +216,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
     const isGuid = dom.type?.value === "guid";
 
     const field = {
-      key: dom.key.value.trim(),
+      key: isGuid ? "id" : dom.key.value.trim(),
       label: isGuid ? "GUID" : dom.label.value.trim(),
       description: dom.description.value.trim(),
       two_column: dom.twoColumn.checked,
@@ -227,7 +234,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
     return field;
   }
-  
+
   return { setField, getField };
 }
 

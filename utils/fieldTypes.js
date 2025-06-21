@@ -24,7 +24,7 @@ export const fieldTypes = {
         value?.trim?.() || field.default?.trim?.() || generateGuid();
       const input = document.createElement("input");
       input.type = "hidden";
-      input.name = field.key;
+      input.name = "id"
       input.value = guidValue;
       input.dataset.guidField = field.key;
       return input;
