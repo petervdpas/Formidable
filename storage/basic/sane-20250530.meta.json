@@ -4,11 +4,11 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-06-21T13:26:24.984Z",
+    "updated": "2025-06-21T13:47:18.634Z",
     "flagged": true
   },
   "data": {
-    "id": "",
+    "id": "86e1b9a4-be62-406f-840c-fc1cea3158fb",
     "test": "Default value",
     "check": true,
     "dropdown": "R",
@@ -32,6 +32,6 @@
       ]
     ],
     "design": "formidable.png",
-    "linktest": ""
+    "linktest": "formidable://basic.yaml:test-20250518.meta.json"
   }
 }

@@ -13,6 +13,11 @@ import {
 } from "./fieldAppliers.js";
 import { collectLoopGroup } from "./formUtils.js";
 
+
+export function generateGuid() {
+  return crypto.randomUUID();
+}
+
 export function clearHighlighted(container) {
   if (!container) return;
 

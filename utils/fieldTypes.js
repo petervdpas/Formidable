@@ -2,7 +2,7 @@
 
 import * as parsers from "./fieldParsers.js";
 import { ensureVirtualLocation } from "./vfsUtils.js";
-import { applyDatasetMapping } from "./domUtils.js";
+import { applyDatasetMapping, generateGuid } from "./domUtils.js";
 
 export const fieldTypes = {
   guid: {
@@ -18,16 +18,22 @@ export const fieldTypes = {
       "default",
       "options",
     ],
-    defaultValue: () => "",
-    renderInput: async function (field) {
+    defaultValue: () => generateGuid(),
+
+    renderInput: async function (field, template, value = "") {
+      const guidValue =
+        value?.trim?.() || field.default?.trim?.() || generateGuid();
+
       const input = document.createElement("input");
       input.type = "hidden";
       input.name = field.key;
-      input.value = field.default || "";
+      input.value = guidValue;
       input.dataset.guidField = field.key;
+
       return input;
     },
-    parseValue: parsers.parseGuidField,
+
+    parseValue: (input) => input?.value?.trim() || generateGuid(),
   },
 
   looper: {

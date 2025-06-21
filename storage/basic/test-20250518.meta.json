@@ -4,23 +4,35 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:19:38.103Z",
-    "updated": "2025-06-21T13:01:39.960Z",
+    "updated": "2025-06-21T13:46:36.654Z",
     "flagged": false
   },
   "data": {
-    "id": "",
+    "id": "bcb2d16e-6680-4092-91a0-aba662f41ae9",
     "test": "Default value",
-    "check": false,
+    "check": true,
     "dropdown": "R",
-    "multichoice": [],
-    "radio": "DOG",
-    "mline": "A whole lot of prefab text...",
-    "numpy": 17,
-    "rangie": 20,
+    "multichoice": [
+      "A",
+      "B"
+    ],
+    "radio": "BIRD",
+    "mline": "Lorum Ipsum",
+    "numpy": 24,
+    "rangie": 85,
     "bday": "1968-12-23",
-    "listy": [],
-    "datable": [],
-    "design": "",
-    "linktest": ""
+    "listy": [
+      "Okay",
+      "Dokay"
+    ],
+    "datable": [
+      [
+        "Wham",
+        "Baba",
+        "Looba"
+      ]
+    ],
+    "design": "GreenSignWhiteArrowPersonRunning.png",
+    "linktest": "formidable://basic.yaml:sane-20250530.meta.json"
   }
 }

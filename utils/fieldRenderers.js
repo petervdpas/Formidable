@@ -6,7 +6,7 @@ import {
   buildSwitchElement,
   addContainerElement,
 } from "./elementBuilders.js";
-import { applyDatasetMapping } from "./domUtils.js";
+import { applyDatasetMapping, generateGuid } from "./domUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 import { getCurrentTheme } from "../modules/themeToggle.js";
 import { createRemoveImageButton } from "../modules/uiButtons.js";
@@ -20,34 +20,18 @@ function resolveOption(opt) {
       };
 }
 
-function generateGuid() {
-  return crypto.randomUUID();
-}
-
 // ─────────────────────────────────────────────
 // Type: guid
-export async function renderGuidField(field) {
-  const container = document.createElement("div");
-  container.className = "meta-field guid-field";
+export async function renderGuidField(field, value = "") {
+  const guidValue = value?.trim?.() || generateGuid();
 
-  const label = document.createElement("label");
-  label.textContent = field.label || "GUID";
-  container.appendChild(label);
+  const hidden = document.createElement("input");
+  hidden.type = "hidden";
+  hidden.name = field.key;
+  hidden.value = guidValue;
 
-  const input = document.createElement("input");
-  input.type = "text";
-  input.readOnly = true;
-  input.value = field.default || generateGuid();
-  input.classList.add("input-guid");
-
-  input.addEventListener("input", () => {
-    field.default = input.value;
-  });
-
-  container.appendChild(input);
-  return container;
+  return hidden;
 }
-
 
 // ─────────────────────────────────────────────
 // Type: loopstart
