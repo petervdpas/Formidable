@@ -11,6 +11,7 @@ import { generateTemplateCode } from "../utils/templateGenerator.js";
 import { formatError } from "../utils/templateValidation.js";
 import { ensureVirtualLocation } from "../utils/vfsUtils.js";
 import { createToggleButtons } from "../utils/iconButtonToggle.js";
+import { createFormRowInput, createSwitch } from "../utils/elementBuilders.js";
 import {
   getEditor,
   handleEditorKey,
@@ -32,6 +33,7 @@ const Sortable = window.Sortable;
 let keyboardListenerAttached = false;
 let editorWrapper = null;
 let typeDropdown = null;
+let collectionSwitch = null;
 
 function sanitizeField(f) {
   const isGuid = f.type === "guid";
@@ -104,50 +106,102 @@ export function initTemplateEditor(containerId, onSaveCallback) {
       currentData.name || "Unnamed",
     ]);
 
-    container.innerHTML = `
-    <fieldset>
-      <legend>Setup Info</legend>
-      <div class="modal-form-row">
-        <label for="yaml-name">Name</label>
-        <input type="text" id="yaml-name" value="${currentData.name || ""}" />
-      </div>
-      <div class="modal-form-row full-editor-row">
-        <label for="markdown-template">Template Code <small>CTRL+ENTER for full screen</small></label>
-        <div class="editor-wrapper">
-          <textarea id="markdown-template" rows="7">${
-            currentData.markdown_template || ""
-          }</textarea>
-        </div>
-        <div class="button-row" id="template-generate-wrapper"></div>
-      </div>
-    </fieldset>
+    container.innerHTML = "";
 
-    <fieldset>
-      <legend>Fields</legend>
-      <ul id="fields-list" class="field-list"></ul>
-      <div class="field-add-row" id="field-add-row"></div>
-    </fieldset>
+    // ─── Setup Info Fieldset ─────
+    const setupFieldset = document.createElement("fieldset");
 
-    <div class="button-group" id="template-actions-row"></div>
-  `;
+    const legend1 = document.createElement("legend");
+    legend1.textContent = "Setup Info";
+    setupFieldset.appendChild(legend1);
 
-    // Init CodeMirror
-    const textarea = container.querySelector("#markdown-template");
-    initCodeMirror(textarea, currentData.markdown_template || "");
-    editorWrapper = container.querySelector(".editor-wrapper");
+    // Name field
+    const nameRow = createFormRowInput({
+      id: "yaml-name",
+      label: "Name",
+      value: currentData.name || "",
+    });
+    setupFieldset.appendChild(nameRow);
 
-    // ─── Dynamische Buttons ─────────────────────────────
-    const generateBtnWrapper = container.querySelector(
-      "#template-generate-wrapper"
+    // Markdown template editor
+    const templateRow = document.createElement("div");
+    templateRow.className = "modal-form-row full-editor-row";
+
+    const label = document.createElement("label");
+    label.setAttribute("for", "markdown-template");
+    label.innerHTML = "Template Code <small>CTRL+ENTER for full screen</small>";
+
+    const editorWrapperDiv = document.createElement("div");
+    editorWrapperDiv.className = "editor-wrapper";
+
+    const textarea = document.createElement("textarea");
+    textarea.id = "markdown-template";
+    textarea.rows = 7;
+    textarea.value = currentData.markdown_template || "";
+    editorWrapperDiv.appendChild(textarea);
+
+    const generateWrapper = document.createElement("div");
+    generateWrapper.className = "button-row";
+    generateWrapper.id = "template-generate-wrapper";
+
+    templateRow.appendChild(label);
+    templateRow.appendChild(editorWrapperDiv);
+    templateRow.appendChild(generateWrapper);
+
+    setupFieldset.appendChild(templateRow);
+
+    // ─── Enable Collection Switch ──────
+    collectionSwitch = createSwitch(
+      "template-enable-collection",
+      "Enable Collection",
+      currentData.enable_collection === true,
+      null,
+      "block",
+      ["Enabled", "Disabled"]
     );
+    setupFieldset.appendChild(collectionSwitch);
+
+    // ─── Fields Fieldset ────────────────
+    const fieldsFieldset = document.createElement("fieldset");
+
+    const legend2 = document.createElement("legend");
+    legend2.textContent = "Fields";
+    fieldsFieldset.appendChild(legend2);
+
+    const fieldList = document.createElement("ul");
+    fieldList.id = "fields-list";
+    fieldList.className = "field-list";
+
+    const addFieldRow = document.createElement("div");
+    addFieldRow.id = "field-add-row";
+    addFieldRow.className = "field-add-row";
+
+    fieldsFieldset.appendChild(fieldList);
+    fieldsFieldset.appendChild(addFieldRow);
+
+    // ─── Action Buttons ────────────────
+    const actionsRow = document.createElement("div");
+    actionsRow.className = "button-group";
+    actionsRow.id = "template-actions-row";
+
+    // ─── Inject ─────────────────────────
+    container.appendChild(setupFieldset);
+    container.appendChild(fieldsFieldset);
+    container.appendChild(actionsRow);
+
+    // ─── Init CodeMirror ────────────────
+    initCodeMirror(textarea, currentData.markdown_template || "");
+    editorWrapper = editorWrapperDiv;
+
+    // ─── Generate Button ────────────────
     const generateBtn = createTemplateGeneratorButton(() => {
       const code = generateTemplateCode(currentData.fields);
       getEditor().setValue(code);
-      generateBtnWrapper.style.display = "none";
+      generateWrapper.style.display = "none";
     });
-    generateBtnWrapper.appendChild(generateBtn);
+    generateWrapper.appendChild(generateBtn);
 
-    const addFieldRow = container.querySelector("#field-add-row");
+    // ─── Add Field Button ───────────────
     addFieldRow.appendChild(
       createTemplateAddFieldButton(() => {
         currentEditIndex = null;
@@ -155,16 +209,26 @@ export function initTemplateEditor(containerId, onSaveCallback) {
       })
     );
 
-    const actionsRow = container.querySelector("#template-actions-row");
-
+    // ─── Save + Delete Buttons ──────────
     const { save, delete: del } = await createToggleButtons(
       {
         save: async () => {
+          const fieldsSanitized = currentData.fields.map((f) =>
+            sanitizeField(f)
+          );
+          const collectionElement = document.getElementById(
+            "template-enable-collection"
+          );
+          const hasGuidField = fieldsSanitized.some((f) => f.type === "guid");
+
           const fullTemplate = {
             name:
               container.querySelector("#yaml-name")?.value.trim() || "Unnamed",
             markdown_template: getEditor()?.getValue() || "",
-            fields: currentData.fields.map((f) => sanitizeField(f)),
+            enable_collection: hasGuidField
+              ? collectionElement?.checked === true
+              : false,
+            fields: fieldsSanitized,
           };
 
           const errors = await new Promise((resolve) => {
@@ -224,20 +288,35 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     const editor = getEditor();
     const updateVisibility = () => {
       const hasCode = editor.getValue().trim().length > 0;
-      generateBtnWrapper.style.display = hasCode ? "none" : "block";
+      generateWrapper.style.display = hasCode ? "none" : "block";
     };
     editor.on("change", updateVisibility);
     updateVisibility();
 
-    // ─── Field List Rendering ───────────────────────────
+    // ─── Render Field List ──────────────
     renderFieldListWrapper();
 
-    // ─── Keyboard Shortcuts ─────────────────────────────
+    // ─── Keyboard Shortcuts ─────────────
     if (keyboardListenerAttached) {
       document.removeEventListener("keydown", handleEditorKey);
     }
     document.addEventListener("keydown", handleEditorKey);
     keyboardListenerAttached = true;
+  }
+
+  function updateCollectionSwitch() {
+    const hasGuidField = currentData.fields.some((f) => f.type === "guid");
+
+    const switchEl = document.getElementById("template-enable-collection");
+    if (!switchEl) return;
+
+    if (!hasGuidField) {
+      switchEl.checked = false;
+      switchEl.disabled = true;
+    } else {
+      switchEl.disabled = false;
+      // do not touch .checked → let user control if GUID present
+    }
   }
 
   function renderFieldListWrapper() {
@@ -248,6 +327,8 @@ export function initTemplateEditor(containerId, onSaveCallback) {
       },
       onOpenEditModal: openEditModal,
     });
+
+    updateCollectionSwitch();
   }
 
   function openEditModal(field) {

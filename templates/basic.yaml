@@ -190,6 +190,7 @@ markdown_template: |-
   {{else}}
   _No image uploaded for Design_
   {{/if}}
+enable_collection: true
 fields:
   - key: id
     label: GUID

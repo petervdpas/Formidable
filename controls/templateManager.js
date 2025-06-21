@@ -44,10 +44,22 @@ function saveTemplate(name, data) {
     const ordered = {
       name: data.name || "",
       filename: data.filename,
+      markdown_template: data.markdown_template || "",
+      enable_collection: data.enable_collection === true,
+      fields: Array.isArray(data.fields) ? data.fields : [],
     };
 
+    // Add extra custom keys if any
     for (const key of Object.keys(data)) {
-      if (!["name", "filename"].includes(key)) {
+      if (
+        ![
+          "name",
+          "filename",
+          "markdown_template",
+          "enable_collection",
+          "fields",
+        ].includes(key)
+      ) {
         ordered[key] = data[key];
       }
     }
@@ -104,7 +116,9 @@ function checkPrimaryKey(fields) {
     return {
       type: "multiple-primary-keys",
       keys: pkFields.map((f) => f.key),
-      message: `Multiple primary keys found: ${pkFields.map((f) => f.key).join(", ")}`,
+      message: `Multiple primary keys found: ${pkFields
+        .map((f) => f.key)
+        .join(", ")}`,
     };
   }
   return null;
@@ -176,7 +190,9 @@ function checkLoopPairing(fields) {
 
 function validateTemplate(template) {
   if (!template || !Array.isArray(template.fields)) {
-    return [{ type: "invalid-template", message: "Missing or invalid fields array" }];
+    return [
+      { type: "invalid-template", message: "Missing or invalid fields array" },
+    ];
   }
 
   const errors = [];
@@ -204,7 +220,13 @@ function createBasicTemplateIfMissing() {
       filename: basicYamlName,
       markdown_template: ``,
       fields: [
-        { key: "test", label: "Test", type: "text", default: "Default value", two_column: true },
+        {
+          key: "test",
+          label: "Test",
+          type: "text",
+          default: "Default value",
+          two_column: true,
+        },
         { key: "check", label: "Check", type: "boolean", two_column: true },
         {
           key: "dropdown",

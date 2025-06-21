@@ -5,6 +5,7 @@ module.exports = {
     name: "",
     filename: "",
     markdown_template: "",
+    enable_collection: false,
     fields: [],
   },
 
@@ -20,12 +21,21 @@ module.exports = {
       name: obj.name || "",
       filename: obj.filename || filename || "",
       markdown_template: obj.markdown_template,
+      enable_collection: obj.enable_collection === true,
       fields: obj.fields,
     };
 
     // Append any additional/custom keys
     for (const key of Object.keys(obj)) {
-      if (!["name", "filename", "markdown_template", "fields"].includes(key)) {
+      if (
+        ![
+          "name",
+          "filename",
+          "markdown_template",
+          "enable_collection",
+          "fields",
+        ].includes(key)
+      ) {
         result[key] = obj[key];
       }
     }
