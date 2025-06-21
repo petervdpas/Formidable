@@ -2,6 +2,11 @@
 
 import { ensureVirtualLocation } from "./vfsUtils.js";
 
+// GUID
+export function parseGuidField(input) {
+  return input?.value?.trim() || "";
+}
+
 // Text
 export function parseTextField(input) {
   return input.value.trim();

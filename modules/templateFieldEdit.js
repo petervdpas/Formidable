@@ -98,7 +98,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
     dom.key.value = field.key || "";
 
     if (dom.primaryKey) {
-      dom.primaryKey.value = field.primary_key ? "true" : "false";
+      dom.primaryKey.value = field.type === "guid" ? "true" : "false";
     }
 
     if (field.type === "guid") {
@@ -206,10 +206,11 @@ function setupFieldEditor(container, onChange, allFields = []) {
       optionsEditor?.getValues() ||
       (dom.options.value ? JSON.parse(dom.options.value) : undefined);
 
+    const isGuid = dom.type?.value === "guid";
+
     const field = {
       key: dom.key.value.trim(),
-      primary_key: dom.primaryKey?.value === "true",
-      label: dom.label.value.trim(),
+      label: isGuid ? "GUID" : dom.label.value.trim(),
       description: dom.description.value.trim(),
       two_column: dom.twoColumn.checked,
       list_display: dom.listDisplay.checked,
@@ -218,14 +219,15 @@ function setupFieldEditor(container, onChange, allFields = []) {
       type: dom.type?.value || "text",
     };
 
-    if (field.type === "guid") {
-      field.label = "GUID";
+    if (isGuid) {
       field.primary_key = true;
+    } else {
+      delete field.primary_key;
     }
 
     return field;
   }
-
+  
   return { setField, getField };
 }
 
@@ -428,6 +430,9 @@ export function showFieldEditorModal(field, allFields = [], onConfirm) {
         };
 
         onConfirm?.([loopStart, loopStop]);
+
+        //onConfirm?.(loopStart);
+        //onConfirm?.(loopStop);
       } else {
         onConfirm?.(confirmedField);
       }

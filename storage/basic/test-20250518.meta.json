@@ -4,11 +4,11 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:19:38.103Z",
-    "updated": "2025-06-21T11:34:58.797Z",
+    "updated": "2025-06-21T13:01:39.960Z",
     "flagged": false
   },
   "data": {
-    "MyId": "",
+    "id": "",
     "test": "Default value",
     "check": false,
     "dropdown": "R",

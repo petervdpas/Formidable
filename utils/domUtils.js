@@ -2,6 +2,7 @@
 
 import { EventBus } from "../modules/eventBus.js";
 import {
+  applyGuidField,
   applyListField,
   applyTableField,
   applyMultioptionField,
@@ -147,8 +148,19 @@ export function applyModalTypeClass(modal, typeKey, fieldTypes) {
   }
 }
 
-export async function applyValueToField(container, field, value, template, eventFunctions = {}) {
+export async function applyValueToField(
+  container,
+  field,
+  value,
+  template,
+  eventFunctions = {}
+) {
   const key = field.key;
+
+  if (container.querySelector(`[data-guid-field="${key}"]`)) {
+    applyGuidField(container, key, value);
+    return;
+  }
 
   if (container.querySelector(`[data-multioption-field="${key}"]`)) {
     applyMultioptionField(container, key, value);
@@ -195,7 +207,12 @@ export async function applyValueToField(container, field, value, template, event
   applyGenericField(input, key, value);
 }
 
-export async function applyFieldValues(container, template, data = {}, eventFunctions = {}) {
+export async function applyFieldValues(
+  container,
+  template,
+  data = {},
+  eventFunctions = {}
+) {
   if (!container || typeof container.querySelector !== "function") return;
   const fields = template?.fields || [];
 
@@ -225,7 +242,13 @@ export async function applyFieldValues(container, template, data = {}, eventFunc
         if (!item) continue;
 
         for (const f of group) {
-          await applyValueToField(item, f, entry[f.key], template, eventFunctions);
+          await applyValueToField(
+            item,
+            f,
+            entry[f.key],
+            template,
+            eventFunctions
+          );
         }
       }
 

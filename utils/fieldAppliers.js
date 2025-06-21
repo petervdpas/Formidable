@@ -5,6 +5,19 @@ import { createLinkOpenButton } from "../modules/uiButtons.js";
 import { ensureVirtualLocation } from "./vfsUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 
+export function applyGuidField(container, key, value) {
+  const input = container.querySelector(`input[type="hidden"][data-guid-field="${key}"]`);
+  
+  if (!input) {
+    EventBus.emit("logging:warning", [
+      `[applyGuidField] Missing input for key "${key}".`,
+    ]);
+    return;
+  }
+
+  input.value = value != null ? String(value) : "";
+}
+
 export function applyRangeField(container, field, value) {
   const key = field.key;
   const rangeWrapper = container.querySelector(`[data-range-field="${key}"]`);

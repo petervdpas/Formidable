@@ -191,16 +191,17 @@ markdown_template: |-
   _No image uploaded for Design_
   {{/if}}
 fields:
-  - key: MyId
+  - key: id
     label: GUID
     type: guid
+    primary_key: true
   - key: test
     label: Test
     type: text
-    default: Default value
-    list_display: true
-    two_column: true
     description: A basic text input for demonstration purposes.
+    two_column: true
+    list_display: true
+    default: Default value
   - key: check
     label: Check
     type: boolean
@@ -214,9 +215,9 @@ fields:
   - key: dropdown
     label: Dropdown
     type: dropdown
-    default: R
     description: Select a single value from a dropdown menu.
     two_column: true
+    default: R
     options:
       - value: L
         label: Left
@@ -237,9 +238,9 @@ fields:
   - key: radio
     label: Radio
     type: radio
-    default: DOG
     description: Pick one option using radio buttons.
     two_column: true
+    default: DOG
     options:
       - value: CAT
         label: Cat
@@ -250,19 +251,19 @@ fields:
   - key: mline
     label: Mline
     type: textarea
-    default: A whole lot of prefab text...
     description: Enter longer text, such as notes or paragraphs.
+    default: A whole lot of prefab text...
   - key: numpy
     label: Numpy
     type: number
-    default: '17'
     description: A numeric input field. Only accepts numbers.
+    default: '17'
   - key: rangie
     label: Rangie
     type: range
-    default: '20'
     description: A Range slider. Values are set by sliding the value
     two_column: true
+    default: '20'
     options:
       - value: min
         label: '0'
@@ -273,8 +274,8 @@ fields:
   - key: bday
     label: Birthday
     type: date
-    default: '1968-12-23'
     description: Select a date from the calendar picker.
+    default: '1968-12-23'
   - key: listy
     label: Listy
     type: list

@@ -53,13 +53,13 @@ fields:
   - key: sub_title
     label: Sub Title
     type: text
-    default: Wauwie
     description: This is a subtitle inside the looper....
+    default: Wauwie
   - key: description
     label: Description
     type: textarea
-    default: Describe wauw...
     description: This is a description inside the the looper...
+    default: Describe wauw...
   - key: looper
     label: Looper
     type: loopstop

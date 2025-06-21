@@ -19,6 +19,15 @@ export const fieldTypes = {
       "options",
     ],
     defaultValue: () => "",
+    renderInput: async function (field) {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = field.key;
+      input.value = field.default || "";
+      input.dataset.guidField = field.key;
+      return input;
+    },
+    parseValue: parsers.parseGuidField,
   },
 
   looper: {

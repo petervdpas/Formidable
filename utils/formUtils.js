@@ -85,6 +85,8 @@ export function extractFieldDefinition({
 
 function resolveFieldElement(container, field) {
   switch (field.type) {
+    case "guid":
+      return container.querySelector(`[data-guid-field="${field.key}"]`);
     case "range":
       return container.querySelector(`[data-range-field="${field.key}"]`);
     case "radio":

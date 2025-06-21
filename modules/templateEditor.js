@@ -33,6 +33,43 @@ let keyboardListenerAttached = false;
 let editorWrapper = null;
 let typeDropdown = null;
 
+function sanitizeField(f) {
+  const isGuid = f.type === "guid";
+
+  const field = {
+    key: f.key?.trim(),
+    label: isGuid ? "GUID" : f.label?.trim(),
+    type: f.type || "text",
+    ...(isGuid ? { primary_key: true } : {}),
+  };
+
+  if (f.description?.trim()) {
+    field.description = f.description.trim();
+  }
+
+  if (f.two_column) {
+    field.two_column = true;
+  }
+
+  if (f.list_display) {
+    field.list_display = true;
+  }
+
+  if (
+    f.default !== undefined &&
+    f.default !== null &&
+    `${f.default}`.trim() !== ""
+  ) {
+    field.default = f.default;
+  }
+
+  if (f.options && Array.isArray(f.options) && f.options.length > 0) {
+    field.options = f.options;
+  }
+
+  return field;
+}
+
 export function initTemplateEditor(containerId, onSaveCallback) {
   const container = document.getElementById(containerId);
   if (!container) {
@@ -127,7 +164,7 @@ export function initTemplateEditor(containerId, onSaveCallback) {
             name:
               container.querySelector("#yaml-name")?.value.trim() || "Unnamed",
             markdown_template: getEditor()?.getValue() || "",
-            fields: currentData.fields || [],
+            fields: currentData.fields.map((f) => sanitizeField(f)),
           };
 
           const errors = await new Promise((resolve) => {
@@ -153,7 +190,7 @@ export function initTemplateEditor(containerId, onSaveCallback) {
 
           EventBus.emit("editor:save", {
             container,
-            fields: currentData.fields,
+            fields: fullTemplate.fields,
             callback: onSaveCallback,
           });
 
@@ -201,7 +238,6 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     }
     document.addEventListener("keydown", handleEditorKey);
     keyboardListenerAttached = true;
-
   }
 
   function renderFieldListWrapper() {
