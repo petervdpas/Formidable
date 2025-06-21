@@ -1,10 +1,11 @@
 // utils/fieldParsers.js
 
 import { ensureVirtualLocation } from "./vfsUtils.js";
+import { generateGuid } from "./domUtils.js";
 
 // GUID
 export function parseGuidField(input) {
-  return input?.value?.trim() || "";
+  return input?.value?.trim() || generateGuid();
 }
 
 // Text

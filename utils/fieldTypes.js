@@ -19,21 +19,17 @@ export const fieldTypes = {
       "options",
     ],
     defaultValue: () => generateGuid(),
-
     renderInput: async function (field, template, value = "") {
       const guidValue =
         value?.trim?.() || field.default?.trim?.() || generateGuid();
-
       const input = document.createElement("input");
       input.type = "hidden";
       input.name = field.key;
       input.value = guidValue;
       input.dataset.guidField = field.key;
-
       return input;
     },
-
-    parseValue: (input) => input?.value?.trim() || generateGuid(),
+    parseValue: parsers.parseGuidField
   },
 
   looper: {
