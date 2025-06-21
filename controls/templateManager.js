@@ -188,6 +188,21 @@ function checkLoopPairing(fields) {
   return errors;
 }
 
+function checkCollectionEnableValid(template) {
+  if (template.enable_collection !== true) return null;
+
+  const hasGuid = template.fields.some((f) => f.type === "guid");
+  if (!hasGuid) {
+    return {
+      type: "missing-guid-for-collection",
+      message:
+        "`Enable Collection` is active but no GUID field found. Add a GUID field or disable this option.",
+    };
+  }
+
+  return null;
+}
+
 function validateTemplate(template) {
   if (!template || !Array.isArray(template.fields)) {
     return [
@@ -208,6 +223,12 @@ function validateTemplate(template) {
   }
 
   errors.push(...checkLoopPairing(template.fields));
+
+  const collectionError = checkCollectionEnableValid(template);
+
+  if (collectionError) {
+    errors.push(collectionError);
+  }
 
   return errors;
 }

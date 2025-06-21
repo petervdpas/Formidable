@@ -155,7 +155,19 @@ export function initTemplateEditor(containerId, onSaveCallback) {
       "template-enable-collection",
       "Enable Collection",
       currentData.enable_collection === true,
-      null,
+      () => {
+        const hasGuid = currentData.fields.some((f) => f.type === "guid");
+        const checkbox = document.getElementById("template-enable-collection");
+
+        if (!hasGuid) {
+          checkbox.checked = false;
+          EventBus.emit("ui:toast", {
+            message:
+              "`Enable Collection` requires at least one GUID field in the template.",
+            variant: "warn",
+          });
+        }
+      },
       "block",
       ["Enabled", "Disabled"]
     );
@@ -311,11 +323,11 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     if (!switchEl) return;
 
     if (!hasGuidField) {
+      switchEl.classList.add("disabled-switch");
       switchEl.checked = false;
-      switchEl.disabled = true;
     } else {
-      switchEl.disabled = false;
-      // do not touch .checked → let user control if GUID present
+      switchEl.classList.remove("disabled-switch");
+      // let user control .checked
     }
   }
 
