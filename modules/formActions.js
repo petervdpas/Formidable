@@ -44,10 +44,20 @@ export async function saveForm(container, template) {
     EventBus.emit("config:load", (cfg) => resolve(cfg));
   });
 
+  // Determine GUID field
+  const guidField = template.fields?.find((f) => f.type === "guid");
+  const guidKey = guidField?.key || "id";
+
+  const idValue = data[guidKey] || meta.id || null;
+
+  // REMOVE id from data!
+  //delete data[guidKey];
+
   const payload = {
     ...data,
     _meta: {
       ...meta,
+      id: idValue,
       author_name: userConfig.author_name || "unknown",
       author_email: userConfig.author_email || "unknown@example.com",
       template: template.filename || "unknown",

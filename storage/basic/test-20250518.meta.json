@@ -1,14 +1,15 @@
 {
   "meta": {
+    "id": "18e4c5c4-d0d9-49d1-b14d-86582a11e1c9",
     "author_name": "Regular user",
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:19:38.103Z",
-    "updated": "2025-06-21T13:46:36.654Z",
+    "updated": "2025-06-21T23:19:03.505Z",
     "flagged": false
   },
   "data": {
-    "id": "bcb2d16e-6680-4092-91a0-aba662f41ae9",
+    "id": "18e4c5c4-d0d9-49d1-b14d-86582a11e1c9",
     "test": "Default value",
     "check": true,
     "dropdown": "R",
@@ -33,6 +34,6 @@
       ]
     ],
     "design": "GreenSignWhiteArrowPersonRunning.png",
-    "linktest": "formidable://basic.yaml:sane-20250530.meta.json"
+    "linktest": ""
   }
 }

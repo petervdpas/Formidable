@@ -27,7 +27,7 @@ export async function renderGuidField(field, value = "") {
 
   const hidden = document.createElement("input");
   hidden.type = "hidden";
-  hidden.name = "id";
+  hidden.setAttribute("data-guid-field", field.key);
   hidden.value = guidValue;
 
   return hidden;

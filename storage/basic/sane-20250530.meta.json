@@ -1,14 +1,15 @@
 {
   "meta": {
+    "id": "18e4c5c4-d0d9-49d1-b14d-86582a11e1c9",
     "author_name": "Regular user",
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-06-21T13:47:18.634Z",
+    "updated": "2025-06-21T23:19:01.291Z",
     "flagged": true
   },
   "data": {
-    "id": "86e1b9a4-be62-406f-840c-fc1cea3158fb",
+    "id": "18e4c5c4-d0d9-49d1-b14d-86582a11e1c9",
     "test": "Default value",
     "check": true,
     "dropdown": "R",
@@ -32,6 +33,6 @@
       ]
     ],
     "design": "formidable.png",
-    "linktest": "formidable://basic.yaml:test-20250518.meta.json"
+    "linktest": ""
   }
 }

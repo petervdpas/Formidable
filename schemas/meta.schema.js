@@ -5,6 +5,7 @@ module.exports = {
     raw = {},
     templateFields = [],
     {
+      id = null,
       templateName = "unknown",
       author_name = "Unknown",
       author_email = "unknown@example.com",
@@ -39,8 +40,17 @@ module.exports = {
       }
     }
 
+    // Guarantee id present (even null)
+    const resolvedId =
+      id ||
+      rawMeta.id ||
+      injected.id ||
+      rawData.id ||
+      (templateFields.some((f) => f.type === "guid") ? null : undefined);
+
     return {
       meta: {
+        id: resolvedId,
         author_name: rawMeta.author_name || injected.author_name || author_name,
         author_email:
           rawMeta.author_email || injected.author_email || author_email,
