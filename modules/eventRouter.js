@@ -152,6 +152,7 @@ export function initEventRouter() {
   // Form events
   EventBus.off("form:selected", formHandlers.handleFormSelected);
   EventBus.off("form:list", formHandlers.handleListForms);
+  EventBus.off("form:extendedList", formHandlers.handleExtendedListForms);
   EventBus.off("form:load", formHandlers.handleLoadForm);
   EventBus.off("form:save", formHandlers.handleSaveForm);
   EventBus.off("form:delete", formHandlers.handleDeleteForm);
@@ -160,6 +161,7 @@ export function initEventRouter() {
 
   EventBus.on("form:selected", formHandlers.handleFormSelected);
   EventBus.on("form:list", formHandlers.handleListForms);
+  EventBus.on("form:extendedList", formHandlers.handleExtendedListForms);
   EventBus.on("form:load", formHandlers.handleLoadForm);
   EventBus.on("form:save", formHandlers.handleSaveForm);
   EventBus.on("form:delete", formHandlers.handleDeleteForm);

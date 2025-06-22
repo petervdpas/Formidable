@@ -74,6 +74,7 @@ export function createTemplateListManager(modal, dropdown = null) {
   };
 }
 
+
 export function createStorageListManager(formManager, modal) {
   const { input: toggle, element: wrapper } = buildSwitchElement({
     id: "flagged-toggle",
@@ -102,33 +103,25 @@ export function createStorageListManager(formManager, modal) {
     elementId: "storage-list",
     itemClass: "storage-item",
     fetchListFunction: async () => {
-      const template = await ensureVirtualLocation(
-        window.currentSelectedTemplate
-      );
+      const template = await ensureVirtualLocation(window.currentSelectedTemplate);
       if (!template || !template.virtualLocation) return [];
 
       await EventBus.emitWithResponse("form:ensureDir", template.filename);
 
-      const files = await new Promise((resolve) => {
-        EventBus.emit("form:list", {
+      const entries = await new Promise((resolve) => {
+        EventBus.emit("form:extendedList", {
           templateFilename: template.filename,
           callback: resolve,
         });
       });
 
-      return Promise.all(
-        files.map(async (dataFile) => {
-          const meta = await EventBus.emitWithResponse("form:load", {
-            templateFilename: template.filename,
-            datafile: dataFile,
-          });
-          return {
-            display: stripMetaExtension(dataFile),
-            value: dataFile,
-            flagged: meta?.meta?.flagged || false,
-          };
-        })
-      );
+      return entries.map((entry) => {
+        return {
+          display: stripMetaExtension(entry.filename),
+          value: entry.filename,
+          flagged: entry.meta?.flagged || false,
+        };
+      });
     },
     onItemClick: (storageItem) =>
       EventBus.emit("form:list:itemClicked", storageItem),

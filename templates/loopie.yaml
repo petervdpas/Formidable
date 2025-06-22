@@ -48,6 +48,7 @@ fields:
     label: Title
     type: text
     description: This is just a title....
+    sidebar_item: true
   - key: looper
     label: Chapters
     type: loopstart

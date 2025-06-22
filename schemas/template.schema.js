@@ -5,6 +5,7 @@ module.exports = {
     name: "",
     filename: "",
     markdown_template: "",
+    sidebar_handling: "",
     enable_collection: false,
     fields: [],
   },
@@ -21,6 +22,7 @@ module.exports = {
       name: obj.name || "",
       filename: obj.filename || filename || "",
       markdown_template: obj.markdown_template,
+      sidebar_handling: obj.sidebar_handling,
       enable_collection: obj.enable_collection === true,
       fields: obj.fields,
     };
@@ -32,6 +34,7 @@ module.exports = {
           "name",
           "filename",
           "markdown_template",
+          "sidebar_handling",
           "enable_collection",
           "fields",
         ].includes(key)

@@ -91,6 +91,20 @@ export async function handleListForms({ templateFilename, callback }) {
   }
 }
 
+// EXTENDED LIST
+export async function handleExtendedListForms({ templateFilename, callback }) {
+  try {
+    const result = await window.api.forms.extendedListForms(templateFilename);
+    callback?.(result);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      "[formHandlers] Failed to extended list forms:",
+      err,
+    ]);
+    callback?.([]);
+  }
+}
+
 // LOAD
 export async function handleLoadForm(
   { templateFilename, datafile, fields = [] },
