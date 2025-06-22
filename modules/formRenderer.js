@@ -225,14 +225,25 @@ async function buildMetaSection(
   const metaText = document.createElement("div");
   metaText.className = "meta-text";
 
-  [
+  const metaLines = [
     `Filename: ${filename || ""}`,
+  ];
+
+  if (meta.id) {
+    metaLines.push(`ID: ${meta.id}`);
+  } else if (meta.guid) {
+    metaLines.push(`GUID: ${meta.guid}`);
+  }
+
+  metaLines.push(
     `Author: ${meta.author_name || ""}`,
     `Email: ${meta.author_email || ""}`,
     `Template: ${meta.template || ""}`,
     `Created: ${meta.created || ""}`,
-    `Updated: ${meta.updated || ""}`,
-  ].forEach((line) => {
+    `Updated: ${meta.updated || ""}`
+  );
+
+  metaLines.forEach((line) => {
     const div = document.createElement("div");
     div.textContent = line;
     metaText.appendChild(div);
@@ -260,7 +271,6 @@ async function buildMetaSection(
     }
   );
 
-  // Wrap text + buttons in row layout
   const wrapper = document.createElement("div");
   wrapper.className = "meta-wrapper";
   wrapper.appendChild(metaText);
