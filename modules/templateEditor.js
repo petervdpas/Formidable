@@ -276,7 +276,7 @@ export function initTemplateEditor(containerId, onSaveCallback) {
 
           EventBus.emit("editor:save", {
             container,
-            data: fullTemplate,
+            fields: fullTemplate.fields,
             callback: onSaveCallback,
           });
 
