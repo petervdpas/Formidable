@@ -5,22 +5,15 @@ import { getValue as getMarkdownTemplate } from "../templateCodemirror.js";
 import { showConfirmModal } from "../modalSetup.js";
 import { clearContainerUI } from "../../utils/formUtils.js";
 
-export async function handleSaveTemplate({ container, fields, callback }) {
-  const name = container.querySelector("#yaml-name").value.trim();
-  const markdownTemplate = getMarkdownTemplate();
-  const enableCollection =
+export async function handleSaveTemplate({ container, data, callback }) {
+  data.name = container.querySelector("#yaml-name")?.value.trim() || "Unnamed";
+  data.markdown_template = getMarkdownTemplate();
+  data.enable_collection =
     document.getElementById("template-enable-collection")?.checked === true;
-
-  const updated = {
-    name,
-    markdown_template: markdownTemplate,
-    enable_collection: enableCollection,
-    fields,
-  };
 
   // 🔍 Validatie
   const validationErrors = await new Promise((resolve) => {
-    EventBus.emit("template:validate", { data: updated, callback: resolve });
+    EventBus.emit("template:validate", { data, callback: resolve });
   });
   if (validationErrors.length > 0) {
     const messages = validationErrors.map(formatError);
@@ -33,10 +26,10 @@ export async function handleSaveTemplate({ container, fields, callback }) {
 
   EventBus.emit("logging:default", [
     "[EditorHandler] Valid template → save triggered:",
-    updated,
+    data,
   ]);
 
-  callback?.(updated);
+  callback?.(data);
 }
 
 export async function handleDeleteTemplate(container) {

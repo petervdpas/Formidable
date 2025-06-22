@@ -45,6 +45,7 @@ function saveTemplate(name, data) {
       name: data.name || "",
       filename: data.filename,
       markdown_template: data.markdown_template || "",
+      sidebar_handling: data.sidebar_handling || "",
       enable_collection: data.enable_collection === true,
       fields: Array.isArray(data.fields) ? data.fields : [],
     };
@@ -56,6 +57,7 @@ function saveTemplate(name, data) {
           "name",
           "filename",
           "markdown_template",
+          "sidebar_handling",
           "enable_collection",
           "fields",
         ].includes(key)

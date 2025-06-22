@@ -5,6 +5,7 @@
   align-items: stretch;
   width: 100%;
   gap: 6px;
+  margin-bottom: 8px;
 }
 
 .modal-form-row.full-editor-row label {
@@ -20,6 +21,7 @@
   overflow: auto;
   display: flex;
   flex-direction: column;
+  border: 1px solid var(--input-border-color);
 }
 
 .CodeMirror {

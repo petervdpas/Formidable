@@ -150,6 +150,14 @@ export function initTemplateEditor(containerId, onSaveCallback) {
 
     setupFieldset.appendChild(templateRow);
 
+    // Sidebar Handling input row
+    const sidebarRow = createFormRowInput({
+      id: "sidebar-handling",
+      label: "Sidebar Handling",
+      value: currentData.sidebar_handling || "",
+    });
+    setupFieldset.appendChild(sidebarRow);
+
     // ─── Enable Collection Switch ──────
     collectionSwitch = createSwitch(
       "template-enable-collection",
@@ -237,6 +245,8 @@ export function initTemplateEditor(containerId, onSaveCallback) {
             name:
               container.querySelector("#yaml-name")?.value.trim() || "Unnamed",
             markdown_template: getEditor()?.getValue() || "",
+            sidebar_handling:
+              container.querySelector("#sidebar-handling")?.value.trim() || "",
             enable_collection: hasGuidField
               ? collectionElement?.checked === true
               : false,
@@ -266,7 +276,7 @@ export function initTemplateEditor(containerId, onSaveCallback) {
 
           EventBus.emit("editor:save", {
             container,
-            fields: fullTemplate.fields,
+            data: fullTemplate,
             callback: onSaveCallback,
           });
 
