@@ -46,6 +46,7 @@ const api = {
   forms: buildGroup([
     "ensure-form-dir",
     "list-forms",
+    "extended-list-forms",
     "load-form",
     "save-form",
     "save-image-file",

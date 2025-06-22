@@ -118,6 +118,9 @@ function registerIpcHandlers() {
   registerIpc("list-forms", (e, templateFilename) =>
     formManager.listForms(templateFilename)
   );
+  registerIpc("extended-list-forms", (e, templateFilename) =>
+    formManager.extendedListForms(templateFilename)
+  );
   registerIpc("load-form", (e, templateFilename, dataFile, fields) =>
     formManager.loadForm(templateFilename, dataFile, fields)
   );

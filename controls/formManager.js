@@ -25,6 +25,35 @@ function listForms(templateFilename) {
   return metaRepo.listFiles(storagePath);
 }
 
+async function extendedListForms(templateFilename) {
+  const storagePath = configManager.getTemplateStoragePath(templateFilename);
+  const files = metaRepo.listFiles(storagePath);
+
+  const template = configManager.getTemplate(templateFilename); // if needed, or load template.yaml
+  const fields = template?.fields || [];
+
+  const results = [];
+
+  for (const filename of files) {
+    try {
+      const raw = metaRepo.loadFromBase(storagePath, filename);
+      const sanitized = metaSchema.sanitize(raw, fields);
+
+      const result = {
+        filename,
+        meta: sanitized?.meta || {},
+        data: sanitized || {},
+      };
+
+      results.push(result);
+    } catch (err) {
+      error("[FormManager] Failed to load form (for listForms):", filename, err);
+    }
+  }
+
+  return results;
+}
+
 function loadForm(templateFilename, datafile, templateFields = []) {
   const storagePath = configManager.getTemplateStoragePath(templateFilename);
   try {
@@ -65,6 +94,7 @@ function deleteForm(templateFilename, datafile) {
 module.exports = {
   ensureFormDirectory,
   listForms,
+  extendedListForms,
   loadForm,
   saveForm,
   deleteForm,
