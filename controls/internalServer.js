@@ -171,6 +171,64 @@ function startInternalServer(port = 8383) {
     );
   });
 
+  // MiniExpr Test Page
+  app.get("/miniexpr", (req, res) => {
+    const sampleContext = {
+      test: "Hello",
+      check: true,
+      value: 42,
+      score: 75,
+      other: "World",
+    };
+
+    const examples = [
+      `[test]`,
+      `[test + " (" + value + ")"]`,
+      `[check ? "green" : "red"]`,
+      `[score > 50 ? "Pass" : "Fail"]`,
+      `[test + " → " + other + " → " + value]`,
+      `[value * 2 + score / 5]`,
+      `[ { label: test, color: check ? "green" : "red" } ]`,
+      `[ { label: "Score: " + score, color: score > 50 ? "blue" : "orange" } ]`,
+    ];
+
+    const miniExprParser = require("./miniExprParser");
+
+    const results = examples.map((expr) => {
+      const result = miniExprParser.parseMiniExpr(expr, sampleContext);
+
+      const resultJson = JSON.stringify(result, null, 2);
+
+      return `<tr>
+      <td style="font-family:monospace;">${expr}</td>
+      <td colspan="2"><pre style="margin:0;">${resultJson}</pre></td>
+    </tr>`;
+    });
+
+    const body = `
+    <p><a href="/">⬅ Back to Home</a></p>
+    <h2>MiniExpr Parser Test</h2>
+    <p>Sample context:</p>
+    <pre>${JSON.stringify(sampleContext, null, 2)}</pre>
+    <table border="1" cellpadding="6" cellspacing="0">
+      <thead>
+        <tr><th>Expression</th><th colspan="2">Result Object</th></tr>
+      </thead>
+      <tbody>
+        ${results.join("")}
+      </tbody>
+    </table>
+  `;
+
+    res.send(
+      renderPage({
+        title: "MiniExpr Parser Test",
+        body,
+        footerNote: `Running on port ${currentPort}`,
+      })
+    );
+  });
+
   // Start server
   server = app.listen(port, () => {
     const addr = server.address();

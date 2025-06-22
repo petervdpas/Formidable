@@ -210,8 +210,11 @@ export function initEventRouter() {
   // Transform events
   EventBus.off("transform:markdown", transformHandler.handleRenderMarkdown);
   EventBus.off("transform:html", transformHandler.handleRenderHtml);
+  EventBus.off("transform:parseMiniExpr", transformHandler.handleParseMiniExpr);
+
   EventBus.on("transform:markdown", transformHandler.handleRenderMarkdown);
   EventBus.on("transform:html", transformHandler.handleRenderHtml);
+  EventBus.on("transform:parseMiniExpr", transformHandler.handleParseMiniExpr);
 
   // Git events
   EventBus.off("git:check", gitHandler.handleGitCheckRepo);

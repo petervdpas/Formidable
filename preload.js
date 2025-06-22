@@ -59,7 +59,11 @@ const api = {
     "save-markdown",
     "delete-markdown",
   ]),
-  transform: buildGroup(["render-markdown-template", "render-html-preview"]),
+  transform: buildGroup([
+    "render-markdown-template",
+    "render-html-preview",
+    "parse-mini-expr",
+  ]),
   system: {
     getAppRoot: () => ipcRenderer.invoke("get-app-root"),
     resolvePath: (...args) => ipcRenderer.invoke("resolve-path", ...args),

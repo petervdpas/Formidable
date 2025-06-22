@@ -20,6 +20,7 @@ const configManager = require("./configManager");
 const markdownManager = require("./markdownManager");
 const markdownRenderer = require("./markdownRenderer");
 const htmlRenderer = require("./htmlRenderer");
+const miniExprParser = require("./miniExprParser");
 
 const sfr = new SingleFileRepository();
 
@@ -193,6 +194,11 @@ function registerIpcHandlers() {
   );
   registerIpc("get-single-template-entry", (e, templateFilename) =>
     configManager.getSingleTemplateEntry(templateFilename)
+  );
+
+  // MiniExprParser
+  registerIpc("parse-mini-expr", (e, expr, context) =>
+    miniExprParser.parseMiniExpr(expr, context)
   );
 
   // Render

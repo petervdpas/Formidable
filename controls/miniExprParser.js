@@ -1,53 +1,59 @@
 // controls/miniExprParser.js
 
 const { Parser } = require("expr-eval");
+const vm = require("vm");
 
 function parseMiniExpr(expr, context = {}) {
-  if (!expr || typeof expr !== "string") return { label: "", color: "" };
+  if (!expr || typeof expr !== "string") return {};
 
   try {
-    // Simple syntax:
-    //  [field] → returns field as label
-    //  [field + " (" + otherField + ")"]
-    //  [check ? "green" : "red"]
-
-    // Match bracketed expression:
     const match = expr.match(/^\[(.+)\]$/);
-    if (!match) {
-      return { label: expr, color: "" };
-    }
+    if (!match) return { text: expr };
 
     const inner = match[1].trim();
 
-    // Split expression: "labelExpr | colorExpr"
-    const [labelPart, colorPart] = inner.split("|").map((s) => s.trim());
-
     const parser = new Parser();
 
-    const labelExpr = parser.parse(labelPart);
-    const label = labelExpr.evaluate(context);
+    let result = safeEval(parser, inner, context);
 
-    let color = "";
-    if (colorPart) {
-      const colorExpr = parser.parse(colorPart);
-      color = colorExpr.evaluate(context);
+    // If expr-eval failed or result === "", fallback to vm
+    if (result === "" || result === undefined) {
+      result = safeVmEval(inner, context);
     }
 
-    return {
-      label: label ?? "",
-      color: color ?? "",
-    };
+    if (typeof result === "object" && result !== null) {
+      return result;
+    } else {
+      return { text: result };
+    }
+
   } catch (err) {
     console.warn("[miniExprParser] Parse error:", err);
-    return { label: expr, color: "" };
+    return { text: expr };
   }
 }
 
-const helpers = {
-  parseMiniExpr,
-};
+function safeEval(parser, expr, context) {
+  try {
+    const compiled = parser.parse(expr);
+    return compiled.evaluate(context);
+  } catch (err) {
+    console.warn("[miniExprParser] ExprEval error:", expr);
+    return "";
+  }
+}
+
+function safeVmEval(expr, context) {
+  try {
+    // Wrap in parentheses for object literal:
+    const wrapped = /^\{.*\}$/.test(expr) ? `(${expr})` : expr;
+    return vm.runInNewContext(wrapped, context);
+  } catch (err) {
+    console.warn("[miniExprParser] VM Eval error:", expr, err);
+    return "";
+  }
+}
 
 module.exports = {
   parseMiniExpr,
-  helpers,
 };

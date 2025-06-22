@@ -34,3 +34,21 @@ export async function handleRenderHtml(markdown, callback) {
     callback?.(null);
   }
 }
+
+export async function handleParseMiniExpr(expr, context, callback) {
+  try {
+    EventBus.emit("logging:default", [
+      "[transformHandler] Parsing miniExpr...",
+      expr,
+      context,
+    ]);
+    const result = await window.api.transform.parseMiniExpr(expr, context);
+    callback?.(result);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      "[transformHandler] Failed to parse miniExpr:",
+      err,
+    ]);
+    callback?.(null);
+  }
+}
