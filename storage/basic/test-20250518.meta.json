@@ -1,15 +1,15 @@
 {
   "meta": {
-    "id": "18e4c5c4-d0d9-49d1-b14d-86582a11e1c9",
+    "id": "5a7bec64-f3f2-47cc-a836-2e4643e4f9a9",
     "author_name": "Regular user",
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:19:38.103Z",
-    "updated": "2025-06-21T23:19:03.505Z",
+    "updated": "2025-06-21T23:46:27.113Z",
     "flagged": false
   },
   "data": {
-    "id": "18e4c5c4-d0d9-49d1-b14d-86582a11e1c9",
+    "id": "5a7bec64-f3f2-47cc-a836-2e4643e4f9a9",
     "test": "Default value",
     "check": true,
     "dropdown": "R",
