@@ -2,6 +2,7 @@
 
 const { Parser } = require("expr-eval");
 const vm = require("vm");
+const { log, warn, error } = require("./nodeLogger");
 
 function parseMiniExpr(expr, context = {}) {
   if (!expr || typeof expr !== "string") return {};
@@ -28,7 +29,7 @@ function parseMiniExpr(expr, context = {}) {
     }
 
   } catch (err) {
-    console.warn("[miniExprParser] Parse error:", err);
+    error("[miniExprParser] Parse error:", err);
     return { text: expr };
   }
 }
@@ -38,7 +39,10 @@ function safeEval(parser, expr, context) {
     const compiled = parser.parse(expr);
     return compiled.evaluate(context);
   } catch (err) {
-    console.warn("[miniExprParser] ExprEval error:", expr);
+    // Suppress warning if input is an object literal
+    if (!/^\{.*\}$/.test(expr)) {
+      warn("[miniExprParser] ExprEval error:", expr);
+    }
     return "";
   }
 }
@@ -49,7 +53,7 @@ function safeVmEval(expr, context) {
     const wrapped = /^\{.*\}$/.test(expr) ? `(${expr})` : expr;
     return vm.runInNewContext(wrapped, context);
   } catch (err) {
-    console.warn("[miniExprParser] VM Eval error:", expr, err);
+    warn("[miniExprParser] VM Eval error:", expr, err);
     return "";
   }
 }
