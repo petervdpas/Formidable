@@ -5,6 +5,7 @@ const express = require("express");
 const { renderPage } = require("./pageGenerator");
 const {
   getVirtualStructure,
+  extendedListForms,
   loadAndRenderForm,
   loadTemplateYaml,
 } = require("./serverDataProvider");
@@ -97,6 +98,25 @@ function startInternalServer(port = 8383) {
         footerNote: `Running on port ${currentPort}`,
       })
     );
+  });
+
+  app.get("/template/:template/extended-list", async (req, res) => {
+    const tmpl = req.params.template;
+    const vfs = await getVirtualStructure();
+    const templateInfo = vfs.templateStorageFolders?.[tmpl];
+
+    if (!templateInfo?.filename) {
+      res.status(404).send({
+        error: "Template not found",
+        template: tmpl,
+      });
+      return;
+    }
+
+    const result = await extendedListForms(templateInfo.filename);
+
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    res.send(JSON.stringify(result, null, 2));
   });
 
   // HTML - Rendered Form

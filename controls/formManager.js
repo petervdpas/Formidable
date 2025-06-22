@@ -2,6 +2,7 @@
 
 const { SingleFileRepository } = require("./sfr");
 const configManager = require("./configManager");
+const templateManager = require("./templateManager");
 const fileManager = require("./fileManager");
 const metaSchema = require("../schemas/meta.schema");
 const { log, warn, error } = require("./nodeLogger");
@@ -29,8 +30,11 @@ async function extendedListForms(templateFilename) {
   const storagePath = configManager.getTemplateStoragePath(templateFilename);
   const files = metaRepo.listFiles(storagePath);
 
-  const template = configManager.getTemplate(templateFilename); // if needed, or load template.yaml
+  const template = templateManager.loadTemplate(templateFilename);
   const fields = template?.fields || [];
+
+  // Find special fields
+  const sidebarFields = fields.filter((f) => f.sidebar_item);
 
   const results = [];
 
@@ -39,15 +43,28 @@ async function extendedListForms(templateFilename) {
       const raw = metaRepo.loadFromBase(storagePath, filename);
       const sanitized = metaSchema.sanitize(raw, fields);
 
+      const sidebarItems = {};
+
+      for (const field of sidebarFields) {
+        const value = sanitized.data?.[field.key];
+        if (value !== undefined && value !== null && value !== "") {
+          sidebarItems[field.key] = value;
+        }
+      }
+
       const result = {
         filename,
-        meta: sanitized?.meta || {},
-        data: sanitized || {},
+        meta: sanitized.meta || {},
+        sidebarItems,  // <── THIS you want!
       };
 
       results.push(result);
     } catch (err) {
-      error("[FormManager] Failed to load form (for listForms):", filename, err);
+      error(
+        "[FormManager] Failed to load form (for listForms):",
+        filename,
+        err
+      );
     }
   }
 

@@ -5,13 +5,13 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:19:38.103Z",
-    "updated": "2025-06-22T10:28:16.481Z",
+    "updated": "2025-06-22T11:37:48.741Z",
     "flagged": false
   },
   "data": {
     "id": "5a7bec64-f3f2-47cc-a836-2e4643e4f9a9",
     "test": "Default value",
-    "check": true,
+    "check": false,
     "dropdown": "R",
     "multichoice": [
       "A",

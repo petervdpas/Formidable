@@ -208,6 +208,7 @@ fields:
     type: boolean
     description: Enable or disable this feature using a checkbox.
     two_column: true
+    sidebar_item: true
     options:
       - value: true
         label: 'On'

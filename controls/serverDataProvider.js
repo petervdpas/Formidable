@@ -10,6 +10,10 @@ async function getVirtualStructure() {
   return configManager.getVirtualStructure();
 }
 
+async function extendedListForms(templateName) {
+  return formManager.extendedListForms(templateName);
+}
+
 async function loadTemplateYaml(templateFilename) {
   if (!templateFilename) return null;
   return templateManager.loadTemplate(templateFilename);
@@ -64,6 +68,7 @@ async function loadAndRenderForm(templateName, dataFile) {
 
 module.exports = {
   getVirtualStructure,
+  extendedListForms,
   loadTemplateYaml,
   loadFormFile,
   loadAndRenderForm,

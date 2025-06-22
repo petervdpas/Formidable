@@ -3,20 +3,20 @@
   "show_icon_buttons": false,
   "font_size": 14,
   "logging_enabled": true,
-  "context_mode": "storage",
+  "context_mode": "template",
   "context_folder": "./",
-  "selected_template": "basic.yaml",
-  "selected_data_file": "sane-20250530.meta.json",
+  "selected_template": "loopie.yaml",
+  "selected_data_file": null,
   "author_name": "Regular user",
   "author_email": "regular@example.com",
   "use_git": false,
   "git_root": "",
-  "enable_internal_server": false,
+  "enable_internal_server": true,
   "internal_server_port": 8383,
   "window_bounds": {
-    "width": 1102,
-    "height": 923,
-    "x": 142,
-    "y": 34
+    "width": 1936,
+    "height": 1048,
+    "x": -8,
+    "y": -8
   }
 }
