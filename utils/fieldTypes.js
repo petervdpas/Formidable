@@ -15,6 +15,7 @@ export const fieldTypes = {
       "description",
       "default",
       "options",
+      "constructFieldsRow",
       "twoColumnRow",
       "sidebarItemRow",
     ],
@@ -40,6 +41,7 @@ export const fieldTypes = {
       "description",
       "default",
       "options",
+      "constructFieldsRow",
       "twoColumnRow",
       "sidebarItemRow",
     ],
@@ -53,6 +55,7 @@ export const fieldTypes = {
       "description",
       "default",
       "options",
+      "constructFieldsRow",
       "twoColumnRow",
       "sidebarItemRow",
     ],
@@ -74,6 +77,7 @@ export const fieldTypes = {
       "description",
       "default",
       "options",
+      "constructFieldsRow",
       "twoColumnRow",
       "sidebarItemRow",
     ],
@@ -87,9 +91,23 @@ export const fieldTypes = {
     parseValue: () => null,
   },
 
+  construct: {
+    label: "Construct",
+    cssClass: "modal-construct",
+    disabledAttributes: ["default", "twoColumnRow", "sidebarItemRow"],
+    defaultValue: () => [],
+    renderInput: async function (field) {
+      const wrapper = document.createElement("div");
+      wrapper.textContent = "Construct field — contains subfields.";
+      return wrapper;
+    },
+    parseValue: () => null,
+  },
+
   text: {
     label: "Text",
     cssClass: "modal-text",
+    disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
     renderInput: async function (field) {
       const input = document.createElement("input");
@@ -104,6 +122,7 @@ export const fieldTypes = {
   boolean: {
     label: "Checkbox",
     cssClass: "modal-boolean",
+    disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => false,
     renderInput: async function (field) {
       const input = document.createElement("input");
@@ -118,6 +137,7 @@ export const fieldTypes = {
   dropdown: {
     label: "Dropdown",
     cssClass: "modal-dropdown",
+    disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
     renderInput: async function (field) {
       const select = document.createElement("select");
@@ -137,6 +157,7 @@ export const fieldTypes = {
   multioption: {
     label: "Multiple Choice",
     cssClass: "modal-multioption",
+    disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => [],
     renderInput: async function (field) {
       const wrapper = document.createElement("div");
@@ -167,6 +188,7 @@ export const fieldTypes = {
   radio: {
     label: "Radio Buttons",
     cssClass: "modal-radio",
+    disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
     renderInput: async function (field) {
       const wrapper = document.createElement("div");
@@ -205,6 +227,7 @@ export const fieldTypes = {
   textarea: {
     label: "Multiline Text",
     cssClass: "modal-textarea",
+    disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
     renderInput: async function (field) {
       const textarea = document.createElement("textarea");
@@ -218,6 +241,7 @@ export const fieldTypes = {
   number: {
     label: "Number",
     cssClass: "modal-number",
+    disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => 0,
     renderInput: async function (field) {
       const input = document.createElement("input");
@@ -232,6 +256,7 @@ export const fieldTypes = {
   range: {
     label: "Range Slider",
     cssClass: "modal-range",
+    disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => 50,
 
     renderInput: async function (field) {
@@ -280,6 +305,7 @@ export const fieldTypes = {
   date: {
     label: "Date",
     cssClass: "modal-date",
+    disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
     renderInput: async function (field) {
       const input = document.createElement("input");
@@ -294,6 +320,7 @@ export const fieldTypes = {
   list: {
     label: "List",
     cssClass: "modal-list",
+    disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => [],
     renderInput: async function (field) {
       const input = document.createElement("input");
@@ -309,6 +336,7 @@ export const fieldTypes = {
   table: {
     label: "Table",
     cssClass: "modal-table",
+    disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => [],
     renderInput: async function (field) {
       const textarea = document.createElement("textarea");
@@ -327,6 +355,7 @@ export const fieldTypes = {
   image: {
     label: "Image Upload",
     cssClass: "modal-image",
+    disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
     renderInput: async function (field, template) {
       template = await ensureVirtualLocation(template);
@@ -390,6 +419,7 @@ export const fieldTypes = {
   link: {
     label: "Link",
     cssClass: "modal-link",
+    disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
 
     renderInput: async function (field) {

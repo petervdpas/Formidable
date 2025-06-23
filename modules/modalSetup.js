@@ -231,7 +231,7 @@ export function setupFieldEditModal(onConfirm) {
     closeBtn: "field-edit-close",
     escToClose: true,
     backdropClick: true,
-    width: "40em",
+    width: "44em",
     height: "auto",
   });
 

@@ -35,6 +35,8 @@ function setupFieldEditor(container, onChange, allFields = []) {
     default: container.querySelector("#edit-default"),
     options: container.querySelector("#edit-options"),
     type: container.querySelector("#edit-type-container select"),
+    constructFields: container.querySelector("#edit-construct-fields"),
+    constructFieldsRow: container.querySelector("#edit-construct-fields-row"),
   };
 
   let optionsEditor = null;

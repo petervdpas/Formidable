@@ -1,8 +1,23 @@
 // schemas/field.schema.js
 
 const knownTypes = [
-  "text", "textarea", "number", "range", "boolean", "dropdown", "multioption",
-  "list", "table", "image", "date", "guid", "link", "loopstart", "loopstop", "construct"
+  "guid",
+  "loopstart",
+  "loopstop",
+  "construct",
+  "text",
+  "boolean",
+  "dropdown",
+  "multioption",
+  "radio",
+  "textarea",
+  "number",
+  "range",
+  "date",
+  "list",
+  "table",
+  "image",
+  "link",
 ];
 
 module.exports = {
@@ -15,7 +30,7 @@ module.exports = {
     two_column: false,
     default: "",
     options: [],
-    fields: []
+    fields: [],
   },
 
   sanitize(raw) {
@@ -40,5 +55,5 @@ module.exports = {
     if (!Array.isArray(field.options)) field.options = [];
 
     return field;
-  }
+  },
 };
