@@ -507,7 +507,8 @@ export async function renderTableField(field) {
   wrapper.dataset.tableField = field.key;
 
   const columns = field.options || [];
-  const rows = field.default || [];
+  const rawRows = field.default;
+  const rows = Array.isArray(rawRows) ? rawRows : [];
 
   const table = addContainerElement({
     parent: wrapper,
