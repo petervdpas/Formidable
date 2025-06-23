@@ -153,6 +153,7 @@ export function createStorageListManager(formManager, modal) {
         flagNode.appendChild(wrapper);
       }
 
+      /*
       if (rawData.sidebarExpr && rawData.sidebarContext) {
         const parsed = await EventBus.emitWithResponse(
           "transform:parseMiniExpr",
@@ -174,6 +175,7 @@ export function createStorageListManager(formManager, modal) {
       } else if (rawData.id) {
         subLabelNode.textContent = rawData.id;
       }
+      */
     },
     filterFunction: (item) => !showOnlyFlagged || item.flagged,
     filterUI: wrapper,

@@ -91,9 +91,9 @@ export function createProfileListManager() {
       }
     },
 
-    renderItemExtra: (element, raw) => {
+    renderItemExtra: async ({ itemNode, rawData }) => {
       const subtitle = document.createElement("small");
-      subtitle.textContent = `[${raw.value}]`;
+      subtitle.textContent = `[${rawData.value}]`;
 
       Object.assign(subtitle.style, {
         opacity: "0.5",
@@ -103,7 +103,7 @@ export function createProfileListManager() {
         pointerEvents: "none",
       });
 
-      element.appendChild(subtitle);
+      itemNode.appendChild(subtitle);
     },
 
     emptyMessage: "No profiles found.",
