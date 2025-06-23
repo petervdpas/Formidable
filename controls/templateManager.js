@@ -112,8 +112,10 @@ function getTemplateDescriptor(name) {
   };
 }
 
+// Check for multiple primary keys (now supports nested constructs)
 function checkPrimaryKey(fields) {
-  const pkFields = fields.filter((f) => f.primary_key);
+  const allFields = collectAllFields(fields);
+  const pkFields = allFields.filter((f) => f.primary_key);
   if (pkFields.length > 1) {
     return {
       type: "multiple-primary-keys",
@@ -126,11 +128,24 @@ function checkPrimaryKey(fields) {
   return null;
 }
 
+// Helper: recursively flatten all fields (including inside constructs)
+function collectAllFields(fields, result = []) {
+  for (const f of fields) {
+    result.push(f);
+    if (f.type === "construct" && Array.isArray(f.fields)) {
+      collectAllFields(f.fields, result);
+    }
+  }
+  return result;
+}
+
+// Check for duplicate keys (now supports nested constructs)
 function checkDuplicateKeys(fields) {
+  const allFields = collectAllFields(fields);
   const seen = new Map();
   const duplicates = [];
 
-  for (const { key, type } of fields) {
+  for (const { key, type } of allFields) {
     if (!key) continue;
     if (seen.has(key)) {
       const existingType = seen.get(key);
