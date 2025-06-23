@@ -1,5 +1,7 @@
 // schemas/template.schema.js
 
+const fieldSchema = require("./field.schema.js");
+
 module.exports = {
   defaults: {
     name: "",
@@ -11,23 +13,22 @@ module.exports = {
   },
 
   sanitize(raw, filename = null) {
-    // Merge raw with defaults
     const obj = { ...this.defaults, ...raw };
 
-    if (!Array.isArray(obj.fields)) obj.fields = [];
     if (typeof obj.markdown_template !== "string") obj.markdown_template = "";
 
-    // Build sanitized object in fixed order
     const result = {
       name: obj.name || "",
       filename: obj.filename || filename || "",
       markdown_template: obj.markdown_template,
       sidebar_handling: obj.sidebar_handling,
       enable_collection: obj.enable_collection === true,
-      fields: obj.fields,
+      fields: Array.isArray(obj.fields)
+        ? obj.fields.map((f) => fieldSchema.sanitize(f))
+        : [],
     };
 
-    // Append any additional/custom keys
+    // Append any unknown keys
     for (const key of Object.keys(obj)) {
       if (
         ![
