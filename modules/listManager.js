@@ -60,7 +60,7 @@ export function createListManager({
     }
   }
 
-  function renderList(customFilter = filterFunction, postRender = null) {
+  async function renderList(customFilter = filterFunction, postRender = null) {
     listWrapper.innerHTML = "";
 
     let filteredItems = fullList;
@@ -71,35 +71,63 @@ export function createListManager({
     if (!filteredItems || filteredItems.length === 0) {
       listWrapper.innerHTML = `<div class="empty-message">${emptyMessage}</div>`;
     } else {
-      const listItems = filteredItems.map((raw) => {
-        const isObject = typeof raw === "object" && raw !== null;
-        const display = isObject
-          ? raw.display
-          : raw.replace(/\.yaml$|\.md$/i, "");
-        const value = isObject ? raw.value : raw;
+      const listItems = await Promise.all(
+        filteredItems.map(async (raw) => {
+          const isObject = typeof raw === "object" && raw !== null;
+          const display = isObject
+            ? raw.display
+            : raw.replace(/\.yaml$|\.md$/i, "");
+          const value = isObject ? raw.value : raw;
 
-        const item = document.createElement("div");
-        item.className = itemClass;
-        item.dataset.value = value;
-        item.dataset.listId = elementId;
+          const item = document.createElement("div");
+          item.className = itemClass;
+          item.dataset.value = value;
+          item.dataset.listId = elementId;
 
-        // Enrich with additional attributes
-        if (isObject) {
-          for (const [key, val] of Object.entries(raw)) {
-            if (typeof val === "string" || typeof val === "boolean") {
-              item.dataset[key] = String(val);
+          // Enrich with additional attributes
+          if (isObject) {
+            for (const [key, val] of Object.entries(raw)) {
+              if (typeof val === "string" || typeof val === "boolean") {
+                item.dataset[key] = String(val);
+              }
             }
           }
-        }
 
-        item.appendChild(document.createTextNode(display));
-        if (typeof renderItemExtra === "function") {
-          renderItemExtra(item, raw);
-        }
+          // Create structure: main + sub + flag
+          const mainWrapper = document.createElement("div");
+          mainWrapper.className = "list-item-main";
 
-        listWrapper.appendChild(item);
-        return { element: item, value };
-      });
+          const labelDiv = document.createElement("div");
+          labelDiv.className = "list-item-label";
+          labelDiv.textContent = display;
+
+          const subDiv = document.createElement("div");
+          subDiv.className = "list-item-sub";
+          subDiv.textContent = ""; // Empty by default
+
+          mainWrapper.appendChild(labelDiv);
+          mainWrapper.appendChild(subDiv);
+
+          const flagWrapper = document.createElement("div");
+          flagWrapper.className = "list-item-flag";
+
+          item.appendChild(mainWrapper);
+          item.appendChild(flagWrapper);
+
+          // Inject sublabel if needed
+          if (typeof renderItemExtra === "function") {
+            await renderItemExtra({
+              subLabelNode: subDiv,
+              flagNode: flagWrapper,
+              itemNode: item,
+              rawData: raw,
+            });
+          }
+
+          listWrapper.appendChild(item);
+          return { element: item, value };
+        })
+      );
 
       makeSelectableList(listItems, onItemClick);
     }

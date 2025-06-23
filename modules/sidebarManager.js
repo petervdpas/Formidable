@@ -74,7 +74,6 @@ export function createTemplateListManager(modal, dropdown = null) {
   };
 }
 
-
 export function createStorageListManager(formManager, modal) {
   const { input: toggle, element: wrapper } = buildSwitchElement({
     id: "flagged-toggle",
@@ -103,10 +102,23 @@ export function createStorageListManager(formManager, modal) {
     elementId: "storage-list",
     itemClass: "storage-item",
     fetchListFunction: async () => {
-      const template = await ensureVirtualLocation(window.currentSelectedTemplate);
+      const template = await ensureVirtualLocation(
+        window.currentSelectedTemplate
+      );
       if (!template || !template.virtualLocation) return [];
 
       await EventBus.emitWithResponse("form:ensureDir", template.filename);
+
+      const descriptor = await new Promise((resolve) => {
+        EventBus.emit("template:descriptor", {
+          name: template.filename,
+          callback: resolve,
+        });
+      });
+
+      console.log("DESCRIPTOR:", descriptor);
+
+      const sidebarExpr = descriptor?.yaml?.sidebar_handling || null;
 
       const entries = await new Promise((resolve) => {
         EventBus.emit("form:extendedList", {
@@ -120,14 +132,18 @@ export function createStorageListManager(formManager, modal) {
           display: stripMetaExtension(entry.filename),
           value: entry.filename,
           flagged: entry.meta?.flagged || false,
+          id: entry.meta?.id || "",
+          sidebarContext: entry.sidebarItems || {},
+          sidebarExpr: sidebarExpr,
         };
       });
     },
     onItemClick: (storageItem) =>
       EventBus.emit("form:list:itemClicked", storageItem),
     emptyMessage: "No metadata files found.",
-    renderItemExtra: (item, raw) => {
-      if (raw.flagged) {
+    renderItemExtra: async ({ subLabelNode, flagNode, rawData }) => {
+      // Flag (with wrapper so CSS matches)
+      if (rawData.flagged) {
         const wrapper = document.createElement("span");
         wrapper.className = "flag-icon-wrapper";
 
@@ -136,7 +152,33 @@ export function createStorageListManager(formManager, modal) {
         flagIcon.style.pointerEvents = "none";
 
         wrapper.appendChild(flagIcon);
-        item.appendChild(wrapper);
+        flagNode.appendChild(wrapper);
+      }
+
+      console.log("RAWDATA:", rawData);
+
+      if (rawData.sidebarExpr && rawData.sidebarContext) {
+        const parsed = await EventBus.emitWithResponse(
+          "transform:parseMiniExpr",
+          {
+            expr: rawData.sidebarExpr,
+            context: rawData.sidebarContext,
+          }
+        );
+
+        console.log("[SidebarManager] MiniExpr parsed:", parsed);
+
+        if (parsed?.text) {
+          subLabelNode.textContent = parsed.text;
+        } else if (rawData.id) {
+          subLabelNode.textContent = rawData.id;
+        }
+
+        if (parsed?.color) {
+          subLabelNode.style.color = parsed.color;
+        }
+      } else if (rawData.id) {
+        subLabelNode.textContent = rawData.id;
       }
     },
     filterFunction: (item) => !showOnlyFlagged || item.flagged,

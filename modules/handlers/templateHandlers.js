@@ -173,7 +173,18 @@ export async function handleValidateTemplate({ data, callback }) {
 // DESCRIPTOR
 export async function handleGetTemplateDescriptor({ name, callback }) {
   try {
-    const result = await window.api.templates.getTemplateDescriptor(name);
+    if (typeof name !== "string" || name.trim() === "") {
+      EventBus.emit("logging:error", [
+        `[TemplateHandler] Invalid template name (not a string):`,
+        name,
+      ]);
+      callback?.(null);
+      return;
+    }
+
+    const safeName = name.endsWith(".yaml") ? name : `${name}.yaml`;
+    const result = await window.api.templates.getTemplateDescriptor(safeName);
+
     callback?.(result);
   } catch (err) {
     EventBus.emit("logging:error", [

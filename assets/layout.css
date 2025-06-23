@@ -48,8 +48,8 @@ body {
 /* ───── Template, Markdown Context Layout ───── */
 #template-sidebar,
 #storage-sidebar {
-  width: 250px;
-  padding: 10px;
+  width: 320px;
+  padding: 6px;
   box-sizing: border-box;
   overflow-y: auto;
   flex-shrink: 0;
@@ -181,6 +181,37 @@ body {
 
 .markdown-editor-wrapper {
   width: inherit;
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-direction: row;
+  padding: 4px 8px;
+}
+
+.list-item-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.list-item-label {
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.list-item-sub {
+  font-size: 0.7em;
+  color: #888; 
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+.list-item-flag {
+  margin-left: 8px;
+  align-self: flex-start;
 }
 
 @media (max-width: 720px) {
