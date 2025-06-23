@@ -252,6 +252,13 @@
   border-left: 4px solid #888c95;
 }
 
+.field-list-item[data-type="construct"] {
+  background-color: #f9e06e;
+  /* Light Yellow */
+  border-left: 4px solid #d6b000;
+  color: #444;
+}
+
 /* ───── Field Type Color Badges ───── */
 .field-type.type-looper,
 .field-type.type-loopstart,
@@ -341,6 +348,12 @@
   background-color: #888c95;
   /* Slightly darker Gray */
   color: black;
+}
+
+.field-type.type-construct {
+  background-color: #e4ba00;
+  /* Light Yellow */
+  color: #444;
 }
 
 /* ───── Field Edit Modal Size ───── */
@@ -433,6 +446,12 @@
   border-left: 6px solid #888c95;
 }
 
+#field-edit-modal.modal-construct {
+  background-color: #f9e06e;
+  border-left: 6px solid #d6b000;
+  color: #444;
+}
+
 /* ───── Per-Type Close Button Overrides ───── */
 
 #field-edit-modal.modal-loopstart .btn-close,
@@ -494,6 +513,10 @@
 
 #field-edit-modal.modal-guid .btn-close {
   color: #ccc;
+}
+
+#field-edit-modal.modal-construct .btn-close {
+  color: #444;
 }
 
 /* Optional hover enhancement for all: */

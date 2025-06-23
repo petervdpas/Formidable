@@ -302,3 +302,6 @@ fields:
     label: Linktest
     type: link
     description: A link test
+  - key: construct-test
+    label: Construct
+    type: construct

@@ -63,7 +63,7 @@
     padding: 10px 0;
     /* Reduce vertical padding */
     margin-bottom: 12px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid;
 }
 
 .modal-title-row {
@@ -237,6 +237,11 @@
 .modal-guid {
   background-color: #444c54;
   color: white;
+}
+
+.modal-construct {
+  background-color: #f9e06e;
+  color: #444;
 }
 
 .modal-form-row.tight-gap {
