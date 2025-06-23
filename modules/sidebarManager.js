@@ -116,8 +116,6 @@ export function createStorageListManager(formManager, modal) {
         });
       });
 
-      console.log("DESCRIPTOR:", descriptor);
-
       const sidebarExpr = descriptor?.yaml?.sidebar_handling || null;
 
       const entries = await new Promise((resolve) => {
@@ -155,8 +153,6 @@ export function createStorageListManager(formManager, modal) {
         flagNode.appendChild(wrapper);
       }
 
-      console.log("RAWDATA:", rawData);
-
       if (rawData.sidebarExpr && rawData.sidebarContext) {
         const parsed = await EventBus.emitWithResponse(
           "transform:parseMiniExpr",
@@ -165,8 +161,6 @@ export function createStorageListManager(formManager, modal) {
             context: rawData.sidebarContext,
           }
         );
-
-        console.log("[SidebarManager] MiniExpr parsed:", parsed);
 
         if (parsed?.text) {
           subLabelNode.textContent = parsed.text;
