@@ -8,7 +8,8 @@ export const fieldTypes = {
   guid: {
     type: "guid",
     label: "Guid",
-    cssClass: "modal-guid",
+    cssClass: { main: "modal-guid", construct: false },
+    constructEnabled: false,
     disabledAttributes: [
       "primaryKeyRow",
       "label",
@@ -36,7 +37,8 @@ export const fieldTypes = {
   looper: {
     label: "Looper",
     metaOnly: true,
-    cssClass: "modal-looper",
+    cssClass: { main: "modal-looper", construct: "construct-type-looper" },
+    constructEnabled: true,
     disabledAttributes: [
       "description",
       "default",
@@ -50,7 +52,11 @@ export const fieldTypes = {
   loopstart: {
     label: "Loop Start",
     metaOnly: true,
-    cssClass: "modal-loopstart",
+    cssClass: {
+      main: "modal-loopstart",
+      construct: "construct-type-loopstart",
+    },
+    constructEnabled: true,
     disabledAttributes: [
       "description",
       "default",
@@ -72,7 +78,8 @@ export const fieldTypes = {
   loopstop: {
     label: "Loop Stop",
     metaOnly: true,
-    cssClass: "modal-loopstop",
+    cssClass: { main: "modal-loopstop", construct: "construct-type-loopstop" },
+    constructEnabled: true,
     disabledAttributes: [
       "description",
       "default",
@@ -93,7 +100,8 @@ export const fieldTypes = {
 
   construct: {
     label: "Construct",
-    cssClass: "modal-construct",
+    cssClass: { main: "modal-construct", construct: false },
+    constructEnabled: false,
     disabledAttributes: ["default", "twoColumnRow", "sidebarItemRow"],
     defaultValue: () => [],
     renderInput: async function (field) {
@@ -106,7 +114,8 @@ export const fieldTypes = {
 
   text: {
     label: "Text",
-    cssClass: "modal-text",
+    cssClass: { main: "modal-text", construct: "construct-type-text" },
+    constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
     renderInput: async function (field) {
@@ -118,10 +127,29 @@ export const fieldTypes = {
     },
     parseValue: parsers.parseTextField,
   },
-
+/*
+  text: {
+    label: "Text",
+    cssClass: { main: "modal-text", construct: "construct-type-text" },
+    constructEnabled: true,
+    disabledAttributes: ["constructFieldsRow"],
+    disabledConstructAttributes: ["constructFieldsRow"],
+    defaultValue: () => "",
+    renderInput: async function (field) {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.value = field.default || "";
+      input.name = field.key;
+      return input;
+    },
+    parseValue: parsers.parseTextField,
+    parseConstructValue: parsers.parseTextField,
+  },
+*/
   boolean: {
     label: "Checkbox",
-    cssClass: "modal-boolean",
+    cssClass: { main: "modal-boolean", construct: "construct-type-boolean" },
+    constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => false,
     renderInput: async function (field) {
@@ -136,7 +164,8 @@ export const fieldTypes = {
 
   dropdown: {
     label: "Dropdown",
-    cssClass: "modal-dropdown",
+    cssClass: { main: "modal-dropdown", construct: "construct-type-dropdown" },
+    constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
     renderInput: async function (field) {
@@ -156,7 +185,11 @@ export const fieldTypes = {
 
   multioption: {
     label: "Multiple Choice",
-    cssClass: "modal-multioption",
+    cssClass: {
+      main: "modal-multioption",
+      construct: "construct-type-multioption",
+    },
+    constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => [],
     renderInput: async function (field) {
@@ -178,16 +211,13 @@ export const fieldTypes = {
       wrapper.dataset.multioptionField = field.key;
       return wrapper;
     },
-    parseValue(wrapper) {
-      return Array.from(
-        wrapper.querySelectorAll(`input[type="checkbox"]:checked`)
-      ).map((el) => el.value);
-    },
+    parseValue: parsers.parseMultiOptionField,
   },
 
   radio: {
     label: "Radio Buttons",
-    cssClass: "modal-radio",
+    cssClass: { main: "modal-radio", construct: "construct-type-radio" },
+    constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
     renderInput: async function (field) {
@@ -226,7 +256,8 @@ export const fieldTypes = {
 
   textarea: {
     label: "Multiline Text",
-    cssClass: "modal-textarea",
+    cssClass: { main: "modal-textarea", construct: "construct-type-textarea" },
+    constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
     renderInput: async function (field) {
@@ -240,7 +271,8 @@ export const fieldTypes = {
 
   number: {
     label: "Number",
-    cssClass: "modal-number",
+    cssClass: { main: "modal-number", construct: "construct-type-number" },
+    constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => 0,
     renderInput: async function (field) {
@@ -255,7 +287,8 @@ export const fieldTypes = {
 
   range: {
     label: "Range Slider",
-    cssClass: "modal-range",
+    cssClass: { main: "modal-range", construct: "construct-type-range" },
+    constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => 50,
 
@@ -304,7 +337,8 @@ export const fieldTypes = {
 
   date: {
     label: "Date",
-    cssClass: "modal-date",
+    cssClass: { main: "modal-date", construct: "construct-type-date" },
+    constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
     renderInput: async function (field) {
@@ -319,7 +353,8 @@ export const fieldTypes = {
 
   list: {
     label: "List",
-    cssClass: "modal-list",
+    cssClass: { main: "modal-list", construct: "construct-type-list" },
+    constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => [],
     renderInput: async function (field) {
@@ -335,7 +370,8 @@ export const fieldTypes = {
 
   table: {
     label: "Table",
-    cssClass: "modal-table",
+    cssClass: { main: "modal-table", construct: "construct-type-table" },
+    constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => [],
     renderInput: async function (field) {
@@ -354,7 +390,8 @@ export const fieldTypes = {
 
   image: {
     label: "Image Upload",
-    cssClass: "modal-image",
+    cssClass: { main: "modal-image", construct: "construct-type-image" },
+    constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
     renderInput: async function (field, template) {
@@ -418,7 +455,8 @@ export const fieldTypes = {
 
   link: {
     label: "Link",
-    cssClass: "modal-link",
+    cssClass: { main: "modal-link", construct: "construct-type-link" },
+    constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
 

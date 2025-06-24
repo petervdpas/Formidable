@@ -4,63 +4,70 @@ import { ensureVirtualLocation } from "./vfsUtils.js";
 import { generateGuid } from "./domUtils.js";
 
 // GUID
-export function parseGuidField(input) {
+export const parseGuidField = async function (input) {
   return input?.value?.trim() || generateGuid();
-}
+};
 
 // Text
-export function parseTextField(input) {
+export const parseTextField = async function (input) {
   return input.value.trim();
-}
+};
 
 // Boolean
-export function parseBooleanField(input) {
+export const parseBooleanField = async function (input) {
   return input.checked;
-}
+};
 
 // Dropdown
-export function parseDropdownField(input) {
+export const parseDropdownField = async function (input) {
   return input.value;
-}
+};
+
+// Multi-option
+export const parseMultiOptionField = async function (wrapper) {
+  return Array.from(
+    wrapper.querySelectorAll(`input[type="checkbox"]:checked`)
+  ).map((el) => el.value);
+};
 
 // Radio
-export function parseRadioField(wrapper) {
+export const parseRadioField = async function (wrapper) {
   const selected = wrapper.querySelector(
     `input[name="${wrapper.dataset.radioGroup}"]:checked`
   );
   return selected?.value || "";
-}
+};
 
 // Textarea
-export function parseTextareaField(input) {
+export const parseTextareaField = async function (input) {
   return input.value.trim();
-}
+};
 
 // Number
-export function parseNumberField(input) {
+export const parseNumberField = async function (input) {
   return parseFloat(input.value) || 0;
-}
+};
 
 // Range
-export function parseRangeField(wrapper) {
+export const parseRangeField = async function (wrapper) {
   const input = wrapper.querySelector(`input[type="range"]`);
   if (!input) return 0;
   return parseFloat(input.value) || 0;
-}
+};
 
 // Date
-export function parseDateField(input) {
+export const parseDateField = async function (input) {
   return input.value;
-}
+};
 
 // List
-export function parseListField(wrapper) {
+export const parseListField = async function (wrapper) {
   const items = Array.from(wrapper.querySelectorAll('input[type="text"]'));
   return items.map((input) => input.value.trim()).filter(Boolean);
-}
+};
 
 // Table
-export function parseTableField(wrapper) {
+export const parseTableField = async function (wrapper) {
   const table = wrapper.querySelector("table");
   if (!table) return [];
 
@@ -76,10 +83,10 @@ export function parseTableField(wrapper) {
   });
 
   return data;
-}
+};
 
 // Image
-export async function parseImageField(inputWrapper, template) {
+export const parseImageField = async function (inputWrapper, template) {
   template = await ensureVirtualLocation(template);
 
   if (!inputWrapper || !template?.virtualLocation) return "";
@@ -116,9 +123,9 @@ export async function parseImageField(inputWrapper, template) {
     console.error("parseImageField failed:", err);
     return "";
   }
-}
+};
 
 // Link
-export function parseLinkField(input) {
+export const parseLinkField = async function (input) {
   return input.value.trim();
-}
+};

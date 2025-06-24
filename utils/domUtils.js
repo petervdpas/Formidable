@@ -134,7 +134,7 @@ export function focusFirstInput(
   tryFocus(0);
 }
 
-export function applyModalTypeClass(modal, typeKey, fieldTypes) {
+export function applyModalTypeClass(modal, typeKey, fieldTypes, mode = "main") {
   if (!modal) return;
 
   modal.classList.forEach((cls) => {
@@ -144,11 +144,23 @@ export function applyModalTypeClass(modal, typeKey, fieldTypes) {
   });
 
   const typeDef = fieldTypes[typeKey];
-  if (typeDef?.cssClass) {
-    modal.classList.add(typeDef.cssClass);
-  } else {
+  if (!typeDef?.cssClass) {
     EventBus.emit("logging:warning", [
       `[applyModalTypeClass] Unknown type "${typeKey}"`,
+    ]);
+    return;
+  }
+
+  const cssClass =
+    typeof typeDef.cssClass === "string"
+      ? typeDef.cssClass
+      : typeDef.cssClass?.[mode] || typeDef.cssClass?.main;
+
+  if (cssClass && typeof cssClass === "string") {
+    modal.classList.add(cssClass);
+  } else {
+    EventBus.emit("logging:warning", [
+      `[applyModalTypeClass] No cssClass found for type "${typeKey}", mode "${mode}"`,
     ]);
   }
 }

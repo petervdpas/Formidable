@@ -191,7 +191,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
     }
 
     const modal = container.closest(".modal");
-    applyModalTypeClass(modal, field.type || "text", fieldTypes);
+    applyModalTypeClass(modal, field.type || "text", fieldTypes, "main");
 
     onChange?.(structuredClone(state));
 
