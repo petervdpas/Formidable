@@ -183,67 +183,6 @@
     opacity: 1;
 }
 
-/* ───── Dynamic Type Styling ───── */
-.modal-text {
-    background-color: #1258aa;
-    color: white;
-}
-
-.modal-boolean {
-    background-color: #266b2b;
-    color: white;
-}
-
-.modal-dropdown {
-    background-color: #6b1a91;
-    color: white;
-}
-
-.modal-radio {
-    background-color: #cc4417;
-    color: white;
-}
-
-.modal-textarea {
-    background-color: #8567b9;
-    color: white;
-}
-
-.modal-number {
-    background-color: #3b91db;
-    color: white;
-}
-
-.modal-date {
-    background-color: #429c9a;
-    color: white;
-}
-
-.modal-list {
-    background-color: #74b876;
-    color: white;
-}
-
-.modal-table {
-    background-color: #ee9b84;
-    color: white;
-}
-
-.modal-link {
-  background-color: #7b1e3a;
-  color: white;
-}
-
-.modal-guid {
-  background-color: #444c54;
-  color: white;
-}
-
-.modal-construct {
-  background-color: #f9e06e;
-  color: #444;
-}
-
 .modal-form-row.tight-gap {
   gap: 0.3em;
 }

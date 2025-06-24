@@ -15,6 +15,7 @@ import {
   // createReorderDownButton,
   buildButtonGroup,
 } from "./uiButtons.js";
+import { setupConstructFieldsEditor } from "./constructFieldsEditor.js";
 
 function setupFieldEditor(container, onChange, allFields = []) {
   const state = {};
@@ -36,7 +37,12 @@ function setupFieldEditor(container, onChange, allFields = []) {
     options: container.querySelector("#edit-options"),
     type: container.querySelector("#edit-type-container select"),
     constructFields: container.querySelector("#edit-construct-fields"),
-    constructFieldsRow: container.querySelector("#edit-construct-fields-row"),
+    constructFieldsContainer: container.querySelector(
+      "#construct-fields-container"
+    ),
+    constructFieldsRow: container
+      .querySelector("#edit-construct-fields")
+      ?.closest(".modal-form-row"),
   };
 
   let optionsEditor = null;
@@ -85,12 +91,37 @@ function setupFieldEditor(container, onChange, allFields = []) {
     }
   }
 
+  function setupConstructEditor(currentType) {
+    if (!dom.constructFieldsContainer) return;
+
+    dom.constructFieldsContainer.innerHTML = "";
+
+    if (currentType === "construct") {
+      const constructEditor = setupConstructFieldsEditor(
+        dom.constructFieldsContainer,
+        state,
+        (updatedFields) => {
+          state.fields = updatedFields;
+          onChange?.(structuredClone(state));
+        }
+      );
+
+      if (state.fields) {
+        constructEditor.setFields(state.fields);
+      }
+    }
+  }
+
   let originalKey = "";
   let confirmBtn = null;
 
   function setField(field) {
     Object.assign(state, field);
     originalKey = field.key?.trim();
+
+    if (field.type === "construct") {
+      state.fields = field.fields || [];
+    }
 
     dom.key.classList.remove("input-error");
     confirmBtn = document.getElementById("btn-field-edit-confirm");
@@ -158,6 +189,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
         dom.label.value = isGuidType ? "GUID" : state.label || "";
 
         setupOptionsEditor();
+        //setupConstructEditor(currentType);
         applyFieldAttributeDisabling(
           {
             ...dom,
@@ -184,6 +216,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
       field.type
     );
 
+    //setupConstructEditor(field.type);
     setupOptionsEditor();
     if (optionsEditor) {
       optionsEditor.setValues([]);
@@ -228,6 +261,10 @@ function setupFieldEditor(container, onChange, allFields = []) {
       options,
       type: dom.type?.value || "text",
     };
+
+    if (field.type === "construct") {
+      field.fields = structuredClone(state.fields || []);
+    }
 
     if (isGuid) {
       field.primary_key = true;

@@ -1,0 +1,295 @@
+/* ───── Field Type Color Themes (refactored with variables) ───── */
+
+/* Looper, LoopStart, LoopStop */
+.field-list-item[data-type="looper"],
+.field-list-item[data-type="loopstart"],
+.field-list-item[data-type="loopstop"] {
+    background-color: var(--field-type-looper-bg);
+    border-left: 4px solid var(--field-type-looper-border);
+    color: var(--field-type-looper-text);
+}
+
+.field-type.type-looper,
+.field-type.type-loopstart,
+.field-type.type-loopstop {
+    background-color: var(--field-type-looper-badge);
+    color: var(--field-type-looper-text);
+}
+
+#field-edit-modal.modal-looper,
+#field-edit-modal.modal-loopstart,
+#field-edit-modal.modal-loopstop {
+    background-color: var(--field-type-looper-modal);
+    border-left: 6px solid var(--field-type-looper-border);
+    color: var(--field-type-looper-text);
+}
+
+/* Text */
+.field-list-item[data-type="text"] {
+    background-color: var(--field-type-text-bg);
+    border-left: 4px solid var(--field-type-text-border);
+    color: var(--field-type-text-text);
+}
+
+.field-type.type-text {
+    background-color: var(--field-type-text-badge);
+    color: var(--field-type-text-text);
+}
+
+#field-edit-modal.modal-text {
+    background-color: var(--field-type-text-modal);
+    border-left: 6px solid var(--field-type-text-border);
+    color: var(--field-type-text-text);
+}
+
+/* Boolean */
+.field-list-item[data-type="boolean"] {
+    background-color: var(--field-type-boolean-bg);
+    border-left: 4px solid var(--field-type-boolean-border);
+    color: var(--field-type-boolean-text);
+}
+
+.field-type.type-boolean {
+    background-color: var(--field-type-boolean-badge);
+    color: var(--field-type-boolean-text);
+}
+
+#field-edit-modal.modal-boolean {
+    background-color: var(--field-type-boolean-modal);
+    border-left: 6px solid var(--field-type-boolean-border);
+    color: var(--field-type-boolean-text);
+}
+
+/* Dropdown */
+.field-list-item[data-type="dropdown"] {
+    background-color: var(--field-type-dropdown-bg);
+    border-left: 4px solid var(--field-type-dropdown-border);
+    color: var(--field-type-dropdown-text);
+}
+
+.field-type.type-dropdown {
+    background-color: var(--field-type-dropdown-badge);
+    color: var(--field-type-dropdown-text);
+}
+
+#field-edit-modal.modal-dropdown {
+    background-color: var(--field-type-dropdown-modal);
+    border-left: 6px solid var(--field-type-dropdown-border);
+    color: var(--field-type-dropdown-text);
+}
+
+/* Multioption */
+.field-list-item[data-type="multioption"] {
+    background-color: var(--field-type-multioption-bg);
+    border-left: 4px solid var(--field-type-multioption-border);
+    color: var(--field-type-multioption-text);
+}
+
+.field-type.type-multioption {
+    background-color: var(--field-type-multioption-badge);
+    color: var(--field-type-multioption-text);
+}
+
+#field-edit-modal.modal-multioption {
+    background-color: var(--field-type-multioption-modal);
+    border-left: 6px solid var(--field-type-multioption-border);
+    color: var(--field-type-multioption-text);
+}
+
+/* Radio */
+.field-list-item[data-type="radio"] {
+    background-color: var(--field-type-radio-bg);
+    border-left: 4px solid var(--field-type-radio-border);
+    color: var(--field-type-radio-text);
+}
+
+.field-type.type-radio {
+    background-color: var(--field-type-radio-badge);
+    color: var(--field-type-radio-text);
+}
+
+#field-edit-modal.modal-radio {
+    background-color: var(--field-type-radio-modal);
+    border-left: 6px solid var(--field-type-radio-border);
+    color: var(--field-type-radio-text);
+}
+
+/* Textarea */
+.field-list-item[data-type="textarea"] {
+    background-color: var(--field-type-textarea-bg);
+    border-left: 4px solid var(--field-type-textarea-border);
+    color: var(--field-type-textarea-text);
+}
+
+.field-type.type-textarea {
+    background-color: var(--field-type-textarea-badge);
+    color: var(--field-type-textarea-text);
+}
+
+#field-edit-modal.modal-textarea {
+    background-color: var(--field-type-textarea-modal);
+    border-left: 6px solid var(--field-type-textarea-border);
+    color: var(--field-type-textarea-text);
+}
+
+/* Number */
+.field-list-item[data-type="number"] {
+    background-color: var(--field-type-number-bg);
+    border-left: 4px solid var(--field-type-number-border);
+    color: var(--field-type-number-text);
+}
+
+.field-type.type-number {
+    background-color: var(--field-type-number-badge);
+    color: var(--field-type-number-text);
+}
+
+#field-edit-modal.modal-number {
+    background-color: var(--field-type-number-modal);
+    border-left: 6px solid var(--field-type-number-border);
+    color: var(--field-type-number-text);
+}
+
+/* Range */
+.field-list-item[data-type="range"] {
+    background-color: var(--field-type-range-bg);
+    border-left: 4px solid var(--field-type-range-border);
+    color: var(--field-type-range-text);
+}
+
+.field-type.type-range {
+    background-color: var(--field-type-range-badge);
+    color: var(--field-type-range-text);
+}
+
+#field-edit-modal.modal-range {
+    background-color: var(--field-type-range-modal);
+    border-left: 6px solid var(--field-type-range-border);
+    color: var(--field-type-range-text);
+}
+
+/* Date */
+.field-list-item[data-type="date"] {
+    background-color: var(--field-type-date-bg);
+    border-left: 4px solid var(--field-type-date-border);
+    color: var(--field-type-date-text);
+}
+
+.field-type.type-date {
+    background-color: var(--field-type-date-badge);
+    color: var(--field-type-date-text);
+}
+
+#field-edit-modal.modal-date {
+    background-color: var(--field-type-date-modal);
+    border-left: 6px solid var(--field-type-date-border);
+    color: var(--field-type-date-text);
+}
+
+/* List */
+.field-list-item[data-type="list"] {
+    background-color: var(--field-type-list-bg);
+    border-left: 4px solid var(--field-type-list-border);
+    color: var(--field-type-list-text);
+}
+
+.field-type.type-list {
+    background-color: var(--field-type-list-badge);
+    color: var(--field-type-list-text);
+}
+
+#field-edit-modal.modal-list {
+    background-color: var(--field-type-list-modal);
+    border-left: 6px solid var(--field-type-list-border);
+    color: var(--field-type-list-text);
+}
+
+/* Table */
+.field-list-item[data-type="table"] {
+    background-color: var(--field-type-table-bg);
+    border-left: 4px solid var(--field-type-table-border);
+    color: var(--field-type-table-text);
+}
+
+.field-type.type-table {
+    background-color: var(--field-type-table-badge);
+    color: var(--field-type-table-text);
+}
+
+#field-edit-modal.modal-table {
+    background-color: var(--field-type-table-modal);
+    border-left: 6px solid var(--field-type-table-border);
+    color: var(--field-type-table-text);
+}
+
+/* Image */
+.field-list-item[data-type="image"] {
+    background-color: var(--field-type-image-bg);
+    border-left: 4px solid var(--field-type-image-border);
+    color: var(--field-type-image-text);
+}
+
+.field-type.type-image {
+    background-color: var(--field-type-image-badge);
+    color: var(--field-type-image-text);
+}
+
+#field-edit-modal.modal-image {
+    background-color: var(--field-type-image-modal);
+    border-left: 6px solid var(--field-type-image-border);
+    color: var(--field-type-image-text);
+}
+
+/* Link */
+.field-list-item[data-type="link"] {
+    background-color: var(--field-type-link-bg);
+    border-left: 4px solid var(--field-type-link-border);
+    color: var(--field-type-link-text);
+}
+
+.field-type.type-link {
+    background-color: var(--field-type-link-badge);
+    color: var(--field-type-link-text);
+}
+
+#field-edit-modal.modal-link {
+    background-color: var(--field-type-link-modal);
+    border-left: 6px solid var(--field-type-link-border);
+    color: var(--field-type-link-text);
+}
+
+/* Guid */
+.field-list-item[data-type="guid"] {
+    background-color: var(--field-type-guid-bg);
+    border-left: 4px solid var(--field-type-guid-border);
+    color: var(--field-type-guid-text);
+}
+
+.field-type.type-guid {
+    background-color: var(--field-type-guid-badge);
+    color: var(--field-type-guid-text);
+}
+
+#field-edit-modal.modal-guid {
+    background-color: var(--field-type-guid-modal);
+    border-left: 6px solid var(--field-type-guid-border);
+    color: var(--field-type-guid-text);
+}
+
+/* Construct */
+.field-list-item[data-type="construct"] {
+    background-color: var(--field-type-construct-bg);
+    border-left: 4px solid var(--field-type-construct-border);
+    color: var(--field-type-construct-text);
+}
+
+.field-type.type-construct {
+    background-color: var(--field-type-construct-badge);
+    color: var(--field-type-construct-text);
+}
+
+#field-edit-modal.modal-construct {
+    background-color: var(--field-type-construct-modal);
+    border-left: 6px solid var(--field-type-construct-border);
+    color: var(--field-type-construct-text);
+}

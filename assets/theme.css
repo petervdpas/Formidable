@@ -28,8 +28,7 @@
   --status-info-divider: #ccc;
 
   /* ───── Generic Shadows ───── */
-  --generic-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)
-  --generic-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --generic-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) --generic-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
   --generic-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.35);
   --generic-shadow-active: inset 0 1px 2px rgba(0, 0, 0, 0.4);
 
@@ -108,6 +107,104 @@
   --profile-list-bg: #f0f0f0;
 
   --popup-option-height: 40px;
+
+  /* ───── Field Type Colors ───── */
+
+  --field-type-looper-bg: #b9e2c0;
+  --field-type-looper-border: #999;
+  --field-type-looper-modal: #c6eccc;
+  --field-type-looper-badge: #999;
+  --field-type-looper-text: #222;
+
+  --field-type-text-bg: #1565c0;
+  --field-type-text-border: #2196f3;
+  --field-type-text-modal: #1258aa;
+  --field-type-text-badge: #1976d2;
+  --field-type-text-text: #fff;
+
+  --field-type-boolean-bg: #2e7d32;
+  --field-type-boolean-border: #4caf50;
+  --field-type-boolean-modal: #266b2b;
+  --field-type-boolean-badge: #43a047;
+  --field-type-boolean-text: #fff;
+
+  --field-type-dropdown-bg: #5e178b;
+  --field-type-dropdown-border: #ba68c8;
+  --field-type-dropdown-modal: #6b1a91;
+  --field-type-dropdown-badge: #a05db5;
+  --field-type-dropdown-text: #fff;
+
+  --field-type-multioption-bg: #4e729a;
+  --field-type-multioption-border: #5bc0de;
+  --field-type-multioption-modal: #4e729a;
+  --field-type-multioption-badge: #5bc0de;
+  --field-type-multioption-text: #fff;
+
+  --field-type-radio-bg: #cc4417;
+  --field-type-radio-border: #ff7043;
+  --field-type-radio-modal: #c63e13;
+  --field-type-radio-badge: #f46333;
+  --field-type-radio-text: #fff;
+
+  --field-type-textarea-bg: #6c4ab0;
+  --field-type-textarea-border: #9575cd;
+  --field-type-textarea-modal: #5d33a0;
+  --field-type-textarea-badge: #8567b9;
+  --field-type-textarea-text: #fff;
+
+  --field-type-number-bg: #3a94e4;
+  --field-type-number-border: #64b5f6;
+  --field-type-number-modal: #1d84db;
+  --field-type-number-badge: #5aaae9;
+  --field-type-number-text: #fff;
+
+  --field-type-range-bg: #3c3f77;
+  --field-type-range-border: #7986cb;
+  --field-type-range-modal: #2c2f5e;
+  --field-type-range-badge: #7986cb;
+  --field-type-range-text: #fff;
+
+  --field-type-date-bg: #229388;
+  --field-type-date-border: #4dd0e1;
+  --field-type-date-modal: #007e72;
+  --field-type-date-badge: #44c5d1;
+  --field-type-date-text: #fff;
+
+  --field-type-list-bg: #6fbf73;
+  --field-type-list-border: #aed581;
+  --field-type-list-modal: #5da861;
+  --field-type-list-badge: #9dcf6e;
+  --field-type-list-text: #fff;
+
+  --field-type-table-bg: #ee9b84;
+  --field-type-table-border: #ffccbc;
+  --field-type-table-modal: #f07b59;
+  --field-type-table-badge: #f5bfa9;
+  --field-type-table-text: #222;
+
+  --field-type-image-bg: #bdbdbd;
+  --field-type-image-border: #cfd8dc;
+  --field-type-image-modal: #e0e0e0;
+  --field-type-image-badge: #cfd8dc;
+  --field-type-image-text: #222;
+
+  --field-type-link-bg: #7b1e3a;
+  --field-type-link-border: #d46a85;
+  --field-type-link-modal: #7b1e3a;
+  --field-type-link-badge: #d46a85;
+  --field-type-link-text: #fff;
+
+  --field-type-guid-bg: #444c54;
+  --field-type-guid-border: #888c95;
+  --field-type-guid-modal: #444c54;
+  --field-type-guid-badge: #888c95;
+  --field-type-guid-text: #fff;
+
+  --field-type-construct-bg: #f9e06e;
+  --field-type-construct-border: #d6b000;
+  --field-type-construct-modal: #f9e06e;
+  --field-type-construct-badge: #e4ba00;
+  --field-type-construct-text: #222;
 }
 
 .editor-wrapper.fullscreen {

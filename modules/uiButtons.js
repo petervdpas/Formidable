@@ -449,6 +449,60 @@ export function createDeleteLoopItemButton(onClick, identifier = "") {
   });
 }
 
+export function createConstructAddButton(onClick) {
+  return createButton({
+    text: "+ Add Subfield",
+    className: "btn-info",
+    identifier: "construct-add-subfield",
+    onClick,
+  });
+}
+
+export function createConstructClearButton(onClick) {
+  return createButton({
+    text: "Clear",
+    className: "btn-danger",
+    identifier: "construct-clear-subfields",
+    onClick,
+  });
+}
+
+export function createConstructSaveButton(onClick) {
+  return createButton({
+    text: "Save",
+    className: "btn-okay",
+    identifier: "construct-save-subfield",
+    onClick,
+  });
+}
+
+export function createConstructCancelButton(onClick) {
+  return createButton({
+    text: "Cancel",
+    className: "btn-default",
+    identifier: "construct-cancel-subfield",
+    onClick,
+  });
+}
+
+export function createConstructEditButton(onClick) {
+  return createButton({
+    text: "Edit",
+    className: "btn-warn",
+    identifier: "construct-edit-subfield",
+    onClick,
+  });
+}
+
+export function createConstructDeleteButton(onClick) {
+  return createButton({
+    text: "Delete",
+    className: "btn-danger",
+    identifier: "construct-delete-subfield",
+    onClick,
+  });
+}
+
 export function createRemoveImageButton(onClick, identifier = "") {
   return createButton({
     text: "✕",

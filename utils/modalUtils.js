@@ -17,7 +17,12 @@ export function applyModalCssClass(modalEl, typeDef) {
     }
   });
 
-  if (typeDef?.cssClass) {
-    modalEl.classList.add(typeDef.cssClass);
+  const cssClass =
+    typeof typeDef?.cssClass === "string"
+      ? typeDef.cssClass
+      : typeDef?.cssClass?.main;
+
+  if (cssClass && typeof cssClass === "string") {
+    modalEl.classList.add(cssClass);
   }
 }

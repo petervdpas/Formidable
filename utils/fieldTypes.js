@@ -127,25 +127,7 @@ export const fieldTypes = {
     },
     parseValue: parsers.parseTextField,
   },
-/*
-  text: {
-    label: "Text",
-    cssClass: { main: "modal-text", construct: "construct-type-text" },
-    constructEnabled: true,
-    disabledAttributes: ["constructFieldsRow"],
-    disabledConstructAttributes: ["constructFieldsRow"],
-    defaultValue: () => "",
-    renderInput: async function (field) {
-      const input = document.createElement("input");
-      input.type = "text";
-      input.value = field.default || "";
-      input.name = field.key;
-      return input;
-    },
-    parseValue: parsers.parseTextField,
-    parseConstructValue: parsers.parseTextField,
-  },
-*/
+
   boolean: {
     label: "Checkbox",
     cssClass: { main: "modal-boolean", construct: "construct-type-boolean" },

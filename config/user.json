@@ -3,10 +3,10 @@
   "show_icon_buttons": false,
   "font_size": 14,
   "logging_enabled": true,
-  "context_mode": "storage",
+  "context_mode": "template",
   "context_folder": "./",
   "selected_template": "basic.yaml",
-  "selected_data_file": "sane-20250530.meta.json",
+  "selected_data_file": null,
   "author_name": "Regular user",
   "author_email": "regular@example.com",
   "use_git": false,
@@ -14,7 +14,7 @@
   "enable_internal_server": true,
   "internal_server_port": 8383,
   "window_bounds": {
-    "width": 1119,
+    "width": 1590,
     "height": 916,
     "x": 260,
     "y": 57
