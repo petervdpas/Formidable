@@ -74,14 +74,14 @@ async function renderFieldsWithLoops(container, fields, metaData, template, even
 
       for (const entry of loopData) {
         const complete = { ...createLoopDefaults(group), ...entry };
-        const itemWrapper = await createLoopItem(group, complete, eventFunctions);
+        const itemWrapper = await createLoopItem(group, complete, template, eventFunctions);
         loopList.appendChild(itemWrapper);
       }
 
       loopContainer.appendChild(loopList);
 
       const addButton = createAddLoopItemButton(async () => {
-        const newItem = await createLoopItem(group, {}, eventFunctions);
+        const newItem = await createLoopItem(group, {}, template, eventFunctions);
         loopList.appendChild(newItem);
       });
 
@@ -129,7 +129,7 @@ async function renderFieldsWithLoops(container, fields, metaData, template, even
   }
 }
 
-async function createLoopItem(groupFields, dataEntry = {}, eventFunctions = {}) {
+async function createLoopItem(groupFields, dataEntry = {}, template, eventFunctions = {}) {
   const itemWrapper = document.createElement("div");
   itemWrapper.className = "loop-item";
 
