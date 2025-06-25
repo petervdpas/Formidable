@@ -5,22 +5,22 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-06-25T13:38:52.618Z",
+    "updated": "2025-06-25T15:06:22.903Z",
     "flagged": true
   },
   "data": {
     "id": "5a7bec64-f3f2-47cc-a836-2e4643e4f9a9",
-    "test": "Default value",
+    "test": "A lad In sane",
     "check": true,
     "dropdown": "R",
     "multichoice": [
       "A",
       "B"
     ],
-    "radio": "BIRD",
+    "radio": "CAT",
     "mline": "I dont like this one bit",
     "numpy": 17,
-    "rangie": 45,
+    "rangie": 15,
     "bday": "1968-12-23",
     "listy": [
       "A single list item",

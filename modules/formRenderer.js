@@ -43,7 +43,7 @@ function getEventFunctions() {
   };
 }
 
-async function renderFieldsWithLoops(container, fields, metaData, eventFunctions = {}) {
+async function renderFieldsWithLoops(container, fields, metaData, template, eventFunctions = {}) {
   const loopGroupKeys = new Set();
   let i = 0;
 
@@ -122,7 +122,7 @@ async function renderFieldsWithLoops(container, fields, metaData, eventFunctions
         continue;
       }
 
-      const row = await renderFieldElement(field, metaData[field.key], eventFunctions);
+      const row = await renderFieldElement(field, metaData[field.key], template, eventFunctions);
       if (row) container.appendChild(row);
       i++;
     }
@@ -172,7 +172,7 @@ async function createLoopItem(groupFields, dataEntry = {}, eventFunctions = {}) 
         : undefined;
     }
 
-    const row = await renderFieldElement(fieldCopy, dataEntry[fieldKey], eventFunctions);
+    const row = await renderFieldElement(fieldCopy, dataEntry[fieldKey], template, eventFunctions);
     if (row) itemWrapper.appendChild(row);
   }
 
@@ -313,7 +313,7 @@ export async function renderFormUI(
 
   const fields = template.fields || [];
   injectFieldDefaults(fields, metaData);
-  await renderFieldsWithLoops(container, fields, metaData, eventFunctions);
+  await renderFieldsWithLoops(container, fields, metaData, template, eventFunctions);
 
   await applyFieldValues(container, template, metaData, eventFunctions);
   focusFirstInput(container);
