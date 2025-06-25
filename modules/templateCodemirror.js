@@ -15,6 +15,7 @@ export function initCodeMirror(textarea, initialValue = "") {
   const cmTheme = getCurrentTheme() === "dark" ? "monokai" : "eclipse";
 
   editor = CodeMirror.fromTextArea(textarea, {
+    initialValue: initialValue,
     mode: "yaml",
     theme: cmTheme,
     lineNumbers: true,
@@ -23,8 +24,6 @@ export function initCodeMirror(textarea, initialValue = "") {
     viewportMargin: Infinity,
     autofocus: true,
   });
-
-  editor.setValue(initialValue);
 
   requestAnimationFrame(() => {
     editor.refresh();
