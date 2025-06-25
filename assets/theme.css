@@ -205,6 +205,19 @@
   --field-type-construct-modal: #f9e06e;
   --field-type-construct-badge: #e4ba00;
   --field-type-construct-text: #222;
+
+  /* ───── Popup Panel ───── */
+  --popup-bg: #fff;
+  --popup-fg: #000;
+  --popup-border: #ccc;
+
+  --popup-option-bg: #f5f5f5;
+  --popup-option-hover: #e0e0e0;
+
+  --btn-primary-bg: #4caf50;
+  --btn-primary-fg: #fff;
+  --btn-secondary-bg: #eee;
+  --btn-secondary-fg: #333;
 }
 
 .editor-wrapper.fullscreen {

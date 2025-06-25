@@ -25,8 +25,7 @@
   --status-info-divider: #444;
 
   /* ───── Generic Shadows ───── */
-  --generic-box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1)
-  --generic-shadow: 0 1px 2px rgba(255, 255, 255, 0.15);
+  --generic-box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1) --generic-shadow: 0 1px 2px rgba(255, 255, 255, 0.15);
   --generic-shadow-hover: 0 2px 4px rgba(255, 255, 255, 0.25);
   --generic-shadow-active: inset 0 1px 2px rgba(255, 255, 255, 0.3);
 
@@ -103,6 +102,19 @@
   --unflagged-color: #555;
 
   --profile-list-bg: #1c1c1c;
+
+  /* ───── Popup Panel ───── */
+  --popup-bg: #1e1e1e;
+  --popup-fg: #eee;
+  --popup-border: #444;
+
+  --popup-option-bg: #333;
+  --popup-option-hover: #444;
+
+  --btn-primary-bg: #2e7d32;
+  --btn-primary-fg: #fff;
+  --btn-secondary-bg: #444;
+  --btn-secondary-fg: #ccc;
 }
 
 .dark-mode body,

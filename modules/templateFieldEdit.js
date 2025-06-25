@@ -189,7 +189,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
         dom.label.value = isGuidType ? "GUID" : state.label || "";
 
         setupOptionsEditor();
-        //setupConstructEditor(currentType);
+        // setupConstructEditor(currentType);
         applyFieldAttributeDisabling(
           {
             ...dom,

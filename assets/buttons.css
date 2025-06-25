@@ -327,6 +327,12 @@ button.btn-remove-image:active,
   white-space: nowrap;
 }
 
+.inline-button-group {
+  display: flex;
+  gap: 0.4em;
+  flex-shrink: 0;
+}
+
 /* ───── Button Hover ───── */
 .modal-actions button:hover {
   background-color: #f0f0f0;

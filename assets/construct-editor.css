@@ -1,0 +1,167 @@
+/* Construct Editor Styles */
+
+.construct-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6em;
+  margin-bottom: 2px;
+}
+
+.construct-label-row label {
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+}
+
+.modal-form-row.construct-fullwidth {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.25em;
+}
+
+.modal-form-row.construct-fullwidth label {
+  text-align: left;
+  padding-top: 0;
+  margin-bottom: 2px;
+}
+
+.modal-form-row > .construct-field-list {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.construct-field-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0.4em 0 1em 0;
+  width: 100%;
+}
+
+.construct-field-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.4em 0.6em;
+  margin-bottom: 0.4em;
+  border-radius: 4px;
+  font-size: 14px;
+  background: var(--field-bg, #eee);
+  box-sizing: border-box;
+  gap: 0.6em;
+}
+
+.construct-field-label {
+  flex-grow: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.construct-field-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.4em;
+  background: none;
+}
+
+.construct-field-item {
+  flex-grow: 1;
+}
+
+/* Type-specific styles for construct field items */
+#construct-popup.construct-type-text,
+.construct-field-item[data-type="text"] {
+  background-color: var(--field-type-text-bg);
+  border-left: 4px solid var(--field-type-text-border);
+  color: var(--field-type-text-text);
+}
+
+#construct-popup.construct-type-boolean,
+.construct-field-item[data-type="boolean"] {
+  background-color: var(--field-type-boolean-bg);
+  border-left: 4px solid var(--field-type-boolean-border);
+  color: var(--field-type-boolean-text);
+}
+
+#construct-popup.construct-type-dropdown,
+.construct-field-item[data-type="dropdown"] {
+  background-color: var(--field-type-dropdown-bg);
+  border-left: 4px solid var(--field-type-dropdown-border);
+  color: var(--field-type-dropdown-text);
+}
+
+#construct-popup.construct-type-multioption,
+.construct-field-item[data-type="multioption"] {
+  background-color: var(--field-type-multioption-bg);
+  border-left: 4px solid var(--field-type-multioption-border);
+  color: var(--field-type-multioption-text);
+}
+
+#construct-popup.construct-type-radio,
+.construct-field-item[data-type="radio"] {
+  background-color: var(--field-type-radio-bg);
+  border-left: 4px solid var(--field-type-radio-border);
+  color: var(--field-type-radio-text);
+}
+
+#construct-popup.construct-type-range,
+.construct-field-item[data-type="range"] {
+  background-color: var(--field-type-range-bg);
+  border-left: 4px solid var(--field-type-range-border);
+  color: var(--field-type-range-text);
+}
+
+#construct-popup.construct-type-list,
+.construct-field-item[data-type="list"] {
+  background-color: var(--field-type-list-bg);
+  border-left: 4px solid var(--field-type-list-border);
+  color: var(--field-type-list-text);
+}
+
+#construct-popup.construct-type-table,
+.construct-field-item[data-type="table"] {
+  background-color: var(--field-type-table-bg);
+  border-left: 4px solid var(--field-type-table-border);
+  color: var(--field-type-table-text);
+}
+
+#construct-popup.construct-type-date,
+.construct-field-item[data-type="date"] {
+  background-color: var(--field-type-date-bg);
+  border-left: 4px solid var(--field-type-date-border);
+  color: var(--field-type-date-text);
+}
+
+#construct-popup.construct-type-image,
+.construct-field-item[data-type="image"] {
+  background-color: var(--field-type-image-bg);
+  border-left: 4px solid var(--field-type-image-border);
+  color: var(--field-type-image-text);
+}
+
+#construct-popup.construct-type-link,
+.construct-field-item[data-type="link"] {
+  background-color: var(--field-type-link-bg);
+  border-left: 4px solid var(--field-type-link-border);
+  color: var(--field-type-link-text);
+}
+
+#construct-popup.construct-type-looper,
+#construct-popup.construct-type-loopstart,
+#construct-popup.construct-type-loopstop,
+.construct-field-item[data-type="looper"],
+.construct-field-item[data-type="loopstart"],
+.construct-field-item[data-type="loopstop"] {
+  background-color: var(--field-type-looper-bg);
+  border-left: 4px solid var(--field-type-looper-border);
+  color: var(--field-type-looper-text);
+}
+
+@media (max-width: 500px) {
+  .construct-field-label {
+    max-width: 60%;
+  }
+}

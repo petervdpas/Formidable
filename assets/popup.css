@@ -54,3 +54,189 @@
   background: #888;
   border-radius: 4px;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Popup Panel (e.g., for editing construct fields)
+───────────────────────────────────────────────────────────── */
+.popup-panel {
+  position: absolute;
+  z-index: 1001;
+  background-color: var(--popup-bg);
+  color: var(--popup-fg);
+  border: 1px solid var(--popup-border);
+  box-shadow: var(--generic-box-shadow);
+  padding: 12px;
+  max-width: 420px;
+  min-width: 300px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95em;
+  transition: opacity 0.2s ease;
+}
+
+.popup-hidden {
+  display: none !important;
+  opacity: 0;
+}
+
+.popup-visible {
+  display: block;
+  opacity: 1;
+}
+
+/* ─────────── Header with title ─────────── */
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--popup-border);
+  padding-bottom: 4px;
+  min-height: 32px;
+}
+
+.popup-header h3 {
+  margin: 0;
+  font-size: 1.1em;
+  flex: 1;
+  color: var(--popup-fg);
+}
+
+/* ─────────── Close Button ─────────── */
+
+.popup-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.2em;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 8px;
+  line-height: 1;
+}
+
+/* ─────────── Form Rows ─────────── */
+.popup-form-row {
+  margin-bottom: 10px;
+}
+.popup-form-row label {
+  display: block;
+  font-weight: bold;
+  font-size: 0.9em;
+  margin-bottom: 4px;
+  color: var(--popup-fg);
+}
+.popup-form-row input,
+.popup-form-row select,
+.popup-form-row textarea {
+  display: block;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--input-border-color);
+  border-radius: 4px;
+  background-color: var(--input-bg);
+  color: var(--input-fg);
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 0.95em;
+}
+
+/* ─────────── Button Group ─────────── */
+.popup-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+.popup-buttons button {
+  font-size: 0.95em;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.popup-buttons .btn-primary {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-fg);
+  border: none;
+}
+
+.popup-buttons .btn-secondary {
+  background-color: var(--btn-secondary-bg);
+  color: var(--btn-secondary-fg);
+  border: 1px solid var(--input-border-color);
+}
+
+/* ─────────── Resizer (bottom-right corner) ─────────── */
+.popup-resizer {
+  width: 10px;
+  height: 10px;
+  background: var(--input-border-color);
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  cursor: se-resize;
+  border-bottom-right-radius: 6px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Popup Selector (Dropdown-style popups)
+───────────────────────────────────────────────────────────── */
+.popup-selector {
+  position: fixed;
+  z-index: 1000;
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 8px;
+  min-width: 150px;
+
+  background-color: var(--input-bg);
+  color: var(--input-fg);
+  border: 1px solid var(--input-border-color);
+  box-shadow: var(--generic-box-shadow);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.9em;
+
+  scrollbar-width: thin;
+  scrollbar-color: #888 transparent;
+}
+
+.popup-option {
+  display: block;
+  width: 100%;
+  padding: 6px 10px;
+  margin-bottom: 4px;
+  text-align: left;
+  background-color: var(--popup-option-bg);
+  color: inherit;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: inherit;
+  transition: background-color 0.2s ease;
+}
+.popup-option:last-child {
+  margin-bottom: 0;
+}
+.popup-option:hover {
+  background-color: var(--popup-option-hover);
+}
+
+/* ─────────── Scrollbar (Webkit fallback) ─────────── */
+.popup-selector::-webkit-scrollbar {
+  width: 6px;
+}
+.popup-selector::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+/* ─────────── Responsive Layout (Mobile) ─────────── */
+@media (max-width: 480px) {
+  .popup-panel {
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+  }
+}

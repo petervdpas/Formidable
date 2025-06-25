@@ -35,6 +35,7 @@
     <link rel="stylesheet" href="assets/sortable.css" />
     <link rel="stylesheet" href="assets/modal.css" />
     <link rel="stylesheet" href="assets/field-types.css" />
+    <link rel="stylesheet" href="assets/construct-editor.css" />
     <link rel="stylesheet" href="assets/git-actions.css" />
     <link rel="stylesheet" href="assets/theme.css" />
     <link rel="stylesheet" href="assets/dark-theme.css" />
@@ -241,13 +242,59 @@
             placeholder="Comma-separated"
           ></textarea>
         </div>
-        <div class="modal-form-row">
-          <label for="edit-construct-fields">Fields (YAML)</label>
+        <div class="modal-form-row construct-fullwidth">
+          <div class="construct-label-row">
+            <label for="edit-construct-fields">Subfields</label>
+            <div
+              id="construct-fields-buttons"
+              class="inline-button-group"
+            ></div>
+          </div>
           <input type="hidden" id="edit-construct-fields" />
           <div id="construct-fields-container"></div>
         </div>
 
         <div id="field-edit-buttons-wrapper"></div>
+      </div>
+    </div>
+
+    <!-- Construct Popup -->
+    <div id="construct-popup" class="popup-panel" style="display: none">
+      <div class="popup-header">
+        <h3>Edit Subfield</h3>
+      </div>
+      <div class="popup-body">
+        <div class="popup-form-row">
+          <label for="popup-key">Key</label>
+          <input type="text" id="popup-key" placeholder="e.g., user_name" />
+        </div>
+        <div class="popup-form-row">
+          <label for="popup-type">Type</label>
+          <select id="popup-type">
+            <!-- Type dropdown will be injected here -->
+          </select>
+        </div>
+        <div class="popup-form-row">
+          <label for="popup-label">Label</label>
+          <input type="text" id="popup-label" />
+        </div>
+        <div class="popup-form-row">
+          <label for="popup-description">Description</label>
+          <input type="text" id="popup-description" />
+        </div>
+        <div
+          class="popup-form-row"
+          id="popup-options-row"
+          style="display: none"
+        >
+          <label for="popup-options">Options</label>
+          <textarea
+            id="popup-options"
+            rows="2"
+            placeholder="Comma-separated values"
+          ></textarea>
+        </div>
+        <div class="popup-buttons"></div>
       </div>
     </div>
 
