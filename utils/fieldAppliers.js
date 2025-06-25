@@ -79,17 +79,17 @@ export function applyListField(container, field, value) {
   }
 
   // Remove existing list items
-  const existingItems = listWrapper.querySelectorAll(".list-item");
+  const existingItems = listWrapper.querySelectorAll(".list-field-item");
   existingItems.forEach((item) => item.remove());
 
   // Add new items from value
   (value || []).forEach((item) => {
     const itemWrapper = document.createElement("div");
-    itemWrapper.className = "list-item";
+    itemWrapper.className = "list-field-item";
 
     const input = document.createElement("input");
     input.type = "text";
-    input.name = "list-item";
+    input.name = "list-item";   // ✅ must match renderListField!
     input.className = "list-input";
     input.value = item;
 

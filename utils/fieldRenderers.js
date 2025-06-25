@@ -452,7 +452,7 @@ export async function renderListField(field, value = "") {
 async function createListItem(value, options = []) {
   const container = addContainerElement({
     tag: "div",
-    className: "list-item",
+    className: "list-field-item",
   });
 
   const input = addContainerElement({
