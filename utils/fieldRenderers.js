@@ -254,13 +254,13 @@ export async function renderTextareaField(field) {
     tag: "textarea",
     attributes: { name: field.key },
   });
-  textarea.value = field.default || "";
 
   requestAnimationFrame(() => {
     let keystrokeCount = 0;
 
     const editor = new EasyMDE({
       element: textarea,
+      initialValue: field.default || "",
       minHeight: "80px",
       theme: getCurrentTheme() === "dark" ? "monokai" : "eclipse",
       toolbar: [
