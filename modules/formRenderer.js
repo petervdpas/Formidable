@@ -43,12 +43,7 @@ function getEventFunctions() {
   };
 }
 
-async function renderFieldsWithLoops(
-  container,
-  fields,
-  metaData,
-  eventFunctions = {}
-) {
+async function renderFieldsWithLoops(container, fields, metaData, eventFunctions = {}) {
   const loopGroupKeys = new Set();
   let i = 0;
 
@@ -61,9 +56,7 @@ async function renderFieldsWithLoops(
       group.forEach((f) => loopGroupKeys.add(f.key));
       i = stopIdx + 1;
 
-      const loopData = Array.isArray(metaData[loopKey])
-        ? metaData[loopKey]
-        : [{}];
+      const loopData = Array.isArray(metaData[loopKey]) ? metaData[loopKey] : [{}];
 
       const loopContainer = document.createElement("div");
       loopContainer.className = "loop-container";
@@ -81,11 +74,7 @@ async function renderFieldsWithLoops(
 
       for (const entry of loopData) {
         const complete = { ...createLoopDefaults(group), ...entry };
-        const itemWrapper = await createLoopItem(
-          group,
-          complete,
-          eventFunctions
-        );
+        const itemWrapper = await createLoopItem(group, complete, eventFunctions);
         loopList.appendChild(itemWrapper);
       }
 
@@ -133,18 +122,14 @@ async function renderFieldsWithLoops(
         continue;
       }
 
-      const row = await renderFieldElement(field, metaData, eventFunctions);
+      const row = await renderFieldElement(field, metaData[field.key], eventFunctions);
       if (row) container.appendChild(row);
       i++;
     }
   }
 }
 
-async function createLoopItem(
-  groupFields,
-  dataEntry = {},
-  eventFunctions = {}
-) {
+async function createLoopItem(groupFields, dataEntry = {}, eventFunctions = {}) {
   const itemWrapper = document.createElement("div");
   itemWrapper.className = "loop-item";
 
@@ -187,7 +172,7 @@ async function createLoopItem(
         : undefined;
     }
 
-    const row = await renderFieldElement(fieldCopy, dataEntry, eventFunctions);
+    const row = await renderFieldElement(fieldCopy, dataEntry[fieldKey], eventFunctions);
     if (row) itemWrapper.appendChild(row);
   }
 

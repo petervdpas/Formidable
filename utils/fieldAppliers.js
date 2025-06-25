@@ -66,21 +66,37 @@ export function applyListField(container, field, value) {
   const listWrapper = container.querySelector(`[data-list-field="${key}"]`);
   if (!listWrapper) return;
 
-  const addButton = listWrapper.querySelector("button");
-  const existingItems = listWrapper.querySelectorAll('div input[type="text"]');
-  existingItems.forEach((el) => el.parentElement.remove());
+  // Find the Add (+) button safely
+  const addButton = Array.from(listWrapper.children).find(
+    (el) => el.tagName === "BUTTON" && el.textContent.trim() === "+"
+  );
 
+  if (!addButton) {
+    EventBus.emit("logging:error", [
+      `[applyListField] Could not find Add (+) button for key "${key}".`,
+    ]);
+    return;
+  }
+
+  // Remove existing list items
+  const existingItems = listWrapper.querySelectorAll(".list-item");
+  existingItems.forEach((item) => item.remove());
+
+  // Add new items from value
   (value || []).forEach((item) => {
+    const itemWrapper = document.createElement("div");
+    itemWrapper.className = "list-item";
+
     const input = document.createElement("input");
     input.type = "text";
+    input.name = "list-item";
+    input.className = "list-input";
     input.value = item;
 
-    // If options exist, activate popup behavior
     if (options.length > 0) {
       input.readOnly = true;
       input.onclick = () => showOptionPopup(input, options);
 
-      // Check if value is in allowed options
       const isValid = options.some((opt) =>
         typeof opt === "string" ? opt === item : opt.value === item
       );
@@ -90,28 +106,18 @@ export function applyListField(container, field, value) {
         input.placeholder = "⚠ Not in list";
         input.title = "This value is not in the allowed options";
       }
-
-      if (!value) {
-        requestAnimationFrame(() => {
-          input.click();
-        });
-      }
     }
 
-    const wrapper = document.createElement("div");
-    wrapper.style.display = "flex";
-    wrapper.style.alignItems = "center";
-    wrapper.style.marginBottom = "6px";
-
     const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "remove-btn";
     removeBtn.textContent = "-";
-    removeBtn.style.marginLeft = "6px";
-    removeBtn.onclick = () => wrapper.remove();
+    removeBtn.onclick = () => itemWrapper.remove();
 
-    wrapper.appendChild(input);
-    wrapper.appendChild(removeBtn);
+    itemWrapper.appendChild(input);
+    itemWrapper.appendChild(removeBtn);
 
-    listWrapper.insertBefore(wrapper, addButton);
+    listWrapper.insertBefore(itemWrapper, addButton);
   });
 }
 

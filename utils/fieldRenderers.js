@@ -14,10 +14,11 @@ import { createRemoveImageButton } from "../modules/uiButtons.js";
 function resolveOption(opt) {
   return typeof opt === "string"
     ? { value: opt, label: opt }
-    : {
-        value: opt.value,
-        label: opt.label ?? opt.value,
-      };
+    : { value: opt.value, label: opt.label ?? opt.value };
+}
+
+function resolveValue(field, value) {
+  return value !== undefined && value !== null ? value : field.default ?? "";
 }
 
 // ─────────────────────────────────────────────
@@ -35,7 +36,7 @@ export async function renderGuidField(field, value = "") {
 
 // ─────────────────────────────────────────────
 // Type: loopstart
-export async function renderLoopstartField(field) {
+export async function renderLoopstartField(field, value = "") {
   const wrapper = document.createElement("div");
 
   addContainerElement({
@@ -65,7 +66,7 @@ export async function renderLoopstartField(field) {
 
 // ─────────────────────────────────────────────
 // Type: loopstop
-export async function renderLoopstopField(field) {
+export async function renderLoopstopField(field, value = "") {
   const wrapper = document.createElement("div");
 
   addContainerElement({
@@ -95,11 +96,12 @@ export async function renderLoopstopField(field) {
 
 // ─────────────────────────────────────────────
 // Type: text
-export async function renderTextField(field) {
+export async function renderTextField(field, value = "") {
+  const v = resolveValue(field, value);
   const input = document.createElement("input");
   input.type = "text";
   input.name = field.key;
-  input.value = "default" in field ? field.default : "";
+  input.value = v;
   return wrapInputWithLabel(
     input,
     field.label,
@@ -110,17 +112,16 @@ export async function renderTextField(field) {
 
 // ─────────────────────────────────────────────
 // Type: boolean
-export async function renderBooleanField(field) {
+export async function renderBooleanField(field, value = "") {
   let trailingLabel = null;
-
   if (Array.isArray(field.options) && field.options.length >= 2) {
     const first = resolveOption(field.options[0]);
     const second = resolveOption(field.options[1]);
     trailingLabel = [first.label, second.label];
   }
 
-  // Normalize true/false strictly
-  const normalized = String(field.default).trim().toLowerCase();
+  const v = resolveValue(field, value);
+  const normalized = String(v).trim().toLowerCase();
   const isChecked = normalized === "true" || normalized === "1";
 
   const { element: toggle } = buildSwitchElement({
@@ -141,18 +142,18 @@ export async function renderBooleanField(field) {
 
 // ─────────────────────────────────────────────
 // Type: dropdown
-export async function renderDropdownField(field) {
+export async function renderDropdownField(field, value = "") {
+  const v = resolveValue(field, value);
   const select = document.createElement("select");
   (field.options || []).forEach((opt) => {
     const { value, label } = resolveOption(opt);
-
     const option = document.createElement("option");
     option.value = value;
     option.textContent = label;
     select.appendChild(option);
   });
   select.name = field.key;
-  select.value = "default" in field ? field.default : "";
+  select.value = v;
   return wrapInputWithLabel(
     select,
     field.label,
@@ -163,17 +164,17 @@ export async function renderDropdownField(field) {
 
 // ─────────────────────────────────────────────
 // Type: multioption
-export async function renderMultioptionField(field) {
+export async function renderMultioptionField(field, value = "") {
+  const v = resolveValue(field, value);
+  const selected = Array.isArray(v) ? v : [];
+
   const wrapper = document.createElement("div");
   wrapper.dataset.multioptionField = field.key;
 
   (field.options || []).forEach((opt) => {
     const { value, label } = resolveOption(opt);
 
-    const labelEl = addContainerElement({
-      parent: wrapper,
-      tag: "label",
-    });
+    const labelEl = addContainerElement({ parent: wrapper, tag: "label" });
     labelEl.style.display = "block";
 
     addContainerElement({
@@ -185,7 +186,7 @@ export async function renderMultioptionField(field) {
         value: value,
       },
       callback: (el) => {
-        if ((field.default || []).includes(value)) {
+        if (selected.includes(value)) {
           el.checked = true;
         }
       },
@@ -204,17 +205,15 @@ export async function renderMultioptionField(field) {
 
 // ─────────────────────────────────────────────
 // Type: radio
-export async function renderRadioField(field) {
+export async function renderRadioField(field, value = "") {
+  const v = resolveValue(field, value);
   const wrapper = document.createElement("div");
   wrapper.dataset.radioGroup = field.key;
 
   (field.options || []).forEach((opt) => {
     const { value, label } = resolveOption(opt);
 
-    const labelEl = addContainerElement({
-      parent: wrapper,
-      tag: "label",
-    });
+    const labelEl = addContainerElement({ parent: wrapper, tag: "label" });
     labelEl.style.display = "block";
 
     addContainerElement({
@@ -226,7 +225,7 @@ export async function renderRadioField(field) {
         value: value,
       },
       callback: (el) => {
-        if (String(field.default) === String(value)) {
+        if (String(v) === String(value)) {
           el.checked = true;
         }
       },
@@ -245,7 +244,8 @@ export async function renderRadioField(field) {
 
 // ─────────────────────────────────────────────
 // Type: textarea
-export async function renderTextareaField(field) {
+export async function renderTextareaField(field, value = "") {
+  const v = resolveValue(field, value);
   const wrapper = document.createElement("div");
   wrapper.className = "markdown-editor-wrapper";
 
@@ -257,10 +257,11 @@ export async function renderTextareaField(field) {
 
   requestAnimationFrame(() => {
     let keystrokeCount = 0;
+    let editorInstance = null;  // 🟢 declare outside
 
-    const editor = new EasyMDE({
+    editorInstance = new EasyMDE({
       element: textarea,
-      initialValue: field.default || "",
+      initialValue: v,
       minHeight: "80px",
       theme: getCurrentTheme() === "dark" ? "monokai" : "eclipse",
       toolbar: [
@@ -284,7 +285,7 @@ export async function renderTextareaField(field) {
             el.innerHTML = "characters: 0";
           },
           onUpdate(el) {
-            const text = editor.value() || "";
+            const text = editorInstance?.value?.() || "";
             el.innerHTML = `characters: ${text.length}`;
           },
         },
@@ -302,15 +303,13 @@ export async function renderTextareaField(field) {
       autoDownloadFontAwesome: false,
     });
 
-    const cm = editor.codemirror;
-
+    const cm = editorInstance.codemirror;
     cm.on("keydown", () => {
       keystrokeCount++;
     });
-
     cm.on("change", () => {
-      textarea.value = editor.value();
-      editor.updateStatusBar(); // triggers all custom status updates
+      textarea.value = editorInstance.value();
+      editorInstance.updateStatusBar();
     });
   });
 
@@ -324,11 +323,12 @@ export async function renderTextareaField(field) {
 
 // ─────────────────────────────────────────────
 // Type: number
-export async function renderNumberField(field) {
+export async function renderNumberField(field, value = "") {
+  const v = resolveValue(field, value);
   const input = document.createElement("input");
   input.type = "number";
   input.name = field.key;
-  input.value = "default" in field ? field.default : 0;
+  input.value = v;
   return wrapInputWithLabel(
     input,
     field.label,
@@ -339,9 +339,8 @@ export async function renderNumberField(field) {
 
 // ─────────────────────────────────────────────
 // Type: range
-export async function renderRangeField(field) {
-  const wrapper = document.createElement("div");
-  wrapper.dataset.rangeField = field.key;
+export async function renderRangeField(field, value = "") {
+  const v = resolveValue(field, value);
 
   const optMap = Object.fromEntries(
     (field.options || []).map((pair) =>
@@ -354,7 +353,10 @@ export async function renderRangeField(field) {
   const min = parseFloat(optMap.min ?? field.min ?? 0);
   const max = parseFloat(optMap.max ?? field.max ?? 100);
   const step = parseFloat(optMap.step ?? field.step ?? 1);
-  const value = field.default ?? (min + max) / 2;
+  const resolved = v !== "" ? v : (min + max) / 2;
+
+  const wrapper = document.createElement("div");
+  wrapper.dataset.rangeField = field.key;
 
   const input = addContainerElement({
     parent: wrapper,
@@ -367,7 +369,7 @@ export async function renderRangeField(field) {
       step: step,
     },
     callback: (el) => {
-      el.value = value;
+      el.value = resolved;
     },
   });
 
@@ -375,10 +377,8 @@ export async function renderRangeField(field) {
     parent: wrapper,
     tag: "span",
     className: "range-display",
-    textContent: value,
-    attributes: {
-      style: "margin-left: 10px;",
-    },
+    textContent: resolved,
+    attributes: { style: "margin-left: 10px;" },
   });
 
   input.addEventListener("input", () => {
@@ -395,11 +395,12 @@ export async function renderRangeField(field) {
 
 // ─────────────────────────────────────────────
 // Type: date
-export async function renderDateField(field) {
+export async function renderDateField(field, value = "") {
+  const v = resolveValue(field, value);
   const input = document.createElement("input");
   input.type = "date";
   input.name = field.key;
-  input.value = "default" in field ? field.default : "";
+  input.value = v;
   return wrapInputWithLabel(
     input,
     field.label,
@@ -410,12 +411,13 @@ export async function renderDateField(field) {
 
 // ─────────────────────────────────────────────
 // Type: list (dynamic add/remove)
-export async function renderListField(field) {
+export async function renderListField(field, value = "") {
+  const v = resolveValue(field, value);
+  const items = Array.isArray(v) ? v : [];
+
   const wrapper = document.createElement("div");
   wrapper.dataset.type = "list";
   wrapper.dataset.listField = field.key;
-
-  const items = field.default || [];
 
   for (const item of items) {
     const row = await createListItem(item, field.options || []);
@@ -426,9 +428,7 @@ export async function renderListField(field) {
     parent: wrapper,
     tag: "button",
     textContent: "+",
-    attributes: {
-      type: "button",
-    },
+    attributes: { type: "button" },
   });
 
   addBtn.addEventListener("click", async () => {
@@ -461,7 +461,7 @@ async function createListItem(value, options = []) {
     attributes: {
       type: "text",
       name: "list-item",
-      class: "list-input",
+      className: "list-input",
     },
     callback: (el) => {
       el.value = value;
@@ -488,9 +488,7 @@ async function createListItem(value, options = []) {
     tag: "button",
     textContent: "-",
     className: "remove-btn",
-    attributes: {
-      type: "button",
-    },
+    attributes: { type: "button" },
   });
 
   removeBtn.onclick = () => container.remove();
@@ -500,15 +498,15 @@ async function createListItem(value, options = []) {
 
 // ─────────────────────────────────────────────
 // Type: table
-export async function renderTableField(field) {
+export async function renderTableField(field, value = "") {
+  const v = resolveValue(field, value);
+  const rows = Array.isArray(v) ? v : [];
+  const columns = field.options || [];
+
   const wrapper = document.createElement("div");
   wrapper.className = "table-wrapper";
   wrapper.dataset.type = "table";
   wrapper.dataset.tableField = field.key;
-
-  const columns = field.options || [];
-  const rawRows = field.default;
-  const rows = Array.isArray(rawRows) ? rawRows : [];
 
   const table = addContainerElement({
     parent: wrapper,
@@ -516,16 +514,8 @@ export async function renderTableField(field) {
     className: "dynamic-table",
   });
 
-  // Header
-  const thead = addContainerElement({
-    parent: table,
-    tag: "thead",
-  });
-
-  const headRow = addContainerElement({
-    parent: thead,
-    tag: "tr",
-  });
+  const thead = addContainerElement({ parent: table, tag: "thead" });
+  const headRow = addContainerElement({ parent: thead, tag: "tr" });
 
   columns.forEach((col) => {
     const { label } = resolveOption(col);
@@ -536,33 +526,18 @@ export async function renderTableField(field) {
     });
   });
 
-  // Add a header cell for the remove button
-  addContainerElement({
-    parent: headRow,
-    tag: "th",
-    textContent: "", // remove column header
-  });
+  addContainerElement({ parent: headRow, tag: "th", textContent: "" }); // remove button header
 
-  // Body
-  const tbody = addContainerElement({
-    parent: table,
-    tag: "tbody",
-  });
+  const tbody = addContainerElement({ parent: table, tag: "tbody" });
 
   function createRow(values = []) {
-    const tr = addContainerElement({
-      tag: "tr",
-    });
+    const tr = addContainerElement({ tag: "tr" });
 
     columns.forEach((col, colIdx) => {
       const { value } = resolveOption(col);
+      const td = addContainerElement({ parent: tr, tag: "td" });
 
-      const td = addContainerElement({
-        parent: tr,
-        tag: "td",
-      });
-
-      const input = addContainerElement({
+      addContainerElement({
         parent: td,
         tag: "input",
         attributes: {
@@ -575,12 +550,7 @@ export async function renderTableField(field) {
       });
     });
 
-    // Remove button cell
-    const tdRemove = addContainerElement({
-      parent: tr,
-      tag: "td",
-    });
-
+    const tdRemove = addContainerElement({ parent: tr, tag: "td" });
     const removeBtn = addContainerElement({
       parent: tdRemove,
       tag: "button",
@@ -597,7 +567,6 @@ export async function renderTableField(field) {
     tbody.appendChild(createRow(row));
   });
 
-  // Add Row Button
   const addBtn = addContainerElement({
     parent: wrapper,
     tag: "button",
@@ -619,8 +588,9 @@ export async function renderTableField(field) {
 
 // ─────────────────────────────────────────────
 // Type: image
-export async function renderImageField(field, template) {
+export async function renderImageField(field, value = "", template) {
   template = await ensureVirtualLocation(template);
+  const v = resolveValue(field, value);
 
   const wrapper = document.createElement("div");
 
@@ -643,16 +613,11 @@ export async function renderImageField(field, template) {
     },
   });
 
-  const preview = addContainerElement({
-    parent: wrapper,
-    tag: "img",
-  });
-  // preview.style.display = "none";
-
-  const deleteBtn = createRemoveImageButton(() => {
-    clearImage();
-  }, `delete-${field.key}`);
-
+  const preview = addContainerElement({ parent: wrapper, tag: "img" });
+  const deleteBtn = createRemoveImageButton(
+    () => clearImage(),
+    `delete-${field.key}`
+  );
   deleteBtn.style.display = "none";
 
   const setImage = (src, filename = "") => {
@@ -671,14 +636,13 @@ export async function renderImageField(field, template) {
     wrapper.removeAttribute("data-filename");
   };
 
-  // Load initial preview if filename is present
-  if (typeof field.default === "string" && field.default) {
-    wrapper.setAttribute("data-filename", field.default);
+  if (typeof v === "string" && v) {
+    wrapper.setAttribute("data-filename", v);
     if (template?.virtualLocation) {
       window.api.system
-        .resolvePath(template.virtualLocation, "images", field.default)
+        .resolvePath(template.virtualLocation, "images", v)
         .then((fullPath) => {
-          setImage(`file://${fullPath.replace(/\\/g, "/")}`, field.default);
+          setImage(`file://${fullPath.replace(/\\/g, "/")}`, v);
         })
         .catch(() => {
           preview.alt = "Image not found";
@@ -718,9 +682,12 @@ export async function renderImageField(field, template) {
 // Type: link
 export async function renderLinkField(
   field,
+  value = "",
   currentTemplate,
   { fetchTemplates, fetchMetaFiles }
 ) {
+  const v = resolveValue(field, value);
+
   const wrapper = addContainerElement({
     tag: "div",
     attributes: {
@@ -731,7 +698,6 @@ export async function renderLinkField(
     },
   });
 
-  // HIDDEN actual input
   const input = addContainerElement({
     parent: wrapper,
     tag: "input",
@@ -740,16 +706,11 @@ export async function renderLinkField(
       name: field.key,
     },
     callback: (el) => {
-      el.value = field.default || "";
+      el.value = v;
     },
   });
 
-  // Format dropdown
-  const formatSelect = addContainerElement({
-    parent: wrapper,
-    tag: "select",
-  });
-
+  const formatSelect = addContainerElement({ parent: wrapper, tag: "select" });
   ["regular", "formidable"].forEach((opt) => {
     const o = document.createElement("option");
     o.value = opt;
@@ -757,25 +718,18 @@ export async function renderLinkField(
     formatSelect.appendChild(o);
   });
 
-  // Template dropdown (for formidable)
   const templateSelect = addContainerElement({
     parent: wrapper,
     tag: "select",
-    attributes: {
-      style: "display: none;",
-    },
+    attributes: { style: "display: none;" },
   });
 
-  // Entry dropdown
   const entrySelect = addContainerElement({
     parent: wrapper,
     tag: "select",
-    attributes: {
-      style: "display: none;",
-    },
+    attributes: { style: "display: none;" },
   });
 
-  // URL input (for regular)
   const urlInput = addContainerElement({
     parent: wrapper,
     tag: "input",
@@ -786,7 +740,6 @@ export async function renderLinkField(
     },
   });
 
-  // BUILD actual value
   function updateValue() {
     const format = formatSelect.value;
 
@@ -795,20 +748,14 @@ export async function renderLinkField(
     } else if (format === "formidable") {
       const tpl = templateSelect.value;
       const entry = entrySelect.value;
-      if (tpl && entry) {
-        input.value = `formidable://${tpl}:${entry}`;
-      } else {
-        input.value = "";
-      }
+      input.value = tpl && entry ? `formidable://${tpl}:${entry}` : "";
     } else {
       input.value = "";
     }
   }
 
-  // HANDLERS
   formatSelect.addEventListener("change", async () => {
     const fmt = formatSelect.value;
-
     if (fmt === "regular") {
       templateSelect.style.display = "none";
       entrySelect.style.display = "none";
@@ -832,10 +779,8 @@ export async function renderLinkField(
   entrySelect.addEventListener("change", updateValue);
   urlInput.addEventListener("input", updateValue);
 
-  // CALLBACK: fillTemplateDropdown
   async function fillTemplateDropdown() {
     const templates = await fetchTemplates();
-
     templateSelect.innerHTML = "";
     templates.forEach((tpl) => {
       const o = document.createElement("option");
@@ -843,12 +788,9 @@ export async function renderLinkField(
       o.textContent = tpl.filename;
       templateSelect.appendChild(o);
     });
-
-    // Pre-select current template
     templateSelect.value = currentTemplate;
   }
 
-  // CALLBACK: fillEntryDropdownForSelectedTemplate
   async function fillEntryDropdownForSelectedTemplate() {
     const tpl = templateSelect.value;
     if (!tpl) return;
@@ -856,7 +798,6 @@ export async function renderLinkField(
     fillEntryDropdown(metaFiles);
   }
 
-  // Helper
   function fillEntryDropdown(metaFiles) {
     entrySelect.innerHTML = "";
     metaFiles.forEach((file) => {
@@ -869,7 +810,7 @@ export async function renderLinkField(
 
   // Init state
   formatSelect.value = "regular";
-  urlInput.value = field.default || "";
+  urlInput.value = v;
   updateValue();
 
   return wrapInputWithLabel(
