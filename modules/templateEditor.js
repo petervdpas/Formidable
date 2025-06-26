@@ -69,6 +69,10 @@ function sanitizeField(f) {
     field.options = f.options;
   }
 
+  if (f.type === "construct" && Array.isArray(f.fields)) {
+    field.fields = structuredClone(f.fields);
+  }
+  
   return field;
 }
 
