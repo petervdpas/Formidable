@@ -276,6 +276,21 @@ export function applyFieldAttributeDisabling(dom, fieldTypeKey) {
   });
 }
 
+export function applyConstructAttributeDisabling(popupEl, typeKey) {
+  const typeDef = fieldTypes[typeKey];
+  const disabled = new Set(typeDef?.disabledAttributes || []);
+
+  const domMap = {
+    options: popupEl.querySelector("#popup-options-row"),
+    description: popupEl.querySelector("#popup-description")?.closest(".popup-form-row"),
+  };
+
+  for (const [key, row] of Object.entries(domMap)) {
+    if (!row) continue;
+    row.style.display = disabled.has(key) ? "none" : "";
+  }
+}
+
 export function clearContainerUI(
   container,
   label = "Select or create a form-file to begin."

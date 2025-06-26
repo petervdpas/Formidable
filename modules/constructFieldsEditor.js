@@ -2,6 +2,7 @@
 
 import { setupPopup } from "./popupManager.js";
 import { applyPopupTypeClass } from "../utils/domUtils.js";
+import { applyConstructAttributeDisabling } from "../utils/formUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 
 import {
@@ -34,7 +35,9 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
   const keyInput = popupEl.querySelector("#popup-key");
   const typeSelect = popupEl.querySelector("#popup-type");
   const labelInput = popupEl.querySelector("#popup-label");
-  const descRow = popupEl.querySelector("#popup-description").closest(".popup-form-row");
+  const descRow = popupEl
+    .querySelector("#popup-description")
+    .closest(".popup-form-row");
   const descTextarea = popupEl.querySelector("#popup-description");
   const optionsRow = popupEl.querySelector("#popup-options-row");
   const optionsInput = popupEl.querySelector("#popup-options");
@@ -59,10 +62,8 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
   }
 
   function updatePopupUIForType(typeKey) {
-    const disabled = fieldTypes[typeKey]?.disabledAttributes || [];
-    optionsRow.style.display = disabled.includes("options") ? "none" : "";
-    descRow.style.display = disabled.includes("description") ? "none" : "";
     applyPopupTypeClass(popupEl, typeKey, fieldTypes);
+    applyConstructAttributeDisabling(popupEl, typeKey);
   }
 
   typeSelect.addEventListener("change", () => {
@@ -114,6 +115,7 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
             .split(",")
             .map((s) => s.trim())
             .filter(Boolean);
+
           if (
             opts.length > 0 &&
             !fieldTypes[updated.type]?.disabledAttributes?.includes("options")
@@ -142,7 +144,11 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
         onChange?.(structuredClone(state.fields));
       });
 
-      const actions = buildButtonGroup(editBtn, deleteBtn, "construct-field-actions");
+      const actions = buildButtonGroup(
+        editBtn,
+        deleteBtn,
+        "construct-field-actions"
+      );
       item.appendChild(label);
       item.appendChild(actions);
       list.appendChild(item);
