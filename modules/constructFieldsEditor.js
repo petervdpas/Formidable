@@ -28,66 +28,40 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
   const btnTarget = document.getElementById("construct-fields-buttons");
   const hiddenInput = document.getElementById("edit-construct-fields");
 
+  const popupEl = document.getElementById("construct-popup");
+  const popup = setupPopup(popupEl, { escToClose: true, resizable: false });
+
+  const keyInput = popupEl.querySelector("#popup-key");
+  const typeSelect = popupEl.querySelector("#popup-type");
+  const labelInput = popupEl.querySelector("#popup-label");
+  const descRow = popupEl.querySelector("#popup-description").closest(".popup-form-row");
+  const descTextarea = popupEl.querySelector("#popup-description");
+  const optionsRow = popupEl.querySelector("#popup-options-row");
+  const optionsInput = popupEl.querySelector("#popup-options");
+  const buttonsContainer = popupEl.querySelector(".popup-buttons");
+
   function syncHiddenInput() {
     if (hiddenInput) {
       hiddenInput.value = JSON.stringify(state.fields || []);
     }
   }
 
-  const btnAdd = createConstructAddButton(() => {
-    state.fields = state.fields || [];
-    state.fields.push({
-      key: "",
-      type: "text",
-      label: "",
-      description: "",
-      default: "",
-    });
-    renderFieldList();
-    syncHiddenInput();
-    onChange?.(structuredClone(state.fields));
-  });
-
-  const btnClear = createConstructClearButton(() => {
-    state.fields = [];
-    renderFieldList();
-    syncHiddenInput();
-    onChange?.(structuredClone(state.fields));
-  });
-
-  const buttonGroup = buildButtonGroup(btnAdd, btnClear, "inline-button-group");
-  btnTarget.innerHTML = "";
-  btnTarget.appendChild(buttonGroup);
-
-  const popupEl = document.getElementById("construct-popup");
-  const popup = setupPopup(popupEl, {
-    escToClose: true,
-    resizable: false,
-  });
-
-  const keyInput = popupEl.querySelector("#popup-key");
-  const typeSelect = popupEl.querySelector("#popup-type");
-  const labelInput = popupEl.querySelector("#popup-label");
-  const descInput = popupEl.querySelector("#popup-description");
-  const optionsRow = popupEl.querySelector("#popup-options-row");
-  const optionsInput = popupEl.querySelector("#popup-options");
-  const buttonsContainer = popupEl.querySelector(".popup-buttons");
-
   function populateTypeDropdown() {
     typeSelect.innerHTML = "";
     for (const [typeKey, typeDef] of Object.entries(fieldTypes)) {
-      if (!typeDef.constructEnabled) continue;
-      const option = document.createElement("option");
-      option.value = typeKey;
-      option.textContent = typeDef.label || typeKey;
-      typeSelect.appendChild(option);
+      if (typeDef.constructEnabled) {
+        const option = document.createElement("option");
+        option.value = typeKey;
+        option.textContent = typeDef.label || typeKey;
+        typeSelect.appendChild(option);
+      }
     }
   }
 
   function updatePopupUIForType(typeKey) {
-    const typeDef = fieldTypes[typeKey];
-    const disabled = typeDef?.disabledAttributes || [];
+    const disabled = fieldTypes[typeKey]?.disabledAttributes || [];
     optionsRow.style.display = disabled.includes("options") ? "none" : "";
+    descRow.style.display = disabled.includes("description") ? "none" : "";
     applyPopupTypeClass(popupEl, typeKey, fieldTypes);
   }
 
@@ -120,32 +94,34 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
         keyInput.value = subfield.key || "";
         typeSelect.value = subfield.type || "text";
         labelInput.value = subfield.label || "";
-        descInput.value = subfield.description || "";
+        descTextarea.value = subfield.description || "";
         optionsInput.value = Array.isArray(subfield.options)
           ? subfield.options.join(", ")
           : subfield.options || "";
 
         updatePopupUIForType(typeSelect.value);
-        buttonsContainer.innerHTML = "";
 
+        buttonsContainer.innerHTML = "";
         const saveBtn = createConstructSaveButton(() => {
           const updated = {
             key: keyInput.value.trim(),
             type: typeSelect.value,
             label: labelInput.value.trim(),
-            description: descInput.value.trim(),
+            description: descTextarea.value.trim(),
           };
 
           const opts = optionsInput.value
             .split(",")
             .map((s) => s.trim())
             .filter(Boolean);
-          if (opts.length > 0) {
+          if (
+            opts.length > 0 &&
+            !fieldTypes[updated.type]?.disabledAttributes?.includes("options")
+          ) {
             updated.options = opts;
           }
 
           state.fields[idx] = updated;
-
           popup.hide();
           renderFieldList();
           syncHiddenInput();
@@ -166,17 +142,37 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
         onChange?.(structuredClone(state.fields));
       });
 
-      const actions = buildButtonGroup(
-        editBtn,
-        deleteBtn,
-        "construct-field-actions"
-      );
-
+      const actions = buildButtonGroup(editBtn, deleteBtn, "construct-field-actions");
       item.appendChild(label);
       item.appendChild(actions);
       list.appendChild(item);
     });
   }
+
+  const btnAdd = createConstructAddButton(() => {
+    state.fields = state.fields || [];
+    state.fields.push({
+      key: "",
+      type: "text",
+      label: "",
+      description: "",
+      default: "",
+    });
+    renderFieldList();
+    syncHiddenInput();
+    onChange?.(structuredClone(state.fields));
+  });
+
+  const btnClear = createConstructClearButton(() => {
+    state.fields = [];
+    renderFieldList();
+    syncHiddenInput();
+    onChange?.(structuredClone(state.fields));
+  });
+
+  const buttonGroup = buildButtonGroup(btnAdd, btnClear, "inline-button-group");
+  btnTarget.innerHTML = "";
+  btnTarget.appendChild(buttonGroup);
 
   state.fields = state.fields || [];
   renderFieldList();
