@@ -102,6 +102,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
         state,
         (updatedFields) => {
           state.fields = updatedFields;
+          dom.constructFields.value = JSON.stringify(state.fields || []);
           onChange?.(structuredClone(state));
         }
       );
@@ -189,7 +190,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
         dom.label.value = isGuidType ? "GUID" : state.label || "";
 
         setupOptionsEditor();
-        // setupConstructEditor(currentType);
+        setupConstructEditor(currentType);
         applyFieldAttributeDisabling(
           {
             ...dom,
@@ -216,7 +217,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
       field.type
     );
 
-    //setupConstructEditor(field.type);
+    setupConstructEditor(field.type);
     setupOptionsEditor();
     if (optionsEditor) {
       optionsEditor.setValues([]);
@@ -263,7 +264,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
     };
 
     if (field.type === "construct") {
-      field.fields = structuredClone(state.fields || []);
+      field.fields = JSON.parse(dom.constructFields.value || "[]");
     }
 
     if (isGuid) {
@@ -457,13 +458,15 @@ let cachedFieldEditModal = null;
 let cachedFieldEditSetup = null;
 
 export function showFieldEditorModal(field, allFields = [], onConfirm) {
+  let editor;
+
   if (!cachedFieldEditSetup) {
-    cachedFieldEditSetup = setupFieldEditModal((confirmedField) => {
+    cachedFieldEditSetup = setupFieldEditModal(() => {
+      const confirmedField = editor.getField();
       if (confirmedField.type === "looper") {
         const loopKey = confirmedField.key;
         const loopLabel = confirmedField.label || loopKey;
 
-        // Create loopstart and loopstop
         const loopStart = {
           key: loopKey,
           label: loopLabel,
@@ -477,9 +480,6 @@ export function showFieldEditorModal(field, allFields = [], onConfirm) {
         };
 
         onConfirm?.([loopStart, loopStop]);
-
-        //onConfirm?.(loopStart);
-        //onConfirm?.(loopStop);
       } else {
         onConfirm?.(confirmedField);
       }
@@ -493,7 +493,7 @@ export function showFieldEditorModal(field, allFields = [], onConfirm) {
     return;
   }
 
-  const editor = setupFieldEditor(container, null, allFields);
+  editor = setupFieldEditor(container, null, allFields);
   editor.setField(field);
   cachedFieldEditModal.show();
 }

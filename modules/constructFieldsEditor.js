@@ -25,6 +25,15 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
   wrapper.appendChild(list);
   containerEl.appendChild(wrapper);
 
+  const btnTarget = document.getElementById("construct-fields-buttons");
+  const hiddenInput = document.getElementById("edit-construct-fields");
+
+  function syncHiddenInput() {
+    if (hiddenInput) {
+      hiddenInput.value = JSON.stringify(state.fields || []);
+    }
+  }
+
   const btnAdd = createConstructAddButton(() => {
     state.fields = state.fields || [];
     state.fields.push({
@@ -35,18 +44,18 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
       default: "",
     });
     renderFieldList();
+    syncHiddenInput();
     onChange?.(structuredClone(state.fields));
   });
 
   const btnClear = createConstructClearButton(() => {
     state.fields = [];
     renderFieldList();
+    syncHiddenInput();
     onChange?.(structuredClone(state.fields));
   });
 
   const buttonGroup = buildButtonGroup(btnAdd, btnClear, "inline-button-group");
-
-  const btnTarget = document.getElementById("construct-fields-buttons");
   btnTarget.innerHTML = "";
   btnTarget.appendChild(buttonGroup);
 
@@ -78,9 +87,7 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
   function updatePopupUIForType(typeKey) {
     const typeDef = fieldTypes[typeKey];
     const disabled = typeDef?.disabledAttributes || [];
-
     optionsRow.style.display = disabled.includes("options") ? "none" : "";
-
     applyPopupTypeClass(popupEl, typeKey, fieldTypes);
   }
 
@@ -91,42 +98,57 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
   function renderFieldList() {
     list.innerHTML = "";
 
-    (state.fields || []).forEach((field, idx) => {
+    (state.fields || []).forEach((subfield, idx) => {
       const item = document.createElement("li");
       item.className = "construct-field-item";
-      item.dataset.type = field.type;
+      item.dataset.type = subfield.type;
 
       const label = document.createElement("span");
       label.className = "construct-field-label";
-      label.textContent = `${field.label || "(unnamed)"} (${field.type})`;
+      label.textContent = subfield.label || "--- New Field ---";
+
+      const badge = document.createElement("span");
+      badge.className = `subfield-type type-${subfield.type}`;
+      badge.textContent = `(${subfield.type.toUpperCase()})`;
+
+      label.appendChild(document.createTextNode(" "));
+      label.appendChild(badge);
 
       const editBtn = createConstructEditButton((event) => {
         populateTypeDropdown();
 
-        keyInput.value = field.key || "";
-        typeSelect.value = field.type || "text";
-        labelInput.value = field.label || "";
-        descInput.value = field.description || "";
-        optionsInput.value = Array.isArray(field.options)
-          ? field.options.join(", ")
-          : field.options || "";
+        keyInput.value = subfield.key || "";
+        typeSelect.value = subfield.type || "text";
+        labelInput.value = subfield.label || "";
+        descInput.value = subfield.description || "";
+        optionsInput.value = Array.isArray(subfield.options)
+          ? subfield.options.join(", ")
+          : subfield.options || "";
 
         updatePopupUIForType(typeSelect.value);
         buttonsContainer.innerHTML = "";
 
         const saveBtn = createConstructSaveButton(() => {
-          field.key = keyInput.value.trim();
-          field.type = typeSelect.value;
-          field.label = labelInput.value.trim();
-          field.description = descInput.value.trim();
+          const updated = {
+            key: keyInput.value.trim(),
+            type: typeSelect.value,
+            label: labelInput.value.trim(),
+            description: descInput.value.trim(),
+          };
+
           const opts = optionsInput.value
             .split(",")
             .map((s) => s.trim())
             .filter(Boolean);
-          field.options = opts.length > 0 ? opts : undefined;
+          if (opts.length > 0) {
+            updated.options = opts;
+          }
+
+          state.fields[idx] = updated;
 
           popup.hide();
           renderFieldList();
+          syncHiddenInput();
           onChange?.(structuredClone(state.fields));
         });
 
@@ -140,6 +162,7 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
       const deleteBtn = createConstructDeleteButton(() => {
         state.fields.splice(idx, 1);
         renderFieldList();
+        syncHiddenInput();
         onChange?.(structuredClone(state.fields));
       });
 
@@ -157,11 +180,13 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
 
   state.fields = state.fields || [];
   renderFieldList();
+  syncHiddenInput();
 
   return {
     setFields: (fields) => {
       state.fields = fields || [];
       renderFieldList();
+      syncHiddenInput();
     },
     getFields: () => structuredClone(state.fields || []),
   };

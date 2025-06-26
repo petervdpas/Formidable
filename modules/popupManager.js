@@ -32,6 +32,7 @@ export function setupPopup(popupId, defaultOptions = {}) {
 
   const header = popup.querySelector(".popup-header");
   if (header) {
+    header.querySelectorAll(".popup-close-btn").forEach((btn) => btn.remove());
     const closeBtn = createModalCloseButton({ onClick: () => hide() });
     closeBtn.classList.add("popup-close-btn");
     header.appendChild(closeBtn);
