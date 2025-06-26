@@ -15,7 +15,7 @@ import {
   // createReorderDownButton,
   buildButtonGroup,
 } from "./uiButtons.js";
-import { createOptionsEditor } from "../utils/optionsEditor.js";
+import { setupOptionsEditor } from "../utils/optionsEditor.js";
 import { setupConstructFieldsEditor } from "./constructFieldsEditor.js";
 
 function setupFieldEditor(container, onChange, allFields = []) {
@@ -46,51 +46,16 @@ function setupFieldEditor(container, onChange, allFields = []) {
       ?.closest(".modal-form-row"),
   };
 
-  let optionsEditor = null;
   let labelLocked = false;
 
-  function setupOptionsEditor() {
-    if (!dom.options) return;
-
-    const containerRow = dom.options.closest(".modal-form-row");
-    const currentType = dom.type?.value || "text";
-    const optionTypes = [
-      "boolean",
-      "dropdown",
-      "multioption",
-      "radio",
-      "range",
-      "list",
-      "table",
-    ];
-
-    // Always hide raw <textarea> or JSON field
-    dom.options.style.display = "none";
-
-    // Clean previous editors/messages
-    containerRow.querySelector(".options-editor")?.remove();
-    containerRow.querySelector(".options-message")?.remove();
-
-    if (!optionTypes.includes(currentType)) {
-      // Add fallback message if unsupported
-      const msg = document.createElement("div");
-      msg.className = "options-message";
-      msg.textContent = "Options not available!";
-      containerRow.appendChild(msg);
-      optionsEditor = null;
-      return;
-    }
-
-    // Otherwise inject proper editor
-    optionsEditor = createOptionsEditor(containerRow, (newOptions) => {
-      dom.options.value = JSON.stringify(newOptions, null, 2);
-      state.options = newOptions;
-    });
-
-    if (state.options) {
-      optionsEditor.setValues(state.options);
-    }
-  }
+  let optionsEditor = setupOptionsEditor({
+    type: dom.type?.value || "text",
+    state,
+    dom: {
+      options: dom.options,
+      containerRow: dom.options?.closest(".modal-form-row"),
+    },
+  });
 
   function setupConstructEditor(currentType) {
     if (!dom.constructFieldsContainer) return;
@@ -190,7 +155,14 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
         dom.label.value = isGuidType ? "GUID" : state.label || "";
 
-        setupOptionsEditor();
+        optionsEditor = setupOptionsEditor({
+          type: currentType,
+          state,
+          dom: {
+            options: dom.options,
+            containerRow: dom.options?.closest(".modal-form-row"),
+          },
+        });
         setupConstructEditor(currentType);
         applyFieldAttributeDisabling(
           {
@@ -219,10 +191,9 @@ function setupFieldEditor(container, onChange, allFields = []) {
     );
 
     setupConstructEditor(field.type);
-    setupOptionsEditor();
-    if (optionsEditor) {
-      optionsEditor.setValues([]);
-      if (field.options) optionsEditor.setValues(field.options);
+
+    if (optionsEditor && field.options) {
+      optionsEditor.setValues(field.options);
     }
 
     const modal = container.closest(".modal");

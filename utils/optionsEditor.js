@@ -1,6 +1,39 @@
 // utils/optionsEditor.js
 
-export function createOptionsEditor(container, onChange) {
+import { shouldEnableAttribute } from "./formUtils.js";
+
+export function setupOptionsEditor({ type = "text", state, dom }) {
+  const { options, containerRow } = dom || {};
+  if (!options || !containerRow) return null;
+
+  // Always hide raw <textarea> or JSON field
+  options.style.display = "none";
+
+  // Clean previous editors/messages
+  containerRow.querySelector(".options-editor")?.remove();
+  containerRow.querySelector(".options-message")?.remove();
+
+  if (!shouldEnableAttribute(type, "options")) {
+    const msg = document.createElement("div");
+    msg.className = "options-message";
+    msg.textContent = "Options not available!";
+    containerRow.appendChild(msg);
+    return null;
+  }
+
+  const editor = createOptionsEditor(containerRow, (newOptions) => {
+    options.value = JSON.stringify(newOptions, null, 2);
+    state.options = newOptions;
+  });
+
+  if (state.options) {
+    editor.setValues(state.options);
+  }
+
+  return editor;
+}
+
+function createOptionsEditor(container, onChange) {
   const wrapper = document.createElement("div");
   wrapper.className = "options-editor";
 
