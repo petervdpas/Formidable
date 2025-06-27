@@ -5,12 +5,6 @@ import { fieldTypes } from "./fieldTypes.js";
 import { capitalize } from "./stringUtils.js";
 import * as renderers from "./fieldRenderers.js";
 
-export function shouldEnableAttribute(typeKey, attributeName) {
-  const typeDef = fieldTypes[typeKey];
-  const disabled = typeDef?.disabledAttributes || [];
-  return !disabled.includes(attributeName);
-}
-
 export function extractFieldDefinition({
   keyId = "edit-key",
   sidebarItemId = "edit-sidebar-item",

@@ -20,7 +20,6 @@ import { setupConstructFieldsEditor } from "./constructFieldsEditor.js";
 
 function setupFieldEditor(container, onChange, allFields = []) {
   const state = {};
-
   const dom = {
     key: container.querySelector("#edit-key"),
     primaryKey: container.querySelector("#edit-primary-key"),
@@ -48,14 +47,18 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
   let labelLocked = false;
 
-  let optionsEditor = setupOptionsEditor({
-    type: dom.type?.value || "text",
-    state,
-    dom: {
-      options: dom.options,
-      containerRow: dom.options?.closest(".modal-form-row"),
-    },
-  });
+  let optionsEditor = null;
+
+  function initializeOptionsEditor(fieldType) {
+    optionsEditor = setupOptionsEditor({
+      type: fieldType,
+      state,
+      dom: {
+        options: dom.options,
+        containerRow: dom.options?.closest(".modal-form-row"),
+      },
+    });
+  }
 
   function setupConstructEditor(currentType) {
     if (!dom.constructFieldsContainer) return;
@@ -155,15 +158,9 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
         dom.label.value = isGuidType ? "GUID" : state.label || "";
 
-        optionsEditor = setupOptionsEditor({
-          type: currentType,
-          state,
-          dom: {
-            options: dom.options,
-            containerRow: dom.options?.closest(".modal-form-row"),
-          },
-        });
+        initializeOptionsEditor(currentType);
         setupConstructEditor(currentType);
+
         applyFieldAttributeDisabling(
           {
             ...dom,
@@ -190,6 +187,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
       field.type
     );
 
+    initializeOptionsEditor(field.type);
     setupConstructEditor(field.type);
 
     if (optionsEditor && field.options) {

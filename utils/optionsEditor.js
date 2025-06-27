@@ -1,8 +1,15 @@
 // utils/optionsEditor.js
 
-import { shouldEnableAttribute } from "./formUtils.js";
-
 export function setupOptionsEditor({ type = "text", state, dom }) {
+  const optionTypes = [
+    "boolean",
+    "dropdown",
+    "multioption",
+    "radio",
+    "range",
+    "list",
+    "table",
+  ];
   const { options, containerRow } = dom || {};
   if (!options || !containerRow) return null;
 
@@ -13,7 +20,7 @@ export function setupOptionsEditor({ type = "text", state, dom }) {
   containerRow.querySelector(".options-editor")?.remove();
   containerRow.querySelector(".options-message")?.remove();
 
-  if (!shouldEnableAttribute(type, "options")) {
+  if (!optionTypes.includes(type)) {
     const msg = document.createElement("div");
     msg.className = "options-message";
     msg.textContent = "Options not available!";
