@@ -159,7 +159,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
         dom.label.value = isGuidType ? "GUID" : state.label || "";
 
         initializeOptionsEditor(currentType);
-        setupConstructEditor(currentType);
+        // setupConstructEditor(currentType);
 
         applyFieldAttributeDisabling(
           {
@@ -188,7 +188,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
     );
 
     initializeOptionsEditor(field.type);
-    setupConstructEditor(field.type);
+    //(field.type);
 
     if (optionsEditor && field.options) {
       optionsEditor.setValues(field.options);

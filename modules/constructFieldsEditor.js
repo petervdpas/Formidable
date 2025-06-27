@@ -4,6 +4,7 @@ import { setupPopup } from "./popupManager.js";
 import { applyPopupTypeClass } from "../utils/domUtils.js";
 import { applyConstructAttributeDisabling } from "../utils/formUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
+import { setupOptionsEditor } from "../utils/optionsEditor.js";
 
 import {
   createConstructAddButton,
@@ -35,13 +36,13 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
   const keyInput = popupEl.querySelector("#popup-key");
   const typeSelect = popupEl.querySelector("#popup-type");
   const labelInput = popupEl.querySelector("#popup-label");
-  const descRow = popupEl
-    .querySelector("#popup-description")
-    .closest(".popup-form-row");
   const descTextarea = popupEl.querySelector("#popup-description");
+  const descRow = descTextarea.closest(".popup-form-row");
   const optionsRow = popupEl.querySelector("#popup-options-row");
   const optionsInput = popupEl.querySelector("#popup-options");
   const buttonsContainer = popupEl.querySelector(".popup-buttons");
+
+  let optionsEditorInstance = null;
 
   function syncHiddenInput() {
     if (hiddenInput) {
@@ -64,9 +65,29 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
   function updatePopupUIForType(typeKey) {
     applyPopupTypeClass(popupEl, typeKey, fieldTypes);
     applyConstructAttributeDisabling(popupEl, typeKey);
+
+    // Recreate options editor
+    if (optionsEditorInstance) {
+      optionsRow.querySelector(".options-editor")?.remove();
+      optionsRow.querySelector(".options-message")?.remove();
+    }
+
+    optionsEditorInstance = setupOptionsEditor({
+      type: typeKey,
+      state: currentEditingSubfield,
+      dom: {
+        options: optionsInput,
+        containerRow: optionsRow,
+      },
+    });
   }
 
+  let currentEditingSubfield = null;
+
   typeSelect.addEventListener("change", () => {
+    if (currentEditingSubfield) {
+      currentEditingSubfield.type = typeSelect.value;
+    }
     updatePopupUIForType(typeSelect.value);
   });
 
@@ -92,17 +113,18 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
       const editBtn = createConstructEditButton((event) => {
         populateTypeDropdown();
 
+        currentEditingSubfield = subfield;
+
         keyInput.value = subfield.key || "";
         typeSelect.value = subfield.type || "text";
         labelInput.value = subfield.label || "";
         descTextarea.value = subfield.description || "";
-        optionsInput.value = Array.isArray(subfield.options)
-          ? subfield.options.join(", ")
-          : subfield.options || "";
+        optionsInput.value = JSON.stringify(subfield.options || []);
 
         updatePopupUIForType(typeSelect.value);
 
         buttonsContainer.innerHTML = "";
+
         const saveBtn = createConstructSaveButton(() => {
           const updated = {
             key: keyInput.value.trim(),
@@ -111,12 +133,12 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
             description: descTextarea.value.trim(),
           };
 
-          const opts = optionsInput.value
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean);
+          const opts =
+            optionsEditorInstance?.getValues?.() ||
+            (optionsInput.value ? JSON.parse(optionsInput.value) : undefined);
 
           if (
+            Array.isArray(opts) &&
             opts.length > 0 &&
             !fieldTypes[updated.type]?.disabledAttributes?.includes("options")
           ) {
