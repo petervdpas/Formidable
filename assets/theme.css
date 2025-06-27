@@ -206,6 +206,8 @@
   --field-type-construct-badge: #e4ba00;
   --field-type-construct-text: #222;
 
+  --construct-editor-transparent: rgba(59, 59, 59, 0.2);
+  
   /* ───── Popup Panel ───── */
   --popup-bg: #fff;
   --popup-fg: #000;

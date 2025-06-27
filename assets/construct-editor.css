@@ -19,11 +19,11 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: 100%;
-  gap: 0.5em;
+  width: auto;
+  gap: 0.2em;
   margin-top: 0.6em;
-  margin-bottom: 1em;
-  background: var(--modal-highlight-bg);
+  margin-bottom: 0.2em;
+  background: var(--construct-editor-transparent);
   padding: 0.75em;
   border-radius: 6px;
 }
@@ -42,8 +42,8 @@
 .construct-field-list {
   list-style-type: none;
   padding: 0;
-  margin: 0.4em 0 1em 0;
-  width: 100%;
+  margin: 0.4em 0;
+  width: auto;
 }
 
 .construct-field-item {
@@ -51,22 +51,23 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 0.4em 0.6em;
+  padding: 0.4em;
   margin-bottom: 0.4em;
   border-radius: 4px;
   font-size: 14px;
   background: var(--field-bg, #eee);
   box-sizing: border-box;
   gap: 0.6em;
+  height: auto;
 }
 
 .construct-field-label {
-  flex-grow: 1;
-  min-width: 0;
-  overflow: hidden;
+  font-weight: bold;
+  display: flex;
   text-overflow: ellipsis;
   white-space: nowrap;
   gap: 4px;
+  align-items: center;
   cursor: grab;
 }
 
@@ -87,14 +88,13 @@
 
 .subfield-type {
   font-size: 12px;
-  font-weight: bold;
-  padding: 2px 6px;
+  padding: 2px 5px 3px 5px;
   border-radius: 4px;
   text-transform: uppercase;
+  margin-left: 0.2em;
 }
 
 .construct-field-item .subfield-type.is-loop-boundary {
-  color: gray;
   font-style: italic;
 }
 
@@ -111,6 +111,11 @@
   color: var(--field-type-text-text);
 }
 
+#construct-popup.construct-type-text .popup-header h3,
+#construct-popup.construct-type-text .popup-body label {
+  color: var(--field-type-text-text) !important;
+}
+
 #construct-popup.construct-type-boolean,
 .construct-field-item[data-type="boolean"] {
   background-color: var(--field-type-boolean-bg);
@@ -121,6 +126,11 @@
 .subfield-type.type-boolean {
   background-color: var(--field-type-boolean-badge);
   color: var(--field-type-boolean-text);
+}
+
+#construct-popup.construct-type-boolean .popup-header h3,
+#construct-popup.construct-type-boolean .popup-body label {
+  color: var(--field-type-boolean-text) !important;
 }
 
 #construct-popup.construct-type-number,
@@ -135,6 +145,11 @@
   color: var(--field-type-number-text);
 }
 
+#construct-popup.construct-type-number .popup-header h3,
+#construct-popup.construct-type-number .popup-body label {
+  color: var(--field-type-number-text) !important;
+}
+
 #construct-popup.construct-type-dropdown,
 .construct-field-item[data-type="dropdown"] {
   background-color: var(--field-type-dropdown-bg);
@@ -145,6 +160,11 @@
 .subfield-type.type-dropdown {
   background-color: var(--field-type-dropdown-badge);
   color: var(--field-type-dropdown-text);
+}
+
+#construct-popup.construct-type-dropdown .popup-header h3,
+#construct-popup.construct-type-dropdown .popup-body label {
+  color: var(--field-type-dropdown-text) !important;
 }
 
 #construct-popup.construct-type-multioption,
@@ -159,6 +179,11 @@
   color: var(--field-type-multioption-text);
 }
 
+#construct-popup.construct-type-multioption .popup-header h3,
+#construct-popup.construct-type-multioption .popup-body label {
+  color: var(--field-type-multioption-text) !important;
+}
+
 #construct-popup.construct-type-radio,
 .construct-field-item[data-type="radio"] {
   background-color: var(--field-type-radio-bg);
@@ -169,6 +194,11 @@
 .subfield-type.type-radio {
   background-color: var(--field-type-radio-badge);
   color: var(--field-type-radio-text);
+}
+
+#construct-popup.construct-type-radio .popup-header h3,
+#construct-popup.construct-type-radio .popup-body label {
+  color: var(--field-type-radio-text) !important;
 }
 
 #construct-popup.construct-type-textarea,
@@ -183,6 +213,11 @@
   color: var(--field-type-textarea-text);
 }
 
+#construct-popup.construct-type-textarea .popup-header h3,
+#construct-popup.construct-type-textarea .popup-body label {
+  color: var(--field-type-textarea-text) !important;
+}
+
 #construct-popup.construct-type-range,
 .construct-field-item[data-type="range"] {
   background-color: var(--field-type-range-bg);
@@ -193,6 +228,11 @@
 .subfield-type.type-range {
   background-color: var(--field-type-range-badge);
   color: var(--field-type-range-text);
+}
+
+#construct-popup.construct-type-range .popup-header h3,
+#construct-popup.construct-type-range .popup-body label {
+  color: var(--field-type-range-text) !important;
 }
 
 #construct-popup.construct-type-list,
@@ -207,6 +247,11 @@
   color: var(--field-type-list-text);
 }
 
+#construct-popup.construct-type-list .popup-header h3,
+#construct-popup.construct-type-list .popup-body label {
+  color: var(--field-type-list-text) !important;
+}
+
 #construct-popup.construct-type-table,
 .construct-field-item[data-type="table"] {
   background-color: var(--field-type-table-bg);
@@ -217,6 +262,11 @@
 .subfield-type.type-table {
   background-color: var(--field-type-table-badge);
   color: var(--field-type-table-text);
+}
+
+#construct-popup.construct-type-table .popup-header h3,
+#construct-popup.construct-type-table .popup-body label {
+  color: var(--field-type-table-text) !important;
 }
 
 #construct-popup.construct-type-date,
@@ -231,6 +281,11 @@
   color: var(--field-type-date-text);
 }
 
+#construct-popup.construct-type-date .popup-header h3,
+#construct-popup.construct-type-date .popup-body label {
+  color: var(--field-type-date-text) !important;
+}
+
 #construct-popup.construct-type-image,
 .construct-field-item[data-type="image"] {
   background-color: var(--field-type-image-bg);
@@ -243,6 +298,11 @@
   color: var(--field-type-image-text);
 }
 
+#construct-popup.construct-type-image .popup-header h3,
+#construct-popup.construct-type-image .popup-body label {
+  color: var(--field-type-image-text) !important;
+}
+
 #construct-popup.construct-type-link,
 .construct-field-item[data-type="link"] {
   background-color: var(--field-type-link-bg);
@@ -253,6 +313,11 @@
 .subfield-type.type-link {
   background-color: var(--field-type-link-badge);
   color: var(--field-type-link-text);
+}
+
+#construct-popup.construct-type-link .popup-header h3,
+#construct-popup.construct-type-link .popup-body label {
+  color: var(--field-type-link-text) !important;
 }
 
 #construct-popup.construct-type-looper,
