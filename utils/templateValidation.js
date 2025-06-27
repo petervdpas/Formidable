@@ -10,6 +10,12 @@ export function formatError(error) {
   if (error.type === "unmatched-loopstop") {
     return `Unmatched loop stop at: ${error.field?.key || "?"}`;
   }
+  if (error.type === "nested-loop-not-allowed") {
+    return `Only 1 loop level allowed — Found nested loop with key: "${error.field?.key}".`;
+  }
+  if (error.type === "loop-key-mismatch") {
+    return `Loopstop key "${error.field?.key}" does not match loopstart key "${error.expectedKey}"`;
+  }
   if (error.type === "multiple-primary-keys") {
     return `Multiple primary keys: ${error.keys.join(", ")}`;
   }
