@@ -305,3 +305,40 @@ fields:
   - key: construct-test
     label: Construct
     type: construct
+    fields:
+      - key: subDrop
+        type: dropdown
+        label: SubDrop
+        description: ''
+        sidebar_item: false
+        two_column: false
+        default: ''
+        options: []
+        fields: []
+      - key: subloop
+        type: loopstart
+        label: Subloop
+        description: ''
+        sidebar_item: false
+        two_column: false
+        default: ''
+        options: []
+        fields: []
+      - key: subtext
+        type: text
+        label: SubTest
+        description: ''
+        sidebar_item: false
+        two_column: false
+        default: ''
+        options: []
+        fields: []
+      - key: subloop
+        type: loopstop
+        label: Subloop
+        description: ''
+        sidebar_item: false
+        two_column: false
+        default: ''
+        options: []
+        fields: []

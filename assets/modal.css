@@ -90,12 +90,12 @@
     padding: 6px;
 }
 
-
 /* ───── Modal Body ───── */
 .modal-body {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
+    padding-right: 1em;
 }
 
 /* Make sure the header and content align well */
@@ -184,7 +184,7 @@
 }
 
 .modal-form-row.tight-gap {
-  gap: 0.3em;
+    gap: 0.3em;
 }
 
 .modal-form-row.tight-gap label {
@@ -200,12 +200,12 @@
 }
 
 .pane.hidden {
-  display: none;
+    display: none;
 }
 
-.modal-body.two-pane > .pane:not(.hidden) {
-  flex: 1 1 0;
-  min-width: 0;
+.modal-body.two-pane>.pane:not(.hidden) {
+    flex: 1 1 0;
+    min-width: 0;
 }
 
 .pane-header {

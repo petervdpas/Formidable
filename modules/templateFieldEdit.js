@@ -148,7 +148,20 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
     // ── Type change ──
     if (dom.type) {
+      // Empty and refill without loopstart/loopstop
+      dom.type.innerHTML = "";
+
+      for (const [typeKey, typeDef] of Object.entries(fieldTypes)) {
+        if (typeKey === "loopstart" || typeKey === "loopstop") continue; // overslaan
+
+        const option = document.createElement("option");
+        option.value = typeKey;
+        option.textContent = typeDef.label || typeKey;
+        dom.type.appendChild(option);
+      }
+
       dom.type.value = field.type || "text";
+
       dom.type.onchange = () => {
         const currentType = dom.type.value;
         const isGuidType = currentType === "guid";
@@ -159,7 +172,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
         dom.label.value = isGuidType ? "GUID" : state.label || "";
 
         initializeOptionsEditor(currentType);
-        // setupConstructEditor(currentType);
+        setupConstructEditor(currentType);
 
         applyFieldAttributeDisabling(
           {
@@ -188,7 +201,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
     );
 
     initializeOptionsEditor(field.type);
-    //(field.type);
+    setupConstructEditor(field.type);
 
     if (optionsEditor && field.options) {
       optionsEditor.setValues(field.options);

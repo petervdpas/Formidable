@@ -12,12 +12,20 @@
   font-weight: bold;
   margin: 0;
   padding: 0;
+  color: var(--modal-highlight-text);
 }
 
 .modal-form-row.construct-fullwidth {
+  display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0.25em;
+  width: 100%;
+  gap: 0.5em;
+  margin-top: 0.6em;
+  margin-bottom: 1em;
+  background: var(--modal-highlight-bg);
+  padding: 0.75em;
+  border-radius: 6px;
 }
 
 .modal-form-row.construct-fullwidth label {
@@ -58,6 +66,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  gap: 4px;
+  cursor: grab;
+}
+
+.construct-field-label .drag-handle {
+  display: inline-block;
 }
 
 .construct-field-actions {
@@ -77,6 +91,11 @@
   padding: 2px 6px;
   border-radius: 4px;
   text-transform: uppercase;
+}
+
+.construct-field-item .subfield-type.is-loop-boundary {
+  color: gray;
+  font-style: italic;
 }
 
 /* Type-specific styles for construct field items */
