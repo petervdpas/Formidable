@@ -153,7 +153,12 @@ function setupFieldEditor(container, onChange, allFields = []) {
       dom.type.innerHTML = "";
 
       for (const [typeKey, typeDef] of Object.entries(fieldTypes)) {
-        if (typeKey === "loopstart" || typeKey === "loopstop") continue; // overslaan
+        const isLoop = typeKey === "loopstart" || typeKey === "loopstop";
+
+        // Alleen overslaan als het NIET de huidige type is
+        if (isLoop && typeKey !== field.type) {
+          continue;
+        }
 
         const option = document.createElement("option");
         option.value = typeKey;

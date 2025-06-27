@@ -161,49 +161,72 @@ function checkDuplicateKeys(fields) {
   return duplicates;
 }
 
-function checkLoopPairing(fields) {
+function checkLoopPairing(fields, context = [], inConstruct = false) {
   const errors = [];
-  const stack = [];
 
-  fields.forEach((field, index) => {
-    if (field.type === "loopstart") {
-      stack.push({ field, index });
-    } else if (field.type === "loopstop") {
-      if (stack.length === 0) {
-        errors.push({
-          type: "unmatched-loopstop",
-          field,
-          index,
-          message: "Unmatched loopstop without preceding loopstart",
-        });
-      } else {
-        const start = stack.pop();
-        if (field.key !== start.field.key) {
+  function validate(fields, nestingLevel, context, inConstruct) {
+    const stack = [];
+
+    for (let i = 0; i < fields.length; i++) {
+      const field = fields[i];
+      const currentPath = [...context, field.key || `#${i}`];
+
+      if (field.type === "construct" && Array.isArray(field.fields)) {
+        validate(field.fields, 0, currentPath, true); // Reset depth inside construct
+        continue;
+      }
+
+      if (field.type === "loopstart") {
+        if (nestingLevel >= 1) {
           errors.push({
-            type: "loop-key-mismatch",
+            type: "nested-loop-not-allowed",
             field,
-            index,
-            expectedKey: start.field.key,
-            actualKey: field.key,
-            message: `Loopstop key '${field.key}' does not match loopstart key '${start.field.key}'`,
+            path: currentPath,
+            message: `Nested loopstart '${field.key}' not allowed. Max loop depth = 1.`,
           });
+        }
+        stack.push({ field, path: currentPath });
+        nestingLevel++;
+      } else if (field.type === "loopstop") {
+        if (stack.length === 0) {
+          errors.push({
+            type: "unmatched-loopstop",
+            field,
+            path: currentPath,
+            message: `Unmatched loopstop '${field.key}' without preceding loopstart.`,
+          });
+        } else {
+          const start = stack.pop();
+          nestingLevel--;
+
+          if (start.field.key !== field.key) {
+            errors.push({
+              type: "loop-key-mismatch",
+              field,
+              path: currentPath,
+              expectedKey: start.field.key,
+              message: `Loopstop key '${field.key}' does not match loopstart key '${start.field.key}'`,
+            });
+          }
         }
       }
     }
-  });
 
-  while (stack.length > 0) {
-    const { field, index } = stack.pop();
-    errors.push({
-      type: "unmatched-loopstart",
-      field,
-      index,
-      message: "Unmatched loopstart without corresponding loopstop",
-    });
+    while (stack.length > 0) {
+      const { field, path: p } = stack.pop();
+      errors.push({
+        type: "unmatched-loopstart",
+        field,
+        path: p,
+        message: `Unmatched loopstart '${field.key}' without corresponding loopstop.`,
+      });
+    }
   }
 
+  validate(fields, 0, context, inConstruct);
   return errors;
 }
+
 
 function checkCollectionEnableValid(template) {
   if (template.enable_collection !== true) return null;

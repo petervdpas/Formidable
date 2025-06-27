@@ -5,7 +5,7 @@
   "logging_enabled": true,
   "context_mode": "template",
   "context_folder": "./",
-  "selected_template": "basic.yaml",
+  "selected_template": "loopie.yaml",
   "selected_data_file": null,
   "author_name": "Regular user",
   "author_email": "regular@example.com",
