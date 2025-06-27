@@ -73,6 +73,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
           state.fields = updatedFields;
           dom.constructFields.value = JSON.stringify(state.fields || []);
           onChange?.(structuredClone(state));
+          validate();
         }
       );
 
@@ -221,6 +222,17 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
     const result = validateField(field, allFields);
 
+    // Extra check: construct subfields mogen niet leeg zijn
+    let hasEmptySubfield = false;
+    if (field.type === "construct" && Array.isArray(field.fields)) {
+      hasEmptySubfield = field.fields.some(
+        (sub) => !sub.key?.trim() || !sub.label?.trim()
+      );
+      if (hasEmptySubfield) {
+        result.valid = false;
+      }
+    }
+
     dom.key.classList.toggle("input-error", !result.valid);
 
     if (confirmBtn) {
@@ -363,6 +375,7 @@ export function showFieldEditorModal(field, allFields = [], onConfirm) {
   if (!cachedFieldEditSetup) {
     cachedFieldEditSetup = setupFieldEditModal(() => {
       const confirmedField = editor.getField();
+
       if (confirmedField.type === "looper") {
         const loopKey = confirmedField.key;
         const loopLabel = confirmedField.label || loopKey;

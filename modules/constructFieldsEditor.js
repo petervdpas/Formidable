@@ -220,13 +220,33 @@ export function setupConstructFieldsEditor(containerEl, state, onChange) {
       });
 
       const deleteBtn = createConstructDeleteButton(() => {
+        const removed = state.fields[idx];
+        const removedKey = removed.key;
+        const removedType = removed.type;
+
         state.fields.splice(idx, 1);
+
+        if (["loopstart", "loopstop"].includes(removedType)) {
+          const partnerType =
+            removedType === "loopstart" ? "loopstop" : "loopstart";
+          const partnerIdx = state.fields.findIndex(
+            (f) => f.key === removedKey && f.type === partnerType
+          );
+          if (partnerIdx !== -1) {
+            state.fields.splice(partnerIdx, 1);
+          }
+        }
+
         renderFieldList();
         syncHiddenInput();
         onChange?.(structuredClone(state.fields));
       });
 
-      const actions = buildButtonGroup(editBtn, deleteBtn, "construct-field-actions");
+      const actions = buildButtonGroup(
+        editBtn,
+        deleteBtn,
+        "construct-field-actions"
+      );
 
       item.appendChild(labelRow);
       item.appendChild(actions);
