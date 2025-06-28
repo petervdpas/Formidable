@@ -310,11 +310,11 @@ fields:
         type: dropdown
         label: SubDrop
         description: ''
-        sidebar_item: false
-        two_column: false
-        default: ''
-        options: []
-        fields: []
+        options:
+          - value: One
+            label: One
+          - value: Two
+            label: Two
       - key: subloop
         type: loopstart
         label: Subloop

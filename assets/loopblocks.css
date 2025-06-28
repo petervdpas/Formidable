@@ -24,8 +24,6 @@
   background-color: var(--loop-bg, #fff);
 }
 
-
-
 /* ─── Remove Button ────────────────────────────── */
 .loop-item .loop-item-remove {
   position: absolute;
@@ -65,4 +63,16 @@
   background-color: var(--color-accent, #2196f3);
   border-radius: 2px;
   transition: all 0.2s ease-in-out;
+}
+
+.construct-container {
+  border-left: 4px solid var(--field-border, #999);
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  background: var(--form-bg-secondary);
+  border-radius: 4px;
+}
+.construct-label {
+  font-weight: bold;
+  margin-bottom: 0.5em;
 }
