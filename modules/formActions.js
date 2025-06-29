@@ -35,23 +35,26 @@ export async function saveForm(container, template) {
       templateFilename: template.filename,
       datafile: datafile,
     });
-
     created = existing?.meta?.created || null;
   } catch {}
 
+  if (window.easyMDEInstances) {
+    Object.values(window.easyMDEInstances).forEach((mde) => {
+      if (typeof mde?.codemirror?.save === "function") {
+        mde.codemirror.save();
+      }
+    });
+  }
+
   const { data, meta } = await getFormData(container, template);
+
   const userConfig = await new Promise((resolve) => {
     EventBus.emit("config:load", (cfg) => resolve(cfg));
   });
 
-  // Determine GUID field
   const guidField = template.fields?.find((f) => f.type === "guid");
   const guidKey = guidField?.key || "id";
-
   const idValue = data[guidKey] || meta.id || null;
-
-  // REMOVE id from data!
-  //delete data[guidKey];
 
   const payload = {
     ...data,

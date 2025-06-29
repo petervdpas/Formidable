@@ -111,15 +111,25 @@ function resolveFieldElement(container, field) {
   if (loopKey) sel += `[data-field-loop="${loopKey}"]`;
   if (constructKey) sel += `[data-field-construct="${constructKey}"]`;
 
-  const el = container.querySelector(sel)
-    || container.querySelector(`[${attr}="${key}"]`)
-    || container.querySelector(`[data-field-key="${key}"]`)
-    || container.querySelector(`[name="${key}"]`);
+  const el =
+    container.querySelector(sel) ||
+    container.querySelector(`[${attr}="${key}"]`) ||
+    container.querySelector(`[data-field-key="${key}"]`) ||
+    container.querySelector(`[name="${key}"]`);
 
   if (!el) {
     EventBus.emit("logging:warning", [
       `[resolveFieldElement] Element not found for key="${key}", type="${type}"`,
     ]);
+  }
+
+  // fallback for EasyMDE-wrappers
+  if (
+    el?.classList?.contains("EasyMDEContainer") ||
+    el?.querySelector?.(".editor-toolbar")
+  ) {
+    const textarea = el.querySelector("textarea");
+    if (textarea) return textarea;
   }
 
   return el;
@@ -134,7 +144,12 @@ async function parseFieldValue(container, field, template) {
     return undefined;
   }
 
-  const el = resolveFieldElement(container, field);
+  const el = resolveFieldElement(container, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey,
+    constructKey: field.constructKey,
+  });
 
   if (!el) {
     EventBus.emit("logging:warning", [
@@ -175,7 +190,8 @@ export async function getFormData(container, template) {
       for (const item of loopItems) {
         const entry = {};
         for (const f of group) {
-          const value = await parseFieldValue(item, f, template);
+          const scoped = { ...f, loopKey };
+          const value = await parseFieldValue(item, scoped, template);
           if (value !== undefined) entry[f.key] = value;
         }
 

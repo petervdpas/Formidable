@@ -51,38 +51,23 @@ export const parseRadioField = async function (wrapper) {
 };
 
 // Textarea
-export async function parseTextareaField(wrapper, template) {
-  if (!wrapper) {
-    EventBus.emit("logging:warning", [
-      `[parseTextareaField] Wrapper is null or undefined.`,
-    ]);
-    return "";
-  }
-
+export async function parseTextareaField(el, template) {
   try {
-    const textarea = wrapper.querySelector("textarea");
-    if (!textarea) {
-      EventBus.emit("logging:warning", [
-        `[parseTextareaField] No <textarea> found inside wrapper.`,
-      ]);
-      return "";
-    }
+    // Zoek de juiste key — uit EasyMDE of uit fallback
+    const key =
+      el?.dataset?.fieldKey ||
+      el?.getAttribute?.("name") ||
+      el?.querySelector?.("textarea")?.getAttribute?.("name") ||
+      el?.closest?.("textarea")?.getAttribute?.("name");
 
-    const key = textarea.name || textarea.dataset.fieldKey || textarea.getAttribute("data-field-key");
     const instance = window.easyMDEInstances?.[key];
-
     if (instance && typeof instance.value === "function") {
       return instance.value().trim();
     }
 
-    if (typeof textarea.value === "string") {
-      return textarea.value.trim();
-    }
-
-    EventBus.emit("logging:warning", [
-      `[parseTextareaField] Could not resolve value from EasyMDE or textarea for key="${key}".`,
-    ]);
-    return "";
+    // fallback
+    const fallback = el?.tagName === "TEXTAREA" ? el : el?.querySelector?.("textarea");
+    return fallback?.value?.trim?.() || "";
   } catch (err) {
     EventBus.emit("logging:error", [`[parseTextareaField] ${err.message}`]);
     return "";
