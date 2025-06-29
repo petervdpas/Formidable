@@ -7,7 +7,11 @@ import {
   buildSwitchElement,
   addContainerElement,
 } from "./elementBuilders.js";
-import { applyDatasetMapping, generateGuid } from "./domUtils.js";
+import {
+  applyDatasetMapping,
+  applyFieldContextAttributes,
+  generateGuid,
+} from "./domUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 import { getCurrentTheme } from "../modules/themeToggle.js";
 import { createRemoveImageButton } from "../modules/uiButtons.js";
@@ -31,6 +35,8 @@ export async function renderGuidField(field, value = "") {
   hidden.type = "hidden";
   hidden.setAttribute("data-guid-field", field.key);
   hidden.value = guidValue;
+
+  applyFieldContextAttributes(hidden, field);
 
   return hidden;
 }
@@ -56,6 +62,8 @@ export async function renderLoopstartField(field, value = "") {
       value: "__loop_start__",
     },
   });
+
+  applyFieldContextAttributes(wrapper, field);
 
   return wrapInputWithLabel(
     wrapper,
@@ -87,6 +95,8 @@ export async function renderLoopstopField(field, value = "") {
     },
   });
 
+  applyFieldContextAttributes(wrapper, field);
+
   return wrapInputWithLabel(
     wrapper,
     field.label,
@@ -97,12 +107,19 @@ export async function renderLoopstopField(field, value = "") {
 
 // ─────────────────────────────────────────────
 // Type: construct
-export async function renderConstructField(field, value = {}, template, options = {}) {
+export async function renderConstructField(
+  field,
+  value = {},
+  template,
+  options = {}
+) {
   const wrapper = document.createElement("div");
   wrapper.className = "construct-wrapper full-width";
   wrapper.dataset.constructKey = field.key;
 
-  // Label + description block (beter dan los divje)
+  applyFieldContextAttributes(wrapper, field);
+
+  // Label + description block
   const header = document.createElement("div");
   header.className = "construct-header";
 
@@ -142,6 +159,9 @@ export async function renderTextField(field, value = "") {
   input.type = "text";
   input.name = field.key;
   input.value = v;
+
+  applyFieldContextAttributes(input, field);
+
   return wrapInputWithLabel(
     input,
     field.label,
@@ -172,6 +192,8 @@ export async function renderBooleanField(field, value = "") {
     trailingLabel,
   });
 
+  applyFieldContextAttributes(toggle, field);
+
   return wrapInputWithLabel(
     toggle,
     field.label,
@@ -194,6 +216,9 @@ export async function renderDropdownField(field, value = "") {
   });
   select.name = field.key;
   select.value = v;
+
+  applyFieldContextAttributes(select, field);
+
   return wrapInputWithLabel(
     select,
     field.label,
@@ -235,6 +260,8 @@ export async function renderMultioptionField(field, value = "") {
     labelEl.appendChild(document.createTextNode(" " + label));
   });
 
+  applyFieldContextAttributes(wrapper, field);
+
   return wrapInputWithLabel(
     wrapper,
     field.label,
@@ -274,6 +301,8 @@ export async function renderRadioField(field, value = "") {
     labelEl.appendChild(document.createTextNode(" " + label));
   });
 
+  applyFieldContextAttributes(wrapper, field);
+
   return wrapInputWithLabel(
     wrapper,
     field.label,
@@ -297,7 +326,7 @@ export async function renderTextareaField(field, value = "") {
 
   requestAnimationFrame(() => {
     let keystrokeCount = 0;
-    let editorInstance = null; // 🟢 declare outside
+    let editorInstance = null;
 
     editorInstance = new EasyMDE({
       element: textarea,
@@ -353,6 +382,8 @@ export async function renderTextareaField(field, value = "") {
     });
   });
 
+  applyFieldContextAttributes(wrapper, field);
+
   return wrapInputWithLabel(
     wrapper,
     field.label,
@@ -369,6 +400,9 @@ export async function renderNumberField(field, value = "") {
   input.type = "number";
   input.name = field.key;
   input.value = v;
+
+  applyFieldContextAttributes(input, field);
+
   return wrapInputWithLabel(
     input,
     field.label,
@@ -425,6 +459,8 @@ export async function renderRangeField(field, value = "") {
     display.textContent = input.value;
   });
 
+  applyFieldContextAttributes(wrapper, field);
+
   return wrapInputWithLabel(
     wrapper,
     field.label,
@@ -441,6 +477,9 @@ export async function renderDateField(field, value = "") {
   input.type = "date";
   input.name = field.key;
   input.value = v;
+
+  applyFieldContextAttributes(input, field);
+
   return wrapInputWithLabel(
     input,
     field.label,
@@ -480,6 +519,8 @@ export async function renderListField(field, value = "") {
       input.click();
     }
   });
+
+  applyFieldContextAttributes(wrapper, field);
 
   return wrapInputWithLabel(
     wrapper,
@@ -618,6 +659,8 @@ export async function renderTableField(field, value = "") {
     tbody.appendChild(newRow);
   };
 
+  applyFieldContextAttributes(wrapper, field);
+
   return wrapInputWithLabel(
     wrapper,
     field.label,
@@ -711,10 +754,13 @@ export async function renderImageField(field, value = "", template) {
 
   wrapper.appendChild(deleteBtn);
 
+  applyFieldContextAttributes(wrapper, field);
+  
   return wrapInputWithLabel(
     wrapper,
     field.label || "Image Upload",
-    field.description
+    field.description,
+    field.two_column
   );
 }
 
@@ -852,6 +898,8 @@ export async function renderLinkField(
   formatSelect.value = "regular";
   urlInput.value = v;
   updateValue();
+
+  applyFieldContextAttributes(wrapper, field);
 
   return wrapInputWithLabel(
     wrapper,

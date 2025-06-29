@@ -115,6 +115,22 @@ export function collectLoopGroup(fields, startIdx, loopKey) {
   return { group, stopIdx: i };
 }
 
+async function parseFieldValue(container, field, template) {
+  const def = fieldTypes[field.type];
+  if (!def || typeof def.parseValue !== "function") return undefined;
+
+  let el;
+
+  if (field.type === "construct") {
+    el = container.querySelector(`[data-construct-key="${field.key}"]`);
+  } else {
+    el = resolveFieldElement(container, field);
+  }
+
+  if (!el) return undefined;
+  return await def.parseValue(el, template);
+}
+
 export async function getFormData(container, template) {
   const data = {};
   const meta = {};
@@ -137,76 +153,37 @@ export async function getFormData(container, template) {
       for (const item of loopItems) {
         const entry = {};
         for (const f of group) {
-          const def = fieldTypes[f.type];
-          if (!def || typeof def.parseValue !== "function") continue;
-
-          let el;
-
-          if (f.type === "construct") {
-            el = item.querySelector(`[data-construct-key="${f.key}"]`);
-            if (!el) continue;
-            entry[f.key] = await def.parseValue(el, template);
-          } else {
-            el = resolveFieldElement(item, f);
-            if (!el) continue;
-            entry[f.key] = await def.parseValue(el, template);
-          }
+          const value = await parseFieldValue(item, f, template);
+          if (value !== undefined) entry[f.key] = value;
         }
-        loopValues.push(entry);
+
+        const hasValues = Object.values(entry).some((v) => {
+          if (Array.isArray(v)) return v.length > 0;
+          if (v && typeof v === "object") return Object.keys(v).length > 0;
+          return v !== undefined && v !== null && v !== "";
+        });
+
+        if (hasValues) {
+          loopValues.push(entry);
+        }
       }
 
       data[loopKey] = loopValues;
-    }
-
-    else if (field.type === "construct") {
-      const el = container.querySelector(`[data-construct-key="${field.key}"]`);
-      if (!el) {
-        EventBus.emit("logging:warning", [
-          `[getFormData] Missing construct wrapper for: ${field.key}`,
-        ]);
-        i++;
-        continue;
+    } else {
+      const value = await parseFieldValue(container, field, template);
+      if (value !== undefined) {
+        data[field.key] = value;
       }
-
-      const def = fieldTypes[field.type];
-      data[field.key] = await def.parseValue(el, template);
-      i++;
-    }
-
-    else {
-      const def = fieldTypes[field.type];
-      if (!def || typeof def.parseValue !== "function") {
-        EventBus.emit("logging:warning", [
-          `[getFormData] No parser for field type: ${field.type}`,
-        ]);
-        i++;
-        continue;
-      }
-
-      const el = resolveFieldElement(container, field);
-      if (!el) {
-        EventBus.emit("logging:warning", [
-          `[getFormData] Missing input for: ${field.key}`,
-        ]);
-        i++;
-        continue;
-      }
-
-      data[field.key] = await def.parseValue(el, template);
       i++;
     }
   }
 
-  // Read hidden inputs for _filename and flagged
+  // Metadata extraction
   const filenameInput = container.querySelector("#meta-json-filename");
-  if (filenameInput) {
-    meta._filename = filenameInput.value.trim();
-  }
+  if (filenameInput) meta._filename = filenameInput.value.trim();
 
   const flaggedInput = container.querySelector("#meta-flagged");
-  if (flaggedInput) {
-    meta.flagged = flaggedInput.value === "true";
-  }
+  if (flaggedInput) meta.flagged = flaggedInput.value === "true";
 
   EventBus.emit("logging:default", [
     "[getFormData] Collected form data:",
@@ -303,7 +280,9 @@ export function applyConstructAttributeDisabling(popupEl, typeKey) {
 
   const domMap = {
     options: popupEl.querySelector("#popup-options-row"),
-    description: popupEl.querySelector("#popup-description")?.closest(".popup-form-row"),
+    description: popupEl
+      .querySelector("#popup-description")
+      ?.closest(".popup-form-row"),
   };
 
   for (const [key, row] of Object.entries(domMap)) {

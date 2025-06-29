@@ -101,6 +101,21 @@ export function resolveScopedElement(container, field) {
   return container.querySelector(attr);
 }
 
+export function applyFieldContextAttributes(el, { key, type, loopKey = null, constructKey = null }) {
+  if (!el || !key || !type) return;
+
+  el.dataset.fieldKey = key;
+  el.dataset.fieldType = type;
+
+  if (loopKey) {
+    el.dataset.fieldLoop = loopKey;
+  }
+
+  if (constructKey) {
+    el.dataset.fieldConstruct = constructKey;
+  }
+}
+
 export function applyDatasetMapping(el, sources, mappings = []) {
   if (!el || typeof el.dataset === "undefined") return;
   if (!Array.isArray(sources)) sources = [sources];

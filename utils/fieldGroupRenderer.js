@@ -75,7 +75,8 @@ export async function fieldGroupRenderer(
           group,
           complete,
           template,
-          eventFunctions
+          eventFunctions,
+          loopKey
         );
         loopList.appendChild(itemWrapper);
       }
@@ -87,10 +88,12 @@ export async function fieldGroupRenderer(
           group,
           {},
           template,
-          eventFunctions
+          eventFunctions,
+          loopKey
         );
         loopList.appendChild(newItem);
       });
+
       loopContainer.appendChild(addButton);
       container.appendChild(loopContainer);
 
@@ -129,7 +132,7 @@ export async function fieldGroupRenderer(
       }
 
       const row = await renderFieldElement(
-        field,
+        { ...field, constructKey: eventFunctions?.constructKey || null },
         metaData[field.key],
         template,
         eventFunctions
@@ -144,7 +147,8 @@ async function createLoopItem(
   groupFields,
   dataEntry = {},
   template,
-  eventFunctions = {}
+  eventFunctions = {},
+  loopKey = null
 ) {
   const itemWrapper = document.createElement("div");
   itemWrapper.className = "loop-item";
@@ -176,7 +180,11 @@ async function createLoopItem(
   itemWrapper.appendChild(removeBtn);
 
   for (const loopField of groupFields) {
-    const fieldCopy = { ...loopField };
+    const fieldCopy = {
+      ...loopField,
+      loopKey,
+    };
+
     const fieldKey = fieldCopy.key;
 
     if (!Object.prototype.hasOwnProperty.call(dataEntry, fieldKey)) {
