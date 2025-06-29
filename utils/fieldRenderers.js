@@ -899,7 +899,7 @@ export async function renderLinkField(
   urlInput.value = v;
   updateValue();
 
-  applyFieldContextAttributes(wrapper, field);
+  applyFieldContextAttributes(input, field);
 
   return wrapInputWithLabel(
     wrapper,

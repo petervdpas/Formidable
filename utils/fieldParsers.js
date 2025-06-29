@@ -15,8 +15,19 @@ export const parseTextField = async function (input) {
 };
 
 // Boolean
-export const parseBooleanField = async function (input) {
-  return input.checked;
+export const parseBooleanField = async function (wrapper) {
+  if (!wrapper) {
+    EventBus.emit("logging:warning", ["[parseBooleanField] Wrapper is null"]);
+    return false;
+  }
+
+  const input = wrapper.querySelector(`input[type="checkbox"]`);
+  if (!input) {
+    EventBus.emit("logging:warning", ["[parseBooleanField] Checkbox not found"]);
+    return false;
+  }
+
+  return input.checked === true;
 };
 
 // Dropdown
@@ -40,9 +51,43 @@ export const parseRadioField = async function (wrapper) {
 };
 
 // Textarea
-export const parseTextareaField = async function (input) {
-  return input.value.trim();
-};
+export async function parseTextareaField(wrapper, template) {
+  if (!wrapper) {
+    EventBus.emit("logging:warning", [
+      `[parseTextareaField] Wrapper is null or undefined.`,
+    ]);
+    return "";
+  }
+
+  try {
+    const textarea = wrapper.querySelector("textarea");
+    if (!textarea) {
+      EventBus.emit("logging:warning", [
+        `[parseTextareaField] No <textarea> found inside wrapper.`,
+      ]);
+      return "";
+    }
+
+    const key = textarea.name || textarea.dataset.fieldKey || textarea.getAttribute("data-field-key");
+    const instance = window.easyMDEInstances?.[key];
+
+    if (instance && typeof instance.value === "function") {
+      return instance.value().trim();
+    }
+
+    if (typeof textarea.value === "string") {
+      return textarea.value.trim();
+    }
+
+    EventBus.emit("logging:warning", [
+      `[parseTextareaField] Could not resolve value from EasyMDE or textarea for key="${key}".`,
+    ]);
+    return "";
+  } catch (err) {
+    EventBus.emit("logging:error", [`[parseTextareaField] ${err.message}`]);
+    return "";
+  }
+}
 
 // Number
 export const parseNumberField = async function (input) {
@@ -127,8 +172,9 @@ export const parseImageField = async function (inputWrapper, template) {
 };
 
 // Link
-export const parseLinkField = async function (input) {
-  return input.value.trim();
+export const parseLinkField = async function (wrapper) {
+  const input = wrapper.querySelector(`input[type="hidden"][name]`);
+  return input?.value?.trim() || "";
 };
 
 export const parseConstructField = async function (wrapper, template) {

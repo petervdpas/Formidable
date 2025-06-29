@@ -10,6 +10,7 @@ export const fieldTypes = {
     type: "guid",
     label: "Guid",
     cssClass: { main: "modal-guid", construct: false },
+    selectorAttr: "data-guid-field",
     constructEnabled: false,
     disabledAttributes: [
       "primaryKeyRow",
@@ -83,6 +84,7 @@ export const fieldTypes = {
   construct: {
     label: "Construct",
     cssClass: { main: "modal-construct", construct: false },
+    selectorAttr: "data-construct-key",
     constructEnabled: false,
     disabledAttributes: ["default", "twoColumnRow", "sidebarItemRow"],
     defaultValue: () => ({}), // Changed to an object
@@ -93,6 +95,7 @@ export const fieldTypes = {
   text: {
     label: "Text",
     cssClass: { main: "modal-text", construct: "construct-type-text" },
+    selectorAttr: "data-text-field",
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
@@ -103,6 +106,7 @@ export const fieldTypes = {
   boolean: {
     label: "Checkbox",
     cssClass: { main: "modal-boolean", construct: "construct-type-boolean" },
+    selectorAttr: "data-boolean-field",
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => false,
@@ -113,6 +117,7 @@ export const fieldTypes = {
   dropdown: {
     label: "Dropdown",
     cssClass: { main: "modal-dropdown", construct: "construct-type-dropdown" },
+    selectorAttr: "data-dropdown-field",
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
@@ -126,6 +131,7 @@ export const fieldTypes = {
       main: "modal-multioption",
       construct: "construct-type-multioption",
     },
+    selectorAttr: "data-multioption-field",
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => [],
@@ -136,6 +142,7 @@ export const fieldTypes = {
   radio: {
     label: "Radio Buttons",
     cssClass: { main: "modal-radio", construct: "construct-type-radio" },
+    selectorAttr: "data-radio-field",
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
@@ -146,6 +153,7 @@ export const fieldTypes = {
   textarea: {
     label: "Multiline Text",
     cssClass: { main: "modal-textarea", construct: "construct-type-textarea" },
+    selectorAttr: "data-textarea-field",
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
@@ -156,6 +164,7 @@ export const fieldTypes = {
   number: {
     label: "Number",
     cssClass: { main: "modal-number", construct: "construct-type-number" },
+    selectorAttr: "data-number-field",
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => 0,
@@ -166,6 +175,7 @@ export const fieldTypes = {
   range: {
     label: "Range Slider",
     cssClass: { main: "modal-range", construct: "construct-type-range" },
+    selectorAttr: "data-range-field",
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => 50,
@@ -176,6 +186,7 @@ export const fieldTypes = {
   date: {
     label: "Date",
     cssClass: { main: "modal-date", construct: "construct-type-date" },
+    selectorAttr: "data-date-field",
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
@@ -186,6 +197,7 @@ export const fieldTypes = {
   list: {
     label: "List",
     cssClass: { main: "modal-list", construct: "construct-type-list" },
+    selectorAttr: "data-list-field",
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => [],
@@ -196,6 +208,7 @@ export const fieldTypes = {
   table: {
     label: "Table",
     cssClass: { main: "modal-table", construct: "construct-type-table" },
+    selectorAttr: "data-table-field",
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => [],
@@ -206,6 +219,7 @@ export const fieldTypes = {
   image: {
     label: "Image Upload",
     cssClass: { main: "modal-image", construct: "construct-type-image" },
+    selectorAttr: "data-image-field",
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
@@ -216,6 +230,7 @@ export const fieldTypes = {
   link: {
     label: "Link",
     cssClass: { main: "modal-link", construct: "construct-type-link" },
+    selectorAttr: "data-link-field",
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",

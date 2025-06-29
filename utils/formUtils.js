@@ -81,27 +81,6 @@ export function extractFieldDefinition({
   return field;
 }
 
-function resolveFieldElement(container, field) {
-  switch (field.type) {
-    case "guid":
-      return container.querySelector(`[data-guid-field="${field.key}"]`);
-    case "range":
-      return container.querySelector(`[data-range-field="${field.key}"]`);
-    case "radio":
-      return container.querySelector(`[data-radio-group="${field.key}"]`);
-    case "multioption":
-      return container.querySelector(`[data-multioption-field="${field.key}"]`);
-    case "list":
-      return container.querySelector(`[data-list-field="${field.key}"]`);
-    case "table":
-      return container.querySelector(`[data-table-field="${field.key}"]`);
-    case "image":
-      return container.querySelector(`[data-image-field="${field.key}"]`);
-    default:
-      return container.querySelector(`[name="${field.key}"]`);
-  }
-}
-
 export function collectLoopGroup(fields, startIdx, loopKey) {
   const group = [];
   let i = startIdx;
@@ -115,20 +94,63 @@ export function collectLoopGroup(fields, startIdx, loopKey) {
   return { group, stopIdx: i };
 }
 
-async function parseFieldValue(container, field, template) {
-  const def = fieldTypes[field.type];
-  if (!def || typeof def.parseValue !== "function") return undefined;
+function resolveFieldElement(container, field) {
+  const { key, type, loopKey, constructKey } = field;
+  const attr = fieldTypes[type]?.selectorAttr;
 
-  let el;
-
-  if (field.type === "construct") {
-    el = container.querySelector(`[data-construct-key="${field.key}"]`);
-  } else {
-    el = resolveFieldElement(container, field);
+  if (!attr) {
+    // Fallback op standaard contextselector
+    let sel = `[data-field-key="${key}"]`;
+    if (loopKey) sel += `[data-field-loop="${loopKey}"]`;
+    if (constructKey) sel += `[data-field-construct="${constructKey}"]`;
+    return container.querySelector(sel) || null;
   }
 
-  if (!el) return undefined;
-  return await def.parseValue(el, template);
+  // Specifieke selector via attr
+  let sel = `[${attr}="${key}"]`;
+  if (loopKey) sel += `[data-field-loop="${loopKey}"]`;
+  if (constructKey) sel += `[data-field-construct="${constructKey}"]`;
+
+  const el = container.querySelector(sel)
+    || container.querySelector(`[${attr}="${key}"]`)
+    || container.querySelector(`[data-field-key="${key}"]`)
+    || container.querySelector(`[name="${key}"]`);
+
+  if (!el) {
+    EventBus.emit("logging:warning", [
+      `[resolveFieldElement] Element not found for key="${key}", type="${type}"`,
+    ]);
+  }
+
+  return el;
+}
+
+async function parseFieldValue(container, field, template) {
+  const def = fieldTypes[field.type];
+  if (!def || typeof def.parseValue !== "function") {
+    EventBus.emit("logging:warning", [
+      `[parseFieldValue] No parseValue function found for type="${field.type}"`,
+    ]);
+    return undefined;
+  }
+
+  const el = resolveFieldElement(container, field);
+
+  if (!el) {
+    EventBus.emit("logging:warning", [
+      `[parseFieldValue] No DOM element found for key="${field.key}", type="${field.type}".`,
+    ]);
+    return undefined;
+  }
+
+  try {
+    return await def.parseValue(el, template);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[parseFieldValue] Error parsing field "${field.key}": ${err.message}`,
+    ]);
+    return undefined;
+  }
 }
 
 export async function getFormData(container, template) {
