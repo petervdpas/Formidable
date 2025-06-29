@@ -129,3 +129,23 @@ export const parseImageField = async function (inputWrapper, template) {
 export const parseLinkField = async function (input) {
   return input.value.trim();
 };
+
+export const parseConstructField = async function (wrapper, template) {
+  const result = {};
+  const constructKey = wrapper?.dataset?.constructKey;
+  if (!constructKey) return result;
+
+  for (const field of fieldTypes.construct?.subFieldTypes || []) {
+    const typeDef = fieldTypes[field.type];
+    if (!typeDef || typeof typeDef.parseValue !== "function") continue;
+
+    const selector = `[name="${field.key}"], [data-${field.type}-field="${field.key}"]`;
+    const el = wrapper.querySelector(selector);
+    if (!el) continue;
+
+    const value = await typeDef.parseValue(el, template);
+    result[field.key] = value;
+  }
+
+  return result;
+};

@@ -1,8 +1,9 @@
 // modules/fieldTypes.js
 
 import * as parsers from "./fieldParsers.js";
-import { ensureVirtualLocation } from "./vfsUtils.js";
-import { applyDatasetMapping, generateGuid } from "./domUtils.js";
+import * as renderers from "./fieldRenderers.js";
+import { generateGuid } from "./domUtils.js";
+
 
 export const fieldTypes = {
   guid: {
@@ -21,16 +22,7 @@ export const fieldTypes = {
       "sidebarItemRow",
     ],
     defaultValue: () => generateGuid(),
-    renderInput: async function (field, template, value = "") {
-      const guidValue =
-        value?.trim?.() || field.default?.trim?.() || generateGuid();
-      const input = document.createElement("input");
-      input.type = "hidden";
-      input.name = "id";
-      input.value = guidValue;
-      input.dataset.guidField = field.key;
-      return input;
-    },
+    renderInput: renderers.renderGuidField,
     parseValue: parsers.parseGuidField,
   },
 
@@ -66,12 +58,7 @@ export const fieldTypes = {
       "sidebarItemRow",
     ],
     defaultValue: () => "",
-    renderInput: async function (field) {
-      const wrapper = document.createElement("div");
-      wrapper.className = "loop-control-block";
-      wrapper.textContent = `Loop Start → ${field.for || "(not set)"}`;
-      return wrapper;
-    },
+    renderInput: renderers.renderLoopstartField,
     parseValue: () => null, // Not a real input
   },
 
@@ -89,12 +76,7 @@ export const fieldTypes = {
       "sidebarItemRow",
     ],
     defaultValue: () => "",
-    renderInput: async function () {
-      const wrapper = document.createElement("div");
-      wrapper.className = "loop-control-block";
-      wrapper.textContent = "Loop End";
-      return wrapper;
-    },
+    renderInput: renderers.renderLoopstopField,
     parseValue: () => null,
   },
 
@@ -103,13 +85,9 @@ export const fieldTypes = {
     cssClass: { main: "modal-construct", construct: false },
     constructEnabled: false,
     disabledAttributes: ["default", "twoColumnRow", "sidebarItemRow"],
-    defaultValue: () => [],
-    renderInput: async function (field) {
-      const wrapper = document.createElement("div");
-      wrapper.textContent = "Construct field — contains subfields.";
-      return wrapper;
-    },
-    parseValue: () => null,
+    defaultValue: () => ({}), // Changed to an object
+    renderInput: renderers.renderConstructField,
+    parseValue: parsers.parseConstructField,
   },
 
   text: {
@@ -118,13 +96,7 @@ export const fieldTypes = {
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
-    renderInput: async function (field) {
-      const input = document.createElement("input");
-      input.type = "text";
-      input.value = field.default || "";
-      input.name = field.key;
-      return input;
-    },
+    renderInput: renderers.renderTextField,
     parseValue: parsers.parseTextField,
   },
 
@@ -134,13 +106,7 @@ export const fieldTypes = {
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => false,
-    renderInput: async function (field) {
-      const input = document.createElement("input");
-      input.type = "checkbox";
-      input.checked = field.default === true;
-      input.name = field.key;
-      return input;
-    },
+    renderInput: renderers.renderBooleanField,
     parseValue: parsers.parseBooleanField,
   },
 
@@ -150,18 +116,7 @@ export const fieldTypes = {
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
-    renderInput: async function (field) {
-      const select = document.createElement("select");
-      (field.options || []).forEach((opt) => {
-        const option = document.createElement("option");
-        option.value = opt;
-        option.textContent = opt;
-        select.appendChild(option);
-      });
-      select.value = field.default || "";
-      select.name = field.key;
-      return select;
-    },
+    renderInput:  renderers.renderDropdownField,
     parseValue: parsers.parseDropdownField,
   },
 
@@ -174,25 +129,7 @@ export const fieldTypes = {
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => [],
-    renderInput: async function (field) {
-      const wrapper = document.createElement("div");
-      (field.options || []).forEach((opt) => {
-        const label = document.createElement("label");
-        label.style.display = "block";
-
-        const input = document.createElement("input");
-        input.type = "checkbox";
-        input.name = field.key;
-        input.value = opt;
-        if ((field.default || []).includes(opt)) input.checked = true;
-
-        label.appendChild(input);
-        label.appendChild(document.createTextNode(` ${opt}`));
-        wrapper.appendChild(label);
-      });
-      wrapper.dataset.multioptionField = field.key;
-      return wrapper;
-    },
+    renderInput: renderers.renderMultioptionField,
     parseValue: parsers.parseMultiOptionField,
   },
 
@@ -202,37 +139,7 @@ export const fieldTypes = {
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
-    renderInput: async function (field) {
-      const wrapper = document.createElement("div");
-
-      (field.options || []).forEach((opt) => {
-        const { value, label } =
-          typeof opt === "string"
-            ? { value: opt, label: opt }
-            : {
-                value: opt.value,
-                label: opt.label ?? opt.value,
-              };
-
-        const labelEl = document.createElement("label");
-        labelEl.style.display = "block";
-
-        const input = document.createElement("input");
-        input.type = "radio";
-        input.name = field.key;
-        input.value = value;
-        if (value === field.default) {
-          input.checked = true;
-        }
-
-        labelEl.appendChild(input);
-        labelEl.appendChild(document.createTextNode(` ${label}`));
-        wrapper.appendChild(labelEl);
-      });
-
-      wrapper.dataset.radioGroup = field.key;
-      return wrapper;
-    },
+    renderInput: renderers.renderRadioField,
     parseValue: parsers.parseRadioField,
   },
 
@@ -242,12 +149,7 @@ export const fieldTypes = {
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
-    renderInput: async function (field) {
-      const textarea = document.createElement("textarea");
-      textarea.value = field.default || "";
-      textarea.name = field.key;
-      return textarea;
-    },
+    renderInput: renderers.renderTextareaField,
     parseValue: parsers.parseTextareaField,
   },
 
@@ -257,13 +159,7 @@ export const fieldTypes = {
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => 0,
-    renderInput: async function (field) {
-      const input = document.createElement("input");
-      input.type = "number";
-      input.value = field.default ?? 0;
-      input.name = field.key;
-      return input;
-    },
+    renderInput: renderers.renderNumberField,
     parseValue: parsers.parseNumberField,
   },
 
@@ -273,47 +169,7 @@ export const fieldTypes = {
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => 50,
-
-    renderInput: async function (field) {
-      const wrapper = document.createElement("div");
-      wrapper.dataset.rangeField = field.key;
-
-      const optMap = Object.fromEntries(
-        (field.options || []).map((pair) =>
-          Array.isArray(pair)
-            ? [pair[0], pair[1]]
-            : [pair.value ?? pair, pair.label ?? pair]
-        )
-      );
-
-      const min = parseFloat(optMap.min ?? field.min ?? 0);
-      const max = parseFloat(optMap.max ?? field.max ?? 100);
-      const step = parseFloat(optMap.step ?? field.step ?? 1);
-      const value = field.default ?? (min + max) / 2;
-
-      const input = document.createElement("input");
-      input.type = "range";
-      input.name = field.key;
-      input.min = min;
-      input.max = max;
-      input.step = step;
-      input.value = value;
-
-      const display = document.createElement("span");
-      display.className = "range-display";
-      display.textContent = input.value;
-      display.style.marginLeft = "10px";
-
-      input.addEventListener("input", () => {
-        display.textContent = input.value;
-      });
-
-      wrapper.appendChild(input);
-      wrapper.appendChild(display);
-
-      return wrapper;
-    },
-
+    renderInput: renderers.renderRangeField,
     parseValue: parsers.parseRangeField,
   },
 
@@ -323,13 +179,7 @@ export const fieldTypes = {
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
-    renderInput: async function (field) {
-      const input = document.createElement("input");
-      input.type = "date";
-      input.value = field.default || "";
-      input.name = field.key;
-      return input;
-    },
+    renderInput: renderers.renderDateField,
     parseValue: parsers.parseDateField,
   },
 
@@ -339,14 +189,7 @@ export const fieldTypes = {
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => [],
-    renderInput: async function (field) {
-      const input = document.createElement("input");
-      input.type = "text";
-      input.value = (field.default || []).join(", ");
-      input.name = field.key;
-      input.placeholder = "e.g., item1, item2, item3";
-      return input;
-    },
+    renderInput: renderers.renderListField,
     parseValue: parsers.parseListField,
   },
 
@@ -356,17 +199,7 @@ export const fieldTypes = {
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => [],
-    renderInput: async function (field) {
-      const textarea = document.createElement("textarea");
-      textarea.name = field.key;
-      textarea.rows = 5;
-      try {
-        textarea.value = JSON.stringify(field.default || [], null, 2);
-      } catch {
-        textarea.value = "[]";
-      }
-      return textarea;
-    },
+    renderInput: renderers.renderTableField,
     parseValue: parsers.parseTableField,
   },
 
@@ -376,62 +209,7 @@ export const fieldTypes = {
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
-    renderInput: async function (field, template) {
-      template = await ensureVirtualLocation(template);
-
-      const wrapper = document.createElement("div");
-
-      applyDatasetMapping(
-        wrapper,
-        [field, template],
-        [
-          { from: "key", to: "imageField" },
-          { from: "virtualLocation", to: "virtualLocation" },
-        ]
-      );
-
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = "image/png, image/jpeg";
-      input.name = field.key;
-
-      const preview = document.createElement("img");
-      preview.style.maxWidth = "200px";
-      preview.style.maxHeight = "150px";
-      preview.style.display = "block";
-      preview.style.marginTop = "6px";
-
-      // Show preview if default filename is known
-      if (typeof field.default === "string" && field.default) {
-        const filename = field.default;
-        if (template?.virtualLocation) {
-          window.api.system
-            .resolvePath(template.virtualLocation, "images", filename)
-            .then((fullPath) => {
-              preview.src = `file://${fullPath}`;
-            })
-            .catch(() => {
-              preview.alt = "Image not found";
-            });
-        }
-      }
-
-      input.addEventListener("change", () => {
-        const file = input.files?.[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            preview.src = e.target.result;
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-
-      wrapper.appendChild(input);
-      wrapper.appendChild(preview);
-
-      return wrapper;
-    },
+    renderInput: renderers.renderImageField,
     parseValue: parsers.parseImageField,
   },
 
@@ -441,17 +219,7 @@ export const fieldTypes = {
     constructEnabled: true,
     disabledAttributes: ["constructFieldsRow"],
     defaultValue: () => "",
-
-    renderInput: async function (field) {
-      const input = document.createElement("input");
-      input.type = "text";
-      input.name = field.key;
-      input.value = field.default || "";
-      input.placeholder = "Enter link or URL";
-
-      return input;
-    },
-
+    renderInput: renderers.renderLinkField,
     parseValue: parsers.parseLinkField,
   },
 };

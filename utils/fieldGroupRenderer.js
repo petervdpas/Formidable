@@ -1,17 +1,36 @@
 // utils/fieldGroupRenderer.js
 
 import { addContainerElement } from "./elementBuilders.js";
-import {
-  renderFieldElement,
-  collectLoopGroup,
-  createLoopDefaults,
-} from "./formUtils.js";
+import { collectLoopGroup, createLoopDefaults } from "./formUtils.js";
 import {
   createAddLoopItemButton,
   createDeleteLoopItemButton,
 } from "../modules/uiButtons.js";
 import { showConfirmModal } from "../modules/modalSetup.js";
 import { fieldTypes } from "./fieldTypes.js";
+
+async function renderFieldElement(
+  field,
+  value = "",
+  template = null,
+  options = {}
+) {
+  const type = field.type;
+  const typeDef = fieldTypes[type];
+
+  if (!typeDef || typeof typeDef.renderInput !== "function") {
+    EventBus.emit("logging:default", [
+      `[renderFieldElement] No renderInput defined for field type: ${type}`,
+    ]);
+    return null;
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(field, "default")) {
+    field.default = typeDef.defaultValue();
+  }
+
+  return await typeDef.renderInput(field, value, template, options);
+}
 
 export async function fieldGroupRenderer(
   container,

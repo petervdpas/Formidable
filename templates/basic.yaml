@@ -305,11 +305,12 @@ fields:
   - key: construct-test
     label: Construct
     type: construct
+    description: Description for Construct
     fields:
       - key: subDrop
         type: dropdown
         label: SubDrop
-        description: ''
+        description: Description for subdrop
         options:
           - value: One
             label: One
@@ -327,12 +328,7 @@ fields:
       - key: subtext
         type: text
         label: SubTest
-        description: ''
-        sidebar_item: false
-        two_column: false
-        default: ''
-        options: []
-        fields: []
+        description: Description for subtest
       - key: subloop
         type: loopstop
         label: Subloop

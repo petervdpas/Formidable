@@ -208,6 +208,9 @@
 
   --construct-editor-transparent: rgba(59, 59, 59, 0.2);
   
+  --construct-border-color: #ccc;
+  --construct-bg-secondary: #f9f9f9;
+
   /* ───── Popup Panel ───── */
   --popup-bg: #fff;
   --popup-fg: #000;

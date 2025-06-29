@@ -2,8 +2,6 @@
 
 import { EventBus } from "../modules/eventBus.js";
 import { fieldTypes } from "./fieldTypes.js";
-import { capitalize } from "./stringUtils.js";
-import * as renderers from "./fieldRenderers.js";
 
 export function extractFieldDefinition({
   keyId = "edit-key",
@@ -306,23 +304,4 @@ export function stripMarkdownExtension(filename = "") {
 export function validateFilenameInput(inputEl) {
   const name = inputEl?.value.trim();
   return name || null;
-}
-
-export async function renderFieldElement(field, value = "", template = null, options = {}) {
-  const type = field.type;
-  const fn = renderers[`render${capitalize(type)}Field`];
-  const typeDef = fieldTypes[type];
-
-  if (!fn || !typeDef) {
-    EventBus.emit("logging:default", [
-      `[renderFieldElement] No renderer found for type: ${type}`,
-    ]);
-    return null;
-  }
-
-  if (!Object.prototype.hasOwnProperty.call(field, "default")) {
-    field.default = typeDef.defaultValue();
-  }
-
-  return await fn(field, value, template, options);
 }

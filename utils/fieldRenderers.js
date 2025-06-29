@@ -1,6 +1,7 @@
 // utils/fieldRenderers.js
 
 import { ensureVirtualLocation } from "./vfsUtils.js";
+import { fieldGroupRenderer } from "./fieldGroupRenderer.js";
 import {
   wrapInputWithLabel,
   buildSwitchElement,
@@ -92,6 +93,45 @@ export async function renderLoopstopField(field, value = "") {
     field.description,
     field.two_column
   );
+}
+
+// ─────────────────────────────────────────────
+// Type: construct
+export async function renderConstructField(field, value = {}, template, options = {}) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "construct-wrapper full-width";
+  wrapper.dataset.constructKey = field.key;
+
+  // Label + description block (beter dan los divje)
+  const header = document.createElement("div");
+  header.className = "construct-header";
+
+  if (field.label) {
+    const title = document.createElement("div");
+    title.className = "construct-title";
+    title.textContent = field.label;
+    header.appendChild(title);
+  }
+
+  if (field.description) {
+    const desc = document.createElement("div");
+    desc.className = "construct-description";
+    desc.textContent = field.description;
+    header.appendChild(desc);
+  }
+
+  wrapper.appendChild(header);
+
+  const innerContainer = document.createElement("div");
+  innerContainer.className = "construct-fields";
+  wrapper.appendChild(innerContainer);
+
+  const subFields = field.fields || [];
+  const subData = value || {};
+
+  await fieldGroupRenderer(innerContainer, subFields, subData, template, options);
+
+  return wrapper;
 }
 
 // ─────────────────────────────────────────────
@@ -257,7 +297,7 @@ export async function renderTextareaField(field, value = "") {
 
   requestAnimationFrame(() => {
     let keystrokeCount = 0;
-    let editorInstance = null;  // 🟢 declare outside
+    let editorInstance = null; // 🟢 declare outside
 
     editorInstance = new EasyMDE({
       element: textarea,
