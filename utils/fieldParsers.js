@@ -206,7 +206,12 @@ export const parseConstructField = async function (wrapper, template) {
           const def = fieldTypes[f.type];
           if (!def || typeof def.parseValue !== "function") continue;
 
-          const el = resolveScopedElement(item, f);
+          const el = resolveScopedElement(item, {
+            ...f,
+            loopKey,
+            constructKey,
+          });
+
           if (!el) continue;
 
           entry[f.key] = await def.parseValue(el, template);
@@ -219,7 +224,11 @@ export const parseConstructField = async function (wrapper, template) {
       const def = fieldTypes[field.type];
       if (!def || typeof def.parseValue !== "function") continue;
 
-      const el = resolveScopedElement(wrapper, field);
+      const el = resolveScopedElement(wrapper, {
+        ...field,
+        constructKey,
+      });
+
       if (!el) continue;
 
       result[field.key] = await def.parseValue(el, template);
