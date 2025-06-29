@@ -38,14 +38,6 @@ export async function saveForm(container, template) {
     created = existing?.meta?.created || null;
   } catch {}
 
-  if (window.easyMDEInstances) {
-    Object.values(window.easyMDEInstances).forEach((mde) => {
-      if (typeof mde?.codemirror?.save === "function") {
-        mde.codemirror.save();
-      }
-    });
-  }
-
   const { data, meta } = await getFormData(container, template);
 
   const userConfig = await new Promise((resolve) => {

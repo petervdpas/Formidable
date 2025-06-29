@@ -324,13 +324,18 @@ export async function renderTextareaField(field, value = "") {
     attributes: { name: field.key },
   });
 
+  // Use textContent to avoid HTML parsing issues
+  // This is very important for security and consistency
+  textarea.textContent = v;
+
+  applyFieldContextAttributes(textarea, field);
+
   requestAnimationFrame(() => {
     let keystrokeCount = 0;
     let editorInstance = null;
 
     editorInstance = new EasyMDE({
       element: textarea,
-      initialValue: v,
       minHeight: "80px",
       theme: getCurrentTheme() === "dark" ? "monokai" : "eclipse",
       toolbar: [
@@ -381,8 +386,6 @@ export async function renderTextareaField(field, value = "") {
       editorInstance.updateStatusBar();
     });
   });
-
-  applyFieldContextAttributes(wrapper, field);
 
   return wrapInputWithLabel(
     wrapper,

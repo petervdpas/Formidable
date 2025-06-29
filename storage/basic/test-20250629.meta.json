@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-29T09:32:36.440Z",
-    "updated": "2025-06-29T14:12:18.940Z",
+    "updated": "2025-06-29T23:04:59.817Z",
     "flagged": false
   },
   "data": {
@@ -18,7 +18,7 @@
       "C"
     ],
     "radio": "BIRD",
-    "mline": "A whole lot of prefab text...",
+    "mline": "Okay, and 2 bit?? A small change to test stuff! Test can be done by hand... like in the old days.... but people think that isn't that good!",
     "numpy": 17,
     "rangie": 85,
     "bday": "1968-12-23",
