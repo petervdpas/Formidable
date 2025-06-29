@@ -92,6 +92,15 @@ export function highlightAndClickForm(entry, delay = 100) {
   }, delay);
 }
 
+export function resolveScopedElement(container, field) {
+  if (field.type === "construct") {
+    return container.querySelector(`[data-construct-key="${field.key}"]`);
+  }
+
+  const attr = `[name="${field.key}"], [data-${field.type}-field="${field.key}"]`;
+  return container.querySelector(attr);
+}
+
 export function applyDatasetMapping(el, sources, mappings = []) {
   if (!el || typeof el.dataset === "undefined") return;
   if (!Array.isArray(sources)) sources = [sources];

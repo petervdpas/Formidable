@@ -118,7 +118,6 @@ export function collectLoopGroup(fields, startIdx, loopKey) {
 export async function getFormData(container, template) {
   const data = {};
   const meta = {};
-
   const fields = template.fields || [];
 
   let i = 0;
@@ -141,18 +140,42 @@ export async function getFormData(container, template) {
           const def = fieldTypes[f.type];
           if (!def || typeof def.parseValue !== "function") continue;
 
-          const el = resolveFieldElement(item, f);
-          if (!el) continue;
+          let el;
 
-          entry[f.key] = await def.parseValue(el, template);
+          if (f.type === "construct") {
+            el = item.querySelector(`[data-construct-key="${f.key}"]`);
+            if (!el) continue;
+            entry[f.key] = await def.parseValue(el, template);
+          } else {
+            el = resolveFieldElement(item, f);
+            if (!el) continue;
+            entry[f.key] = await def.parseValue(el, template);
+          }
         }
         loopValues.push(entry);
       }
 
       data[loopKey] = loopValues;
-    } else {
-      const typeDef = fieldTypes[field.type];
-      if (!typeDef || typeof typeDef.parseValue !== "function") {
+    }
+
+    else if (field.type === "construct") {
+      const el = container.querySelector(`[data-construct-key="${field.key}"]`);
+      if (!el) {
+        EventBus.emit("logging:warning", [
+          `[getFormData] Missing construct wrapper for: ${field.key}`,
+        ]);
+        i++;
+        continue;
+      }
+
+      const def = fieldTypes[field.type];
+      data[field.key] = await def.parseValue(el, template);
+      i++;
+    }
+
+    else {
+      const def = fieldTypes[field.type];
+      if (!def || typeof def.parseValue !== "function") {
         EventBus.emit("logging:warning", [
           `[getFormData] No parser for field type: ${field.type}`,
         ]);
@@ -169,7 +192,7 @@ export async function getFormData(container, template) {
         continue;
       }
 
-      data[field.key] = await typeDef.parseValue(el, template);
+      data[field.key] = await def.parseValue(el, template);
       i++;
     }
   }

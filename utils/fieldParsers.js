@@ -1,8 +1,9 @@
 // utils/fieldParsers.js
 
 import { ensureVirtualLocation } from "./vfsUtils.js";
-import { generateGuid } from "./domUtils.js";
-
+import { fieldTypes } from "./fieldTypes.js";
+import { generateGuid, resolveScopedElement } from "./domUtils.js";
+import { collectLoopGroup } from "./formUtils.js";
 // GUID
 export const parseGuidField = async function (input) {
   return input?.value?.trim() || generateGuid();
@@ -135,16 +136,48 @@ export const parseConstructField = async function (wrapper, template) {
   const constructKey = wrapper?.dataset?.constructKey;
   if (!constructKey) return result;
 
-  for (const field of fieldTypes.construct?.subFieldTypes || []) {
-    const typeDef = fieldTypes[field.type];
-    if (!typeDef || typeof typeDef.parseValue !== "function") continue;
+  const fieldDef = (template.fields || []).find((f) => f.key === constructKey);
+  if (!fieldDef || !Array.isArray(fieldDef.fields)) return result;
 
-    const selector = `[name="${field.key}"], [data-${field.type}-field="${field.key}"]`;
-    const el = wrapper.querySelector(selector);
-    if (!el) continue;
+  const subFields = fieldDef.fields;
 
-    const value = await typeDef.parseValue(el, template);
-    result[field.key] = value;
+  for (let i = 0; i < subFields.length; i++) {
+    const field = subFields[i];
+
+    if (field.type === "loopstart") {
+      const loopKey = field.key;
+      const { group, stopIdx } = collectLoopGroup(subFields, i + 1, loopKey);
+      i = stopIdx;
+
+      const loopItems = wrapper.querySelectorAll(
+        `.loop-container[data-loop-key="${loopKey}"] .loop-item`
+      );
+
+      const loopValues = [];
+      for (const item of loopItems) {
+        const entry = {};
+        for (const f of group) {
+          const def = fieldTypes[f.type];
+          if (!def || typeof def.parseValue !== "function") continue;
+
+          const el = resolveScopedElement(item, f);
+          if (!el) continue;
+
+          entry[f.key] = await def.parseValue(el, template);
+        }
+        loopValues.push(entry);
+      }
+
+      result[loopKey] = loopValues;
+    } else {
+      const def = fieldTypes[field.type];
+      if (!def || typeof def.parseValue !== "function") continue;
+
+      const el = resolveScopedElement(wrapper, field);
+      if (!el) continue;
+
+      result[field.key] = await def.parseValue(el, template);
+    }
   }
 
   return result;
