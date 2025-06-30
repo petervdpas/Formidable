@@ -275,21 +275,3 @@
     border-left: 6px solid var(--field-type-guid-border);
     color: var(--field-type-guid-text);
 }
-
-/* Construct */
-.field-list-item[data-type="construct"] {
-    background-color: var(--field-type-construct-bg);
-    border-left: 4px solid var(--field-type-construct-border);
-    color: var(--field-type-construct-text);
-}
-
-.field-type.type-construct {
-    background-color: var(--field-type-construct-badge);
-    color: var(--field-type-construct-text);
-}
-
-#field-edit-modal.modal-construct {
-    background-color: var(--field-type-construct-modal);
-    border-left: 6px solid var(--field-type-construct-border);
-    color: var(--field-type-construct-text);
-}

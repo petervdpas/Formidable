@@ -5,12 +5,12 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-29T09:32:36.440Z",
-    "updated": "2025-06-29T23:04:59.817Z",
+    "updated": "2025-06-29T23:39:45.257Z",
     "flagged": false
   },
   "data": {
     "id": "c0b845d5-281b-464e-a099-98bdc182946f",
-    "test": "Testing Constructs",
+    "test": "Testing Stuff",
     "check": false,
     "dropdown": "R",
     "multichoice": [
@@ -38,17 +38,6 @@
       ]
     ],
     "design": "GreenSignWhiteArrowPersonRunning.png",
-    "linktest": "formidable://basic.yaml:sane-20250530.meta.json",
-    "construct-test": {
-      "subDrop": "Two",
-      "subloop": [
-        {
-          "subtext": "Red"
-        },
-        {
-          "subtext": "Green"
-        }
-      ]
-    }
+    "linktest": "formidable://basic.yaml:sane-20250530.meta.json"
   }
 }

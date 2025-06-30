@@ -95,21 +95,19 @@ export function collectLoopGroup(fields, startIdx, loopKey) {
 }
 
 function resolveFieldElement(container, field) {
-  const { key, type, loopKey, constructKey } = field;
+  const { key, type, loopKey } = field;
   const attr = fieldTypes[type]?.selectorAttr;
 
   if (!attr) {
-    // Fallback op standaard contextselector
+    // Fallback to default selector
     let sel = `[data-field-key="${key}"]`;
     if (loopKey) sel += `[data-field-loop="${loopKey}"]`;
-    if (constructKey) sel += `[data-field-construct="${constructKey}"]`;
     return container.querySelector(sel) || null;
   }
 
-  // Specifieke selector via attr
+  // Use specific selector attribute
   let sel = `[${attr}="${key}"]`;
   if (loopKey) sel += `[data-field-loop="${loopKey}"]`;
-  if (constructKey) sel += `[data-field-construct="${constructKey}"]`;
 
   const el =
     container.querySelector(sel) ||
@@ -123,7 +121,7 @@ function resolveFieldElement(container, field) {
     ]);
   }
 
-  // fallback for EasyMDE-wrappers
+  // Fallback for EasyMDE
   if (
     el?.classList?.contains("EasyMDEContainer") ||
     el?.querySelector?.(".editor-toolbar")
@@ -148,7 +146,6 @@ async function parseFieldValue(container, field, template) {
     key: field.key,
     type: field.type,
     loopKey: field.loopKey,
-    constructKey: field.constructKey,
   });
 
   if (!el) {
@@ -311,24 +308,6 @@ export function applyFieldAttributeDisabling(dom, fieldTypeKey) {
     }
   });
 }
-
-export function applyConstructAttributeDisabling(popupEl, typeKey) {
-  const typeDef = fieldTypes[typeKey];
-  const disabled = new Set(typeDef?.disabledAttributes || []);
-
-  const domMap = {
-    options: popupEl.querySelector("#popup-options-row"),
-    description: popupEl
-      .querySelector("#popup-description")
-      ?.closest(".popup-form-row"),
-  };
-
-  for (const [key, row] of Object.entries(domMap)) {
-    if (!row) continue;
-    row.style.display = disabled.has(key) ? "none" : "";
-  }
-}
-
 export function clearContainerUI(
   container,
   label = "Select or create a form-file to begin."

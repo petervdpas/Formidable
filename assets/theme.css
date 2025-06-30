@@ -200,17 +200,6 @@
   --field-type-guid-badge: #888c95;
   --field-type-guid-text: #fff;
 
-  --field-type-construct-bg: #f9e06e;
-  --field-type-construct-border: #d6b000;
-  --field-type-construct-modal: #f9e06e;
-  --field-type-construct-badge: #e4ba00;
-  --field-type-construct-text: #222;
-
-  --construct-editor-transparent: rgba(59, 59, 59, 0.2);
-  
-  --construct-border-color: #ccc;
-  --construct-bg-secondary: #f9f9f9;
-
   /* ───── Popup Panel ───── */
   --popup-bg: #fff;
   --popup-fg: #000;

@@ -302,39 +302,3 @@ fields:
     label: Linktest
     type: link
     description: A link test
-  - key: construct-test
-    label: Construct
-    type: construct
-    description: Description for Construct
-    fields:
-      - key: subDrop
-        type: dropdown
-        label: SubDrop
-        description: Description for subdrop
-        options:
-          - value: One
-            label: One
-          - value: Two
-            label: Two
-      - key: subloop
-        type: loopstart
-        label: Subloop
-        description: ''
-        sidebar_item: false
-        two_column: false
-        default: ''
-        options: []
-        fields: []
-      - key: subtext
-        type: text
-        label: SubTest
-        description: Description for subtest
-      - key: subloop
-        type: loopstop
-        label: Subloop
-        description: ''
-        sidebar_item: false
-        two_column: false
-        default: ''
-        options: []
-        fields: []

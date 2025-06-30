@@ -4,7 +4,7 @@
     "author_email": "regular@example.com",
     "template": "loopie.yaml",
     "created": "2025-06-04T13:30:38.187Z",
-    "updated": "2025-06-29T22:56:55.376Z",
+    "updated": "2025-06-30T11:33:09.842Z",
     "flagged": false
   },
   "data": {
@@ -12,42 +12,15 @@
     "looper": [
       {
         "sub_title": "Once upon a time...",
-        "description": "**Once upon a time** there was a ~~little~~ princess... It was a tiny princess! You could hardly see her.\n\n1.  One\n2.  Two\n3.  Three\n\n-----",
-        "inside-construct": {
-          "subloop": [
-            {
-              "subTest": "One"
-            }
-          ]
-        }
+        "description": "**Once upon a time** there was a ~~little~~ princess... It was a tiny princess! You could hardly see her.\n\n1.  One\n2.  Two\n3.  Three\n\n-----"
       },
       {
         "sub_title": "A splut sound is never good news",
-        "description": "You guessed it... ~~The princess was no more!~~ That does it!",
-        "inside-construct": {
-          "subloop": [
-            {
-              "subTest": "Two"
-            }
-          ]
-        }
+        "description": "You guessed it... ~~The princess was no more!~~ That does it!"
       },
       {
         "sub_title": "A splut sound is never good news",
-        "description": "You guessed it... ~~The princess was no more!~~ That does it!",
-        "inside-construct": {
-          "subloop": [
-            {
-              "subTest": "One"
-            },
-            {
-              "subTest": "Two"
-            },
-            {
-              "subTest": "Three"
-            }
-          ]
-        }
+        "description": "You guessed it... ~~The princess was no more!~~ That does it!"
       }
     ]
   }

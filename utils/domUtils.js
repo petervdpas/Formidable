@@ -93,15 +93,11 @@ export function highlightAndClickForm(entry, delay = 100) {
 }
 
 export function resolveScopedElement(container, field) {
-  if (field.type === "construct") {
-    return container.querySelector(`[data-construct-key="${field.key}"]`);
-  }
-
   const attr = `[name="${field.key}"], [data-${field.type}-field="${field.key}"]`;
   return container.querySelector(attr);
 }
 
-export function applyFieldContextAttributes(el, { key, type, loopKey = null, constructKey = null }) {
+export function applyFieldContextAttributes(el, { key, type, loopKey = null }) {
   if (!el || !key || !type) return;
 
   el.dataset.fieldKey = key;
@@ -109,10 +105,6 @@ export function applyFieldContextAttributes(el, { key, type, loopKey = null, con
 
   if (loopKey) {
     el.dataset.fieldLoop = loopKey;
-  }
-
-  if (constructKey) {
-    el.dataset.fieldConstruct = constructKey;
   }
 }
 
@@ -186,40 +178,6 @@ export function applyModalTypeClass(modal, typeKey, fieldTypes, mode = "main") {
   } else {
     EventBus.emit("logging:warning", [
       `[applyModalTypeClass] No valid cssClass found for type "${typeKey}", mode "${mode}"`,
-    ]);
-  }
-}
-
-export function applyPopupTypeClass(popupEl, typeKey, fieldTypes) {
-  if (!popupEl || !typeKey || !fieldTypes) return;
-
-  // Verwijder bestaande construct-type-* klassen
-  popupEl.classList.forEach((cls) => {
-    if (cls.startsWith("construct-type-")) {
-      popupEl.classList.remove(cls);
-    }
-  });
-
-  const typeDef = fieldTypes[typeKey];
-  if (!typeDef) {
-    EventBus.emit("logging:warning", [
-      `[applyPopupTypeClass] Unknown type "${typeKey}"`,
-    ]);
-    return;
-  }
-
-  let cssClass = typeDef.cssClass;
-
-  if (typeof cssClass === "object") {
-    cssClass = cssClass.construct ?? null;
-  }
-
-  if (typeof cssClass === "string" && cssClass.trim() !== "") {
-    popupEl.classList.add(cssClass);
-  } else {
-    // geen class = niks toevoegen (bijv. guid of construct)
-    EventBus.emit("logging:default", [
-      `[applyPopupTypeClass] No construct class applied for type "${typeKey}"`,
     ]);
   }
 }

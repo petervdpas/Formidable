@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-06-29T22:38:01.290Z",
+    "updated": "2025-06-30T11:32:48.364Z",
     "flagged": true
   },
   "data": {
@@ -39,17 +39,6 @@
       ]
     ],
     "design": "formidable.png",
-    "linktest": "formidable://basic.yaml:test-20250629.meta.json",
-    "construct-test": {
-      "subDrop": "Two",
-      "subloop": [
-        {
-          "subtext": "Alpha"
-        },
-        {
-          "subtext": "Beta"
-        }
-      ]
-    }
+    "linktest": "formidable://basic.yaml:test-20250629.meta.json"
   }
 }

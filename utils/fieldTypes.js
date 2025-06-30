@@ -4,21 +4,18 @@ import * as parsers from "./fieldParsers.js";
 import * as renderers from "./fieldRenderers.js";
 import { generateGuid } from "./domUtils.js";
 
-
 export const fieldTypes = {
   guid: {
     type: "guid",
     label: "Guid",
-    cssClass: { main: "modal-guid", construct: false },
+    cssClass: { main: "modal-guid" },
     selectorAttr: "data-guid-field",
-    constructEnabled: false,
     disabledAttributes: [
       "primaryKeyRow",
       "label",
       "description",
       "default",
       "options",
-      "constructFieldsRow",
       "twoColumnRow",
       "sidebarItemRow",
     ],
@@ -30,13 +27,11 @@ export const fieldTypes = {
   looper: {
     label: "Looper",
     metaOnly: true,
-    cssClass: { main: "modal-looper", construct: "construct-type-looper" },
-    constructEnabled: true,
+    cssClass: { main: "modal-looper" },
     disabledAttributes: [
       "description",
       "default",
       "options",
-      "constructFieldsRow",
       "twoColumnRow",
       "sidebarItemRow",
     ],
@@ -47,14 +42,11 @@ export const fieldTypes = {
     metaOnly: true,
     cssClass: {
       main: "modal-loopstart",
-      construct: "construct-type-loopstart",
     },
-    constructEnabled: true,
     disabledAttributes: [
       "description",
       "default",
       "options",
-      "constructFieldsRow",
       "twoColumnRow",
       "sidebarItemRow",
     ],
@@ -66,13 +58,11 @@ export const fieldTypes = {
   loopstop: {
     label: "Loop Stop",
     metaOnly: true,
-    cssClass: { main: "modal-loopstop", construct: "construct-type-loopstop" },
-    constructEnabled: true,
+    cssClass: { main: "modal-loopstop" },
     disabledAttributes: [
       "description",
       "default",
       "options",
-      "constructFieldsRow",
       "twoColumnRow",
       "sidebarItemRow",
     ],
@@ -81,23 +71,11 @@ export const fieldTypes = {
     parseValue: () => null,
   },
 
-  construct: {
-    label: "Construct",
-    cssClass: { main: "modal-construct", construct: false },
-    selectorAttr: "data-construct-key",
-    constructEnabled: false,
-    disabledAttributes: ["default", "twoColumnRow", "sidebarItemRow"],
-    defaultValue: () => ({}), // Changed to an object
-    renderInput: renderers.renderConstructField,
-    parseValue: parsers.parseConstructField,
-  },
-
   text: {
     label: "Text",
-    cssClass: { main: "modal-text", construct: "construct-type-text" },
+    cssClass: { main: "modal-text" },
     selectorAttr: "data-text-field",
-    constructEnabled: true,
-    disabledAttributes: ["constructFieldsRow"],
+    disabledAttributes: [],
     defaultValue: () => "",
     renderInput: renderers.renderTextField,
     parseValue: parsers.parseTextField,
@@ -105,10 +83,9 @@ export const fieldTypes = {
 
   boolean: {
     label: "Checkbox",
-    cssClass: { main: "modal-boolean", construct: "construct-type-boolean" },
+    cssClass: { main: "modal-boolean" },
     selectorAttr: "data-boolean-field",
-    constructEnabled: true,
-    disabledAttributes: ["constructFieldsRow"],
+    disabledAttributes: [],
     defaultValue: () => false,
     renderInput: renderers.renderBooleanField,
     parseValue: parsers.parseBooleanField,
@@ -116,24 +93,19 @@ export const fieldTypes = {
 
   dropdown: {
     label: "Dropdown",
-    cssClass: { main: "modal-dropdown", construct: "construct-type-dropdown" },
+    cssClass: { main: "modal-dropdown" },
     selectorAttr: "data-dropdown-field",
-    constructEnabled: true,
-    disabledAttributes: ["constructFieldsRow"],
+    disabledAttributes: [],
     defaultValue: () => "",
-    renderInput:  renderers.renderDropdownField,
+    renderInput: renderers.renderDropdownField,
     parseValue: parsers.parseDropdownField,
   },
 
   multioption: {
     label: "Multiple Choice",
-    cssClass: {
-      main: "modal-multioption",
-      construct: "construct-type-multioption",
-    },
+    cssClass: { main: "modal-multioption" },
     selectorAttr: "data-multioption-field",
-    constructEnabled: true,
-    disabledAttributes: ["constructFieldsRow"],
+    disabledAttributes: [],
     defaultValue: () => [],
     renderInput: renderers.renderMultioptionField,
     parseValue: parsers.parseMultiOptionField,
@@ -141,10 +113,9 @@ export const fieldTypes = {
 
   radio: {
     label: "Radio Buttons",
-    cssClass: { main: "modal-radio", construct: "construct-type-radio" },
+    cssClass: { main: "modal-radio" },
     selectorAttr: "data-radio-field",
-    constructEnabled: true,
-    disabledAttributes: ["constructFieldsRow"],
+    disabledAttributes: [],
     defaultValue: () => "",
     renderInput: renderers.renderRadioField,
     parseValue: parsers.parseRadioField,
@@ -152,10 +123,9 @@ export const fieldTypes = {
 
   textarea: {
     label: "Multiline Text",
-    cssClass: { main: "modal-textarea", construct: "construct-type-textarea" },
+    cssClass: { main: "modal-textarea" },
     selectorAttr: "data-textarea-field",
-    constructEnabled: true,
-    disabledAttributes: ["constructFieldsRow"],
+    disabledAttributes: [],
     defaultValue: () => "",
     renderInput: renderers.renderTextareaField,
     parseValue: parsers.parseTextareaField,
@@ -163,10 +133,9 @@ export const fieldTypes = {
 
   number: {
     label: "Number",
-    cssClass: { main: "modal-number", construct: "construct-type-number" },
+    cssClass: { main: "modal-number" },
     selectorAttr: "data-number-field",
-    constructEnabled: true,
-    disabledAttributes: ["constructFieldsRow"],
+    disabledAttributes: [],
     defaultValue: () => 0,
     renderInput: renderers.renderNumberField,
     parseValue: parsers.parseNumberField,
@@ -174,10 +143,9 @@ export const fieldTypes = {
 
   range: {
     label: "Range Slider",
-    cssClass: { main: "modal-range", construct: "construct-type-range" },
+    cssClass: { main: "modal-range" },
     selectorAttr: "data-range-field",
-    constructEnabled: true,
-    disabledAttributes: ["constructFieldsRow"],
+    disabledAttributes: [],
     defaultValue: () => 50,
     renderInput: renderers.renderRangeField,
     parseValue: parsers.parseRangeField,
@@ -185,10 +153,9 @@ export const fieldTypes = {
 
   date: {
     label: "Date",
-    cssClass: { main: "modal-date", construct: "construct-type-date" },
+    cssClass: { main: "modal-date" },
     selectorAttr: "data-date-field",
-    constructEnabled: true,
-    disabledAttributes: ["constructFieldsRow"],
+    disabledAttributes: [],
     defaultValue: () => "",
     renderInput: renderers.renderDateField,
     parseValue: parsers.parseDateField,
@@ -196,10 +163,9 @@ export const fieldTypes = {
 
   list: {
     label: "List",
-    cssClass: { main: "modal-list", construct: "construct-type-list" },
+    cssClass: { main: "modal-list" },
     selectorAttr: "data-list-field",
-    constructEnabled: true,
-    disabledAttributes: ["constructFieldsRow"],
+    disabledAttributes: [],
     defaultValue: () => [],
     renderInput: renderers.renderListField,
     parseValue: parsers.parseListField,
@@ -207,10 +173,9 @@ export const fieldTypes = {
 
   table: {
     label: "Table",
-    cssClass: { main: "modal-table", construct: "construct-type-table" },
+    cssClass: { main: "modal-table" },
     selectorAttr: "data-table-field",
-    constructEnabled: true,
-    disabledAttributes: ["constructFieldsRow"],
+    disabledAttributes: [],
     defaultValue: () => [],
     renderInput: renderers.renderTableField,
     parseValue: parsers.parseTableField,
@@ -218,10 +183,9 @@ export const fieldTypes = {
 
   image: {
     label: "Image Upload",
-    cssClass: { main: "modal-image", construct: "construct-type-image" },
+    cssClass: { main: "modal-image" },
     selectorAttr: "data-image-field",
-    constructEnabled: true,
-    disabledAttributes: ["constructFieldsRow"],
+    disabledAttributes: [],
     defaultValue: () => "",
     renderInput: renderers.renderImageField,
     parseValue: parsers.parseImageField,
@@ -229,10 +193,9 @@ export const fieldTypes = {
 
   link: {
     label: "Link",
-    cssClass: { main: "modal-link", construct: "construct-type-link" },
+    cssClass: { main: "modal-link" },
     selectorAttr: "data-link-field",
-    constructEnabled: true,
-    disabledAttributes: ["constructFieldsRow"],
+    disabledAttributes: [],
     defaultValue: () => "",
     renderInput: renderers.renderLinkField,
     parseValue: parsers.parseLinkField,

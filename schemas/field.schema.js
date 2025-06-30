@@ -4,7 +4,6 @@ const knownTypes = [
   "guid",
   "loopstart",
   "loopstop",
-  "construct",
   "text",
   "boolean",
   "dropdown",
@@ -30,7 +29,6 @@ module.exports = {
     two_column: false,
     default: "",
     options: [],
-    fields: [],
   },
 
   sanitize(raw) {
@@ -41,18 +39,10 @@ module.exports = {
       field.type = "text"; // fallback
     }
 
-    // Loop types or simple types: no subfields
-    if (field.type !== "construct") {
-      field.fields = [];
-    } else {
-      // Recursively sanitize fields inside construct
-      field.fields = Array.isArray(field.fields)
-        ? field.fields.map((f) => this.sanitize(f))
-        : [];
+    // Clean up options
+    if (!Array.isArray(field.options)) {
+      field.options = [];
     }
-
-    // Basic cleanups
-    if (!Array.isArray(field.options)) field.options = [];
 
     return field;
   },

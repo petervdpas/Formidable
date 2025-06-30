@@ -16,7 +16,6 @@ import {
   buildButtonGroup,
 } from "./uiButtons.js";
 import { setupOptionsEditor } from "../utils/optionsEditor.js";
-import { setupConstructFieldsEditor } from "./constructFieldsEditor.js";
 
 function setupFieldEditor(container, onChange, allFields = []) {
   const state = {};
@@ -36,13 +35,6 @@ function setupFieldEditor(container, onChange, allFields = []) {
     default: container.querySelector("#edit-default"),
     options: container.querySelector("#edit-options"),
     type: container.querySelector("#edit-type-container select"),
-    constructFields: container.querySelector("#edit-construct-fields"),
-    constructFieldsContainer: container.querySelector(
-      "#construct-fields-container"
-    ),
-    constructFieldsRow: container
-      .querySelector("#edit-construct-fields")
-      ?.closest(".modal-form-row"),
   };
 
   let labelLocked = false;
@@ -60,39 +52,12 @@ function setupFieldEditor(container, onChange, allFields = []) {
     });
   }
 
-  function setupConstructEditor(currentType) {
-    if (!dom.constructFieldsContainer) return;
-
-    dom.constructFieldsContainer.innerHTML = "";
-
-    if (currentType === "construct") {
-      const constructEditor = setupConstructFieldsEditor(
-        dom.constructFieldsContainer,
-        state,
-        (updatedFields) => {
-          state.fields = updatedFields;
-          dom.constructFields.value = JSON.stringify(state.fields || []);
-          onChange?.(structuredClone(state));
-          validate();
-        }
-      );
-
-      if (state.fields) {
-        constructEditor.setFields(state.fields);
-      }
-    }
-  }
-
   let originalKey = "";
   let confirmBtn = null;
 
   function setField(field) {
     Object.assign(state, field);
     originalKey = field.key?.trim();
-
-    if (field.type === "construct") {
-      state.fields = field.fields || [];
-    }
 
     dom.key.classList.remove("input-error");
     confirmBtn = document.getElementById("btn-field-edit-confirm");
@@ -178,7 +143,6 @@ function setupFieldEditor(container, onChange, allFields = []) {
         dom.label.value = isGuidType ? "GUID" : state.label || "";
 
         initializeOptionsEditor(currentType);
-        setupConstructEditor(currentType);
 
         applyFieldAttributeDisabling(
           {
@@ -207,7 +171,6 @@ function setupFieldEditor(container, onChange, allFields = []) {
     );
 
     initializeOptionsEditor(field.type);
-    setupConstructEditor(field.type);
 
     if (optionsEditor && field.options) {
       optionsEditor.setValues(field.options);
@@ -226,17 +189,6 @@ function setupFieldEditor(container, onChange, allFields = []) {
     field._originalKey = originalKey;
 
     const result = validateField(field, allFields);
-
-    // Extra check: construct subfields mogen niet leeg zijn
-    let hasEmptySubfield = false;
-    if (field.type === "construct" && Array.isArray(field.fields)) {
-      hasEmptySubfield = field.fields.some(
-        (sub) => !sub.key?.trim() || !sub.label?.trim()
-      );
-      if (hasEmptySubfield) {
-        result.valid = false;
-      }
-    }
 
     dom.key.classList.toggle("input-error", !result.valid);
 
@@ -262,10 +214,6 @@ function setupFieldEditor(container, onChange, allFields = []) {
       options,
       type: dom.type?.value || "text",
     };
-
-    if (field.type === "construct") {
-      field.fields = JSON.parse(dom.constructFields.value || "[]");
-    }
 
     if (isGuid) {
       field.primary_key = true;

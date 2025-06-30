@@ -112,10 +112,8 @@ function getTemplateDescriptor(name) {
   };
 }
 
-// Check for multiple primary keys (now supports nested constructs)
 function checkPrimaryKey(fields) {
-  const allFields = collectAllFields(fields);
-  const pkFields = allFields.filter((f) => f.primary_key);
+  const pkFields = fields.filter((f) => f.primary_key);
   if (pkFields.length > 1) {
     return {
       type: "multiple-primary-keys",
@@ -128,24 +126,11 @@ function checkPrimaryKey(fields) {
   return null;
 }
 
-// Helper: recursively flatten all fields (including inside constructs)
-function collectAllFields(fields, result = []) {
-  for (const f of fields) {
-    result.push(f);
-    if (f.type === "construct" && Array.isArray(f.fields)) {
-      collectAllFields(f.fields, result);
-    }
-  }
-  return result;
-}
-
-// Check for duplicate keys (now supports nested constructs)
 function checkDuplicateKeys(fields) {
-  const allFields = collectAllFields(fields);
   const seen = new Map();
   const duplicates = [];
 
-  for (const { key, type } of allFields) {
+  for (const { key, type } of fields) {
     if (!key) continue;
     if (seen.has(key)) {
       const existingType = seen.get(key);
@@ -161,72 +146,49 @@ function checkDuplicateKeys(fields) {
   return duplicates;
 }
 
-function checkLoopPairing(fields, context = [], inConstruct = false) {
+function checkLoopPairing(fields) {
   const errors = [];
+  const stack = [];
 
-  function validate(fields, nestingLevel, context, inConstruct) {
-    const stack = [];
-
-    for (let i = 0; i < fields.length; i++) {
-      const field = fields[i];
-      const currentPath = [...context, field.key || `#${i}`];
-
-      if (field.type === "construct" && Array.isArray(field.fields)) {
-        validate(field.fields, 0, currentPath, true); // Reset depth inside construct
-        continue;
-      }
-
-      if (field.type === "loopstart") {
-        if (nestingLevel >= 1) {
+  fields.forEach((field, index) => {
+    if (field.type === "loopstart") {
+      stack.push({ field, index });
+    } else if (field.type === "loopstop") {
+      if (stack.length === 0) {
+        errors.push({
+          type: "unmatched-loopstop",
+          field,
+          index,
+          message: "Unmatched loopstop without preceding loopstart",
+        });
+      } else {
+        const start = stack.pop();
+        if (field.key !== start.field.key) {
           errors.push({
-            type: "nested-loop-not-allowed",
+            type: "loop-key-mismatch",
             field,
-            path: currentPath,
-            message: `Nested loopstart '${field.key}' not allowed. Max loop depth = 1.`,
+            index,
+            expectedKey: start.field.key,
+            actualKey: field.key,
+            message: `Loopstop key '${field.key}' does not match loopstart key '${start.field.key}'`,
           });
-        }
-        stack.push({ field, path: currentPath });
-        nestingLevel++;
-      } else if (field.type === "loopstop") {
-        if (stack.length === 0) {
-          errors.push({
-            type: "unmatched-loopstop",
-            field,
-            path: currentPath,
-            message: `Unmatched loopstop '${field.key}' without preceding loopstart.`,
-          });
-        } else {
-          const start = stack.pop();
-          nestingLevel--;
-
-          if (start.field.key !== field.key) {
-            errors.push({
-              type: "loop-key-mismatch",
-              field,
-              path: currentPath,
-              expectedKey: start.field.key,
-              message: `Loopstop key '${field.key}' does not match loopstart key '${start.field.key}'`,
-            });
-          }
         }
       }
     }
+  });
 
-    while (stack.length > 0) {
-      const { field, path: p } = stack.pop();
-      errors.push({
-        type: "unmatched-loopstart",
-        field,
-        path: p,
-        message: `Unmatched loopstart '${field.key}' without corresponding loopstop.`,
-      });
-    }
+  while (stack.length > 0) {
+    const { field, index } = stack.pop();
+    errors.push({
+      type: "unmatched-loopstart",
+      field,
+      index,
+      message: "Unmatched loopstart without corresponding loopstop",
+    });
   }
 
-  validate(fields, 0, context, inConstruct);
   return errors;
 }
-
 
 function checkCollectionEnableValid(template) {
   if (template.enable_collection !== true) return null;

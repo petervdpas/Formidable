@@ -132,7 +132,7 @@ export async function fieldGroupRenderer(
       }
 
       const row = await renderFieldElement(
-        { ...field, constructKey: eventFunctions?.constructKey || null },
+        field,
         metaData[field.key],
         template,
         eventFunctions

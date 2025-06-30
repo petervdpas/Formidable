@@ -56,7 +56,7 @@
 }
 
 /* ─────────────────────────────────────────────────────────────
-   Popup Panel (e.g., for editing construct fields)
+   Popup Panel (e.g., for special editors, settings, etc.)
 ───────────────────────────────────────────────────────────── */
 .popup-panel {
   position: absolute;

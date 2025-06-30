@@ -63,44 +63,6 @@ fields:
     type: textarea
     description: This is a description inside the the looper...
     default: Describe wauw...
-  - key: inside-construct
-    label: Inside Construct
-    type: construct
-    description: Description for the inside construct
-    fields:
-      - key: subloop
-        type: loopstart
-        label: SubLoop
-        description: ''
-        sidebar_item: false
-        two_column: false
-        default: ''
-        options: []
-        fields: []
-      - key: subTest
-        type: dropdown
-        label: SubTest
-        description: Description for dropdown inside construct, inside looper
-        sidebar_item: false
-        two_column: false
-        default: ''
-        options:
-          - value: One
-            label: One
-          - value: Two
-            label: Two
-          - value: Three
-            label: Three
-        fields: []
-      - key: subloop
-        type: loopstop
-        label: SubLoop
-        description: ''
-        sidebar_item: false
-        two_column: false
-        default: ''
-        options: []
-        fields: []
   - key: looper
     label: Chapters - End
     type: loopstop
