@@ -47,12 +47,14 @@ export function initEventRouter() {
   EventBus.off("plugin:reload", pluginHandler.handleReloadPlugins);
   EventBus.off("plugin:upload", pluginHandler.handleUploadPlugin);
   EventBus.off("plugin:create", pluginHandler.handleCreatePlugin);
+  EventBus.off("plugin:get-code", pluginHandler.handleGetPluginCode);
 
   EventBus.on("plugin:list", pluginHandler.handleListPlugins);
   EventBus.on("plugin:run", pluginHandler.handleRunPlugin);
   EventBus.on("plugin:reload", pluginHandler.handleReloadPlugins);
   EventBus.on("plugin:upload", pluginHandler.handleUploadPlugin);
   EventBus.on("plugin:create", pluginHandler.handleCreatePlugin);
+  EventBus.on("plugin:get-code", pluginHandler.handleGetPluginCode);
 
   // Logging
   EventBus.off("logging:toggle", loggingHandler.handleLoggingToggle);

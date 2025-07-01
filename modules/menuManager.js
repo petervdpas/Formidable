@@ -5,6 +5,7 @@ import { bindActionHandlers } from "../utils/domUtils.js";
 import { createSwitch } from "../utils/elementBuilders.js";
 
 let cachedConfig = null;
+let pluginMap = new Map(); // name → pluginMeta
 
 export async function buildMenu(containerId = "app-menu", commandHandler) {
   const container = document.getElementById(containerId);
@@ -17,16 +18,20 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
     return;
   }
 
+  // Load config if not cached
   cachedConfig =
     cachedConfig ||
     (await new Promise((resolve) => {
-      EventBus.emit("config:load", (cfg) => resolve(cfg));
+      EventBus.emit("config:load", resolve);
     }));
+
+  // Reset plugin map
+  pluginMap.clear();
 
   const menuBar = document.createElement("ul");
   menuBar.className = "menu-bar";
 
-  // Base menu items
+  // ─── File & Config Menu ─────────────────────
   menuBar.append(
     createMenuGroup("File", [
       { label: "Open Template Folder", action: "open-template-folder" },
@@ -41,7 +46,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
     ])
   );
 
-  // Add Git menu option before Help (if enabled)
+  // ─── Git Menu ────────────────────────────────
   if (cachedConfig.use_git) {
     menuBar.append(
       createMenuGroup("Git", [
@@ -50,7 +55,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
     );
   }
 
-  // Add internal server options if enabled
+  // ─── Server Menu ─────────────────────────────
   if (cachedConfig.enable_internal_server) {
     menuBar.append(
       createMenuGroup("Server", [
@@ -61,25 +66,48 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
     );
   }
 
-  // Append View and Help last
+  // ─── Plugins Menu ────────────────────────────
+  const pluginItems = [
+    { label: "Plugin Manager...", action: "open-plugin-manager" },
+  ];
+
+  const plugins = await EventBus.emitWithResponse("plugin:list", null);
+  pluginMap = new Map(plugins.map((p) => [p.name, p])); // ✅ cache plugin meta
+
+  if (plugins?.length) {
+    pluginItems.push("separator");
+
+    for (const plugin of plugins) {
+      pluginItems.push({
+        label: plugin.name,
+        action: `plugin:run:${plugin.name}`,
+      });
+    }
+  }
+
+  menuBar.append(createMenuGroup("Plugins", pluginItems));
+
+  // ─── View, Help, Context Toggle ───────────────
   menuBar.append(
     createMenuGroup("View", [
-      { label: "Plugin Manager...", action: "open-plugin-manager" },
       { label: "Reload", action: "reload" },
       { label: "Toggle DevTools", action: "devtools" },
     ]),
-    createMenuGroup("Help", [{ label: "About", action: "about" }])
+    createMenuGroup("Help", [{ label: "About", action: "about" }]),
+    createContextToggleItem()
   );
 
-  // Always add the context mode toggle
-  menuBar.append(createContextToggleItem());
-
+  // ─── Finalize ────────────────────────────────
   container.innerHTML = "";
   container.appendChild(menuBar);
-
   bindActionHandlers(container, "[data-action]", commandHandler);
 
   EventBus.emit("logging:default", ["[Menu] Menu setup complete."]);
+}
+
+// Export pluginMap so it can be used in handleMenuAction
+export function getPluginMeta(name) {
+  return pluginMap.get(name) || null;
 }
 
 function createMenuGroup(title, items) {
@@ -135,6 +163,18 @@ export async function handleMenuAction(action) {
   const { templatesPath: templatesLocation } = await new Promise((resolve) => {
     EventBus.emit("config:context:paths", { callback: resolve });
   });
+
+  // Handle plugin:run:pluginName
+  if (action.startsWith("plugin:run:")) {
+    const pluginName = action.split(":")[2];
+    EventBus.emit("logging:default", [`[Menu] Running plugin: ${pluginName}`]);
+
+    const pluginMeta = getPluginMeta(pluginName);
+    const target = pluginMeta?.target || "backend";
+
+    EventBus.emit("plugin:run", { name: pluginName, target });
+    return;
+  }
 
   switch (action) {
     case "open-template-folder": {

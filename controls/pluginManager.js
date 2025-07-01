@@ -59,20 +59,39 @@ function loadPlugins() {
   }
 }
 
-function runPlugin(name, context = {}) {
-  const plugin = pluginRepo[name];
-  if (!plugin || typeof plugin.run !== "function") {
-    error(`[PluginManager] Plugin not found or not executable: ${name}`);
-    return null;
+function getPluginCode(name) {
+  const safeName = name.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const pluginPath = fileManager.joinPath(getPluginRoot(), safeName, "plugin.js");
+
+  if (!fileManager.fileExists(pluginPath)) {
+    return { success: false, error: `Plugin "${name}" not found.` };
   }
 
   try {
-    const result = plugin.run(context);
+    const code = fileManager.loadFile(pluginPath, { format: "text", silent: true });
+    return { success: true, code };
+  } catch (err) {
+    error(`[PluginManager] Failed to read code for "${name}":`, err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+async function runPlugin(name, context = {}) {
+  const plugin = pluginRepo[name];
+  if (!plugin) return { error: `Plugin "${name}" not found.` };
+
+  if (plugin.target === "frontend") {
+    log(`[PluginManager] Plugin "${name}" is frontend-only. Skipping backend run.`);
+    return { success: false, message: "Frontend plugin. Not run on backend." };
+  }
+
+  try {
+    const result = await plugin.run(context);
     log(`[PluginManager] Plugin "${name}" executed successfully.`);
     return result;
   } catch (err) {
-    error(`[PluginManager] Plugin "${name}" crashed:`, err.message);
-    return null;
+    error(`[PluginManager] Plugin "${name}" failed:`, err.message || err);
+    return { error: err.message || "Plugin crashed." };
   }
 }
 
@@ -134,6 +153,7 @@ exports.run = function (context) {
     author: "Unknown",
     tags: [],
     enabled: true,
+    target: "frontend",
   };
 
   try {
@@ -153,6 +173,7 @@ exports.run = function (context) {
 module.exports = {
   loadPlugins,
   runPlugin,
+  getPluginCode,
   listPlugins,
   reloadPlugins,
   uploadPlugin,

@@ -144,7 +144,7 @@ export function setupPluginModal() {
     backdropClick: true,
     resizable: true,
     width: "40em",
-    height: "70vh",
+    height: "50vh",
 
     onOpen: async () => {
       const container = document.getElementById("plugin-manager-body");

@@ -15,7 +15,10 @@ export async function renderPluginManager(container) {
 
     fetchListFunction: async () => {
       const result = await EventBus.emitWithResponse("plugin:list", null);
-      return result || [];
+      return (result || []).map((p) => ({
+        ...p,
+        display: p.name,
+      }));
     },
 
     renderItemExtra: async ({ subLabelNode, flagNode, rawData }) => {

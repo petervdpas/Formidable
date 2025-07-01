@@ -89,6 +89,12 @@ function registerIpcHandlers() {
     }
     return pluginManager.runPlugin(name, context);
   });
+  registerIpc("get-plugin-code", (e, name) => {
+    if (typeof name !== "string") {
+      throw new Error("Invalid plugin name");
+    }
+    return getPluginCode(name); // should return { success, code, ... }
+  });
   registerIpc("reload-plugins", () => {
     pluginManager.reloadPlugins();
     return pluginManager.listPlugins();

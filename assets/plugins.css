@@ -1,6 +1,5 @@
 /* Plugin Manager List Area */
 #plugin-list {
-  margin-top: 1.5em;
   padding-top: 1em;
   border-top: 1px solid var(--border-color, #ccc);
 }
@@ -16,6 +15,10 @@
   border-radius: 4px;
   margin-bottom: 0.5em;
   gap: 1em;
+}
+
+.plugin-list-item:hover {
+  background-color: var(--hover-background, #eef);
 }
 
 /* Left: Title + Description */
@@ -51,7 +54,6 @@
 
 /* Plugin Upload Section */
 .plugin-upload-section {
-  margin-top: 2em;
   padding-top: 1em;
   border-top: 1px solid var(--border-color, #ccc);
 }

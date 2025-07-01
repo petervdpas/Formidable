@@ -12,6 +12,7 @@ const api = {
   plugin: buildGroup([
     "list-plugins",
     "run-plugin",
+    "get-plugin-code",
     "reload-plugins",
     "upload-plugin",
     "create-plugin",
