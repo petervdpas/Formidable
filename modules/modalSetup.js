@@ -10,6 +10,7 @@ import { extractFieldDefinition } from "../utils/formUtils.js";
 import { createDropdown } from "./dropdownManager.js";
 import { syncScroll } from "../utils/domUtils.js";
 import { createProfileListManager } from "./profileManager.js";
+import { renderPluginManager } from "./pluginManagerUI.js";
 import { renderGitStatus } from "./gitActions.js";
 import {
   createModalConfirmButton,
@@ -17,6 +18,8 @@ import {
   createShowMarkdownButton,
   createShowPreviewButton,
   createPaneCloseButton,
+  createPluginReloadButton,
+  createPluginCreateButton,
   buildButtonGroup,
 } from "./uiButtons.js";
 
@@ -130,6 +133,86 @@ export function setupTemplateModal() {
           EventBus.emit("config:load", (cfg) => resolve(cfg));
         }));
       input.value = config.context_folder || "./";
+    },
+  });
+}
+
+export function setupPluginModal() {
+  return setupModal("plugin-manager-modal", {
+    closeBtn: "plugin-manager-close",
+    escToClose: true,
+    backdropClick: true,
+    resizable: true,
+    width: "40em",
+    height: "70vh",
+
+    onOpen: async () => {
+      const container = document.getElementById("plugin-manager-body");
+      if (!container) {
+        console.warn("[PluginModal] Missing container #plugin-manager-body");
+        return;
+      }
+
+      try {
+        container.innerHTML = "";
+
+        // ─── Plugin List ───────────────────────────────
+        const listWrapper = document.createElement("div");
+        listWrapper.id = "plugin-list";
+        container.appendChild(listWrapper);
+
+        const listManager = await renderPluginManager(container);
+
+        // ─── Reload Button ──────────────────────────────
+        const reloadBtn = createPluginReloadButton(() => {
+          EventBus.emitWithResponse("plugin:reload", null).then(() => {
+            listManager.loadList();
+          });
+        });
+        container.insertBefore(reloadBtn, listWrapper);
+
+        // ─── Create Plugin Section ─────────────────────
+        const uploadWrapper = document.createElement("div");
+        uploadWrapper.className = "plugin-upload-section";
+
+        const header = document.createElement("h3");
+        header.textContent = "Create New Plugin";
+        uploadWrapper.appendChild(header);
+
+        const folderInput = document.createElement("input");
+        folderInput.type = "text";
+        folderInput.placeholder = "New plugin folder name";
+        folderInput.className = "plugin-upload-folder";
+        uploadWrapper.appendChild(folderInput);
+
+        const createBtn = createPluginCreateButton(() => {
+          const folder = folderInput.value.trim();
+          if (!folder) {
+            EventBus.emit("ui:toast", {
+              message: "Folder name is required.",
+              variant: "error",
+            });
+            return;
+          }
+
+          EventBus.emitWithResponse("plugin:create", { folder }).then(
+            (result) => {
+              EventBus.emit("ui:toast", {
+                message: result.message || result.error || "Plugin created.",
+                variant: result.error ? "error" : "success",
+              });
+              listManager.loadList();
+              folderInput.value = "";
+            }
+          );
+        });
+
+        uploadWrapper.appendChild(createBtn);
+        container.appendChild(uploadWrapper);
+      } catch (err) {
+        console.error("[PluginModal] Failed to render plugin manager:", err);
+        container.innerHTML = `<p class="error">Failed to load plugin manager.</p>`;
+      }
     },
   });
 }

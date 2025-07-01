@@ -64,6 +64,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   // Append View and Help last
   menuBar.append(
     createMenuGroup("View", [
+      { label: "Plugin Manager...", action: "open-plugin-manager" },
       { label: "Reload", action: "reload" },
       { label: "Toggle DevTools", action: "devtools" },
     ]),
@@ -214,6 +215,11 @@ export async function handleMenuAction(action) {
         "[Menu] Opening profile switcher modal...",
       ]);
       window.openProfileModal?.();
+      break;
+
+    case "open-plugin-manager":
+      EventBus.emit("logging:default", ["[Menu] Opening plugin manager..."]);
+      window.openPluginModal?.();
       break;
 
     case "reload":

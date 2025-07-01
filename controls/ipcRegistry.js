@@ -11,6 +11,7 @@ const { registerIpc } = require("./ipcRoutes");
 const { SingleFileRepository } = require("./sfr");
 
 const internalServer = require("./internalServer");
+const pluginManager = require("./pluginManager");
 const packageJson = require("../package.json");
 const fileManager = require("./fileManager");
 const gitManager = require("./gitManager");
@@ -79,6 +80,27 @@ function registerIpcHandlers() {
     internalServer.stopInternalServer()
   );
   registerIpc("get-internal-server-status", () => internalServer.getStatus());
+
+  // Plugins
+  registerIpc("list-plugins", () => pluginManager.listPlugins());
+  registerIpc("run-plugin", (e, name, context = {}) => {
+    if (typeof name !== "string") {
+      throw new Error("Invalid plugin name");
+    }
+    return pluginManager.runPlugin(name, context);
+  });
+  registerIpc("reload-plugins", () => {
+    pluginManager.reloadPlugins();
+    return pluginManager.listPlugins();
+  });
+  registerIpc("upload-plugin", (e, args) => {
+    const { folder, js, meta } = args || {};
+    return pluginManager.uploadPlugin(folder, js, meta);
+  });
+  registerIpc("create-plugin", (e, args) => {
+    const folder = typeof args === "string" ? args : args?.folder;
+    return pluginManager.createPlugin(folder);
+  });
 
   // Git
   registerIpc("is-git-repo", (e, folder) => gitManager.isGitRepo(folder));

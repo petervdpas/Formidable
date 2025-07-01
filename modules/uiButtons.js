@@ -469,6 +469,54 @@ export function createLinkOpenButton(linkText, onClick, disabled = false) {
   });
 }
 
+// Plugin-specific buttons
+export function createPluginReloadButton(onClick) {
+  return createButton({
+    text: "Reload Plugins",
+    className: "btn-default btn-fullwidth",
+    identifier: "reload-plugins",
+    onClick,
+  });
+}
+
+export function createPluginCreateButton(onClick) {
+  return createButton({
+    text: "Create Plugin",
+    className: "btn-okay",
+    identifier: "create-plugin",
+    onClick,
+  });
+}
+
+export function createPluginUploadButton(onClick) {
+  return createButton({
+    text: "Upload Plugin",
+    className: "btn-okay",
+    identifier: "upload-plugin",
+    onClick,
+  });
+}
+
+export function createPluginDeleteButton(name, onClick) {
+  return createButton({
+    text: "Delete",
+    className: "btn-danger btn-small",
+    identifier: `plugin-delete-${name}`,
+    onClick,
+    ariaLabel: `Delete plugin ${name}`,
+  });
+}
+
+export function createPluginToggleButton(name, enabled, onClick) {
+  return createButton({
+    text: enabled ? "Disable" : "Enable",
+    className: "btn-small",
+    identifier: `plugin-toggle-${name}`,
+    onClick,
+    ariaLabel: `${enabled ? "Disable" : "Enable"} plugin ${name}`,
+  });
+}
+
 export function disableButton(btn, state = true) {
   if (btn instanceof HTMLElement) {
     btn.disabled = state;

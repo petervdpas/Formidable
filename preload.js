@@ -9,6 +9,13 @@ const api = {
     "stop-internal-server",
     "get-internal-server-status",
   ]),
+  plugin: buildGroup([
+    "list-plugins",
+    "run-plugin",
+    "reload-plugins",
+    "upload-plugin",
+    "create-plugin",
+  ]),
   git: buildGroup([
     "is-git-repo",
     "get-git-root",

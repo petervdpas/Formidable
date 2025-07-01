@@ -20,6 +20,7 @@ import {
   setupEntryModal,
   setupTemplateModal,
   setupGitModal,
+  setupPluginModal,
   setupAboutModal,
 } from "./modules/modalSetup.js";
 
@@ -93,6 +94,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const entryInputModal = setupEntryModal();
   const templateModal = setupTemplateModal();
   const gitModal = setupGitModal();
+  const pluginModal = setupPluginModal();
   const aboutModal = setupAboutModal();
 
   window.openProfileModal = profile.show;
@@ -100,6 +102,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   window.openWorkspaceModal = workspaceModal.show;
   window.openGitModal = gitModal.show;
   window.openAboutModal = aboutModal.show;
+  window.openPluginModal = pluginModal.show;
 
   // ── Form System ──
   const formManager = createFormManager("storage-content");

@@ -3,6 +3,7 @@
 import { EventBus } from "./eventBus.js";
 
 import * as serverHandler from "./handlers/serverHandler.js";
+import * as pluginHandler from "./handlers/pluginHandler.js";
 import * as cacheHandler from "./handlers/cacheHandler.js";
 import * as vfsHandler from "./handlers/vfsHandler.js";
 import * as gitHandler from "./handlers/gitHandler.js";
@@ -39,6 +40,19 @@ export function initEventRouter() {
   EventBus.on("server:start", serverHandler.handleStartServer);
   EventBus.on("server:stop", serverHandler.handleStopServer);
   EventBus.on("server:status", serverHandler.handleGetServerStatus);
+
+  // Plugin events
+  EventBus.off("plugin:list", pluginHandler.handleListPlugins);
+  EventBus.off("plugin:run", pluginHandler.handleRunPlugin);
+  EventBus.off("plugin:reload", pluginHandler.handleReloadPlugins);
+  EventBus.off("plugin:upload", pluginHandler.handleUploadPlugin);
+  EventBus.off("plugin:create", pluginHandler.handleCreatePlugin);
+
+  EventBus.on("plugin:list", pluginHandler.handleListPlugins);
+  EventBus.on("plugin:run", pluginHandler.handleRunPlugin);
+  EventBus.on("plugin:reload", pluginHandler.handleReloadPlugins);
+  EventBus.on("plugin:upload", pluginHandler.handleUploadPlugin);
+  EventBus.on("plugin:create", pluginHandler.handleCreatePlugin);
 
   // Logging
   EventBus.off("logging:toggle", loggingHandler.handleLoggingToggle);

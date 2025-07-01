@@ -5,6 +5,7 @@ const { app, BrowserWindow, Menu } = require("electron");
 const path = require("path");
 const nodeLogger = require("./controls/nodeLogger");
 const fileManager = require("./controls/fileManager");
+const pluginManager = require("./controls/pluginManager");
 const templateManager = require("./controls/templateManager");
 const configManager = require("./controls/configManager");
 const { registerIpcHandlers } = require("./controls/ipcRegistry");
@@ -47,7 +48,7 @@ function createWindow() {
     },
   });
 
-  // Menu.setApplicationMenu(null);
+  Menu.setApplicationMenu(null);
 
   win.loadFile("index.html");
 
@@ -73,13 +74,14 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  registerIpcHandlers();
-
   const isPackaged = app.isPackaged;
   const root = isPackaged ? app.getAppPath() : process.cwd();
   fileManager.setAppRoot(root);
 
   // fileManager.setAppRoot(process.cwd());
+
+  pluginManager.loadPlugins();
+  registerIpcHandlers();
 
   log("[Main] App is ready. Checking environment...");
 

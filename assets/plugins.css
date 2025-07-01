@@ -1,0 +1,81 @@
+/* Plugin Manager List Area */
+#plugin-list {
+  margin-top: 1.5em;
+  padding-top: 1em;
+  border-top: 1px solid var(--border-color, #ccc);
+}
+
+/* Each Plugin Item */
+.plugin-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.6em 0.8em;
+  border-bottom: 1px solid var(--border-color, #ddd);
+  background-color: var(--input-background, #f9f9f9);
+  border-radius: 4px;
+  margin-bottom: 0.5em;
+  gap: 1em;
+}
+
+/* Left: Title + Description */
+.plugin-list-item .list-item-main {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.plugin-list-item .list-item-label {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-primary, #222);
+  margin-bottom: 0.2em;
+  word-break: break-word;
+}
+
+.plugin-list-item .list-item-sub {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666);
+  word-break: break-word;
+}
+
+/* Right: Buttons */
+.plugin-list-item .list-item-flag {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  margin-left: 0.5em;
+}
+
+/* Plugin Upload Section */
+.plugin-upload-section {
+  margin-top: 2em;
+  padding-top: 1em;
+  border-top: 1px solid var(--border-color, #ccc);
+}
+
+.plugin-upload-section h3 {
+  font-size: 1.1em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+}
+
+.plugin-upload-folder {
+  width: calc(100% - 9em);
+  margin-right: 0.6em;
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#btn-create-plugin {
+  vertical-align: middle;
+}
+
+/* Reload Button */
+#btn-reload-plugins {
+  margin-bottom: 1em;
+}

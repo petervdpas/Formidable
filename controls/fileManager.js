@@ -81,6 +81,23 @@ function resolvePath(...segments) {
   return path.isAbsolute(flat) ? flat : path.resolve(getAppRoot(), flat);
 }
 
+function listFolders(dir, { silent = false, filter = null } = {}) {
+  try {
+    let folders = fs.readdirSync(dir).filter((f) =>
+      fs.statSync(path.join(dir, f)).isDirectory()
+    );
+
+    if (typeof filter === "function") {
+      folders = folders.filter(filter);
+    }
+
+    return folders;
+  } catch (err) {
+    if (!silent) error("[FileManager] Failed to list folders:", err);
+    return [];
+  }
+}
+
 function listFiles(dir, { silent = false, filter = null } = {}) {
   try {
     let files = fs.readdirSync(dir).filter((f) =>
@@ -104,6 +121,20 @@ function listFilesByExtension(dir, ext, opts = {}) {
     ...opts,
     filter: (f) => f.endsWith(ext),
   });
+}
+
+function listDirectoryEntries(dir, { silent = false } = {}) {
+  try {
+    const fs = require("fs");
+    return fs.readdirSync(dir, { withFileTypes: true }).map((entry) => ({
+      name: entry.name,
+      isDirectory: entry.isDirectory(),
+      isFile: entry.isFile(),
+    }));
+  } catch (err) {
+    if (!silent) console.error(`[FileManager] Failed to read: ${dir}`, err);
+    return [];
+  }
 }
 
 // Check if a file exists
@@ -191,8 +222,10 @@ module.exports = {
   buildFilePath,
   resolvePath,
   joinPath,
+  listFolders,
   listFiles,
   listFilesByExtension,
+  listDirectoryEntries,
   fileExists,
   loadFile,
   saveFile,
