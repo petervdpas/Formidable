@@ -1,11 +1,12 @@
 // modules/pluginManagerUI.js
+
 import { EventBus } from "./eventBus.js";
 import { buildButtonGroup } from "../utils/buttonUtils.js";
+import { createListManager } from "../utils/listUtils.js";
 import {
   createPluginToggleButton,
   createPluginDeleteButton,
 } from "./uiButtons.js";
-import { createListManager } from "./listManager.js";
 
 export async function renderPluginManager(container) {
   const listManager = createListManager({

@@ -1,5 +1,6 @@
 // utils/modalUtils.js
 
+import { EventBus } from "../modules/eventBus.js";
 import { enableElementResizing } from "./resizing.js";
 import { createButton } from "./buttonUtils.js";
 
@@ -100,12 +101,102 @@ export function setupModal(
   return { show, hide };
 }
 
+export function setupPluginModal({
+  id = "plugin-modal",
+  title = "Plugin Modal",
+  body = "",
+  width = "40%",
+  height = "auto",
+  escToClose = true,
+  backdropClick = true,
+  onOpen = () => {},
+  onClose = () => {},
+  prepareBody = null, // ✅ optional hook
+} = {}) {
+  if (document.getElementById(id)) {
+    EventBus.emit("logging:warning", [
+      `[setupPluginModal] Modal with id "${id}" already exists.`,
+    ]);
+    return null;
+  }
+
+  const modal = document.createElement("div");
+  modal.id = id;
+  modal.className = "modal";
+
+  // ── Header
+  const header = document.createElement("div");
+  header.className = "modal-header";
+
+  const titleRow = document.createElement("div");
+  titleRow.className = "modal-title-row";
+
+  const titleEl = document.createElement("h2");
+  titleEl.textContent = title;
+
+  titleRow.appendChild(titleEl);
+  header.appendChild(titleRow);
+
+  // ── Body
+  const bodyEl = document.createElement("div");
+  bodyEl.className = "modal-body";
+
+  const changeBody = (content) => {
+    bodyEl.innerHTML = "";
+    if (typeof content === "string") {
+      bodyEl.innerHTML = content;
+    } else if (content instanceof HTMLElement) {
+      bodyEl.appendChild(content);
+    } else {
+      EventBus.emit("logging:warning", [
+        `[setupPluginModal] changeBody: invalid content (must be string or HTMLElement)`,
+      ]);
+    }
+  };
+
+  // Initial content
+  changeBody(body);
+
+  // Optional body mutation hook
+  if (typeof prepareBody === "function") {
+    try {
+      prepareBody(modal, bodyEl);
+    } catch (err) {
+      EventBus.emit("logging:error", [
+        "[setupPluginModal] prepareBody failed:",
+        err,
+      ]);
+    }
+  }
+
+  // ── Assemble
+  modal.appendChild(header);
+  modal.appendChild(bodyEl);
+
+  const host = document.getElementById("plugin-executor") || document.body;
+  host.appendChild(modal);
+
+  const { show, hide } = setupModal(id, {
+    closeBtn: `${id}-close`,
+    escToClose,
+    backdropClick,
+    width,
+    height,
+    onOpen,
+    onClose,
+  });
+
+  return { modal, show, hide, changeBody };
+}
+
 export function setupPopup(popupId, defaultOptions = {}) {
   const popup =
     typeof popupId === "string" ? document.getElementById(popupId) : popupId;
 
   if (!popup) {
-    console.warn("[popupManager] Popup not found:", popupId);
+    EventBus.emit("logging:warning", [
+      `[setupPopup] Popup not found: ${popupId}`,
+    ]);
     return { show: () => {}, hide: () => {}, popup: null };
   }
 

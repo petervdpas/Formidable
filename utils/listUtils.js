@@ -1,7 +1,32 @@
-// modules/listManager.js
+// utils/listUtils.js
 
-import { EventBus } from "./eventBus.js";
-import { makeSelectableList } from "../utils/domUtils.js";
+import { EventBus } from "../modules/eventBus.js";
+
+export function makeSelectableList(
+  items,
+  onSelect,
+  selectedClass = "selected"
+) {
+  items.forEach((item, index) => {
+    const oldElement = item.element;
+    const clean = oldElement.cloneNode(true);
+
+    // 🛠 Restore dataset
+    clean.dataset.value = oldElement.dataset.value;
+    clean.dataset.listId = oldElement.dataset.listId;
+
+    oldElement.replaceWith(clean);
+
+    // Replace the reference inside the array!
+    items[index].element = clean;
+
+    clean.addEventListener("click", () => {
+      items.forEach(({ element }) => element.classList.remove(selectedClass));
+      clean.classList.add(selectedClass);
+      onSelect(item.value);
+    });
+  });
+}
 
 export function createListManager({
   elementId,
@@ -17,7 +42,7 @@ export function createListManager({
   const container = document.getElementById(elementId);
   if (!container) {
     EventBus.emit("logging:error", [
-      `[ListManager] Element not found: #${elementId}`,
+      `[createListManager] Element not found: #${elementId}`,
     ]);
     throw new Error(`List container #${elementId} not found.`);
   }
@@ -41,7 +66,7 @@ export function createListManager({
 
   async function loadList() {
     EventBus.emit("logging:default", [
-      `[ListManager] Loading list into #${elementId}...`,
+      `[createListManager] Loading list into #${elementId}...`,
     ]);
     listWrapper.innerHTML = "";
     try {
@@ -51,7 +76,7 @@ export function createListManager({
       renderList(); // initial render
     } catch (err) {
       EventBus.emit("logging:error", [
-        "[ListManager] Failed to load list:",
+        "[createListManager] Failed to load list:",
         err,
       ]);
       listWrapper.innerHTML =

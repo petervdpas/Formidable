@@ -1,43 +1,28 @@
 // plugins/Crazy/plugin.js
 export function run() {
-  const host = document.getElementById("plugin-executor");
-  if (!host) return;
+  const { setupPluginModal } = window.FPA.modal;
+  const { createButton } = window.FPA.button;
 
-  const modalId = "plugin-cool-modal";
-  if (document.getElementById(modalId)) return;
+  const { show } = setupPluginModal({
+    id: "plugin-example-modal",
+    title: "Plugin Injected",
+    body: "",
 
-  const modal = document.createElement("div");
-  modal.id = modalId;
-  modal.className = "modal";
-  modal.innerHTML = `
-    <div class="modal-header">
-      <div class="modal-title-row">
-        <h2>Injected Plugin Modal</h2>
-      </div>
-    </div>
-    <div class="modal-body">
-      <p>This is a dynamic modal from a plugin!</p>
-      <button id="plugin-close-btn">Close</button>
-    </div>
-  `;
+    prepareBody: (modal, bodyEl) => {
+      const p = document.createElement("p");
+      p.textContent = "Hello to a Formidable World! This is a plugin-injected modal.";
+      bodyEl.appendChild(p);
 
-  host.appendChild(modal);
-
-  const { show, hide } = FPA.modal.setupModal(modalId, {
-    closeBtn: "plugin-close-btn",
-    escToClose: true,
-    backdropClick: true,
-    width: "40%",
-    height: "auto",
-    onOpen: () => {
-      FPA.dom.focusFirstInput(modal); // optional, good UX
-    },
-    onClose: () => {
-      modal.remove(); // cleanup modal when closed
+      const btn = createButton({
+        text: "Toast!",
+        className: "btn-success",
+        onClick: () =>
+          emit("ui:toast", { message: "Plugin says hi!", variant: "success" }),
+        ariaLabel: "Send toast",
+      });
+      bodyEl.appendChild(btn);
     },
   });
 
   show();
-
-  return { message: "Modal injected with setupModal()" };
 }

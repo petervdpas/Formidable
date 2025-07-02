@@ -303,32 +303,6 @@ export async function applyFieldValues(
   ]);
 }
 
-export function makeSelectableList(
-  items,
-  onSelect,
-  selectedClass = "selected"
-) {
-  items.forEach((item, index) => {
-    const oldElement = item.element;
-    const clean = oldElement.cloneNode(true);
-
-    // 🛠 Restore dataset
-    clean.dataset.value = oldElement.dataset.value;
-    clean.dataset.listId = oldElement.dataset.listId;
-
-    oldElement.replaceWith(clean);
-
-    // 🔄 Replace the reference inside the array!
-    items[index].element = clean;
-
-    clean.addEventListener("click", () => {
-      items.forEach(({ element }) => element.classList.remove(selectedClass));
-      clean.classList.add(selectedClass);
-      onSelect(item.value);
-    });
-  });
-}
-
 export function bindActionHandlers(container, selector, callback) {
   if (!container || typeof container.querySelectorAll !== "function") {
     EventBus.emit("logging:warning", [

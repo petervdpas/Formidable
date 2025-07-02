@@ -4,7 +4,7 @@ import { EventBus } from "./eventBus.js";
 import { ensureVirtualLocation } from "../utils/vfsUtils.js";
 import { stripMetaExtension } from "../utils/pathUtils.js";
 import { buildSwitchElement } from "../utils/elementBuilders.js";
-import { createListManager } from "./listManager.js";
+import { createListManager } from "../utils/listUtils.js";
 import { createAddButton } from "./uiButtons.js";
 
 export function createTemplateListManager(modal, dropdown = null) {

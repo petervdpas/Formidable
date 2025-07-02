@@ -1,7 +1,7 @@
 // modules/profileManager.js
 
 import { EventBus } from "./eventBus.js";
-import { createListManager } from "./listManager.js";
+import { createListManager } from "../utils/listUtils.js";
 import { createProfileAddButton } from "./uiButtons.js";
 
 export function createProfileListManager() {
