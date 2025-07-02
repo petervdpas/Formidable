@@ -150,25 +150,6 @@ export function createDirectoryPicker({
   return { element: wrapper, input, button };
 }
 
-export function populateSelectOptions(
-  selectElement,
-  options = [],
-  selectedValue = ""
-) {
-  selectElement.innerHTML = "";
-
-  options.forEach(({ value, label, disabled = false }) => {
-    const option = document.createElement("option");
-    option.value = value;
-    option.textContent = label;
-    option.disabled = disabled;
-    if (value === selectedValue) {
-      option.selected = true;
-    }
-    selectElement.appendChild(option);
-  });
-}
-
 export function wrapInputWithLabel(
   inputElement,
   labelText,

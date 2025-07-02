@@ -111,13 +111,14 @@ export function setupPluginModal({
   backdropClick = true,
   onOpen = () => {},
   onClose = () => {},
-  prepareBody = null, // ✅ optional hook
+  prepareBody = null,
 } = {}) {
-  if (document.getElementById(id)) {
-    EventBus.emit("logging:warning", [
-      `[setupPluginModal] Modal with id "${id}" already exists.`,
-    ]);
-    return null;
+  const existing = document.getElementById(id);
+  if (existing) {
+    console.warn(
+      `[setupPluginModal] Modal with id "${id}" already exists. Removing...`
+    );
+    existing.remove();
   }
 
   const modal = document.createElement("div");

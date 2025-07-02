@@ -131,11 +131,11 @@ export async function handleUploadPlugin({ folder, js, meta }, callback) {
   }
 }
 
-export async function handleCreatePlugin({ folder }, callback) {
-  console.log(`[PluginHandler] Creating plugin: "${folder}"`);
+export async function handleCreatePlugin({ folder, target = "frontend" }, callback) {
+  console.log(`[PluginHandler] Creating plugin: "${folder}" with target: "${target}"`);
 
   try {
-    const result = await window.api.plugin.createPlugin(folder);
+    const result = await window.api.plugin.createPlugin({ folder, target });
     console.log(
       `[PluginHandler] Plugin "${folder}" created successfully:`,
       result

@@ -174,7 +174,49 @@ function uploadPlugin(folderName, jsContent, meta = null) {
   }
 }
 
-function createPlugin(folderName) {
+function getFrontendBoilerplate(name) {
+  return `// plugins/${name}/plugin.js
+export function run() {
+  const { button, modal } = window.FPA;
+  const { createButton } = button;
+  const { setupPluginModal } = modal;
+
+  const { show } = setupPluginModal({
+    id: "plugin-example-modal",
+    title: "Plugin Injected",
+    body: "",
+
+    prepareBody: (modalEl, bodyEl) => {
+      const p = document.createElement("p");
+      p.textContent =
+        "Hello to a Formidable World! This is a plugin-injected modal.";
+      bodyEl.appendChild(p);
+
+      const btn = createButton({
+        text: "Toast!",
+        className: "btn-success",
+        onClick: () =>
+          emit("ui:toast", { message: "Plugin says hi!", variant: "success" }),
+        ariaLabel: "Send toast",
+      });
+      bodyEl.appendChild(btn);
+    },
+  });
+
+  show();
+}
+`;
+}
+
+function getBackendBoilerplate(name) {
+  return `// plugins/${name}/plugin.js
+exports.run = function (context) {
+  console.log("Hello from ${name}!");
+  return { message: "Hello World", context };
+};`;
+}
+
+function createPlugin(folderName, target = "frontend") {
   ensurePluginFolder();
 
   const safeName = folderName.replace(/[^a-zA-Z0-9_-]/g, "_");
@@ -182,11 +224,10 @@ function createPlugin(folderName) {
   const pluginFile = fileManager.joinPath(pluginDir, "plugin.js");
   const metaFile = fileManager.joinPath(pluginDir, "plugin.json");
 
-  const boilerplateCode = `// plugins/${safeName}/plugin.js
-exports.run = function (context) {
-  console.log("Hello from ${safeName}!");
-  return { message: "Hello World", context };
-};`;
+  const boilerplateCode =
+    target === "frontend"
+      ? getFrontendBoilerplate(safeName)
+      : getBackendBoilerplate(safeName);
 
   const boilerplateMeta = {
     name: safeName,
@@ -195,7 +236,7 @@ exports.run = function (context) {
     author: "Unknown",
     tags: [],
     enabled: true,
-    target: "frontend",
+    target,
   };
 
   try {
@@ -212,14 +253,11 @@ exports.run = function (context) {
       silent: true,
     });
 
-    log(`[PluginManager] Created plugin "${safeName}"`);
+    log(`[PluginManager] Created plugin "${safeName}" (${target})`);
     reloadPlugins();
     return { success: true, message: `Plugin "${safeName}" created.` };
   } catch (err) {
-    error(
-      `[PluginManager] Failed to create plugin "${safeName}":`,
-      err.message
-    );
+    error(`[PluginManager] Failed to create plugin "${safeName}":`, err.message);
     return { success: false, error: err.message };
   }
 }

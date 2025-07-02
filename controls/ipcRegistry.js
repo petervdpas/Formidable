@@ -104,8 +104,17 @@ function registerIpcHandlers() {
     return pluginManager.uploadPlugin(folder, js, meta);
   });
   registerIpc("create-plugin", (e, args) => {
-    const folder = typeof args === "string" ? args : args?.folder;
-    return pluginManager.createPlugin(folder);
+    if (typeof args === "string") {
+      return pluginManager.createPlugin(args, "frontend");
+    }
+
+    if (typeof args === "object" && args !== null) {
+      const folder = args.folder;
+      const target = args.target || "frontend";
+      return pluginManager.createPlugin(folder, target);
+    }
+
+    return { success: false, error: "Invalid arguments for plugin creation." };
   });
 
   // Git

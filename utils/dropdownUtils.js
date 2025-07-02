@@ -1,11 +1,26 @@
-// modules/dropdownManager.js
+// utils//dropdownUtils.js
 
-import { EventBus } from "./eventBus.js";
-import {
-  createStyledLabel,
-  createStyledSelect,
-  populateSelectOptions,
-} from "../utils/elementBuilders.js";
+import { EventBus } from "../modules/eventBus.js";
+import { createStyledLabel, createStyledSelect } from "./elementBuilders.js";
+
+export function populateSelectOptions(
+  selectElement,
+  options = [],
+  selectedValue = ""
+) {
+  selectElement.innerHTML = "";
+
+  options.forEach(({ value, label, disabled = false }) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = label;
+    option.disabled = disabled;
+    if (value === selectedValue) {
+      option.selected = true;
+    }
+    selectElement.appendChild(option);
+  });
+}
 
 export function createDropdown({
   containerId,
@@ -72,10 +87,10 @@ export function createDropdown({
           if (onChange) onChange("");
         }
       } catch (err) {
-        EventBus.emit(
-          "logging:error",
-          [`[DropdownManager] refresh() failed:`, err]
-        );
+        EventBus.emit("logging:error", [
+          `[DropdownManager] refresh() failed:`,
+          err,
+        ]);
       }
     },
   };

@@ -7,7 +7,7 @@ import { renderSettings, getCachedConfig } from "./settingsManager.js";
 import { renderWorkspaceModal } from "./contextManager.js";
 import { applyModalCssClass, setupModal } from "../utils/modalUtils.js";
 import { extractFieldDefinition } from "../utils/formUtils.js";
-import { createDropdown } from "./dropdownManager.js";
+import { createDropdown } from "../utils/dropdownUtils.js";
 import { syncScroll } from "../utils/domUtils.js";
 import { createProfileListManager } from "./profileManager.js";
 import { renderPluginManager } from "./pluginManagerUI.js";
@@ -178,11 +178,20 @@ export function setupPluginModal() {
         header.textContent = "Create New Plugin";
         uploadWrapper.appendChild(header);
 
+        // ── Form Row: Input + Dropdown + Button ─────────
+        const row = document.createElement("div");
+        row.className = "plugin-create-row"; // Requires CSS for flex layout
+
         const folderInput = document.createElement("input");
         folderInput.type = "text";
         folderInput.placeholder = "New plugin folder name";
         folderInput.className = "plugin-upload-folder";
-        uploadWrapper.appendChild(folderInput);
+        row.appendChild(folderInput);
+
+        const dropdownContainer = document.createElement("div");
+        dropdownContainer.id = "plugin-target-dropdown";
+        dropdownContainer.style.flex = "1";
+        row.appendChild(dropdownContainer);
 
         const createBtn = createPluginCreateButton(() => {
           const folder = folderInput.value.trim();
@@ -194,20 +203,39 @@ export function setupPluginModal() {
             return;
           }
 
-          EventBus.emitWithResponse("plugin:create", { folder }).then(
-            (result) => {
-              EventBus.emit("ui:toast", {
-                message: result.message || result.error || "Plugin created.",
-                variant: result.error ? "error" : "success",
-              });
-              listManager.loadList();
-              folderInput.value = "";
-            }
-          );
+          EventBus.emitWithResponse("plugin:create", {
+            folder,
+            target: selectedTarget,
+          }).then((result) => {
+            EventBus.emit("ui:toast", {
+              message: result.message || result.error || "Plugin created.",
+              variant: result.error ? "error" : "success",
+            });
+            listManager.loadList();
+            folderInput.value = "";
+          });
+        });
+        row.appendChild(createBtn);
+
+        uploadWrapper.appendChild(row);
+        container.appendChild(uploadWrapper);
+
+        // ── Initialize Dropdown ─────────────────────────
+        let selectedTarget = "frontend";
+
+        createDropdown({
+          containerId: "plugin-target-dropdown",
+          labelText: "", // omit label for compact layout
+          selectedValue: selectedTarget,
+          options: [
+            { value: "frontend", label: "Frontend" },
+            { value: "backend", label: "Backend" },
+          ],
+          onChange: (val) => {
+            selectedTarget = val;
+          },
         });
 
-        uploadWrapper.appendChild(createBtn);
-        container.appendChild(uploadWrapper);
       } catch (err) {
         console.error("[PluginModal] Failed to render plugin manager:", err);
         container.innerHTML = `<p class="error">Failed to load plugin manager.</p>`;

@@ -1,16 +1,18 @@
 // plugins/Crazy/plugin.js
 export function run() {
-  const { setupPluginModal } = window.FPA.modal;
-  const { createButton } = window.FPA.button;
+  const { button, modal } = window.FPA;
+  const { createButton } = button;
+  const { setupPluginModal } = modal;
 
   const { show } = setupPluginModal({
     id: "plugin-example-modal",
     title: "Plugin Injected",
     body: "",
 
-    prepareBody: (modal, bodyEl) => {
+    prepareBody: (modalEl, bodyEl) => {
       const p = document.createElement("p");
-      p.textContent = "Hello to a Formidable World! This is a plugin-injected modal.";
+      p.textContent =
+        "Hello to a Formidable World! This is a plugin-injected modal.";
       bodyEl.appendChild(p);
 
       const btn = createButton({

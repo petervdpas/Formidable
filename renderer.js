@@ -10,9 +10,9 @@ import {
 } from "./modules/handlers/statusHandler.js";
 
 import { buildMenu, handleMenuAction } from "./modules/menuManager.js";
-import { createDropdown } from "./modules/dropdownManager.js";
 import { initTemplateEditor } from "./modules/templateEditor.js";
 import { createFormManager } from "./modules/formUI.js";
+import { createDropdown } from "./utils/dropdownUtils.js";
 
 import {
   setupProfileModal,

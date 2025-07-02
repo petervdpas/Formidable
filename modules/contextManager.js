@@ -4,7 +4,7 @@ import { EventBus } from "./eventBus.js";
 import { ensureVirtualLocation } from "../utils/vfsUtils.js";
 import { setupSplitter } from "../utils/resizing.js";
 import { createSwitch } from "../utils/elementBuilders.js";
-import { createDropdown } from "./dropdownManager.js";
+import { createDropdown } from "../utils/dropdownUtils.js";
 
 let templateSplitterInitialized = false;
 let storageSplitterInitialized = false;

@@ -1,8 +1,12 @@
 /* Plugin Manager List Area */
 #plugin-list {
+  max-height: 24vh;
+  overflow-y: auto;
+  padding-right: 0.5em;
   padding-top: 1em;
   border-top: 1px solid var(--border-color, #ccc);
 }
+
 
 /* Each Plugin Item */
 .plugin-list-item {
@@ -66,7 +70,6 @@
 
 .plugin-upload-folder {
   width: calc(100% - 9em);
-  margin-right: 0.6em;
   padding: 6px 10px;
   font-size: 14px;
   border: 1px solid #ccc;
@@ -80,4 +83,21 @@
 /* Reload Button */
 #btn-reload-plugins {
   margin-bottom: 1em;
+}
+
+.plugin-create-row {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.plugin-create-row input,
+.plugin-create-row select {
+  flex: 1;
+  min-width: 0;
+}
+
+.plugin-create-row .btn {
+  white-space: nowrap;
 }
