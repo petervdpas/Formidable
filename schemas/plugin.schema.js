@@ -9,6 +9,7 @@ module.exports = {
     tags: [],
     enabled: true,
     run: null,
+    target: "backend", // ensure target is defaulted
   },
 
   sanitize(raw = {}, pluginName = "unnamed") {
@@ -22,7 +23,12 @@ module.exports = {
     if (!Array.isArray(plugin.tags)) plugin.tags = [];
     plugin.enabled = raw.enabled !== false;
 
-    if (typeof plugin.run !== "function") {
+    // 🧠 Important fix:
+    // Allow frontend plugins to skip defining run()
+    if (
+      typeof plugin.run !== "function" &&
+      plugin.target !== "frontend"
+    ) {
       throw new Error(`[plugin.schema] Plugin "${pluginName}" is missing a valid run() function`);
     }
 

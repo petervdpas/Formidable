@@ -1,9 +1,9 @@
 // modules/pluginManagerUI.js
 import { EventBus } from "./eventBus.js";
+import { buildButtonGroup } from "../utils/buttonUtils.js";
 import {
   createPluginToggleButton,
   createPluginDeleteButton,
-  buildButtonGroup,
 } from "./uiButtons.js";
 import { createListManager } from "./listManager.js";
 

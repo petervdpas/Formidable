@@ -6,6 +6,7 @@
       http-equiv="Content-Security-Policy"
       content="
   default-src 'self';
+  script-src 'self' blob:;
   img-src 'self' data:;
   style-src 'self' 'unsafe-inline';
   font-src 'self' data:;
@@ -326,6 +327,9 @@
       </div>
     </div>
 
+    <!-- Plugin container -->
+    <div id="plugin-executor"></div>
+    
     <div id="modalBackdrop" class="modal-backdrop"></div>
     <div id="toast-container"></div>
 

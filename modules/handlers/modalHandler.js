@@ -1,9 +1,9 @@
 // modules/handlers/modalHandler.js
 
+import { buildButtonGroup } from "../../utils/buttonUtils.js";
 import {
   createModalConfirmButton,
   createModalCancelButton,
-  buildButtonGroup,
 } from "../uiButtons.js";
 import { sanitize } from "../../utils/stringUtils.js";
 import { getCompactDate } from "../../utils/dateUtils.js";

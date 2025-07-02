@@ -93,7 +93,7 @@ function registerIpcHandlers() {
     if (typeof name !== "string") {
       throw new Error("Invalid plugin name");
     }
-    return getPluginCode(name); // should return { success, code, ... }
+    return pluginManager.getPluginCode(name); // should return { success, code, ... }
   });
   registerIpc("reload-plugins", () => {
     pluginManager.reloadPlugins();

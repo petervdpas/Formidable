@@ -1,11 +1,11 @@
 // modules/modalSetup.js
 
-import { setupModal } from "./modalManager.js";
 import { EventBus } from "./eventBus.js";
+import { buildButtonGroup } from "../utils/buttonUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 import { renderSettings, getCachedConfig } from "./settingsManager.js";
 import { renderWorkspaceModal } from "./contextManager.js";
-import { applyModalCssClass } from "../utils/modalUtils.js";
+import { applyModalCssClass, setupModal } from "../utils/modalUtils.js";
 import { extractFieldDefinition } from "../utils/formUtils.js";
 import { createDropdown } from "./dropdownManager.js";
 import { syncScroll } from "../utils/domUtils.js";
@@ -20,7 +20,6 @@ import {
   createPaneCloseButton,
   createPluginReloadButton,
   createPluginCreateButton,
-  buildButtonGroup,
 } from "./uiButtons.js";
 
 export function setupProfileModal() {

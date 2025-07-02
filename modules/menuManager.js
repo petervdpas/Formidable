@@ -72,8 +72,8 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   ];
 
   const plugins = await EventBus.emitWithResponse("plugin:list", null);
-  pluginMap = new Map(plugins.map((p) => [p.name, p])); // ✅ cache plugin meta
-
+  pluginMap = new Map(plugins.map((p) => [p.name, p])); 
+  
   if (plugins?.length) {
     pluginItems.push("separator");
 

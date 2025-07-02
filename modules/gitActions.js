@@ -1,13 +1,12 @@
 // modules/gitActions.js
 
 import { EventBus } from "./eventBus.js";
+import { buildButtonGroup } from "../utils/buttonUtils.js";
 import {
   createGitCommitButton,
   createGitPushButton,
   createGitPullButton,
-  buildButtonGroup,
 } from "./uiButtons.js";
-
 import { createFormRowInput } from "../utils/elementBuilders.js";
 
 // ─── Git Line Formatter ─────────────────────────────────────

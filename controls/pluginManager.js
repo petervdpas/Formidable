@@ -23,7 +23,9 @@ function ensurePluginFolder() {
 function loadPlugins() {
   ensurePluginFolder();
 
-  const entries = fileManager.listDirectoryEntries(getPluginRoot(), { silent: true });
+  const entries = fileManager.listDirectoryEntries(getPluginRoot(), {
+    silent: true,
+  });
   const folders = entries.filter((e) => e.isDirectory).map((e) => e.name);
 
   log(`[PluginManager] Found ${folders.length} plugin folder(s)`);
@@ -39,36 +41,57 @@ function loadPlugins() {
         continue;
       }
 
-      const meta = fileManager.loadFile(metaPath, { format: "json", silent: true });
+      const meta = fileManager.loadFile(metaPath, {
+        format: "json",
+        silent: true,
+      });
 
       let run = null;
-      if (fileManager.fileExists(pluginPath)) {
+      if (fileManager.fileExists(pluginPath) && meta.target !== "frontend") {
         delete require.cache[require.resolve(pluginPath)];
         const pluginExport = require(pluginPath);
-        run = typeof pluginExport.run === "function" ? pluginExport.run : pluginExport;
+        run =
+          typeof pluginExport.run === "function"
+            ? pluginExport.run
+            : pluginExport;
       }
 
-      const pluginDef = { ...meta, run };
-      const plugin = pluginSchema.sanitize({ name: folder, ...pluginDef }, folder);
+      const pluginDef = run ? { ...meta, run } : { ...meta };
+      const plugin = pluginSchema.sanitize(
+        { name: folder, ...pluginDef },
+        folder
+      );
 
       pluginRepo[plugin.name] = plugin;
-      log(`[PluginManager] Registered plugin: ${plugin.name} (${plugin.version})`);
+      log(
+        `[PluginManager] Registered plugin: ${plugin.name} (${plugin.version})`
+      );
     } catch (err) {
       error(`[PluginManager] Failed to load plugin "${folder}":`, err.message);
     }
   }
+
+  // 🔍 Add this at the end to log the full pluginRepo
+  console.log("[PluginManager] Final pluginRepo contents:", pluginRepo);
 }
 
 function getPluginCode(name) {
   const safeName = name.replace(/[^a-zA-Z0-9_-]/g, "_");
-  const pluginPath = fileManager.joinPath(getPluginRoot(), safeName, "plugin.js");
+  const pluginPath = fileManager.joinPath(
+    getPluginRoot(),
+    safeName,
+    "plugin.js"
+  );
 
   if (!fileManager.fileExists(pluginPath)) {
     return { success: false, error: `Plugin "${name}" not found.` };
   }
 
   try {
-    const code = fileManager.loadFile(pluginPath, { format: "text", silent: true });
+    const code = fileManager.loadFile(pluginPath, {
+      format: "text",
+      silent: true,
+    });
     return { success: true, code };
   } catch (err) {
     error(`[PluginManager] Failed to read code for "${name}":`, err.message);
@@ -81,7 +104,9 @@ async function runPlugin(name, context = {}) {
   if (!plugin) return { error: `Plugin "${name}" not found.` };
 
   if (plugin.target === "frontend") {
-    log(`[PluginManager] Plugin "${name}" is frontend-only. Skipping backend run.`);
+    log(
+      `[PluginManager] Plugin "${name}" is frontend-only. Skipping backend run.`
+    );
     return { success: false, message: "Frontend plugin. Not run on backend." };
   }
 
@@ -97,8 +122,16 @@ async function runPlugin(name, context = {}) {
 
 function listPlugins() {
   return Object.keys(pluginRepo).map((name) => {
-    const { version, description = "", author = "", tags = [], enabled } = pluginRepo[name];
-    return { name, version, description, author, tags, enabled };
+    const {
+      version,
+      description = "",
+      author = "",
+      tags = [],
+      enabled,
+      target = "backend",
+    } = pluginRepo[name];
+
+    return { name, version, description, author, tags, enabled, target };
   });
 }
 
@@ -116,8 +149,14 @@ function uploadPlugin(folderName, jsContent, meta = null) {
   const metaFile = fileManager.joinPath(pluginDir, "plugin.json");
 
   try {
-    fileManager.ensureDirectory(pluginDir, { label: `Plugin<${safeName}>`, silent: true });
-    fileManager.saveFile(pluginFile, jsContent, { format: "text", silent: false });
+    fileManager.ensureDirectory(pluginDir, {
+      label: `Plugin<${safeName}>`,
+      silent: true,
+    });
+    fileManager.saveFile(pluginFile, jsContent, {
+      format: "text",
+      silent: false,
+    });
 
     if (meta && typeof meta === "object") {
       fileManager.saveFile(metaFile, meta, { format: "json", silent: true });
@@ -127,7 +166,10 @@ function uploadPlugin(folderName, jsContent, meta = null) {
     reloadPlugins();
     return { success: true, message: `Plugin "${safeName}" uploaded.` };
   } catch (err) {
-    error(`[PluginManager] Failed to upload plugin "${safeName}":`, err.message);
+    error(
+      `[PluginManager] Failed to upload plugin "${safeName}":`,
+      err.message
+    );
     return { success: false, error: err.message };
   }
 }
@@ -157,15 +199,27 @@ exports.run = function (context) {
   };
 
   try {
-    fileManager.ensureDirectory(pluginDir, { label: `Plugin<${safeName}>`, silent: true });
-    fileManager.saveFile(pluginFile, boilerplateCode, { format: "text", silent: false });
-    fileManager.saveFile(metaFile, boilerplateMeta, { format: "json", silent: true });
+    fileManager.ensureDirectory(pluginDir, {
+      label: `Plugin<${safeName}>`,
+      silent: true,
+    });
+    fileManager.saveFile(pluginFile, boilerplateCode, {
+      format: "text",
+      silent: false,
+    });
+    fileManager.saveFile(metaFile, boilerplateMeta, {
+      format: "json",
+      silent: true,
+    });
 
     log(`[PluginManager] Created plugin "${safeName}"`);
     reloadPlugins();
     return { success: true, message: `Plugin "${safeName}" created.` };
   } catch (err) {
-    error(`[PluginManager] Failed to create plugin "${safeName}":`, err.message);
+    error(
+      `[PluginManager] Failed to create plugin "${safeName}":`,
+      err.message
+    );
     return { success: false, error: err.message };
   }
 }

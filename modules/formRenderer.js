@@ -1,11 +1,8 @@
 // modules/formRenderer.js
 
-import {
-  buildHiddenInput,
-} from "../utils/elementBuilders.js";
-import {
-  injectFieldDefaults,
-} from "../utils/formUtils.js";
+import { buildHiddenInput } from "../utils/elementBuilders.js";
+import { buildButtonGroup } from "../utils/buttonUtils.js";
+import { injectFieldDefaults } from "../utils/formUtils.js";
 import { applyFieldValues, focusFirstInput } from "../utils/domUtils.js";
 import { createToggleButtons } from "../utils/iconButtonToggle.js";
 import {
@@ -16,7 +13,6 @@ import {
   createFormDeleteIconButton,
   createFormRenderButton,
   createFormRenderIconButton,
-  buildButtonGroup,
 } from "./uiButtons.js";
 import { fieldGroupRenderer } from "../utils/fieldGroupRenderer.js";
 
@@ -67,9 +63,7 @@ async function buildMetaSection(
   const metaText = document.createElement("div");
   metaText.className = "meta-text";
 
-  const metaLines = [
-    `Filename: ${filename || ""}`,
-  ];
+  const metaLines = [`Filename: ${filename || ""}`];
 
   if (meta.id) {
     metaLines.push(`ID: ${meta.id}`);
@@ -170,7 +164,13 @@ export async function renderFormUI(
 
   const fields = template.fields || [];
   injectFieldDefaults(fields, metaData);
-  await fieldGroupRenderer(container, fields, metaData, template, eventFunctions);
+  await fieldGroupRenderer(
+    container,
+    fields,
+    metaData,
+    template,
+    eventFunctions
+  );
 
   await applyFieldValues(container, template, metaData, eventFunctions);
   focusFirstInput(container);
