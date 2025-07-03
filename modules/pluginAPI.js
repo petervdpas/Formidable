@@ -63,6 +63,7 @@ export function exposePluginAPI() {
 
     // DOM/utility helpers
     dom: {
+      loadRemoteScript: domUtils.loadRemoteScript,
       generateGuid: domUtils.generateGuid,
       clearHighlighted: domUtils.clearHighlighted,
       highlightSelected: domUtils.highlightSelected,
