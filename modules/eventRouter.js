@@ -2,6 +2,7 @@
 
 import { EventBus } from "./eventBus.js";
 
+import * as systemHandler from "./handlers/systemHandler.js";
 import * as serverHandler from "./handlers/serverHandler.js";
 import * as pluginHandler from "./handlers/pluginHandler.js";
 import * as cacheHandler from "./handlers/cacheHandler.js";
@@ -31,6 +32,21 @@ export function initEventRouter() {
   routerInitialized = true;
 
   console.log("[EventRouter] Initializing global event listeners...");
+
+  // File events
+  EventBus.off("file:resolve", systemHandler.handleResolvePath);
+  EventBus.off("file:save", systemHandler.handleSaveFile);
+  EventBus.off("file:load", systemHandler.handleLoadFile);
+  EventBus.off("file:delete", systemHandler.handleDeleteFile);
+  EventBus.off("file:exists", systemHandler.handleFileExists);
+  EventBus.off("file:openExternal", systemHandler.handleOpenExternal);
+
+  EventBus.on("file:resolve", systemHandler.handleResolvePath);
+  EventBus.on("file:save", systemHandler.handleSaveFile);
+  EventBus.on("file:load", systemHandler.handleLoadFile);
+  EventBus.on("file:delete", systemHandler.handleDeleteFile);
+  EventBus.on("file:exists", systemHandler.handleFileExists);
+  EventBus.on("file:openExternal", systemHandler.handleOpenExternal);
 
   // Internal Server
   EventBus.off("server:start", serverHandler.handleStartServer);

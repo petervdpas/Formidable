@@ -1,8 +1,11 @@
 // modules/pluginAPI.js
 
 import { EventBus } from "./eventBus.js";
+import * as configUtils from "../utils/configUtils.js";
+import * as pluginUtils from "../utils/pluginUtils.js";
 import * as modalUtils from "../utils/modalUtils.js";
 import * as listUtils from "../utils/listUtils.js";
+import * as elementBuilders from "../utils/elementBuilders.js";
 import * as domUtils from "../utils/domUtils.js";
 import * as buttonUtils from "../utils/buttonUtils.js";
 
@@ -10,6 +13,24 @@ export function exposePluginAPI() {
   const api = {
     // Core event system
     EventBus,
+
+    // Plugin management utilities
+    plugin: {
+      getSettings: pluginUtils.getPluginSettings,
+      saveSettings: pluginUtils.savePluginSettings,
+      resolvePath: pluginUtils.resolvePath,
+      saveFile: pluginUtils.saveFile,
+      loadFile: pluginUtils.loadFile,
+      deleteFile: pluginUtils.deleteFile,
+      fileExists: pluginUtils.fileExists,
+      openExternal: pluginUtils.openExternal,
+    },
+
+    // Configuration management
+    config: {
+      getConfig: configUtils.getUserConfig,
+      saveConfig: configUtils.saveUserConfig,
+    },
 
     // Modal and popup helpers
     modal: {
@@ -24,6 +45,20 @@ export function exposePluginAPI() {
     list: {
       createListManager: listUtils.createListManager,
       makeSelectableList: listUtils.makeSelectableList,
+    },
+
+    // Element creation and manipulation
+    builders: {
+      createStyledLabel: elementBuilders.createStyledLabel,
+      createStyledSelect: elementBuilders.createStyledSelect,
+      addContainerElement: elementBuilders.addContainerElement,
+      createFormRowInput: elementBuilders.createFormRowInput,
+      createDirectoryPicker: elementBuilders.createDirectoryPicker,
+      wrapInputWithLabel: elementBuilders.wrapInputWithLabel,
+      buildHiddenInput: elementBuilders.buildHiddenInput,
+      buildReadOnlyInput: elementBuilders.buildReadOnlyInput,
+      buildSwitchElement: elementBuilders.buildSwitchElement,
+      createSwitch: elementBuilders.createSwitch,
     },
 
     // DOM/utility helpers

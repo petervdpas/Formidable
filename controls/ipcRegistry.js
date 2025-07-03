@@ -288,6 +288,15 @@ function registerIpcHandlers() {
   registerIpc("resolve-path", (e, ...segments) =>
     fileManager.resolvePath(...segments)
   );
+  registerIpc("save-file", (e, filepath, data, opts) =>
+    fileManager.saveFile(filepath, data, opts)
+  );
+  registerIpc("load-file", (e, filepath, opts) =>
+    fileManager.loadFile(filepath, opts)
+  );
+  registerIpc("delete-file", (e, filepath, opts) =>
+    fileManager.deleteFile(filepath, opts)
+  );
   registerIpc("file-exists", (e, filePath) => fileManager.fileExists(filePath));
 }
 

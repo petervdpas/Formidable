@@ -79,6 +79,12 @@ const api = {
   system: {
     getAppRoot: () => ipcRenderer.invoke("get-app-root"),
     resolvePath: (...args) => ipcRenderer.invoke("resolve-path", ...args),
+    saveFile: (filepath, data, opts) =>
+      ipcRenderer.invoke("save-file", filepath, data, opts),
+    loadFile: (filepath, opts) =>
+      ipcRenderer.invoke("load-file", filepath, opts),
+    deleteFile: (filepath, opts) =>
+      ipcRenderer.invoke("delete-file", filepath, opts),
     fileExists: (path) => ipcRenderer.invoke("file-exists", path),
     openExternal: (url) => ipcRenderer.invoke("shell-open-external", url),
   },
