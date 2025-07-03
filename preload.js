@@ -16,6 +16,9 @@ const api = {
     "reload-plugins",
     "upload-plugin",
     "create-plugin",
+    "delete-plugin",
+    "get-plugin-settings",
+    "save-plugin-settings",
   ]),
   git: buildGroup([
     "is-git-repo",

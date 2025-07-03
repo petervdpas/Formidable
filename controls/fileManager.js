@@ -214,6 +214,23 @@ function deleteFile(filepath, { silent = false } = {}) {
   }
 }
 
+function deleteFolder(dirPath, { silent = false } = {}) {
+  try {
+    const fullPath = resolvePath(dirPath);
+    if (fs.existsSync(fullPath)) {
+      fs.rmSync(fullPath, { recursive: true, force: true });
+      if (!silent) log(`[FileManager] Deleted folder: ${fullPath}`);
+      return true;
+    } else {
+      if (!silent) warn(`[FileManager] Folder not found for deletion: ${fullPath}`);
+      return false;
+    }
+  } catch (err) {
+    if (!silent) error(`[FileManager] Failed to delete folder ${dirPath}:`, err);
+    return false;
+  }
+}
+
 module.exports = {
   baseDir,
   setAppRoot,
@@ -231,4 +248,5 @@ module.exports = {
   saveFile,
   saveImageFile,
   deleteFile,
+  deleteFolder,
 };

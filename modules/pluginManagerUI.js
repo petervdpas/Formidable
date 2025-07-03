@@ -28,26 +28,24 @@ export async function renderPluginManager(container) {
       const toggleBtn = createPluginToggleButton(
         rawData.name,
         rawData.enabled,
-        () => {
-          EventBus.emit(
-            "plugin:update",
-            {
-              folder: rawData.name,
-              updates: { enabled: !rawData.enabled },
-            },
-            () => listManager.loadList()
-          );
+        async () => {
+          await EventBus.emitWithResponse("plugin:update", {
+            folder: rawData.name,
+            updates: { enabled: !rawData.enabled },
+          });
+          await listManager.loadList();
         }
       );
 
-      const deleteBtn = createPluginDeleteButton(rawData.name, () => {
-        EventBus.emit(
-          "plugin:delete",
-          {
-            folder: rawData.name,
-          },
-          () => listManager.loadList()
-        );
+      const deleteBtn = createPluginDeleteButton(rawData.name, async () => {
+        const confirmed = window.confirm(`Delete plugin "${rawData.name}"?`);
+        if (!confirmed) return;
+
+        await EventBus.emitWithResponse("plugin:delete", {
+          folder: rawData.name,
+        });
+
+        await listManager.loadList();
       });
 
       const btnGroup = buildButtonGroup(toggleBtn, deleteBtn);
@@ -55,6 +53,7 @@ export async function renderPluginManager(container) {
     },
 
     onItemClick: () => {},
+
     emptyMessage: "No plugins found.",
   });
 

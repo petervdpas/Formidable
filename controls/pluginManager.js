@@ -6,6 +6,10 @@ const pluginSchema = require("../schemas/plugin.schema.js");
 
 const pluginRepo = Object.create(null);
 
+function getSafePluginName(name) {
+  return name.replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
 function getPluginRoot() {
   return fileManager.resolvePath("plugins");
 }
@@ -76,7 +80,7 @@ function loadPlugins() {
 }
 
 function getPluginCode(name) {
-  const safeName = name.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const safeName = getSafePluginName(name);
   const pluginPath = fileManager.joinPath(
     getPluginRoot(),
     safeName,
@@ -143,7 +147,7 @@ function reloadPlugins() {
 function uploadPlugin(folderName, jsContent, meta = null) {
   ensurePluginFolder();
 
-  const safeName = folderName.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const safeName = getSafePluginName(folderName);
   const pluginDir = fileManager.joinPath(getPluginRoot(), safeName);
   const pluginFile = fileManager.joinPath(pluginDir, "plugin.js");
   const metaFile = fileManager.joinPath(pluginDir, "plugin.json");
@@ -168,6 +172,81 @@ function uploadPlugin(folderName, jsContent, meta = null) {
   } catch (err) {
     error(
       `[PluginManager] Failed to upload plugin "${safeName}":`,
+      err.message
+    );
+    return { success: false, error: err.message };
+  }
+}
+
+function deletePlugin(name) {
+  const safeName = getSafePluginName(name);
+  const pluginDir = fileManager.joinPath(getPluginRoot(), safeName);
+
+  try {
+    if (!fileManager.fileExists(fileManager.joinPath(pluginDir, "plugin.json"))) {
+      return { success: false, error: `Plugin "${name}" not found.` };
+    }
+
+    const deleted = fileManager.deleteFolder(pluginDir, { silent: false });
+
+    if (deleted) {
+      delete pluginRepo[safeName];
+      log(`[PluginManager] Deleted plugin "${safeName}"`);
+      return { success: true, message: `Plugin "${safeName}" deleted.` };
+    } else {
+      return { success: false, error: `Failed to delete plugin "${safeName}".` };
+    }
+  } catch (err) {
+    error(`[PluginManager] Error deleting plugin "${safeName}":`, err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+
+function getPluginSettings(name) {
+  const safeName = getSafePluginName(name);
+  const settingsPath = fileManager.joinPath(
+    getPluginRoot(),
+    safeName,
+    "settings.json"
+  );
+
+  if (!fileManager.fileExists(settingsPath)) {
+    return {}; // default empty settings
+  }
+
+  try {
+    return fileManager.loadFile(settingsPath, {
+      format: "json",
+      silent: true,
+    });
+  } catch (err) {
+    error(
+      `[PluginManager] Failed to read settings for "${name}":`,
+      err.message
+    );
+    return {};
+  }
+}
+
+function savePluginSettings(name, settings) {
+  const safeName = getSafePluginName(name);
+  const settingsPath = fileManager.joinPath(
+    getPluginRoot(),
+    safeName,
+    "settings.json"
+  );
+
+  try {
+    fileManager.saveFile(settingsPath, settings, {
+      format: "json",
+      silent: true,
+    });
+    log(`[PluginManager] Saved settings for "${name}"`);
+    return { success: true };
+  } catch (err) {
+    error(
+      `[PluginManager] Failed to save settings for "${name}":`,
       err.message
     );
     return { success: false, error: err.message };
@@ -219,7 +298,7 @@ exports.run = function (context) {
 function createPlugin(folderName, target = "frontend") {
   ensurePluginFolder();
 
-  const safeName = folderName.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const safeName = getSafePluginName(folderName);
   const pluginDir = fileManager.joinPath(getPluginRoot(), safeName);
   const pluginFile = fileManager.joinPath(pluginDir, "plugin.js");
   const metaFile = fileManager.joinPath(pluginDir, "plugin.json");
@@ -257,7 +336,10 @@ function createPlugin(folderName, target = "frontend") {
     reloadPlugins();
     return { success: true, message: `Plugin "${safeName}" created.` };
   } catch (err) {
-    error(`[PluginManager] Failed to create plugin "${safeName}":`, err.message);
+    error(
+      `[PluginManager] Failed to create plugin "${safeName}":`,
+      err.message
+    );
     return { success: false, error: err.message };
   }
 }
@@ -270,4 +352,7 @@ module.exports = {
   reloadPlugins,
   uploadPlugin,
   createPlugin,
+  deletePlugin,
+  getPluginSettings,
+  savePluginSettings,
 };

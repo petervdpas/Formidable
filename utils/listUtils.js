@@ -7,23 +7,24 @@ export function makeSelectableList(
   onSelect,
   selectedClass = "selected"
 ) {
-  items.forEach((item, index) => {
-    const oldElement = item.element;
-    const clean = oldElement.cloneNode(true);
+  items.forEach((item) => {
+    const el = item.element;
 
-    // 🛠 Restore dataset
-    clean.dataset.value = oldElement.dataset.value;
-    clean.dataset.listId = oldElement.dataset.listId;
+    el.addEventListener("click", (e) => {
+      const isButtonClick =
+        e.target.closest("button") || e.target.closest(".btn");
+      if (isButtonClick) {
+        console.log("[SelectableList] Ignoring click on button inside item");
+        return;
+      }
 
-    oldElement.replaceWith(clean);
-
-    // Replace the reference inside the array!
-    items[index].element = clean;
-
-    clean.addEventListener("click", () => {
+      console.log("[SelectableList] Selecting item:", item.value);
       items.forEach(({ element }) => element.classList.remove(selectedClass));
-      clean.classList.add(selectedClass);
-      onSelect(item.value);
+      el.classList.add(selectedClass);
+
+      if (typeof onSelect === "function") {
+        onSelect(item.value);
+      }
     });
   });
 }

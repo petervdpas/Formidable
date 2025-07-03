@@ -44,7 +44,6 @@ export async function runFrontendPlugin(name, context = {}) {
 export async function handleListPlugins(_, callback) {
   try {
     const list = await window.api.plugin.listPlugins();
-    console.log("Loaded plugin list:", list); // 👈 add this for debugging
     callback?.(list);
   } catch (err) {
     EventBus.emit("logging:error", [
@@ -143,6 +142,45 @@ export async function handleCreatePlugin({ folder, target = "frontend" }, callba
     callback?.(result);
   } catch (err) {
     console.error("[PluginHandler] createPlugin failed:", err);
+    callback?.({ success: false, error: err.message });
+  }
+}
+
+export async function handleDeletePlugin({ folder }, callback) {
+  try {
+    const result = await window.api.plugin.deletePlugin(folder);
+    callback?.(result);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[PluginHandler] deletePlugin "${folder}" failed:`,
+      err,
+    ]);
+    callback?.({ success: false, error: err.message });
+  }
+}
+
+export async function handleGetPluginSettings({ name }, callback) {
+  try {
+    const settings = await window.api.plugin.getPluginSettings(name);
+    callback?.(settings);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[PluginHandler] getPluginSettings "${name}" failed:`,
+      err,
+    ]);
+    callback?.({});
+  }
+}
+
+export async function handleSavePluginSettings({ name, settings }, callback) {
+  try {
+    const result = await window.api.plugin.savePluginSettings({ name, settings });
+    callback?.(result);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[PluginHandler] savePluginSettings "${name}" failed:`,
+      err,
+    ]);
     callback?.({ success: false, error: err.message });
   }
 }

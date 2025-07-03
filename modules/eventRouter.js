@@ -48,6 +48,9 @@ export function initEventRouter() {
   EventBus.off("plugin:upload", pluginHandler.handleUploadPlugin);
   EventBus.off("plugin:create", pluginHandler.handleCreatePlugin);
   EventBus.off("plugin:get-code", pluginHandler.handleGetPluginCode);
+  EventBus.off("plugin:delete", pluginHandler.handleDeletePlugin);
+  EventBus.off("plugin:get-settings", pluginHandler.handleGetPluginSettings);
+  EventBus.off("plugin:save-settings", pluginHandler.handleSavePluginSettings);
 
   EventBus.on("plugin:list", pluginHandler.handleListPlugins);
   EventBus.on("plugin:run", pluginHandler.handleRunPlugin);
@@ -55,6 +58,9 @@ export function initEventRouter() {
   EventBus.on("plugin:upload", pluginHandler.handleUploadPlugin);
   EventBus.on("plugin:create", pluginHandler.handleCreatePlugin);
   EventBus.on("plugin:get-code", pluginHandler.handleGetPluginCode);
+  EventBus.on("plugin:delete", pluginHandler.handleDeletePlugin);
+  EventBus.on("plugin:get-settings", pluginHandler.handleGetPluginSettings);
+  EventBus.on("plugin:save-settings", pluginHandler.handleSavePluginSettings);
 
   // Logging
   EventBus.off("logging:toggle", loggingHandler.handleLoggingToggle);

@@ -116,6 +116,33 @@ function registerIpcHandlers() {
 
     return { success: false, error: "Invalid arguments for plugin creation." };
   });
+  registerIpc("delete-plugin", (e, name) => {
+    if (typeof name !== "string") {
+      return { success: false, error: "Invalid plugin name" };
+    }
+    return pluginManager.deletePlugin(name);
+  });
+  registerIpc("get-plugin-settings", (e, name) => {
+    if (typeof name !== "string") {
+      throw new Error("Invalid plugin name");
+    }
+    return pluginManager.getPluginSettings(name);
+  });
+
+  registerIpc("save-plugin-settings", (e, args) => {
+    const { name, settings } = args || {};
+    if (
+      typeof name !== "string" ||
+      typeof settings !== "object" ||
+      settings === null
+    ) {
+      return {
+        success: false,
+        error: "Invalid arguments for saving plugin settings.",
+      };
+    }
+    return pluginManager.savePluginSettings(name, settings);
+  });
 
   // Git
   registerIpc("is-git-repo", (e, folder) => gitManager.isGitRepo(folder));
