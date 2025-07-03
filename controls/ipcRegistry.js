@@ -82,6 +82,9 @@ function registerIpcHandlers() {
   registerIpc("get-internal-server-status", () => internalServer.getStatus());
 
   // Plugins
+  registerIpc("get-plugins-path", () => {
+    return pluginManager.getPluginRoot();
+  });
   registerIpc("list-plugins", () => pluginManager.listPlugins());
   registerIpc("run-plugin", (e, name, context = {}) => {
     if (typeof name !== "string") {
@@ -98,10 +101,6 @@ function registerIpcHandlers() {
   registerIpc("reload-plugins", () => {
     pluginManager.reloadPlugins();
     return pluginManager.listPlugins();
-  });
-  registerIpc("upload-plugin", (e, args) => {
-    const { folder, js, meta } = args || {};
-    return pluginManager.uploadPlugin(folder, js, meta);
   });
   registerIpc("create-plugin", (e, args) => {
     if (typeof args === "string") {
@@ -128,7 +127,6 @@ function registerIpcHandlers() {
     }
     return pluginManager.getPluginSettings(name);
   });
-
   registerIpc("save-plugin-settings", (e, args) => {
     const { name, settings } = args || {};
     if (

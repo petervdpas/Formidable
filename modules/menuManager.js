@@ -36,6 +36,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
     createMenuGroup("File", [
       { label: "Open Template Folder", action: "open-template-folder" },
       { label: "Open Storage Folder", action: "open-storage-folder" },
+      { label: "Open Plugins Folder", action: "open-plugins-folder" },
       "separator",
       { label: "Quit", action: "quit" },
     ]),
@@ -72,8 +73,8 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   ];
 
   const plugins = await EventBus.emitWithResponse("plugin:list", null);
-  pluginMap = new Map(plugins.map((p) => [p.name, p])); 
-  
+  pluginMap = new Map(plugins.map((p) => [p.name, p]));
+
   if (plugins?.length) {
     pluginItems.push("separator");
 
@@ -234,6 +235,38 @@ export async function handleMenuAction(action) {
       } catch (err) {
         EventBus.emit("logging:error", [
           "[Menu] Failed to open storage folder:",
+          err,
+        ]);
+      }
+      break;
+    }
+
+    case "open-plugins-folder": {
+      try {
+        const pluginPath = await EventBus.emitWithResponse(
+          "plugin:get-plugins-path",
+          null
+        );
+
+        if (!pluginPath) {
+          throw new Error("No plugin path returned");
+        }
+
+        const result = await window.electron.shell.openPath(pluginPath);
+        if (result) {
+          EventBus.emit("logging:error", [
+            "[Shell] Failed to open plugins folder:",
+            result,
+          ]);
+        } else {
+          EventBus.emit("logging:default", [
+            "[Shell] Opened plugins folder:",
+            pluginPath,
+          ]);
+        }
+      } catch (err) {
+        EventBus.emit("logging:error", [
+          "[Menu] Failed to open plugins folder:",
           err,
         ]);
       }

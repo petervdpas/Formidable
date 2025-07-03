@@ -42,6 +42,7 @@ export function initEventRouter() {
   EventBus.on("server:status", serverHandler.handleGetServerStatus);
 
   // Plugin events
+  EventBus.off("plugin:get-plugins-path", pluginHandler.handleGetPluginPath);
   EventBus.off("plugin:list", pluginHandler.handleListPlugins);
   EventBus.off("plugin:run", pluginHandler.handleRunPlugin);
   EventBus.off("plugin:reload", pluginHandler.handleReloadPlugins);
@@ -52,6 +53,7 @@ export function initEventRouter() {
   EventBus.off("plugin:get-settings", pluginHandler.handleGetPluginSettings);
   EventBus.off("plugin:save-settings", pluginHandler.handleSavePluginSettings);
 
+  EventBus.on("plugin:get-plugins-path", pluginHandler.handleGetPluginPath);
   EventBus.on("plugin:list", pluginHandler.handleListPlugins);
   EventBus.on("plugin:run", pluginHandler.handleRunPlugin);
   EventBus.on("plugin:reload", pluginHandler.handleReloadPlugins);

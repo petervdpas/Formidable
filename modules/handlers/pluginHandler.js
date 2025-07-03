@@ -2,6 +2,19 @@
 
 import { EventBus } from "../eventBus.js";
 
+export async function handleGetPluginPath(_, callback) {
+  try {
+    const path = await window.api.plugin.getPluginsPath();
+    callback?.(path);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      "[PluginHandler] getPluginsPath failed:",
+      err,
+    ]);
+    callback?.(null);
+  }
+}
+
 export async function runFrontendPlugin(name, context = {}) {
   const result = await window.api.plugin.getPluginCode(name);
 

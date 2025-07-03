@@ -10,11 +10,11 @@ const api = {
     "get-internal-server-status",
   ]),
   plugin: buildGroup([
+    "get-plugins-path",
     "list-plugins",
     "run-plugin",
     "get-plugin-code",
     "reload-plugins",
-    "upload-plugin",
     "create-plugin",
     "delete-plugin",
     "get-plugin-settings",

@@ -74,9 +74,6 @@ function loadPlugins() {
       error(`[PluginManager] Failed to load plugin "${folder}":`, err.message);
     }
   }
-
-  // 🔍 Add this at the end to log the full pluginRepo
-  console.log("[PluginManager] Final pluginRepo contents:", pluginRepo);
 }
 
 function getPluginCode(name) {
@@ -142,40 +139,6 @@ function listPlugins() {
 function reloadPlugins() {
   for (const key in pluginRepo) delete pluginRepo[key];
   loadPlugins();
-}
-
-function uploadPlugin(folderName, jsContent, meta = null) {
-  ensurePluginFolder();
-
-  const safeName = getSafePluginName(folderName);
-  const pluginDir = fileManager.joinPath(getPluginRoot(), safeName);
-  const pluginFile = fileManager.joinPath(pluginDir, "plugin.js");
-  const metaFile = fileManager.joinPath(pluginDir, "plugin.json");
-
-  try {
-    fileManager.ensureDirectory(pluginDir, {
-      label: `Plugin<${safeName}>`,
-      silent: true,
-    });
-    fileManager.saveFile(pluginFile, jsContent, {
-      format: "text",
-      silent: false,
-    });
-
-    if (meta && typeof meta === "object") {
-      fileManager.saveFile(metaFile, meta, { format: "json", silent: true });
-    }
-
-    log(`[PluginManager] Uploaded plugin to "${safeName}"`);
-    reloadPlugins();
-    return { success: true, message: `Plugin "${safeName}" uploaded.` };
-  } catch (err) {
-    error(
-      `[PluginManager] Failed to upload plugin "${safeName}":`,
-      err.message
-    );
-    return { success: false, error: err.message };
-  }
 }
 
 function deletePlugin(name) {
@@ -302,6 +265,7 @@ function createPlugin(folderName, target = "frontend") {
   const pluginDir = fileManager.joinPath(getPluginRoot(), safeName);
   const pluginFile = fileManager.joinPath(pluginDir, "plugin.js");
   const metaFile = fileManager.joinPath(pluginDir, "plugin.json");
+  const settingsFile = fileManager.joinPath(pluginDir, "settings.json");
 
   const boilerplateCode =
     target === "frontend"
@@ -323,11 +287,19 @@ function createPlugin(folderName, target = "frontend") {
       label: `Plugin<${safeName}>`,
       silent: true,
     });
+
     fileManager.saveFile(pluginFile, boilerplateCode, {
       format: "text",
       silent: false,
     });
+
     fileManager.saveFile(metaFile, boilerplateMeta, {
+      format: "json",
+      silent: true,
+    });
+
+    // 🔧 Write an empty settings file
+    fileManager.saveFile(settingsFile, {}, {
       format: "json",
       silent: true,
     });
@@ -347,10 +319,10 @@ function createPlugin(folderName, target = "frontend") {
 module.exports = {
   loadPlugins,
   runPlugin,
+  getPluginRoot,
   getPluginCode,
   listPlugins,
   reloadPlugins,
-  uploadPlugin,
   createPlugin,
   deletePlugin,
   getPluginSettings,
