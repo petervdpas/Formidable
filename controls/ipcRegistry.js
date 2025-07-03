@@ -121,6 +121,13 @@ function registerIpcHandlers() {
     }
     return pluginManager.deletePlugin(name);
   });
+  registerIpc("update-plugin", (e, args) => {
+    const { folder, updates } = args || {};
+    if (typeof folder !== "string" || typeof updates !== "object") {
+      return { success: false, error: "Invalid arguments for update-plugin." };
+    }
+    return pluginManager.updatePlugin(folder, updates);
+  });
   registerIpc("get-plugin-settings", (e, name) => {
     if (typeof name !== "string") {
       throw new Error("Invalid plugin name");

@@ -104,6 +104,11 @@ async function runPlugin(name, context = {}) {
   const plugin = pluginRepo[name];
   if (!plugin) return { error: `Plugin "${name}" not found.` };
 
+  if (!plugin.enabled) {
+    log(`[PluginManager] Plugin "${name}" is disabled. Skipping run.`);
+    return { success: false, message: "Plugin is disabled." };
+  }
+
   if (plugin.target === "frontend") {
     log(
       `[PluginManager] Plugin "${name}" is frontend-only. Skipping backend run.`
@@ -146,7 +151,9 @@ function deletePlugin(name) {
   const pluginDir = fileManager.joinPath(getPluginRoot(), safeName);
 
   try {
-    if (!fileManager.fileExists(fileManager.joinPath(pluginDir, "plugin.json"))) {
+    if (
+      !fileManager.fileExists(fileManager.joinPath(pluginDir, "plugin.json"))
+    ) {
       return { success: false, error: `Plugin "${name}" not found.` };
     }
 
@@ -157,14 +164,16 @@ function deletePlugin(name) {
       log(`[PluginManager] Deleted plugin "${safeName}"`);
       return { success: true, message: `Plugin "${safeName}" deleted.` };
     } else {
-      return { success: false, error: `Failed to delete plugin "${safeName}".` };
+      return {
+        success: false,
+        error: `Failed to delete plugin "${safeName}".`,
+      };
     }
   } catch (err) {
     error(`[PluginManager] Error deleting plugin "${safeName}":`, err.message);
     return { success: false, error: err.message };
   }
 }
-
 
 function getPluginSettings(name) {
   const safeName = getSafePluginName(name);
@@ -299,10 +308,14 @@ function createPlugin(folderName, target = "frontend") {
     });
 
     // 🔧 Write an empty settings file
-    fileManager.saveFile(settingsFile, {}, {
-      format: "json",
-      silent: true,
-    });
+    fileManager.saveFile(
+      settingsFile,
+      {},
+      {
+        format: "json",
+        silent: true,
+      }
+    );
 
     log(`[PluginManager] Created plugin "${safeName}" (${target})`);
     reloadPlugins();
@@ -316,6 +329,45 @@ function createPlugin(folderName, target = "frontend") {
   }
 }
 
+function updatePlugin(name, updates = {}) {
+  const safeName = getSafePluginName(name);
+  const metaPath = fileManager.joinPath(
+    getPluginRoot(),
+    safeName,
+    "plugin.json"
+  );
+
+  if (!fileManager.fileExists(metaPath)) {
+    return { success: false, error: `Plugin "${name}" not found.` };
+  }
+
+  try {
+    const meta = fileManager.loadFile(metaPath, {
+      format: "json",
+      silent: true,
+    });
+
+    const updated = { ...meta, ...updates };
+    fileManager.saveFile(metaPath, updated, {
+      format: "json",
+      silent: true,
+    });
+
+    log(`[PluginManager] Updated plugin "${name}" with:`, updates);
+
+    // Update in-memory cache
+    pluginRepo[safeName] = {
+      ...pluginRepo[safeName],
+      ...updates,
+    };
+
+    return { success: true };
+  } catch (err) {
+    error(`[PluginManager] Failed to update plugin "${name}":`, err.message);
+    return { success: false, error: err.message };
+  }
+}
+
 module.exports = {
   loadPlugins,
   runPlugin,
@@ -325,6 +377,7 @@ module.exports = {
   reloadPlugins,
   createPlugin,
   deletePlugin,
+  updatePlugin,
   getPluginSettings,
   savePluginSettings,
 };

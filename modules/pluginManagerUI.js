@@ -29,10 +29,35 @@ export async function renderPluginManager(container) {
         rawData.name,
         rawData.enabled,
         async () => {
-          await EventBus.emitWithResponse("plugin:update", {
+          const newState = !rawData.enabled;
+
+          if (typeof rawData.name !== "string") {
+            EventBus.emit("logging:error", [
+              `[PluginToggle] Invalid plugin name.`,
+              rawData,
+            ]);
+            return;
+          }
+
+          const result = await EventBus.emitWithResponse("plugin:update", {
             folder: rawData.name,
-            updates: { enabled: !rawData.enabled },
+            updates: { enabled: newState },
           });
+
+          if (result?.success) {
+            EventBus.emit("ui:toast", {
+              message: `Plugin "${rawData.name}" ${
+                newState ? "enabled" : "disabled"
+              }.`,
+              variant: newState ? "success" : "warn",
+            });
+          } else {
+            EventBus.emit("ui:toast", {
+              message: `Failed to update plugin "${rawData.name}": ${result?.error}`,
+              variant: "error",
+            });
+          }
+
           await listManager.loadList();
         }
       );

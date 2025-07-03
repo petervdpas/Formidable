@@ -76,13 +76,18 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   pluginMap = new Map(plugins.map((p) => [p.name, p]));
 
   if (plugins?.length) {
-    pluginItems.push("separator");
+    // Filter only enabled plugins
+    const enabledPlugins = plugins.filter((p) => p.enabled);
 
-    for (const plugin of plugins) {
-      pluginItems.push({
-        label: plugin.name,
-        action: `plugin:run:${plugin.name}`,
-      });
+    if (enabledPlugins.length) {
+      pluginItems.push("separator");
+
+      for (const plugin of enabledPlugins) {
+        pluginItems.push({
+          label: plugin.name,
+          action: `plugin:run:${plugin.name}`,
+        });
+      }
     }
   }
 

@@ -172,6 +172,19 @@ export async function handleDeletePlugin({ folder }, callback) {
   }
 }
 
+export async function handleUpdatePlugin({ folder, updates }) {
+  try {
+    const result = await window.api.plugin.updatePlugin({ folder, updates });
+    return result;
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[PluginHandler] updatePlugin "${folder}" failed:`,
+      err,
+    ]);
+    return { success: false, error: err.message };
+  }
+}
+
 export async function handleGetPluginSettings({ name }, callback) {
   try {
     const settings = await window.api.plugin.getPluginSettings(name);

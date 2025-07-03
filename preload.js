@@ -17,6 +17,7 @@ const api = {
     "reload-plugins",
     "create-plugin",
     "delete-plugin",
+    "update-plugin",
     "get-plugin-settings",
     "save-plugin-settings",
   ]),

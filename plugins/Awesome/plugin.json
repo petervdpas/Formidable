@@ -4,6 +4,6 @@
   "description": "A new plugin",
   "author": "Unknown",
   "tags": [],
-  "enabled": true,
+  "enabled": false,
   "target": "backend"
 }

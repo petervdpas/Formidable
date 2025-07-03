@@ -50,6 +50,7 @@ export function initEventRouter() {
   EventBus.off("plugin:create", pluginHandler.handleCreatePlugin);
   EventBus.off("plugin:get-code", pluginHandler.handleGetPluginCode);
   EventBus.off("plugin:delete", pluginHandler.handleDeletePlugin);
+  EventBus.off("plugin:update", pluginHandler.handleUpdatePlugin);
   EventBus.off("plugin:get-settings", pluginHandler.handleGetPluginSettings);
   EventBus.off("plugin:save-settings", pluginHandler.handleSavePluginSettings);
 
@@ -61,6 +62,7 @@ export function initEventRouter() {
   EventBus.on("plugin:create", pluginHandler.handleCreatePlugin);
   EventBus.on("plugin:get-code", pluginHandler.handleGetPluginCode);
   EventBus.on("plugin:delete", pluginHandler.handleDeletePlugin);
+  EventBus.on("plugin:update", pluginHandler.handleUpdatePlugin);
   EventBus.on("plugin:get-settings", pluginHandler.handleGetPluginSettings);
   EventBus.on("plugin:save-settings", pluginHandler.handleSavePluginSettings);
 

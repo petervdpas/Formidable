@@ -9,14 +9,14 @@ export function handleToast({ message, variant = "info", duration = 3000 }) {
 
   if (!allowedVariants.includes(variant)) {
     EventBus.emit("logging:warning", [
-      `[ToastHandler] Onbekende variant "${variant}", fallback naar "info".`,
+      `[ToastHandler] Unknown variant "${variant}", falling back to "info".`,
     ]);
     variant = "info";
   }
 
   if (!message) {
     EventBus.emit("logging:warning", [
-      "[ToastHandler] Geen message ontvangen.",
+      "[ToastHandler] No message received.",
     ]);
     return;
   }
@@ -24,6 +24,6 @@ export function handleToast({ message, variant = "info", duration = 3000 }) {
   showToast(message, variant, duration);
   
   EventBus.emit("logging:default", [
-    `[ToastHandler] Toast weergegeven: ${variant} - "${message}"`,
+    `[ToastHandler] Toast displayed: ${variant} - "${message}"`,
   ]);
 }
