@@ -111,3 +111,33 @@ export function disableButton(btn, state = true) {
     btn.disabled = state;
   }
 }
+
+/* Specialized button creators */
+
+export function createCancelButton({
+  text = "Cancel",
+  onClick = () => {},
+  id = "modal-cancel",
+  className = "btn-default",
+}) {
+  return createButton({
+    text,
+    className,
+    identifier: id,
+    onClick,
+  });
+}
+
+export function createConfirmButton({
+  text = "Confirm",
+  onClick = () => {},
+  id = "modal-confirm",
+  className = "btn-okay",
+}) {
+  return createButton({
+    text,
+    className,
+    identifier: id,
+    onClick,
+  });
+}

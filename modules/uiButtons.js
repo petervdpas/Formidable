@@ -309,34 +309,6 @@ export function createAddButton({
   });
 }
 
-export function createModalCancelButton({
-  text = "Cancel",
-  onClick = () => {},
-  id = "modal-cancel",
-  className = "btn-default",
-}) {
-  return createButton({
-    text,
-    className,
-    identifier: id,
-    onClick,
-  });
-}
-
-export function createModalConfirmButton({
-  text = "Confirm",
-  onClick = () => {},
-  id = "modal-confirm",
-  className = "btn-okay",
-}) {
-  return createButton({
-    text,
-    className,
-    identifier: id,
-    onClick,
-  });
-}
-
 export function createAddLoopItemButton(onClick) {
   return createButton({
     text: "+ Add Loop Item",

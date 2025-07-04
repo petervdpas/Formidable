@@ -3,7 +3,8 @@
 import { EventBus } from "./eventBus.js";
 import { ensureVirtualLocation } from "../utils/vfsUtils.js";
 import { getFormData, validateFilenameInput } from "../utils/formUtils.js";
-import { showConfirmModal, setupRenderModal } from "./modalSetup.js";
+import { setupRenderModal } from "./modalSetup.js";
+import { showConfirmModal } from "../utils/modalUtils.js";
 import { copyToClipboard } from "../utils/domUtils.js";
 import {
   createCopyMarkdownButton,

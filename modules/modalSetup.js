@@ -1,7 +1,7 @@
 // modules/modalSetup.js
 
 import { EventBus } from "./eventBus.js";
-import { buildButtonGroup } from "../utils/buttonUtils.js";
+import { buildButtonGroup, createButton } from "../utils/buttonUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 import { renderSettings, getCachedConfig } from "./settingsManager.js";
 import { renderWorkspaceModal } from "./contextManager.js";
@@ -13,8 +13,6 @@ import { createProfileListManager } from "./profileManager.js";
 import { renderPluginManager } from "./pluginManagerUI.js";
 import { renderGitStatus } from "./gitActions.js";
 import {
-  createModalConfirmButton,
-  createModalCancelButton,
   createShowMarkdownButton,
   createShowPreviewButton,
   createPaneCloseButton,
@@ -366,7 +364,7 @@ export function setupFieldEditModal(onConfirm) {
     },
   });
 
-  const confirmBtn = createModalConfirmButton({
+  const confirmBtn = createButton({
     id: "field-edit-confirm",
     text: "Confirm",
     onClick: () => {
@@ -415,40 +413,3 @@ export function setupFieldEditModal(onConfirm) {
   };
 }
 
-export function showConfirmModal(message, { ...options } = {}) {
-  const modal = setupModal("confirm-modal", {
-    escToClose: true,
-    backdropClick: true,
-    width: "30em",
-    height: "auto",
-    resizable: false,
-    ...options,
-  });
-
-  const messageEl = document.getElementById("confirm-message");
-  const buttonWrapper = document.getElementById("confirm-buttons-wrapper");
-
-  messageEl.innerHTML = message;
-
-  return new Promise((resolve) => {
-    const okBtn = createModalConfirmButton({
-      text: options.okText || "OK",
-      onClick: () => {
-        modal.hide();
-        resolve(true);
-      },
-    });
-
-    const cancelBtn = createModalCancelButton({
-      text: options.cancelText || "Cancel",
-      onClick: () => {
-        modal.hide();
-        resolve(false);
-      },
-    });
-
-    buttonWrapper.innerHTML = "";
-    buttonWrapper.appendChild(buildButtonGroup(okBtn, cancelBtn));
-    modal.show();
-  });
-}

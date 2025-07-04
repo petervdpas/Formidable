@@ -2,7 +2,12 @@
 
 import { EventBus } from "../modules/eventBus.js";
 import { enableElementResizing } from "./resizing.js";
-import { createButton } from "./buttonUtils.js";
+import {
+  createButton,
+  createCancelButton,
+  createConfirmButton,
+  buildButtonGroup 
+} from "./buttonUtils.js";
 
 function createModalCloseButton({
   onClick = () => {},
@@ -313,4 +318,42 @@ export function applyModalCssClass(modalEl, typeDef) {
   if (cssClass && typeof cssClass === "string") {
     modalEl.classList.add(cssClass);
   }
+}
+
+export function showConfirmModal(message, { ...options } = {}) {
+  const modal = setupModal("confirm-modal", {
+    escToClose: true,
+    backdropClick: true,
+    width: "30em",
+    height: "auto",
+    resizable: false,
+    ...options,
+  });
+
+  const messageEl = document.getElementById("confirm-message");
+  const buttonWrapper = document.getElementById("confirm-buttons-wrapper");
+
+  messageEl.innerHTML = message;
+
+  return new Promise((resolve) => {
+    const okBtn = createConfirmButton({
+      text: options.okText || "OK",
+      onClick: () => {
+        modal.hide();
+        resolve(true);
+      },
+    });
+
+    const cancelBtn = createCancelButton({
+      text: options.cancelText || "Cancel",
+      onClick: () => {
+        modal.hide();
+        resolve(false);
+      },
+    });
+
+    buttonWrapper.innerHTML = "";
+    buttonWrapper.appendChild(buildButtonGroup(okBtn, cancelBtn));
+    modal.show();
+  });
 }

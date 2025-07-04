@@ -2,7 +2,7 @@
 
 import { EventBus } from "../eventBus.js";
 import { getValue as getMarkdownTemplate } from "../templateCodemirror.js";
-import { showConfirmModal } from "../modalSetup.js";
+import { showConfirmModal } from "../../utils/modalUtils.js";
 import { clearContainerUI } from "../../utils/formUtils.js";
 
 export async function handleSaveTemplate({ container, fields, callback }) {

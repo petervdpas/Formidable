@@ -6,7 +6,7 @@ import {
   createAddLoopItemButton,
   createDeleteLoopItemButton,
 } from "../modules/uiButtons.js";
-import { showConfirmModal } from "../modules/modalSetup.js";
+import { showConfirmModal } from "./modalUtils.js";
 import { fieldTypes } from "./fieldTypes.js";
 
 async function renderFieldElement(

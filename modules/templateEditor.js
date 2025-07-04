@@ -1,7 +1,7 @@
 // modules/templateEditor.js
 
 import { EventBus } from "./eventBus.js";
-import { showConfirmModal } from "./modalSetup.js";
+import { showConfirmModal } from "../utils/modalUtils.js";
 import {
   renderFieldList,
   showFieldEditorModal,

@@ -1,26 +1,23 @@
 // modules/handlers/modalHandler.js
 
-import { buildButtonGroup } from "../../utils/buttonUtils.js";
 import {
-  createModalConfirmButton,
-  createModalCancelButton,
-} from "../uiButtons.js";
+  buildButtonGroup,
+  createConfirmButton,
+  createCancelButton,
+} from "../../utils/buttonUtils.js";
 import { sanitize } from "../../utils/stringUtils.js";
 import { getCompactDate } from "../../utils/dateUtils.js";
 
 // ─────────────────────────────────────────────────────────────
 // Handle creation of a new template via modal
 // ─────────────────────────────────────────────────────────────
-export function handleTemplateConfirm({
-  modal,
-  callback,
-}) {
+export function handleTemplateConfirm({ modal, callback }) {
   const nameInput = document.getElementById("template-name");
   const wrapper = document.getElementById("template-modal-buttons-wrapper");
 
   nameInput.value = "";
 
-  const confirmBtn = createModalConfirmButton({
+  const confirmBtn = createConfirmButton({
     id: "template-confirm",
     text: "Create",
     onClick: () => {
@@ -42,7 +39,7 @@ export function handleTemplateConfirm({
     },
   });
 
-  const cancelBtn = createModalCancelButton({
+  const cancelBtn = createCancelButton({
     id: "template-cancel",
     onClick: () => modal.hide(),
   });
