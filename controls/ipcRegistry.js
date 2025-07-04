@@ -149,6 +149,19 @@ function registerIpcHandlers() {
     return pluginManager.savePluginSettings(name, settings);
   });
 
+  registerIpc("proxy-fetch-remote", async (e, { url }) => {
+    if (typeof url !== "string") {
+      return { error: "Invalid URL" };
+    }
+
+    try {
+      const result = await pluginManager.fetchRemoteContent(url);
+      return result;
+    } catch (err) {
+      return { error: err.message || "Failed to fetch remote content" };
+    }
+  });
+
   // Git
   registerIpc("is-git-repo", (e, folder) => gitManager.isGitRepo(folder));
   registerIpc("get-git-root", (e, folder) => gitManager.getGitRoot(folder));

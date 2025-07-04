@@ -20,6 +20,7 @@ const api = {
     "update-plugin",
     "get-plugin-settings",
     "save-plugin-settings",
+    "proxy-fetch-remote",
   ]),
   git: buildGroup([
     "is-git-repo",

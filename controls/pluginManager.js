@@ -1,5 +1,6 @@
 // controls/pluginManager.js
 
+const https = require("https");
 const { log, error } = require("./nodeLogger");
 const fileManager = require("./fileManager");
 const pluginSchema = require("../schemas/plugin.schema.js");
@@ -368,6 +369,29 @@ function updatePlugin(name, updates = {}) {
   }
 }
 
+function fetchRemoteContent(url) {
+  return new Promise((resolve, reject) => {
+    try {
+      const req = https.get(url, (res) => {
+        if (res.statusCode !== 200) {
+          reject(
+            new Error(`Failed to fetch (${res.statusCode}): ${url}`)
+          );
+          return;
+        }
+
+        let data = "";
+        res.on("data", (chunk) => (data += chunk));
+        res.on("end", () => resolve(data));
+      });
+
+      req.on("error", reject);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
 module.exports = {
   loadPlugins,
   runPlugin,
@@ -380,4 +404,5 @@ module.exports = {
   updatePlugin,
   getPluginSettings,
   savePluginSettings,
+  fetchRemoteContent,
 };

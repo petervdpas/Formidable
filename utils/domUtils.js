@@ -13,19 +13,6 @@ import {
 } from "./fieldAppliers.js";
 import { collectLoopGroup } from "./formUtils.js";
 
-export function loadRemoteScript(url) {
-  return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${url}"]`)) return resolve();
-
-    const script = document.createElement("script");
-    script.src = url;
-    script.type = "text/javascript";
-    script.onload = () => resolve();
-    script.onerror = (e) => reject(e);
-    document.head.appendChild(script);
-  });
-}
-
 export function generateGuid() {
   return crypto.randomUUID();
 }
