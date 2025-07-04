@@ -69,6 +69,7 @@ export function initEventRouter() {
   EventBus.off("plugin:update", pluginHandler.handleUpdatePlugin);
   EventBus.off("plugin:get-settings", pluginHandler.handleGetPluginSettings);
   EventBus.off("plugin:save-settings", pluginHandler.handleSavePluginSettings);
+  EventBus.off("plugin:proxy-fetch", pluginHandler.handlePluginProxyFetch);
 
   EventBus.on("plugin:get-plugins-path", pluginHandler.handleGetPluginPath);
   EventBus.on("plugin:list", pluginHandler.handleListPlugins);
@@ -81,6 +82,7 @@ export function initEventRouter() {
   EventBus.on("plugin:update", pluginHandler.handleUpdatePlugin);
   EventBus.on("plugin:get-settings", pluginHandler.handleGetPluginSettings);
   EventBus.on("plugin:save-settings", pluginHandler.handleSavePluginSettings);
+  EventBus.on("plugin:proxy-fetch", pluginHandler.handlePluginProxyFetch);
 
   // Logging
   EventBus.off("logging:toggle", loggingHandler.handleLoggingToggle);

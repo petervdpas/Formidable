@@ -210,3 +210,16 @@ export async function handleSavePluginSettings({ name, settings }, callback) {
     callback?.({ success: false, error: err.message });
   }
 }
+
+export async function handlePluginProxyFetch({ url }, callback) {
+  try {
+    const result = await window.api.plugin.proxyFetchRemote(url);
+    callback?.({ success: true, content: result });
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[PluginHandler] proxyFetchRemote failed for URL "${url}":`,
+      err,
+    ]);
+    callback?.({ success: false, error: err.message });
+  }
+}
