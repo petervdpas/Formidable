@@ -229,7 +229,7 @@ function savePluginSettings(name, settings) {
 function getFrontendBoilerplate(name) {
   return `// plugins/${name}/plugin.js
 export function run() {
-  const { button, modal } = window.FPA;
+  const { button, modal } = window.FGA;
   const { createButton } = button;
   const { setupPluginModal } = modal;
 

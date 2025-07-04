@@ -1,7 +1,7 @@
 // plugins/Crazy/plugin.js
 
 export async function run() {
-  const { plugin, button, modal, builders } = window.FPA;
+  const { plugin, button, modal, builders } = window.FGA;
   const { getSettings, saveSettings } = plugin;
   const { createButton } = button;
   const { setupPluginModal } = modal;

@@ -36,3 +36,7 @@ export async function openExternal(url) {
   // This one does not need a response
   EventBus.emit("file:openExternal", { url });
 }
+
+export async function proxyFetch(url) {
+  return EventBus.emitWithResponse("plugin:proxy-fetch", { url });
+}

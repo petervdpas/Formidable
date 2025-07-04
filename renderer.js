@@ -2,7 +2,7 @@
 
 // ───── Imports ──────────────────────────────
 import { EventBus } from "./modules/eventBus.js";
-import { exposePluginAPI } from "./modules/pluginAPI.js";
+import { exposeGlobalAPI } from "./modules/globalAPI.js";
 import { initEventRouter } from "./modules/eventRouter.js";
 import {
   initStatusHandler,
@@ -73,7 +73,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // ── Plugin API ──
   console.log("[Renderer] Exposing Plugin API...");
-  exposePluginAPI();
+  exposeGlobalAPI();
 
   // ── Menu ──
   buildMenu("app-menu", handleMenuAction);

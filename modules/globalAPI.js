@@ -1,4 +1,4 @@
-// modules/pluginAPI.js
+// modules/globalAPI.js
 
 import { EventBus } from "./eventBus.js";
 import * as configUtils from "../utils/configUtils.js";
@@ -9,7 +9,7 @@ import * as elementBuilders from "../utils/elementBuilders.js";
 import * as domUtils from "../utils/domUtils.js";
 import * as buttonUtils from "../utils/buttonUtils.js";
 
-export function exposePluginAPI() {
+export function exposeGlobalAPI() {
   const api = {
     // Core event system
     EventBus,
@@ -24,6 +24,7 @@ export function exposePluginAPI() {
       deleteFile: pluginUtils.deleteFile,
       fileExists: pluginUtils.fileExists,
       openExternal: pluginUtils.openExternal,
+      proxyFetch: pluginUtils.proxyFetch,
     },
 
     // Configuration management
@@ -87,14 +88,14 @@ export function exposePluginAPI() {
   };
 
   // Expose full API
-  window.FormidablePluginAPI = api;
+  window.FormidableGlobalAPI = api;
 
   // Short global aliases
-  window.FPA = api;
+  window.FGA = api;
   window.emit = EventBus.emit;
   window.emitWithResponse = EventBus.emitWithResponse;
   window.on = EventBus.on;
   window.once = EventBus.once;
 
-  console.log("[PluginAPI] FormidablePluginAPI exposed.");
+  console.log("[GlobalAPI] FormidableGlobalAPI exposed.");
 }
