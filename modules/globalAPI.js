@@ -84,6 +84,7 @@ export function exposeGlobalAPI() {
       createButton: buttonUtils.createButton,
       createIconButton: buttonUtils.createIconButton,
       buildButtonGroup: buttonUtils.buildButtonGroup,
+      disableButton: buttonUtils.disableButton,
     },
   };
 

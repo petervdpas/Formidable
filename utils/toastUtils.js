@@ -1,4 +1,4 @@
-// modules/toastManager.js
+// utils/toastUtils.js
 
 export function showToast(message, variant = "info", duration = 3000) {
   const container = document.getElementById("toast-container");

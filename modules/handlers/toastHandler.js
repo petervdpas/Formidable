@@ -1,7 +1,7 @@
 // modules/handlers/toastHandler.js
 
 import { EventBus } from "../eventBus.js";
-import { showToast } from "../toastManager.js";
+import { showToast } from "../../utils/toastUtils.js";
 
 const allowedVariants = ["info", "success", "error", "warn"];
 

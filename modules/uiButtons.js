@@ -1,6 +1,6 @@
 // modules/uiButtons.js
 
-import { createButton, createIconButton, buildButtonGroup } from "../utils/buttonUtils.js";
+import { createButton, createIconButton } from "../utils/buttonUtils.js";
 
 export function createProfileAddButton(onClick) {
   return createButton({
@@ -28,7 +28,6 @@ export function createFieldEditButton(idx, onClick) {
     className: "btn-warn",
     identifier: `field-edit-${idx}`,
     onClick,
-    
   });
 }
 
@@ -422,10 +421,4 @@ export function createPluginToggleButton(name, enabled, onClick) {
     onClick,
     ariaLabel: `${enabled ? "Disable" : "Enable"} plugin ${name}`,
   });
-}
-
-export function disableButton(btn, state = true) {
-  if (btn instanceof HTMLElement) {
-    btn.disabled = state;
-  }
 }

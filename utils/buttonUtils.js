@@ -80,3 +80,9 @@ export function buildButtonGroup(...args) {
 
   return group;
 }
+
+export function disableButton(btn, state = true) {
+  if (btn instanceof HTMLElement) {
+    btn.disabled = state;
+  }
+}
