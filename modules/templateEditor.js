@@ -10,7 +10,7 @@ import {
 import { generateTemplateCode } from "../utils/templateGenerator.js";
 import { formatError } from "../utils/templateValidation.js";
 import { ensureVirtualLocation } from "../utils/vfsUtils.js";
-import { createToggleButtons } from "../utils/iconButtonToggle.js";
+import { createToggleButtons } from "../utils/buttonUtils.js";
 import { createFormRowInput, createSwitch } from "../utils/elementBuilders.js";
 import {
   getEditor,

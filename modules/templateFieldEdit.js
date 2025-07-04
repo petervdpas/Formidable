@@ -5,8 +5,7 @@ import { applyModalTypeClass } from "../utils/domUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 import { validateField } from "../utils/templateValidation.js";
 import { applyFieldAttributeDisabling } from "../utils/formUtils.js";
-import { createToggleButtons } from "../utils/iconButtonToggle.js";
-import { buildButtonGroup } from "../utils/buttonUtils.js";
+import { buildButtonGroup, createToggleButtons } from "../utils/buttonUtils.js";
 import {
   createFieldEditButton,
   createFieldEditIconButton,

@@ -1,10 +1,9 @@
 // modules/formRenderer.js
 
 import { buildHiddenInput } from "../utils/elementBuilders.js";
-import { buildButtonGroup } from "../utils/buttonUtils.js";
+import { buildButtonGroup, createToggleButtons } from "../utils/buttonUtils.js";
 import { injectFieldDefaults } from "../utils/formUtils.js";
 import { applyFieldValues, focusFirstInput } from "../utils/domUtils.js";
-import { createToggleButtons } from "../utils/iconButtonToggle.js";
 import {
   createFlaggedToggleButton,
   createFormSaveButton,
