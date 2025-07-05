@@ -94,7 +94,6 @@ export function highlightAndClickForm(entry, delay = 100) {
   }, delay);
 }
 
-
 export function createFieldManager({
   container,
   fields = [],
@@ -107,7 +106,6 @@ export function createFieldManager({
   injectAfter = null,
   onSave = null,
 }) {
-
   console.log("[FieldManager] Fields to render:", fields);
 
   if (!container) {
@@ -119,38 +117,41 @@ export function createFieldManager({
     throw new Error("renderField must be a function if provided.");
   }
 
+  const enrichedData = {};
+  const inputRefs = {};
+
+  for (const field of fields) {
+    const raw = data?.[field.key];
+    enrichedData[field.key] =
+      field.type === "boolean"
+        ? raw === true || raw === "true"
+        : raw ?? (field.type === "boolean" ? false : "");
+  }
+
   async function renderFields() {
     if (clear) container.innerHTML = "";
 
     if (typeof injectBefore === "function") {
       const beforeEl = await injectBefore(container);
-      if (beforeEl instanceof HTMLElement) {
-        container.appendChild(beforeEl);
-      } else if (Array.isArray(beforeEl)) {
-        for (const el of beforeEl) {
-          if (el instanceof HTMLElement) container.appendChild(el);
-        }
+      const nodes = Array.isArray(beforeEl) ? beforeEl : [beforeEl];
+      for (const el of nodes) {
+        if (el instanceof HTMLElement) container.appendChild(el);
       }
     }
 
     for (const field of fields) {
-      if (typeof beforeEach === "function") {
-        await beforeEach(field);
-      }
+      if (typeof beforeEach === "function") await beforeEach(field);
 
-      const value = data[field.key];
+      const value = enrichedData[field.key];
 
       const renderFn =
         renderField ||
-        (async (field, value) => {
-          if (field.fieldRenderer && typeof fieldRenderers[field.fieldRenderer] === "function") {
-            return await fieldRenderers[field.fieldRenderer](field, value);
-          }
-
-          const typeFn =
-            fieldRenderers[`render${capitalize(field.type)}Field`] ||
+        (async (f, val) => {
+          const fn =
+            (f.fieldRenderer && fieldRenderers[f.fieldRenderer]) ||
+            fieldRenderers[`render${f.type?.[0]?.toUpperCase()}${f.type?.slice(1)}Field`] ||
             fieldRenderers.renderTextField;
-          return await typeFn(field, value);
+          return await fn(f, val);
         });
 
       const node = await renderFn(field, value);
@@ -158,38 +159,60 @@ export function createFieldManager({
       if (node instanceof HTMLElement) {
         container.appendChild(node);
 
-        // Generic save binding
-        if (onSave) {
-          const input = node.querySelector(`[name="${field.key}"]`);
-          if (input) {
-            input.addEventListener("change", () => onSave(field, input.value));
-          }
+        const input = node.querySelector(`[name="${field.key}"]`);
+        if (input) inputRefs[field.key] = input;
+
+        if (onSave && input) {
+          input.addEventListener("change", () => {
+            const val =
+              field.type === "boolean"
+                ? input.checked
+                : input.value ?? "";
+            enrichedData[field.key] = val;
+            onSave(field, val);
+          });
         }
       }
 
-      if (typeof afterEach === "function") {
-        await afterEach(field);
-      }
+      if (typeof afterEach === "function") await afterEach(field);
     }
 
     if (typeof injectAfter === "function") {
       const afterEl = await injectAfter(container);
-      if (afterEl instanceof HTMLElement) {
-        container.appendChild(afterEl);
-      } else if (Array.isArray(afterEl)) {
-        for (const el of afterEl) {
-          if (el instanceof HTMLElement) container.appendChild(el);
-        }
+      const nodes = Array.isArray(afterEl) ? afterEl : [afterEl];
+      for (const el of nodes) {
+        if (el instanceof HTMLElement) container.appendChild(el);
       }
     }
 
     EventBus.emit("logging:default", [
-      `[FieldManager] Rendered ${fields.length} field(s).`],
-    );
+      `[FieldManager] Rendered ${fields.length} field(s).`,
+    ]);
+  }
+
+  function getValues() {
+    const values = {};
+    for (const field of fields) {
+      const input = inputRefs[field.key];
+      let value;
+
+      if (input) {
+        value =
+          field.type === "boolean"
+            ? input.checked
+            : input.value ?? "";
+      } else {
+        value = enrichedData[field.key];
+      }
+
+      values[field.key] = value;
+    }
+    return values;
   }
 
   return {
     renderFields,
+    getValues,
   };
 }
 

@@ -1,7 +1,7 @@
 {
   "variables": {
     "InputPath": {
-      "value": "E:\\Projects\\documentation\\Fontys\\Bedrijfsregister.md"
+      "value": "E:\\Projects\\documentation\\Fontys\\Analyse Inschrijving OnStage.md"
     },
     "OutputPath": {
       "value": "E:\\Projects\\documentation\\output"
@@ -18,5 +18,5 @@
   },
   "command": "pwsh {script} -InputPath {InputPath} -UseCurrentDate {UseCurrentDate} -TemplatePath {TemplatePath} -OutputPath {OutputPath}",
   "overwrite": true,
-  "updated": "2025-07-05T15:31:29.353Z"
+  "updated": "2025-07-05T20:23:59.186Z"
 }
