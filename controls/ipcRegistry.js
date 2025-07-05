@@ -297,6 +297,13 @@ function registerIpcHandlers() {
     return result.canceled ? null : result.filePaths[0];
   });
 
+  registerIpc("dialog-choose-file", async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ["openFile"],
+    });
+    return result.canceled ? null : result.filePaths[0];
+  });
+
   registerIpc("get-app-root", () => fileManager.getAppRoot());
   registerIpc("resolve-path", (e, ...segments) =>
     fileManager.resolvePath(...segments)

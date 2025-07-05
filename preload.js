@@ -91,6 +91,7 @@ const api = {
   },
   dialog: {
     chooseDirectory: () => ipcRenderer.invoke("dialog-choose-directory"),
+    chooseFile: () => ipcRenderer.invoke("dialog-choose-file"),
   },
 };
 

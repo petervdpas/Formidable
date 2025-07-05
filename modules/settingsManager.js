@@ -93,6 +93,7 @@ export async function renderSettings() {
     id: "settings-context-folder",
     label: "Context Folder",
     value: config.context_folder || "./",
+    outerClass: "modal-form-row tight-gap",
   });
   tabDirs.appendChild(contextFolderPicker.element);
 
@@ -110,6 +111,7 @@ export async function renderSettings() {
     id: "settings-git-root",
     label: "Git Root Directory",
     value: config.git_root || "",
+    outerClass: "modal-form-row tight-gap",
   });
   tabDirs.appendChild(gitRootPicker.element);
 

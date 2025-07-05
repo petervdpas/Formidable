@@ -1,0 +1,22 @@
+{
+  "variables": {
+    "InputPath": {
+      "value": "E:\\Projects\\documentation\\Fontys\\Bedrijfsregister.md"
+    },
+    "OutputPath": {
+      "value": "E:\\Projects\\documentation\\output"
+    },
+    "TemplatePath": {
+      "value": "E:\\Projects\\documentation\\Templates\\eisvogel.latex"
+    },
+    "UseCurrentDate": {
+      "value": true
+    },
+    "PowershellScript": {
+      "value": "E:\\Projects\\documentation\\Tools\\Convert-MarkdownToPDF.ps1"
+    }
+  },
+  "command": "pwsh {script} -InputPath {InputPath} -UseCurrentDate {UseCurrentDate} -TemplatePath {TemplatePath} -OutputPath {OutputPath}",
+  "overwrite": true,
+  "updated": "2025-07-05T15:31:29.353Z"
+}

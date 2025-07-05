@@ -8,6 +8,7 @@ import * as listUtils from "../utils/listUtils.js";
 import * as elementBuilders from "../utils/elementBuilders.js";
 import * as domUtils from "../utils/domUtils.js";
 import * as buttonUtils from "../utils/buttonUtils.js";
+import * as fieldRenderers from "../utils/fieldRenderers.js";
 
 export function exposeGlobalAPI() {
   const api = {
@@ -54,6 +55,7 @@ export function exposeGlobalAPI() {
       createStyledSelect: elementBuilders.createStyledSelect,
       addContainerElement: elementBuilders.addContainerElement,
       createFormRowInput: elementBuilders.createFormRowInput,
+      createFilePicker: elementBuilders.createFilePicker,
       createDirectoryPicker: elementBuilders.createDirectoryPicker,
       wrapInputWithLabel: elementBuilders.wrapInputWithLabel,
       buildHiddenInput: elementBuilders.buildHiddenInput,
@@ -68,6 +70,7 @@ export function exposeGlobalAPI() {
       clearHighlighted: domUtils.clearHighlighted,
       highlightSelected: domUtils.highlightSelected,
       highlightAndClickForm: domUtils.highlightAndClickForm,
+      createFieldManager: domUtils.createFieldManager,
       resolveScopedElement: domUtils.resolveScopedElement,
       applyFieldContextAttributes: domUtils.applyFieldContextAttributes,
       applyDatasetMapping: domUtils.applyDatasetMapping,
@@ -87,6 +90,8 @@ export function exposeGlobalAPI() {
       createToggleButtons: buttonUtils.createToggleButtons,
       disableButton: buttonUtils.disableButton,
     },
+
+    fieldRenderers
   };
 
   // Expose full API

@@ -190,6 +190,11 @@
     margin-right: 12px;
 }
 
+.modal-form-row.tight-gap input[type="text"] {
+  flex: 1;
+  min-width: 0;
+}
+
 .pane {
     flex: 1 1 0;
     display: flex;

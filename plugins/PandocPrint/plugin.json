@@ -1,0 +1,9 @@
+{
+  "name": "PandocPrint",
+  "version": "1.0.0",
+  "description": "A new plugin",
+  "author": "Unknown",
+  "tags": [],
+  "enabled": true,
+  "target": "frontend"
+}

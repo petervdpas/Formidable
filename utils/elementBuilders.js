@@ -113,21 +113,24 @@ export function createFormRowInput({
 
 export function createDirectoryPicker({
   id,
-  label,
   value = "",
   buttonText = "Browse",
-  outerClass = "modal-form-row tight-gap",
+  outerClass = "form-row tight-gap",
   placeholder = "",
   readOnly = true,
   enabled = true,
+  label = "",
 }) {
   const wrapper = document.createElement("div");
   wrapper.className = `${outerClass} directory-picker`;
   if (!enabled) wrapper.classList.add("disabled");
 
-  const labelEl = document.createElement("label");
-  labelEl.setAttribute("for", id);
-  labelEl.textContent = label;
+  if (label) {
+    const labelEl = document.createElement("label");
+    labelEl.htmlFor = id;
+    labelEl.innerText = label;
+    wrapper.appendChild(labelEl);
+  }
 
   const input = document.createElement("input");
   input.type = "text";
@@ -143,7 +146,48 @@ export function createDirectoryPicker({
   button.textContent = buttonText;
   button.disabled = !enabled;
 
-  wrapper.appendChild(labelEl);
+  wrapper.appendChild(input);
+  wrapper.appendChild(button);
+
+  return { element: wrapper, input, button };
+}
+
+export function createFilePicker({
+  id,
+  value = "",
+  buttonText = "Browse",
+  outerClass = "form-row tight-gap",
+  placeholder = "",
+  readOnly = true,
+  enabled = true,
+  accept = "",
+  label = "",
+}) {
+  const wrapper = document.createElement("div");
+  wrapper.className = `${outerClass} file-picker`;
+  if (!enabled) wrapper.classList.add("disabled");
+
+  if (label) {
+    const labelEl = document.createElement("label");
+    labelEl.htmlFor = id;
+    labelEl.innerText = label;
+    wrapper.appendChild(labelEl);
+  }
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.id = id;
+  input.value = value;
+  if (placeholder) input.placeholder = placeholder;
+  if (readOnly) input.readOnly = true;
+  input.disabled = !enabled;
+
+  const button = document.createElement("button");
+  button.id = `choose-${id}`;
+  button.className = "btn btn-info btn-input-height";
+  button.textContent = buttonText;
+  button.disabled = !enabled;
+
   wrapper.appendChild(input);
   wrapper.appendChild(button);
 
@@ -154,14 +198,21 @@ export function wrapInputWithLabel(
   inputElement,
   labelText,
   descriptionText = "",
-  layout = "single"
+  layout = "single",
+  wrapperClass = "form-row"
 ) {
   const isTwoColumn = layout === true || layout === "two-column";
 
-  const wrapper = document.createElement("div");
-  wrapper.className = isTwoColumn ? "form-row two-column" : "form-row";
+  const classes = Array.isArray(wrapperClass)
+    ? wrapperClass
+    : wrapperClass.trim().split(/\s+/);
 
-  if (isTwoColumn) {
+  if (isTwoColumn) classes.push("two-column");
+
+  const wrapper = document.createElement("div");
+  wrapper.className = classes.join(" ");
+
+  if (isTwoColumn && !wrapperClass?.includes("modal-form-row")) {
     const left = document.createElement("div");
     const right = document.createElement("div");
 
@@ -329,3 +380,4 @@ export function createSwitch(
   container.appendChild(switchWithLabel);
   return container;
 }
+

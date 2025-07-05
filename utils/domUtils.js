@@ -12,6 +12,8 @@ import {
   applyGenericField,
 } from "./fieldAppliers.js";
 import { collectLoopGroup } from "./formUtils.js";
+import * as fieldRenderers from "./fieldRenderers.js"; 
+import { capitalize } from "./stringUtils.js";
 
 export function generateGuid() {
   return crypto.randomUUID();
@@ -90,6 +92,105 @@ export function highlightAndClickForm(entry, delay = 100) {
   setTimeout(() => {
     EventBus.emit("form:list:highlighted", entry);
   }, delay);
+}
+
+
+export function createFieldManager({
+  container,
+  fields = [],
+  data = {},
+  renderField = null,
+  beforeEach = null,
+  afterEach = null,
+  clear = true,
+  injectBefore = null,
+  injectAfter = null,
+  onSave = null,
+}) {
+
+  console.log("[FieldManager] Fields to render:", fields);
+
+  if (!container) {
+    EventBus.emit("logging:error", ["[FieldManager] container is null"]);
+    throw new Error("FieldManager container is required.");
+  }
+
+  if (renderField && typeof renderField !== "function") {
+    throw new Error("renderField must be a function if provided.");
+  }
+
+  async function renderFields() {
+    if (clear) container.innerHTML = "";
+
+    if (typeof injectBefore === "function") {
+      const beforeEl = await injectBefore(container);
+      if (beforeEl instanceof HTMLElement) {
+        container.appendChild(beforeEl);
+      } else if (Array.isArray(beforeEl)) {
+        for (const el of beforeEl) {
+          if (el instanceof HTMLElement) container.appendChild(el);
+        }
+      }
+    }
+
+    for (const field of fields) {
+      if (typeof beforeEach === "function") {
+        await beforeEach(field);
+      }
+
+      const value = data[field.key];
+
+      const renderFn =
+        renderField ||
+        (async (field, value) => {
+          if (field.fieldRenderer && typeof fieldRenderers[field.fieldRenderer] === "function") {
+            return await fieldRenderers[field.fieldRenderer](field, value);
+          }
+
+          const typeFn =
+            fieldRenderers[`render${capitalize(field.type)}Field`] ||
+            fieldRenderers.renderTextField;
+          return await typeFn(field, value);
+        });
+
+      const node = await renderFn(field, value);
+
+      if (node instanceof HTMLElement) {
+        container.appendChild(node);
+
+        // Generic save binding
+        if (onSave) {
+          const input = node.querySelector(`[name="${field.key}"]`);
+          if (input) {
+            input.addEventListener("change", () => onSave(field, input.value));
+          }
+        }
+      }
+
+      if (typeof afterEach === "function") {
+        await afterEach(field);
+      }
+    }
+
+    if (typeof injectAfter === "function") {
+      const afterEl = await injectAfter(container);
+      if (afterEl instanceof HTMLElement) {
+        container.appendChild(afterEl);
+      } else if (Array.isArray(afterEl)) {
+        for (const el of afterEl) {
+          if (el instanceof HTMLElement) container.appendChild(el);
+        }
+      }
+    }
+
+    EventBus.emit("logging:default", [
+      `[FieldManager] Rendered ${fields.length} field(s).`],
+    );
+  }
+
+  return {
+    renderFields,
+  };
 }
 
 export function resolveScopedElement(container, field) {

@@ -5,6 +5,8 @@ import {
   wrapInputWithLabel,
   buildSwitchElement,
   addContainerElement,
+  createFilePicker,
+  createDirectoryPicker,
 } from "./elementBuilders.js";
 import {
   applyDatasetMapping,
@@ -68,7 +70,8 @@ export async function renderLoopstartField(field, value = "") {
     wrapper,
     field.label,
     field.description,
-    field.two_column
+    field.two_column,
+    field.context || "form-row"
   );
 }
 
@@ -100,7 +103,8 @@ export async function renderLoopstopField(field, value = "") {
     wrapper,
     field.label,
     field.description,
-    field.two_column
+    field.two_column,
+    field.wrapper || "form-row"
   );
 }
 
@@ -119,7 +123,8 @@ export async function renderTextField(field, value = "") {
     input,
     field.label,
     field.description,
-    field.two_column
+    field.two_column,
+    field.wrapper || "form-row"
   );
 }
 
@@ -151,7 +156,8 @@ export async function renderBooleanField(field, value = "") {
     toggle,
     field.label,
     field.description,
-    field.two_column
+    field.two_column,
+    field.wrapper || "form-row"
   );
 }
 
@@ -176,7 +182,8 @@ export async function renderDropdownField(field, value = "") {
     select,
     field.label,
     field.description,
-    field.two_column
+    field.two_column,
+    field.wrapper || "form-row"
   );
 }
 
@@ -219,7 +226,8 @@ export async function renderMultioptionField(field, value = "") {
     wrapper,
     field.label,
     field.description,
-    field.two_column
+    field.two_column,
+    field.wrapper || "form-row"
   );
 }
 
@@ -260,7 +268,8 @@ export async function renderRadioField(field, value = "") {
     wrapper,
     field.label,
     field.description,
-    field.two_column
+    field.two_column,
+    field.wrapper || "form-row"
   );
 }
 
@@ -344,7 +353,8 @@ export async function renderTextareaField(field, value = "") {
     wrapper,
     field.label,
     field.description,
-    field.two_column
+    field.two_column,
+    field.wrapper || "form-row"
   );
 }
 
@@ -363,7 +373,8 @@ export async function renderNumberField(field, value = "") {
     input,
     field.label,
     field.description,
-    field.two_column
+    field.two_column,
+    field.wrapper || "form-row"
   );
 }
 
@@ -421,7 +432,8 @@ export async function renderRangeField(field, value = "") {
     wrapper,
     field.label,
     field.description,
-    field.two_column
+    field.two_column,
+    field.wrapper || "form-row"
   );
 }
 
@@ -440,7 +452,8 @@ export async function renderDateField(field, value = "") {
     input,
     field.label,
     field.description,
-    field.two_column
+    field.two_column,
+    field.wrapper || "form-row"
   );
 }
 
@@ -482,7 +495,8 @@ export async function renderListField(field, value = "") {
     wrapper,
     field.label,
     field.description,
-    field.two_column
+    field.two_column,
+    field.wrapper || "form-row"
   );
 }
 
@@ -621,7 +635,8 @@ export async function renderTableField(field, value = "") {
     wrapper,
     field.label,
     field.description,
-    field.two_column
+    field.two_column,
+    field.wrapper || "form-row"
   );
 }
 
@@ -716,7 +731,8 @@ export async function renderImageField(field, value = "", template) {
     wrapper,
     field.label || "Image Upload",
     field.description,
-    field.two_column
+    field.two_column,
+    field.wrapper || "form-row"
   );
 }
 
@@ -861,6 +877,69 @@ export async function renderLinkField(
     wrapper,
     field.label,
     field.description,
-    field.two_column
+    field.two_column,
+    field.wrapper || "form-row"
   );
+}
+
+// ─────────────────────────────────────────────
+// Type: file
+export async function renderFileField(field, value = "") {
+  const v = resolveValue(field, value);
+  const id = field.key;
+
+  const { element, input, button } = createFilePicker({
+    id,
+    value: v,
+    placeholder: field.placeholder || "",
+    noWrapping: true,
+    label: field.label || "Select File",
+    outerClass: field.wrapper || "form-row tight-gap", 
+  });
+
+  input.name = field.key;
+
+  button.onclick = async () => {
+    const selected = await window.api.dialog.chooseFile();
+    if (selected) {
+      input.value = selected;
+      if (typeof field.onSave === "function") {
+        await field.onSave(field, selected);
+      }
+    }
+  };
+
+  applyFieldContextAttributes(element, field);
+  return element;
+}
+
+// ─────────────────────────────────────────────
+// Type: directory
+export async function renderDirectoryField(field, value = "") {
+  const v = resolveValue(field, value);
+  const id = field.key;
+
+  const { element, input, button } = createDirectoryPicker({
+    id,
+    value: v,
+    placeholder: field.placeholder || "",
+    noWrapping: true,
+    label: field.label || "Select Directory",
+    outerClass: field.wrapper || "form-row tight-gap",
+  });
+
+  input.name = field.key;
+
+  button.onclick = async () => {
+    const selected = await window.api.dialog.chooseDirectory();
+    if (selected) {
+      input.value = selected;
+      if (typeof field.onSave === "function") {
+        await field.onSave(field, selected);
+      }
+    }
+  };
+
+  applyFieldContextAttributes(element, field);
+  return element;
 }
