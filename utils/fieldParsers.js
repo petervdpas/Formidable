@@ -1,9 +1,8 @@
 // utils/fieldParsers.js
 
 import { ensureVirtualLocation } from "./vfsUtils.js";
-import { fieldTypes } from "./fieldTypes.js";
-import { generateGuid, resolveScopedElement } from "./domUtils.js";
-import { collectLoopGroup } from "./formUtils.js";
+import { generateGuid } from "./domUtils.js";
+
 // GUID
 export const parseGuidField = async function (input) {
   return input?.value?.trim() || generateGuid();

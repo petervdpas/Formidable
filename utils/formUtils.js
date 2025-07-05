@@ -3,6 +3,77 @@
 import { EventBus } from "../modules/eventBus.js";
 import { fieldTypes } from "./fieldTypes.js";
 
+export function createFieldManager({
+  container,
+  fields = [],
+  data = {},
+  renderField,
+  beforeEach = null,
+  afterEach = null,
+  clear = true,
+  injectBefore = null,
+  injectAfter = null,
+}) {
+  if (!container) {
+    EventBus.emit("logging:error", ["[FieldManager] container is null"]);
+    throw new Error("FieldManager container is required.");
+  }
+
+  if (typeof renderField !== "function") {
+    throw new Error("renderField must be a function");
+  }
+
+  async function renderFields() {
+    if (clear) container.innerHTML = "";
+
+    if (typeof injectBefore === "function") {
+      const beforeEl = await injectBefore(container);
+      if (beforeEl instanceof HTMLElement) {
+        container.appendChild(beforeEl);
+      } else if (Array.isArray(beforeEl)) {
+        for (const el of beforeEl) {
+          if (el instanceof HTMLElement) container.appendChild(el);
+        }
+      }
+    }
+
+    for (const field of fields) {
+      if (typeof beforeEach === "function") {
+        await beforeEach(field);
+      }
+
+      const value = data[field.key];
+      const node = await renderField(field, value);
+      if (node instanceof HTMLElement) {
+        container.appendChild(node);
+      }
+
+      if (typeof afterEach === "function") {
+        await afterEach(field);
+      }
+    }
+
+    if (typeof injectAfter === "function") {
+      const afterEl = await injectAfter(container);
+      if (afterEl instanceof HTMLElement) {
+        container.appendChild(afterEl);
+      } else if (Array.isArray(afterEl)) {
+        for (const el of afterEl) {
+          if (el instanceof HTMLElement) container.appendChild(el);
+        }
+      }
+    }
+
+    EventBus.emit("logging:default", [
+      `[FieldManager] Rendered ${fields.length} field(s).`,
+    ]);
+  }
+
+  return {
+    renderFields,
+  };
+}
+
 export function extractFieldDefinition({
   keyId = "edit-key",
   sidebarItemId = "edit-sidebar-item",
