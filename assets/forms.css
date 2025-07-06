@@ -3,7 +3,7 @@ form,
 fieldset {
   border-radius: 6px;
   padding: 10px 14px;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 legend {
@@ -91,6 +91,18 @@ label small {
   flex-direction: row;
   gap: 0.8rem;
   align-items: center;
+}
+
+.form-info-text {
+  font-size: 0.95em;
+  line-height: 1.6;
+  margin: 0.4em 0;
+  padding: 0.75em 1em;
+  background-color: var(--generic-bg-info, #f7f7f9);
+  border-left: 4px solid var(--generic-border-info, #4a90e2);
+  color: var(--generic-fg-info, #333);
+  border-radius: 4px;
+  font-style: italic;
 }
 
 /* ───── Directory Picker ───── */

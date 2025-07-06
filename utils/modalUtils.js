@@ -112,6 +112,7 @@ export function setupPluginModal({
   body = "",
   width = "40%",
   height = "auto",
+  resizable = true,
   escToClose = true,
   backdropClick = true,
   onOpen = () => {},
@@ -188,6 +189,7 @@ export function setupPluginModal({
     backdropClick,
     width,
     height,
+    resizable,
     onOpen,
     onClose,
   });

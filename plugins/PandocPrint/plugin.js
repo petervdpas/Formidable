@@ -1,51 +1,7 @@
 // plugins/PandocPrint/plugin.js
 
-async function prepareFormidableMarkdown({
-  selectedTemplate,
-  selectedDataFile,
-  pluginName,
-  plugin,
-  path,
-  emit,
-}) {
-  if (!selectedTemplate || !selectedDataFile) return null;
-
-  const { template, storage } = await plugin.getTemplateAndData(
-    selectedTemplate,
-    selectedDataFile
-  );
-
-  const markdown = await plugin.renderMarkdown(template, storage.data);
-  if (!markdown) return null;
-
-  const pluginMarkdownDir = await plugin.resolvePath(
-    "plugins",
-    pluginName,
-    "markdown"
-  );
-
-  await plugin.ensureDirectory(pluginMarkdownDir, "PandocPrint");
-
-  const filenameWithoutExt = path.stripMetaExtension(selectedDataFile);
-  const markdownFilePath = await plugin.resolvePath(
-    pluginMarkdownDir,
-    `${filenameWithoutExt}.md`
-  );
-
-  await plugin.saveFile(markdownFilePath, markdown, {
-    encoding: "utf8",
-  });
-
-  emit("ui:toast", {
-    message: `Saved markdown to plugins/${pluginName}/markdown/${filenameWithoutExt}.md`,
-    variant: "success",
-  });
-
-  return markdownFilePath;
-}
-
 export async function run() {
-  const { path, plugin, button, modal, dom, string } = window.FGA;
+  const { plugin, button, modal, dom, string } = window.FGA;
   const pluginName = "PandocPrint";
 
   const { show } = modal.setupPluginModal({
@@ -53,8 +9,9 @@ export async function run() {
     title: "Pandoc Print",
     escToClose: false,
     backdropClick: true,
-    width: "40em",
+    width: "44em",
     height: "auto",
+    resizable: false,
 
     prepareBody: async (modalEl, bodyEl) => {
       const [contextFolder, selectedTemplate, selectedDataFile] =
@@ -64,11 +21,13 @@ export async function run() {
           plugin.getConfig("selected_data_file"),
         ]);
 
+      /*
       console.log("[PandocPrint] Context:", {
         contextFolder,
         selectedTemplate,
         selectedDataFile,
       });
+      */
 
       let settings = await plugin.getSettings(pluginName);
       if (!settings || typeof settings !== "object") settings = {};
@@ -141,24 +100,29 @@ export async function run() {
         container: bodyEl,
         fields,
         data: initialData,
+        injectBefore: () => {
+          const info = document.createElement("p");
+          info.textContent =
+            "This plugin allows you to convert Formidable entries—or any valid Markdown file with proper frontmatter—into a styled PDF using Pandoc and LaTeX. In 'Formidable mode', it auto-generates Markdown from your selected form entry. When disabled, you can manually provide any input file. This makes it powerful for both regular use and expert workflows. Make sure Pandoc and LaTeX (e.g. MikTeX) are installed, and check the plugin’s Tools folder for the required scripts.";
+          info.className = "form-info-text";
+          return info;
+        },
       });
 
+      await fieldManager.renderFields();
+
       if (initialData.UseFormidable) {
-        const markdownPath = await prepareFormidableMarkdown({
+        const markdownPath = await plugin.saveMarkdownTo({
           selectedTemplate,
           selectedDataFile,
-          pluginName,
-          plugin,
-          path,
-          emit,
+          outputDir: `plugins/${pluginName}/markdown`,
+          filename: null,
         });
 
         if (markdownPath) {
           fieldManager.setValue("InputPath", markdownPath);
         }
       }
-
-      await fieldManager.renderFields();
 
       const saveBtn = button.createButton({
         text: "Save Settings",
@@ -185,7 +149,7 @@ export async function run() {
       });
 
       const previewBtn = button.createButton({
-        text: "Generate Command",
+        text: "Generate PDF",
         className: "btn-info",
         onClick: async () => {
           const values = fieldManager.getValues();
@@ -202,8 +166,8 @@ export async function run() {
           const result = await plugin.executeSystemCommand(finalCommand);
 
           const toastMessage = result.success
-            ? "Command executed successfully"
-            : "Command execution failed";
+            ? "PDF generation executed successfully"
+            : "PDF generation failed";
           const toastVariant = result.success ? "success" : "error";
 
           emit("ui:toast", {

@@ -19,7 +19,6 @@ const gitManager = require("./gitManager");
 const templateManager = require("./templateManager");
 const formManager = require("./formManager");
 const configManager = require("./configManager");
-const markdownManager = require("./markdownManager");
 const markdownRenderer = require("./markdownRenderer");
 const htmlRenderer = require("./htmlRenderer");
 const miniExprParser = require("./miniExprParser");
@@ -217,23 +216,6 @@ function registerIpcHandlers() {
   // This one still uses raw storageLocation (not templateFilename), so leave as-is for now:
   registerIpc("save-image-file", async (e, storageLocation, fileName, buffer) =>
     fileManager.saveImageFile(storageLocation, fileName, buffer)
-  );
-
-  // Markdown
-  registerIpc("ensure-markdown-dir", (e, dir) =>
-    markdownManager.ensureMarkdownDirectory(dir)
-  );
-  registerIpc("list-markdowns", (e, dir) =>
-    markdownManager.listMarkdownFiles(dir)
-  );
-  registerIpc("load-markdown", (e, dir, file) =>
-    markdownManager.loadMarkdownFile(dir, file)
-  );
-  registerIpc("save-markdown", (e, dir, file, data) =>
-    markdownManager.saveMarkdownFile(dir, file, data)
-  );
-  registerIpc("delete-markdown", (e, dir, file) =>
-    markdownManager.deleteMarkdownFile(dir, file)
   );
 
   // Config

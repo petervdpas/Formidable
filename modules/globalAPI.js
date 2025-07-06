@@ -31,6 +31,7 @@ export function exposeGlobalAPI() {
       saveConfig: pluginUtils.saveUserConfig,
       getTemplateAndData: pluginUtils.getTemplateAndData,
       renderMarkdown: pluginUtils.renderMarkdown,
+      saveMarkdownTo: pluginUtils.saveMarkdownTo,
       getSettings: pluginUtils.getPluginSettings,
       saveSettings: pluginUtils.savePluginSettings,
       resolvePath: pluginUtils.resolvePath,

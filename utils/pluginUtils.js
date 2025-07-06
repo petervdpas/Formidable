@@ -1,6 +1,7 @@
 // utils/pluginUtils.js
 
 import { EventBus } from "../modules/eventBus.js";
+import { stripMetaExtension } from "./pathUtils.js";
 
 const allowedConfigKeys = [
   "theme",
@@ -153,4 +154,49 @@ export async function executeSystemCommand(cmd) {
     console.warn("[pluginUtils] System command failed:", err);
     return { success: false, error: err.message || "Command failed" };
   }
+}
+
+export async function saveMarkdownTo({
+  selectedTemplate,
+  selectedDataFile,
+  outputDir,
+  filename,
+  showToast = false,
+}) {
+  if (!selectedTemplate || !selectedDataFile || !outputDir) {
+    console.warn("[saveMarkdownTo] Missing required input(s)");
+    return null;
+  }
+
+  const { template, storage } = await getTemplateAndData(
+    selectedTemplate,
+    selectedDataFile
+  );
+
+  if (!template || !storage) {
+    console.warn("[saveMarkdownTo] Could not load template or data");
+    return null;
+  }
+
+  const markdown = await renderMarkdown(template, storage.data);
+  if (!markdown) {
+    console.warn("[saveMarkdownTo] Markdown rendering failed");
+    return null;
+  }
+
+  await ensureDirectory(outputDir, "MarkdownOutput");
+
+  const baseName = filename || stripMetaExtension(selectedDataFile);
+  const markdownFilePath = await resolvePath(outputDir, `${baseName}.md`);
+
+  await saveFile(markdownFilePath, markdown, { encoding: "utf8" });
+
+  if (showToast) {
+    EventBus.emit("ui:toast", {
+      message: `Saved markdown to ${markdownFilePath}`,
+      variant: "success",
+    });
+  }
+
+  return markdownFilePath;
 }

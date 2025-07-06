@@ -311,6 +311,7 @@ button.btn-remove-image:active,
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
+  margin-top: 4px;;
   gap: 0.3em;
 
   flex-wrap: wrap;
