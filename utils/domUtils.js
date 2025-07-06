@@ -106,8 +106,6 @@ export function createFieldManager({
   injectAfter = null,
   onSave = null,
 }) {
-  console.log("[FieldManager] Fields to render:", fields);
-
   if (!container) {
     EventBus.emit("logging:error", ["[FieldManager] container is null"]);
     throw new Error("FieldManager container is required.");

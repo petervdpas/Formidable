@@ -9,7 +9,7 @@ let storageList = null;
 
 export function bindListDependencies(deps) {
   templateList = deps.templateListManager;
-  storageList = deps.metaListManager;
+  storageList = deps.storageListManager;
 }
 
 export async function handleListReload({ listId }) {
@@ -75,9 +75,7 @@ export async function handleListItemClicked({ listId, name }) {
         return;
       }
 
-      const data = await new Promise((resolve) => {
-        EventBus.emit("template:load", { name, callback: resolve });
-      });
+      const data = await EventBus.emitWithResponse("template:load", { name });
 
       EventBus.emit("template:selected", { name, yaml: data });
       EventBus.emit("status:update", `Loaded Template: ${name}`);

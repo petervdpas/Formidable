@@ -1,8 +1,8 @@
 // modules/globalAPI.js
 
 import { EventBus } from "./eventBus.js";
-import * as configUtils from "../utils/configUtils.js";
 import * as pluginUtils from "../utils/pluginUtils.js";
+import * as pathUtils from "../utils/pathUtils.js";
 import * as modalUtils from "../utils/modalUtils.js";
 import * as listUtils from "../utils/listUtils.js";
 import * as elementBuilders from "../utils/elementBuilders.js";
@@ -15,23 +15,31 @@ export function exposeGlobalAPI() {
     // Core event system
     EventBus,
 
+    // Path Utility function
+    path: {
+      formatAsRelativePath: pathUtils.formatAsRelativePath,
+      stripYamlExtension: pathUtils.stripYamlExtension,
+      addYamlExtension: pathUtils.addYamlExtension,
+      stripMetaExtension: pathUtils.stripMetaExtension,
+      addMetaExtension: pathUtils.addMetaExtension,
+    },
+
     // Plugin management utilities
     plugin: {
+      getConfig: pluginUtils.getUserConfig,
+      saveConfig: pluginUtils.saveUserConfig,
+      getTemplateAndData: pluginUtils.getTemplateAndData,
+      renderMarkdown: pluginUtils.renderMarkdown,
       getSettings: pluginUtils.getPluginSettings,
       saveSettings: pluginUtils.savePluginSettings,
       resolvePath: pluginUtils.resolvePath,
+      ensureDirectory: pluginUtils.ensureDirectory,
       saveFile: pluginUtils.saveFile,
       loadFile: pluginUtils.loadFile,
       deleteFile: pluginUtils.deleteFile,
       fileExists: pluginUtils.fileExists,
       openExternal: pluginUtils.openExternal,
       proxyFetch: pluginUtils.proxyFetch,
-    },
-
-    // Configuration management
-    config: {
-      getConfig: configUtils.getUserConfig,
-      saveConfig: configUtils.saveUserConfig,
     },
 
     // Modal and popup helpers
@@ -91,7 +99,7 @@ export function exposeGlobalAPI() {
       disableButton: buttonUtils.disableButton,
     },
 
-    fieldRenderers
+    fieldRenderers,
   };
 
   // Expose full API

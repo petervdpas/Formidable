@@ -4,7 +4,7 @@ import { EventBus } from "../eventBus.js";
 import { clearContainerUI } from "../../utils/formUtils.js";
 
 let formManager = null;
-let metaListManager = null;
+let storageListManager = null;
 
 let lastSelectedForm = null;
 let lastSelectedTime = 0;
@@ -12,7 +12,7 @@ let isLoadingForm = false;
 
 export function bindFormDependencies(deps) {
   formManager = deps.formManager;
-  metaListManager = deps.metaListManager;
+  storageListManager = deps.storageListManager;
 }
 
 // SELECTED

@@ -35,6 +35,7 @@ export function initEventRouter() {
 
   // File events
   EventBus.off("file:resolve", systemHandler.handleResolvePath);
+  EventBus.off("file:ensure-directory", systemHandler.handleEnsureDirectory);
   EventBus.off("file:save", systemHandler.handleSaveFile);
   EventBus.off("file:load", systemHandler.handleLoadFile);
   EventBus.off("file:delete", systemHandler.handleDeleteFile);
@@ -42,6 +43,7 @@ export function initEventRouter() {
   EventBus.off("file:openExternal", systemHandler.handleOpenExternal);
 
   EventBus.on("file:resolve", systemHandler.handleResolvePath);
+  EventBus.on("file:ensure-directory", systemHandler.handleEnsureDirectory);
   EventBus.on("file:save", systemHandler.handleSaveFile);
   EventBus.on("file:load", systemHandler.handleLoadFile);
   EventBus.on("file:delete", systemHandler.handleDeleteFile);

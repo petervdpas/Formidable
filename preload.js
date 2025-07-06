@@ -80,6 +80,8 @@ const api = {
   system: {
     getAppRoot: () => ipcRenderer.invoke("get-app-root"),
     resolvePath: (...args) => ipcRenderer.invoke("resolve-path", ...args),
+    ensureDirectory: (dirPath, label) =>
+      ipcRenderer.invoke("ensure-directory", { dirPath, label }),
     saveFile: (filepath, data, opts) =>
       ipcRenderer.invoke("save-file", filepath, data, opts),
     loadFile: (filepath, opts) =>

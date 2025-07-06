@@ -45,8 +45,8 @@ export async function handleFormidableNavigate(data) {
   ]);
 
   // Load the template first
-  const yaml = await new Promise((resolve) => {
-    EventBus.emit("template:load", { name: template, callback: resolve });
+  const yaml = await EventBus.emitWithResponse("template:load", {
+    name: template,
   });
 
   if (!yaml) {

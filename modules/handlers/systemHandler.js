@@ -15,6 +15,19 @@ export async function handleResolvePath({ segments = [] }) {
   }
 }
 
+export async function handleEnsureDirectory({ dirPath, label = null }) {
+  try {
+    const result = await window.api.system.ensureDirectory(dirPath, label);
+    return result;
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[SystemHandler] ensureDirectory failed for "${dirPath}":`,
+      err,
+    ]);
+    return false;
+  }
+}
+
 export async function handleSaveFile({ filepath, data, opts = {} }) {
   try {
     const result = await window.api.system.saveFile(filepath, data, opts);

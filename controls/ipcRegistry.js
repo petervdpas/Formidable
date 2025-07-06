@@ -305,6 +305,9 @@ function registerIpcHandlers() {
   });
 
   registerIpc("get-app-root", () => fileManager.getAppRoot());
+  registerIpc("ensure-directory", (e, { dirPath, label }) => {
+    return fileManager.ensureDirectory(dirPath, { label });
+  });
   registerIpc("resolve-path", (e, ...segments) =>
     fileManager.resolvePath(...segments)
   );

@@ -3,7 +3,7 @@
 import { EventBus } from "../eventBus.js";
 
 let formManager = null;
-let metaListManager = null;
+let storageListManager = null;
 let templateEditor = null;
 
 let lastSelectedTemplate = null;
@@ -13,7 +13,7 @@ let isRenderingTemplate = false;
 // 🔗 Inject dependencies from renderer.js
 export function bindTemplateDependencies(deps) {
   formManager = deps.formManager;
-  metaListManager = deps.metaListManager;
+  storageListManager = deps.storageListManager;
   templateEditor = deps.templateEditor;
 }
 
@@ -62,9 +62,9 @@ export async function handleTemplateSelected({ name, yaml }) {
       EventBus.emit("form:selected", null); // clear form selection
     }
 
-    if (formManager && metaListManager) {
+    if (formManager && storageListManager) {
       await formManager.loadTemplate(yaml);
-      await metaListManager.loadList();
+      await storageListManager.loadList();
 
       const config = await new Promise((resolve) => {
         EventBus.emit("config:load", (cfg) => resolve(cfg));
@@ -100,16 +100,16 @@ export async function handleListTemplates({ callback }) {
 }
 
 // LOAD
-export async function handleLoadTemplate({ name, callback }) {
+export async function handleLoadTemplate({ name }) {
   try {
     const result = await window.api.templates.loadTemplate(name);
-    callback?.(result);
+    return result;
   } catch (err) {
     EventBus.emit("logging:error", [
       `[TemplateHandler] Failed to load template "${name}":`,
       err,
     ]);
-    callback?.(null);
+    return null;
   }
 }
 

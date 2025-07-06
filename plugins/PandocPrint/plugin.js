@@ -1,7 +1,7 @@
 // plugins/PandocPrint/plugin.js
 
 export async function run() {
-  const { plugin, button, modal, dom } = window.FGA;
+  const { path, plugin, button, modal, dom } = window.FGA;
   const pluginName = "PandocPrint";
 
   const { show } = modal.setupPluginModal({
@@ -13,7 +13,21 @@ export async function run() {
     height: "auto",
 
     prepareBody: async (modalEl, bodyEl) => {
-      // ─── Laad settings ─────────────────────────────────────────────
+      // ─── Laad globale config ─────────────────────────────────────
+      const [contextFolder, selectedTemplate, selectedDataFile] =
+        await Promise.all([
+          plugin.getConfig("context_folder"),
+          plugin.getConfig("selected_template"),
+          plugin.getConfig("selected_data_file"),
+        ]);
+
+      console.log("[PandocPrint] Context:", {
+        contextFolder,
+        selectedTemplate,
+        selectedDataFile,
+      });
+
+      // ─── Laad plugin settings ─────────────────────────────────────
       let settings = await plugin.getSettings(pluginName);
       if (!settings || typeof settings !== "object") settings = {};
       settings.variables ??= {};
@@ -21,8 +35,16 @@ export async function run() {
         "pwsh {script} -InputPath {InputPath} -UseCurrentDate {UseCurrentDate} -TemplatePath {TemplatePath} -OutputPath {OutputPath}";
       settings.overwrite ??= true;
 
-      // ─── Definieer velden ──────────────────────────────────────────
+      // ─── Definieer instelvelden ───────────────────────────────────
       const fields = [
+        {
+          key: "UseFormidable",
+          type: "boolean",
+          label: "Use Formidable",
+          wrapper: "modal-form-row",
+          fieldRenderer: "renderBooleanField",
+          value: true,
+        },
         {
           key: "InputPath",
           type: "file",
@@ -67,14 +89,15 @@ export async function run() {
 
       // ─── Vul initiële waarden ─────────────────────────────────────
       const initialData = Object.fromEntries(
-        fields.map(f => {
+        fields.map((f) => {
           const raw = settings.variables?.[f.key]?.value;
-          const val = f.type === "boolean" ? raw === true || raw === "true" : raw;
+          const val =
+            f.type === "boolean" ? raw === true || raw === "true" : raw;
           return [f.key, val];
         })
       );
 
-      // ─── Maak field manager ────────────────────────────────────────
+      // ─── Render instelformulier ────────────────────────────────────
       const fieldManager = dom.createFieldManager({
         container: bodyEl,
         fields,
@@ -89,13 +112,16 @@ export async function run() {
         className: "btn-primary",
         onClick: async () => {
           const values = fieldManager.getValues();
+
           for (const [key, val] of Object.entries(values)) {
-            const field = fields.find(f => f.key === key);
+            const field = fields.find((f) => f.key === key);
             const toSave = field?.type === "boolean" ? Boolean(val) : val;
             settings.variables[key] = { value: toSave };
           }
+
           settings.updated = new Date().toISOString();
           const result = await plugin.saveSettings(pluginName, settings);
+
           emit("ui:toast", {
             message: result?.success
               ? "Settings saved"
@@ -106,6 +132,43 @@ export async function run() {
       });
 
       bodyEl.appendChild(saveBtn);
+
+      // ─── Optioneel: haal template + data op ────────────────────────
+      if (initialData.UseFormidable && selectedTemplate && selectedDataFile) {
+        const { template, storage } = await plugin.getTemplateAndData(
+          selectedTemplate,
+          selectedDataFile
+        );
+
+        const markdown = await plugin.renderMarkdown(template, storage.data);
+        console.log("[PandocPrint] Rendered Markdown:", markdown);
+
+        if (markdown) {
+          const pluginMarkdownDir = await plugin.resolvePath(
+            "plugins",
+            pluginName,
+            "markdown"
+          );
+
+          // 💡 Zorg dat de output directory bestaat
+          await plugin.ensureDirectory(pluginMarkdownDir, "PandocPrint");
+
+          const filenameWithoutExt = path.stripMetaExtension(selectedDataFile);
+          const markdownFilePath = await plugin.resolvePath(
+            pluginMarkdownDir,
+            `${filenameWithoutExt}.md`
+          );
+
+          await plugin.saveFile(markdownFilePath, markdown, {
+            encoding: "utf8",
+          });
+
+          emit("ui:toast", {
+            message: `Saved markdown to plugins/${pluginName}/markdown/${filenameWithoutExt}.md`,
+            variant: "success",
+          });
+        }
+      }
     },
   });
 

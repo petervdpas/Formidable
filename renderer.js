@@ -177,7 +177,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     templateDropdown
   );
 
-  const metaListManager = createStorageListManager(
+  const storageListManager = createStorageListManager(
     formManager,
     entryInputModal
   );
@@ -195,18 +195,18 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   bindTemplateDependencies({
     formManager,
-    metaListManager,
+    storageListManager,
     templateEditor,
   });
 
   bindFormDependencies({
     formManager,
-    metaListManager,
+    storageListManager,
   });
 
   bindListDependencies({
     templateListManager: window.templateListManager,
-    metaListManager,
+    storageListManager,
   });
 
   bindLinkDependencies({
