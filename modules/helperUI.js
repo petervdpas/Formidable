@@ -1,5 +1,4 @@
 // modules/helperUI.js
-
 import { EventBus } from "./eventBus.js";
 
 export async function renderHelp() {
@@ -15,15 +14,51 @@ export async function renderHelp() {
       return true;
     }
 
-    const first = topics[0];
-    const topic = await EventBus.emitWithResponse("help:get", first.id);
-    if (!topic?.content) {
-      container.innerHTML = "<p>Help topic failed to load.</p>";
-      return true;
+    // Build navigation
+    const navHtml = topics
+      .map(
+        (t) =>
+          `<button class="help-nav-btn" data-id="${t.id}">${t.title}</button>`
+      )
+      .join("");
+
+    container.innerHTML = `
+        <div class="help-nav">${navHtml}</div>
+        <div class="help-scroll-container">
+            <div class="help-content">Loading...</div>
+        </div>
+        `;
+
+    const contentEl = container.querySelector(".help-content");
+    const buttons = container.querySelectorAll(".help-nav-btn");
+
+    async function loadTopic(id) {
+      const topic = await EventBus.emitWithResponse("help:get", id);
+      const html = await EventBus.emitWithResponse(
+        "transform:html",
+        topic.content
+      );
+      contentEl.innerHTML = html;
+
+      // Highlight active button
+      buttons.forEach((btn) => {
+        btn.classList.toggle("active", btn.getAttribute("data-id") === id);
+      });
+
+      // Scroll content back to top on topic change
+      contentEl.scrollTop = 0;
     }
 
-    const html = await EventBus.emitWithResponse("transform:html", topic.content);
-    container.innerHTML = `<div class="help-content">${html}</div>`;
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-id");
+        loadTopic(id);
+      });
+    });
+
+    const first = topics.find((t) => t.id === "index") || topics[0];
+    if (first) await loadTopic(first.id);
+
     return true;
   } catch (err) {
     console.error("[Help] Failed to render help:", err);

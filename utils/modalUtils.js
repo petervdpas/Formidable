@@ -6,7 +6,7 @@ import {
   createButton,
   createCancelButton,
   createConfirmButton,
-  buildButtonGroup 
+  buildButtonGroup,
 } from "./buttonUtils.js";
 
 function createModalCloseButton({
@@ -34,6 +34,7 @@ export function setupModal(
     backdropClick = false,
     width = "60%",
     height = "70%",
+    maxHeight = null,
     resizable = true,
   } = {}
 ) {
@@ -64,6 +65,10 @@ export function setupModal(
   if (!modal.classList.contains("large")) {
     modal.style.width = width;
     modal.style.height = height;
+  }
+
+  if (maxHeight) {
+    modal.style.maxHeight = maxHeight;
   }
 
   if (resizable) {

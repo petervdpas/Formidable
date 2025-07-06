@@ -1,5 +1,5 @@
 ---
-id: "intro"
+id: "index"
 title: "Getting Started"
 order: 1
 ---

@@ -100,7 +100,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
       { label: "Toggle DevTools", action: "devtools" },
     ]),
     createMenuGroup("Help", [
-      { label: "Help", action: "open-help" },
+      { label: "Help Pages", action: "open-help" },
       { label: "About", action: "open-about" },
     ]),
     createContextToggleItem()

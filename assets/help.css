@@ -1,11 +1,50 @@
 #help-body {
+  display: flex;
+  flex-direction: column;
+  max-height: 70vh;            /* not fixed — allows shrinking */
   padding: 1em;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.help-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  margin-bottom: 1em;
+}
+
+.help-nav-btn {
+  background: var(--btn-bg, #ddd);
+  border: none;
+  padding: 0.4em 0.8em;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background 0.2s ease;
+}
+
+.help-nav-btn:hover {
+  background: var(--btn-hover, #ccc);
+}
+
+.help-nav-btn.active {
+  background: var(--btn-active, #444);
+  color: white;
+}
+
+.help-scroll-container {
+  flex-shrink: 1;
+  flex-grow: 1;
   overflow-y: auto;
+  min-height: 0;
+  max-height: 100%;            /* keep it scrollable if content grows */
 }
 
 .help-content {
   font-family: sans-serif;
   line-height: 1.6;
+  padding-bottom: 1em;
 }
 
 .help-content h1,
@@ -20,4 +59,5 @@
   padding: 2px 4px;
   border-radius: 3px;
   font-family: monospace;
+  font-size: 0.95em;
 }

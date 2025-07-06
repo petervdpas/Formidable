@@ -80,6 +80,7 @@ export function setuHelpModal() {
     resizable: true,
     width: "60em",
     height: "auto",
+    maxHeight: "80vh", 
     onOpen: async () => {
       const ok = await renderHelp();
       if (!ok)
