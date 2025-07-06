@@ -322,7 +322,7 @@ function registerIpcHandlers() {
     fileManager.deleteFile(filepath, opts)
   );
   registerIpc("file-exists", (e, filePath) => fileManager.fileExists(filePath));
-  registerIpc("execute-command", async (e, cmd) => {
+  registerIpc("execute-command", async (e, cmd) => {    
     return new Promise((resolve) => {
       exec(cmd, { shell: true }, (error, stdout, stderr) => {
         if (error) {

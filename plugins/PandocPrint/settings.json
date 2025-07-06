@@ -4,7 +4,7 @@
       "value": true
     },
     "InputPath": {
-      "value": "E:\\Projects\\documentation\\Fontys\\Analyse Inschrijving OnStage.md"
+      "value": "E:\\Projects\\documentation\\Science\\De spiegel spreekt niet terug.md"
     },
     "OutputPath": {
       "value": "E:\\Projects\\documentation\\output"
@@ -21,5 +21,5 @@
   },
   "command": "pwsh {script} -InputPath {InputPath} -UseCurrentDate {UseCurrentDate} -TemplatePath {TemplatePath} -OutputPath {OutputPath}",
   "overwrite": true,
-  "updated": "2025-07-06T06:48:30.016Z"
+  "updated": "2025-07-06T11:56:38.470Z"
 }

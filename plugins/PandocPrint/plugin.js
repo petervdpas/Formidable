@@ -13,7 +13,7 @@ export async function run() {
     height: "auto",
 
     prepareBody: async (modalEl, bodyEl) => {
-      // ─── Laad globale config ─────────────────────────────────────
+      
       const [contextFolder, selectedTemplate, selectedDataFile] =
         await Promise.all([
           plugin.getConfig("context_folder"),
@@ -27,7 +27,6 @@ export async function run() {
         selectedDataFile,
       });
 
-      // ─── Laad plugin settings ─────────────────────────────────────
       let settings = await plugin.getSettings(pluginName);
       if (!settings || typeof settings !== "object") settings = {};
       settings.variables ??= {};
@@ -35,7 +34,6 @@ export async function run() {
         "pwsh {script} -InputPath {InputPath} -UseCurrentDate {UseCurrentDate} -TemplatePath {TemplatePath} -OutputPath {OutputPath}";
       settings.overwrite ??= true;
 
-      // ─── Definieer instelvelden ───────────────────────────────────
       const fields = [
         {
           key: "UseFormidable",
@@ -87,7 +85,6 @@ export async function run() {
         },
       ];
 
-      // ─── Vul initiële waarden ─────────────────────────────────────
       const initialData = Object.fromEntries(
         fields.map((f) => {
           const raw = settings.variables?.[f.key]?.value;
@@ -97,7 +94,6 @@ export async function run() {
         })
       );
 
-      // ─── Render instelformulier ────────────────────────────────────
       const fieldManager = dom.createFieldManager({
         container: bodyEl,
         fields,
@@ -133,7 +129,7 @@ export async function run() {
       const previewBtn = button.createButton({
         text: "Generate Command",
         className: "btn-info",
-        onClick: () => {
+        onClick: async () => {
           const values = fieldManager.getValues();
 
           const cmdParams = {
@@ -145,20 +141,22 @@ export async function run() {
           };
 
           const finalCommand = string.combiMerge([settings.command], cmdParams);
+          const result = await plugin.executeSystemCommand(finalCommand);
+
+          const toastMessage = result.success
+            ? "Command executed successfully"
+            : "Command execution failed";
+          const toastVariant = result.success ? "success" : "error";
 
           emit("ui:toast", {
-            message: `Generated:\n${finalCommand}`,
-            variant: "info",
+            message: toastMessage,
+            variant: toastVariant,
             duration: 8000,
           });
-
-          console.log("[PandocPrint] Final command:", finalCommand);
         },
       });
 
       bodyEl.appendChild(button.buildButtonGroup(saveBtn, previewBtn));
-
-
 
       if (initialData.UseFormidable && selectedTemplate && selectedDataFile) {
         const { template, storage } = await plugin.getTemplateAndData(
@@ -175,7 +173,6 @@ export async function run() {
             "markdown"
           );
 
-          // 💡 Zorg dat de output directory bestaat
           await plugin.ensureDirectory(pluginMarkdownDir, "PandocPrint");
 
           const filenameWithoutExt = path.stripMetaExtension(selectedDataFile);

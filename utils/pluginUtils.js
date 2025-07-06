@@ -138,3 +138,19 @@ export async function openExternal(url) {
 export async function proxyFetch(url) {
   return EventBus.emitWithResponse("plugin:proxy-fetch", { url });
 }
+
+// Execute system-level command (e.g., Powershell, shell script, etc.)
+export async function executeSystemCommand(cmd) {
+  if (!cmd || typeof cmd !== "string") {
+    console.warn("[pluginUtils] executeSystemCommand requires a valid command string.");
+    return { success: false, error: "Invalid command" };
+  }
+
+  try {
+    const result = await EventBus.emitWithResponse("system:execute", { cmd });
+    return result;
+  } catch (err) {
+    console.warn("[pluginUtils] System command failed:", err);
+    return { success: false, error: err.message || "Command failed" };
+  }
+}

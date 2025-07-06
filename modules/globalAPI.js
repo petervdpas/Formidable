@@ -41,6 +41,7 @@ export function exposeGlobalAPI() {
       fileExists: pluginUtils.fileExists,
       openExternal: pluginUtils.openExternal,
       proxyFetch: pluginUtils.proxyFetch,
+      executeSystemCommand: pluginUtils.executeSystemCommand,
     },
 
     // Modal and popup helpers
