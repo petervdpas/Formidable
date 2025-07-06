@@ -90,6 +90,7 @@ const api = {
       ipcRenderer.invoke("delete-file", filepath, opts),
     fileExists: (path) => ipcRenderer.invoke("file-exists", path),
     openExternal: (url) => ipcRenderer.invoke("shell-open-external", url),
+    executeCommand: (cmd) => ipcRenderer.invoke("execute-command", cmd),
   },
   dialog: {
     chooseDirectory: () => ipcRenderer.invoke("dialog-choose-directory"),

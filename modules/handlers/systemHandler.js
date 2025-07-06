@@ -90,3 +90,19 @@ export async function handleOpenExternal({ url }) {
     ]);
   }
 }
+
+export async function handleExecuteCommand({ cmd }) {
+  try {
+    const result = await window.api.system.executeCommand(cmd);
+    return result;
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[SystemHandler] executeCommand failed for "${cmd}":`,
+      err,
+    ]);
+    return {
+      success: false,
+      error: err.message,
+    };
+  }
+}

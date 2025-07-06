@@ -50,6 +50,9 @@ export function initEventRouter() {
   EventBus.on("file:exists", systemHandler.handleFileExists);
   EventBus.on("file:openExternal", systemHandler.handleOpenExternal);
 
+  EventBus.off("system:execute", systemHandler.handleExecuteCommand);
+  EventBus.on("system:execute", systemHandler.handleExecuteCommand);
+
   // Internal Server
   EventBus.off("server:start", serverHandler.handleStartServer);
   EventBus.off("server:stop", serverHandler.handleStopServer);

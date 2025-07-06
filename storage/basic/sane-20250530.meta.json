@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-07-05T13:37:35.472Z",
+    "updated": "2025-07-06T06:12:13.015Z",
     "flagged": true
   },
   "data": {
@@ -18,7 +18,7 @@
       "B"
     ],
     "radio": "CAT",
-    "mline": "I dont like this one bit",
+    "mline": "I dont like this one bit or byte for that matter.",
     "numpy": 17,
     "rangie": 15,
     "bday": "1968-12-23",

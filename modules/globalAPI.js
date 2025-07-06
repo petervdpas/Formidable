@@ -9,6 +9,7 @@ import * as elementBuilders from "../utils/elementBuilders.js";
 import * as domUtils from "../utils/domUtils.js";
 import * as buttonUtils from "../utils/buttonUtils.js";
 import * as fieldRenderers from "../utils/fieldRenderers.js";
+import * as stringUtils from "../utils/stringUtils.js";
 
 export function exposeGlobalAPI() {
   const api = {
@@ -100,6 +101,12 @@ export function exposeGlobalAPI() {
     },
 
     fieldRenderers,
+
+    string: {
+      sanitize: stringUtils.sanitize,
+      capitalize: stringUtils.capitalize,
+      combiMerge: stringUtils.combiMerge,
+    },
   };
 
   // Expose full API

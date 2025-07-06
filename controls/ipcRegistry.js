@@ -9,6 +9,7 @@ const {
 } = require("electron");
 const { registerIpc } = require("./ipcRoutes");
 const { SingleFileRepository } = require("./sfr");
+const { exec } = require("child_process");
 
 const internalServer = require("./internalServer");
 const pluginManager = require("./pluginManager");
@@ -321,6 +322,26 @@ function registerIpcHandlers() {
     fileManager.deleteFile(filepath, opts)
   );
   registerIpc("file-exists", (e, filePath) => fileManager.fileExists(filePath));
+  registerIpc("execute-command", async (e, cmd) => {
+    return new Promise((resolve) => {
+      exec(cmd, { shell: true }, (error, stdout, stderr) => {
+        if (error) {
+          resolve({
+            success: false,
+            error: error.message,
+            stderr,
+            stdout,
+          });
+        } else {
+          resolve({
+            success: true,
+            stdout,
+            stderr,
+          });
+        }
+      });
+    });
+  });
 }
 
 module.exports = { registerIpcHandlers };

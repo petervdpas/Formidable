@@ -1,7 +1,7 @@
 // plugins/PandocPrint/plugin.js
 
 export async function run() {
-  const { path, plugin, button, modal, dom } = window.FGA;
+  const { path, plugin, button, modal, dom, string } = window.FGA;
   const pluginName = "PandocPrint";
 
   const { show } = modal.setupPluginModal({
@@ -106,10 +106,9 @@ export async function run() {
 
       await fieldManager.renderFields();
 
-      // ─── Save Settings knop ────────────────────────────────────────
       const saveBtn = button.createButton({
         text: "Save Settings",
-        className: "btn-primary",
+        className: "btn-warn",
         onClick: async () => {
           const values = fieldManager.getValues();
 
@@ -131,9 +130,36 @@ export async function run() {
         },
       });
 
-      bodyEl.appendChild(saveBtn);
+      const previewBtn = button.createButton({
+        text: "Generate Command",
+        className: "btn-info",
+        onClick: () => {
+          const values = fieldManager.getValues();
 
-      // ─── Optioneel: haal template + data op ────────────────────────
+          const cmdParams = {
+            script: values.PowershellScript,
+            InputPath: values.InputPath,
+            OutputPath: values.OutputPath,
+            TemplatePath: values.TemplatePath,
+            UseCurrentDate: values.UseCurrentDate ? "true" : "false",
+          };
+
+          const finalCommand = string.combiMerge([settings.command], cmdParams);
+
+          emit("ui:toast", {
+            message: `Generated:\n${finalCommand}`,
+            variant: "info",
+            duration: 8000,
+          });
+
+          console.log("[PandocPrint] Final command:", finalCommand);
+        },
+      });
+
+      bodyEl.appendChild(button.buildButtonGroup(saveBtn, previewBtn));
+
+
+
       if (initialData.UseFormidable && selectedTemplate && selectedDataFile) {
         const { template, storage } = await plugin.getTemplateAndData(
           selectedTemplate,
@@ -141,7 +167,6 @@ export async function run() {
         );
 
         const markdown = await plugin.renderMarkdown(template, storage.data);
-        console.log("[PandocPrint] Rendered Markdown:", markdown);
 
         if (markdown) {
           const pluginMarkdownDir = await plugin.resolvePath(
