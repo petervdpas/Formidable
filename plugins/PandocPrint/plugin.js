@@ -7,7 +7,7 @@ export async function run() {
   const { show } = modal.setupPluginModal({
     id: "plugin-settings-pandocprint",
     title: "Pandoc Print",
-    escToClose: false,
+    escToClose: true,
     backdropClick: true,
     width: "44em",
     height: "auto",

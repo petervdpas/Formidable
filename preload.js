@@ -22,6 +22,7 @@ const api = {
     "save-plugin-settings",
     "proxy-fetch-remote",
   ]),
+  help: buildGroup(["list-help-topics", "get-help-topic"]),
   git: buildGroup([
     "is-git-repo",
     "get-git-root",

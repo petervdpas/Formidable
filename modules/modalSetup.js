@@ -62,7 +62,7 @@ export function setupSettingsModal() {
     backdropClick: true,
     resizable: true,
     width: "30em",
-    height: "auto",
+    height: "20em",
     onOpen: async () => {
       const ok = await renderSettings();
       if (!ok)

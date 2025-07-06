@@ -5,6 +5,7 @@ import { EventBus } from "./eventBus.js";
 import * as systemHandler from "./handlers/systemHandler.js";
 import * as serverHandler from "./handlers/serverHandler.js";
 import * as pluginHandler from "./handlers/pluginHandler.js";
+import * as helpHandler from "./handlers/helpHandler.js";
 import * as cacheHandler from "./handlers/cacheHandler.js";
 import * as vfsHandler from "./handlers/vfsHandler.js";
 import * as gitHandler from "./handlers/gitHandler.js";
@@ -88,6 +89,13 @@ export function initEventRouter() {
   EventBus.on("plugin:get-settings", pluginHandler.handleGetPluginSettings);
   EventBus.on("plugin:save-settings", pluginHandler.handleSavePluginSettings);
   EventBus.on("plugin:proxy-fetch", pluginHandler.handlePluginProxyFetch);
+
+  // Help events
+  EventBus.off("help:list", helpHandler.handleHelpList);
+  EventBus.off("help:get", helpHandler.handleHelpGet);
+
+  EventBus.on("help:list", helpHandler.handleHelpList);
+  EventBus.on("help:get", helpHandler.handleHelpGet);
 
   // Logging
   EventBus.off("logging:toggle", loggingHandler.handleLoggingToggle);

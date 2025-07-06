@@ -13,6 +13,7 @@ const { exec } = require("child_process");
 
 const internalServer = require("./internalServer");
 const pluginManager = require("./pluginManager");
+const helpManager = require("./helpManager");
 const packageJson = require("../package.json");
 const fileManager = require("./fileManager");
 const gitManager = require("./gitManager");
@@ -162,6 +163,10 @@ function registerIpcHandlers() {
     }
   });
 
+  // Help
+  registerIpc("list-help-topics", () => helpManager.listHelpTopics());
+  registerIpc("get-help-topic", (e, id) => helpManager.getHelpTopic(id));
+
   // Git
   registerIpc("is-git-repo", (e, folder) => gitManager.isGitRepo(folder));
   registerIpc("get-git-root", (e, folder) => gitManager.getGitRoot(folder));
@@ -304,7 +309,7 @@ function registerIpcHandlers() {
     fileManager.deleteFile(filepath, opts)
   );
   registerIpc("file-exists", (e, filePath) => fileManager.fileExists(filePath));
-  registerIpc("execute-command", async (e, cmd) => {    
+  registerIpc("execute-command", async (e, cmd) => {
     return new Promise((resolve) => {
       exec(cmd, { shell: true }, (error, stdout, stderr) => {
         if (error) {
