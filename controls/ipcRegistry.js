@@ -284,8 +284,8 @@ function registerIpcHandlers() {
   );
 
   // Render
-  registerIpc("render-markdown-template", (e, data, yaml) =>
-    markdownRenderer.renderMarkdown(data, yaml)
+  registerIpc("render-markdown-template", (e, data, yaml, filePrefix = true) =>
+    markdownRenderer.renderMarkdown(data, yaml, filePrefix)
   );
   registerIpc("render-html-preview", (e, md) => htmlRenderer.renderHtml(md));
 

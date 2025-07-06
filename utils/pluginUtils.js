@@ -87,6 +87,7 @@ export async function renderMarkdown(template, data) {
     const markdown = await EventBus.emitWithResponse("transform:markdown", {
       template,
       data,
+      filePrefix: false,
     });
     return markdown;
   } catch (err) {

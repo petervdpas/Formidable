@@ -56,13 +56,13 @@ const defaultRenderers = {
     return v.map((val) => map.get(val) || val).join(", ");
   },
   textarea: (v) => v,
-  image: (filename, field, template) => {
+  image: (filename, field, template, filePrefix = true) => {
     if (!filename || typeof filename !== "string") return "";
     const basePath =
       configManager.getTemplateStoragePath(template?.filename) || "";
     const absPath = resolvePath(basePath, "images", filename);
-    const uri = `file://${absPath.replace(/\\/g, "/")}`; // normalize for Electron
-    return uri;
+    const normalized = absPath.replace(/\\/g, "/");
+    return filePrefix ? `file://${normalized}` : normalized;
   },
 };
 
@@ -90,7 +90,7 @@ function buildLoopGroups(fields) {
   return groups;
 }
 
-function registerHelpers() {
+function registerHelpers(filePrefix = true) {
   Handlebars.registerHelper("json", (value) => {
     return new Handlebars.SafeString(JSON.stringify(value, null, 2));
   });
@@ -179,7 +179,10 @@ function registerHelpers() {
       fn = defaultRenderers[field.type];
     }
 
-    const rendered = fn(value, field, template);
+    const rendered =
+      field.type === "image"
+        ? defaultRenderers.image(value, field, template, filePrefix)
+        : fn(value, field, template);
     return typeof rendered === "string" ? rendered : `${rendered}`;
   });
 
@@ -217,7 +220,7 @@ function registerHelpers() {
         const indexValue = `${index + 1}`;
         const subContext = {
           ...entry,
-          loop_index: { key : "loop_index", value: indexValue, type: "text" },
+          loop_index: { key: "loop_index", value: indexValue, type: "text" },
           _fields: groupFields,
           _template: ctx._template,
         };
@@ -227,13 +230,13 @@ function registerHelpers() {
   });
 }
 
-function renderMarkdown(formData, templateYaml) {
+function renderMarkdown(formData, templateYaml, filePrefix = true) {
   if (!templateYaml.markdown_template) {
     return "# No template defined.";
   }
 
   try {
-    registerHelpers();
+    registerHelpers(filePrefix); // geef mee aan de helpers
     const context = {
       ...formData,
       _fields: templateYaml.fields || [],

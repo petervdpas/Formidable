@@ -2,14 +2,15 @@
 
 import { EventBus } from "../eventBus.js";
 
-export async function handleRenderMarkdown({ data, template }, callback) {
+export async function handleRenderMarkdown({ data, template, filePrefix = true }, callback) {
   try {
     EventBus.emit("logging:default", [
       "[transformHandler] Rendering Markdown...",
     ]);
     const markdown = await window.api.transform.renderMarkdownTemplate(
       data,
-      template
+      template,
+      filePrefix
     );
     callback?.(markdown);
   } catch (err) {
