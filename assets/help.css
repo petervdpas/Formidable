@@ -1,0 +1,23 @@
+#help-body {
+  padding: 1em;
+  overflow-y: auto;
+}
+
+.help-content {
+  font-family: sans-serif;
+  line-height: 1.6;
+}
+
+.help-content h1,
+.help-content h2,
+.help-content h3 {
+  margin-top: 1em;
+  font-weight: bold;
+}
+
+.help-content code {
+  background: #eee;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: monospace;
+}

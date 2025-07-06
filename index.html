@@ -38,6 +38,7 @@
     <link rel="stylesheet" href="assets/modal.css" />
     <link rel="stylesheet" href="assets/field-types.css" />
     <link rel="stylesheet" href="assets/git-actions.css" />
+    <link rel="stylesheet" href="assets/help.css" />
     <link rel="stylesheet" href="assets/theme.css" />
     <link rel="stylesheet" href="assets/dark-theme.css" />
 
@@ -305,6 +306,18 @@
       </div>
     </div>
 
+    <!-- Help Modal -->
+    <div id="help-modal" class="modal">
+      <div class="modal-header">
+        <div class="modal-title-row">
+          <h2>Help</h2>
+        </div>
+      </div>
+      <div class="modal-body" id="help-body">
+        <!-- Populated dynamically via helperUI -->
+      </div>
+    </div>
+
     <!-- About Modal -->
     <div id="about-modal" class="modal">
       <div class="modal-header">
@@ -329,7 +342,7 @@
 
     <!-- Plugin container -->
     <div id="plugin-executor"></div>
-    
+
     <div id="modalBackdrop" class="modal-backdrop"></div>
     <div id="toast-container"></div>
 

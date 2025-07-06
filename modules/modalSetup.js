@@ -11,6 +11,7 @@ import { createDropdown } from "../utils/dropdownUtils.js";
 import { syncScroll } from "../utils/domUtils.js";
 import { createProfileListManager } from "./profileManager.js";
 import { renderPluginManager } from "./pluginManagerUI.js";
+import { renderHelp } from "./helperUI.js";
 import { renderGitStatus } from "./gitActions.js";
 import {
   createShowMarkdownButton,
@@ -67,6 +68,22 @@ export function setupSettingsModal() {
       const ok = await renderSettings();
       if (!ok)
         EventBus.emit("logging:warning", ["Settings container not found"]);
+    },
+  });
+}
+
+export function setuHelpModal() {
+  return setupModal("help-modal", {
+    closeBtn: "help-close",
+    escToClose: true,
+    backdropClick: true,
+    resizable: true,
+    width: "60em",
+    height: "auto",
+    onOpen: async () => {
+      const ok = await renderHelp();
+      if (!ok)
+        EventBus.emit("logging:warning", ["Help container not found"]);
     },
   });
 }

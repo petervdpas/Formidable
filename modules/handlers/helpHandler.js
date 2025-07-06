@@ -8,5 +8,5 @@ export async function handleHelpList() {
 
 export async function handleHelpGet(id) {
   if (typeof id !== "string") return null;
-  return await window.api.help.get(id);
+  return await window.api.help.getHelpTopic(id);
 }

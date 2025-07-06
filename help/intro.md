@@ -6,7 +6,7 @@ order: 1
 
 ## Welcome to Formidable
 
-Formidable is a modular form editor...
+![Formidable Logo](images/formidable.png)
 
 ### Getting Started
 

@@ -99,7 +99,10 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
       { label: "Reload", action: "reload" },
       { label: "Toggle DevTools", action: "devtools" },
     ]),
-    createMenuGroup("Help", [{ label: "About", action: "about" }]),
+    createMenuGroup("Help", [
+      { label: "Help", action: "open-help" },
+      { label: "About", action: "open-about" },
+    ]),
     createContextToggleItem()
   );
 
@@ -190,11 +193,6 @@ export async function handleMenuAction(action) {
           "[Shell] Failed to open template folder:",
           result,
         ]);
-      } else {
-        EventBus.emit("logging:default", [
-          "[Shell] Opened template folder:",
-          templatesLocation,
-        ]);
       }
       break;
     }
@@ -230,11 +228,6 @@ export async function handleMenuAction(action) {
           EventBus.emit("logging:error", [
             "[Shell] Failed to open storage folder:",
             result,
-          ]);
-        } else {
-          EventBus.emit("logging:default", [
-            "[Shell] Opened storage folder:",
-            targetPath,
           ]);
         }
       } catch (err) {
@@ -279,49 +272,38 @@ export async function handleMenuAction(action) {
     }
 
     case "quit":
-      EventBus.emit("logging:default", ["[Menu] Quitting app..."]);
       window.electron.app.quit();
       break;
 
     case "open-settings":
-      EventBus.emit("logging:default", ["[Menu] Opening settings modal..."]);
       window.openSettingsModal?.();
       break;
 
     case "open-profile-switcher":
-      EventBus.emit("logging:default", [
-        "[Menu] Opening profile switcher modal...",
-      ]);
       window.openProfileModal?.();
       break;
 
     case "open-plugin-manager":
-      EventBus.emit("logging:default", ["[Menu] Opening plugin manager..."]);
       window.openPluginModal?.();
       break;
 
     case "reload":
-      EventBus.emit("logging:default", ["[Menu] Reloading page..."]);
       location.reload();
       break;
 
     case "devtools":
-      EventBus.emit("logging:default", ["[Menu] Toggling devtools..."]);
       window.electron.devtools.toggle();
       break;
 
     case "open-workspace-settings":
-      EventBus.emit("logging:default", ["[Menu] Opening workspace modal..."]);
       window.openWorkspaceModal?.();
       break;
 
     case "open-git-modal":
-      EventBus.emit("logging:default", ["[Menu] Opening Git modal..."]);
       window.openGitModal?.();
       break;
 
     case "start-internal-server":
-      EventBus.emit("logging:default", ["[Menu] Starting internal server..."]);
       {
         const port = cachedConfig?.internal_server_port || 8383;
         EventBus.emit("server:start", { port });
@@ -329,14 +311,10 @@ export async function handleMenuAction(action) {
       break;
 
     case "stop-internal-server":
-      EventBus.emit("logging:default", ["[Menu] Stopping internal server..."]);
       EventBus.emit("server:stop");
       break;
 
     case "get-internal-server-status":
-      EventBus.emit("logging:default", [
-        "[Menu] Getting internal server status...",
-      ]);
       EventBus.emit("server:status", {
         callback: (server) => {
           console.log("[Menu] Server status:", server);
@@ -350,8 +328,11 @@ export async function handleMenuAction(action) {
       });
       break;
 
-    case "about":
-      EventBus.emit("logging:default", ["[Menu] Opening about modal..."]);
+    case "open-help":
+      window.openHelpModal?.();
+      break;
+      
+    case "open-about":
       window.openAboutModal?.();
       break;
 

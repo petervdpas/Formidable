@@ -1,5 +1,6 @@
 // controls/htmlRenderer.js
 
+const { joinPath } = require("./fileManager");
 const { log, error } = require("./nodeLogger");
 const MarkdownIt = require("markdown-it");
 const sanitizeHtml = require("sanitize-html");
@@ -11,9 +12,11 @@ const md = new MarkdownIt({
 });
 
 // 🧩 Patch image rule to support file:// URLs
-const defaultImageRenderer = md.renderer.rules.image || function (tokens, idx, options, env, self) {
-  return self.renderToken(tokens, idx, options);
-};
+const defaultImageRenderer =
+  md.renderer.rules.image ||
+  function (tokens, idx, options, env, self) {
+    return self.renderToken(tokens, idx, options);
+  };
 
 md.renderer.rules.image = function (tokens, idx, options, env, self) {
   const token = tokens[idx];
@@ -33,10 +36,19 @@ function stripFrontmatter(markdown) {
 }
 
 function convertFileImages(markdown) {
-  // converteer ![alt](file://...) → <img src="file://..." alt="alt">
-  return markdown.replace(/!\[([^\]]*)\]\((file:\/\/[^\)]+)\)/g, (_, alt, src) => {
+  // Convert ![alt](file://...) to <img>
+  markdown = markdown.replace(/!\[([^\]]*)\]\((file:\/\/[^\)]+)\)/g, (_, alt, src) => {
     return `<img src="${src}" alt="${alt}">`;
   });
+
+  // Convert ![alt](images/...) to absolute file:// URL
+  markdown = markdown.replace(/!\[([^\]]*)\]\((images\/[^\)]+)\)/g, (_, alt, relPath) => {
+    const absPath = joinPath("help", relPath);
+    const fileUrl = `file://${absPath.replace(/\\/g, "/")}`;
+    return `<img src="${fileUrl}" alt="${alt}">`;
+  });
+
+  return markdown;
 }
 
 function renderHtml(markdown) {
