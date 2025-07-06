@@ -1,7 +1,15 @@
 name: Looper example
 filename: loopie.yaml
 markdown_template: |-
-  <!-- AUTO-GENERATED TEMPLATE - Only if Editor is empty! -->
+  ---
+  title: Auto-generated Report
+  author: Formidable Generator
+  date: 2025-07-06
+  toc: true
+  toc-title: Inhoudsopgave
+  toc-own-page: true
+  ---
+
   ## Title
 
   _{{fieldDescription "title"}}_

@@ -1,5 +1,49 @@
 // plugins/PandocPrint/plugin.js
 
+async function prepareFormidableMarkdown({
+  selectedTemplate,
+  selectedDataFile,
+  pluginName,
+  plugin,
+  path,
+  emit,
+}) {
+  if (!selectedTemplate || !selectedDataFile) return null;
+
+  const { template, storage } = await plugin.getTemplateAndData(
+    selectedTemplate,
+    selectedDataFile
+  );
+
+  const markdown = await plugin.renderMarkdown(template, storage.data);
+  if (!markdown) return null;
+
+  const pluginMarkdownDir = await plugin.resolvePath(
+    "plugins",
+    pluginName,
+    "markdown"
+  );
+
+  await plugin.ensureDirectory(pluginMarkdownDir, "PandocPrint");
+
+  const filenameWithoutExt = path.stripMetaExtension(selectedDataFile);
+  const markdownFilePath = await plugin.resolvePath(
+    pluginMarkdownDir,
+    `${filenameWithoutExt}.md`
+  );
+
+  await plugin.saveFile(markdownFilePath, markdown, {
+    encoding: "utf8",
+  });
+
+  emit("ui:toast", {
+    message: `Saved markdown to plugins/${pluginName}/markdown/${filenameWithoutExt}.md`,
+    variant: "success",
+  });
+
+  return markdownFilePath;
+}
+
 export async function run() {
   const { path, plugin, button, modal, dom, string } = window.FGA;
   const pluginName = "PandocPrint";
@@ -13,7 +57,6 @@ export async function run() {
     height: "auto",
 
     prepareBody: async (modalEl, bodyEl) => {
-      
       const [contextFolder, selectedTemplate, selectedDataFile] =
         await Promise.all([
           plugin.getConfig("context_folder"),
@@ -100,6 +143,21 @@ export async function run() {
         data: initialData,
       });
 
+      if (initialData.UseFormidable) {
+        const markdownPath = await prepareFormidableMarkdown({
+          selectedTemplate,
+          selectedDataFile,
+          pluginName,
+          plugin,
+          path,
+          emit,
+        });
+
+        if (markdownPath) {
+          fieldManager.setValue("InputPath", markdownPath);
+        }
+      }
+
       await fieldManager.renderFields();
 
       const saveBtn = button.createButton({
@@ -157,40 +215,6 @@ export async function run() {
       });
 
       bodyEl.appendChild(button.buildButtonGroup(saveBtn, previewBtn));
-
-      if (initialData.UseFormidable && selectedTemplate && selectedDataFile) {
-        const { template, storage } = await plugin.getTemplateAndData(
-          selectedTemplate,
-          selectedDataFile
-        );
-
-        const markdown = await plugin.renderMarkdown(template, storage.data);
-
-        if (markdown) {
-          const pluginMarkdownDir = await plugin.resolvePath(
-            "plugins",
-            pluginName,
-            "markdown"
-          );
-
-          await plugin.ensureDirectory(pluginMarkdownDir, "PandocPrint");
-
-          const filenameWithoutExt = path.stripMetaExtension(selectedDataFile);
-          const markdownFilePath = await plugin.resolvePath(
-            pluginMarkdownDir,
-            `${filenameWithoutExt}.md`
-          );
-
-          await plugin.saveFile(markdownFilePath, markdown, {
-            encoding: "utf8",
-          });
-
-          emit("ui:toast", {
-            message: `Saved markdown to plugins/${pluginName}/markdown/${filenameWithoutExt}.md`,
-            variant: "success",
-          });
-        }
-      }
     },
   });
 

@@ -3,7 +3,17 @@
 export function generateTemplateCode(fields = []) {
   if (!Array.isArray(fields) || fields.length === 0) return "";
 
-  const headerComment = `<!-- AUTO-GENERATED TEMPLATE - Only if Editor is empty! -->\n`;
+  const frontmatter = [
+    "---",
+    "title: Auto-generated Report",
+    "author: Formidable Generator",
+    `date: ${new Date().toISOString().split("T")[0]}`,
+    "toc: true",
+    "toc-title: Inhoudsopgave",
+    "toc-own-page: true",
+    "---",
+    "",
+  ].join("\n");
 
   const bodyParts = [];
   const seenKeys = new Set();
@@ -40,7 +50,7 @@ export function generateTemplateCode(fields = []) {
     i++;
   }
 
-  return headerComment + bodyParts.join("\n---\n\n");
+  return frontmatter + "\n" + bodyParts.join("\n---\n\n");
 }
 
 function generateSingleFieldBlock(field, headingLevel = 2) {

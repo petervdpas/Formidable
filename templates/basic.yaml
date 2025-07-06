@@ -1,7 +1,26 @@
 name: Basic example
 filename: basic.yaml
 markdown_template: |-
-  <!-- AUTO-GENERATED TEMPLATE - Only if Editor is empty! -->
+  ---
+  title: Auto-generated Report
+  author: Formidable Generator
+  date: 2025-07-06
+  toc: true
+  toc-title: Inhoudsopgave
+  toc-own-page: true
+  ---
+
+  ## GUID
+
+  _{{fieldDescription "id"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "id")}}
+  ```
+  {{field "id"}}
+  ---
+
   ## Test
 
   _{{fieldDescription "test"}}_
@@ -190,6 +209,17 @@ markdown_template: |-
   {{else}}
   _No image uploaded for Design_
   {{/if}}
+  ---
+
+  ## Linktest
+
+  _{{fieldDescription "linktest"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "linktest")}}
+  ```
+  {{field "linktest"}}
 sidebar_handling: '[ test + " (" + check + ")" | check ? "green" : "red" ]'
 enable_collection: true
 fields:

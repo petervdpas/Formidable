@@ -12,8 +12,7 @@ import {
   applyGenericField,
 } from "./fieldAppliers.js";
 import { collectLoopGroup } from "./formUtils.js";
-import * as fieldRenderers from "./fieldRenderers.js"; 
-import { capitalize } from "./stringUtils.js";
+import * as fieldRenderers from "./fieldRenderers.js";
 
 export function generateGuid() {
   return crypto.randomUUID();
@@ -147,7 +146,9 @@ export function createFieldManager({
         (async (f, val) => {
           const fn =
             (f.fieldRenderer && fieldRenderers[f.fieldRenderer]) ||
-            fieldRenderers[`render${f.type?.[0]?.toUpperCase()}${f.type?.slice(1)}Field`] ||
+            fieldRenderers[
+              `render${f.type?.[0]?.toUpperCase()}${f.type?.slice(1)}Field`
+            ] ||
             fieldRenderers.renderTextField;
           return await fn(f, val);
         });
@@ -163,9 +164,7 @@ export function createFieldManager({
         if (onSave && input) {
           input.addEventListener("change", () => {
             const val =
-              field.type === "boolean"
-                ? input.checked
-                : input.value ?? "";
+              field.type === "boolean" ? input.checked : input.value ?? "";
             enrichedData[field.key] = val;
             onSave(field, val);
           });
@@ -188,6 +187,18 @@ export function createFieldManager({
     ]);
   }
 
+  function setValue(key, value) {
+    enrichedData[key] = value;
+    const input = inputRefs[key];
+    if (input) {
+      if (input.type === "checkbox") {
+        input.checked = !!value;
+      } else {
+        input.value = value ?? "";
+      }
+    }
+  }
+
   function getValues() {
     const values = {};
     for (const field of fields) {
@@ -195,10 +206,7 @@ export function createFieldManager({
       let value;
 
       if (input) {
-        value =
-          field.type === "boolean"
-            ? input.checked
-            : input.value ?? "";
+        value = field.type === "boolean" ? input.checked : input.value ?? "";
       } else {
         value = enrichedData[field.key];
       }
@@ -211,6 +219,7 @@ export function createFieldManager({
   return {
     renderFields,
     getValues,
+    setValue,
   };
 }
 
