@@ -12,10 +12,21 @@ order: 1
 
 To get started with Formidable, follow these steps:
 
-1. **Installation**: Download and install Formidable from the official website or repository.
-2. **Create a New Form**: Use the intuitive interface to create a new form by dragging and dropping elements.
-3. **Configure Settings**: Customize your form's settings, including validation rules and submission options.
-4. **Preview and Test**: Preview your form in real-time and test its functionality.
-5. **Deploy**: Once satisfied, deploy your form to your website or application.
+1. **Installation**: Download and install the latest Formidable installer from [the official website or repository](https://github.com/petervdpas/Formidable/releases).
+2. **Create a New Template**: Use the intuitive interface to create a new template by creating fields and arranging them as needed.
+3. **Switch Context**: Use the context switcher to change between template creation or storage, allowing you to manage multiple forms easily.
+4. **Fill out a Form**: Once your template is ready, you can fill out a form using the fields you created.
+5. **Render output**: After filling out the form, you can render the output in various formats such as Markdown and HTML.
+6. **Check your work in the Wiki**: With the internal server running, you can check your work by accessing the local server URL in your web browser. This allows you to see how your forms will look and function in a [live environment](http://localhost:8383).
 
-For more detailed instructions, refer to the documentation.
+### Context Mode
+
+Formidable allows you to switch **template creation mode** and **storage mode** easily. This means you can move from creating a template to filling out a form or viewing the rendered output without losing your place.
+
+It is a simple toggle switch in the upper right corner of the interface.
+
+![Template Context](images/context-template.png)
+
+![Storage Context](images/context-storage.png)
+
+Don't forget to check the [Templates documentation](#templates) for more information on creating and managing templates.

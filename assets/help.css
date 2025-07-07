@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   max-height: 70vh;            /* not fixed — allows shrinking */
-  padding: 1em;
+  padding: 4px;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -45,6 +45,7 @@
   font-family: sans-serif;
   line-height: 1.6;
   padding-bottom: 1em;
+  padding-right: 8px;
 }
 
 .help-content h1,

@@ -93,6 +93,23 @@ export function highlightAndClickForm(entry, delay = 100) {
   }, delay);
 }
 
+export function applyExternalLinkBehavior(container) {
+  if (!container) return;
+
+  container.querySelectorAll("a[href]").forEach((a) => {
+    const url = a.getAttribute("href");
+    if (!url || url.startsWith("#") || url.startsWith("javascript:")) return;
+
+    a.setAttribute("target", "_blank");
+    a.setAttribute("rel", "noopener");
+
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      EventBus.emit("file:openExternal", { url });
+    });
+  });
+}
+
 export function createFieldManager({
   container,
   fields = [],

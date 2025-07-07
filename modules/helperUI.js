@@ -1,5 +1,6 @@
 // modules/helperUI.js
 import { EventBus } from "./eventBus.js";
+import { applyExternalLinkBehavior } from "../utils/domUtils.js";
 
 export async function renderHelp() {
   const container = document.getElementById("help-body");
@@ -39,6 +40,16 @@ export async function renderHelp() {
         topic.content
       );
       contentEl.innerHTML = html;
+
+      applyExternalLinkBehavior(contentEl);
+
+      contentEl.querySelectorAll("a[href^='#']").forEach((a) => {
+        const targetId = a.getAttribute("href").slice(1);
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          loadTopic(targetId);
+        });
+      });
 
       // Highlight active button
       buttons.forEach((btn) => {

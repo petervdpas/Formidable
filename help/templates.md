@@ -6,7 +6,18 @@ order: 2
 
 ## Formidable Templates
 
-Formidable provides a variety of templates to help you quickly create forms for different purposes. These templates are designed to be easily customizable, allowing you to adapt them to your specific needs. And are fully under your control.
+Formidable provides a way to help you quickly create templates for different purposes. Templates can be easily customized, allowing you to adapt them to your specific needs. And are fully under your control. You can create templates for forms, documents, or any other structured content you need.
+
+### Creating a Template
+
+To create a new template in Formidable, follow these steps:
+
+1. **Open the Template Editor**: Navigate to the template editor in Formidable.
+2. **Add Fields**: Use the field editor to add various fields to your template.
+3. **Customize Fields**: Configure each field's properties, such as type, validation rules, and default values.
+4. **Save the Template**: Once you have added and configured all the fields, save your template.
+
+![Template Fields](images/template-fields.png)
 
 ### Available Fieldtypes
 
