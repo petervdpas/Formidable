@@ -14,27 +14,24 @@ export async function run() {
     resizable: false,
 
     prepareBody: async (modalEl, bodyEl) => {
-      const [contextFolder, selectedTemplate, selectedDataFile] =
-        await Promise.all([
-          plugin.getConfig("context_folder"),
-          plugin.getConfig("selected_template"),
-          plugin.getConfig("selected_data_file"),
-        ]);
-
-      /*
-      console.log("[PandocPrint] Context:", {
-        contextFolder,
-        selectedTemplate,
-        selectedDataFile,
-      });
-      */
+      const [contextFolder, selectedTemplate, selectedDataFile] = await Promise.all([
+        plugin.getConfig("context_folder"),
+        plugin.getConfig("selected_template"),
+        plugin.getConfig("selected_data_file"),
+      ]);
 
       let settings = await plugin.getSettings(pluginName);
       if (!settings || typeof settings !== "object") settings = {};
       settings.variables ??= {};
-      settings.command ??=
-        "pwsh {script} -InputPath {InputPath} -UseCurrentDate {UseCurrentDate} -TemplatePath {TemplatePath} -OutputPath {OutputPath}";
       settings.overwrite ??= true;
+
+      // Ensure default shell command is injected only once
+      if (!settings.variables.ShellCommand?.value) {
+        settings.variables.ShellCommand = {
+          value:
+            'powershell -ExecutionPolicy Bypass -File {script} -InputPath {InputPath} -UseCurrentDate {UseCurrentDate} -TemplatePath {TemplatePath} -OutputPath {OutputPath}',
+        };
+      }
 
       const fields = [
         {
@@ -44,6 +41,14 @@ export async function run() {
           wrapper: "modal-form-row",
           fieldRenderer: "renderBooleanField",
           value: true,
+        },
+        {
+          key: "ShellCommand",
+          type: "text",
+          label: "Shell Command",
+          wrapper: "modal-form-row",
+          fieldRenderer: "renderTextField",
+          value: "",
         },
         {
           key: "InputPath",
@@ -90,8 +95,7 @@ export async function run() {
       const initialData = Object.fromEntries(
         fields.map((f) => {
           const raw = settings.variables?.[f.key]?.value;
-          const val =
-            f.type === "boolean" ? raw === true || raw === "true" : raw;
+          const val = f.type === "boolean" ? raw === true || raw === "true" : raw;
           return [f.key, val];
         })
       );
@@ -103,7 +107,7 @@ export async function run() {
         injectBefore: () => {
           const info = document.createElement("p");
           info.textContent =
-            "This plugin allows you to convert Formidable entries—or any valid Markdown file with proper frontmatter—into a styled PDF using Pandoc and LaTeX. In 'Formidable mode', it auto-generates Markdown from your selected form entry. When disabled, you can manually provide any input file. This makes it powerful for both regular use and expert workflows. Make sure Pandoc and LaTeX (e.g. MikTeX) are installed, and check the plugin’s Tools folder for the required scripts.";
+            "This plugin allows you to convert Formidable entries—or any valid Markdown file with proper frontmatter—into a styled PDF using Pandoc and LaTeX. The Shell Command field is required and fully user-controlled. Use placeholders like {script}, {InputPath}, {OutputPath}, etc. for dynamic values.";
           info.className = "form-info-text";
           return info;
         },
@@ -140,9 +144,7 @@ export async function run() {
           const result = await plugin.saveSettings(pluginName, settings);
 
           emit("ui:toast", {
-            message: result?.success
-              ? "Settings saved"
-              : "Failed to save settings",
+            message: result?.success ? "Settings saved" : "Failed to save settings",
             variant: result?.success ? "success" : "error",
           });
         },
@@ -162,7 +164,9 @@ export async function run() {
             UseCurrentDate: values.UseCurrentDate ? "true" : "false",
           };
 
-          const finalCommand = string.combiMerge([settings.command], cmdParams);
+          const finalCommand = string.combiMerge([values.ShellCommand], cmdParams);
+
+          console.log("[PandocPrint] Final command:", finalCommand);
           const result = await plugin.executeSystemCommand(finalCommand);
 
           const toastMessage = result.success
