@@ -90,10 +90,16 @@
   --loop-border-color: #ccc;
   --loop-bg: #fff;
   --loop-bg-secondary: #f9f9f9;
-
   --loop-add-bg: #28a745;
   --loop-add-bg-hover: #218838;
   --loop-add-fg: #fff;
+
+  --subloop-bg-secondary: #f0f7ff;
+  --subloop-border-color: #b5d3f5;
+  --subloop-bg: #ffffff;
+  --subloop-add-bg: #007bff;
+  --subloop-add-bg-hover: #0062cc;
+  --subloop-add-fg: #fff;
 
   --meta-section-bg: #f9f9f9;
   --meta-section-border: #ccc;

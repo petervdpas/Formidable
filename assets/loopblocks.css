@@ -64,3 +64,25 @@
   border-radius: 2px;
   transition: all 0.2s ease-in-out;
 }
+
+/* ─── Sub-loop Container (Nested) ───────────────── */
+.sub-loop-container {
+  margin-left: 2rem;
+  background-color: var(--subloop-bg-secondary, #f0f7ff);
+  border-color: var(--subloop-border-color, #b5d3f5);
+}
+
+.sub-loop-container .loop-item {
+  background-color: var(--subloop-bg, #ffffff);
+  border-color: var(--subloop-border-color, #c3ddf5);
+}
+
+/* Optional: override add button color for nested */
+.sub-loop-container .add-loop-item-btn {
+  background-color: var(--subloop-add-bg, #007bff);
+  color: var(--subloop-add-fg, #fff);
+}
+
+.sub-loop-container .add-loop-item-btn:hover {
+  background-color: var(--subloop-add-bg-hover, #0062cc);
+}

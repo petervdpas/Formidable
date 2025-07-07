@@ -205,6 +205,34 @@ function checkCollectionEnableValid(template) {
   return null;
 }
 
+function checkLoopNestingDepth(fields, maxDepth = 2) {
+  const errors = [];
+  const stack = [];
+
+  for (const field of fields) {
+    if (field.type === "loopstart") {
+      stack.push(field.key);
+      if (stack.length > maxDepth) {
+        errors.push({
+          type: "excessive-loop-nesting",
+          key: field.key,
+          depth: stack.length,
+          maxDepth,
+          path: stack.join(" → "),
+        });
+      }
+    } else if (field.type === "loopstop") {
+      if (stack[stack.length - 1] === field.key) {
+        stack.pop();
+      } else {
+        // Let checkLoopPairing handle mismatches
+      }
+    }
+  }
+
+  return errors;
+}
+
 function validateTemplate(template) {
   if (!template || !Array.isArray(template.fields)) {
     return [
@@ -225,6 +253,7 @@ function validateTemplate(template) {
   }
 
   errors.push(...checkLoopPairing(template.fields));
+  errors.push(...checkLoopNestingDepth(template.fields, 1)); // LOOPLEVEL 1 only
 
   const collectionError = checkCollectionEnableValid(template);
 

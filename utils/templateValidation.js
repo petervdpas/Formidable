@@ -13,6 +13,11 @@ export function formatError(error) {
   if (error.type === "nested-loop-not-allowed") {
     return `Only 1 loop level allowed — Found nested loop with key: "${error.field?.key}".`;
   }
+  if (error.type === "excessive-loop-nesting") {
+    return `Too many nested loops: ${
+      error.path || error.key || "unknown"
+    }. Max depth is ${error.maxDepth || 2}.`;
+  }
   if (error.type === "loop-key-mismatch") {
     return `Loopstop key "${error.field?.key}" does not match loopstart key "${error.expectedKey}"`;
   }

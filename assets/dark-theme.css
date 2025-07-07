@@ -87,10 +87,16 @@
   --loop-border-color: #444;
   --loop-bg: #1c1c1c;
   --loop-bg-secondary: #2a2a2a;
-
   --loop-add-bg: #28a745;
   --loop-add-bg-hover: #1e7e34;
   --loop-add-fg: #fff;
+
+  --subloop-bg-secondary: #1a2332;
+  --subloop-border-color: #35557a;
+  --subloop-bg: #202b3b;
+  --subloop-add-bg: #3390ff;
+  --subloop-add-bg-hover: #1e78d5;
+  --subloop-add-fg: #fff;
 
   --meta-section-bg: #2a2a2a;
   --meta-section-border: #555;

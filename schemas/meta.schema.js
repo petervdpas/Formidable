@@ -68,16 +68,37 @@ module.exports = {
   },
 };
 
-function extractLoopGroup(fields, start, loopKey) {
+function extractLoopGroup(fields, start, loopKey, depth = 1) {
   const keys = [];
   let end = start;
+
   while (
     end < fields.length &&
     !(fields[end].type === "loopstop" && fields[end].key === loopKey)
   ) {
-    keys.push(fields[end].key);
-    end++;
+    const f = fields[end];
+    if (f.type === "loopstart") {
+      if (depth >= 2) {
+        throw new Error(
+          `[Schema Error] Loop nesting exceeds max depth of 2: "${loopKey}" contains nested loop "${f.key}"`
+        );
+      }
+
+      // Recurse and skip inner loop group
+      const { keys: innerKeys, endIndex } = extractLoopGroup(
+        fields,
+        end + 1,
+        f.key,
+        depth + 1
+      );
+      keys.push(...innerKeys);
+      end = endIndex;
+    } else {
+      keys.push(f.key);
+      end++;
+    }
   }
+
   return { keys, endIndex: end };
 }
 

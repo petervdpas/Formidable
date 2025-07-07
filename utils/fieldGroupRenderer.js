@@ -76,12 +76,10 @@ export async function fieldGroupRenderer(
           complete,
           template,
           eventFunctions,
-          loopKey
+          [loopKey]
         );
         loopList.appendChild(itemWrapper);
       }
-
-      loopContainer.appendChild(loopList);
 
       const addButton = createAddLoopItemButton(async () => {
         const newItem = await createLoopItem(
@@ -89,11 +87,12 @@ export async function fieldGroupRenderer(
           {},
           template,
           eventFunctions,
-          loopKey
+          [loopKey]
         );
         loopList.appendChild(newItem);
       });
 
+      loopContainer.appendChild(loopList);
       loopContainer.appendChild(addButton);
       container.appendChild(loopContainer);
 
@@ -148,16 +147,18 @@ async function createLoopItem(
   dataEntry = {},
   template,
   eventFunctions = {},
-  loopKey = null
+  loopKeyChain = []
 ) {
   const itemWrapper = document.createElement("div");
   itemWrapper.className = "loop-item";
 
+  // Drag handle
   const dragHandle = document.createElement("div");
   dragHandle.className = "drag-handle";
   dragHandle.textContent = "⠿";
   itemWrapper.appendChild(dragHandle);
 
+  // Remove button with confirmation
   const firstField = groupFields[0];
   const firstKey = firstField?.key || "(unknown)";
   const label = firstField?.label || firstKey;
@@ -167,43 +168,102 @@ async function createLoopItem(
     const confirmed = await showConfirmModal(
       `<div>Are you sure you want to remove this loop item?</div>
        <div class="modal-message-highlight"><strong>${label}</strong>: <em>${value}</em></div>`,
-      {
-        okText: "Delete",
-        cancelText: "Cancel",
-        width: "auto",
-        height: "auto",
-      }
+      { okText: "Delete", cancelText: "Cancel", width: "auto", height: "auto" }
     );
     if (confirmed) itemWrapper.remove();
   });
 
   itemWrapper.appendChild(removeBtn);
 
-  for (const loopField of groupFields) {
-    const fieldCopy = {
-      ...loopField,
-      loopKey,
-    };
+  // Iterate through all fields in the group
+  let i = 0;
+  while (i < groupFields.length) {
+    const field = groupFields[i];
 
-    const fieldKey = fieldCopy.key;
+    if (field.type === "loopstart") {
+      // ───── Nested Loop Detected ─────
+      const nestedKey = field.key;
+      const { group: nestedGroup, stopIdx } = collectLoopGroup(
+        groupFields,
+        i + 1,
+        nestedKey
+      );
+      i = stopIdx + 1;
 
-    if (!Object.prototype.hasOwnProperty.call(dataEntry, fieldKey)) {
-      const defFn = fieldTypes[fieldCopy.type]?.defaultValue;
-      dataEntry[fieldKey] = fieldCopy.hasOwnProperty("default")
-        ? fieldCopy.default
-        : typeof defFn === "function"
-        ? defFn()
-        : undefined;
+      const nestedLoopKeyChain = [...loopKeyChain, nestedKey];
+      const nestedLoopData = Array.isArray(dataEntry[nestedKey])
+        ? dataEntry[nestedKey]
+        : [{}];
+
+      const nestedContainer = document.createElement("div");
+      nestedContainer.className = `loop-container${
+        nestedLoopKeyChain.length > 1 ? " sub-loop-container" : ""
+      }`;
+      nestedContainer.dataset.loopKey = nestedKey;
+      nestedContainer.dataset.loopDepth = nestedLoopKeyChain.length;
+
+      const label = document.createElement("div");
+      label.className = "loop-label";
+      label.textContent = field.label || "(Unnamed Loop)";
+      nestedContainer.appendChild(label);
+
+      const nestedList = document.createElement("div");
+      nestedList.className = "loop-list";
+
+      for (const entry of nestedLoopData) {
+        const complete = { ...createLoopDefaults(nestedGroup), ...entry };
+        const nestedItem = await createLoopItem(
+          nestedGroup,
+          complete,
+          template,
+          eventFunctions,
+          nestedLoopKeyChain
+        );
+        nestedList.appendChild(nestedItem);
+      }
+
+      const addNestedButton = createAddLoopItemButton(async () => {
+        const newItem = await createLoopItem(
+          nestedGroup,
+          {},
+          template,
+          eventFunctions,
+          nestedLoopKeyChain
+        );
+        nestedList.appendChild(newItem);
+      });
+
+      nestedContainer.appendChild(nestedList);
+      nestedContainer.appendChild(addNestedButton);
+      itemWrapper.appendChild(nestedContainer);
+    } else {
+      // ───── Regular Field ─────
+      const fieldKey = field.key;
+      const fieldCopy = {
+        ...field,
+        loopKey: loopKeyChain,
+      };
+
+      if (!Object.prototype.hasOwnProperty.call(dataEntry, fieldKey)) {
+        const defFn = fieldTypes[fieldCopy.type]?.defaultValue;
+        dataEntry[fieldKey] = fieldCopy.hasOwnProperty("default")
+          ? fieldCopy.default
+          : typeof defFn === "function"
+          ? defFn()
+          : undefined;
+      }
+
+      const row = await renderFieldElement(
+        fieldCopy,
+        dataEntry[fieldKey],
+        template,
+        eventFunctions
+      );
+      if (row) itemWrapper.appendChild(row);
+      i++;
     }
-
-    const row = await renderFieldElement(
-      fieldCopy,
-      dataEntry[fieldKey],
-      template,
-      eventFunctions
-    );
-    if (row) itemWrapper.appendChild(row);
   }
 
   return itemWrapper;
 }
+

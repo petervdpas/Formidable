@@ -15,7 +15,7 @@ function initHelpCache() {
   files
     .filter((entry) => entry.isFile && entry.name.endsWith(".md"))
     .forEach((entry) => {
-      const fullPath = fileManager.joinPath(getHelpFolder(), entry.name);
+      const fullPath = fileManager.resolvePath(getHelpFolder(), entry.name);
       const raw = fileManager.loadFile(fullPath, { format: "text", silent: true });
       const parsed = matter(raw);
       const id = parsed.data.id || entry.name.replace(/\.md$/, "");
