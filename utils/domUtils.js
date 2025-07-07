@@ -245,14 +245,20 @@ export function resolveScopedElement(container, field) {
   return container.querySelector(attr);
 }
 
-export function applyFieldContextAttributes(el, { key, type, loopKey = null }) {
+export function applyFieldContextAttributes(el, { key, type, loopKey = null, constructKey = null }) {
   if (!el || !key || !type) return;
 
   el.dataset.fieldKey = key;
   el.dataset.fieldType = type;
 
   if (loopKey) {
-    el.dataset.fieldLoop = loopKey;
+    // Support both string and array input
+    const loopChain = Array.isArray(loopKey) ? loopKey : [loopKey];
+    el.dataset.fieldLoop = loopChain.join(".");
+  }
+
+  if (constructKey) {
+    el.dataset.fieldConstruct = constructKey;
   }
 }
 

@@ -37,7 +37,11 @@ export async function renderGuidField(field, value = "") {
   hidden.setAttribute("data-guid-field", field.key);
   hidden.value = guidValue;
 
-  applyFieldContextAttributes(hidden, field);
+  applyFieldContextAttributes(hidden, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
 
   return hidden;
 }
@@ -64,7 +68,11 @@ export async function renderLoopstartField(field, value = "") {
     },
   });
 
-  applyFieldContextAttributes(wrapper, field);
+  applyFieldContextAttributes(wrapper, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
 
   return wrapInputWithLabel(
     wrapper,
@@ -97,7 +105,11 @@ export async function renderLoopstopField(field, value = "") {
     },
   });
 
-  applyFieldContextAttributes(wrapper, field);
+  applyFieldContextAttributes(wrapper, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
 
   return wrapInputWithLabel(
     wrapper,
@@ -117,7 +129,11 @@ export async function renderTextField(field, value = "") {
   input.name = field.key;
   input.value = v;
 
-  applyFieldContextAttributes(input, field);
+  applyFieldContextAttributes(input, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
 
   return wrapInputWithLabel(
     input,
@@ -150,7 +166,11 @@ export async function renderBooleanField(field, value = "") {
     trailingLabel,
   });
 
-  applyFieldContextAttributes(toggle, field);
+  applyFieldContextAttributes(toggle, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
 
   return wrapInputWithLabel(
     toggle,
@@ -176,7 +196,11 @@ export async function renderDropdownField(field, value = "") {
   select.name = field.key;
   select.value = v;
 
-  applyFieldContextAttributes(select, field);
+  applyFieldContextAttributes(select, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
 
   return wrapInputWithLabel(
     select,
@@ -220,7 +244,11 @@ export async function renderMultioptionField(field, value = "") {
     labelEl.appendChild(document.createTextNode(" " + label));
   });
 
-  applyFieldContextAttributes(wrapper, field);
+  applyFieldContextAttributes(wrapper, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
 
   return wrapInputWithLabel(
     wrapper,
@@ -262,7 +290,11 @@ export async function renderRadioField(field, value = "") {
     labelEl.appendChild(document.createTextNode(" " + label));
   });
 
-  applyFieldContextAttributes(wrapper, field);
+  applyFieldContextAttributes(wrapper, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
 
   return wrapInputWithLabel(
     wrapper,
@@ -290,7 +322,11 @@ export async function renderTextareaField(field, value = "") {
   // This is very important for security and consistency
   textarea.textContent = v;
 
-  applyFieldContextAttributes(textarea, field);
+  applyFieldContextAttributes(textarea, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
 
   requestAnimationFrame(() => {
     let keystrokeCount = 0;
@@ -367,7 +403,11 @@ export async function renderNumberField(field, value = "") {
   input.name = field.key;
   input.value = v;
 
-  applyFieldContextAttributes(input, field);
+  applyFieldContextAttributes(input, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
 
   return wrapInputWithLabel(
     input,
@@ -426,7 +466,11 @@ export async function renderRangeField(field, value = "") {
     display.textContent = input.value;
   });
 
-  applyFieldContextAttributes(wrapper, field);
+  applyFieldContextAttributes(wrapper, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
 
   return wrapInputWithLabel(
     wrapper,
@@ -446,7 +490,11 @@ export async function renderDateField(field, value = "") {
   input.name = field.key;
   input.value = v;
 
-  applyFieldContextAttributes(input, field);
+  applyFieldContextAttributes(input, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
 
   return wrapInputWithLabel(
     input,
@@ -489,7 +537,11 @@ export async function renderListField(field, value = "") {
     }
   });
 
-  applyFieldContextAttributes(wrapper, field);
+  applyFieldContextAttributes(wrapper, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
 
   return wrapInputWithLabel(
     wrapper,
@@ -629,7 +681,11 @@ export async function renderTableField(field, value = "") {
     tbody.appendChild(newRow);
   };
 
-  applyFieldContextAttributes(wrapper, field);
+  applyFieldContextAttributes(wrapper, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
 
   return wrapInputWithLabel(
     wrapper,
@@ -725,8 +781,12 @@ export async function renderImageField(field, value = "", template) {
 
   wrapper.appendChild(deleteBtn);
 
-  applyFieldContextAttributes(wrapper, field);
-  
+  applyFieldContextAttributes(wrapper, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
+
   return wrapInputWithLabel(
     wrapper,
     field.label || "Image Upload",
@@ -871,7 +931,11 @@ export async function renderLinkField(
   urlInput.value = v;
   updateValue();
 
-  applyFieldContextAttributes(input, field);
+  applyFieldContextAttributes(input, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
 
   return wrapInputWithLabel(
     wrapper,
@@ -894,7 +958,7 @@ export async function renderFileField(field, value = "") {
     placeholder: field.placeholder || "",
     noWrapping: true,
     label: field.label || "Select File",
-    outerClass: field.wrapper || "form-row tight-gap", 
+    outerClass: field.wrapper || "form-row tight-gap",
   });
 
   input.name = field.key;
@@ -909,7 +973,12 @@ export async function renderFileField(field, value = "") {
     }
   };
 
-  applyFieldContextAttributes(element, field);
+  applyFieldContextAttributes(element, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
+
   return element;
 }
 
@@ -940,6 +1009,11 @@ export async function renderDirectoryField(field, value = "") {
     }
   };
 
-  applyFieldContextAttributes(element, field);
+  applyFieldContextAttributes(element, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
+
   return element;
 }
