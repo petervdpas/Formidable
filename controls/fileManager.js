@@ -78,6 +78,12 @@ function joinPath(...segments) {
 // Resolve a path relative to app root
 function resolvePath(...segments) {
   const flat = path.join(...segments);
+
+  // Normalize relative "./" to appRoot, avoid duplicate prefixing
+  if (flat === "." || flat === "./") {
+    return getAppRoot();
+  }
+
   return path.isAbsolute(flat) ? flat : path.resolve(getAppRoot(), flat);
 }
 
