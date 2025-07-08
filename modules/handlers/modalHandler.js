@@ -61,7 +61,7 @@ export function handleEntryConfirm({ modal, callback }) {
   input.value = "";
   checkbox.checked = true;
 
-  const confirmBtn = createModalConfirmButton({
+  const confirmBtn = createConfirmButton({
     id: "entry-confirm",
     text: "Confirm",
     className: "btn-okay",
@@ -79,7 +79,7 @@ export function handleEntryConfirm({ modal, callback }) {
     },
   });
 
-  const cancelBtn = createModalCancelButton({
+  const cancelBtn = createCancelButton({
     id: "entry-cancel",
     onClick: () => modal.hide(),
   });

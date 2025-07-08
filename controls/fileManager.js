@@ -63,28 +63,25 @@ function buildFilePath(directory, baseFilename, { extension = "" } = {}) {
 
 // Join + normalize path relative to app root
 function joinPath(...segments) {
-  const flattened = segments.flatMap((s) =>
-    typeof s === "string" ? s.split(/[/\\]/).filter(Boolean) : []
-  );
+  if (!segments.length) return getAppRoot();
 
   const first = segments[0];
+
+  // If the first segment is an absolute path, do a direct join (native)
   if (typeof first === "string" && path.isAbsolute(first)) {
-    return path.join(...flattened);
+    return path.join(...segments);
   }
 
-  return path.join(getAppRoot(), ...flattened);
+  // Otherwise, join relative to app root
+  return path.join(getAppRoot(), ...segments);
 }
 
 // Resolve a path relative to app root
 function resolvePath(...segments) {
-  const flat = path.join(...segments);
-
-  // Normalize relative "./" to appRoot, avoid duplicate prefixing
-  if (flat === "." || flat === "./") {
-    return getAppRoot();
-  }
-
-  return path.isAbsolute(flat) ? flat : path.resolve(getAppRoot(), flat);
+  const joined = path.join(...segments);
+  return path.isAbsolute(joined)
+    ? path.normalize(joined)
+    : path.resolve(getAppRoot(), joined);
 }
 
 function listFolders(dir, { silent = false, filter = null } = {}) {
