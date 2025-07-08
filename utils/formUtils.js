@@ -81,6 +81,41 @@ export function extractFieldDefinition({
   return field;
 }
 
+export function buildShadowData(fields, rawData = {}) {
+  const data = rawData.data || rawData;
+  const structuredData = {};
+  let i = 0;
+
+  while (i < fields.length) {
+    const field = fields[i];
+
+    // ───────────────────────────────
+    // Loop handling
+    // ───────────────────────────────
+    if (field.type === "loopstart") {
+      const loopKey = field.key;
+      const { group, stopIdx } = collectLoopGroup(fields, i + 1, loopKey);
+
+      const rawItems = Array.isArray(data[loopKey]) ? data[loopKey] : [];
+
+      structuredData[loopKey] = rawItems.map((itemData) =>
+        buildShadowData(group, itemData)
+      );
+
+      i = stopIdx + 1;
+      continue;
+    }
+
+    // ───────────────────────────────
+    // Regular field
+    // ───────────────────────────────
+    structuredData[field.key] = data[field.key] ?? field.default ?? null;
+    i++;
+  }
+
+  return structuredData;
+}
+
 export function collectLoopGroup(fields, startIdx, loopKey) {
   const group = [];
   let i = startIdx;

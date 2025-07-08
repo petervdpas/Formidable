@@ -2,7 +2,7 @@
 
 import { buildHiddenInput } from "../utils/elementBuilders.js";
 import { buildButtonGroup, createToggleButtons } from "../utils/buttonUtils.js";
-import { injectFieldDefaults } from "../utils/formUtils.js";
+import { injectFieldDefaults, buildShadowData } from "../utils/formUtils.js";
 import { applyFieldValues, focusFirstInput } from "../utils/domUtils.js";
 import {
   createFlaggedToggleButton,
@@ -170,6 +170,10 @@ export async function renderFormUI(
     template,
     eventFunctions
   );
+
+  const shadowData = buildShadowData(fields, metaData);
+  // You can log or inspect this:
+  console.log("[ShadowData] Structured shadow copy:", shadowData);
 
   await applyFieldValues(container, template, metaData, eventFunctions);
   focusFirstInput(container);
