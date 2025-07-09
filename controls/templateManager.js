@@ -253,7 +253,7 @@ function validateTemplate(template) {
   }
 
   errors.push(...checkLoopPairing(template.fields));
-  errors.push(...checkLoopNestingDepth(template.fields, 1)); // LOOPLEVEL 1 only
+  errors.push(...checkLoopNestingDepth(template.fields, 2)); // LOOPLEVEL 1 only
 
   const collectionError = checkCollectionEnableValid(template);
 

@@ -240,12 +240,24 @@ export function createFieldManager({
   };
 }
 
+export function delayPaintSafe(cb, fallbackDelay = 500) {
+  if ("requestIdleCallback" in window) {
+    requestIdleCallback(cb, { timeout: fallbackDelay });
+  } else {
+    setTimeout(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(cb);
+      });
+    }, fallbackDelay);
+  }
+}
+
 export function resolveScopedElement(container, field) {
   const attr = `[name="${field.key}"], [data-${field.type}-field="${field.key}"]`;
   return container.querySelector(attr);
 }
 
-export function applyFieldContextAttributes(el, { key, type, loopKey = null, constructKey = null }) {
+export function applyFieldContextAttributes(el, { key, type, loopKey = null }) {
   if (!el || !key || !type) return;
 
   el.dataset.fieldKey = key;
@@ -255,10 +267,6 @@ export function applyFieldContextAttributes(el, { key, type, loopKey = null, con
     // Support both string and array input
     const loopChain = Array.isArray(loopKey) ? loopKey : [loopKey];
     el.dataset.fieldLoop = loopChain.join(".");
-  }
-
-  if (constructKey) {
-    el.dataset.fieldConstruct = constructKey;
   }
 }
 

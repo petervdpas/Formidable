@@ -71,6 +71,16 @@ fields:
     type: textarea
     description: This is a description inside the the looper...
     default: Describe wauw...
+  - key: subloop
+    label: Subloop
+    type: loopstart
+  - key: another_fld
+    label: Another Field
+    type: text
+    description: Figure it out!
+  - key: subloop
+    label: Subloop
+    type: loopstop
   - key: looper
     label: Chapters - End
     type: loopstop
