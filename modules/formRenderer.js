@@ -175,9 +175,6 @@ export async function renderFormUI(
     eventFunctions
   );
 
-  // You can log or inspect this:
-  console.log("[ShadowData] Structured shadow copy:", window.currentShadowData);
-
   delayPaintSafe(() => {
     applyFieldValues(container, template, metaData, eventFunctions);
   }, 500);
