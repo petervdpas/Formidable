@@ -201,52 +201,55 @@ async function parseFieldValue(container, field, template) {
 }
 
 export async function getFormData(container, template) {
-  const data = {};
-  const meta = {};
   const fields = template.fields || [];
+  const meta = {};
 
-  let i = 0;
-  while (i < fields.length) {
-    const field = fields[i];
+  async function collectData(fields, container, parentLoopKeyChain = []) {
+    const result = {};
+    let i = 0;
 
-    if (field.type === "loopstart") {
-      const loopKey = field.key;
-      const { group, stopIdx } = collectLoopGroup(fields, i + 1, loopKey);
-      i = stopIdx + 1;
+    while (i < fields.length) {
+      const field = fields[i];
 
-      const loopItems = container.querySelectorAll(
-        `.loop-container[data-loop-key="${loopKey}"] .loop-item`
-      );
+      if (field.type === "loopstart") {
+        const loopKey = field.key;
+        const { group, stopIdx } = collectLoopGroup(fields, i + 1, loopKey);
+        i = stopIdx + 1;
 
-      const loopValues = [];
-      for (const item of loopItems) {
-        const entry = {};
-        for (const f of group) {
-          const scoped = { ...f, loopKey };
-          const value = await parseFieldValue(item, scoped, template);
-          if (value !== undefined) entry[f.key] = value;
+        const selector = `.loop-container[data-loop-key="${loopKey}"] .loop-item`;
+        const loopItems = container.querySelectorAll(selector);
+        const loopValues = [];
+
+        for (const item of loopItems) {
+          const entry = await collectData(group, item, [
+            ...parentLoopKeyChain,
+            loopKey,
+          ]);
+
+          const hasValues = Object.values(entry).some((v) => {
+            if (Array.isArray(v)) return v.length > 0;
+            if (v && typeof v === "object") return Object.keys(v).length > 0;
+            return v !== undefined && v !== null && v !== "";
+          });
+
+          if (hasValues) loopValues.push(entry);
         }
 
-        const hasValues = Object.values(entry).some((v) => {
-          if (Array.isArray(v)) return v.length > 0;
-          if (v && typeof v === "object") return Object.keys(v).length > 0;
-          return v !== undefined && v !== null && v !== "";
-        });
-
-        if (hasValues) {
-          loopValues.push(entry);
+        result[loopKey] = loopValues;
+      } else {
+        const scopedField = { ...field, loopKey: parentLoopKeyChain };
+        const value = await parseFieldValue(container, scopedField, template);
+        if (value !== undefined) {
+          result[field.key] = value;
         }
+        i++;
       }
-
-      data[loopKey] = loopValues;
-    } else {
-      const value = await parseFieldValue(container, field, template);
-      if (value !== undefined) {
-        data[field.key] = value;
-      }
-      i++;
     }
+
+    return result;
   }
+
+  const data = await collectData(fields, container);
 
   // Metadata extraction
   const filenameInput = container.querySelector("#meta-json-filename");

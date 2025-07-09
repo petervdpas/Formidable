@@ -410,58 +410,62 @@ export async function applyFieldValues(
   eventFunctions = {}
 ) {
   if (!container || typeof container.querySelector !== "function") return;
+
   const fields = template?.fields || [];
 
-  const loopChildKeys = new Set();
+  async function applyFieldsToGroup(fields, container, data, loopKeyChain = []) {
+    let i = 0;
 
-  let i = 0;
-  while (i < fields.length) {
-    const field = fields[i];
-    const key = field.key;
-    const value = data[key];
+    while (i < fields.length) {
+      const field = fields[i];
+      const key = field.key;
+      const value = data?.[key];
 
-    if (field.type === "loopstart") {
-      const loopKey = field.key;
-      const { group, stopIdx } = collectLoopGroup(fields, i + 1, loopKey);
-      group.forEach((f) => loopChildKeys.add(f.key));
-      i = stopIdx + 1;
+      if (field.type === "loopstart") {
+        const loopKey = key;
+        const { group, stopIdx } = collectLoopGroup(fields, i + 1, loopKey);
+        i = stopIdx + 1;
 
-      const loopItems = container.querySelectorAll(
-        `.loop-container[data-loop-key="${loopKey}"] .loop-item`
-      );
+        const loopData = Array.isArray(data?.[loopKey]) ? data[loopKey] : [];
 
-      const loopData = data[loopKey] || [];
+        // Get loop container
+        const containerSelector = `.loop-container[data-loop-key="${loopKey}"]`;
+        const loopContainer = container.querySelector(containerSelector);
+        const addButton = loopContainer?.querySelector(`[data-action="add-loop-item"]`);
 
-      for (let index = 0; index < loopData.length; index++) {
-        const entry = loopData[index];
-        const item = loopItems[index];
-        if (!item) continue;
-
-        for (const f of group) {
-          await applyValueToField(
-            item,
-            f,
-            entry[f.key],
-            template,
-            eventFunctions
-          );
+        if (!loopContainer || !addButton) {
+          EventBus.emit("logging:warning", [
+            `[applyFieldValues] Missing container or button for loop "${loopKey}"`,
+          ]);
+          continue;
         }
+
+        // Ensure enough loop items are rendered
+        while (loopContainer.querySelectorAll(".loop-item").length < loopData.length) {
+          addButton.click();
+          await new Promise((r) => setTimeout(r, 10)); // Allow render to catch up
+        }
+
+        const loopItems = loopContainer.querySelectorAll(".loop-item");
+
+        for (let idx = 0; idx < loopItems.length; idx++) {
+          const item = loopItems[idx];
+          const entry = loopData[idx] || {};
+
+          await applyFieldsToGroup(group, item, entry, [...loopKeyChain, loopKey]);
+        }
+      } else {
+        const scopedField = { ...field, loopKey: loopKeyChain };
+        await applyValueToField(container, scopedField, value, template, eventFunctions);
+        i++;
       }
-
-      continue;
     }
-
-    if (loopChildKeys.has(key)) {
-      i++;
-      continue;
-    }
-
-    await applyValueToField(container, field, value, template, eventFunctions);
-    i++;
   }
 
+  await applyFieldsToGroup(fields, container, data);
+
   EventBus.emit("logging:default", [
-    "[applyFieldValues] Applied field values, skipping loop-child root keys.",
+    "[applyFieldValues] Completed nested loop-aware value application.",
   ]);
 }
 
