@@ -14,6 +14,8 @@ import {
 import { collectLoopGroup } from "./formUtils.js";
 import * as fieldRenderers from "./fieldRenderers.js";
 
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export function generateGuid() {
   return crypto.randomUUID();
 }
@@ -403,6 +405,39 @@ export async function applyValueToField(
   applyGenericField(input, key, value);
 }
 
+export async function findLoopContainer(
+  root,
+  loopKeyChain,
+  maxRetries = 20,
+  retryDelay = 10
+) {
+  if (!Array.isArray(loopKeyChain) || loopKeyChain.length === 0) return null;
+
+  let container = root;
+
+  for (const key of loopKeyChain) {
+    const selector = `.loop-container[data-loop-key="${key}"]:has([data-action="add-loop-item"])`;
+
+    let found = null;
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      found = container.querySelector(selector);
+      if (found) break;
+      await wait(retryDelay);
+    }
+
+    if (!found) {
+      EventBus.emit("logging:warning", [
+        `[findLoopContainer] Could not find container for "${key}" in ${maxRetries} attempts`,
+      ]);
+      return null;
+    }
+
+    container = found;
+  }
+
+  return container;
+}
+
 export async function applyFieldValues(
   container,
   template,
@@ -413,7 +448,12 @@ export async function applyFieldValues(
 
   const fields = template?.fields || [];
 
-  async function applyFieldsToGroup(fields, container, data, loopKeyChain = []) {
+  async function applyFieldsToGroup(
+    fields,
+    container,
+    data,
+    loopKeyChain = []
+  ) {
     let i = 0;
 
     while (i < fields.length) {
@@ -426,24 +466,35 @@ export async function applyFieldValues(
         const { group, stopIdx } = collectLoopGroup(fields, i + 1, loopKey);
         i = stopIdx + 1;
 
-        const loopData = Array.isArray(data?.[loopKey]) ? data[loopKey] : [];
+        const loopData = Array.isArray(value) ? value : [];
+        const fullKeyChain = [...loopKeyChain, loopKey];
 
-        // Get loop container
-        const containerSelector = `.loop-container[data-loop-key="${loopKey}"]`;
-        const loopContainer = container.querySelector(containerSelector) || container.closest(".loop-item")?.querySelector(containerSelector);
-        const addButton = loopContainer?.querySelector(`[data-action="add-loop-item"]`);
-
-        if (!loopContainer || !addButton) {
+        const loopContainer = await findLoopContainer(container, fullKeyChain);
+        if (!loopContainer) {
           EventBus.emit("logging:warning", [
-            `[applyFieldValues] Missing container or button for loop "${loopKey}"`,
+            `[applyFieldValues] No loop container found for "${fullKeyChain.join(
+              " > "
+            )}"`,
           ]);
           continue;
         }
 
-        // Ensure enough loop items are rendered
-        while (loopContainer.querySelectorAll(".loop-item").length < loopData.length) {
+        const addButton = loopContainer.querySelector(
+          '[data-action="add-loop-item"]'
+        );
+        if (!addButton) {
+          EventBus.emit("logging:warning", [
+            `[applyFieldValues] Missing add button for loop "${loopKey}"`,
+          ]);
+          continue;
+        }
+
+        // Ensure sufficient loop items are rendered
+        while (
+          loopContainer.querySelectorAll(".loop-item").length < loopData.length
+        ) {
           addButton.click();
-          await new Promise((r) => setTimeout(r, 10)); // Allow render to catch up
+          await wait(10);
         }
 
         const loopItems = loopContainer.querySelectorAll(".loop-item");
@@ -451,22 +502,23 @@ export async function applyFieldValues(
         for (let idx = 0; idx < loopItems.length; idx++) {
           const item = loopItems[idx];
           const entry = loopData[idx] || {};
-
-          await applyFieldsToGroup(group, item, entry, [...loopKeyChain, loopKey]);
+          await applyFieldsToGroup(group, item, entry, fullKeyChain);
         }
       } else {
         const scopedField = { ...field, loopKey: loopKeyChain };
-        await applyValueToField(container, scopedField, value, template, eventFunctions);
+        await applyValueToField(
+          container,
+          scopedField,
+          value,
+          template,
+          eventFunctions
+        );
         i++;
       }
     }
   }
 
   await applyFieldsToGroup(fields, container, data);
-
-  EventBus.emit("logging:default", [
-    "[applyFieldValues] Completed nested loop-aware value application.",
-  ]);
 }
 
 export function bindActionHandlers(container, selector, callback) {
