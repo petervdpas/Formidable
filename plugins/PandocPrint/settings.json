@@ -1,25 +1,27 @@
 {
   "variables": {
     "UseFormidable": {
-      "value": true
+      "value": false
     },
     "InputPath": {
-      "value": "E:\\Projects\\Formidable\\plugins\\PandocPrint\\markdown\\test-20250629.md"
+      "value": "/home/peter/Projects/documentation/Fontys/Wat is een datamesh.md"
     },
     "OutputPath": {
-      "value": "E:\\Projects\\documentation\\output"
+      "value": "/home/peter/Projects/documentation/output"
     },
     "TemplatePath": {
-      "value": "E:\\Projects\\documentation\\Templates\\eisvogel.latex"
+      "value": "/home/peter/Projects/documentation/Templates/eisvogel.latex"
     },
     "UseCurrentDate": {
       "value": true
     },
     "PowershellScript": {
-      "value": "E:\\Projects\\documentation\\Tools\\Convert-MarkdownToPDF.ps1"
+      "value": "/home/peter/Projects/documentation/Tools/Convert-MarkdownToPDF.ps1"
+    },
+    "ShellCommand": {
+      "value": "pwsh -ExecutionPolicy Bypass -File {script} -InputPath {InputPath} -UseCurrentDate {UseCurrentDate} -TemplatePath {TemplatePath} -OutputPath {OutputPath}"
     }
   },
-  "command": "pwsh {script} -InputPath {InputPath} -UseCurrentDate {UseCurrentDate} -TemplatePath {TemplatePath} -OutputPath {OutputPath}",
   "overwrite": true,
-  "updated": "2025-07-06T14:57:30.303Z"
+  "updated": "2025-07-09T09:13:41.126Z"
 }

@@ -61,23 +61,24 @@ fields:
   - key: looper
     label: Chapters - Start
     type: loopstart
-  - key: sub_title
-    label: Sub Title
+  - key: inloop_title
+    label: Inloop Title
     type: text
-    description: This is a subtitle inside the looper....
-    default: Wauwie
-  - key: description
-    label: Description
+    description: This is a title inside the looper....
+    default: Wauwie... I'm inside the looper
+  - key: inloop_description
+    label: Inloop - Description
     type: textarea
-    description: This is a description inside the the looper...
-    default: Describe wauw...
+    description: This is a description inside the looper...
+    default: Describe how it feels to be inside a looper....
   - key: subloop
     label: Subloop
     type: loopstart
-  - key: another_fld
-    label: Another Field
+  - key: subloop_title
+    label: Sub loop
     type: text
-    description: Figure it out!
+    description: A title field inside a loop inside a parent loop
+    default: This is Crazy!!
   - key: subloop
     label: Subloop
     type: loopstop

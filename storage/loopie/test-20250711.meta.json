@@ -1,0 +1,45 @@
+{
+  "meta": {
+    "author_name": "Regular user",
+    "author_email": "regular@example.com",
+    "template": "loopie.yaml",
+    "created": "2025-07-11T06:10:16.683Z",
+    "updated": "2025-07-11T06:16:06.906Z",
+    "flagged": false
+  },
+  "data": {
+    "title": "This is the main title.... No loop here!",
+    "looper": [
+      {
+        "inloop_title": "Once upon a time...",
+        "inloop_description": "**Once upon a time** there was a ~~little~~ princess... It was a tiny princess! You could hardly see her.",
+        "subloop": [
+          {
+            "subloop_title": "This is Crazy!!"
+          }
+        ]
+      },
+      {
+        "inloop_title": "Then he came...",
+        "inloop_description": "Then the **giant** with the *big feet* came... Ooohhh... the humanity.",
+        "subloop": [
+          {
+            "subloop_title": "It's getting crazier!"
+          }
+        ]
+      },
+      {
+        "inloop_title": "A splut sound is never good news",
+        "inloop_description": "Are crackling **splut sound** was the last we've heard.... \nYou guessed it... ~~The princess was no more!~~ That does it!",
+        "subloop": [
+          {
+            "subloop_title": "What he said! This does it!"
+          },
+          {
+            "subloop_title": "Is this really how the story evolved?"
+          }
+        ]
+      }
+    ]
+  }
+}
