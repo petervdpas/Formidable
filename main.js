@@ -12,12 +12,12 @@ const { registerIpcHandlers } = require("./controls/ipcRegistry");
 const { getSafeBounds } = require("./controls/windowBounds");
 const { log, warn, error } = nodeLogger;
 
-const userConfig = configManager.loadUserConfig();
-
 if (process.platform === "win32") {
   const portableDataPath = path.join(process.cwd(), "user-data");
   app.setPath("userData", portableDataPath);
 }
+
+const userConfig = configManager.loadUserConfig();
 
 const iconPath = (() => {
   if (process.platform === "win32") {
@@ -89,6 +89,8 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  app.setName("Formidable v" + packageJson.version);
+
   const isPackaged = app.isPackaged;
   const root = isPackaged ? app.getAppPath() : process.cwd();
   fileManager.setAppRoot(root);
