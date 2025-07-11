@@ -70,7 +70,10 @@ function listAvailableProfiles() {
       let authorName = "(unknown)";
 
       try {
-        const raw = fileManager.loadFile(fullPath, { format: "json", silent: true });
+        const raw = fileManager.loadFile(fullPath, {
+          format: "json",
+          silent: true,
+        });
         const { config } = schema.sanitize(raw);
         authorName = config?.author_name?.trim() || "(unnamed)";
       } catch (err) {
@@ -79,7 +82,8 @@ function listAvailableProfiles() {
 
       return {
         value: filename,
-        display: `${authorName}`      };
+        display: `${authorName}`,
+      };
     });
 }
 
@@ -95,8 +99,8 @@ function getCurrentProfileFilename() {
 // ─────────────────────────────────────────────
 function buildVirtualStructure(config) {
   const base = fileManager.resolvePath(config.context_folder || "./");
-  const templatesPath = fileManager.joinPath(base, "templates");
-  const storagePath = fileManager.joinPath(base, "storage");
+  const templatesPath = path.join(base, "templates");
+  const storagePath = path.join(base, "storage");
 
   fileManager.ensureDirectory(templatesPath, {
     label: "Templates",
@@ -313,8 +317,8 @@ function getSingleTemplateEntry(templateName) {
   const config = loadUserConfig();
   const base = fileManager.resolvePath(config.context_folder || "./");
   const storagePath = fileManager.joinPath(base, "storage");
-  const templateStoragePath = fileManager.joinPath(storagePath, templateName);
-  const imagesPath = fileManager.joinPath(templateStoragePath, "images");
+  const templateStoragePath = path.join(storagePath, templateName);
+  const imagesPath = path.join(templateStoragePath, "images");
 
   fileManager.ensureDirectory(templateStoragePath, {
     label: `Storage<${templateName}>`,
@@ -326,9 +330,13 @@ function getSingleTemplateEntry(templateName) {
     silent: true,
   });
 
-  const metaFiles = fileManager.listFilesByExtension(templateStoragePath, ".meta.json", {
-    silent: true,
-  });
+  const metaFiles = fileManager.listFilesByExtension(
+    templateStoragePath,
+    ".meta.json",
+    {
+      silent: true,
+    }
+  );
 
   const imageFiles = fileManager.listFiles(imagesPath, { silent: true });
 

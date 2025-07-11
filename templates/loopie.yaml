@@ -4,7 +4,7 @@ markdown_template: |-
   ---
   title: Auto-generated Report
   author: Formidable Generator
-  date: 2025-07-06
+  date: 2025-07-11
   toc: true
   toc-title: Inhoudsopgave
   toc-own-page: true
@@ -29,26 +29,48 @@ markdown_template: |-
 
   ---
 
-  ### Sub Title
+  ### Inloop Title
 
-  _{{fieldDescription "sub_title"}}_
+  _{{fieldDescription "inloop_title"}}_
 
   ```sh
   [LOG]
-  {{json (fieldRaw "sub_title")}}
+  {{json (fieldRaw "inloop_title")}}
   ```
-  {{field "sub_title"}}
+  {{field "inloop_title"}}
   ---
 
-  ### Description
+  ### Inloop - Description
 
-  _{{fieldDescription "description"}}_
+  _{{fieldDescription "inloop_description"}}_
 
   ```sh
   [LOG]
-  {{json (fieldRaw "description")}}
+  {{json (fieldRaw "inloop_description")}}
   ```
-  {{field "description"}}
+  {{field "inloop_description"}}
+  ---
+
+  ### Subloop
+
+  _{{fieldDescription "subloop"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "subloop")}}
+  ```
+  {{field "subloop"}}
+  ---
+
+  ### Sub loop
+
+  _{{fieldDescription "subloop_title"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "subloop_title")}}
+  ```
+  {{field "subloop_title"}}
   {{/loop}}
 sidebar_handling: ''
 enable_collection: false
