@@ -19,9 +19,24 @@ if (process.platform === "win32") {
   app.setPath("userData", portableDataPath);
 }
 
-const iconPath = app.isPackaged
-  ? path.join(process.resourcesPath, "assets", "formidable.ico")
-  : path.join(__dirname, "assets", "formidable.ico");
+const iconPath = (() => {
+  if (process.platform === "win32") {
+    return app.isPackaged
+      ? path.join(process.resourcesPath, "assets", "formidable.ico")
+      : path.join(__dirname, "assets", "formidable.ico");
+  }
+
+  if (process.platform === "darwin") {
+    return app.isPackaged
+      ? path.join(process.resourcesPath, "assets", "formidable.icns")
+      : path.join(__dirname, "assets", "formidable.icns");
+  }
+
+  // Linux (use PNG)
+  return app.isPackaged
+    ? path.join(process.resourcesPath, "assets", "formidable.png")
+    : path.join(__dirname, "assets", "formidable.png");
+})();
 
 function createWindow() {
   const bounds = getSafeBounds(userConfig.window_bounds);
