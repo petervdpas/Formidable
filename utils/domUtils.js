@@ -430,7 +430,7 @@ export async function applyFieldValues(
 
         // Get loop container
         const containerSelector = `.loop-container[data-loop-key="${loopKey}"]`;
-        const loopContainer = container.querySelector(containerSelector);
+        const loopContainer = container.querySelector(containerSelector) || container.closest(".loop-item")?.querySelector(containerSelector);
         const addButton = loopContainer?.querySelector(`[data-action="add-loop-item"]`);
 
         if (!loopContainer || !addButton) {
