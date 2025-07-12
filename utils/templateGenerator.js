@@ -9,48 +9,58 @@ export function generateTemplateCode(fields = []) {
     "author: Formidable Generator",
     `date: ${new Date().toISOString().split("T")[0]}`,
     "toc: true",
-    "toc-title: Inhoudsopgave",
+    "toc-title: Contents",
     "toc-own-page: true",
     "---",
     "",
   ].join("\n");
 
-  const bodyParts = [];
-  const seenKeys = new Set();
-  let i = 0;
+  const body = renderFieldBlocks(fields);
+  return frontmatter + "\n" + body.join("\n---\n\n");
+}
 
-  while (i < fields.length) {
+function renderFieldBlocks(fields, headingLevel = 2) {
+  const result = [];
+  const seenKeys = new Set();
+
+  for (let i = 0; i < fields.length; i++) {
     const field = fields[i];
     const key = field.key || "unknown";
     const type = (field.type || "text").toLowerCase();
 
     if (type === "loopstart") {
       const loopKey = key;
-      const loopFields = [];
-      i++;
+      const innerFields = [];
+      let depth = 1;
 
-      while (i < fields.length && fields[i].type !== "loopstop") {
-        loopFields.push(fields[i]);
+      i++;
+      while (i < fields.length && depth > 0) {
+        const f = fields[i];
+        const t = (f.type || "").toLowerCase();
+        if (t === "loopstart") depth++;
+        else if (t === "loopstop") depth--;
+
+        if (depth > 0) innerFields.push(f);
         i++;
       }
+      i--; // correct overshoot
 
-      const loopContent = [
-        `### LoopIndex: {{loop_index.value}}\n`,
-        ...loopFields.map((f) => generateSingleFieldBlock(f, 3)),
-      ].join("\n---\n\n");
-
-      bodyParts.push(
-        `\n## Loop: ${loopKey}\n\n{{#loop "${loopKey}"}}\n${loopContent}\n{{/loop}}\n`
+      const loopContent = renderFieldBlocks(innerFields, headingLevel + 1).join(
+        "\n---\n\n"
+      );
+      result.push(
+        `\n${"#".repeat(
+          headingLevel
+        )} Loop: ${loopKey}\n\n{{#loop "${loopKey}"}}\n${loopContent}\n{{/loop}}\n`
       );
     } else if (type !== "loopstop" && !seenKeys.has(key)) {
-      bodyParts.push(generateSingleFieldBlock(field)); // defaults to H2
+      result.push(generateSingleFieldBlock(field, headingLevel));
     }
 
     seenKeys.add(key);
-    i++;
   }
 
-  return frontmatter + "\n" + bodyParts.join("\n---\n\n");
+  return result;
 }
 
 function generateSingleFieldBlock(field, headingLevel = 2) {
