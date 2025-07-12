@@ -63,6 +63,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
         { label: "Start Server", action: "start-internal-server" },
         { label: "Stop Server", action: "stop-internal-server" },
         { label: "Server Status", action: "get-internal-server-status" },
+        { label: "Open in Browser", action: "open-internal-server-browser" },
       ])
     );
   }
@@ -304,14 +305,45 @@ export async function handleMenuAction(action) {
       break;
 
     case "start-internal-server":
-      {
-        const port = cachedConfig?.internal_server_port || 8383;
-        EventBus.emit("server:start", { port });
-      }
+      EventBus.emit("server:status", {
+        callback: (server) => {
+          if (!server.running) {
+            {
+              const port = cachedConfig?.internal_server_port || 8383;
+              EventBus.emit("server:start", { port });
+            }
+            EventBus.emit("ui:toast", {
+              message: "Internal server was started.",
+              variant: "success",
+            });
+          } else {
+            EventBus.emit("ui:toast", {
+              message: "Internal server is already running.",
+              variant: "success",
+            });
+          }
+        },
+      });
+
       break;
 
     case "stop-internal-server":
-      EventBus.emit("server:stop");
+      EventBus.emit("server:status", {
+        callback: (server) => {
+          if (server.running) {
+            EventBus.emit("server:stop");
+            EventBus.emit("ui:toast", {
+              message: "Internal server was stopped.",
+              variant: "warning",
+            });
+          } else {
+            EventBus.emit("ui:toast", {
+              message: "Internal server wasn't running.",
+              variant: "warning",
+            });
+          }
+        },
+      });
       break;
 
     case "get-internal-server-status":
@@ -328,10 +360,27 @@ export async function handleMenuAction(action) {
       });
       break;
 
+    case "open-internal-server-browser":
+      EventBus.emit("server:status", {
+        callback: (server) => {
+          if (server.running) {
+            const port = server.port || 8383;
+            const url = `http://localhost:${port}/`;
+            EventBus.emit("file:openExternal", { url });
+          } else {
+            EventBus.emit("ui:toast", {
+              message: "Internal server isn't running.",
+              variant: "warning",
+            });
+          }
+        },
+      });
+      break;
+
     case "open-help":
       window.openHelpModal?.();
       break;
-      
+
     case "open-about":
       window.openAboutModal?.();
       break;

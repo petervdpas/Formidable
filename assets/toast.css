@@ -23,6 +23,11 @@
   color: var(--generic-fg-info);
 }
 
+.toast.default {
+  background-color: var(--generic-bg-info);
+  color: var(--generic-fg-info);
+}
+
 .toast.success {
   background-color: var(--generic-bg-success);
   color: var(--generic-fg-success);
@@ -34,6 +39,11 @@
 }
 
 .toast.warn {
+  background-color: var(--generic-bg-warn);
+  color: var(--generic-fg-warn);
+}
+
+.toast.warning {
   background-color: var(--generic-bg-warn);
   color: var(--generic-fg-warn);
 }

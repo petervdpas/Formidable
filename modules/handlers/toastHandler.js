@@ -2,7 +2,7 @@
 
 import { EventBus } from "../eventBus.js";
 
-const allowedVariants = ["info", "success", "error", "warn"];
+const allowedVariants = ["default", "info", "success", "error", "warn", "warning"];
 
 function showToast(message, variant = "info", duration = 3000) {
   const container = document.getElementById("toast-container");
