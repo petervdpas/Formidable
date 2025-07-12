@@ -134,10 +134,6 @@ function registerHelpers(filePrefix = true) {
   Handlebars.registerHelper("field", function (key, mode = "label", options) {
     const context = options?.data?.root || this;
 
-    if (key in context && typeof context[key] !== "object") {
-      return context[key];
-    }
-
     const fields = context._fields || [];
     const template = context._template || {};
     const field = fields.find((f) => f.key === key);

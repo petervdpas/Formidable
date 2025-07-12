@@ -2,7 +2,7 @@
   "theme": "light",
   "show_icon_buttons": false,
   "font_size": 14,
-  "logging_enabled": false,
+  "logging_enabled": true,
   "context_mode": "storage",
   "context_folder": "./",
   "selected_template": "loopie.yaml",
@@ -14,9 +14,9 @@
   "enable_internal_server": true,
   "internal_server_port": 8383,
   "window_bounds": {
-    "width": 1280,
+    "width": 1643,
     "height": 912,
     "x": 238,
-    "y": 121
+    "y": 158
   }
 }
