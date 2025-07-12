@@ -12,65 +12,20 @@ markdown_template: |-
 
   ## Title
 
-  _{{fieldDescription "title"}}_
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "title")}}
-  ```
   {{field "title"}}
-  ---
-
 
   ## Loop: looper
 
   {{#loop "looper"}}
-  ### LoopIndex: {{loop_index.value}}
+  ### Loop Item: {{field "loop_index"}}
 
-  ---
+  - Inloop Title: {{field "inloop_title"}}
+  - Inloop Description: {{field "inloop_description"}}
 
-  ### Inloop Title
+    {{#loop "subloop"}}
+    - Subloop Title: {{field "subloop_title"}}
+    {{/loop}}
 
-  _{{fieldDescription "inloop_title"}}_
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "inloop_title")}}
-  ```
-  {{field "inloop_title"}}
-  ---
-
-  ### Inloop - Description
-
-  _{{fieldDescription "inloop_description"}}_
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "inloop_description")}}
-  ```
-  {{field "inloop_description"}}
-  ---
-
-  ### Subloop
-
-  _{{fieldDescription "subloop"}}_
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "subloop")}}
-  ```
-  {{field "subloop"}}
-  ---
-
-  ### Sub loop
-
-  _{{fieldDescription "subloop_title"}}_
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "subloop_title")}}
-  ```
-  {{field "subloop_title"}}
   {{/loop}}
 sidebar_handling: ''
 enable_collection: false

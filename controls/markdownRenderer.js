@@ -66,25 +66,23 @@ const defaultRenderers = {
   },
 };
 
-function buildLoopGroups(fields) {
+function buildNestedLoopGroups(fields) {
   const groups = {};
-  let i = 0;
+  const stack = [];
 
-  while (i < fields.length) {
+  for (let i = 0; i < fields.length; i++) {
     const field = fields[i];
+
     if (field.type === "loopstart") {
-      const loopKey = field.key;
-      const group = [];
-      i++;
-
-      while (i < fields.length && fields[i].type !== "loopstop") {
-        group.push(fields[i]);
-        i++;
+      stack.push({ key: field.key, fields: [] });
+    } else if (field.type === "loopstop") {
+      const completed = stack.pop();
+      if (completed) {
+        groups[completed.key] = completed.fields;
       }
-
-      groups[loopKey] = group;
+    } else if (stack.length > 0) {
+      stack[stack.length - 1].fields.push(field);
     }
-    i++;
   }
 
   return groups;
@@ -135,6 +133,11 @@ function registerHelpers(filePrefix = true) {
 
   Handlebars.registerHelper("field", function (key, mode = "label", options) {
     const context = options?.data?.root || this;
+
+    if (key in context && typeof context[key] !== "object") {
+      return context[key];
+    }
+
     const fields = context._fields || [];
     const template = context._template || {};
     const field = fields.find((f) => f.key === key);
@@ -209,22 +212,29 @@ function registerHelpers(filePrefix = true) {
   Handlebars.registerHelper("loop", function (key, options) {
     const ctx = options?.data?.root || this;
     const items = ctx[key];
+    const template = ctx._template;
+    const allLoopGroups = ctx._loopGroups;
 
     if (!Array.isArray(items)) return "";
 
-    const loopGroups = buildLoopGroups(ctx._fields || []);
-    const groupFields = loopGroups[key] || [];
+    const groupFields = allLoopGroups?.[key] || [];
 
     return items
       .map((entry, index) => {
-        const indexValue = `${index + 1}`;
         const subContext = {
           ...entry,
-          loop_index: { key: "loop_index", value: indexValue, type: "text" },
+          loop_index: index + 1,
           _fields: groupFields,
-          _template: ctx._template,
+          _template: template,
+          _loopGroups: allLoopGroups,
         };
-        return options.fn(subContext);
+
+        return options.fn(subContext, {
+          data: {
+            ...options.data,
+            root: subContext, // 👈 override root context
+          },
+        });
       })
       .join("\n");
   });
@@ -236,14 +246,14 @@ function renderMarkdown(formData, templateYaml, filePrefix = true) {
   }
 
   try {
-    registerHelpers(filePrefix); // geef mee aan de helpers
+    registerHelpers(filePrefix);
     const context = {
       ...formData,
       _fields: templateYaml.fields || [],
       _template: templateYaml,
     };
 
-    context._loopGroups = buildLoopGroups(context._fields);
+    context._loopGroups = buildNestedLoopGroups(context._fields);
 
     const tmpl = Handlebars.compile(templateYaml.markdown_template);
     const output = tmpl(context);
