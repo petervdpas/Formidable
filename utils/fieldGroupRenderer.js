@@ -91,9 +91,7 @@ export async function fieldGroupRenderer(
             [loopKey]
           );
           loopList.appendChild(newItem);
-        },
-        loopKey,
-        loopList.children.length || 0
+        }
       );
 
       loopContainer.appendChild(loopList);
@@ -236,9 +234,7 @@ async function createLoopItem(
             nestedLoopKeyChain
           );
           nestedList.appendChild(newItem);
-        },
-        nestedKey,
-        nestedList.children.length || 0
+        }
       );
 
       nestedContainer.appendChild(nestedList);
