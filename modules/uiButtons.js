@@ -309,12 +309,17 @@ export function createAddButton({
   });
 }
 
-export function createAddLoopItemButton(onClick) {
+export function createAddLoopItemButton(onClick, key, idx = 0) {
   return createButton({
     text: "+ Add Loop Item",
     className: "btn-okay add-loop-item-btn",
     identifier: "add-loop-item",
     onClick,
+    attributes: {
+      "data-action": "add-loop-item",
+      "data-loop-key": key,
+      "data-loop-idx": idx,
+    },
   });
 }
 

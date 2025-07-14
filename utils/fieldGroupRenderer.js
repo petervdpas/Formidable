@@ -81,16 +81,20 @@ export async function fieldGroupRenderer(
         loopList.appendChild(itemWrapper);
       }
 
-      const addButton = createAddLoopItemButton(async () => {
-        const newItem = await createLoopItem(
-          group,
-          {},
-          template,
-          eventFunctions,
-          [loopKey]
-        );
-        loopList.appendChild(newItem);
-      });
+      const addButton = createAddLoopItemButton(
+        async () => {
+          const newItem = await createLoopItem(
+            group,
+            {},
+            template,
+            eventFunctions,
+            [loopKey]
+          );
+          loopList.appendChild(newItem);
+        },
+        loopKey,
+        loopList.children.length || 0
+      );
 
       loopContainer.appendChild(loopList);
       loopContainer.appendChild(addButton);
@@ -222,16 +226,20 @@ async function createLoopItem(
         nestedList.appendChild(nestedItem);
       }
 
-      const addNestedButton = createAddLoopItemButton(async () => {
-        const newItem = await createLoopItem(
-          nestedGroup,
-          {},
-          template,
-          eventFunctions,
-          nestedLoopKeyChain
-        );
-        nestedList.appendChild(newItem);
-      });
+      const addNestedButton = createAddLoopItemButton(
+        async () => {
+          const newItem = await createLoopItem(
+            nestedGroup,
+            {},
+            template,
+            eventFunctions,
+            nestedLoopKeyChain
+          );
+          nestedList.appendChild(newItem);
+        },
+        nestedKey,
+        nestedList.children.length || 0
+      );
 
       nestedContainer.appendChild(nestedList);
       nestedContainer.appendChild(addNestedButton);
@@ -266,4 +274,3 @@ async function createLoopItem(
 
   return itemWrapper;
 }
-
