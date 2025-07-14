@@ -38,6 +38,7 @@ fields:
   - key: looper
     label: Chapters - Start
     type: loopstart
+    description: Enter your chapters here...!
   - key: inloop_title
     label: Inloop Title
     type: text
@@ -51,6 +52,7 @@ fields:
   - key: subloop
     label: Subloop
     type: loopstart
+    description: Enter paragraphs here...!
   - key: subloop_title
     label: Sub loop
     type: text

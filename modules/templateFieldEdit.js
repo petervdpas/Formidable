@@ -270,7 +270,7 @@ async function listFields(
     typeSpan.textContent = `(${field.type.toUpperCase()})`;
     labelEl.appendChild(typeSpan);
 
-    // Acties
+    // Actions
     const actionsWrapper = document.createElement("div");
     actionsWrapper.className = "actions-wrapper";
 
@@ -303,6 +303,13 @@ async function listFields(
     actionsEl.appendChild(btnUp);
     actionsEl.appendChild(btnDown);
     */
+
+    if (field.type === "loopstop") {
+      fieldButtons.edit.disabled = true;
+      fieldButtons.delete.disabled = true;
+      fieldButtons.edit.classList.add("disabled");
+      fieldButtons.delete.classList.add("disabled");
+    }
 
     actionsWrapper.appendChild(
       buildButtonGroup(fieldButtons.edit, fieldButtons.delete, "field-actions")
