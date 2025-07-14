@@ -5,7 +5,7 @@ import { ensureVirtualLocation } from "../utils/vfsUtils.js";
 import { getFormData, validateFilenameInput } from "../utils/formUtils.js";
 import { setupRenderModal } from "./modalSetup.js";
 import { showConfirmModal } from "../utils/modalUtils.js";
-import { copyToClipboard } from "../utils/domUtils.js";
+import { copyToClipboard, waitForElement } from "../utils/domUtils.js";
 import {
   createCopyMarkdownButton,
   createCopyPreviewButton,
@@ -15,59 +15,79 @@ const log = (...args) => EventBus.emit("logging:default", args);
 const warn = (...args) => EventBus.emit("logging:warning", args);
 const err = (...args) => EventBus.emit("logging:error", args);
 
+let savingInProgress = false;
+
 export async function saveForm(container, template) {
-  template = await ensureVirtualLocation(template);
-  if (!template?.virtualLocation) {
-    EventBus.emit("status:update", "No template selected.");
+  if (savingInProgress) {
+    EventBus.emit("logging:warning", [
+      "[saveForm] Already in progress. Ignoring duplicate save.",
+    ]);
     return;
   }
+  savingInProgress = true;
 
-  const datafile = validateFilenameInput(
-    container.querySelector("#meta-json-filename")
-  );
-  if (!datafile) {
-    EventBus.emit("status:update", "Please enter a filename for datafile.");
-    return;
-  }
-
-  let created = null;
   try {
-    const existing = await EventBus.emitWithResponse("form:load", {
+    template = await ensureVirtualLocation(template);
+    if (!template?.virtualLocation) {
+      EventBus.emit("status:update", "No template selected.");
+      return;
+    }
+
+    const datafile = validateFilenameInput(
+      container.querySelector("#meta-json-filename")
+    );
+    if (!datafile) {
+      EventBus.emit("status:update", "Please enter a filename for datafile.");
+      return;
+    }
+
+    let created = null;
+    try {
+      const existing = await EventBus.emitWithResponse("form:load", {
+        templateFilename: template.filename,
+        datafile: datafile,
+      });
+      created = existing?.meta?.created || null;
+    } catch {}
+
+    try {
+      await waitForElement("[data-field-key]", container, 3000);
+    } catch (e) {
+      warn(`[saveForm] Warning: ${e.message}`);
+    }
+
+    const { data, meta } = await getFormData(container, template);
+
+    const userConfig = await new Promise((resolve) => {
+      EventBus.emit("config:load", (cfg) => resolve(cfg));
+    });
+
+    const guidField = template.fields?.find((f) => f.type === "guid");
+    const guidKey = guidField?.key || "id";
+    const idValue = data[guidKey] || meta.id || null;
+
+    const payload = {
+      ...data,
+      _meta: {
+        ...meta,
+        id: idValue,
+        author_name: userConfig.author_name || "unknown",
+        author_email: userConfig.author_email || "unknown@example.com",
+        template: template.filename || "unknown",
+        created,
+        updated: new Date().toISOString(),
+      },
+    };
+
+    await EventBus.emitWithResponse("form:save", {
       templateFilename: template.filename,
       datafile: datafile,
+      payload: payload,
+      fields: template.fields || [],
     });
-    created = existing?.meta?.created || null;
-  } catch {}
-
-  const { data, meta } = await getFormData(container, template);
-
-  const userConfig = await new Promise((resolve) => {
-    EventBus.emit("config:load", (cfg) => resolve(cfg));
-  });
-
-  const guidField = template.fields?.find((f) => f.type === "guid");
-  const guidKey = guidField?.key || "id";
-  const idValue = data[guidKey] || meta.id || null;
-
-  const payload = {
-    ...data,
-    _meta: {
-      ...meta,
-      id: idValue,
-      author_name: userConfig.author_name || "unknown",
-      author_email: userConfig.author_email || "unknown@example.com",
-      template: template.filename || "unknown",
-      created,
-      updated: new Date().toISOString(),
-    },
-  };
-
-  await EventBus.emitWithResponse("form:save", {
-    templateFilename: template.filename,
-    datafile: datafile,
-    payload: payload,
-    fields: template.fields || [],
-  });
+  } finally {
+    savingInProgress = false;
+  }
 }
 
 export async function deleteForm(container, template, datafile) {

@@ -13,7 +13,27 @@ import {
 } from "./fieldAppliers.js";
 import * as fieldRenderers from "./fieldRenderers.js";
 
-const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+export function waitForElement(selector, root = document.body, timeout = 5000) {
+  return new Promise((resolve, reject) => {
+    const el = root.querySelector(selector);
+    if (el) return resolve(el);
+
+    const observer = new MutationObserver(() => {
+      const el = root.querySelector(selector);
+      if (el) {
+        observer.disconnect();
+        resolve(el);
+      }
+    });
+
+    observer.observe(root, { childList: true, subtree: true });
+
+    setTimeout(() => {
+      observer.disconnect();
+      reject(new Error(`Timeout waiting for ${selector}`));
+    }, timeout);
+  });
+}
 
 export function generateGuid() {
   return crypto.randomUUID();
