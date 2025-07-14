@@ -4,8 +4,6 @@ import { buildHiddenInput } from "../utils/elementBuilders.js";
 import { buildButtonGroup, createToggleButtons } from "../utils/buttonUtils.js";
 import { injectFieldDefaults } from "../utils/formUtils.js";
 import {
-  applyFieldValues,
-  delayPaintSafe,
   focusFirstInput,
 } from "../utils/domUtils.js";
 import {
@@ -166,18 +164,12 @@ export async function renderFormUI(
   container.appendChild(metaSection);
 
   const fields = template.fields || [];
-  injectFieldDefaults(fields, metaData);
-  await fieldGroupRenderer(
-    container,
-    fields,
-    metaData,
-    template,
-    eventFunctions
-  );
 
-  delayPaintSafe(() => {
-    applyFieldValues(container, template, metaData, eventFunctions);
-  }, 500);
+  // Inject default values first
+  injectFieldDefaults(fields, metaData);
+
+  // Let fieldGroupRenderer do the job — passing metaData directly!
+  await fieldGroupRenderer(container, fields, metaData, template, eventFunctions);
 
   focusFirstInput(container);
 }

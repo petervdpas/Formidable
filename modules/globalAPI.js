@@ -89,7 +89,6 @@ export function exposeGlobalAPI() {
       focusFirstInput: domUtils.focusFirstInput,
       applyModalTypeClass: domUtils.applyModalTypeClass,
       applyValueToField: domUtils.applyValueToField,
-      applyFieldValues: domUtils.applyFieldValues,
       bindActionHandlers: domUtils.bindActionHandlers,
       syncScroll: domUtils.syncScroll,
       copyToClipboard: domUtils.copyToClipboard,
