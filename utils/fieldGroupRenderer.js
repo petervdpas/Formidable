@@ -2,6 +2,7 @@
 
 import { addContainerElement } from "./elementBuilders.js";
 import { collectLoopGroup, createLoopDefaults } from "./formUtils.js";
+import { applyValueToField } from "./domUtils.js";
 import {
   createAddLoopItemButton,
   createDeleteLoopItemButton,
@@ -81,18 +82,16 @@ export async function fieldGroupRenderer(
         loopList.appendChild(itemWrapper);
       }
 
-      const addButton = createAddLoopItemButton(
-        async () => {
-          const newItem = await createLoopItem(
-            group,
-            {},
-            template,
-            eventFunctions,
-            [loopKey]
-          );
-          loopList.appendChild(newItem);
-        }
-      );
+      const addButton = createAddLoopItemButton(async () => {
+        const newItem = await createLoopItem(
+          group,
+          {},
+          template,
+          eventFunctions,
+          [loopKey]
+        );
+        loopList.appendChild(newItem);
+      });
 
       loopContainer.appendChild(loopList);
       loopContainer.appendChild(addButton);
@@ -138,7 +137,16 @@ export async function fieldGroupRenderer(
         template,
         eventFunctions
       );
-      if (row) container.appendChild(row);
+      if (row) {
+        container.appendChild(row);
+        await applyValueToField(
+          container,
+          field,
+          metaData[field.key],
+          template,
+          eventFunctions
+        );
+      }
       i++;
     }
   }
@@ -224,18 +232,16 @@ async function createLoopItem(
         nestedList.appendChild(nestedItem);
       }
 
-      const addNestedButton = createAddLoopItemButton(
-        async () => {
-          const newItem = await createLoopItem(
-            nestedGroup,
-            {},
-            template,
-            eventFunctions,
-            nestedLoopKeyChain
-          );
-          nestedList.appendChild(newItem);
-        }
-      );
+      const addNestedButton = createAddLoopItemButton(async () => {
+        const newItem = await createLoopItem(
+          nestedGroup,
+          {},
+          template,
+          eventFunctions,
+          nestedLoopKeyChain
+        );
+        nestedList.appendChild(newItem);
+      });
 
       nestedContainer.appendChild(nestedList);
       nestedContainer.appendChild(addNestedButton);
@@ -263,7 +269,16 @@ async function createLoopItem(
         template,
         eventFunctions
       );
-      if (row) itemWrapper.appendChild(row);
+      if (row) {
+        itemWrapper.appendChild(row);
+        await applyValueToField(
+          itemWrapper,
+          fieldCopy,
+          dataEntry[fieldKey],
+          template,
+          eventFunctions
+        );
+      }
       i++;
     }
   }

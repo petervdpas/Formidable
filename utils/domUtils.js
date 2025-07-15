@@ -363,6 +363,13 @@ export async function applyValueToField(
   template,
   eventFunctions = {}
 ) {
+  if (field.type === "loopstart" || field.type === "loopstop") {
+    EventBus.emit("logging:default", [
+      `[applyValueToField] Skipping loop control field: ${field.type}`,
+    ]);
+    return;
+  }
+
   const def = fieldTypes[field.type];
   if (!def || typeof def.applyValue !== "function") {
     EventBus.emit("logging:warning", [
@@ -375,7 +382,7 @@ export async function applyValueToField(
     await def.applyValue(container, field, value, template, eventFunctions);
   } catch (err) {
     EventBus.emit("logging:error", [
-      `[applyValueToField] Error applying value for type="${field.type}"`,
+      `[applyValueToField] Error applying value for "${field.key}"`,
       err,
     ]);
   }
