@@ -6,7 +6,7 @@
   "context_mode": "storage",
   "context_folder": "./",
   "selected_template": "basic.yaml",
-  "selected_data_file": "sane-20250530.meta.json",
+  "selected_data_file": "test-20250629.meta.json",
   "author_name": "Regular user",
   "author_email": "regular@example.com",
   "use_git": false,
@@ -14,9 +14,9 @@
   "enable_internal_server": true,
   "internal_server_port": 8383,
   "window_bounds": {
-    "width": 1725,
-    "height": 854,
-    "x": 57,
-    "y": 144
+    "width": 1440,
+    "height": 749,
+    "x": 267,
+    "y": 69
   }
 }

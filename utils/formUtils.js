@@ -175,7 +175,7 @@ async function parseFieldValue(container, field, template) {
   }
 
   try {
-    return await def.parseValue(el, template);
+    return await def.parseValue(el, template, field);
   } catch (err) {
     EventBus.emit("logging:error", [
       `[parseFieldValue] Error parsing field "${field.key}": ${err.message}`,
@@ -242,12 +242,10 @@ export async function getFormData(container, template) {
   const flaggedInput = container.querySelector("#meta-flagged");
   if (flaggedInput) meta.flagged = flaggedInput.value === "true";
 
-  /*
   EventBus.emit("logging:default", [
     "[getFormData] Collected form data:",
     { data, meta },
   ]);
-  */
 
   return { data, meta };
 }

@@ -156,7 +156,18 @@ export const parseImageField = async function (inputWrapper, template) {
 };
 
 // Link
-export const parseLinkField = async function (wrapper) {
-  const input = wrapper.querySelector(`input[type="hidden"][name]`);
-  return input?.value?.trim() || "";
+export const parseLinkField = async function (wrapper, template, field) {
+
+  console.log(`[parseLinkField] wrapper.innerHTML =`, wrapper.innerHTML);
+  
+  const key = field.key;
+  const hidden = wrapper.querySelector(`input[type="hidden"][name="${key}"]`);
+  if (!hidden) {
+    EventBus.emit("logging:warning", [
+      `[parseLinkField] Hidden input not found for link field "${key}"`,
+    ]);
+    return "";
+  }
+
+  return hidden.value?.trim() || "";
 };

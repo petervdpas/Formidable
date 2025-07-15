@@ -931,7 +931,7 @@ export async function renderLinkField(
   urlInput.value = v;
   updateValue();
 
-  applyFieldContextAttributes(input, {
+  applyFieldContextAttributes(wrapper, {
     key: field.key,
     type: field.type,
     loopKey: field.loopKey || null,

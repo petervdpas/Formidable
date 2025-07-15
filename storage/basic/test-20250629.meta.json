@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-29T09:32:36.440Z",
-    "updated": "2025-07-06T22:37:19.271Z",
+    "updated": "2025-07-15T07:38:24.778Z",
     "flagged": false
   },
   "data": {
@@ -15,9 +15,9 @@
     "dropdown": "R",
     "multichoice": [
       "A",
-      "C"
+      "B"
     ],
-    "radio": "BIRD",
+    "radio": "DOG",
     "mline": "Okay, and 2 bit?? A small change to test stuff! Test can be done by hand... like in the old days.... but people think that isn't that good!",
     "numpy": 17,
     "rangie": 85,
