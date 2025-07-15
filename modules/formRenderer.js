@@ -3,9 +3,7 @@
 import { buildHiddenInput } from "../utils/elementBuilders.js";
 import { buildButtonGroup, createToggleButtons } from "../utils/buttonUtils.js";
 import { injectFieldDefaults } from "../utils/formUtils.js";
-import {
-  focusFirstInput,
-} from "../utils/domUtils.js";
+import { focusFirstInput, applyValueToField } from "../utils/domUtils.js";
 import {
   createFlaggedToggleButton,
   createFormSaveButton,
@@ -169,7 +167,19 @@ export async function renderFormUI(
   injectFieldDefaults(fields, metaData);
 
   // Let fieldGroupRenderer do the job — passing metaData directly!
-  await fieldGroupRenderer(container, fields, metaData, template, eventFunctions);
+  await fieldGroupRenderer(
+    container,
+    fields,
+    metaData,
+    template,
+    eventFunctions
+  );
+
+  // ✅ Apply all field values here (AFTER render)
+  for (const field of fields) {
+    const value = metaData?.[field.key];
+    await applyValueToField(container, field, value, template, eventFunctions);
+  }
 
   focusFirstInput(container);
 }

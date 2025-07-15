@@ -2,6 +2,7 @@
 
 import * as parsers from "./fieldParsers.js";
 import * as renderers from "./fieldRenderers.js";
+import * as appliers from "./fieldAppliers.js";
 import { generateGuid } from "./domUtils.js";
 
 export const fieldTypes = {
@@ -22,6 +23,7 @@ export const fieldTypes = {
     defaultValue: () => generateGuid(),
     renderInput: renderers.renderGuidField,
     parseValue: parsers.parseGuidField,
+    applyValue: appliers.applyGuidField,
   },
 
   looper: {
@@ -79,6 +81,7 @@ export const fieldTypes = {
     defaultValue: () => "",
     renderInput: renderers.renderTextField,
     parseValue: parsers.parseTextField,
+    applyValue: appliers.applyGenericField,
   },
 
   boolean: {
@@ -89,6 +92,7 @@ export const fieldTypes = {
     defaultValue: () => false,
     renderInput: renderers.renderBooleanField,
     parseValue: parsers.parseBooleanField,
+    applyValue: appliers.applyGenericField,
   },
 
   dropdown: {
@@ -99,6 +103,7 @@ export const fieldTypes = {
     defaultValue: () => "",
     renderInput: renderers.renderDropdownField,
     parseValue: parsers.parseDropdownField,
+    applyValue: appliers.applyGenericField,
   },
 
   multioption: {
@@ -109,6 +114,7 @@ export const fieldTypes = {
     defaultValue: () => [],
     renderInput: renderers.renderMultioptionField,
     parseValue: parsers.parseMultiOptionField,
+    applyValue: appliers.applyMultioptionField,
   },
 
   radio: {
@@ -119,6 +125,7 @@ export const fieldTypes = {
     defaultValue: () => "",
     renderInput: renderers.renderRadioField,
     parseValue: parsers.parseRadioField,
+    applyValue: appliers.applyGenericField,
   },
 
   textarea: {
@@ -129,6 +136,7 @@ export const fieldTypes = {
     defaultValue: () => "",
     renderInput: renderers.renderTextareaField,
     parseValue: parsers.parseTextareaField,
+    applyValue: appliers.applyGenericField,
   },
 
   number: {
@@ -139,6 +147,7 @@ export const fieldTypes = {
     defaultValue: () => 0,
     renderInput: renderers.renderNumberField,
     parseValue: parsers.parseNumberField,
+    applyValue: appliers.applyGenericField,
   },
 
   range: {
@@ -149,6 +158,7 @@ export const fieldTypes = {
     defaultValue: () => 50,
     renderInput: renderers.renderRangeField,
     parseValue: parsers.parseRangeField,
+    applyValue: appliers.applyRangeField,
   },
 
   date: {
@@ -159,6 +169,7 @@ export const fieldTypes = {
     defaultValue: () => "",
     renderInput: renderers.renderDateField,
     parseValue: parsers.parseDateField,
+    applyValue: appliers.applyGenericField,
   },
 
   list: {
@@ -169,6 +180,7 @@ export const fieldTypes = {
     defaultValue: () => [],
     renderInput: renderers.renderListField,
     parseValue: parsers.parseListField,
+    applyValue: appliers.applyListField,
   },
 
   table: {
@@ -179,6 +191,7 @@ export const fieldTypes = {
     defaultValue: () => [],
     renderInput: renderers.renderTableField,
     parseValue: parsers.parseTableField,
+    applyValue: appliers.applyTableField,
   },
 
   image: {
@@ -189,6 +202,7 @@ export const fieldTypes = {
     defaultValue: () => "",
     renderInput: renderers.renderImageField,
     parseValue: parsers.parseImageField,
+    applyValue: appliers.applyImageField,
   },
 
   link: {
@@ -199,5 +213,6 @@ export const fieldTypes = {
     defaultValue: () => "",
     renderInput: renderers.renderLinkField,
     parseValue: parsers.parseLinkField,
+    applyValue: appliers.applyLinkField,
   },
 };

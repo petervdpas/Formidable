@@ -5,20 +5,27 @@ import { createLinkOpenButton } from "../modules/uiButtons.js";
 import { ensureVirtualLocation } from "./vfsUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 
-export function applyGuidField(container, key, value) {
-  const input = container.querySelector(`input[type="hidden"][data-guid-field="${key}"]`);
-  
+export function applyGuidField(container, field, value) {
+  const key = field.key;
+  const input = container.querySelector(
+    `input[type="hidden"][data-guid-field="${key}"]`
+  );
   if (!input) {
     EventBus.emit("logging:warning", [
-      `[applyGuidField] Missing input for key "${key}".`,
+      `[applyGuidField] Missing input for "${key}"`,
     ]);
     return;
   }
-
   input.value = value != null ? String(value) : "";
 }
 
-export function applyRangeField(container, field, value) {
+export function applyRangeField(
+  container,
+  field,
+  value,
+  template,
+  eventFunctions = {}
+) {
   const key = field.key;
   const rangeWrapper = container.querySelector(`[data-range-field="${key}"]`);
   if (!rangeWrapper) return;
@@ -59,7 +66,13 @@ export function applyRangeField(container, field, value) {
   if (display) display.textContent = String(val);
 }
 
-export function applyListField(container, field, value) {
+export function applyListField(
+  container,
+  field,
+  value,
+  template,
+  eventFunctions = {}
+) {
   const key = field.key;
   const options = field.options || [];
 
@@ -89,7 +102,7 @@ export function applyListField(container, field, value) {
 
     const input = document.createElement("input");
     input.type = "text";
-    input.name = "list-item";   // ✅ must match renderListField!
+    input.name = "list-item"; // ✅ must match renderListField!
     input.className = "list-input";
     input.value = item;
 
@@ -121,7 +134,15 @@ export function applyListField(container, field, value) {
   });
 }
 
-export function applyTableField(container, key, value) {
+export function applyTableField(
+  container,
+  field,
+  value,
+  template,
+  eventFunctions = {}
+) {
+  const key = field.key;
+
   const tableWrapper = container.querySelector(`[data-table-field="${key}"]`);
   if (!tableWrapper || !Array.isArray(value)) return;
 
@@ -152,7 +173,14 @@ export function applyTableField(container, key, value) {
   });
 }
 
-export function applyMultioptionField(container, key, value) {
+export function applyMultioptionField(
+  container,
+  field,
+  value,
+  template,
+  eventFunctions = {}
+) {
+  const key = field.key;
   const wrapper = container.querySelector(`[data-multioption-field="${key}"]`);
   if (!wrapper || !Array.isArray(value)) return;
 
@@ -162,7 +190,14 @@ export function applyMultioptionField(container, key, value) {
   });
 }
 
-export function applyImageField(container, key, value, template) {
+export function applyImageField(
+  container,
+  field,
+  value,
+  template,
+  eventFunctions = {}
+) {
+  const key = field.key;
   ensureVirtualLocation(template).then((resolvedTemplate) => {
     applyImageLogic(container, key, value, resolvedTemplate);
   });
@@ -209,6 +244,7 @@ export async function applyLinkField(
   container,
   field,
   value,
+  template,
   eventFunctions = {}
 ) {
   const key = field.key;
@@ -325,7 +361,10 @@ export async function applyLinkField(
   }
 }
 
-export function applyGenericField(input, key, value) {
+export function applyGenericField(container, field, value) {
+  const key = field.key;
+  const input = container.querySelector(`[name="${key}"]`);
+
   if (!input) {
     EventBus.emit("logging:warning", [
       `[applyGenericField] Missing input for key "${key}".`,
@@ -333,7 +372,6 @@ export function applyGenericField(input, key, value) {
     return;
   }
 
-  // Radio group (wrapped in field container)
   if (input.dataset?.radioGroup === key) {
     const radios = input.querySelectorAll(`input[type="radio"]`);
     radios.forEach((el) => {
@@ -342,15 +380,12 @@ export function applyGenericField(input, key, value) {
     return;
   }
 
-  // Checkbox
   if (input.type === "checkbox") {
     input.checked = value === true;
     return;
   }
 
-  // Text, number, select, etc.
   if ("value" in input) {
-    // Handle undefined/null safely: if null/undefined, leave default as-is
     input.value = value != null ? String(value) : "";
     return;
   }

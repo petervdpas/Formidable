@@ -1,16 +1,7 @@
 // utils/domUtils.js
 
 import { EventBus } from "../modules/eventBus.js";
-import {
-  applyGuidField,
-  applyListField,
-  applyTableField,
-  applyMultioptionField,
-  applyImageField,
-  applyRangeField,
-  applyLinkField,
-  applyGenericField,
-} from "./fieldAppliers.js";
+import { fieldTypes } from "./fieldTypes.js";
 import * as fieldRenderers from "./fieldRenderers.js";
 
 export function waitForElement(selector, root = document.body, timeout = 5000) {
@@ -372,56 +363,22 @@ export async function applyValueToField(
   template,
   eventFunctions = {}
 ) {
-  const key = field.key;
-
-  if (container.querySelector(`[data-guid-field="${key}"]`)) {
-    applyGuidField(container, key, value);
+  const def = fieldTypes[field.type];
+  if (!def || typeof def.applyValue !== "function") {
+    EventBus.emit("logging:warning", [
+      `[applyValueToField] No applyValue for type="${field.type}"`,
+    ]);
     return;
   }
 
-  if (container.querySelector(`[data-multioption-field="${key}"]`)) {
-    applyMultioptionField(container, key, value);
-    return;
+  try {
+    await def.applyValue(container, field, value, template, eventFunctions);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[applyValueToField] Error applying value for type="${field.type}"`,
+      err,
+    ]);
   }
-
-  if (container.querySelector(`[data-list-field="${key}"]`)) {
-    applyListField(container, field, value);
-    return;
-  }
-
-  if (container.querySelector(`[data-table-field="${key}"]`)) {
-    applyTableField(container, key, value);
-    return;
-  }
-
-  if (container.querySelector(`[data-image-field="${key}"]`)) {
-    applyImageField(container, key, value, template);
-    return;
-  }
-
-  if (container.querySelector(`[data-link-field="${key}"]`)) {
-    await applyLinkField(container, field, value, eventFunctions);
-    return;
-  }
-
-  const radioGroup = container.querySelector(`[data-radio-group="${key}"]`);
-  if (radioGroup) {
-    const radios = radioGroup.querySelectorAll(`input[type="radio"]`);
-    radios.forEach((radio) => {
-      radio.checked = String(radio.value) === String(value);
-    });
-    return;
-  }
-
-  if (container.querySelector(`[data-range-field="${key}"]`)) {
-    applyRangeField(container, field, value);
-    return;
-  }
-
-  const input = container.querySelector(`[name="${key}"]`);
-  if (input?.type === "file") return;
-
-  applyGenericField(input, key, value);
 }
 
 export function bindActionHandlers(container, selector, callback) {

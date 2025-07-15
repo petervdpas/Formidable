@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-07-12T05:48:03.101Z",
+    "updated": "2025-07-15T06:38:30.715Z",
     "flagged": true
   },
   "data": {
@@ -15,16 +15,17 @@
     "dropdown": "R",
     "multichoice": [
       "A",
-      "B"
+      "C"
     ],
-    "radio": "CAT",
+    "radio": "BIRD",
     "mline": "I dont like this one bit or byte for that matter.",
-    "numpy": 17,
-    "rangie": 15,
+    "numpy": 20,
+    "rangie": 75,
     "bday": "1968-12-23",
     "listy": [
       "A single list item",
-      "test"
+      "test",
+      "Another test"
     ],
     "datable": [
       [
@@ -36,9 +37,14 @@
         "One",
         "Two",
         "Three"
+      ],
+      [
+        "Testting",
+        "One",
+        "Two"
       ]
     ],
     "design": "formidable.png",
-    "linktest": "formidable://basic.yaml:test-20250629.meta.json"
+    "linktest": ""
   }
 }
