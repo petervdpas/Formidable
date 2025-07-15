@@ -129,41 +129,25 @@ export function collectLoopGroup(fields, startIdx, loopKey) {
   return { group, stopIdx: i };
 }
 
-function resolveFieldElement(container, field) {
-  const { key, type, loopKey } = field;
-  const attr = fieldTypes[type]?.selectorAttr;
+export function resolveFieldElement(container, field) {
+  const { key, type } = field;
+  const loopKey = Array.isArray(field.loopKey)
+    ? field.loopKey.join(".")
+    : field.loopKey;
 
-  if (!attr) {
-    // Fallback to default selector
-    let sel = `[data-field-key="${key}"]`;
-    if (loopKey) sel += `[data-field-loop="${loopKey}"]`;
-    return container.querySelector(sel) || null;
+  if (!container || typeof container.querySelector !== "function") {
+    console.warn(`[resolveFieldElement] ⚠️ Invalid container provided.`);
+    return null;
   }
 
-  // Use specific selector attribute
-  let sel = `[${attr}="${key}"]`;
-  if (loopKey) sel += `[data-field-loop="${loopKey}"]`;
+  const selectorParts = [`[data-field-key="${key}"]`];
 
-  const el =
-    container.querySelector(sel) ||
-    container.querySelector(`[${attr}="${key}"]`) ||
-    container.querySelector(`[data-field-key="${key}"]`) ||
-    container.querySelector(`[name="${key}"]`);
+  if (type) selectorParts.push(`[data-field-type="${type}"]`);
+  if (loopKey) selectorParts.push(`[data-field-loop="${loopKey}"]`);
 
-  if (!el) {
-    EventBus.emit("logging:warning", [
-      `[resolveFieldElement] Element not found for key="${key}", type="${type}"`,
-    ]);
-  }
+  const selector = selectorParts.join("");
 
-  // Fallback for EasyMDE
-  if (
-    el?.classList?.contains("EasyMDEContainer") ||
-    el?.querySelector?.(".editor-toolbar")
-  ) {
-    const textarea = el.querySelector("textarea");
-    if (textarea) return textarea;
-  }
+  const el = container.querySelector(selector);
 
   return el;
 }
@@ -185,7 +169,7 @@ async function parseFieldValue(container, field, template) {
 
   if (!el) {
     EventBus.emit("logging:warning", [
-      `[parseFieldValue] No DOM element found for key="${field.key}", type="${field.type}".`,
+      `[parseFieldValue] Element not found for field "${field.key}" of type "${field.type}" with loopKey "${field.loopKey}"`,
     ]);
     return undefined;
   }
@@ -258,10 +242,12 @@ export async function getFormData(container, template) {
   const flaggedInput = container.querySelector("#meta-flagged");
   if (flaggedInput) meta.flagged = flaggedInput.value === "true";
 
+  /*
   EventBus.emit("logging:default", [
     "[getFormData] Collected form data:",
     { data, meta },
   ]);
+  */
 
   return { data, meta };
 }
