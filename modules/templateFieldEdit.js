@@ -389,7 +389,7 @@ export function renderFieldList(
 
       const confirmed = await showConfirmModal(
         `<div>Are you sure you want to delete this field?</div>
-     <div class="modal-message-highlight"><strong>${removedLabel}</strong></div>`,
+         <div class="modal-message-highlight"><strong>${removedLabel}</strong></div>`,
         {
           okText: "Delete",
           cancelText: "Cancel",
