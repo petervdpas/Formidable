@@ -23,6 +23,8 @@ function createModalCloseButton({
   });
 }
 
+let openModalCount = 0;
+
 export function setupModal(
   modalId,
   {
@@ -83,7 +85,12 @@ export function setupModal(
   const show = () => {
     onOpen(modal);
     modal.classList.add("show");
-    if (backdrop) backdrop.classList.add("show");
+
+    if (backdrop) {
+      openModalCount++;
+      backdrop.classList.add("show");
+    }
+
     if (escToClose) {
       removeEscListener = enableEscToClose(hide);
     }
@@ -91,7 +98,14 @@ export function setupModal(
 
   const hide = () => {
     modal.classList.remove("show");
-    if (backdrop) backdrop.classList.remove("show");
+
+    if (backdrop && openModalCount > 0) {
+      openModalCount--;
+      if (openModalCount === 0) {
+        backdrop.classList.remove("show");
+      }
+    }
+
     onClose(modal);
     if (removeEscListener) {
       removeEscListener();

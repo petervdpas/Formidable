@@ -7,6 +7,7 @@ import {
   createPluginToggleButton,
   createPluginDeleteButton,
 } from "./uiButtons.js";
+import { showConfirmModal } from "../utils/modalUtils.js";
 
 export async function renderPluginManager(container) {
   const listManager = createListManager({
@@ -63,12 +64,34 @@ export async function renderPluginManager(container) {
       );
 
       const deleteBtn = createPluginDeleteButton(rawData.name, async () => {
-        const confirmed = window.confirm(`Delete plugin "${rawData.name}"?`);
+        const confirmed = await showConfirmModal(
+          `<div>Are you sure you want to delete this plugin?</div>
+     <div class="modal-message-highlight"><strong>${rawData.name}</strong></div>`,
+          {
+            okText: "Delete",
+            cancelText: "Cancel",
+            width: "auto",
+            height: "auto",
+          }
+        );
+
         if (!confirmed) return;
 
-        await EventBus.emitWithResponse("plugin:delete", {
+        const result = await EventBus.emitWithResponse("plugin:delete", {
           folder: rawData.name,
         });
+
+        if (result?.success) {
+          EventBus.emit("ui:toast", {
+            message: `Plugin "${rawData.name}" deleted.`,
+            variant: "success",
+          });
+        } else {
+          EventBus.emit("ui:toast", {
+            message: `Failed to delete plugin "${rawData.name}": ${result?.error}`,
+            variant: "error",
+          });
+        }
 
         await listManager.loadList();
       });

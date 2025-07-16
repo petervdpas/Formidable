@@ -7,21 +7,19 @@
     transform: translate(-50%, -50%);
     max-height: calc(100vh - 60px);
     margin: 0 auto;
-    z-index: 999;
+    z-index: 3100;
     background-color: var(--input-bg);
-    border-color: var(--input-border-color);
     color: var(--input-fg);
     transition: opacity 0.2s ease;
-}
-
-.modal {
     display: none;
     opacity: 0;
     pointer-events: none;
     padding: 4px 20px 20px 20px;
-    border-radius: 6px;
     width: 400px;
     max-width: 90%;
+    border: 1px solid var(--border-color, #999);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
 }
 
 .modal.show {
@@ -31,7 +29,6 @@
 }
 
 .modal.large {
-    display: none;
     flex-direction: column;
     width: 80em !important;
     height: 80vh !important;
@@ -192,8 +189,8 @@
 }
 
 .modal-form-row.tight-gap input[type="text"] {
-  flex: 1;
-  min-width: 0;
+    flex: 1;
+    min-width: 0;
 }
 
 .pane {
@@ -344,6 +341,19 @@
     color: #005cc5;
 }
 
+/* ───── Confirm Modal Overrides ───── */
+#confirm-modal {
+    z-index: 3200 !important;
+}
+
+#confirm-modal.modal {
+    z-index: 3200 !important;
+}
+
+#modalBackdrop.show {
+    z-index: 3000 !important;
+}
+
 @media screen and (max-width: 768px) {
 
     .modal.large {
@@ -354,12 +364,9 @@
         transform: translateX(-50%);
         margin: 0 auto;
         max-height: calc(100vh - 80px);
-    }
-
-    .modal.large {
         flex-direction: column;
-        width: 95vw !important;
-        height: auto !important;
+        width: 95vw;
+        height: auto;
     }
 
     .modal-body.two-pane {

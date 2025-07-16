@@ -10,6 +10,7 @@ import {
 } from "./uiButtons.js";
 import { createFormRowInput } from "../utils/elementBuilders.js";
 import { createListManager } from "../utils/listUtils.js";
+import { showConfirmModal } from "../utils/modalUtils.js";
 
 export async function renderGitStatus(container) {
   container.innerHTML = "Loading Git status...";
@@ -121,8 +122,12 @@ export async function renderGitStatus(container) {
 
           // ─── Discard Button ──────────────────────────────────
           const discardBtn = createGitDiscardButton(rawData.value, async () => {
-            const confirmed = window.confirm(
-              `Discard changes in "${rawData.value}"?`
+            const confirmed = await showConfirmModal(
+              `Discard changes in <code>${rawData.value}</code>?`,
+              {
+                okText: "Discard",
+                cancelText: "Cancel",
+              }
             );
             if (!confirmed) return;
 
