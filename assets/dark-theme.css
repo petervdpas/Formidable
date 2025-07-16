@@ -121,6 +121,15 @@
   --btn-primary-fg: #fff;
   --btn-secondary-bg: #444;
   --btn-secondary-fg: #ccc;
+
+  --git-fg-default: #eee;
+  --git-bg-default: #1c1c1c;
+  --git-bg-added: #1f3921;
+  --git-bg-modified: #3f3a1f;
+  --git-bg-deleted: #3f1f1f;
+  --git-bg-renamed: #42351e;
+  --git-bg-untracked: #2c2c2c;
+  --git-bg-unknown: #1c1c1c;
 }
 
 .dark-mode body,

@@ -18,7 +18,8 @@
   border-radius: 4px;
   margin-bottom: 0.2em;
   gap: .5em;
-  background-color: var(--input-background, #f9f9f9);
+  background-color: var(--git-bg-default, var(--input-background, #f9f9f9));
+  color: var(--git-fg-default, var(--text-color, #222));
   transition: background-color 0.2s ease;
 }
 
@@ -37,7 +38,7 @@
 .git-list-item .list-item-label {
   font-weight: 600;
   font-size: 1rem;
-  color: var(--text-primary, #222);
+  color: var(--git-fg-default, var(--text-primary, #222));
   margin-bottom: 0.2em;
   word-break: break-word;
 }
@@ -53,25 +54,20 @@
 
 /* Git status coloring: full background by class */
 .git-list-item.added {
-  background-color: #e0f9e0; /* light green */
+  background-color: var(--git-bg-added);
 }
-
-.git-list-item.deleted {
-  background-color: #fce0e0; /* light red */
-}
-
 .git-list-item.modified {
-  background-color: #fff6db; /* light yellow */
+  background-color: var(--git-bg-modified);
 }
-
+.git-list-item.deleted {
+  background-color: var(--git-bg-deleted);
+}
 .git-list-item.renamed {
-  background-color: #f5e5c0; /* amber */
+  background-color: var(--git-bg-renamed);
 }
-
 .git-list-item.untracked {
-  background-color: #eeeeee; /* light gray */
+  background-color: var(--git-bg-untracked);
 }
-
 .git-list-item.unknown {
-  background-color: #f9f9f9; /* fallback */
+  background-color: var(--git-bg-unknown);
 }

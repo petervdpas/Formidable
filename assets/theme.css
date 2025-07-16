@@ -218,6 +218,15 @@
   --btn-primary-fg: #fff;
   --btn-secondary-bg: #eee;
   --btn-secondary-fg: #333;
+
+  --git-fg-default: #222;
+  --git-bg-default: #f9f9f9;
+  --git-bg-added: #e0f9e0;
+  --git-bg-modified: #fff6db;
+  --git-bg-deleted: #fce0e0;
+  --git-bg-renamed: #f5e5c0;
+  --git-bg-untracked: #eeeeee;
+  --git-bg-unknown: #f9f9f9;
 }
 
 .editor-wrapper.fullscreen {
