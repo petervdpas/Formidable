@@ -1,6 +1,7 @@
 // modules/templateFieldEdit.js
 
 import { setupFieldEditModal } from "./modalSetup.js";
+import { showConfirmModal } from "../utils/modalUtils.js";
 import { applyModalTypeClass } from "../utils/domUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 import { validateField } from "../utils/templateValidation.js";
@@ -380,14 +381,28 @@ export function renderFieldList(
       onEditIndex(idx);
       onOpenEditModal(fields[idx]);
     },
-    onDelete: (idx) => {
+    onDelete: async (idx) => {
       const removed = fields[idx];
       const removedKey = removed.key;
+      const removedLabel = removed.label || removed.key || "Unnamed field";
       const removedType = removed.type;
+
+      const confirmed = await showConfirmModal(
+        `<div>Are you sure you want to delete this field?</div>
+     <div class="modal-message-highlight"><strong>${removedLabel}</strong></div>`,
+        {
+          okText: "Delete",
+          cancelText: "Cancel",
+          variant: "danger",
+          width: "auto",
+          height: "auto",
+        }
+      );
+
+      if (!confirmed) return;
 
       fields.splice(idx, 1);
 
-      // If it's a loopstart or loopstop, remove its partner
       if (["loopstart", "loopstop"].includes(removedType)) {
         const partnerType =
           removedType === "loopstart" ? "loopstop" : "loopstart";

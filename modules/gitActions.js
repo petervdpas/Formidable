@@ -123,10 +123,14 @@ export async function renderGitStatus(container) {
           // ─── Discard Button ──────────────────────────────────
           const discardBtn = createGitDiscardButton(rawData.value, async () => {
             const confirmed = await showConfirmModal(
-              `Discard changes in <code>${rawData.value}</code>?`,
+              `<div>Are you sure you want to discard changes in:</div>
+                <div class="modal-message-highlight"><code>${rawData.value}</code></div>`,
               {
                 okText: "Discard",
                 cancelText: "Cancel",
+                variant: "danger",
+                width: "auto",
+                height: "auto",
               }
             );
             if (!confirmed) return;
