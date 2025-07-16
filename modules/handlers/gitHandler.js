@@ -92,3 +92,16 @@ export async function handleGitCommit({ folderPath, message, callback }) {
     callback?.(null);
   }
 }
+
+export async function handleGitDiscard({ folderPath, filePath }) {
+  try {
+    const result = await window.api.git.gitDiscard({ folderPath, filePath });
+    return result; // ← this is key!
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      "[GitHandler] Failed to discard file changes:",
+      err,
+    ]);
+    return { success: false, error: err.message };
+  }
+}

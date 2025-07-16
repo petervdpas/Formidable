@@ -84,6 +84,14 @@ function resolvePath(...segments) {
     : path.resolve(getAppRoot(), joined);
 }
 
+function makeRelative(basePath, targetPath) {
+  return path.relative(basePath, targetPath);
+}
+
+function toPosixPath(p) {
+  return p.replace(/\\/g, "/");
+}
+
 function listFolders(dir, { silent = false, filter = null } = {}) {
   try {
     let folders = fs.readdirSync(dir).filter((f) =>
@@ -239,6 +247,8 @@ module.exports = {
   setAppRoot,
   getAppRoot,
   ensureDirectory,
+  makeRelative,
+  toPosixPath,
   buildFilePath,
   resolvePath,
   joinPath,

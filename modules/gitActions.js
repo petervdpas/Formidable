@@ -6,34 +6,11 @@ import {
   createGitCommitButton,
   createGitPushButton,
   createGitPullButton,
+  createGitDiscardButton, // make sure this is implemented
 } from "./uiButtons.js";
 import { createFormRowInput } from "../utils/elementBuilders.js";
+import { createListManager } from "../utils/listUtils.js";
 
-// ─── Git Line Formatter ─────────────────────────────────────
-function formatGitStatusLine(file) {
-  const symbol = `${file.index || " "}${file.working_dir || " "}`.trim();
-  console.log("formatGitStatusLine", file, "→", symbol);
-
-  const cssClass =
-    symbol === "A" || symbol === "A " || symbol === " A"
-      ? "added"
-      : symbol === "D" || symbol === "D " || symbol === " D"
-      ? "deleted"
-      : symbol === "M" || symbol === "M " || symbol === " M"
-      ? "modified"
-      : symbol === "R"
-      ? "renamed"
-      : symbol === "??"
-      ? "untracked"
-      : "unknown";
-
-  const line = document.createElement("div");
-  line.className = `git-change-line ${cssClass}`;
-  line.textContent = `${symbol.padEnd(2)} ${file.path}`;
-  return line;
-}
-
-// ─── Main Git Status Renderer ───────────────────────────────
 export async function renderGitStatus(container) {
   container.innerHTML = "Loading Git status...";
 
@@ -42,12 +19,12 @@ export async function renderGitStatus(container) {
   });
 
   const gitPath = config.git_root || ".";
-
   const refresh = () => renderGitStatus(container);
+  const gitFileListId = "git-file-list";
 
   EventBus.emit("git:status", {
     folderPath: gitPath,
-    callback: (status) => {
+    callback: async (status) => {
       if (!status) {
         container.innerHTML = `<p>⚠️ Failed to fetch Git status.</p>`;
         return;
@@ -71,19 +48,111 @@ export async function renderGitStatus(container) {
       `;
       container.appendChild(summary);
 
-      // ─── Changes Section (Colored) ───────────────────────
-      const changesWrapper = document.createElement("div");
-      changesWrapper.className = "git-plain-changes";
+      // ─── File List ───────────────────────────────────────
+      const listWrapper = document.createElement("div");
+      listWrapper.id = gitFileListId;
+      container.appendChild(listWrapper);
 
-      if (status.files.length) {
-        for (const file of status.files) {
-          changesWrapper.appendChild(formatGitStatusLine(file));
-        }
-      } else {
-        changesWrapper.textContent = "(No changes)";
-      }
+      const gitListManager = createListManager({
+        elementId: gitFileListId,
+        itemClass: "git-list-item",
+        emptyMessage: "No changes detected.",
+        fetchListFunction: async () => {
+          const result = await new Promise((resolve) =>
+            EventBus.emit("git:status", {
+              folderPath: gitPath,
+              callback: resolve,
+            })
+          );
+          return (
+            result?.files?.map((file) => ({
+              display: file.path,
+              value: file.path,
+              index: file.index,
+              working_dir: file.working_dir,
+            })) || []
+          );
+        },
+        renderItemExtra: async ({
+          subLabelNode,
+          flagNode,
+          itemNode,
+          rawData,
+        }) => {
+          const index = (rawData.index || "").trim();
+          const work = (rawData.working_dir || "").trim();
+          const symbol = `${index}${work}`.trim() || "??";
 
-      container.appendChild(changesWrapper);
+          // ─── Replace sublabel with inline prefix ─────────────
+          const labelEl = itemNode.querySelector(".list-item-label");
+          if (labelEl) {
+            labelEl.textContent = `${symbol}: ${
+              rawData.display || rawData.value
+            }`;
+          }
+
+          // Remove subLabelNode if it exists
+          if (subLabelNode?.parentNode) subLabelNode.remove();
+
+          // ─── Status Class for background color ───────────────
+          itemNode.classList.remove(
+            "added",
+            "modified",
+            "deleted",
+            "renamed",
+            "untracked",
+            "unknown"
+          );
+
+          const statusClass =
+            symbol === "A" || index === "A" || work === "A"
+              ? "added"
+              : symbol === "D" || index === "D" || work === "D"
+              ? "deleted"
+              : symbol === "M" || index === "M" || work === "M"
+              ? "modified"
+              : symbol === "R" || index === "R" || work === "R"
+              ? "renamed"
+              : symbol === "??" || index === "??" || work === "??"
+              ? "untracked"
+              : "unknown";
+
+          itemNode.classList.add(statusClass);
+
+          // ─── Discard Button ──────────────────────────────────
+          const discardBtn = createGitDiscardButton(rawData.value, async () => {
+            const confirmed = window.confirm(
+              `Discard changes in "${rawData.value}"?`
+            );
+            if (!confirmed) return;
+
+            const result = await EventBus.emitWithResponse("git:discard", {
+              folderPath: gitPath,
+              filePath: rawData.value,
+            });
+
+            if (result?.success) {
+              EventBus.emit("ui:toast", {
+                message: `Discarded changes in ${rawData.value}`,
+                variant: "info",
+              });
+              await gitListManager.loadList();
+            } else {
+              EventBus.emit("ui:toast", {
+                message: `Failed to discard ${rawData.value}`,
+                variant: "error",
+              });
+            }
+          });
+
+          flagNode.appendChild(discardBtn);
+        },
+        onItemClick: (filePath) => {
+          console.log("[GitStatus] Selected file:", filePath);
+        },
+      });
+
+      await gitListManager.loadList();
 
       // ─── Remotes Info ───────────────────────────────────
       const remoteBox = document.createElement("div");
@@ -132,7 +201,7 @@ export async function renderGitStatus(container) {
         },
       });
 
-      const inputField = inputRow.querySelector("input, textarea");
+      const inputField = inputRow.querySelector("textarea, input");
       inputField.addEventListener("input", () => {
         commitMessage = inputField.value.trim();
         commitBtn.disabled = !(hasChanges && commitMessage);
@@ -146,12 +215,11 @@ export async function renderGitStatus(container) {
           });
           return;
         }
+
         EventBus.emit("git:commit", {
           folderPath: gitPath,
           message: commitMessage,
           callback: (result) => {
-            console.log("[GitResult]", result);
-
             EventBus.emit("ui:toast", {
               message:
                 typeof result === "string"
@@ -170,8 +238,6 @@ export async function renderGitStatus(container) {
         EventBus.emit("git:push", {
           folderPath: gitPath,
           callback: (result) => {
-            console.log("[GitPushResult]", result);
-
             EventBus.emit("ui:toast", {
               message:
                 typeof result === "string"
@@ -190,8 +256,6 @@ export async function renderGitStatus(container) {
         EventBus.emit("git:pull", {
           folderPath: gitPath,
           callback: (result) => {
-            console.log("[GitPullResult]", result);
-
             EventBus.emit("ui:toast", {
               message:
                 typeof result === "string"

@@ -31,6 +31,7 @@ const api = {
     "git-pull",
     "git-push",
     "git-commit",
+    "git-discard",
   ]),
   config: buildGroup([
     "switch-user-profile",

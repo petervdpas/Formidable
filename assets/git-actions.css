@@ -1,19 +1,77 @@
-.git-plain-changes {
-  max-height: 140px;
+/* Git File List Container */
+#git-file-list {
+  max-height: 24vh;
   overflow-y: auto;
-  background: #f9f9f9;
-  border: 1px solid #ccc;
-  padding: 6px 10px;
-  font-family: monospace;
-  font-size: 13px;
-  line-height: 1.4;
-  white-space: pre;
-  margin: 4px 0 6px;
+  padding-right: 0.5em;
+  padding: .5em;
+  border-top: 1px solid var(--border-color, #ccc);
+  border-bottom: 1px solid var(--border-color, #ccc);
 }
 
-.git-plain-changes .git-change-line.added     { color: green; }
-.git-plain-changes .git-change-line.deleted   { color: red; }
-.git-plain-changes .git-change-line.modified  { color: goldenrod; }
-.git-plain-changes .git-change-line.renamed   { color: #b58900; }
-.git-plain-changes .git-change-line.untracked { color: gray; }
-.git-plain-changes .git-change-line.unknown   { color: darkgray; }
+/* Git File Item Layout */
+.git-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.6em 0.8em;
+  border-bottom: 1px solid var(--border-color, #ddd);
+  border-radius: 4px;
+  margin-bottom: 0.2em;
+  gap: .5em;
+  background-color: var(--input-background, #f9f9f9);
+  transition: background-color 0.2s ease;
+}
+
+.git-list-item:hover {
+  filter: brightness(0.97);
+}
+
+/* Left: Path + Git Symbol */
+.git-list-item .list-item-main {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.git-list-item .list-item-label {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-primary, #222);
+  margin-bottom: 0.2em;
+  word-break: break-word;
+}
+
+/* Right: Discard Button Area */
+.git-list-item .list-item-flag {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  margin-left: 0.5em;
+}
+
+/* Git status coloring: full background by class */
+.git-list-item.added {
+  background-color: #e0f9e0; /* light green */
+}
+
+.git-list-item.deleted {
+  background-color: #fce0e0; /* light red */
+}
+
+.git-list-item.modified {
+  background-color: #fff6db; /* light yellow */
+}
+
+.git-list-item.renamed {
+  background-color: #f5e5c0; /* amber */
+}
+
+.git-list-item.untracked {
+  background-color: #eeeeee; /* light gray */
+}
+
+.git-list-item.unknown {
+  background-color: #f9f9f9; /* fallback */
+}

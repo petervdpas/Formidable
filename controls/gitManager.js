@@ -125,6 +125,40 @@ async function gitCommit(folderPath, message = "Auto-commit by Formidable") {
   }
 }
 
+async function gitDiscardFile(folderPath, filePath) {
+  try {
+    const absRepoPath = fileManager.resolvePath(folderPath);
+    const absFilePath = fileManager.resolvePath(filePath);
+    const git = await getGitInstance(absRepoPath);
+
+    const root = await git.revparse(["--show-toplevel"]);
+    const relativePath = fileManager.toPosixPath(
+      fileManager.makeRelative(root, absFilePath)
+    );
+
+    const status = await git.status();
+    const isUntracked = status.not_added.includes(relativePath);
+
+    if (isUntracked) {
+      log(`[GitManager] Deleting untracked file: ${relativePath}`);
+      const full = fileManager.resolvePath(root, relativePath);
+      const deleted = fileManager.deleteFile(full, { silent: true });
+
+      if (!deleted) {
+        throw new Error(`Failed to delete untracked file: ${relativePath}`);
+      }
+    } else {
+      log(`[GitManager] Discarding changes for: ${relativePath}`);
+      await git.checkout(["--", relativePath]);
+    }
+
+    return { success: true, file: relativePath };
+  } catch (err) {
+    error("[GitManager] git discard failed:", err);
+    return { success: false, error: err.message };
+  }
+}
+
 module.exports = {
   isGitRepo,
   getGitRoot,
@@ -133,4 +167,5 @@ module.exports = {
   gitPull,
   gitPush,
   gitCommit,
+  gitDiscardFile,
 };

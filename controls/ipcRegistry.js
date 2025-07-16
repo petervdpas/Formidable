@@ -179,6 +179,9 @@ function registerIpcHandlers() {
   registerIpc("git-commit", (e, folder, msg) =>
     gitManager.gitCommit(folder, msg)
   );
+  registerIpc("git-discard", (e, { folderPath, filePath }) =>
+    gitManager.gitDiscardFile(folderPath, filePath)
+  );
 
   // Templates
   registerIpc("list-templates", () => templateManager.listTemplates());

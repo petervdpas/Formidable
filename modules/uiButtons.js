@@ -220,6 +220,17 @@ export function createGitPullButton(onClick, disabled = false) {
   });
 }
 
+export function createGitDiscardButton(filePath, onClick) {
+  return createButton({
+    text: "Discard",
+    className: "btn-warn btn-discard",
+    onClick,
+    attributes: {
+      title: `Discard changes in ${filePath}`,
+    },
+  });
+}
+
 export function createFlaggedToggleButton(initialFlagged, onClick) {
   const btn = createIconButton({
     iconClass: "fa fa-flag",

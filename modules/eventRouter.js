@@ -281,6 +281,7 @@ export function initEventRouter() {
   EventBus.off("git:pull", gitHandler.handleGitPull);
   EventBus.off("git:push", gitHandler.handleGitPush);
   EventBus.off("git:commit", gitHandler.handleGitCommit);
+  EventBus.off("git:discard", gitHandler.handleGitDiscard);
 
   EventBus.on("git:check", gitHandler.handleGitCheckRepo);
   EventBus.on("git:root", gitHandler.handleGitGetRoot);
@@ -289,6 +290,7 @@ export function initEventRouter() {
   EventBus.on("git:pull", gitHandler.handleGitPull);
   EventBus.on("git:push", gitHandler.handleGitPush);
   EventBus.on("git:commit", gitHandler.handleGitCommit);
+  EventBus.on("git:discard", gitHandler.handleGitDiscard);
 
   // Cache events
   EventBus.off("cache:init", cacheHandler.initCache);
