@@ -36,7 +36,7 @@ fields:
     description: This is just a title....
     sidebar_item: true
   - key: looper
-    label: Chapters - Start
+    label: Chapters
     type: loopstart
     description: Enter your chapters here...!
   - key: inloop_title
@@ -62,5 +62,5 @@ fields:
     label: Subloop
     type: loopstop
   - key: looper
-    label: Chapters - End
+    label: Chapters
     type: loopstop
