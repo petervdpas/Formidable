@@ -14,6 +14,16 @@
   margin-bottom: 8px;
 }
 
+/* ─── Loop Description Text ─────────────────────── */
+.loop-container .loop-description {
+  font-size: 0.9em;
+  font-weight: normal;
+  margin-top: -4px;
+  margin-bottom: 12px;
+  padding-left: 2px;
+  color: var(--loop-description-color, #888);
+}
+
 /* ─── Loop Item ────────────────────────────────── */
 .loop-container .loop-item {
   position: relative;
@@ -70,6 +80,11 @@
   margin-left: 2rem;
   background-color: var(--subloop-bg-secondary, #f0f7ff);
   border-color: var(--subloop-border-color, #b5d3f5);
+}
+
+/* ─── Nested Subloop Description ────────────────── */
+.sub-loop-container .loop-description {
+  color: var(--subloop-description-color, #666);
 }
 
 .sub-loop-container .loop-item {

@@ -31,7 +31,7 @@ export const fieldTypes = {
     metaOnly: true,
     cssClass: { main: "modal-looper" },
     disabledAttributes: [
-      "description",
+      //"description",
       "default",
       "options",
       "twoColumnRow",
@@ -46,7 +46,7 @@ export const fieldTypes = {
       main: "modal-loopstart",
     },
     disabledAttributes: [
-      "description",
+      //"description",
       "default",
       "options",
       "twoColumnRow",

@@ -67,6 +67,15 @@ export async function fieldGroupRenderer(
         textContent: field.label || "Unnamed Loop",
       });
 
+      if (field.description) {
+        addContainerElement({
+          parent: loopContainer,
+          tag: "div",
+          className: "loop-description",
+          textContent: field.description,
+        });
+      }
+
       const loopList = document.createElement("div");
       loopList.className = "loop-list";
 
@@ -212,10 +221,21 @@ async function createLoopItem(
       nestedContainer.dataset.loopKey = nestedKey;
       nestedContainer.dataset.loopDepth = nestedLoopKeyChain.length;
 
-      const label = document.createElement("div");
-      label.className = "loop-label";
-      label.textContent = field.label || "(Unnamed Loop)";
-      nestedContainer.appendChild(label);
+      addContainerElement({
+        parent: nestedContainer,
+        tag: "div",
+        className: "loop-label",
+        textContent: field.label || "(Unnamed Loop)",
+      });
+
+      if (field.description) {
+        addContainerElement({
+          parent: nestedContainer,
+          tag: "div",
+          className: "loop-description",
+          textContent: field.description,
+        });
+      }
 
       const nestedList = document.createElement("div");
       nestedList.className = "loop-list";

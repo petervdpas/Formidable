@@ -88,6 +88,7 @@
   --sortable-hover-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
 
   --loop-border-color: #ccc;
+  --loop-description-color: var(--text-description);
   --loop-bg: #fff;
   --loop-bg-secondary: #f9f9f9;
   --loop-add-bg: #28a745;
@@ -95,6 +96,7 @@
   --loop-add-fg: #fff;
 
   --subloop-bg-secondary: #f0f7ff;
+  --subloop-description-color: var(--text-description);
   --subloop-border-color: #b5d3f5;
   --subloop-bg: #ffffff;
   --subloop-add-bg: #007bff;
