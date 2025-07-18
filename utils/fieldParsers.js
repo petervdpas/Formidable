@@ -22,7 +22,9 @@ export const parseBooleanField = async function (wrapper) {
 
   const input = wrapper.querySelector(`input[type="checkbox"]`);
   if (!input) {
-    EventBus.emit("logging:warning", ["[parseBooleanField] Checkbox not found"]);
+    EventBus.emit("logging:warning", [
+      "[parseBooleanField] Checkbox not found",
+    ]);
     return false;
   }
 
@@ -65,7 +67,8 @@ export async function parseTextareaField(el, template) {
     }
 
     // fallback
-    const fallback = el?.tagName === "TEXTAREA" ? el : el?.querySelector?.("textarea");
+    const fallback =
+      el?.tagName === "TEXTAREA" ? el : el?.querySelector?.("textarea");
     return fallback?.value?.trim?.() || "";
   } catch (err) {
     EventBus.emit("logging:error", [`[parseTextareaField] ${err.message}`]);
@@ -157,9 +160,6 @@ export const parseImageField = async function (inputWrapper, template) {
 
 // Link
 export const parseLinkField = async function (wrapper, template, field) {
-
-  console.log(`[parseLinkField] wrapper.innerHTML =`, wrapper.innerHTML);
-  
   const key = field.key;
   const hidden = wrapper.querySelector(`input[type="hidden"][name="${key}"]`);
   if (!hidden) {
