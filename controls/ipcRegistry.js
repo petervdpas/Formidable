@@ -149,6 +149,7 @@ function registerIpcHandlers() {
     }
     return pluginManager.savePluginSettings(name, settings);
   });
+  registerIpc("get-plugin-ipc-map", () => pluginManager.getPluginIpcMap());
 
   registerIpc("proxy-fetch-remote", async (e, { url }) => {
     if (typeof url !== "string") {

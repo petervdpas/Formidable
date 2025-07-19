@@ -27,6 +27,7 @@ import * as linkHandler from "./handlers/linkHandler.js";
 import * as toastHandler from "./handlers/toastHandler.js";
 
 let routerInitialized = false;
+let autobindRegistered = false;
 
 export function initEventRouter() {
   if (routerInitialized) return;
@@ -89,6 +90,11 @@ export function initEventRouter() {
   EventBus.on("plugin:get-settings", pluginHandler.handleGetPluginSettings);
   EventBus.on("plugin:save-settings", pluginHandler.handleSavePluginSettings);
   EventBus.on("plugin:proxy-fetch", pluginHandler.handlePluginProxyFetch);
+
+  if (!autobindRegistered) {
+    EventBus.on("plugin:autobind", pluginHandler.autoBindPluginEvents);
+    autobindRegistered = true;
+  }
 
   // Help events
   EventBus.off("help:list", helpHandler.handleHelpList);

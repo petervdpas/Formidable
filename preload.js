@@ -1,6 +1,38 @@
 // preload.js
 
-const { contextBridge, ipcRenderer, dialog } = require("electron");
+const { contextBridge, ipcRenderer } = require("electron");
+
+// ---------- Helpers ----------
+function buildGroup(methods) {
+  const group = {};
+  for (const method of methods) {
+    const camel = camelCase(method);
+    group[camel] = (...args) => ipcRenderer.invoke(method, ...args);
+  }
+  return group;
+}
+
+function camelCase(str) {
+  return str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
+async function bindPluginIpcMethods() {
+  const pluginIpcMap = await ipcRenderer.invoke("get-plugin-ipc-map");
+  if (pluginIpcMap && typeof pluginIpcMap === "object") {
+    for (const [pluginName, methods] of Object.entries(pluginIpcMap)) {
+      api.plugin[pluginName] = {};
+      for (const method of methods) {
+        const route = `plugin:${pluginName}:${method}`;
+        api.plugin[pluginName][method] = (...args) =>
+          ipcRenderer.invoke(route, ...args);
+      }
+    }
+    console.log("[Plugin] IPC methods bound:", Object.keys(pluginIpcMap));
+  } else {
+    console.warn("[Plugin] No valid plugin IPC map found.");
+  }
+  return pluginIpcMap;
+}
 
 // ---------- IPC Method Groups ----------
 const api = {
@@ -21,6 +53,7 @@ const api = {
     "get-plugin-settings",
     "save-plugin-settings",
     "proxy-fetch-remote",
+    "get-plugin-ipc-map",
   ]),
   help: buildGroup(["list-help-topics", "get-help-topic"]),
   git: buildGroup([
@@ -66,13 +99,6 @@ const api = {
     "save-form",
     "save-image-file",
     "delete-form",
-  ]),
-  markdown: buildGroup([
-    "ensure-markdown-dir",
-    "list-markdowns",
-    "load-markdown",
-    "save-markdown",
-    "delete-markdown",
   ]),
   transform: buildGroup([
     "render-markdown-template",
@@ -133,23 +159,13 @@ const electronAPI = {
   },
 };
 
-// ---------- Expose to Renderer ----------
-contextBridge.exposeInMainWorld("api", api);
-contextBridge.exposeInMainWorld("electron", electronAPI);
-contextBridge.exposeInMainWorld("getAppInfo", () =>
-  ipcRenderer.invoke("get-app-info")
-);
+(async () => {
+  await bindPluginIpcMethods(); // do the actual initial bind
+  api.plugin.rebindPluginMethods = bindPluginIpcMethods; // expose for dynamic rebind
 
-// ---------- Helpers ----------
-function buildGroup(methods) {
-  const group = {};
-  for (const method of methods) {
-    const camel = camelCase(method);
-    group[camel] = (...args) => ipcRenderer.invoke(method, ...args);
-  }
-  return group;
-}
-
-function camelCase(str) {
-  return str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
-}
+  contextBridge.exposeInMainWorld("api", api);
+  contextBridge.exposeInMainWorld("electron", electronAPI);
+  contextBridge.exposeInMainWorld("getAppInfo", () =>
+    ipcRenderer.invoke("get-app-info")
+  );
+})();

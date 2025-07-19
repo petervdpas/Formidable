@@ -9,7 +9,8 @@ module.exports = {
     tags: [],
     enabled: true,
     run: null,
-    target: "backend", // ensure target is defaulted
+    target: "backend",
+    ipc: {},
   },
 
   sanitize(raw = {}, pluginName = "unnamed") {
@@ -23,13 +24,23 @@ module.exports = {
     if (!Array.isArray(plugin.tags)) plugin.tags = [];
     plugin.enabled = raw.enabled !== false;
 
-    // 🧠 Important fix:
-    // Allow frontend plugins to skip defining run()
+    // Validate IPC map
+    if (typeof plugin.ipc !== "object" || plugin.ipc === null) {
+      plugin.ipc = {};
+    }
+
+    for (const key of Object.keys(plugin.ipc)) {
+      if (typeof plugin.ipc[key] !== "string") {
+        throw new Error(`[plugin.schema] Invalid IPC handler for "${key}" in plugin "${plugin.name}"`);
+      }
+    }
+
+    // Require run() for backend plugins
     if (
       typeof plugin.run !== "function" &&
       plugin.target !== "frontend"
     ) {
-      throw new Error(`[plugin.schema] Plugin "${pluginName}" is missing a valid run() function`);
+      throw new Error(`[plugin.schema] Plugin "${plugin.name}" is missing a valid run() function`);
     }
 
     return plugin;

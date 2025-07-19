@@ -1,5 +1,6 @@
 // controls/pluginManager.js
 
+const { ipcMain } = require("electron");
 const https = require("https");
 const { log, error } = require("./nodeLogger");
 const fileManager = require("./fileManager");
@@ -53,7 +54,11 @@ function loadPlugins() {
 
       let run = null;
       if (fileManager.fileExists(pluginPath) && meta.target !== "frontend") {
-        delete require.cache[require.resolve(pluginPath)];
+        const resolved = require.resolve(pluginPath);
+        if (require.cache[resolved]) {
+          delete require.cache[resolved];
+          log(`[PluginManager] Cleared require cache for: ${pluginPath}`);
+        }
         const pluginExport = require(pluginPath);
         run =
           typeof pluginExport.run === "function"
@@ -67,6 +72,12 @@ function loadPlugins() {
         folder
       );
 
+      // Automatically register IPC handlers if declared in plugin.json
+      if (plugin.target !== "frontend" && typeof plugin.ipc === "object") {
+        const pluginModule = require(pluginPath);
+        registerDeclarativeIpc(plugin, pluginModule);
+      }
+
       pluginRepo[plugin.name] = plugin;
       log(
         `[PluginManager] Registered plugin: ${plugin.name} (${plugin.version})`
@@ -75,6 +86,36 @@ function loadPlugins() {
       error(`[PluginManager] Failed to load plugin "${folder}":`, err.message);
     }
   }
+}
+
+function registerDeclarativeIpc(plugin, pluginModule) {
+  for (const [key, fnName] of Object.entries(plugin.ipc || {})) {
+    const route = `plugin:${plugin.name}:${key}`;
+
+    // Always remove, no check
+    ipcMain.removeHandler(route);
+    log(`[PluginManager] Force-removed any existing handler: ${route}`);
+
+    const fn = pluginModule[fnName];
+    if (typeof fn === "function") {
+      ipcMain.handle(route, fn);
+      log(`[PluginManager] Registered IPC: ${route} -> ${fnName}()`);
+    } else {
+      error(
+        `[PluginManager] IPC handler "${fnName}" not found in "${plugin.name}"`
+      );
+    }
+  }
+}
+
+function getPluginIpcMap() {
+  const map = {};
+  for (const [name, plugin] of Object.entries(pluginRepo)) {
+    if (plugin?.target === "frontend") continue;
+    if (typeof plugin.ipc !== "object") continue;
+    map[name] = Object.keys(plugin.ipc);
+  }
+  return map;
 }
 
 function getPluginCode(name) {
@@ -262,10 +303,22 @@ export function run() {
 
 function getBackendBoilerplate(name) {
   return `// plugins/${name}/plugin.js
+
+// Example IPC handler function
+function echoHandler(event, args) {
+  console.log("[${name}] echoHandler called with:", args);
+  return { echoed: args };
+}
+
+// Main run function
 exports.run = function (context) {
   console.log("Hello from ${name}!");
   return { message: "Hello World", context };
-};`;
+};
+
+// Expose named handlers for declarative IPC registration
+exports.echoHandler = echoHandler;
+`;
 }
 
 function createPlugin(folderName, target = "frontend") {
@@ -290,6 +343,11 @@ function createPlugin(folderName, target = "frontend") {
     tags: [],
     enabled: true,
     target,
+    ...(target === "backend" && {
+      ipc: {
+        echo: "echoHandler",
+      },
+    }),
   };
 
   try {
@@ -374,9 +432,7 @@ function fetchRemoteContent(url) {
     try {
       const req = https.get(url, (res) => {
         if (res.statusCode !== 200) {
-          reject(
-            new Error(`Failed to fetch (${res.statusCode}): ${url}`)
-          );
+          reject(new Error(`Failed to fetch (${res.statusCode}): ${url}`));
           return;
         }
 
@@ -394,6 +450,7 @@ function fetchRemoteContent(url) {
 
 module.exports = {
   loadPlugins,
+  getPluginIpcMap,
   runPlugin,
   getPluginRoot,
   getPluginCode,

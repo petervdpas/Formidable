@@ -2,6 +2,84 @@
 
 import { EventBus } from "../eventBus.js";
 
+// ─────────────────────────────────────────────────────────────
+// Persistent plugin event registry (FIX: survives reloads)
+// ─────────────────────────────────────────────────────────────
+const boundPluginEvents =
+  window.__pluginRegistry_boundEvents ||
+  (window.__pluginRegistry_boundEvents = new Map());
+
+function clearPluginBindings() {
+  for (const [eventName, handler] of boundPluginEvents.entries()) {
+    EventBus.off(eventName, handler); // Proper unbinding
+  }
+  boundPluginEvents.clear();
+}
+
+// ─────────────────────────────────────────────────────────────
+// Plugin Handlers
+// ─────────────────────────────────────────────────────────────
+
+export async function autoBindPluginEvents(_, callback) {
+  try {
+    // Clear all previous plugin event bindings
+    clearPluginBindings();
+
+    if (typeof window.api.plugin.rebindPluginMethods !== "function") {
+      EventBus.emit("logging:warning", [
+        "[PluginHandler] rebindPluginMethods not available.",
+      ]);
+      callback?.(false);
+      return;
+    }
+
+    const pluginMap = await window.api.plugin.rebindPluginMethods();
+
+    for (const [pluginName, methods] of Object.entries(pluginMap || {})) {
+      for (const method of methods) {
+        const eventName = `plugin:${pluginName}:${method}`;
+
+        // Prevent duplicate binding
+        if (boundPluginEvents.has(eventName)) {
+          console.warn(
+            `[PluginHandler] Skipping already-bound event: ${eventName}`
+          );
+          continue;
+        }
+
+        const handler = async (args, cb) => {
+          try {
+            const result = await window.api.plugin[pluginName][method](args);
+            cb?.(result);
+          } catch (err) {
+            EventBus.emit("logging:error", [
+              `[PluginHandler] ${eventName} failed:`,
+              err,
+            ]);
+            cb?.({ error: err.message });
+          }
+        };
+
+        EventBus.on(eventName, handler);
+        boundPluginEvents.set(eventName, handler);
+      }
+    }
+
+    EventBus.emit("logging:default", [
+      "[PluginHandler] Auto-bound plugin events:",
+      pluginMap,
+    ]);
+
+    callback?.(true);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      "[PluginHandler] autoBindPluginEvents failed:",
+      err,
+    ]);
+    callback?.(false);
+  }
+}
+
 export async function handleGetPluginPath(_, callback) {
   try {
     const path = await window.api.plugin.getPluginsPath();
@@ -119,7 +197,7 @@ export async function handleGetPluginCode({ name }, callback) {
 export async function handleReloadPlugins(_, callback) {
   try {
     const list = await window.api.plugin.reloadPlugins();
-    console.log("Loaded plugin list:", list);
+    await EventBus.emit("plugin:autobind");
     callback?.(list);
   } catch (err) {
     EventBus.emit("logging:error", [
@@ -143,8 +221,13 @@ export async function handleUploadPlugin({ folder, js, meta }, callback) {
   }
 }
 
-export async function handleCreatePlugin({ folder, target = "frontend" }, callback) {
-  console.log(`[PluginHandler] Creating plugin: "${folder}" with target: "${target}"`);
+export async function handleCreatePlugin(
+  { folder, target = "frontend" },
+  callback
+) {
+  console.log(
+    `[PluginHandler] Creating plugin: "${folder}" with target: "${target}"`
+  );
 
   try {
     const result = await window.api.plugin.createPlugin({ folder, target });
@@ -200,7 +283,10 @@ export async function handleGetPluginSettings({ name }, callback) {
 
 export async function handleSavePluginSettings({ name, settings }, callback) {
   try {
-    const result = await window.api.plugin.savePluginSettings({ name, settings });
+    const result = await window.api.plugin.savePluginSettings({
+      name,
+      settings,
+    });
     callback?.(result);
   } catch (err) {
     EventBus.emit("logging:error", [
