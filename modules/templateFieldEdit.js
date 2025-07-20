@@ -42,6 +42,9 @@ function setupFieldEditor(container, onChange, allFields = []) {
   let optionsEditor = null;
 
   function initializeOptionsEditor(fieldType) {
+    if (optionsEditor?.destroy) {
+      optionsEditor.destroy();
+    }
     optionsEditor = setupOptionsEditor({
       type: fieldType,
       state,

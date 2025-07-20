@@ -120,5 +120,9 @@ function createOptionsEditor(container, onChange) {
     });
   }
 
-  return { setValues, getValues };
+  function destroy() {
+    wrapper.remove();
+  }
+
+  return { setValues, getValues, destroy };
 }
