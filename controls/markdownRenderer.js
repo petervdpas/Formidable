@@ -67,6 +67,28 @@ const defaultRenderers = {
   },
 };
 
+function buildNestedLoopGroups(fields) {
+  const groups = {};
+  const stack = [];
+
+  for (let i = 0; i < fields.length; i++) {
+    const field = fields[i];
+
+    if (field.type === "loopstart") {
+      stack.push({ key: field.key, fields: [] });
+    } else if (field.type === "loopstop") {
+      const completed = stack.pop();
+      if (completed) {
+        groups[completed.key] = completed.fields;
+      }
+    } else if (stack.length > 0) {
+      stack[stack.length - 1].fields.push(field);
+    }
+  }
+
+  return groups;
+}
+
 function registerHelpers(filePrefix = true) {
   Handlebars.registerHelper("json", (value) => {
     return new Handlebars.SafeString(JSON.stringify(value, null, 2));
