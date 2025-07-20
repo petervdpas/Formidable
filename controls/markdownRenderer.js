@@ -4,7 +4,9 @@ const Handlebars = require("handlebars");
 const configManager = require("./configManager");
 const { resolvePath } = require("./fileManager");
 const { log, error } = require("./nodeLogger");
-const { evaluateMath, computeStats } = require("./calculator.js");
+const { evaluateMath, compare, computeStats } = require("./calculator.js");
+
+const vars = Object.create(null);
 
 const defaultRenderers = {
   list: (value) => (value || []).map((v) => `- ${v}`).join("\n"),
@@ -97,13 +99,47 @@ function registerHelpers(filePrefix = true) {
     return `\n[LOG] ${JSON.stringify(value, null, 2)}\n`;
   });
 
-  Handlebars.registerHelper("eq", (a, b) => a === b);
+  ["eq", "ne", "lt", "lte", "gt", "gte"].forEach((name) => {
+    const opMap = {
+      eq: "===",
+      ne: "!==",
+      lt: "<",
+      lte: "<=",
+      gt: ">",
+      gte: ">=",
+    };
+    Handlebars.registerHelper(name, (a, b) => compare(a, opMap[name], b));
+  });
+
+  const mathOps = {
+    add: "+",
+    subtract: "-",
+    multiply: "*",
+    divide: "/",
+    mod: "%",
+    pad: "pad",
+    abs: "abs",
+    round: "round",
+    ceil: "ceil",
+    floor: "floor",
+  };
+
+  for (const [name, op] of Object.entries(mathOps)) {
+    Handlebars.registerHelper(name, (a, b) => evaluateMath(a, op, b));
+  }
 
   Handlebars.registerHelper("length", (arr) =>
     Array.isArray(arr) ? arr.length : 0
   );
 
-  Handlebars.registerHelper("subtract", (a, b) => a - b);
+  Handlebars.registerHelper("setVar", function (name, value, options) {
+    vars[name] = value;
+    return "";
+  });
+
+  Handlebars.registerHelper("getVar", function (name) {
+    return vars[name];
+  });
 
   Handlebars.registerHelper("isSelected", function (array, value, options) {
     console.log("[Renderer] isSelected called with:", { array, value });
@@ -246,10 +282,8 @@ function registerHelpers(filePrefix = true) {
       .join("\n");
   });
 
-  Handlebars.registerHelper("math", function (a, operator, b) {
-    return evaluateMath(a, operator, b);
-  });
-
+  Handlebars.registerHelper("math", (a, op, b) => evaluateMath(a, op, b));
+  Handlebars.registerHelper("compare", (a, op, b) => compare(a, op, b));
   Handlebars.registerHelper("stats", function (table, colIndex = 1, options) {
     if (!Array.isArray(table)) return "_no data_";
 

@@ -40,6 +40,20 @@ function evaluateMath(a, operator, b) {
   }
 }
 
+function compare(a, operator, b) {
+  switch (operator) {
+    case "==": return a == b;
+    case "===": return a === b;
+    case "!=": return a != b;
+    case "!==": return a !== b;
+    case "<": return a < b;
+    case "<=": return a <= b;
+    case ">": return a > b;
+    case ">=": return a >= b;
+    default: return false;
+  }
+}
+
 function computeStats(values = [], percentile = null) {
   const clean = values
     .map((v) => Number(v))
@@ -95,4 +109,4 @@ function computeStats(values = [], percentile = null) {
   };
 }
 
-module.exports = { evaluateMath, computeStats };
+module.exports = { evaluateMath, compare, computeStats };
