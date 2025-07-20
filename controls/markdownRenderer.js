@@ -215,12 +215,22 @@ function registerHelpers(filePrefix = true) {
 
     const groupFields = allLoopGroups?.[key] || [];
 
+    // Add synthetic index field for the loop
+    const syntheticField = {
+      key: `${key}_index`,
+      label: `${key} index`,
+      type: "number",
+      description: `Auto-generated index for loop "${key}"`,
+    };
+
+    const combinedFields = [...groupFields, syntheticField];
+
     return items
       .map((entry, index) => {
         const subContext = {
           ...entry,
-          loop_index: index + 1,
-          _fields: groupFields,
+          [`${key}_index`]: index + 1,
+          _fields: combinedFields,
           _template: template,
           _loopGroups: allLoopGroups,
         };
@@ -228,7 +238,7 @@ function registerHelpers(filePrefix = true) {
         return options.fn(subContext, {
           data: {
             ...options.data,
-            root: subContext, // 👈 override root context
+            root: subContext,
           },
         });
       })

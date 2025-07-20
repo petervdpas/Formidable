@@ -45,19 +45,30 @@ function renderFieldBlocks(fields, headingLevel = 2) {
       }
       i--; // correct overshoot
 
+      // Add synthetic index field for the loop
+      const indexField = {
+        key: `${loopKey}_index`,
+        label: `${loopKey} index`,
+        type: "number",
+        description: `Auto-generated index for loop "${loopKey}"`,
+      };
+      innerFields.unshift(indexField); // Before the actual fields
+
       const loopContent = renderFieldBlocks(innerFields, headingLevel + 1).join(
         "\n---\n\n"
       );
+
       result.push(
         `\n${"#".repeat(
           headingLevel
         )} Loop: ${loopKey}\n\n{{#loop "${loopKey}"}}\n${loopContent}\n{{/loop}}\n`
       );
+
+      seenKeys.add(`${loopKey}_index`);
     } else if (type !== "loopstop" && !seenKeys.has(key)) {
       result.push(generateSingleFieldBlock(field, headingLevel));
+      seenKeys.add(key);
     }
-
-    seenKeys.add(key);
   }
 
   return result;

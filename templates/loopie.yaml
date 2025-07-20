@@ -4,27 +4,85 @@ markdown_template: |-
   ---
   title: Auto-generated Report
   author: Formidable Generator
-  date: 2025-07-11
+  date: 2025-07-20
   toc: true
-  toc-title: Inhoudsopgave
+  toc-title: Contents
   toc-own-page: true
   ---
 
   ## Title
 
+  _{{fieldDescription "title"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "title")}}
+  ```
   {{field "title"}}
+  ---
+
 
   ## Loop: looper
 
   {{#loop "looper"}}
-  ### Loop Item: {{field "loop_index"}}
+  ### looper index
 
-  - Inloop Title: {{field "inloop_title"}}
-  - Inloop Description: {{field "inloop_description"}}
+  _{{fieldDescription "looper_index"}}_
 
-    {{#loop "subloop"}}
-    - Subloop Title: {{field "subloop_title"}}
-    {{/loop}}
+  ```sh
+  [LOG]
+  {{json (fieldRaw "looper_index")}}
+  ```
+  {{field "looper_index"}}
+  ---
+
+  ### Inloop Title
+
+  _{{fieldDescription "inloop_title"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "inloop_title")}}
+  ```
+  {{field "inloop_title"}}
+  ---
+
+  ### Inloop - Description
+
+  _{{fieldDescription "inloop_description"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "inloop_description")}}
+  ```
+  {{field "inloop_description"}}
+  ---
+
+
+  ### Loop: subloop
+
+  {{#loop "subloop"}}
+  #### subloop index
+
+  _{{fieldDescription "subloop_index"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "subloop_index")}}
+  ```
+  {{field "subloop_index"}}
+  ---
+
+  #### Sub loop
+
+  _{{fieldDescription "subloop_title"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "subloop_title")}}
+  ```
+  {{field "subloop_title"}}
+  {{/loop}}
 
   {{/loop}}
 sidebar_handling: ''
