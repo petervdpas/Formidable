@@ -4,6 +4,7 @@ const Handlebars = require("handlebars");
 const configManager = require("./configManager");
 const { resolvePath } = require("./fileManager");
 const { log, error } = require("./nodeLogger");
+const { evaluateMath, computeStats } = require("./calculator.js");
 
 const defaultRenderers = {
   list: (value) => (value || []).map((v) => `- ${v}`).join("\n"),
@@ -65,28 +66,6 @@ const defaultRenderers = {
     return filePrefix ? `file://${normalized}` : normalized;
   },
 };
-
-function buildNestedLoopGroups(fields) {
-  const groups = {};
-  const stack = [];
-
-  for (let i = 0; i < fields.length; i++) {
-    const field = fields[i];
-
-    if (field.type === "loopstart") {
-      stack.push({ key: field.key, fields: [] });
-    } else if (field.type === "loopstop") {
-      const completed = stack.pop();
-      if (completed) {
-        groups[completed.key] = completed.fields;
-      }
-    } else if (stack.length > 0) {
-      stack[stack.length - 1].fields.push(field);
-    }
-  }
-
-  return groups;
-}
 
 function registerHelpers(filePrefix = true) {
   Handlebars.registerHelper("json", (value) => {
@@ -243,6 +222,34 @@ function registerHelpers(filePrefix = true) {
         });
       })
       .join("\n");
+  });
+
+  Handlebars.registerHelper("math", function (a, operator, b) {
+    return evaluateMath(a, operator, b);
+  });
+
+  Handlebars.registerHelper("stats", function (table, colIndex = 1, options) {
+    if (!Array.isArray(table)) return "_no data_";
+
+    const values = table.map((row) => row?.[colIndex]);
+    const percentileArg = options?.hash?.percentile;
+    const stats = computeStats(values, percentileArg);
+
+    if (!stats) return "_no data_";
+
+    const parts = [
+      `min=${stats.min}`,
+      `max=${stats.max}`,
+      `avg=${stats.avg.toFixed(2)}`,
+      `median=${stats.median}`,
+      `stddev=${stats.stddev.toFixed(2)}`,
+    ];
+
+    if (stats.percentile != null && stats.percentileInput != null) {
+      parts.push(`p${stats.percentileInput}=${stats.percentile.toFixed(2)}`);
+    }
+
+    return parts.join(", ");
   });
 }
 

@@ -4,6 +4,12 @@
 
 ![Formidable](assets/formidable.png)
 
+> 💠 Dedicated to **Elly** — who lived with strength, humor and clarity.  
+> _"Sleep, don't weep."_ — Damien Rice  
+>
+> 🌌 And to **Aaron Swartz** — who refused to back down when it mattered.  
+> _"We are all made of stardust, and we are all made of stories."_ — Aaron Swartz
+
 ---
 
 ## ⚠️ Pre-release
