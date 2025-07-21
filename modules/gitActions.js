@@ -195,8 +195,7 @@ export async function renderGitStatus(container) {
       let commitMessage = "";
       const hasChanges = status.files.length > 0;
       const canPush = status.ahead > 0 && !hasChanges;
-      const canPull = Boolean(status.tracking);
-      //const canPull = status.behind > 0;
+      const canPull = Boolean(status.tracking); // status.behind > 0;
 
       const inputRow = createFormRowInput({
         id: "git-commit-message",
