@@ -1,8 +1,8 @@
 // controls/serverDataProvider.js
 
-const configManager = require('./configManager');
-const formManager = require('./formManager');
-const templateManager = require('./templateManager');
+const configManager = require("./configManager");
+const formManager = require("./formManager");
+const templateManager = require("./templateManager");
 const { renderMarkdown } = require("./markdownRenderer");
 const marked = require("marked");
 
@@ -28,6 +28,7 @@ async function loadFormFile(templateName, dataFile) {
 async function loadAndRenderForm(templateName, dataFile) {
   const templateYaml = await loadTemplateYaml(templateName);
   const fields = templateYaml?.fields || [];
+  const templateFolder = templateName.replace(/\.yaml$/i, ""); // ✅ moved here
 
   const formData = formManager.loadForm(templateName, dataFile, fields);
 
@@ -40,23 +41,58 @@ async function loadAndRenderForm(templateName, dataFile) {
     };
   }
 
-  // Generate Markdown from form
   let md = renderMarkdown(formData.data, templateYaml);
 
-  // Strip frontmatter if present (---\n ... \n---)
+  // Replace formidable:// links with internal wiki links
+  md = md.replace(
+    /(?<!\])\bformidable:\/\/([^\s:]+):([^\s)]+)/g,
+    (full, templateFile, dataFile) => {
+      const templateName = templateFile.replace(/\.yaml$/i, "");
+      const href = `/template/${encodeURIComponent(
+        templateName
+      )}/form/${encodeURIComponent(dataFile)}`;
+      return `[${full}](${href})`;
+    }
+  );
+
+  // Strip frontmatter if present
   md = md.replace(/^---[\s\S]*?---\n+/, "");
 
-  // Parse to HTML
+  // Patch file:// image paths in markdown
+  md = md.replace(
+    /!\[([^\]]*?)\]\(file:\/\/([^)]+?)\)/g,
+    (full, alt, filePath) => {
+      const parts = filePath.split(/[\\/]/);
+      const imgFile = parts[parts.length - 1];
+      return `![${alt}](/storage/${encodeURIComponent(
+        templateFolder
+      )}/images/${encodeURIComponent(imgFile)})`;
+    }
+  );
+
   let html = marked.parse(md);
 
-  // Fix image paths also in final HTML (patch any <img> src=)
-  const templateFolder = templateName.replace(/\.yaml$/i, "");
+  html = html.replace(
+    /<a\s+href="\/template\/[^"]+\/form\/[^"]+">([^<]+)<\/a>/gi,
+    (full, text) => {
+      return full.replace("<a ", '<a class="wiki-link" ');
+    }
+  );
 
-  html = html.replace(/<img\s+[^>]*src=["']file:\/\/([^"']+)["'][^>]*>/gi, (match, filePath) => {
-    const parts = filePath.split(/[\\/]/);
-    const imgFile = parts[parts.length - 1];
-    return match.replace(`file://${filePath}`, `/storage/${encodeURIComponent(templateFolder)}/images/${encodeURIComponent(imgFile)}`);
-  });
+  // Patch image tags in HTML (in case some slipped through)
+  html = html.replace(
+    /<img\s+[^>]*src=["']file:\/\/([^"']+)["'][^>]*>/gi,
+    (match, filePath) => {
+      const parts = filePath.split(/[\\/]/);
+      const imgFile = parts[parts.length - 1];
+      return match.replace(
+        `file://${filePath}`,
+        `/storage/${encodeURIComponent(
+          templateFolder
+        )}/images/${encodeURIComponent(imgFile)}`
+      );
+    }
+  );
 
   return {
     template: templateYaml,

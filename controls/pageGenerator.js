@@ -134,6 +134,21 @@ function compilePageTemplate() {
       color: #aaa;
       text-align: center;
     }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 1.5em auto;
+    }
+    a.wiki-link {
+      color: #6a2fb8;
+      font-weight: 600;
+      border-bottom: 1px dashed #aaa;
+    }
+    a.wiki-link:hover {
+      color: #4a90e2;
+      background: #f2f2ff;
+    }
   </style>
 </head>
 <body>

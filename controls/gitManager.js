@@ -51,6 +51,10 @@ async function gitStatus(folderPath) {
     const git = await getGitInstance(root);
     const status = await git.status();
 
+    log("[GitManager] Current branch:", status.current);
+    log("[GitManager] Tracking branch:", status.tracking);
+    log("[GitManager] Ahead/Behind:", status.ahead, status.behind);
+
     return {
       created: status.created,
       deleted: status.deleted,
