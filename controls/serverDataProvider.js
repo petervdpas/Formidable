@@ -45,13 +45,14 @@ async function loadAndRenderForm(templateName, dataFile) {
 
   // Replace formidable:// links with internal wiki links
   md = md.replace(
-    /(?<!\])\bformidable:\/\/([^\s:]+):([^\s)]+)/g,
-    (full, templateFile, dataFile) => {
+    /(^|[^!])\bformidable:\/\/([^\s:]+):([^\s)]+)/g,
+    (match, prefix, templateFile, dataFile) => {
       const templateName = templateFile.replace(/\.yaml$/i, "");
       const href = `/template/${encodeURIComponent(
         templateName
       )}/form/${encodeURIComponent(dataFile)}`;
-      return `[${full}](${href})`;
+      const full = `formidable://${templateFile}:${dataFile}`;
+      return `${prefix}[${full}](${href})`;
     }
   );
 
