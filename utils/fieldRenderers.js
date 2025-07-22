@@ -723,7 +723,87 @@ export async function renderImageField(field, value = "", template) {
     },
   });
 
-  const preview = addContainerElement({ parent: wrapper, tag: "img" });
+  const preview = addContainerElement({
+    parent: wrapper,
+    tag: "img",
+    attributes: {
+      style: "cursor: zoom-in; max-width: 200px; max-height: 200px;",
+      alt: "Image preview",
+    },
+  });
+
+  // Make image clickable to show large version
+  preview.addEventListener("click", () => {
+    const src = preview.src;
+    if (!src) return;
+
+    const overlay = document.createElement("div");
+    overlay.className = "image-modal-overlay";
+
+    const content = document.createElement("div");
+    content.className = "image-modal-content";
+
+    const img = document.createElement("img");
+    img.src = src;
+    img.className = "image-modal-full";
+
+    content.appendChild(img);
+    overlay.appendChild(content);
+    document.body.appendChild(overlay);
+
+    // Click outside the image to close
+    overlay.addEventListener("click", (e) => {
+      if (!content.contains(e.target)) {
+        overlay.remove();
+      }
+    });
+
+    // ESC to close
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") {
+        overlay.remove();
+        document.removeEventListener("keydown", onKeyDown);
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+
+    // ─────────────────────────────
+    // Grab-to-scroll logic
+    // ─────────────────────────────
+    let isDragging = false;
+    let startX, startY, scrollLeft, scrollTop;
+
+    overlay.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      startX = e.pageX - overlay.offsetLeft;
+      startY = e.pageY - overlay.offsetTop;
+      scrollLeft = overlay.scrollLeft;
+      scrollTop = overlay.scrollTop;
+      overlay.style.cursor = "grabbing";
+    });
+
+    overlay.addEventListener("mouseleave", () => {
+      isDragging = false;
+      overlay.style.cursor = "grab";
+    });
+
+    overlay.addEventListener("mouseup", () => {
+      isDragging = false;
+      overlay.style.cursor = "grab";
+    });
+
+    overlay.addEventListener("mousemove", (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const x = e.pageX - overlay.offsetLeft;
+      const y = e.pageY - overlay.offsetTop;
+      const walkX = x - startX;
+      const walkY = y - startY;
+      overlay.scrollLeft = scrollLeft - walkX;
+      overlay.scrollTop = scrollTop - walkY;
+    });
+  });
+
   const deleteBtn = createRemoveImageButton(
     () => clearImage(),
     `delete-${field.key}`
