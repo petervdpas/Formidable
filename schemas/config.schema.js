@@ -6,6 +6,7 @@ module.exports = {
     show_icon_buttons: false,
     font_size: 14,
     logging_enabled: false,
+    enable_plugins: false,
     context_mode: "template",
     context_folder: "./",
     selected_template: "basic.yaml",

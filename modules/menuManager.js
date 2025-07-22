@@ -69,30 +69,29 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   }
 
   // ─── Plugins Menu ────────────────────────────
-  const pluginItems = [
-    { label: "Plugin Manager...", action: "open-plugin-manager" },
-  ];
+  if (cachedConfig.enable_plugins) {
+    const pluginItems = [
+      { label: "Plugin Manager...", action: "open-plugin-manager" },
+    ];
 
-  const plugins = await EventBus.emitWithResponse("plugin:list", null);
-  pluginMap = new Map(plugins.map((p) => [p.name, p]));
+    const plugins = await EventBus.emitWithResponse("plugin:list", null);
+    pluginMap = new Map(plugins.map((p) => [p.name, p]));
 
-  if (plugins?.length) {
-    // Filter only enabled plugins
-    const enabledPlugins = plugins.filter((p) => p.enabled);
-
-    if (enabledPlugins.length) {
-      pluginItems.push("separator");
-
-      for (const plugin of enabledPlugins) {
-        pluginItems.push({
-          label: plugin.name,
-          action: `plugin:run:${plugin.name}`,
-        });
+    if (plugins?.length) {
+      const enabledPlugins = plugins.filter((p) => p.enabled);
+      if (enabledPlugins.length) {
+        pluginItems.push("separator");
+        for (const plugin of enabledPlugins) {
+          pluginItems.push({
+            label: plugin.name,
+            action: `plugin:run:${plugin.name}`,
+          });
+        }
       }
     }
-  }
 
-  menuBar.append(createMenuGroup("Plugins", pluginItems));
+    menuBar.append(createMenuGroup("Plugins", pluginItems));
+  }
 
   // ─── View, Help, Context Toggle ───────────────
   menuBar.append(

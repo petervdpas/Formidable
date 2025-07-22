@@ -8,6 +8,7 @@ import {
   createDirectoryPicker,
   createSwitch,
   createFormRowInput,
+  addContainerElement,
 } from "../utils/elementBuilders.js";
 
 let cachedConfig = null;
@@ -36,6 +37,7 @@ export async function renderSettings() {
   tabButtons.className = "tab-buttons";
   tabButtons.innerHTML = `
     <button class="tab-btn">General</button>
+    <button class="tab-btn">Display</button>
     <button class="tab-btn">Directories</button>
     <button class="tab-btn">Internal Server</button>
   `;
@@ -43,6 +45,14 @@ export async function renderSettings() {
   // ─── General Settings ─────────────────
   const tabGeneral = document.createElement("div");
   tabGeneral.className = "tab-panel tab-general";
+
+  addContainerElement({
+    parent: tabGeneral,
+    tag: "p",
+    className: "form-info-text",
+    textContent:
+      "Configure author details, plugin support, and logging behavior.",
+  });
 
   tabGeneral.appendChild(
     bindFormInput("author-name", "author_name", "Author Name")
@@ -54,23 +64,12 @@ export async function renderSettings() {
 
   tabGeneral.appendChild(
     createSwitch(
-      "theme-toggle",
-      "Dark Mode",
-      config.theme === "dark",
+      "plugin-toggle",
+      "Enable Plugins",
+      config.enable_plugins ?? false,
       null,
       "block",
-      ["On", "Off"]
-    )
-  );
-
-  tabGeneral.appendChild(
-    createSwitch(
-      "show-icons-toggle",
-      "Icon Buttons",
-      config.show_icon_buttons ?? true,
-      null,
-      "block",
-      ["On (Experimental)", "Off"]
+      ["Enabled", "Disabled"]
     )
   );
 
@@ -85,9 +84,51 @@ export async function renderSettings() {
     )
   );
 
+  // ─── Display Settings ─────────────────
+  const tabDisplay = document.createElement("div");
+  tabDisplay.className = "tab-panel tab-display";
+
+  addContainerElement({
+    parent: tabDisplay,
+    tag: "p",
+    className: "form-info-text",
+    textContent:
+      "Configure the display theme and toggle icon-based buttons.",
+  });
+
+  tabDisplay.appendChild(
+    createSwitch(
+      "theme-toggle",
+      "Display Theme",
+      config.theme === "dark",
+      null,
+      "block",
+      ["Dark", "Light"]
+    )
+  );
+
+  tabDisplay.appendChild(
+    createSwitch(
+      "show-icons-toggle",
+      "Icon Buttons",
+      config.show_icon_buttons ?? true,
+      null,
+      "block",
+      ["On (Experimental)", "Off"]
+    )
+  );
+
   // ─── Directories & Git ───────────────
   const tabDirs = document.createElement("div");
   tabDirs.className = "tab-panel tab-dirs";
+
+  addContainerElement({
+    parent: tabDirs,
+    tag: "p",
+    className: "form-info-text",
+    textContent:
+      "Configure the context folder and, if enabled, the Git root directory.",
+  });
 
   const contextFolderPicker = createDirectoryPicker({
     id: "settings-context-folder",
@@ -125,6 +166,14 @@ export async function renderSettings() {
   const tabServer = document.createElement("div");
   tabServer.className = "tab-panel tab-server";
 
+  addContainerElement({
+    parent: tabServer,
+    tag: "p",
+    className: "form-info-text",
+    textContent:
+      "Configure the built-in server and set the listening port.",
+  });
+
   tabServer.appendChild(
     createSwitch(
       "internal-server-toggle",
@@ -143,6 +192,7 @@ export async function renderSettings() {
   // Inject tabs and setup bindings
   container.appendChild(tabButtons);
   container.appendChild(tabGeneral);
+  container.appendChild(tabDisplay);
   container.appendChild(tabDirs);
   container.appendChild(tabServer);
 
@@ -164,6 +214,7 @@ function setupBindings(config, gitRootPicker) {
   bindToggleSwitch("logging-toggle", "logging_enabled", (enabled) =>
     EventBus.emit("logging:toggle", enabled)
   );
+  bindToggleSwitch("plugin-toggle", "enable_plugins");
   bindToggleSwitch("settings-use-git", "use_git", (enabled) => {
     gitRootPicker.input.disabled = !enabled;
     gitRootPicker.button.disabled = !enabled;
