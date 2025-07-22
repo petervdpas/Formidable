@@ -1,7 +1,7 @@
 ---
 id: "templates"
 title: "Templates"
-order: 2
+order: 4
 ---
 
 ## Formidable Templates
