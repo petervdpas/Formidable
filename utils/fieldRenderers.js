@@ -746,10 +746,21 @@ export async function renderImageField(field, value = "", template) {
     const img = document.createElement("img");
     img.src = src;
     img.className = "image-modal-full";
+    img.style.transform = "scale(1)";
+    img.style.transition = "transform 0.1s ease";
+    img.style.willChange = "transform";
 
     content.appendChild(img);
     overlay.appendChild(content);
     document.body.appendChild(overlay);
+
+    const help = document.createElement("div");
+    help.className = "image-modal-help";
+    help.innerHTML = `
+      <div><kbd>Ctrl</kbd> + <kbd>Scroll</kbd> to zoom</div>
+      <div><kbd>+</kbd> / <kbd>-</kbd> or <kbd>Esc</kbd> to close</div>
+    `;
+    overlay.appendChild(help);
 
     // Click outside the image to close
     overlay.addEventListener("click", (e) => {
@@ -779,17 +790,14 @@ export async function renderImageField(field, value = "", template) {
       startY = e.pageY - overlay.offsetTop;
       scrollLeft = overlay.scrollLeft;
       scrollTop = overlay.scrollTop;
-      overlay.style.cursor = "grabbing";
     });
 
     overlay.addEventListener("mouseleave", () => {
       isDragging = false;
-      overlay.style.cursor = "grab";
     });
 
     overlay.addEventListener("mouseup", () => {
       isDragging = false;
-      overlay.style.cursor = "grab";
     });
 
     overlay.addEventListener("mousemove", (e) => {
@@ -802,6 +810,48 @@ export async function renderImageField(field, value = "", template) {
       overlay.scrollLeft = scrollLeft - walkX;
       overlay.scrollTop = scrollTop - walkY;
     });
+
+    // ─────────────────────────────
+    // Zoom logic (+, -, Ctrl+wheel)
+    // ─────────────────────────────
+    let scale = 1;
+
+    function updateZoom() {
+      img.style.width = `${scale * 100}%`;
+      img.style.height = "auto";
+
+      if (scale === 1) {
+        overlay.classList.add("centered");
+      } else {
+        overlay.classList.remove("centered");
+      }
+    }
+
+    overlay.addEventListener("keydown", (e) => {
+      if (e.key === "+" || e.key === "=") {
+        scale = Math.min(scale + 0.1, 5);
+        updateZoom();
+      } else if (e.key === "-" || e.key === "_") {
+        scale = Math.max(scale - 0.1, 0.2);
+        updateZoom();
+      }
+    });
+
+    overlay.addEventListener(
+      "wheel",
+      (e) => {
+        if (!e.ctrlKey) return;
+        e.preventDefault();
+        scale += e.deltaY < 0 ? 0.1 : -0.1;
+        scale = Math.min(Math.max(scale, 0.2), 5);
+        updateZoom();
+      },
+      { passive: false }
+    );
+
+    // Auto-focus for keyboard zoom support
+    overlay.tabIndex = 0;
+    overlay.focus();
   });
 
   const deleteBtn = createRemoveImageButton(
