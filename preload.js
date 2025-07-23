@@ -36,6 +36,12 @@ async function bindPluginIpcMethods() {
 
 // ---------- IPC Method Groups ----------
 const api = {
+  encrypt: buildGroup([
+    "generate-encryption-key",
+    "encrypt-text",
+    "decrypt-text",
+    "encryption-available",
+  ]),
   internalServer: buildGroup([
     "start-internal-server",
     "stop-internal-server",

@@ -97,7 +97,9 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   menuBar.append(
     createMenuGroup("View", [
       { label: "Reload", action: "reload" },
-      { label: "Toggle DevTools", action: "devtools" },
+      ...(cachedConfig.development_enable
+        ? [{ label: "Toggle DevTools", action: "devtools" }]
+        : []),
     ]),
     createMenuGroup("Help", [
       { label: "Help Pages", action: "open-help" },

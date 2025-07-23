@@ -11,6 +11,7 @@ const { registerIpc } = require("./ipcRoutes");
 const { SingleFileRepository } = require("./sfr");
 const { exec } = require("child_process");
 
+const encryption = require("./encryption");
 const internalServer = require("./internalServer");
 const pluginManager = require("./pluginManager");
 const helpManager = require("./helpManager");
@@ -72,6 +73,12 @@ function registerIpcHandlers() {
       version: packageJson.version,
     };
   });
+
+  // Encryption
+  registerIpc("generate-encryption-key", () => encryption.generateKey());
+  registerIpc("encrypt-text", (e, text) => encryption.encrypt(text));
+  registerIpc("decrypt-text", (e, enc) => encryption.decrypt(enc));
+  registerIpc("encryption-available", () => encryption.encryptionAvailable());
 
   // Internal Server
   registerIpc("start-internal-server", (e, port) =>

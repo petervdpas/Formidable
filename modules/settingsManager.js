@@ -10,6 +10,7 @@ import {
   createFormRowInput,
   addContainerElement,
 } from "../utils/elementBuilders.js";
+import { createButton } from "../utils/buttonUtils.js";
 
 let cachedConfig = null;
 
@@ -40,6 +41,7 @@ export async function renderSettings() {
     <button class="tab-btn">Display</button>
     <button class="tab-btn">Directories</button>
     <button class="tab-btn">Internal Server</button>
+    <button class="tab-btn">Advanced</button>
   `;
 
   // ─── General Settings ─────────────────
@@ -51,7 +53,7 @@ export async function renderSettings() {
     tag: "p",
     className: "form-info-text",
     textContent:
-      "Configure author details, plugin support, and logging behavior.",
+      "Configure author details and your secret key. The secret key is used to encrypt/decrypt sensitive data.",
   });
 
   tabGeneral.appendChild(
@@ -62,28 +64,6 @@ export async function renderSettings() {
     bindFormInput("author-email", "author_email", "Author Email")
   );
 
-  tabGeneral.appendChild(
-    createSwitch(
-      "plugin-toggle",
-      "Enable Plugins",
-      config.enable_plugins ?? false,
-      null,
-      "block",
-      ["Enabled", "Disabled"]
-    )
-  );
-
-  tabGeneral.appendChild(
-    createSwitch(
-      "logging-toggle",
-      "Enable Logging",
-      config.logging_enabled,
-      null,
-      "block",
-      ["On", "Off"]
-    )
-  );
-
   // ─── Display Settings ─────────────────
   const tabDisplay = document.createElement("div");
   tabDisplay.className = "tab-panel tab-display";
@@ -92,8 +72,7 @@ export async function renderSettings() {
     parent: tabDisplay,
     tag: "p",
     className: "form-info-text",
-    textContent:
-      "Configure the display theme and toggle icon-based buttons.",
+    textContent: "Configure the display theme and toggle icon-based buttons.",
   });
 
   tabDisplay.appendChild(
@@ -170,8 +149,7 @@ export async function renderSettings() {
     parent: tabServer,
     tag: "p",
     className: "form-info-text",
-    textContent:
-      "Configure the built-in server and set the listening port.",
+    textContent: "Configure the built-in server and set the listening port.",
   });
 
   tabServer.appendChild(
@@ -189,12 +167,73 @@ export async function renderSettings() {
     bindFormInput("internal-server-port", "internal_server_port", "Server Port")
   );
 
+  // ─── Advanced Settings ──────────────────────
+  const tabAdvanced = document.createElement("div");
+  tabAdvanced.className = "tab-panel tab-advanced";
+
+  addContainerElement({
+    parent: tabAdvanced,
+    tag: "p",
+    className: "form-info-text",
+    textContent:
+      "Advanced system options. Use with caution.",
+  });
+
+  tabAdvanced.appendChild(
+    createSwitch(
+      "plugin-toggle",
+      "Enable Plugins",
+      config.enable_plugins ?? false,
+      null,
+      "block",
+      ["Enabled", "Disabled"]
+    )
+  );
+
+  tabAdvanced.appendChild(
+    createFormRowInput({
+      id: "encryption-key",
+      label: "Secret Decryption Key",
+      type: "password",
+      value: config.encryption_key,
+      configKey: "encryption_key",
+      onSave: async (val) => {
+        await EventBus.emit("config:update", { encryption_key: val });
+        cachedConfig = await reloadConfig();
+        EventBus.emit("status:update", "Secret key updated");
+      },
+    })
+  );
+
+  tabAdvanced.appendChild(
+    createSwitch(
+      "settings-development-toggle",
+      "Development Mode",
+      config.development_enable ?? false,
+      null,
+      "block",
+      ["Enabled", "Disabled"]
+    )
+  );
+
+  tabAdvanced.appendChild(
+    createSwitch(
+      "logging-toggle",
+      "Enable Logging",
+      config.logging_enabled,
+      null,
+      "block",
+      ["On", "Off"]
+    )
+  );
+
   // Inject tabs and setup bindings
   container.appendChild(tabButtons);
   container.appendChild(tabGeneral);
   container.appendChild(tabDisplay);
   container.appendChild(tabDirs);
   container.appendChild(tabServer);
+  container.appendChild(tabAdvanced);
 
   initTabs("#settings-body", ".tab-btn", ".tab-panel", {
     activeClass: "active",
@@ -209,12 +248,15 @@ export async function renderSettings() {
 
 function setupBindings(config, gitRootPicker) {
   bindThemeSwitch("theme-toggle", "theme");
-
   bindToggleSwitch("show-icons-toggle", "show_icon_buttons");
+
+  bindToggleSwitch("plugin-toggle", "enable_plugins");
+  bindToggleSwitch("settings-development-toggle", "development_enable");
   bindToggleSwitch("logging-toggle", "logging_enabled", (enabled) =>
     EventBus.emit("logging:toggle", enabled)
   );
-  bindToggleSwitch("plugin-toggle", "enable_plugins");
+
+  bindDirButton("settings-context-folder", "context_folder");
   bindToggleSwitch("settings-use-git", "use_git", (enabled) => {
     gitRootPicker.input.disabled = !enabled;
     gitRootPicker.button.disabled = !enabled;
@@ -224,11 +266,9 @@ function setupBindings(config, gitRootPicker) {
       EventBus.emit("config:update", { git_root: "" });
     }
   });
+  bindDirButton("settings-git-root", "git_root");
 
   bindToggleSwitch("internal-server-toggle", "enable_internal_server");
-
-  bindDirButton("settings-context-folder", "context_folder");
-  bindDirButton("settings-git-root", "git_root");
 }
 
 async function reloadConfig() {

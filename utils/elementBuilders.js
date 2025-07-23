@@ -81,6 +81,7 @@ export function createFormRowInput({
   configKey = id,
   onSave = null,
   multiline = false,
+  append = null,
 }) {
   const row = document.createElement("div");
   row.className = "modal-form-row";
@@ -108,6 +109,12 @@ export function createFormRowInput({
 
   row.appendChild(labelEl);
   row.appendChild(input);
+
+  if (append instanceof HTMLElement) {
+    append.classList.add("inline-after-input");
+    row.appendChild(append);
+  }
+
   return row;
 }
 
