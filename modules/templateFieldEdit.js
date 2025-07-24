@@ -41,10 +41,14 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
   let optionsEditor = null;
 
-  function initializeOptionsEditor(fieldType) {
+  function initializeOptionsEditor(fieldType, fieldOptions = null) {
     if (optionsEditor?.destroy) {
       optionsEditor.destroy();
     }
+
+    dom.options.value = "";
+    state.options = undefined;
+
     optionsEditor = setupOptionsEditor({
       type: fieldType,
       state,
@@ -52,6 +56,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
         options: dom.options,
         containerRow: dom.options?.closest(".modal-form-row"),
       },
+      initialOptions: fieldOptions,
     });
   }
 
@@ -145,7 +150,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
         dom.label.value = isGuidType ? "GUID" : state.label || "";
 
-        initializeOptionsEditor(currentType);
+        initializeOptionsEditor(currentType, []);
 
         applyFieldAttributeDisabling(
           {
@@ -173,11 +178,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
       field.type
     );
 
-    initializeOptionsEditor(field.type);
-
-    if (optionsEditor && field.options) {
-      optionsEditor.setValues(field.options);
-    }
+    initializeOptionsEditor(field.type, field.options);
 
     const modal = container.closest(".modal");
     applyModalTypeClass(modal, field.type || "text", fieldTypes, "main");

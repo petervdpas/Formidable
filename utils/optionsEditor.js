@@ -1,22 +1,13 @@
 // utils/optionsEditor.js
 
-export function setupOptionsEditor({ type = "text", state, dom }) {
+export function setupOptionsEditor({ type = "text", state, dom, initialOptions }) {
   const optionTypes = [
-    "boolean",
-    "dropdown",
-    "multioption",
-    "radio",
-    "range",
-    "list",
-    "table",
+    "boolean", "dropdown", "multioption", "radio", "range", "list", "table",
   ];
   const { options, containerRow } = dom || {};
   if (!options || !containerRow) return null;
 
-  // Always hide raw <textarea> or JSON field
   options.style.display = "none";
-
-  // Clean previous editors/messages
   containerRow.querySelector(".options-editor")?.remove();
   containerRow.querySelector(".options-message")?.remove();
 
@@ -33,8 +24,11 @@ export function setupOptionsEditor({ type = "text", state, dom }) {
     state.options = newOptions;
   });
 
-  if (state.options) {
-    editor.setValues(state.options);
+  // 🔥 Gebruik de expliciet doorgegeven initialOptions, niet state.options
+  if (Array.isArray(initialOptions) && initialOptions.some((o) => o?.value)) {
+    editor.setValues(initialOptions);
+    state.options = initialOptions;
+    options.value = JSON.stringify(initialOptions, null, 2);
   }
 
   return editor;
