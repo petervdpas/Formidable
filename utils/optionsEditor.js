@@ -1,9 +1,19 @@
 // utils/optionsEditor.js
 
-export function setupOptionsEditor({ type = "text", state, dom, initialOptions }) {
-  const optionTypes = [
-    "boolean", "dropdown", "multioption", "radio", "range", "list", "table",
+export function getSupportedOptionTypes() {
+  return [
+    "boolean",
+    "dropdown",
+    "multioption",
+    "radio",
+    "range",
+    "list",
+    "table",
   ];
+}
+
+export function setupOptionsEditor({ type = "text", dom, initialOptions }) {
+  const optionTypes = getSupportedOptionTypes();
   const { options, containerRow } = dom || {};
   if (!options || !containerRow) return null;
 
@@ -21,13 +31,10 @@ export function setupOptionsEditor({ type = "text", state, dom, initialOptions }
 
   const editor = createOptionsEditor(containerRow, (newOptions) => {
     options.value = JSON.stringify(newOptions, null, 2);
-    state.options = newOptions;
   });
 
-  // 🔥 Gebruik de expliciet doorgegeven initialOptions, niet state.options
   if (Array.isArray(initialOptions) && initialOptions.some((o) => o?.value)) {
     editor.setValues(initialOptions);
-    state.options = initialOptions;
     options.value = JSON.stringify(initialOptions, null, 2);
   }
 

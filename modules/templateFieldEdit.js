@@ -15,10 +15,12 @@ import {
   // createReorderUpButton,
   // createReorderDownButton,
 } from "./uiButtons.js";
-import { setupOptionsEditor } from "../utils/optionsEditor.js";
+import {
+  getSupportedOptionTypes,
+  setupOptionsEditor,
+} from "../utils/optionsEditor.js";
 
 function setupFieldEditor(container, onChange, allFields = []) {
-  const state = {};
   const dom = {
     key: container.querySelector("#edit-key"),
     primaryKey: container.querySelector("#edit-primary-key"),
@@ -38,20 +40,16 @@ function setupFieldEditor(container, onChange, allFields = []) {
   };
 
   let labelLocked = false;
-
   let optionsEditor = null;
+  let originalKey = "";
+  let confirmBtn = null;
 
   function initializeOptionsEditor(fieldType, fieldOptions = null) {
-    if (optionsEditor?.destroy) {
-      optionsEditor.destroy();
-    }
+    if (optionsEditor?.destroy) optionsEditor.destroy();
 
     dom.options.value = "";
-    state.options = undefined;
-
     optionsEditor = setupOptionsEditor({
       type: fieldType,
-      state,
       dom: {
         options: dom.options,
         containerRow: dom.options?.closest(".modal-form-row"),
@@ -60,41 +58,27 @@ function setupFieldEditor(container, onChange, allFields = []) {
     });
   }
 
-  let originalKey = "";
-  let confirmBtn = null;
-
   function setField(field) {
-    Object.assign(state, field);
     originalKey = field.key?.trim();
 
     dom.key.classList.remove("input-error");
     confirmBtn = document.getElementById("btn-field-edit-confirm");
-    if (confirmBtn) {
-      confirmBtn.disabled = false;
-    }
+    if (confirmBtn) confirmBtn.disabled = false;
 
     const isGuid = field.type === "guid";
-
     dom.key.value = isGuid ? "id" : field.key || "";
     dom.key.disabled = isGuid;
 
-    if (dom.primaryKey) {
-      dom.primaryKey.value = isGuid ? "true" : "false";
-    }
-
+    if (dom.primaryKey) dom.primaryKey.value = isGuid ? "true" : "false";
     dom.label.value = isGuid ? "GUID" : field.label || "";
-
     dom.description.value = field.description || "";
     dom.twoColumn.checked = !!field.two_column;
     dom.sidebarItem.checked = !!field.sidebar_item;
     dom.default.value = field.default ?? "";
 
     labelLocked = field.label?.trim().length > 0 && field.label !== field.key;
-
-    // ── Crucial Reset Before Attach ──
     dom.key.__listenersAttached = false;
 
-    // ── Key input listeners ──
     if (!dom.key.__listenersAttached) {
       dom.key.__listenersAttached = true;
 
@@ -120,18 +104,12 @@ function setupFieldEditor(container, onChange, allFields = []) {
       });
     }
 
-    // ── Type change ──
     if (dom.type) {
-      // Empty and refill without loopstart/loopstop
       dom.type.innerHTML = "";
 
       for (const [typeKey, typeDef] of Object.entries(fieldTypes)) {
         const isLoop = typeKey === "loopstart" || typeKey === "loopstop";
-
-        // Alleen overslaan als het NIET de huidige type is
-        if (isLoop && typeKey !== field.type) {
-          continue;
-        }
+        if (isLoop && typeKey !== field.type) continue;
 
         const option = document.createElement("option");
         option.value = typeKey;
@@ -145,22 +123,12 @@ function setupFieldEditor(container, onChange, allFields = []) {
         const currentType = dom.type.value;
         const isGuidType = currentType === "guid";
 
-        dom.key.value = isGuidType ? "id" : state.key || "";
+        dom.key.value = isGuidType ? "id" : field.key || "";
         dom.key.disabled = isGuidType;
-
-        dom.label.value = isGuidType ? "GUID" : state.label || "";
+        dom.label.value = isGuidType ? "GUID" : field.label || "";
 
         initializeOptionsEditor(currentType, []);
-
-        applyFieldAttributeDisabling(
-          {
-            ...dom,
-            twoColumnRow: dom.twoColumnRow,
-            sidebarItemRow: dom.sidebarItemRow,
-          },
-          currentType
-        );
-
+        applyFieldAttributeDisabling(dom, currentType);
         validate();
       };
     }
@@ -169,23 +137,14 @@ function setupFieldEditor(container, onChange, allFields = []) {
       dom.options.value = field.options ? JSON.stringify(field.options) : "";
     }
 
-    applyFieldAttributeDisabling(
-      {
-        ...dom,
-        twoColumnRow: dom.twoColumnRow,
-        sidebarItemRow: dom.sidebarItemRow,
-      },
-      field.type
-    );
-
+    applyFieldAttributeDisabling(dom, field.type);
     initializeOptionsEditor(field.type, field.options);
 
     const modal = container.closest(".modal");
     applyModalTypeClass(modal, field.type || "text", fieldTypes, "main");
 
-    onChange?.(structuredClone(state));
-
-    validate(); // IMPORTANT: validate after setting all values!
+    onChange?.(structuredClone(field));
+    validate();
   }
 
   function validate() {
@@ -193,20 +152,25 @@ function setupFieldEditor(container, onChange, allFields = []) {
     field._originalKey = originalKey;
 
     const result = validateField(field, allFields);
-
     dom.key.classList.toggle("input-error", !result.valid);
-
-    if (confirmBtn) {
-      confirmBtn.disabled = !result.valid;
-    }
+    if (confirmBtn) confirmBtn.disabled = !result.valid;
   }
 
   function getField() {
-    const options =
-      optionsEditor?.getValues() ||
-      (dom.options.value ? JSON.parse(dom.options.value) : undefined);
+    const type = dom.type?.value || "text";
+    const isGuid = type === "guid";
 
-    const isGuid = dom.type?.value === "guid";
+    const supportsOptions = getSupportedOptionTypes();
+
+    let options = [];
+    if (supportsOptions.includes(type)) {
+      try {
+        options =
+          optionsEditor?.getValues() || JSON.parse(dom.options.value || "[]");
+      } catch {
+        options = [];
+      }
+    }
 
     const field = {
       key: isGuid ? "id" : dom.key.value.trim(),
@@ -216,15 +180,10 @@ function setupFieldEditor(container, onChange, allFields = []) {
       sidebar_item: dom.sidebarItem.checked,
       default: dom.default.value,
       options,
-      type: dom.type?.value || "text",
+      type,
     };
 
-    if (isGuid) {
-      field.primary_key = true;
-    } else {
-      delete field.primary_key;
-    }
-
+    if (isGuid) field.primary_key = true;
     return field;
   }
 
@@ -336,33 +295,30 @@ let cachedFieldEditSetup = null;
 export function showFieldEditorModal(field, allFields = [], onConfirm) {
   let editor;
 
-  if (!cachedFieldEditSetup) {
-    cachedFieldEditSetup = setupFieldEditModal(() => {
-      const confirmedField = editor.getField();
+  const { modal } = setupFieldEditModal(() => {
+    const confirmedField = editor.getField();
 
-      if (confirmedField.type === "looper") {
-        const loopKey = confirmedField.key;
-        const loopLabel = confirmedField.label || loopKey;
+    if (confirmedField.type === "looper") {
+      const loopKey = confirmedField.key;
+      const loopLabel = confirmedField.label || loopKey;
 
-        const loopStart = {
-          key: loopKey,
-          label: loopLabel,
-          type: "loopstart",
-        };
+      const loopStart = {
+        key: loopKey,
+        label: loopLabel,
+        type: "loopstart",
+      };
 
-        const loopStop = {
-          key: loopKey,
-          label: loopLabel,
-          type: "loopstop",
-        };
+      const loopStop = {
+        key: loopKey,
+        label: loopLabel,
+        type: "loopstop",
+      };
 
-        onConfirm?.([loopStart, loopStop]);
-      } else {
-        onConfirm?.(confirmedField);
-      }
-    });
-    cachedFieldEditModal = cachedFieldEditSetup.modal;
-  }
+      onConfirm?.([loopStart, loopStop]);
+    } else {
+      onConfirm?.(confirmedField);
+    }
+  });
 
   const container = document.querySelector("#field-edit-modal .modal-body");
   if (!container) {
@@ -372,7 +328,7 @@ export function showFieldEditorModal(field, allFields = [], onConfirm) {
 
   editor = setupFieldEditor(container, null, allFields);
   editor.setField(field);
-  cachedFieldEditModal.show();
+  modal.show();
 }
 
 export function renderFieldList(
