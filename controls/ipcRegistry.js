@@ -232,6 +232,11 @@ function registerIpcHandlers() {
   registerIpc("save-image-file", async (e, storageLocation, fileName, buffer) =>
     fileManager.saveImageFile(storageLocation, fileName, buffer)
   );
+  registerIpc("copy-folder", (e, { from, to, overwrite }) => {
+    return {
+      success: fileManager.copyFolderRecursive(from, to, overwrite),
+    };
+  });
 
   // Config
   registerIpc("switch-user-profile", (e, profileFilename) =>

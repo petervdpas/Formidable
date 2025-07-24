@@ -51,6 +51,39 @@ function ensureDirectory(dirPath, { label = null, silent = false, throwOnError =
   }
 }
 
+function copyFolderRecursive(from, to, overwrite = true, { silent = false } = {}) {
+  const src = resolvePath(from);
+  const dest = resolvePath(to);
+
+  try {
+    const entries = fs.readdirSync(src, { withFileTypes: true });
+
+    ensureDirectory(dest, { silent });
+
+    for (const entry of entries) {
+      const srcPath = path.join(src, entry.name);
+      const destPath = path.join(dest, entry.name);
+
+      if (entry.isDirectory()) {
+        copyFolderRecursive(srcPath, destPath, overwrite, { silent });
+      } else {
+        if (!overwrite && fs.existsSync(destPath)) {
+          if (!silent) warn(`[FileManager] Skipped existing file: ${destPath}`);
+          continue;
+        }
+
+        fs.copyFileSync(srcPath, destPath);
+        if (!silent) log(`[FileManager] Copied: ${srcPath} → ${destPath}`);
+      }
+    }
+
+    return true;
+  } catch (err) {
+    error(`[FileManager] Failed to copy folder ${src} to ${dest}:`, err);
+    return false;
+  }
+}
+
 // Build a file path safely, with optional enforced extension
 function buildFilePath(directory, baseFilename, { extension = "" } = {}) {
   const ext = extension
@@ -249,6 +282,7 @@ module.exports = {
   ensureDirectory,
   makeRelative,
   toPosixPath,
+  copyFolderRecursive,
   buildFilePath,
   resolvePath,
   joinPath,

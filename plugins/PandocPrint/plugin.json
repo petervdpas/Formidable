@@ -1,8 +1,8 @@
 {
   "name": "PandocPrint",
   "version": "1.0.0",
-  "description": "A new plugin",
-  "author": "Unknown",
+  "description": "Convert Formidable entries—or any valid Markdown file with proper frontmatter—into a styled PDF using Pandoc and LaTeX.",
+  "author": "Peter van de Pas",
   "tags": [],
   "enabled": true,
   "target": "frontend"

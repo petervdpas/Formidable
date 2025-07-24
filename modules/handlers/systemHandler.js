@@ -67,6 +67,19 @@ export async function handleDeleteFile({ filepath, opts = {} }) {
   }
 }
 
+export async function handleCopyFolder({ from, to, overwrite = true }) {
+  try {
+    const result = await window.api.system.copyFolder({ from, to, overwrite });
+    return result;
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[SystemHandler] copyFolder failed from "${from}" to "${to}":`,
+      err,
+    ]);
+    return { success: false, error: err.message };
+  }
+}
+
 export async function handleFileExists({ path }) {
   try {
     const exists = await window.api.system.fileExists(path);

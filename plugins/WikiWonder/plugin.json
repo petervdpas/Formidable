@@ -1,0 +1,9 @@
+{
+  "name": "WikiWonder",
+  "version": "1.0.0",
+  "description": "A plugin for enhancing wiki functionality",
+  "author": "Peter van de Pas",
+  "tags": [],
+  "enabled": true,
+  "target": "frontend"
+}

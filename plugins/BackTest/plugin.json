@@ -1,8 +1,8 @@
 {
   "name": "BackTest",
   "version": "1.0.0",
-  "description": "A new plugin",
-  "author": "Unknown",
+  "description": "A plugin for testing creating backend api on the fly",
+  "author": "Peter van de Pas",
   "tags": [],
   "enabled": true,
   "target": "backend",

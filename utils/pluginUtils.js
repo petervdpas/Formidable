@@ -127,6 +127,25 @@ export async function deleteFile(filepath, opts = {}) {
   return EventBus.emitWithResponse("file:delete", { filepath, opts });
 }
 
+export async function copyFolder({ from, to, overwrite = true }) {
+  if (!from || !to) {
+    console.warn("[pluginUtils] copyFolder requires 'from' and 'to' paths.");
+    return { success: false, error: "Missing source or target path" };
+  }
+
+  try {
+    const result = await EventBus.emitWithResponse("file:copy-folder", {
+      from,
+      to,
+      overwrite,
+    });
+    return result;
+  } catch (err) {
+    console.warn("[pluginUtils] copyFolder failed:", err);
+    return { success: false, error: err.message || "Copy failed" };
+  }
+}
+
 export async function fileExists(path) {
   return EventBus.emitWithResponse("file:exists", { path });
 }

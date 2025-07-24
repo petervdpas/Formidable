@@ -116,6 +116,8 @@ const api = {
       ipcRenderer.invoke("load-file", filepath, opts),
     deleteFile: (filepath, opts) =>
       ipcRenderer.invoke("delete-file", filepath, opts),
+    copyFolder: ({ from, to, overwrite = true }) =>
+      ipcRenderer.invoke("copy-folder", { from, to, overwrite }),
     fileExists: (path) => ipcRenderer.invoke("file-exists", path),
     openExternal: (url) => ipcRenderer.invoke("shell-open-external", url),
     executeCommand: (cmd) => ipcRenderer.invoke("execute-command", cmd),

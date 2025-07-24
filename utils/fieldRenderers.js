@@ -28,6 +28,11 @@ function resolveValue(field, value) {
   return value !== undefined && value !== null ? value : field.default ?? "";
 }
 
+function isReadonly(field) {
+  const r = field?.readonly;
+  return typeof r === "string" ? r.trim().toLowerCase() === "true" : r === true;
+}
+
 // ─────────────────────────────────────────────
 // Type: guid
 export async function renderGuidField(field, value = "") {
@@ -129,6 +134,10 @@ export async function renderTextField(field, value = "") {
   input.type = "text";
   input.name = field.key;
   input.value = v;
+
+  if (isReadonly(field)) {
+    input.readOnly = true;
+  }
 
   applyFieldContextAttributes(input, {
     key: field.key,
@@ -1175,7 +1184,9 @@ export async function renderPasswordField(field, value = "") {
     onClick: () => {
       input.type = input.type === "password" ? "text" : "password";
       const icon = toggleBtn.querySelector("i");
-      if (icon) icon.className = input.type === "password" ? "fa fa-eye" : "fa fa-eye-slash";
+      if (icon)
+        icon.className =
+          input.type === "password" ? "fa fa-eye" : "fa fa-eye-slash";
     },
   });
 

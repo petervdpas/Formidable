@@ -47,6 +47,7 @@ export function exposeGlobalAPI() {
       saveFile: pluginUtils.saveFile,
       loadFile: pluginUtils.loadFile,
       deleteFile: pluginUtils.deleteFile,
+      copyFolder: pluginUtils.copyFolder,
       fileExists: pluginUtils.fileExists,
       openExternal: pluginUtils.openExternal,
       proxyFetch: pluginUtils.proxyFetch,

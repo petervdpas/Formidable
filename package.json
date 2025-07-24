@@ -74,7 +74,7 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "electron": "^24.1.0",
+    "electron": "^27.3.2",
     "electron-builder": "^26.0.12",
     "rcedit": "^4.0.1"
   },
