@@ -136,8 +136,17 @@ export async function openExternal(url) {
   EventBus.emit("file:openExternal", { url });
 }
 
-export async function proxyFetch(url) {
-  return EventBus.emitWithResponse("plugin:proxy-fetch", { url });
+export async function proxyFetch(url, options = {}) {
+  const result = await EventBus.emitWithResponse("plugin:proxy-fetch", { url, options });
+  if (result?.success && result.content) {
+    return result.content;
+  } else {
+    return {
+      ok: false,
+      error: result?.error || "Unknown proxy fetch error",
+      status: 500,
+    };
+  }
 }
 
 // Execute system-level command (e.g., Powershell, shell script, etc.)

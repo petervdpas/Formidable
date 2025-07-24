@@ -2,6 +2,7 @@
 
 import { EventBus } from "./eventBus.js";
 import * as pluginUtils from "../utils/pluginUtils.js";
+import * as encryptionUtils from "../utils/encryptionUtils.js";
 import * as pathUtils from "../utils/pathUtils.js";
 import * as modalUtils from "../utils/modalUtils.js";
 import * as listUtils from "../utils/listUtils.js";
@@ -25,6 +26,13 @@ export function exposeGlobalAPI() {
       addMetaExtension: pathUtils.addMetaExtension,
     },
 
+    // Encryption utilities
+    encryption: {
+      encrypt: encryptionUtils.encrypt,
+      decrypt: encryptionUtils.decrypt,
+      encryptionAvailable: encryptionUtils.encryptionAvailable,
+    },
+    
     // Plugin management utilities
     plugin: {
       getConfig: pluginUtils.getUserConfig,

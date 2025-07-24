@@ -3,6 +3,7 @@
 import { EventBus } from "./eventBus.js";
 
 import * as systemHandler from "./handlers/systemHandler.js";
+import * as encryptionHandler from "./handlers/encryptionHandler.js";
 import * as serverHandler from "./handlers/serverHandler.js";
 import * as pluginHandler from "./handlers/pluginHandler.js";
 import * as helpHandler from "./handlers/helpHandler.js";
@@ -54,6 +55,21 @@ export function initEventRouter() {
 
   EventBus.off("system:execute", systemHandler.handleExecuteCommand);
   EventBus.on("system:execute", systemHandler.handleExecuteCommand);
+
+  // Encryption events
+  EventBus.off("encryption:encrypt", encryptionHandler.handleEncrypt);
+  EventBus.off("encryption:decrypt", encryptionHandler.handleDecrypt);
+  EventBus.off(
+    "encryption:available",
+    encryptionHandler.handleEncryptionAvailable
+  );
+
+  EventBus.on("encryption:encrypt", encryptionHandler.handleEncrypt);
+  EventBus.on("encryption:decrypt", encryptionHandler.handleDecrypt);
+  EventBus.on(
+    "encryption:available",
+    encryptionHandler.handleEncryptionAvailable
+  );
 
   // Internal Server
   EventBus.off("server:start", serverHandler.handleStartServer);

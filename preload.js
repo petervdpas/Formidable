@@ -36,12 +36,7 @@ async function bindPluginIpcMethods() {
 
 // ---------- IPC Method Groups ----------
 const api = {
-  encrypt: buildGroup([
-    "generate-encryption-key",
-    "encrypt-text",
-    "decrypt-text",
-    "encryption-available",
-  ]),
+  encrypt: buildGroup(["encrypt", "decrypt", "encryption-available"]),
   internalServer: buildGroup([
     "start-internal-server",
     "stop-internal-server",
@@ -58,7 +53,6 @@ const api = {
     "update-plugin",
     "get-plugin-settings",
     "save-plugin-settings",
-    "proxy-fetch-remote",
     "get-plugin-ipc-map",
   ]),
   help: buildGroup(["list-help-topics", "get-help-topic"]),
@@ -125,6 +119,8 @@ const api = {
     fileExists: (path) => ipcRenderer.invoke("file-exists", path),
     openExternal: (url) => ipcRenderer.invoke("shell-open-external", url),
     executeCommand: (cmd) => ipcRenderer.invoke("execute-command", cmd),
+    proxyFetchRemote: (url, options = {}) =>
+      ipcRenderer.invoke("proxy-fetch-remote", { url, options }),
   },
   dialog: {
     chooseDirectory: () => ipcRenderer.invoke("dialog-choose-directory"),

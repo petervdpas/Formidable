@@ -297,15 +297,20 @@ export async function handleSavePluginSettings({ name, settings }, callback) {
   }
 }
 
-export async function handlePluginProxyFetch({ url }, callback) {
+export async function handlePluginProxyFetch(payload, callback) {
+
+  const { url, options = {} } = payload || {};
+
+  if (!url || typeof url !== "string") {
+    const msg = "Invalid or missing URL in proxy fetch payload";
+    callback?.({ success: false, error: msg });
+    return;
+  }
+
   try {
-    const result = await window.api.plugin.proxyFetchRemote(url);
+    const result = await window.api.system.proxyFetchRemote(url, options);
     callback?.({ success: true, content: result });
   } catch (err) {
-    EventBus.emit("logging:error", [
-      `[PluginHandler] proxyFetchRemote failed for URL "${url}":`,
-      err,
-    ]);
-    callback?.({ success: false, error: err.message });
+    callback?.({ success: false, error: err.message || "Unknown error" });
   }
 }

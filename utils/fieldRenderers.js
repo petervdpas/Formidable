@@ -16,6 +16,7 @@ import {
 import { showOptionPopup } from "./popupUtils.js";
 import { getCurrentTheme } from "../modules/themeToggle.js";
 import { createRemoveImageButton } from "../modules/uiButtons.js";
+import { createIconButton } from "./buttonUtils.js";
 
 function resolveOption(opt) {
   return typeof opt === "string"
@@ -1146,4 +1147,46 @@ export async function renderDirectoryField(field, value = "") {
   });
 
   return element;
+}
+
+// ─────────────────────────────────────────────
+// Type: password
+export async function renderPasswordField(field, value = "") {
+  const v = value || "";
+  const wrapper = document.createElement("div");
+  wrapper.className = "input-with-button password-field-wrapper";
+
+  const input = document.createElement("input");
+  input.type = "password";
+  input.name = field.key;
+  input.value = v;
+  input.className = "input";
+  applyFieldContextAttributes(input, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
+
+  // Reveal/hide toggle
+  const toggleBtn = createIconButton({
+    iconClass: "fa fa-eye",
+    className: "toggle-password-btn",
+    ariaLabel: "Show/hide password",
+    onClick: () => {
+      input.type = input.type === "password" ? "text" : "password";
+      const icon = toggleBtn.querySelector("i");
+      if (icon) icon.className = input.type === "password" ? "fa fa-eye" : "fa fa-eye-slash";
+    },
+  });
+
+  wrapper.appendChild(input);
+  wrapper.appendChild(toggleBtn);
+
+  return wrapInputWithLabel(
+    wrapper,
+    field.label,
+    field.description,
+    field.two_column,
+    field.wrapper || "modal-form-row"
+  );
 }

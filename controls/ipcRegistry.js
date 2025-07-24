@@ -74,10 +74,22 @@ function registerIpcHandlers() {
     };
   });
 
+  ipcMain.handle("proxy-fetch-remote", async (e, { url, options }) => {
+    try {
+      return await pluginManager.fetchRemoteContent(url, options);
+    } catch (err) {
+      return {
+        ok: false,
+        status: 500,
+        statusText: "Proxy fetch failed",
+        body: err.message || "Unknown error",
+      };
+    }
+  });
+
   // Encryption
-  registerIpc("generate-encryption-key", () => encryption.generateKey());
-  registerIpc("encrypt-text", (e, text) => encryption.encrypt(text));
-  registerIpc("decrypt-text", (e, enc) => encryption.decrypt(enc));
+  registerIpc("encrypt", (e, text) => encryption.encrypt(text));
+  registerIpc("decrypt", (e, enc) => encryption.decrypt(enc));
   registerIpc("encryption-available", () => encryption.encryptionAvailable());
 
   // Internal Server
@@ -157,19 +169,6 @@ function registerIpcHandlers() {
     return pluginManager.savePluginSettings(name, settings);
   });
   registerIpc("get-plugin-ipc-map", () => pluginManager.getPluginIpcMap());
-
-  registerIpc("proxy-fetch-remote", async (e, { url }) => {
-    if (typeof url !== "string") {
-      return { error: "Invalid URL" };
-    }
-
-    try {
-      const result = await pluginManager.fetchRemoteContent(url);
-      return result;
-    } catch (err) {
-      return { error: err.message || "Failed to fetch remote content" };
-    }
-  });
 
   // Help
   registerIpc("list-help-topics", () => helpManager.listHelpTopics());

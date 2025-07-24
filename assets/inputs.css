@@ -79,3 +79,32 @@ input[type="range"]:hover::-webkit-slider-thumb {
 .input-error {
   border: 2px solid #c00 !important;
 }
+
+.input-with-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  flex-grow: 1;
+}
+
+.input-with-button input {
+  flex: 1;
+}
+
+.password-field-wrapper input[type="password"],
+.password-field-wrapper input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.password-field-wrapper .toggle-password-btn {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  height: 100%;
+  padding: 0 0.7em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

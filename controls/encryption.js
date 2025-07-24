@@ -55,13 +55,8 @@ function encryptionAvailable() {
   return !!key;
 }
 
-function generateKey() {
-  return crypto.randomBytes(32).toString("hex"); // 256-bit key in hex
-}
-
 module.exports = {
   encrypt,
   decrypt,
-  encryptionAvailable,
-  generateKey,
+  encryptionAvailable
 };

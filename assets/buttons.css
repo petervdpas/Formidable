@@ -305,6 +305,14 @@ button.btn-remove-image:active,
   line-height: 1.2;
 }
 
+.toggle-password-btn {
+  font-size: 1em;
+  background: var(--button-secondary, #eee);
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: 4px;
+  padding: 0.35em 0.5em;
+}
+
 /* ───── Button Group ───── */
 
 .button-group {

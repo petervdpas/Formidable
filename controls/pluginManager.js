@@ -2,10 +2,12 @@
 
 const { ipcMain } = require("electron");
 const https = require("https");
+const http = require("http");
 const { log, error } = require("./nodeLogger");
 const fileManager = require("./fileManager");
 const pluginSchema = require("../schemas/plugin.schema.js");
 
+const { URL } = require("url");
 const pluginRepo = Object.create(null);
 
 function getSafePluginName(name) {
@@ -427,21 +429,46 @@ function updatePlugin(name, updates = {}) {
   }
 }
 
-function fetchRemoteContent(url) {
+function fetchRemoteContent(url, options = {}) {
   return new Promise((resolve, reject) => {
     try {
-      const req = https.get(url, (res) => {
-        if (res.statusCode !== 200) {
-          reject(new Error(`Failed to fetch (${res.statusCode}): ${url}`));
-          return;
-        }
+      const parsedUrl = new URL(url);
+      const isHttps = parsedUrl.protocol === "https:";
+      const lib = isHttps ? https : http;
 
-        let data = "";
-        res.on("data", (chunk) => (data += chunk));
-        res.on("end", () => resolve(data));
+      const requestOptions = {
+        method: options.method || "GET",
+        headers: options.headers || {},
+      };
+
+      if (options.body && typeof options.body === "object") {
+        options.body = JSON.stringify(options.body);
+        requestOptions.headers["Content-Type"] ??= "application/json";
+      }
+
+      const req = lib.request(url, requestOptions, (res) => {
+        const { statusCode, headers } = res;
+        let body = "";
+
+        res.on("data", (chunk) => (body += chunk));
+        res.on("end", () => {
+          resolve({
+            ok: statusCode >= 200 && statusCode < 300,
+            status: statusCode,
+            statusText: res.statusMessage || "",
+            headers,
+            body,
+          });
+        });
       });
 
-      req.on("error", reject);
+      req.on("error", (err) => reject(err));
+
+      if (options.body) {
+        req.write(options.body);
+      }
+
+      req.end();
     } catch (err) {
       reject(err);
     }
