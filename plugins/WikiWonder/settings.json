@@ -1,3 +1,5 @@
 {
-  "targetFolder": "C:\\Temp"
+  "targetFolder": "C:\\Projects\\team\\wiki",
+  "bulkMode": true,
+  "stripFrontmatter": false
 }

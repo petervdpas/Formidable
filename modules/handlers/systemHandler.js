@@ -15,9 +15,19 @@ export async function handleResolvePath({ segments = [] }) {
   }
 }
 
-export async function handleEnsureDirectory({ dirPath, label = null }) {
+export async function handleEnsureDirectory({
+  dirPath,
+  label = null,
+  silent = false,
+  throwOnError = false,
+}) {
   try {
-    const result = await window.api.system.ensureDirectory(dirPath, label);
+    const result = await window.api.system.ensureDirectory({
+      dirPath,
+      label,
+      silent,
+      throwOnError,
+    });
     return result;
   } catch (err) {
     EventBus.emit("logging:error", [

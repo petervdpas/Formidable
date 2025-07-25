@@ -42,6 +42,19 @@ export async function saveUserConfig(partial) {
   EventBus.emit("config:update", partial);
 }
 
+export async function getStorageFilesForTemplate(templateFilename) {
+  if (!templateFilename) return [];
+
+  const entries = await new Promise((resolve) => {
+    EventBus.emit("form:extendedList", {
+      templateFilename,
+      callback: resolve,
+    });
+  });
+
+  return (entries || []).map((entry) => entry.filename);
+}
+
 /**
  * Load both the full template YAML and associated storage (.meta.json) data.
  * Both parameters are required.
@@ -111,8 +124,18 @@ export async function resolvePath(...segments) {
   return EventBus.emitWithResponse("file:resolve", { segments });
 }
 
-export async function ensureDirectory(dirPath, label = null) {
-  return EventBus.emitWithResponse("file:ensure-directory", { dirPath, label });
+export async function ensureDirectory(
+  dirPath,
+  label = null,
+  silent = false,
+  throwOnError = false
+) {
+  return EventBus.emitWithResponse("file:ensure-directory", {
+    dirPath,
+    label,
+    silent,
+    throwOnError,
+  });
 }
 
 export async function saveFile(filepath, data, opts = {}) {
@@ -156,7 +179,10 @@ export async function openExternal(url) {
 }
 
 export async function proxyFetch(url, options = {}) {
-  const result = await EventBus.emitWithResponse("plugin:proxy-fetch", { url, options });
+  const result = await EventBus.emitWithResponse("plugin:proxy-fetch", {
+    url,
+    options,
+  });
   if (result?.success && result.content) {
     return result.content;
   } else {
@@ -171,7 +197,9 @@ export async function proxyFetch(url, options = {}) {
 // Execute system-level command (e.g., Powershell, shell script, etc.)
 export async function executeSystemCommand(cmd) {
   if (!cmd || typeof cmd !== "string") {
-    console.warn("[pluginUtils] executeSystemCommand requires a valid command string.");
+    console.warn(
+      "[pluginUtils] executeSystemCommand requires a valid command string."
+    );
     return { success: false, error: "Invalid command" };
   }
 
@@ -189,6 +217,7 @@ export async function saveMarkdownTo({
   selectedDataFile,
   outputDir,
   filename,
+  stripFrontmatter = false,
   showToast = false,
 }) {
   if (!selectedTemplate || !selectedDataFile || !outputDir) {
@@ -206,18 +235,22 @@ export async function saveMarkdownTo({
     return null;
   }
 
-  const markdown = await renderMarkdown(template, storage.data);
+  let markdown = await renderMarkdown(template, storage.data);
   if (!markdown) {
     console.warn("[saveMarkdownTo] Markdown rendering failed");
     return null;
   }
 
-  await ensureDirectory(outputDir, "MarkdownOutput");
+  if (stripFrontmatter) {
+    markdown = markdown.replace(/^---\n[\s\S]*?\n---\n?/, "");
+  }
+
+  await ensureDirectory(outputDir, "MarkdownOutput", true);
 
   const baseName = filename || stripMetaExtension(selectedDataFile);
   const markdownFilePath = await resolvePath(outputDir, `${baseName}.md`);
 
-  await saveFile(markdownFilePath, markdown, { encoding: "utf8" });
+  await saveFile(markdownFilePath, markdown, { silent: true });
 
   if (showToast) {
     EventBus.emit("ui:toast", {

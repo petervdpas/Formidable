@@ -25,7 +25,10 @@ function isAbsolute(p) {
 }
 
 // Ensure a directory exists (creates if missing)
-function ensureDirectory(dirPath, { label = null, silent = false, throwOnError = false } = {}) {
+function ensureDirectory(
+  dirPath,
+  { label = null, silent = false, throwOnError = false } = {}
+) {
   try {
     const fullPath = resolvePath(dirPath);
     const exists = fs.existsSync(fullPath);
@@ -33,25 +36,43 @@ function ensureDirectory(dirPath, { label = null, silent = false, throwOnError =
     if (!exists) {
       fs.mkdirSync(fullPath, { recursive: true });
       if (!silent) {
-        log(`${label ? `[${label}]` : "[FileManager]"} Created directory: ${fullPath}`);
+        log(
+          `${
+            label ? `[${label}]` : "[FileManager]"
+          } Created directory: ${fullPath}`
+        );
       }
     } else {
       if (!silent) {
-        log(`${label ? `[${label}]` : "[FileManager]"} Directory already exists: ${fullPath}`);
+        log(
+          `${
+            label ? `[${label}]` : "[FileManager]"
+          } Directory already exists: ${fullPath}`
+        );
       }
     }
 
     return true;
   } catch (err) {
     if (!silent) {
-      error(`${label ? `[${label}]` : "[FileManager]"} Failed to ensure directory ${dirPath}:`, err);
+      error(
+        `${
+          label ? `[${label}]` : "[FileManager]"
+        } Failed to ensure directory ${dirPath}:`,
+        err
+      );
     }
     if (throwOnError) throw err;
     return false;
   }
 }
 
-function copyFolderRecursive(from, to, overwrite = true, { silent = false } = {}) {
+function copyFolderRecursive(
+  from,
+  to,
+  overwrite = true,
+  { silent = false } = {}
+) {
   const src = resolvePath(from);
   const dest = resolvePath(to);
 
@@ -68,12 +89,13 @@ function copyFolderRecursive(from, to, overwrite = true, { silent = false } = {}
         copyFolderRecursive(srcPath, destPath, overwrite, { silent });
       } else {
         if (!overwrite && fs.existsSync(destPath)) {
-          if (!silent) warn(`[FileManager] Skipped existing file: ${destPath}`);
+          if (!silent) {
+            warn(`[FileManager] Skipped existing file: ${destPath}`);
+          }
           continue;
         }
 
         fs.copyFileSync(srcPath, destPath);
-        if (!silent) log(`[FileManager] Copied: ${srcPath} → ${destPath}`);
       }
     }
 
@@ -127,9 +149,9 @@ function toPosixPath(p) {
 
 function listFolders(dir, { silent = false, filter = null } = {}) {
   try {
-    let folders = fs.readdirSync(dir).filter((f) =>
-      fs.statSync(path.join(dir, f)).isDirectory()
-    );
+    let folders = fs
+      .readdirSync(dir)
+      .filter((f) => fs.statSync(path.join(dir, f)).isDirectory());
 
     if (typeof filter === "function") {
       folders = folders.filter(filter);
@@ -144,9 +166,9 @@ function listFolders(dir, { silent = false, filter = null } = {}) {
 
 function listFiles(dir, { silent = false, filter = null } = {}) {
   try {
-    let files = fs.readdirSync(dir).filter((f) =>
-      fs.statSync(path.join(dir, f)).isFile()
-    );
+    let files = fs
+      .readdirSync(dir)
+      .filter((f) => fs.statSync(path.join(dir, f)).isFile());
 
     if (typeof filter === "function") {
       files = files.filter(filter);
@@ -225,7 +247,12 @@ function saveFile(filepath, data, { format = "text", silent = false } = {}) {
   }
 }
 
-function saveImageFile(storageLocation, filename, buffer, { silent = false } = {}) {
+function saveImageFile(
+  storageLocation,
+  filename,
+  buffer,
+  { silent = false } = {}
+) {
   try {
     const imageDir = resolvePath(storageLocation, "images");
     ensureDirectory(imageDir, { silent });
@@ -249,7 +276,8 @@ function deleteFile(filepath, { silent = false } = {}) {
       if (!silent) log(`[FileManager] Deleted file: ${filepath}`);
       return true;
     } else {
-      if (!silent) warn(`[FileManager] File not found for deletion: ${filepath}`);
+      if (!silent)
+        warn(`[FileManager] File not found for deletion: ${filepath}`);
       return false;
     }
   } catch (err) {
@@ -266,11 +294,13 @@ function deleteFolder(dirPath, { silent = false } = {}) {
       if (!silent) log(`[FileManager] Deleted folder: ${fullPath}`);
       return true;
     } else {
-      if (!silent) warn(`[FileManager] Folder not found for deletion: ${fullPath}`);
+      if (!silent)
+        warn(`[FileManager] Folder not found for deletion: ${fullPath}`);
       return false;
     }
   } catch (err) {
-    if (!silent) error(`[FileManager] Failed to delete folder ${dirPath}:`, err);
+    if (!silent)
+      error(`[FileManager] Failed to delete folder ${dirPath}:`, err);
     return false;
   }
 }
