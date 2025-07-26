@@ -5,6 +5,7 @@ const configManager = require("./configManager");
 const { resolvePath } = require("./fileManager");
 const { log, error } = require("./nodeLogger");
 const { evaluateMath, compare, computeStats } = require("./calculator.js");
+const yaml = require("js-yaml");
 
 const vars = Object.create(null);
 
@@ -334,4 +335,44 @@ function renderMarkdown(formData, templateYaml, filePrefix = true) {
   }
 }
 
-module.exports = { renderMarkdown };
+/**
+ * Extract frontmatter and body from a markdown string
+ */
+function parseFrontmatter(markdown = "") {
+  const match = markdown.match(/^---\n([\s\S]*?)\n---\n?/);
+  if (!match) return { frontmatter: null, body: markdown };
+
+  const raw = match[1];
+  const body = markdown.slice(match[0].length);
+
+  try {
+    const data = yaml.load(raw);
+    return { frontmatter: data || {}, body };
+  } catch (err) {
+    console.warn("[Frontmatter] Failed to parse YAML:", err);
+    return { frontmatter: null, body };
+  }
+}
+
+/**
+ * Serialize a frontmatter object and attach it to the body
+ */
+function buildFrontmatter(data = {}, body = "") {
+  if (!data || Object.keys(data).length === 0) return body;
+  const yamlStr = yaml.dump(data);
+  return `---\n${yamlStr}---\n\n${body}`;
+}
+
+/**
+ * Keep only specified keys from the frontmatter
+ */
+function filterFrontmatter(data = {}, keepKeys = []) {
+  if (!Array.isArray(keepKeys)) return {};
+  const filtered = {};
+  for (const key of keepKeys) {
+    if (key in data) filtered[key] = data[key];
+  }
+  return filtered;
+}
+
+module.exports = { renderMarkdown, parseFrontmatter, buildFrontmatter, filterFrontmatter };

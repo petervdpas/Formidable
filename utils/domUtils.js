@@ -216,16 +216,16 @@ export function createFieldManager({
     ]);
   }
 
-  function setValue(key, value) {
-    enrichedData[key] = value;
+  function getValue(key) {
+    const field = fields.find((f) => f.key === key);
+    if (!field) return undefined;
+
     const input = inputRefs[key];
     if (input) {
-      if (input.type === "checkbox") {
-        input.checked = !!value;
-      } else {
-        input.value = value ?? "";
-      }
+      return field.type === "boolean" ? input.checked : input.value ?? "";
     }
+
+    return enrichedData[key];
   }
 
   function getValues() {
@@ -245,10 +245,30 @@ export function createFieldManager({
     return values;
   }
 
+  function setValue(key, value) {
+    enrichedData[key] = value;
+    const input = inputRefs[key];
+    if (input) {
+      if (input.type === "checkbox") {
+        input.checked = !!value;
+      } else {
+        input.value = value ?? "";
+      }
+    }
+  }
+
+  function setValues(values = {}) {
+    for (const [key, val] of Object.entries(values)) {
+      setValue(key, val);
+    }
+  }
+
   return {
     renderFields,
+    getValue,
     getValues,
     setValue,
+    setValues,
   };
 }
 

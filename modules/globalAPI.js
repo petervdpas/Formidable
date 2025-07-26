@@ -11,6 +11,7 @@ import * as domUtils from "../utils/domUtils.js";
 import * as buttonUtils from "../utils/buttonUtils.js";
 import * as fieldRenderers from "../utils/fieldRenderers.js";
 import * as stringUtils from "../utils/stringUtils.js";
+import * as transform from "../utils/transformationUtils.js";
 
 export function exposeGlobalAPI() {
   const api = {
@@ -39,7 +40,6 @@ export function exposeGlobalAPI() {
       saveConfig: pluginUtils.saveUserConfig,
       getStorageFilesForTemplate: pluginUtils.getStorageFilesForTemplate,
       getTemplateAndData: pluginUtils.getTemplateAndData,
-      renderMarkdown: pluginUtils.renderMarkdown,
       saveMarkdownTo: pluginUtils.saveMarkdownTo,
       getSettings: pluginUtils.getPluginSettings,
       saveSettings: pluginUtils.savePluginSettings,
@@ -53,6 +53,16 @@ export function exposeGlobalAPI() {
       openExternal: pluginUtils.openExternal,
       proxyFetch: pluginUtils.proxyFetch,
       executeSystemCommand: pluginUtils.executeSystemCommand,
+    },
+
+    transform: {
+      getValueAtKey: transform.getValueAtKey,
+      setValueAtKey: transform.setValueAtKey,
+      removeKeyAtPath: transform.removeKeyAtPath,
+      renderMarkdown: transform.renderMarkdown,
+      parseFrontmatter: transform.parseFrontmatter,
+      buildFrontmatter: transform.buildFrontmatter,
+      filterFrontmatter: transform.filterFrontmatter,
     },
 
     // Modal and popup helpers

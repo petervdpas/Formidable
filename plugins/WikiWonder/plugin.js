@@ -6,30 +6,41 @@ async function performMarkdownExport({
   selectedDataFile,
   outputDir,
   bulkMode,
-  stripFrontmatter = false,
+  frontmatterMode = "keep",
+  frontmatterKeys = "",
 }) {
-  if (bulkMode) {
-    const storageFiles = await plugin.getStorageFilesForTemplate(
-      selectedTemplate
-    );
+  const keysArray = frontmatterKeys
+    .split(",")
+    .map((k) => k.trim())
+    .filter(Boolean);
 
-    for (const file of storageFiles) {
-      await plugin.saveMarkdownTo({
-        selectedTemplate,
-        selectedDataFile: file,
-        outputDir,
-        filename: null,
-        stripFrontmatter,
-      });
+  const baseOpts = {
+    selectedTemplate,
+    outputDir,
+    filename: null,
+  };
+
+  async function renderOneFile(dataFile) {
+    let opts = { ...baseOpts, selectedDataFile: dataFile };
+
+    if (frontmatterMode === "remove") {
+      opts.stripFrontmatter = true;
+    } else if (frontmatterMode === "filter") {
+      opts.stripFrontmatter = keysArray;
+    } else {
+      opts.stripFrontmatter = false;
+    }
+
+    await plugin.saveMarkdownTo(opts);
+  }
+
+  if (bulkMode) {
+    const files = await plugin.getStorageFilesForTemplate(selectedTemplate);
+    for (const file of files) {
+      await renderOneFile(file);
     }
   } else {
-    await plugin.saveMarkdownTo({
-      selectedTemplate,
-      selectedDataFile,
-      outputDir,
-      filename: null,
-      stripFrontmatter,
-    });
+    await renderOneFile(selectedDataFile);
   }
 
   emit("ui:toast", {
@@ -89,19 +100,34 @@ export async function run() {
       if (!settings || typeof settings !== "object") settings = {};
       settings.targetFolder ??= "";
       settings.bulkMode ??= false;
-      settings.stripFrontmatter ??= false;
+      settings.frontmatterMode ??= "keep";
+      settings.frontmatterKeys ??= "";
 
       const templateName = path.stripYamlExtension(selectedTemplate);
       const outputDir = `plugins/${pluginName}/markdown/${templateName}`;
 
       const fields = [
         {
-          key: "stripFrontmatter",
-          type: "boolean",
-          label: "Strip Frontmatter",
+          key: "frontmatterMode",
+          type: "dropdown",
+          label: "Frontmatter Mode",
+          options: [
+            { value: "keep", label: "Keep All" },
+            { value: "remove", label: "Remove All" },
+            { value: "filter", label: "Filter by Key" },
+          ],
           wrapper: "modal-form-row",
-          fieldRenderer: "renderBooleanField",
-          value: settings.stripFrontmatter ?? false,
+          fieldRenderer: "renderDropdownField",
+          value: settings.frontmatterMode,
+        },
+        {
+          key: "frontmatterKeys",
+          type: "text",
+          label: "Keys to Keep (CSV)",
+          wrapper: "modal-form-row",
+          fieldRenderer: "renderTextField",
+          value: settings.frontmatterKeys,
+          visible: settings.frontmatterMode === "filter",
         },
         {
           key: "targetFolder",
@@ -127,6 +153,8 @@ export async function run() {
         data: {
           bulkMode: settings.bulkMode,
           targetFolder: settings.targetFolder,
+          frontmatterMode: settings.frontmatterMode,
+          frontmatterKeys: settings.frontmatterKeys,
         },
         injectBefore: () => {
           const info = document.createElement("p");
@@ -145,6 +173,8 @@ export async function run() {
           const values = fieldManager.getValues();
           settings.targetFolder = values.targetFolder;
           settings.bulkMode = Boolean(values.bulkMode);
+          settings.frontmatterMode = values.frontmatterMode;
+          settings.frontmatterKeys = values.frontmatterKeys;
 
           const result = await plugin.saveSettings(pluginName, settings);
           emit("ui:toast", {
@@ -167,7 +197,8 @@ export async function run() {
             selectedDataFile,
             outputDir,
             bulkMode: Boolean(values.bulkMode),
-            stripFrontmatter: Boolean(values.stripFrontmatter),
+            frontmatterMode: values.frontmatterMode,
+            frontmatterKeys: values.frontmatterKeys,
           });
         },
       });

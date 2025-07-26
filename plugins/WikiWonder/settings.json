@@ -1,5 +1,6 @@
 {
   "targetFolder": "C:\\Projects\\team\\wiki",
   "bulkMode": true,
-  "stripFrontmatter": false
+  "frontmatterMode": "filter",
+  "frontmatterKeys": "title, author, date"
 }

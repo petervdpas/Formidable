@@ -1,27 +1,76 @@
 {
-  "variables": {
-    "UseFormidable": {
-      "value": false
-    },
-    "InputPath": {
-      "value": "/home/peter/Projects/documentation/Fontys/Wat is een datamesh.md"
-    },
-    "OutputPath": {
-      "value": "/home/peter/Projects/documentation/output"
-    },
-    "TemplatePath": {
-      "value": "/home/peter/Projects/documentation/Templates/eisvogel.latex"
-    },
-    "UseCurrentDate": {
-      "value": true
-    },
-    "PowershellScript": {
-      "value": "/home/peter/Projects/documentation/Tools/Convert-MarkdownToPDF.ps1"
-    },
-    "ShellCommand": {
-      "value": "pwsh -ExecutionPolicy Bypass -File {script} -InputPath {InputPath} -UseCurrentDate {UseCurrentDate} -TemplatePath {TemplatePath} -OutputPath {OutputPath}"
-    }
-  },
   "overwrite": true,
-  "updated": "2025-07-09T09:13:41.126Z"
+  "updated": "2025-07-26T16:01:07.275Z",
+  "platform": "windows",
+  "platforms": {
+    "linux": {
+      "UseFormidable": {
+        "value": false
+      },
+      "ShellCommand": {
+        "value": "pwsh -ExecutionPolicy Bypass -File {script} -InputPath {InputPath} -UseCurrentDate {UseCurrentDate} -TemplatePath {TemplatePath} -OutputPath {OutputPath}"
+      },
+      "InputPath": {
+        "value": "/home/peter/Projects/documentation/Fontys/Wat is een datamesh.md"
+      },
+      "OutputPath": {
+        "value": "/home/peter/Projects/documentation/output"
+      },
+      "TemplatePath": {
+        "value": "/home/peter/Projects/documentation/Templates/eisvogel.latex"
+      },
+      "UseCurrentDate": {
+        "value": true
+      },
+      "PowershellScript": {
+        "value": "/home/peter/Projects/documentation/Tools/Convert-MarkdownToPDF.ps1"
+      }
+    },
+    "windows": {
+      "UseFormidable": {
+        "value": false
+      },
+      "ShellCommand": {
+        "value": "pwsh -ExecutionPolicy Bypass -File {script} -InputPath {InputPath} -UseCurrentDate {UseCurrentDate} -TemplatePath {TemplatePath} -OutputPath {OutputPath}"
+      },
+      "InputPath": {
+        "value": "E:\\Projects\\documentation\\Leerplan Domein\\FCDM.Account.md"
+      },
+      "OutputPath": {
+        "value": "E:\\Projects\\documentation\\output"
+      },
+      "TemplatePath": {
+        "value": "E:\\Projects\\documentation\\Templates\\eisvogel.latex"
+      },
+      "UseCurrentDate": {
+        "value": true
+      },
+      "PowershellScript": {
+        "value": "E:\\Projects\\documentation\\Tools\\Convert-MarkdownToPDF.ps1"
+      }
+    },
+    "mac": {
+      "UseFormidable": {
+        "value": false
+      },
+      "ShellCommand": {
+        "value": ""
+      },
+      "InputPath": {
+        "value": ""
+      },
+      "OutputPath": {
+        "value": ""
+      },
+      "TemplatePath": {
+        "value": ""
+      },
+      "UseCurrentDate": {
+        "value": false
+      },
+      "PowershellScript": {
+        "value": ""
+      }
+    }
+  }
 }

@@ -2,6 +2,12 @@
 
 import { EventBus } from "../modules/eventBus.js";
 import { stripMetaExtension } from "./pathUtils.js";
+import {
+  renderMarkdown,
+  parseFrontmatter,
+  buildFrontmatter,
+  filterFrontmatter,
+} from "./transformationUtils.js";
 
 const allowedConfigKeys = [
   "theme",
@@ -82,31 +88,6 @@ export async function getTemplateAndData(templateName, dataFilename) {
   } catch (err) {
     console.warn("[pluginUtils] Failed to load template or data:", err);
     return { template: null, storage: null };
-  }
-}
-
-/**
- * Render markdown output from a given data + template combo.
- * Requires both arguments to be valid objects.
- */
-export async function renderMarkdown(template, data) {
-  if (!template || !data) {
-    console.warn(
-      "[pluginUtils] renderMarkdownFromTemplateData requires both template and data objects."
-    );
-    return null;
-  }
-
-  try {
-    const markdown = await EventBus.emitWithResponse("transform:markdown", {
-      template,
-      data,
-      filePrefix: false,
-    });
-    return markdown;
-  } catch (err) {
-    console.warn("[pluginUtils] Failed to render markdown:", err);
-    return null;
   }
 }
 
@@ -241,8 +222,14 @@ export async function saveMarkdownTo({
     return null;
   }
 
-  if (stripFrontmatter) {
-    markdown = markdown.replace(/^---\n[\s\S]*?\n---\n?/, "");
+  // Frontmatter filtering logic
+  if (Array.isArray(stripFrontmatter)) {
+    const { frontmatter, body } = await parseFrontmatter(markdown);
+    const filtered = await filterFrontmatter(frontmatter, stripFrontmatter);
+    markdown = await buildFrontmatter(filtered, body);
+  } else if (stripFrontmatter === true) {
+    const { body } = await parseFrontmatter(markdown);
+    markdown = body;
   }
 
   await ensureDirectory(outputDir, "MarkdownOutput", true);

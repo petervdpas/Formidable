@@ -292,10 +292,16 @@ export function initEventRouter() {
   EventBus.off("transform:markdown", transformHandler.handleRenderMarkdown);
   EventBus.off("transform:html", transformHandler.handleRenderHtml);
   EventBus.off("transform:parseMiniExpr", transformHandler.handleParseMiniExpr);
+  EventBus.off("transform:parseFrontmatter", transformHandler.handleParseFrontmatter);
+  EventBus.off("transform:buildFrontmatter", transformHandler.handleBuildFrontmatter);
+  EventBus.off("transform:filterFrontmatter", transformHandler.handleFilterFrontmatter);
 
   EventBus.on("transform:markdown", transformHandler.handleRenderMarkdown);
   EventBus.on("transform:html", transformHandler.handleRenderHtml);
   EventBus.on("transform:parseMiniExpr", transformHandler.handleParseMiniExpr);
+  EventBus.on("transform:parseFrontmatter", transformHandler.handleParseFrontmatter);
+  EventBus.on("transform:buildFrontmatter", transformHandler.handleBuildFrontmatter);
+  EventBus.on("transform:filterFrontmatter", transformHandler.handleFilterFrontmatter);
 
   // Git events
   EventBus.off("git:check", gitHandler.handleGitCheckRepo);

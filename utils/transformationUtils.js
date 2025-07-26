@@ -81,3 +81,46 @@ export function removeKeyAtPath(source, keyPath) {
 
   return source;
 }
+
+/**
+ * Render markdown output from a given data + template combo.
+ * Requires both arguments to be valid objects.
+ */
+export async function renderMarkdown(template, data) {
+  if (!template || !data) {
+    console.warn(
+      "[transform] renderMarkdownFromTemplateData requires both template and data objects."
+    );
+    return null;
+  }
+
+  try {
+    const markdown = await EventBus.emitWithResponse("transform:markdown", {
+      template,
+      data,
+      filePrefix: false,
+    });
+    return markdown;
+  } catch (err) {
+    console.warn("[transform] Failed to render markdown:", err);
+    return null;
+  }
+}
+
+export async function parseFrontmatter(markdown = "") {
+  return EventBus.emitWithResponse("transform:parseFrontmatter", markdown);
+}
+
+export async function buildFrontmatter(data = {}, body = "") {
+  return EventBus.emitWithResponse("transform:buildFrontmatter", {
+    data,
+    body,
+  });
+}
+
+export async function filterFrontmatter(data = {}, keepKeys = []) {
+  return EventBus.emitWithResponse("transform:filterFrontmatter", {
+    data,
+    keepKeys,
+  });
+} 

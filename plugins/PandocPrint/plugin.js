@@ -22,92 +22,68 @@ export async function run() {
 
       let settings = await plugin.getSettings(pluginName);
       if (!settings || typeof settings !== "object") settings = {};
-      settings.variables ??= {};
+      settings.platform ??= "linux";
+      settings.platforms ??= {};
       settings.overwrite ??= true;
 
-      // Ensure default shell command is injected only once
-      if (!settings.variables.ShellCommand?.value) {
-        settings.variables.ShellCommand = {
-          value:
-            'powershell -ExecutionPolicy Bypass -File {script} -InputPath {InputPath} -UseCurrentDate {UseCurrentDate} -TemplatePath {TemplatePath} -OutputPath {OutputPath}',
-        };
-      }
-
-      const fields = [
-        {
-          key: "UseFormidable",
-          type: "boolean",
-          label: "Use Formidable",
-          wrapper: "modal-form-row",
-          fieldRenderer: "renderBooleanField",
-          value: true,
-        },
-        {
-          key: "ShellCommand",
-          type: "text",
-          label: "Shell Command",
-          wrapper: "modal-form-row",
-          fieldRenderer: "renderTextField",
-          value: "",
-        },
-        {
-          key: "InputPath",
-          type: "file",
-          label: "Input File",
-          wrapper: "modal-form-row tight-gap",
-          fieldRenderer: "renderFileField",
-          value: "",
-        },
-        {
-          key: "OutputPath",
-          type: "directory",
-          label: "Output Directory",
-          wrapper: "modal-form-row tight-gap",
-          fieldRenderer: "renderDirectoryField",
-          value: "",
-        },
-        {
-          key: "TemplatePath",
-          type: "file",
-          label: "Latex Template",
-          wrapper: "modal-form-row tight-gap",
-          fieldRenderer: "renderFileField",
-          value: "",
-        },
-        {
-          key: "UseCurrentDate",
-          type: "boolean",
-          label: "Use Current Date",
-          wrapper: "modal-form-row",
-          fieldRenderer: "renderBooleanField",
-          value: true,
-        },
-        {
-          key: "PowershellScript",
-          type: "file",
-          label: "Powershell Script",
-          wrapper: "modal-form-row tight-gap",
-          fieldRenderer: "renderFileField",
-          value: "",
-        },
+      const platformOptions = [
+        { value: "windows", label: "Windows" },
+        { value: "mac", label: "Mac" },
+        { value: "linux", label: "Linux" },
       ];
 
-      const initialData = Object.fromEntries(
-        fields.map((f) => {
-          const raw = settings.variables?.[f.key]?.value;
-          const val = f.type === "boolean" ? raw === true || raw === "true" : raw;
-          return [f.key, val];
-        })
-      );
+      const variableFields = [
+        { key: "UseFormidable", type: "boolean", label: "Use Formidable" },
+        { key: "ShellCommand", type: "text", label: "Shell Command" },
+        { key: "InputPath", type: "file", label: "Input File" },
+        { key: "OutputPath", type: "directory", label: "Output Directory" },
+        { key: "TemplatePath", type: "file", label: "Latex Template" },
+        { key: "UseCurrentDate", type: "boolean", label: "Use Current Date" },
+        { key: "PowershellScript", type: "file", label: "Powershell Script" },
+      ];
+
+      const platformField = {
+        key: "platform",
+        type: "dropdown",
+        label: "Platform",
+        options: platformOptions,
+        wrapper: "modal-form-row",
+        fieldRenderer: "renderDropdownField",
+        value: settings.platform,
+      };
+
+      const getInitialValues = (platform) => {
+        const vars = settings.platforms?.[platform] || {};
+        const values = {};
+        for (const field of variableFields) {
+          const raw = vars[field.key]?.value;
+          values[field.key] = field.type === "boolean"
+            ? raw === true || raw === "true"
+            : raw || "";
+        }
+        return values;
+      };
+
+      const fields = [
+        platformField,
+        ...variableFields.map((f) => ({
+          ...f,
+          wrapper: "modal-form-row tight-gap",
+          fieldRenderer: `render${f.type.charAt(0).toUpperCase()}${f.type.slice(1)}Field`,
+        })),
+      ];
 
       const fieldManager = dom.createFieldManager({
         container: bodyEl,
         fields,
-        data: initialData,
+        data: {
+          platform: settings.platform,
+          ...getInitialValues(settings.platform),
+        },
         injectBefore: () => {
           const info = document.createElement("p");
           info.textContent =
-            "This plugin allows you to convert Formidable entries—or any valid Markdown file with proper frontmatter—into a styled PDF using Pandoc and LaTeX. The Shell Command field is required and fully user-controlled. Use placeholders like {script}, {InputPath}, {OutputPath}, etc. for dynamic values.";
+            "Convert Markdown to PDF using Pandoc. Configure settings per platform. Use placeholders like {InputPath}, {OutputPath}, etc. in your command.";
           info.className = "form-info-text";
           return info;
         },
@@ -115,7 +91,19 @@ export async function run() {
 
       await fieldManager.renderFields();
 
-      if (initialData.UseFormidable) {
+      // Update fields when switching platform
+      const platformSelect = bodyEl.querySelector('[name="platform"]');
+      platformSelect?.addEventListener("change", async () => {
+        const selected = platformSelect.value;
+        settings.platform = selected;
+        await fieldManager.setValues({
+          platform: selected,
+          ...getInitialValues(selected),
+        });
+      });
+
+      // Set InputPath from Formidable-generated Markdown if applicable
+      if (fieldManager.getValue("UseFormidable")) {
         const markdownPath = await plugin.saveMarkdownTo({
           selectedTemplate,
           selectedDataFile,
@@ -133,11 +121,16 @@ export async function run() {
         className: "btn-warn",
         onClick: async () => {
           const values = fieldManager.getValues();
+          const platform = values.platform;
 
-          for (const [key, val] of Object.entries(values)) {
-            const field = fields.find((f) => f.key === key);
-            const toSave = field?.type === "boolean" ? Boolean(val) : val;
-            settings.variables[key] = { value: toSave };
+          settings.platform = platform;
+          settings.platforms[platform] = settings.platforms[platform] || {};
+
+          for (const field of variableFields) {
+            const val = field.type === "boolean"
+              ? Boolean(values[field.key])
+              : values[field.key];
+            settings.platforms[platform][field.key] = { value: val };
           }
 
           settings.updated = new Date().toISOString();

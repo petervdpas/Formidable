@@ -291,6 +291,15 @@ function registerIpcHandlers() {
     markdownRenderer.renderMarkdown(data, yaml, filePrefix)
   );
   registerIpc("render-html-preview", (e, md) => htmlRenderer.renderHtml(md));
+  registerIpc("parse-frontmatter", (e, markdown) =>
+    markdownRenderer.parseFrontmatter(markdown)
+  );
+  registerIpc("build-frontmatter", (e, data, body = "") =>
+    markdownRenderer.buildFrontmatter(data, body)
+  );
+  registerIpc("filter-frontmatter", (e, data, keys = []) =>
+    markdownRenderer.filterFrontmatter(data, keys)
+  );
 
   // File & Dialog
   registerIpc("dialog-choose-directory", async () => {

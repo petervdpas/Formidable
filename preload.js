@@ -103,6 +103,9 @@ const api = {
   transform: buildGroup([
     "render-markdown-template",
     "render-html-preview",
+    "parse-frontmatter",
+    "build-frontmatter",
+    "filter-frontmatter",
     "parse-mini-expr",
   ]),
   system: {
