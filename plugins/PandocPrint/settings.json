@@ -28,25 +28,25 @@
     },
     "windows": {
       "UseFormidable": {
-        "value": false
+        "value": true
       },
       "ShellCommand": {
-        "value": "pwsh -ExecutionPolicy Bypass -File {script} -InputPath {InputPath} -UseCurrentDate {UseCurrentDate} -TemplatePath {TemplatePath} -OutputPath {OutputPath}"
+        "value": "powershell -ExecutionPolicy Bypass -File {script} -InputPath {InputPath} -UseCurrentDate {UseCurrentDate} -TemplatePath {TemplatePath} -OutputPath {OutputPath}"
       },
       "InputPath": {
-        "value": "E:\\Projects\\documentation\\Leerplan Domein\\FCDM.Account.md"
+        "value": "C:\\Projects\\documentation\\Leerplan Algemeen\\development-flow.md"
       },
       "OutputPath": {
-        "value": "E:\\Projects\\documentation\\output"
+        "value": "C:\\Projects\\team\\audit\\output\\processen"
       },
       "TemplatePath": {
-        "value": "E:\\Projects\\documentation\\Templates\\eisvogel.latex"
+        "value": "C:\\Projects\\documentation\\Templates\\eisvogel.latex"
       },
       "UseCurrentDate": {
         "value": true
       },
       "PowershellScript": {
-        "value": "E:\\Projects\\documentation\\Tools\\Convert-MarkdownToPDF.ps1"
+        "value": "C:\\Projects\\documentation\\Tools\\Convert-MarkdownToPDF.ps1"
       }
     },
     "mac": {
