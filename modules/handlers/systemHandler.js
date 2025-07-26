@@ -90,6 +90,19 @@ export async function handleCopyFolder({ from, to, overwrite = true }) {
   }
 }
 
+export async function handleCopyFile({ from, to, overwrite = true }) {
+  try {
+    const result = await window.api.system.copyFile({ from, to, overwrite });
+    return result;
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[SystemHandler] copyFile failed from "${from}" to "${to}":`,
+      err,
+    ]);
+    return { success: false, error: err.message };
+  }
+}
+
 export async function handleFileExists({ path }) {
   try {
     const exists = await window.api.system.fileExists(path);

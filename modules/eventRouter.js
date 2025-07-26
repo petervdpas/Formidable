@@ -43,6 +43,7 @@ export function initEventRouter() {
   EventBus.off("file:load", systemHandler.handleLoadFile);
   EventBus.off("file:delete", systemHandler.handleDeleteFile);
   EventBus.off("file:copy-folder", systemHandler.handleCopyFolder);
+  EventBus.off("file:copy-file", systemHandler.handleCopyFile);
   EventBus.off("file:exists", systemHandler.handleFileExists);
   EventBus.off("file:openExternal", systemHandler.handleOpenExternal);
 
@@ -52,6 +53,7 @@ export function initEventRouter() {
   EventBus.on("file:load", systemHandler.handleLoadFile);
   EventBus.on("file:delete", systemHandler.handleDeleteFile);
   EventBus.on("file:copy-folder", systemHandler.handleCopyFolder);
+  EventBus.on("file:copy-file", systemHandler.handleCopyFile);
   EventBus.on("file:exists", systemHandler.handleFileExists);
   EventBus.on("file:openExternal", systemHandler.handleOpenExternal);
 
@@ -292,16 +294,34 @@ export function initEventRouter() {
   EventBus.off("transform:markdown", transformHandler.handleRenderMarkdown);
   EventBus.off("transform:html", transformHandler.handleRenderHtml);
   EventBus.off("transform:parseMiniExpr", transformHandler.handleParseMiniExpr);
-  EventBus.off("transform:parseFrontmatter", transformHandler.handleParseFrontmatter);
-  EventBus.off("transform:buildFrontmatter", transformHandler.handleBuildFrontmatter);
-  EventBus.off("transform:filterFrontmatter", transformHandler.handleFilterFrontmatter);
+  EventBus.off(
+    "transform:parseFrontmatter",
+    transformHandler.handleParseFrontmatter
+  );
+  EventBus.off(
+    "transform:buildFrontmatter",
+    transformHandler.handleBuildFrontmatter
+  );
+  EventBus.off(
+    "transform:filterFrontmatter",
+    transformHandler.handleFilterFrontmatter
+  );
 
   EventBus.on("transform:markdown", transformHandler.handleRenderMarkdown);
   EventBus.on("transform:html", transformHandler.handleRenderHtml);
   EventBus.on("transform:parseMiniExpr", transformHandler.handleParseMiniExpr);
-  EventBus.on("transform:parseFrontmatter", transformHandler.handleParseFrontmatter);
-  EventBus.on("transform:buildFrontmatter", transformHandler.handleBuildFrontmatter);
-  EventBus.on("transform:filterFrontmatter", transformHandler.handleFilterFrontmatter);
+  EventBus.on(
+    "transform:parseFrontmatter",
+    transformHandler.handleParseFrontmatter
+  );
+  EventBus.on(
+    "transform:buildFrontmatter",
+    transformHandler.handleBuildFrontmatter
+  );
+  EventBus.on(
+    "transform:filterFrontmatter",
+    transformHandler.handleFilterFrontmatter
+  );
 
   // Git events
   EventBus.off("git:check", gitHandler.handleGitCheckRepo);

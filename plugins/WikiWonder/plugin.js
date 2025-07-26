@@ -1,6 +1,7 @@
 // plugins/WikiWonder/plugin.js
 
 async function performMarkdownExport({
+  path,
   plugin,
   selectedTemplate,
   selectedDataFile,
@@ -14,24 +15,55 @@ async function performMarkdownExport({
     .map((k) => k.trim())
     .filter(Boolean);
 
+  const contextFolder = await plugin.getConfig("context_folder");
+  const templateName = path.stripYamlExtension(selectedTemplate);
+  const imageSrcDir = `${contextFolder}/storage/${templateName}/images`;
+  const imageDestDir = `${outputDir}/.images`;
+
   const baseOpts = {
     selectedTemplate,
     outputDir,
     filename: null,
   };
 
-  async function renderOneFile(dataFile) {
-    let opts = { ...baseOpts, selectedDataFile: dataFile };
+  const imageSet = new Set();
 
-    if (frontmatterMode === "remove") {
-      opts.stripFrontmatter = true;
-    } else if (frontmatterMode === "filter") {
-      opts.stripFrontmatter = keysArray;
-    } else {
-      opts.stripFrontmatter = false;
+  async function renderOneFile(dataFile) {
+    const opts = {
+      ...baseOpts,
+      selectedDataFile: dataFile,
+      stripFrontmatter:
+        frontmatterMode === "remove"
+          ? true
+          : frontmatterMode === "filter"
+          ? keysArray
+          : false,
+    };
+
+    const markdownPath = await plugin.saveMarkdownTo(opts);
+    const content = await plugin.loadFile(markdownPath);
+    const markdown = typeof content === "string" ? content : content?.data;
+    if (!markdown) return;
+
+    let updated = markdown;
+    const matches = [...markdown.matchAll(/!\[.*?\]\((.*?)\)/g)];
+
+    for (const match of matches) {
+      const rawPath = match[1]?.trim();
+      if (!rawPath) continue;
+
+      // Accept absolute Windows path or relative
+      
+      const filename = rawPath.split(/[\\/]/).pop();
+      const newPath = `.images/${filename}`;
+
+      imageSet.add(filename);
+      updated = updated.replaceAll(`](${rawPath})`, `](${newPath})`);
     }
 
-    await plugin.saveMarkdownTo(opts);
+    if (updated !== markdown) {
+      await plugin.saveFile(markdownPath, updated);
+    }
   }
 
   if (bulkMode) {
@@ -41,6 +73,20 @@ async function performMarkdownExport({
     }
   } else {
     await renderOneFile(selectedDataFile);
+  }
+
+  // Copy images
+  if (imageSet.size > 0) {
+    await plugin.ensureDirectory(imageDestDir);
+    for (const filename of imageSet) {
+      const from = `${imageSrcDir}/${filename}`;
+      const to = `${imageDestDir}/${filename}`;
+      try {
+        await plugin.copyFile({ from, to, overwrite: true });
+      } catch (err) {
+        console.warn(`[WikiWonder] Failed to copy ${filename}: ${err.message}`);
+      }
+    }
   }
 
   emit("ui:toast", {
@@ -192,6 +238,7 @@ export async function run() {
         onClick: async () => {
           const values = fieldManager.getValues();
           await performMarkdownExport({
+            path,
             plugin,
             selectedTemplate,
             selectedDataFile,

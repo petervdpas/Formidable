@@ -150,6 +150,25 @@ export async function copyFolder({ from, to, overwrite = true }) {
   }
 }
 
+export async function copyFile({ from, to, overwrite = true }) {
+  if (!from || !to) {
+    console.warn("[pluginUtils] copyFile requires 'from' and 'to' paths.");
+    return { success: false, error: "Missing source or target path" };
+  }
+
+  try {
+    const result = await EventBus.emitWithResponse("file:copy-file", {
+      from,
+      to,
+      overwrite,
+    });
+    return result;
+  } catch (err) {
+    console.warn("[pluginUtils] copyFile failed:", err);
+    return { success: false, error: err.message || "Copy failed" };
+  }
+}
+
 export async function fileExists(path) {
   return EventBus.emitWithResponse("file:exists", { path });
 }

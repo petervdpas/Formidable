@@ -106,6 +106,27 @@ function copyFolderRecursive(
   }
 }
 
+function copyFile(from, to, { overwrite = true, silent = false } = {}) {
+  try {
+    const srcPath = resolvePath(from);
+    const destPath = resolvePath(to);
+
+    if (!overwrite && fs.existsSync(destPath)) {
+      if (!silent) warn(`[FileManager] Skipped existing file: ${destPath}`);
+      return { success: true, skipped: true };
+    }
+
+    ensureDirectory(path.dirname(destPath), { silent });
+    fs.copyFileSync(srcPath, destPath);
+    if (!silent) log(`[FileManager] Copied file: ${srcPath} → ${destPath}`);
+
+    return { success: true };
+  } catch (err) {
+    if (!silent) error(`[FileManager] Failed to copy file:`, err);
+    return { success: false, error: err.message };
+  }
+}
+
 // Build a file path safely, with optional enforced extension
 function buildFilePath(directory, baseFilename, { extension = "" } = {}) {
   const ext = extension
@@ -313,6 +334,7 @@ module.exports = {
   makeRelative,
   toPosixPath,
   copyFolderRecursive,
+  copyFile,
   buildFilePath,
   resolvePath,
   joinPath,

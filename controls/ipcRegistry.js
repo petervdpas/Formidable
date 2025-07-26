@@ -237,6 +237,10 @@ function registerIpcHandlers() {
       success: fileManager.copyFolderRecursive(from, to, overwrite),
     };
   });
+  registerIpc("copy-file", (e, { from, to, overwrite = true }) => {
+    const result = fileManager.copyFile(from, to, { overwrite });
+    return result;
+  });
 
   // Config
   registerIpc("switch-user-profile", (e, profileFilename) =>
