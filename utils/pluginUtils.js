@@ -131,6 +131,10 @@ export async function deleteFile(filepath, opts = {}) {
   return EventBus.emitWithResponse("file:delete", { filepath, opts });
 }
 
+export async function emptyFolder(dirPath) {
+  return EventBus.emitWithResponse("file:empty-folder", { dirPath });
+}
+
 export async function copyFolder({ from, to, overwrite = true }) {
   if (!from || !to) {
     console.warn("[pluginUtils] copyFolder requires 'from' and 'to' paths.");

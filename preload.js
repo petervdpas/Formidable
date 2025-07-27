@@ -118,6 +118,7 @@ const api = {
       ipcRenderer.invoke("load-file", filepath, opts),
     deleteFile: (filepath, opts) =>
       ipcRenderer.invoke("delete-file", filepath, opts),
+    emptyFolder: (dirPath) => ipcRenderer.invoke("empty-folder", dirPath),
     copyFolder: ({ from, to, overwrite = true }) =>
       ipcRenderer.invoke("copy-folder", { from, to, overwrite }),
     copyFile: ({ from, to, overwrite = true }) =>

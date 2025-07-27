@@ -4,6 +4,24 @@ export async function run() {
   const { plugin, button, modal, dom, string } = window.FGA;
   const pluginName = "PandocPrint";
 
+  setTimeout(async () => {
+    const markdownRoot = `plugins/${pluginName}/markdown`;
+    try {
+      await plugin.emptyFolder(markdownRoot);
+      emit("ui:toast", {
+        message: `Cleared markdown folder: ${markdownRoot}`,
+        variant: "success",
+        duration: 3000,
+      });
+    } catch (err) {
+      emit("ui:toast", {
+        message: `Failed to clear markdown folder: ${err.message}`,
+        variant: "error",
+        duration: 5000,
+      });
+    }
+  }, 100);
+
   const { show } = modal.setupPluginModal({
     id: "plugin-settings-pandocprint",
     title: "Pandoc Print",
@@ -14,11 +32,12 @@ export async function run() {
     resizable: false,
 
     prepareBody: async (modalEl, bodyEl) => {
-      const [contextFolder, selectedTemplate, selectedDataFile] = await Promise.all([
-        plugin.getConfig("context_folder"),
-        plugin.getConfig("selected_template"),
-        plugin.getConfig("selected_data_file"),
-      ]);
+      const [contextFolder, selectedTemplate, selectedDataFile] =
+        await Promise.all([
+          plugin.getConfig("context_folder"),
+          plugin.getConfig("selected_template"),
+          plugin.getConfig("selected_data_file"),
+        ]);
 
       let settings = await plugin.getSettings(pluginName);
       if (!settings || typeof settings !== "object") settings = {};
@@ -57,9 +76,10 @@ export async function run() {
         const values = {};
         for (const field of variableFields) {
           const raw = vars[field.key]?.value;
-          values[field.key] = field.type === "boolean"
-            ? raw === true || raw === "true"
-            : raw || "";
+          values[field.key] =
+            field.type === "boolean"
+              ? raw === true || raw === "true"
+              : raw || "";
         }
         return values;
       };
@@ -69,7 +89,9 @@ export async function run() {
         ...variableFields.map((f) => ({
           ...f,
           wrapper: "modal-form-row tight-gap",
-          fieldRenderer: `render${f.type.charAt(0).toUpperCase()}${f.type.slice(1)}Field`,
+          fieldRenderer: `render${f.type.charAt(0).toUpperCase()}${f.type.slice(
+            1
+          )}Field`,
         })),
       ];
 
@@ -102,20 +124,6 @@ export async function run() {
         });
       });
 
-      // Set InputPath from Formidable-generated Markdown if applicable
-      if (fieldManager.getValue("UseFormidable")) {
-        const markdownPath = await plugin.saveMarkdownTo({
-          selectedTemplate,
-          selectedDataFile,
-          outputDir: `plugins/${pluginName}/markdown`,
-          filename: null,
-        });
-
-        if (markdownPath) {
-          fieldManager.setValue("InputPath", markdownPath);
-        }
-      }
-
       const saveBtn = button.createButton({
         text: "Save Settings",
         className: "btn-warn",
@@ -127,9 +135,10 @@ export async function run() {
           settings.platforms[platform] = settings.platforms[platform] || {};
 
           for (const field of variableFields) {
-            const val = field.type === "boolean"
-              ? Boolean(values[field.key])
-              : values[field.key];
+            const val =
+              field.type === "boolean"
+                ? Boolean(values[field.key])
+                : values[field.key];
             settings.platforms[platform][field.key] = { value: val };
           }
 
@@ -137,9 +146,32 @@ export async function run() {
           const result = await plugin.saveSettings(pluginName, settings);
 
           emit("ui:toast", {
-            message: result?.success ? "Settings saved" : "Failed to save settings",
+            message: result?.success
+              ? "Settings saved"
+              : "Failed to save settings",
             variant: result?.success ? "success" : "error",
           });
+        },
+      });
+
+      const renderBtn = button.createButton({
+        text: "Render Markdown",
+        className: "btn-info",
+        onClick: async () => {
+          // Set InputPath from Formidable-generated Markdown if applicable
+          if (fieldManager.getValue("UseFormidable")) {
+            const markdownPath = await plugin.saveMarkdownTo({
+              selectedTemplate,
+              selectedDataFile,
+              outputDir: `plugins/${pluginName}/markdown`,
+              filename: null,
+              showToast: true,
+            });
+
+            if (markdownPath) {
+              fieldManager.setValue("InputPath", markdownPath);
+            }
+          }
         },
       });
 
@@ -157,7 +189,10 @@ export async function run() {
             UseCurrentDate: values.UseCurrentDate ? "true" : "false",
           };
 
-          const finalCommand = string.combiMerge([values.ShellCommand], cmdParams);
+          const finalCommand = string.combiMerge(
+            [values.ShellCommand],
+            cmdParams
+          );
 
           console.log("[PandocPrint] Final command:", finalCommand);
           const result = await plugin.executeSystemCommand(finalCommand);
@@ -175,7 +210,9 @@ export async function run() {
         },
       });
 
-      bodyEl.appendChild(button.buildButtonGroup(saveBtn, previewBtn));
+      bodyEl.appendChild(
+        button.buildButtonGroup(saveBtn, renderBtn, previewBtn)
+      );
     },
   });
 

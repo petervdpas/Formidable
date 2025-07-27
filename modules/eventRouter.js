@@ -42,6 +42,7 @@ export function initEventRouter() {
   EventBus.off("file:save", systemHandler.handleSaveFile);
   EventBus.off("file:load", systemHandler.handleLoadFile);
   EventBus.off("file:delete", systemHandler.handleDeleteFile);
+  EventBus.off("file:empty-folder", systemHandler.handleEmptyFolder);
   EventBus.off("file:copy-folder", systemHandler.handleCopyFolder);
   EventBus.off("file:copy-file", systemHandler.handleCopyFile);
   EventBus.off("file:exists", systemHandler.handleFileExists);
@@ -52,6 +53,7 @@ export function initEventRouter() {
   EventBus.on("file:save", systemHandler.handleSaveFile);
   EventBus.on("file:load", systemHandler.handleLoadFile);
   EventBus.on("file:delete", systemHandler.handleDeleteFile);
+  EventBus.on("file:empty-folder", systemHandler.handleEmptyFolder);
   EventBus.on("file:copy-folder", systemHandler.handleCopyFolder);
   EventBus.on("file:copy-file", systemHandler.handleCopyFile);
   EventBus.on("file:exists", systemHandler.handleFileExists);

@@ -1,6 +1,6 @@
 {
   "overwrite": true,
-  "updated": "2025-07-26T16:01:07.275Z",
+  "updated": "2025-07-27T10:07:41.834Z",
   "platform": "windows",
   "platforms": {
     "linux": {
@@ -34,7 +34,7 @@
         "value": "powershell -ExecutionPolicy Bypass -File {script} -InputPath {InputPath} -UseCurrentDate {UseCurrentDate} -TemplatePath {TemplatePath} -OutputPath {OutputPath}"
       },
       "InputPath": {
-        "value": "C:\\Projects\\documentation\\Leerplan Algemeen\\development-flow.md"
+        "value": "C:\\Projects\\Formidable\\plugins\\PandocPrint\\markdown\\processen-id03.md"
       },
       "OutputPath": {
         "value": "C:\\Projects\\team\\audit\\output\\processen"

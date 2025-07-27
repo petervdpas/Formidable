@@ -326,6 +326,34 @@ function deleteFolder(dirPath, { silent = false } = {}) {
   }
 }
 
+function emptyFolder(dirPath, { silent = false } = {}) {
+  try {
+    const fullPath = resolvePath(dirPath);
+
+    if (!fs.existsSync(fullPath)) {
+      if (!silent) warn(`[FileManager] Folder does not exist: ${fullPath}`);
+      return false;
+    }
+
+    const entries = fs.readdirSync(fullPath, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const entryPath = path.join(fullPath, entry.name);
+      if (entry.isDirectory()) {
+        fs.rmSync(entryPath, { recursive: true, force: true });
+      } else {
+        fs.unlinkSync(entryPath);
+      }
+    }
+
+    if (!silent) log(`[FileManager] Emptied folder: ${fullPath}`);
+    return true;
+  } catch (err) {
+    if (!silent) error(`[FileManager] Failed to empty folder ${dirPath}:`, err);
+    return false;
+  }
+}
+
 module.exports = {
   baseDir,
   setAppRoot,
@@ -348,4 +376,5 @@ module.exports = {
   saveImageFile,
   deleteFile,
   deleteFolder,
+  emptyFolder,
 };

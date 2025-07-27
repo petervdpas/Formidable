@@ -53,7 +53,7 @@ async function performMarkdownExport({
       if (!rawPath) continue;
 
       // Accept absolute Windows path or relative
-      
+
       const filename = rawPath.split(/[\\/]/).pop();
       const newPath = `.images/${filename}`;
 
@@ -124,6 +124,24 @@ async function copyToTarget({ plugin, pluginName, targetDir }) {
 export async function run() {
   const { path, plugin, button, modal, dom } = window.FGA;
   const pluginName = "WikiWonder";
+
+  setTimeout(async () => {
+    const markdownRoot = `plugins/${pluginName}/markdown`;
+    try {
+      await plugin.emptyFolder(markdownRoot);
+      emit("ui:toast", {
+        message: `Cleared markdown folder: ${markdownRoot}`,
+        variant: "success",
+        duration: 3000,
+      });
+    } catch (err) {
+      emit("ui:toast", {
+        message: `Failed to clear markdown folder: ${err.message}`,
+        variant: "error",
+        duration: 5000,
+      });
+    }
+  }, 100);
 
   const { show } = modal.setupPluginModal({
     id: "plugin-settings-wikiwonder",

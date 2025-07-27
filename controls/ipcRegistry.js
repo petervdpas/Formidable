@@ -228,19 +228,6 @@ function registerIpcHandlers() {
   registerIpc("delete-form", (e, templateFilename, dataFile) =>
     formManager.deleteForm(templateFilename, dataFile)
   );
-  // This one still uses raw storageLocation (not templateFilename), so leave as-is for now:
-  registerIpc("save-image-file", async (e, storageLocation, fileName, buffer) =>
-    fileManager.saveImageFile(storageLocation, fileName, buffer)
-  );
-  registerIpc("copy-folder", (e, { from, to, overwrite }) => {
-    return {
-      success: fileManager.copyFolderRecursive(from, to, overwrite),
-    };
-  });
-  registerIpc("copy-file", (e, { from, to, overwrite = true }) => {
-    const result = fileManager.copyFile(from, to, { overwrite });
-    return result;
-  });
 
   // Config
   registerIpc("switch-user-profile", (e, profileFilename) =>
@@ -337,7 +324,20 @@ function registerIpcHandlers() {
   registerIpc("delete-file", (e, filepath, opts) =>
     fileManager.deleteFile(filepath, opts)
   );
+  registerIpc("empty-folder", (e, dirPath) => fileManager.emptyFolder(dirPath));
   registerIpc("file-exists", (e, filePath) => fileManager.fileExists(filePath));
+  registerIpc("save-image-file", async (e, storageLocation, fileName, buffer) =>
+    fileManager.saveImageFile(storageLocation, fileName, buffer)
+  );
+  registerIpc("copy-folder", (e, { from, to, overwrite }) => {
+    return {
+      success: fileManager.copyFolderRecursive(from, to, overwrite),
+    };
+  });
+  registerIpc("copy-file", (e, { from, to, overwrite = true }) => {
+    const result = fileManager.copyFile(from, to, { overwrite });
+    return result;
+  });
   registerIpc("execute-command", async (e, cmd) => {
     return new Promise((resolve) => {
       exec(cmd, { shell: true }, (error, stdout, stderr) => {
