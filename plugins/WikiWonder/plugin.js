@@ -9,6 +9,7 @@ async function performMarkdownExport({
   bulkMode,
   frontmatterMode = "keep",
   frontmatterKeys = "",
+  encodeFilenames = false,
 }) {
   const keysArray = frontmatterKeys
     .split(",")
@@ -52,10 +53,9 @@ async function performMarkdownExport({
       const rawPath = match[1]?.trim();
       if (!rawPath) continue;
 
-      // Accept absolute Windows path or relative
-
       const filename = rawPath.split(/[\\/]/).pop();
-      const newPath = `.images/${filename}`;
+      const encodedName = encodeFilenames ? encodeURIComponent(filename) : filename;
+      const newPath = `.images/${encodedName}`;
 
       imageSet.add(filename);
       updated = updated.replaceAll(`](${rawPath})`, `](${newPath})`);
@@ -95,6 +95,7 @@ async function performMarkdownExport({
     duration: 6000,
   });
 }
+
 
 async function copyToTarget({ plugin, pluginName, targetDir }) {
   if (!targetDir) {
@@ -166,6 +167,7 @@ export async function run() {
       settings.bulkMode ??= false;
       settings.frontmatterMode ??= "keep";
       settings.frontmatterKeys ??= "";
+      settings.encodeFilenames ??= false;
 
       const templateName = path.stripYamlExtension(selectedTemplate);
       const outputDir = `plugins/${pluginName}/markdown/${templateName}`;
@@ -209,6 +211,14 @@ export async function run() {
           fieldRenderer: "renderBooleanField",
           value: settings.bulkMode,
         },
+        {
+          key: "encodeFilenames",
+          type: "boolean",
+          label: "Encode filenames",
+          wrapper: "modal-form-row",
+          fieldRenderer: "renderBooleanField",
+          value: settings.encodeFilenames,
+        },
       ];
 
       const fieldManager = dom.createFieldManager({
@@ -219,6 +229,7 @@ export async function run() {
           targetFolder: settings.targetFolder,
           frontmatterMode: settings.frontmatterMode,
           frontmatterKeys: settings.frontmatterKeys,
+          encodeFilenames: settings.encodeFilenames,
         },
         injectBefore: () => {
           const info = document.createElement("p");
@@ -239,6 +250,7 @@ export async function run() {
           settings.bulkMode = Boolean(values.bulkMode);
           settings.frontmatterMode = values.frontmatterMode;
           settings.frontmatterKeys = values.frontmatterKeys;
+          settings.encodeFilenames = Boolean(values.encodeFilenames);
 
           const result = await plugin.saveSettings(pluginName, settings);
           emit("ui:toast", {
@@ -264,6 +276,7 @@ export async function run() {
             bulkMode: Boolean(values.bulkMode),
             frontmatterMode: values.frontmatterMode,
             frontmatterKeys: values.frontmatterKeys,
+            encodeFilenames: Boolean(values.encodeFilenames),
           });
         },
       });
