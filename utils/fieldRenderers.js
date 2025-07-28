@@ -737,7 +737,7 @@ export async function renderImageField(field, value = "", template) {
     parent: wrapper,
     tag: "img",
     attributes: {
-      style: "cursor: zoom-in; max-width: 200px; max-height: 200px;",
+      style: "display: none; cursor: zoom-in; max-width: 200px; max-height: 200px;",
       alt: "Image preview",
     },
   });
@@ -886,17 +886,17 @@ export async function renderImageField(field, value = "", template) {
     wrapper.removeAttribute("data-filename");
   };
 
-  if (typeof v === "string" && v) {
-    wrapper.setAttribute("data-filename", v);
+  if (typeof v === "string" && v.trim() !== "") {
     if (template?.virtualLocation) {
       window.api.system
         .resolvePath(template.virtualLocation, "images", v)
         .then((fullPath) => {
-          setImage(`file://${fullPath.replace(/\\/g, "/")}`, v);
+          const src = `file://${fullPath.replace(/\\/g, "/")}`;
+          setImage(src, v); // only set image if resolve succeeded
         })
         .catch(() => {
-          preview.alt = "Image not found";
-          preview.style.display = "none";
+          // Do not show anything, just silently fail (no broken image)
+          clearImage(); // optional: clean up any previous UI remnants
         });
     }
   }
@@ -909,13 +909,6 @@ export async function renderImageField(field, value = "", template) {
         setImage(e.target.result, file.name);
       };
       reader.readAsDataURL(file);
-    }
-  });
-
-  requestAnimationFrame(() => {
-    const existing = wrapper.getAttribute("data-filename");
-    if (existing) {
-      deleteBtn.style.display = "inline-block";
     }
   });
 

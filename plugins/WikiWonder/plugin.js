@@ -47,9 +47,10 @@ async function performMarkdownExport({
     if (!markdown) return;
 
     let updated = markdown;
-    const matches = [...markdown.matchAll(/!\[.*?\]\((.*?)\)/g)];
 
-    for (const match of matches) {
+    // ─── Replace image paths ─────────────────────────────────────────────
+    const imageMatches = [...markdown.matchAll(/!\[.*?\]\((.*?)\)/g)];
+    for (const match of imageMatches) {
       const rawPath = match[1]?.trim();
       if (!rawPath) continue;
 
@@ -61,11 +62,35 @@ async function performMarkdownExport({
       updated = updated.replaceAll(`](${rawPath})`, `](${newPath})`);
     }
 
+    // ─── Replace formidable:// links with Azure Wiki links ───────────────
+    const linkPattern = /formidable:\/\/([^:\s]+):([^\s)]+)/g;
+    for (const match of markdown.matchAll(linkPattern)) {
+      const [, templateFile, dataFileName] = match;
+
+      const templateSlug = path.stripYamlExtension(templateFile);   // e.g. "aanpak-audit"
+      const dataSlug = path.stripMetaExtension(dataFileName);       // e.g. "aanpak-ch02"
+
+      // Extract something like "CH.02" from "aanpak-ch02"
+      let label = dataSlug;
+      const chMatch = dataSlug.match(/ch(\d+)/i);
+      if (chMatch) {
+        const chNum = chMatch[1];
+        label = `CH.${chNum.padStart(2, "0")}`;
+      }
+
+      const wikiPath = `/${templateSlug}/${dataSlug}`;
+      const linkText = `${templateSlug}/${dataSlug}`;
+
+      updated = updated.replaceAll(match[0], `[${linkText}](${wikiPath})`);
+    }
+
+    // ─── Save modified markdown ──────────────────────────────────────────
     if (updated !== markdown) {
       await plugin.saveFile(markdownPath, updated);
     }
   }
 
+  // ─── Render all files ──────────────────────────────────────────────────
   if (bulkMode) {
     const files = await plugin.getStorageFilesForTemplate(selectedTemplate);
     for (const file of files) {
@@ -75,7 +100,7 @@ async function performMarkdownExport({
     await renderOneFile(selectedDataFile);
   }
 
-  // Copy images
+  // ─── Copy images ───────────────────────────────────────────────────────
   if (imageSet.size > 0) {
     await plugin.ensureDirectory(imageDestDir);
     for (const filename of imageSet) {
@@ -95,7 +120,6 @@ async function performMarkdownExport({
     duration: 6000,
   });
 }
-
 
 async function copyToTarget({ plugin, pluginName, targetDir }) {
   if (!targetDir) {
