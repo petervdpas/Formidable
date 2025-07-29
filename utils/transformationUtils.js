@@ -1,5 +1,8 @@
 // utils/transformationUtils.js
 
+import { EventBus } from "../modules/eventBus.js";
+import { getUserConfig } from "./configUtil.js";
+
 /**
  * Retrieves a value at a given key path (supports dot notation).
  */
@@ -124,3 +127,36 @@ export async function filterFrontmatter(data = {}, keepKeys = []) {
     keepKeys,
   });
 } 
+
+/**
+ * Evaluates a sidebar expression and returns rich output.
+ * Always attempts evaluation; caller decides whether to use it.
+ */
+export async function evaluateExpression({
+  expr,
+  context,
+  fallbackId,
+}) {
+  if (!expr || !context) {
+    return fallbackId ? { text: fallbackId } : null;
+  }
+
+  try {
+    const parsed = await EventBus.emitWithResponse("transform:parseMiniExpr", {
+      expr,
+      context,
+    });
+
+    if (typeof parsed === "object" && parsed !== null) {
+      return {
+        text: parsed.text ?? fallbackId,
+        ...parsed, // color, bold, italic, etc.
+      };
+    }
+
+    return fallbackId ? { text: fallbackId } : null;
+  } catch (err) {
+    console.warn("[EXPRESSION] Failed:", err);
+    return fallbackId ? { text: fallbackId } : null;
+  }
+}

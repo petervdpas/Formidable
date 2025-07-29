@@ -2,8 +2,13 @@
 
 import { EventBus } from "./eventBus.js";
 import { ensureVirtualLocation } from "../utils/vfsUtils.js";
+import { getUserConfig } from "../utils/configUtil.js";
+import { evaluateExpression } from "../utils/transformationUtils.js";
 import { stripMetaExtension } from "../utils/pathUtils.js";
-import { buildSwitchElement } from "../utils/elementBuilders.js";
+import {
+  buildSwitchElement,
+  buildExpressionLabel,
+} from "../utils/elementBuilders.js";
 import { createListManager } from "../utils/listUtils.js";
 import { createAddButton } from "./uiButtons.js";
 
@@ -12,7 +17,6 @@ export function createTemplateListManager(modal, dropdown = null) {
     elementId: "template-list",
     itemClass: "template-item",
 
-    // 🔁 Use EventBus for fetching templates
     fetchListFunction: async () => {
       return await new Promise((resolve) => {
         EventBus.emit("template:list", { callback: resolve });
@@ -79,19 +83,16 @@ export function createStorageListManager(formManager, modal) {
     id: "flagged-toggle",
     checked: false,
     trailingLabel: ["Show only flagged", "Show all"],
-    onFlip: (value) => {
+    onFlip: async (value) => {
       showOnlyFlagged = value;
 
-      new Promise((resolve) =>
-        EventBus.emit("config:load", (cfg) => resolve(cfg))
-      ).then((cfg) => {
-        const name = window.currentSelectedDataFile || cfg?.selected_data_file;
+      const selected_datafile = await getUserConfig("selected_data_file");
+      const name = window.currentSelectedDataFile || selected_datafile;
 
-        listManager.renderList(undefined, () => {
-          if (name) {
-            EventBus.emit("form:list:highlighted", name);
-          }
-        });
+      listManager.renderList(undefined, () => {
+        if (name) {
+          EventBus.emit("form:list:highlighted", name);
+        }
       });
     },
   });
@@ -101,6 +102,7 @@ export function createStorageListManager(formManager, modal) {
   const listManager = createListManager({
     elementId: "storage-list",
     itemClass: "storage-item",
+
     fetchListFunction: async () => {
       const template = await ensureVirtualLocation(
         window.currentSelectedTemplate
@@ -136,47 +138,43 @@ export function createStorageListManager(formManager, modal) {
         };
       });
     },
+
     onItemClick: (storageItem) =>
       EventBus.emit("form:list:itemClicked", storageItem),
+
     emptyMessage: "No metadata files found.",
+
     renderItemExtra: async ({ subLabelNode, flagNode, rawData }) => {
-      // Flag (with wrapper so CSS matches)
       if (rawData.flagged) {
         const wrapper = document.createElement("span");
         wrapper.className = "flag-icon-wrapper";
-
         const flagIcon = document.createElement("i");
         flagIcon.className = "fa fa-flag";
         flagIcon.style.pointerEvents = "none";
-
         wrapper.appendChild(flagIcon);
         flagNode.appendChild(wrapper);
       }
 
-      /*
-      if (rawData.sidebarExpr && rawData.sidebarContext) {
-        const parsed = await EventBus.emitWithResponse(
-          "transform:parseMiniExpr",
-          {
-            expr: rawData.sidebarExpr,
-            context: rawData.sidebarContext,
-          }
-        );
+      subLabelNode.innerHTML = "";
 
-        if (parsed?.text) {
-          subLabelNode.textContent = parsed.text;
-        } else if (rawData.id) {
-          subLabelNode.textContent = rawData.id;
-        }
+      const enabled = await getUserConfig("use_sidebar_expressions");
+      if (!enabled || !rawData.sidebarExpr || !rawData.sidebarContext) return;
 
-        if (parsed?.color) {
-          subLabelNode.style.color = parsed.color;
-        }
-      } else if (rawData.id) {
-        subLabelNode.textContent = rawData.id;
+      const result = await evaluateExpression({
+        expr: rawData.sidebarExpr,
+        context: rawData.sidebarContext,
+        fallbackId: rawData.id,
+      });
+
+      if (result?.text) {
+        const exprEl = buildExpressionLabel({
+          text: result.text,
+          classes: result.classes ?? [],
+        });
+        subLabelNode.appendChild(exprEl);
       }
-      */
     },
+
     filterFunction: (item) => !showOnlyFlagged || item.flagged,
     filterUI: wrapper,
     addButton: createAddButton({
@@ -202,10 +200,8 @@ export function createStorageListManager(formManager, modal) {
   toggle.addEventListener("change", async () => {
     showOnlyFlagged = toggle.checked;
 
-    const config = await new Promise((resolve) => {
-      EventBus.emit("config:load", (cfg) => resolve(cfg));
-    });
-    const name = window.currentSelectedDataFile || config?.selected_data_file;
+    const selected_datafile = await getUserConfig("selected_data_file");
+    const name = window.currentSelectedDataFile || selected_datafile;
 
     listManager.renderList(undefined, () => {
       if (name) {

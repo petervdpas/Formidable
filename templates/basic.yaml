@@ -220,7 +220,9 @@ markdown_template: |-
   {{json (fieldRaw "linktest")}}
   ```
   {{field "linktest"}}
-sidebar_handling: '[ test + " (" + check + ")" | check ? "green" : "red" ]'
+sidebar_handling: >-
+  [ test | check ? { text: test, classes: ["expr-text-green", "expr-bold"] } : {
+  text: test, classes: ["expr-text-red", "expr-bold", "expr-blinking"] } ]
 enable_collection: true
 fields:
   - key: id

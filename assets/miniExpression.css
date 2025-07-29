@@ -1,0 +1,61 @@
+/* ─────────────────────────────────────────────
+   Expression Wrapper
+───────────────────────────────────────────── */
+.expr-wrapper {
+  display: block;
+  width: 100%;
+}
+
+/* ─────────────────────────────────────────────
+   Text Colors
+───────────────────────────────────────────── */
+.expr-text-green {
+  color: green;
+}
+
+.expr-text-blue {
+  color: blue;
+}
+
+.expr-text-red {
+  color: red;
+}
+
+/* ─────────────────────────────────────────────
+   Text Styles
+───────────────────────────────────────────── */
+.expr-bold {
+  font-weight: bold;
+}
+
+.expr-italic {
+  font-style: italic;
+}
+
+.expr-underline {
+  text-decoration: underline;
+}
+
+/* ─────────────────────────────────────────────
+   Blinking Animation
+───────────────────────────────────────────── */
+.expr-blinking {
+  animation: blinkingText 1.2s infinite;
+}
+
+@keyframes blinkingText {
+  0%   { opacity: 1; }
+  49%  { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.expr-ticker-container {
+  overflow: hidden;
+  position: relative;
+  max-width: 100%;
+}
+
+.expr-ticker {
+  display: inline-block;
+  white-space: nowrap;
+}

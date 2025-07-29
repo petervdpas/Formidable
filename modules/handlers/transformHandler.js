@@ -41,14 +41,7 @@ export async function handleRenderHtml(markdown, callback) {
 
 export async function handleParseMiniExpr({ expr, context }) {
   try {
-    EventBus.emit("logging:default", [
-      "[transformHandler] Parsing miniExpr...",
-      expr,
-      context,
-    ]);
-
     const result = await window.api.transform.parseMiniExpr(expr, context);
-
     return result;
   } catch (err) {
     EventBus.emit("logging:error", [

@@ -68,7 +68,7 @@ function sanitizeField(f) {
   if (f.options && Array.isArray(f.options) && f.options.length > 0) {
     field.options = f.options;
   }
-  
+
   return field;
 }
 
@@ -155,6 +155,7 @@ export function initTemplateEditor(containerId, onSaveCallback) {
       id: "sidebar-handling",
       label: "Sidebar Handling",
       value: currentData.sidebar_handling || "",
+      multiline: true,
     });
     setupFieldset.appendChild(sidebarRow);
 

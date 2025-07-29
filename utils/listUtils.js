@@ -112,7 +112,9 @@ export function createListManager({
 
           // Enrich with additional attributes
           if (isObject) {
+            const skipKeys = new Set(["sidebarExpr", "sidebarContext"]);
             for (const [key, val] of Object.entries(raw)) {
+              if (skipKeys.has(key)) continue;
               if (typeof val === "string" || typeof val === "boolean") {
                 item.dataset[key] = String(val);
               }

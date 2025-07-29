@@ -189,13 +189,12 @@ img {
 .template-item,
 .storage-item,
 .profile-item {
-  padding: 4px 8px;
+  padding: 4px 4px 4px 8px;
   margin-bottom: 5px;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-right: 10px;
   min-height: 36px;
   box-sizing: border-box;
 }
@@ -208,7 +207,6 @@ img {
   height: 28px;
   border-radius: 50%;
   background-color: var(--flagged-circle-bg);
-  margin-left: 12px;
   flex-shrink: 0;
 }
 
@@ -287,7 +285,6 @@ img {
 }
 
 .list-item-flag {
-  margin-left: 8px;
   align-self: flex-start;
 }
 

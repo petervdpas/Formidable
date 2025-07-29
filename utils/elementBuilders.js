@@ -118,6 +118,61 @@ export function createFormRowInput({
   return row;
 }
 
+function setupTicker(el, duration = 6000) {
+  if (!el || !el.parentElement) return;
+
+  const container = el.parentElement;
+  const contentWidth = el.scrollWidth;
+  const containerWidth = container.clientWidth;
+
+  // Restart any previous animation
+  el.style.animation = "none";
+  el.offsetHeight; // force reflow
+  el.style.animation = "";
+
+  const totalDistance = contentWidth + containerWidth;
+
+  const keyframes = [
+    { transform: `translateX(${containerWidth}px)` },
+    { transform: `translateX(-${contentWidth}px)` },
+  ];
+
+  el.animate(keyframes, {
+    duration: duration,
+    iterations: Infinity,
+    easing: "linear",
+  });
+}
+
+export function buildExpressionLabel({
+  text = "",
+  classes = [],
+  isTicker = false,
+  tickerDuration = 8000,
+} = {}) {
+  const container = document.createElement("div");
+  container.className = "expr-wrapper";
+
+  const span = document.createElement("span");
+  span.textContent = text;
+
+  if (Array.isArray(classes)) {
+    for (const cls of classes) span.classList.add(cls);
+  }
+
+  if (isTicker || classes.includes("expr-ticker")) {
+    const tickerWrap = document.createElement("div");
+    tickerWrap.className = "expr-ticker-container";
+    tickerWrap.appendChild(span);
+    container.appendChild(tickerWrap);
+    requestAnimationFrame(() => setupTicker(span, tickerDuration));
+  } else {
+    container.appendChild(span);
+  }
+
+  return container;
+}
+
 export function createDirectoryPicker({
   id,
   value = "",

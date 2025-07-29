@@ -12,20 +12,29 @@ function parseMiniExpr(expr, context = {}) {
     if (!match) return { text: expr };
 
     const inner = match[1].trim();
+    const [rawTextExpr, rawStyleExpr] = inner.split("|").map((s) => s.trim());
 
     const parser = new Parser();
 
-    let result = safeEval(parser, inner, context);
+    const text =
+      safeEval(parser, rawTextExpr, context) ||
+      safeVmEval(rawTextExpr, context) ||
+      "";
 
-    // If expr-eval failed or result === "", fallback to vm
-    if (result === "" || result === undefined) {
-      result = safeVmEval(inner, context);
-    }
+    let style =
+      rawStyleExpr !== undefined
+        ? safeEval(parser, rawStyleExpr, context) ||
+          safeVmEval(rawStyleExpr, context) ||
+          undefined
+        : undefined;
 
-    if (typeof result === "object" && result !== null) {
-      return result;
+    // Normalize output
+    if (style && typeof style === "object" && !Array.isArray(style)) {
+      return { text, ...style };
+    } else if (typeof style === "string") {
+      return { text, color: style };
     } else {
-      return { text: result };
+      return { text };
     }
 
   } catch (err) {

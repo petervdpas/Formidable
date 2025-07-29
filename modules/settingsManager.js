@@ -10,7 +10,6 @@ import {
   createFormRowInput,
   addContainerElement,
 } from "../utils/elementBuilders.js";
-import { createButton } from "../utils/buttonUtils.js";
 
 let cachedConfig = null;
 
@@ -83,6 +82,17 @@ export async function renderSettings() {
       null,
       "block",
       ["Dark", "Light"]
+    )
+  );
+
+  tabDisplay.appendChild(
+    createSwitch(
+      "show-sidebar-expressions-toggle",
+      "Sidebar Expressions",
+      config.use_sidebar_expressions ?? true,
+      null,
+      "block",
+      ["Show", "Hide"]
     )
   );
 
@@ -175,8 +185,7 @@ export async function renderSettings() {
     parent: tabAdvanced,
     tag: "p",
     className: "form-info-text",
-    textContent:
-      "Advanced system options. Use with caution.",
+    textContent: "Advanced system options. Use with caution.",
   });
 
   tabAdvanced.appendChild(
@@ -249,6 +258,10 @@ export async function renderSettings() {
 function setupBindings(config, gitRootPicker) {
   bindThemeSwitch("theme-toggle", "theme");
   bindToggleSwitch("show-icons-toggle", "show_icon_buttons");
+  bindToggleSwitch(
+    "show-sidebar-expressions-toggle",
+    "use_sidebar_expressions"
+  );
 
   bindToggleSwitch("plugin-toggle", "enable_plugins");
   bindToggleSwitch("settings-development-toggle", "development_enable");

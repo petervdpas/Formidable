@@ -8,8 +8,13 @@ import {
   buildFrontmatter,
   filterFrontmatter,
 } from "./transformationUtils.js";
+import {
+  getUserConfig as baseGetUserConfig,
+  saveUserConfig,
+} from "./configUtil.js";
 
-const allowedConfigKeys = [
+// Plugin-specific allowed keys
+const pluginAllowedKeys = [
   "theme",
   "show_icon_buttons",
   "font_size",
@@ -27,26 +32,12 @@ const allowedConfigKeys = [
   "window_bounds",
 ];
 
-// User Config Management
+// Wrapper for plugin usage
 export async function getUserConfig(key) {
-  return new Promise((resolve) => {
-    EventBus.emit("config:load", (config) => {
-      if (!config || typeof config !== "object") return resolve(undefined);
-      if (typeof key === "string") {
-        if (!allowedConfigKeys.includes(key)) {
-          console.warn(`[getUserConfig] Disallowed key: "${key}"`);
-          return resolve(undefined);
-        }
-        return resolve(config[key]);
-      }
-      resolve(config);
-    });
-  });
+  return baseGetUserConfig(key, { allowedKeys: pluginAllowedKeys });
 }
 
-export async function saveUserConfig(partial) {
-  EventBus.emit("config:update", partial);
-}
+export { saveUserConfig };
 
 export async function getStorageFilesForTemplate(templateFilename) {
   if (!templateFilename) return [];
