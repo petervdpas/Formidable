@@ -136,8 +136,10 @@ export async function evaluateExpression({
   expr,
   context,
   fallbackId,
+  throwOnError = false,
 }) {
   if (!expr || !context) {
+    if (throwOnError) throw new Error("Missing expr or context");
     return fallbackId ? { text: fallbackId } : null;
   }
 
@@ -150,13 +152,16 @@ export async function evaluateExpression({
     if (typeof parsed === "object" && parsed !== null) {
       return {
         text: parsed.text ?? fallbackId,
-        ...parsed, // color, bold, italic, etc.
+        ...parsed,
       };
     }
 
+    if (throwOnError) throw new Error("Parsed result is invalid");
     return fallbackId ? { text: fallbackId } : null;
+
   } catch (err) {
     console.warn("[EXPRESSION] Failed:", err);
+    if (throwOnError) throw err;
     return fallbackId ? { text: fallbackId } : null;
   }
 }

@@ -40,16 +40,7 @@ export async function handleRenderHtml(markdown, callback) {
 }
 
 export async function handleParseMiniExpr({ expr, context }) {
-  try {
-    const result = await window.api.transform.parseMiniExpr(expr, context);
-    return result;
-  } catch (err) {
-    EventBus.emit("logging:error", [
-      "[transformHandler] Failed to parse miniExpr:",
-      err,
-    ]);
-    return null;
-  }
+  return await window.api.transform.parseMiniExpr(expr, context);
 }
 
 export async function handleParseFrontmatter(markdown = "") {

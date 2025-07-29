@@ -160,18 +160,28 @@ export function createStorageListManager(formManager, modal) {
       const enabled = await getUserConfig("use_sidebar_expressions");
       if (!enabled || !rawData.sidebarExpr || !rawData.sidebarContext) return;
 
-      const result = await evaluateExpression({
-        expr: rawData.sidebarExpr,
-        context: rawData.sidebarContext,
-        fallbackId: rawData.id,
-      });
-
-      if (result?.text) {
-        const exprEl = buildExpressionLabel({
-          text: result.text,
-          classes: result.classes ?? [],
+      try {
+        const result = await evaluateExpression({
+          expr: rawData.sidebarExpr,
+          context: rawData.sidebarContext,
+          fallbackId: rawData.id,
+          throwOnError: true,
         });
-        subLabelNode.appendChild(exprEl);
+
+        if (result?.text) {
+          const exprEl = buildExpressionLabel({
+            text: result.text,
+            classes: result.classes ?? [],
+          });
+          subLabelNode.appendChild(exprEl);
+        }
+      } catch (err) {
+        console.warn("[sidebarManager] Expression failed:", err);
+        const fallback = buildExpressionLabel({
+          text: "[EXPR ERROR]",
+          classes: ["expr-text-red", "expr-bold"],
+        });
+        subLabelNode.appendChild(fallback);
       }
     },
 

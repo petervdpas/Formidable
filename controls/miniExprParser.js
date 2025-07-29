@@ -7,39 +7,38 @@ const { log, warn, error } = require("./nodeLogger");
 function parseMiniExpr(expr, context = {}) {
   if (!expr || typeof expr !== "string") return {};
 
-  try {
-    const match = expr.match(/^\[(.+)\]$/);
-    if (!match) return { text: expr };
+  const match = expr.match(/^\[(.+)\]$/);
+  if (!match) return { text: expr };
 
-    const inner = match[1].trim();
-    const [rawTextExpr, rawStyleExpr] = inner.split("|").map((s) => s.trim());
+  const inner = match[1].trim();
+  const [rawTextExpr, rawStyleExpr] = inner.split("|").map((s) => s.trim());
 
-    const parser = new Parser();
+  const parser = new Parser();
 
-    const text =
-      safeEval(parser, rawTextExpr, context) ||
-      safeVmEval(rawTextExpr, context) ||
-      "";
+  // Attempt to evaluate text expression
+  let text = safeEval(parser, rawTextExpr, context);
+  if (!text) text = safeVmEval(rawTextExpr, context);
 
-    let style =
-      rawStyleExpr !== undefined
-        ? safeEval(parser, rawStyleExpr, context) ||
-          safeVmEval(rawStyleExpr, context) ||
-          undefined
-        : undefined;
+  if (!text) {
+    const msg = `[miniExprParser] Failed to parse text expression: ${rawTextExpr}`;
+    error(msg);
+    throw new Error(msg);
+  }
 
-    // Normalize output
-    if (style && typeof style === "object" && !Array.isArray(style)) {
-      return { text, ...style };
-    } else if (typeof style === "string") {
-      return { text, color: style };
-    } else {
-      return { text };
-    }
+  // Attempt to evaluate style expression if present
+  let style;
+  if (rawStyleExpr !== undefined) {
+    style = safeEval(parser, rawStyleExpr, context);
+    if (!style) style = safeVmEval(rawStyleExpr, context);
+  }
 
-  } catch (err) {
-    error("[miniExprParser] Parse error:", err);
-    return { text: expr };
+  // Normalize output
+  if (style && typeof style === "object" && !Array.isArray(style)) {
+    return { text, ...style };
+  } else if (typeof style === "string") {
+    return { text, color: style };
+  } else {
+    return { text };
   }
 }
 
@@ -48,9 +47,8 @@ function safeEval(parser, expr, context) {
     const compiled = parser.parse(expr);
     return compiled.evaluate(context);
   } catch (err) {
-    // Suppress warning if input is an object literal
     if (!/^\{.*\}$/.test(expr)) {
-      warn("[miniExprParser] ExprEval error:", expr);
+      warn("[miniExprParser] ExprEval error:", expr, err.message);
     }
     return "";
   }
@@ -58,11 +56,10 @@ function safeEval(parser, expr, context) {
 
 function safeVmEval(expr, context) {
   try {
-    // Wrap in parentheses for object literal:
     const wrapped = /^\{.*\}$/.test(expr) ? `(${expr})` : expr;
     return vm.runInNewContext(wrapped, context);
   } catch (err) {
-    warn("[miniExprParser] VM Eval error:", expr, err);
+    warn("[miniExprParser] VM Eval error:", expr, err.message);
     return "";
   }
 }
