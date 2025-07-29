@@ -118,38 +118,35 @@ export function createFormRowInput({
   return row;
 }
 
-function setupTicker(el, duration = 6000) {
-  if (!el || !el.parentElement) return;
-
-  const container = el.parentElement;
-  const contentWidth = el.scrollWidth;
-  const containerWidth = container.clientWidth;
-
-  // Restart any previous animation
-  el.style.animation = "none";
-  el.offsetHeight; // force reflow
-  el.style.animation = "";
-
-  const totalDistance = contentWidth + containerWidth;
-
-  const keyframes = [
-    { transform: `translateX(${containerWidth}px)` },
-    { transform: `translateX(-${contentWidth}px)` },
-  ];
-
-  el.animate(keyframes, {
-    duration: duration,
-    iterations: Infinity,
-    easing: "linear",
-  });
-}
-
 export function buildExpressionLabel({
   text = "",
   classes = [],
   isTicker = false,
   tickerDuration = 8000,
 } = {}) {
+  function setupTicker(el, duration = 6000) {
+    if (!el || !el.parentElement) return;
+
+    const container = el.parentElement;
+    const contentWidth = el.scrollWidth;
+    const containerWidth = container.clientWidth;
+
+    el.style.animation = "none";
+    el.offsetHeight; // force reflow
+    el.style.animation = "";
+
+    const keyframes = [
+      { transform: `translateX(${containerWidth}px)` },
+      { transform: `translateX(-${contentWidth}px)` },
+    ];
+
+    el.animate(keyframes, {
+      duration: duration,
+      iterations: Infinity,
+      easing: "linear",
+    });
+  }
+
   const container = document.createElement("div");
   container.className = "expr-wrapper";
 
@@ -442,4 +439,3 @@ export function createSwitch(
   container.appendChild(switchWithLabel);
   return container;
 }
-

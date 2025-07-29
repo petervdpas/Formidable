@@ -85,7 +85,9 @@ markdown_template: |-
   {{/loop}}
 
   {{/loop}}
-sidebar_handling: ''
+sidebar_handling: >-
+  [ title | { text: title, classes: ["expr-text-white", "expr-bold",
+  "expr-ticker"] } ]
 enable_collection: false
 fields:
   - key: title
