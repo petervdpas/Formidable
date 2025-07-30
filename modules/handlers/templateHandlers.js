@@ -10,7 +10,7 @@ let lastSelectedTemplate = null;
 let lastSelectedTime = 0;
 let isRenderingTemplate = false;
 
-// 🔗 Inject dependencies from renderer.js
+// Inject dependencies from renderer.js
 export function bindTemplateDependencies(deps) {
   formManager = deps.formManager;
   storageListManager = deps.storageListManager;

@@ -4,35 +4,38 @@ const { Parser } = require("expr-eval");
 const vm = require("vm");
 const { log, warn, error } = require("./nodeLogger");
 
-function parseMiniExpr(expr, context = {}) {
+function parseMiniExpr(expr, originalContext = {}) {
   if (!expr || typeof expr !== "string") return {};
 
   const match = expr.match(/^\[(.+)\]$/);
   if (!match) return { text: expr };
 
   const inner = match[1].trim();
-  const [rawTextExpr, rawStyleExpr] = inner.split("|").map((s) => s.trim());
+  const [rawTextExpr, rawStyleExpr] = splitAtTopLevelPipe(inner);
 
   const parser = new Parser();
 
-  // Attempt to evaluate text expression
+  const context = {
+    ...originalContext,
+    F: originalContext,
+    meta: originalContext,
+  };``
+
   let text = safeEval(parser, rawTextExpr, context);
   if (!text) text = safeVmEval(rawTextExpr, context);
 
-  if (!text) {
+  if (text === undefined) {
     const msg = `[miniExprParser] Failed to parse text expression: ${rawTextExpr}`;
     error(msg);
     throw new Error(msg);
   }
 
-  // Attempt to evaluate style expression if present
   let style;
   if (rawStyleExpr !== undefined) {
     style = safeEval(parser, rawStyleExpr, context);
     if (!style) style = safeVmEval(rawStyleExpr, context);
   }
 
-  // Normalize output
   if (style && typeof style === "object" && !Array.isArray(style)) {
     return { text, ...style };
   } else if (typeof style === "string") {
@@ -40,6 +43,36 @@ function parseMiniExpr(expr, context = {}) {
   } else {
     return { text };
   }
+}
+
+// Improved pipe splitter — respects nesting
+function splitAtTopLevelPipe(str) {
+  let level = 0;
+  let inQuote = false;
+  let quoteChar = null;
+
+  for (let i = 0; i < str.length; i++) {
+    const c = str[i];
+
+    if ((c === '"' || c === "'") && str[i - 1] !== "\\") {
+      if (!inQuote) {
+        inQuote = true;
+        quoteChar = c;
+      } else if (c === quoteChar) {
+        inQuote = false;
+      }
+    }
+
+    if (!inQuote) {
+      if (c === "{" || c === "[" || c === "(") level++;
+      if (c === "}" || c === "]" || c === ")") level--;
+      if (c === "|" && level === 0) {
+        return [str.slice(0, i).trim(), str.slice(i + 1).trim()];
+      }
+    }
+  }
+
+  return [str.trim()]; // No pipe found
 }
 
 function safeEval(parser, expr, context) {
