@@ -3,11 +3,12 @@
 const { Parser } = require("expr-eval");
 const vm = require("vm");
 const { log, warn, error } = require("./nodeLogger");
+const helpers = require("./expressionHelpers");
 
 function parseMiniExpr(expr, originalContext = {}) {
-  if (!expr || typeof expr !== "string") return {};
+  if (!expr || typeof expr !== "string") return { text: "" };
 
-  const match = expr.match(/^\[(.+)\]$/);
+  const match = expr.match(/^\[(.*)\]$/s);
   if (!match) return { text: expr };
 
   const inner = match[1].trim();
@@ -19,33 +20,58 @@ function parseMiniExpr(expr, originalContext = {}) {
     ...originalContext,
     F: originalContext,
     meta: originalContext,
-  };``
+    ...helpers,
+  };
 
-  let text = safeEval(parser, rawTextExpr, context);
-  if (!text) text = safeVmEval(rawTextExpr, context);
+  // ─── Debug ────────────────────────────────────────────────
+  /*
+  try {
+    console.log("[miniExprParser] Parsing:", expr);
+    console.log("[miniExprParser] rawTextExpr:", rawTextExpr);
+    console.log("[miniExprParser] F keys:", Object.keys(context.F || {}));
+    console.log("[miniExprParser] today():", context.today());
+    console.log("[miniExprParser] datum evaluatie:", context.F?.["audit-control-datum-evaluatie"]);
+  } catch (e) {
+    warn("[miniExprParser] Debug logging failed:", e.message);
+  }
+  */
 
-  if (text === undefined) {
-    const msg = `[miniExprParser] Failed to parse text expression: ${rawTextExpr}`;
+  // ─── Evaluate text ────────────────────────────────────────
+  let rawResult = safeEval(parser, rawTextExpr, context);
+  if (!rawResult) rawResult = safeVmEval(rawTextExpr, context);
+
+  if (rawResult === undefined) {
+    const msg = `[miniExprParser] Failed to evaluate expression: ${rawTextExpr}`;
     error(msg);
-    throw new Error(msg);
+    return { text: "[Invalid expression]" };
   }
 
-  let style;
-  if (rawStyleExpr !== undefined) {
-    style = safeEval(parser, rawStyleExpr, context);
-    if (!style) style = safeVmEval(rawStyleExpr, context);
-  }
+  // ─── Normalize result ─────────────────────────────────────
+  let normalized = {};
 
-  if (style && typeof style === "object" && !Array.isArray(style)) {
-    return { text, ...style };
-  } else if (typeof style === "string") {
-    return { text, color: style };
+  if (typeof rawResult === "object" && rawResult !== null && "text" in rawResult) {
+    normalized = { ...rawResult };
   } else {
-    return { text };
+    normalized = { text: String(rawResult) };
   }
+
+  // ─── Evaluate style expression ────────────────────────────
+  if (rawStyleExpr !== undefined) {
+    let style = safeEval(parser, rawStyleExpr, context);
+    if (!style) style = safeVmEval(rawStyleExpr, context);
+
+    if (style && typeof style === "object" && !Array.isArray(style)) {
+      Object.assign(normalized, style);
+    } else if (typeof style === "string") {
+      normalized.color = style;
+    }
+  }
+
+  return normalized;
 }
 
-// Improved pipe splitter — respects nesting
+// ─────────────────────────────────────────────────────────────
+
 function splitAtTopLevelPipe(str) {
   let level = 0;
   let inQuote = false;
