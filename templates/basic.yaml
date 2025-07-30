@@ -4,9 +4,9 @@ markdown_template: |-
   ---
   title: Auto-generated Report
   author: Formidable Generator
-  date: 2025-07-06
+  date: 2025-07-30
   toc: true
-  toc-title: Inhoudsopgave
+  toc-title: Contents
   toc-own-page: true
   ---
 
@@ -220,6 +220,23 @@ markdown_template: |-
   {{json (fieldRaw "linktest")}}
   ```
   {{field "linktest"}}
+  ---
+
+  ## Tags
+
+  _{{fieldDescription "ttags"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "ttags")}}
+  ```
+  {{#if (fieldRaw "ttags")}}
+  Tags(regular): {{field "ttags"}}
+  Tags(with #): {{tags (fieldRaw "ttags") withHash=true}}
+  Tags(without #): {{tags (fieldRaw "ttags") withHash=false}}
+  {{else}}
+  _No tags specified_
+  {{/if}}
 sidebar_handling: >-
   [ test | check ? { text: test, classes: ["expr-text-green", "expr-bold"] } : {
   text: test, classes: ["expr-text-red", "expr-bold", "expr-blinking"] } ]
@@ -334,3 +351,7 @@ fields:
     label: Linktest
     type: link
     description: A link test
+  - key: ttags
+    label: Tags
+    type: tags
+    description: Add any tag you feel like!

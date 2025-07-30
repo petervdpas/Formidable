@@ -215,4 +215,15 @@ export const fieldTypes = {
     parseValue: parsers.parseLinkField,
     applyValue: appliers.applyLinkField,
   },
+
+  tags: {
+    label: "Tags",
+    cssClass: { main: "modal-tags" },
+    selectorAttr: "data-tags-field",
+    disabledAttributes: [],
+    defaultValue: () => [],
+    renderInput: renderers.renderTagsField,
+    parseValue: parsers.parseTagsField,
+    applyValue: appliers.applyGenericField,
+  },
 };

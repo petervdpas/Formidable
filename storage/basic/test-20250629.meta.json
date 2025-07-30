@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-29T09:32:36.440Z",
-    "updated": "2025-07-29T21:39:13.143Z",
+    "updated": "2025-07-30T22:27:15.071Z",
     "flagged": false
   },
   "data": {
@@ -38,6 +38,10 @@
       ]
     ],
     "design": "GreenSignWhiteArrowPersonRunning.png",
-    "linktest": "formidable://basic.yaml:sane-20250530.meta.json"
+    "linktest": "formidable://basic.yaml:sane-20250530.meta.json",
+    "ttags": [
+      "ch.01",
+      "you lucky guy"
+    ]
   }
 }

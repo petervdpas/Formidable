@@ -98,6 +98,9 @@ function generateSingleFieldBlock(field, headingLevel = 2) {
       case "multioption":
         return `- Labels:\n{{#each (fieldRaw "${key}") as |val idx|}}\n  {{#with (lookupOption (fieldMeta "${key}" "options") val) as |opt|}}\n    {{opt.label}}{{#unless (eq idx (subtract (length (fieldRaw "${key}")) 1))}}, {{/unless}}\n  {{/with}}\n{{/each}}\n\n- Values: {{fieldRaw "${key}"}}\n\n- All Options:\n{{#with (fieldRaw "${key}") as |selected|}}\n  {{#each (fieldMeta "${key}" "options") as |opt|}}\n  - [{{#if (includes selected opt.value)}}x{{else}} {{/if}}] {{opt.label}}\n  {{/each}}\n{{/with}}`;
 
+      case "tags":
+        return `{{#if (fieldRaw "${key}")}}\nTags(regular): {{field "${key}"}}\nTags(with #): {{tags (fieldRaw "${key}") withHash=true}}\nTags(without #): {{tags (fieldRaw "${key}") withHash=false}}\n{{else}}\n_No tags specified_\n{{/if}}`;
+
       case "list":
         return `{{#each (fieldRaw "${key}")}}\n- {{this}}\n{{/each}}`;
 

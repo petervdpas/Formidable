@@ -171,3 +171,10 @@ export const parseLinkField = async function (wrapper, template, field) {
 
   return hidden.value?.trim() || "";
 };
+
+export const parseTagsField = async function (wrapper) {
+  const tags = Array.from(wrapper.querySelectorAll(".tag-item"))
+    .map((el) => el.firstChild?.textContent?.trim())
+    .filter(Boolean);
+  return tags;
+};

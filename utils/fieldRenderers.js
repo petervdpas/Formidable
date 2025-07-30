@@ -1080,6 +1080,73 @@ export async function renderLinkField(
 }
 
 // ─────────────────────────────────────────────
+// Type: tags
+export async function renderTagsField(field, value = "") {
+  const tags = Array.isArray(value) ? value : [];
+  const wrapper = document.createElement("div");
+  wrapper.className = "tags-field";
+  wrapper.dataset.tagsField = field.key;
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "tags-input";
+  input.placeholder = "Add tag and press comma or Enter";
+
+  const tagContainer = document.createElement("div");
+  tagContainer.className = "tags-container";
+
+  function createTagElement(tagText) {
+    const tag = document.createElement("span");
+    tag.className = "tag-item";
+    tag.textContent = tagText;
+
+    const remove = document.createElement("button");
+    remove.className = "tag-remove";
+    remove.textContent = "×";
+    remove.onclick = () => {
+      tagContainer.removeChild(tag);
+    };
+
+    tag.appendChild(remove);
+    return tag;
+  }
+
+  // Add initial tags
+  tags.forEach((tagText) => {
+    tagContainer.appendChild(createTagElement(tagText));
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if ((e.key === "," || e.key === "Enter") && input.value.trim()) {
+      e.preventDefault();
+      const newTag = input.value.trim().replace(/,+$/, "");
+      tagContainer.appendChild(createTagElement(newTag));
+      input.value = "";
+    } else if (e.key === "Backspace" && input.value === "") {
+      const lastTag = tagContainer.lastElementChild;
+      if (lastTag) tagContainer.removeChild(lastTag);
+    }
+  });
+
+  wrapper.appendChild(tagContainer);
+  wrapper.appendChild(input);
+
+  applyFieldContextAttributes(wrapper, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
+
+  return wrapInputWithLabel(
+    wrapper,
+    field.label,
+    field.description,
+    field.two_column,
+    field.wrapper || "form-row"
+  );
+}
+
+// ─────────────────────────────────────────────
 // Type: file
 export async function renderFileField(field, value = "") {
   const v = resolveValue(field, value);

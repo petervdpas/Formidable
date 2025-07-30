@@ -17,6 +17,7 @@ const knownTypes = [
   "table",
   "image",
   "link",
+  "tags",
 ];
 
 module.exports = {

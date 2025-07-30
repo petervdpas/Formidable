@@ -105,6 +105,10 @@
   --meta-section-text-color: #ccc;
   --meta-section-font-size: 0.75rem;
 
+  --tag-bg: #3d5a3d;
+  --tag-border: #81c784;
+  --tag-text: #f0fff0;
+
   --flagged-circle-bg: #2a2a2a;
   --flagged-color: #4caf50;
   --unflagged-color: #555;

@@ -224,6 +224,51 @@
   cursor: pointer;
 }
 
+/* ───── Tags Field ───── */
+
+.tags-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+}
+
+.tag-item {
+  background-color: var(--tag-bg);
+  color: var(--tag-text);
+  border: 1px solid var(--tag-border);
+  border-radius: 3px;       /* Less round than pill */
+  padding: 2px 4px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.9em;
+  min-height: 1.8em;
+}
+
+.tag-remove {
+  background: none;
+  border: none;
+  color: var(--tag-text);
+  padding: 2px 4px;
+  margin-left: 0.2em;
+  font-size: 1.1em;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tags-input {
+  padding: 0.4em;
+  font-size: 0.9em;
+  border: 1px solid var(--tag-border);
+  border-radius: 4px;
+  min-width: 200px;
+}
+
 @media (max-width: 720px) {
 
   .field-label {

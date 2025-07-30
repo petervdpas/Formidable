@@ -37,16 +37,22 @@ function stripFrontmatter(markdown) {
 
 function convertFileImages(markdown) {
   // Convert ![alt](file://...) to <img>
-  markdown = markdown.replace(/!\[([^\]]*)\]\((file:\/\/[^\)]+)\)/g, (_, alt, src) => {
-    return `<img src="${src}" alt="${alt}">`;
-  });
+  markdown = markdown.replace(
+    /!\[([^\]]*)\]\((file:\/\/[^\)]+)\)/g,
+    (_, alt, src) => {
+      return `<img src="${src}" alt="${alt}">`;
+    }
+  );
 
   // Convert ![alt](images/...) to absolute file:// URL
-  markdown = markdown.replace(/!\[([^\]]*)\]\((images\/[^\)]+)\)/g, (_, alt, relPath) => {
-    const absPath = joinPath("help", relPath);
-    const fileUrl = `file://${absPath.replace(/\\/g, "/")}`;
-    return `<img src="${fileUrl}" alt="${alt}">`;
-  });
+  markdown = markdown.replace(
+    /!\[([^\]]*)\]\((images\/[^\)]+)\)/g,
+    (_, alt, relPath) => {
+      const absPath = joinPath("help", relPath);
+      const fileUrl = `file://${absPath.replace(/\\/g, "/")}`;
+      return `<img src="${fileUrl}" alt="${alt}">`;
+    }
+  );
 
   return markdown;
 }
@@ -56,11 +62,24 @@ function renderHtml(markdown) {
     const cleaned = stripFrontmatter(markdown);
     const preprocessed = convertFileImages(cleaned);
     const dirty = md.render(preprocessed);
-    const clean = sanitizeHtml(dirty, {
-      allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
+
+    // Wrap hashtags like #read-later in a <span class="inline-tag">
+    const tagDecorated = dirty.replace(
+      /(^|\s)(#[\w.\-]+)/g,
+      (match, pre, tag) => {
+        return `${pre}<span class="inline-tag">${tag}</span>`;
+      }
+    );
+
+    const clean = sanitizeHtml(tagDecorated, {
+      allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "span"]),
       allowedAttributes: {
         img: ["src", "alt", "title"],
         a: ["href", "name", "target"],
+        span: ["class"],
+      },
+      allowedClasses: {
+        span: ["inline-tag"],
       },
       allowedSchemes: ["http", "https", "data", "file"],
     });

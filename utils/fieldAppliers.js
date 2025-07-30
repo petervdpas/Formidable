@@ -361,6 +361,45 @@ export async function applyLinkField(
   }
 }
 
+export function applyTagsField(container, field, value) {
+  const key = field.key;
+  const wrapper = container.querySelector(`[data-tags-field="${key}"]`);
+  if (!wrapper || !Array.isArray(value)) return;
+
+  const inputGroup = wrapper.querySelector(".tags-input-group");
+  if (!inputGroup) {
+    EventBus.emit("logging:warning", [
+      `[applyTagsField] Missing input group for key "${key}".`,
+    ]);
+    return;
+  }
+
+  // Remove existing tag inputs
+  inputGroup.innerHTML = "";
+
+  // Recreate each tag input
+  value.forEach((tag) => {
+    const div = document.createElement("div");
+    div.className = "tag-input-wrapper";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.name = field.key;
+    input.className = "tag-input";
+    input.value = tag;
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.textContent = "-";
+    removeBtn.className = "remove-tag-btn";
+    removeBtn.onclick = () => div.remove();
+
+    div.appendChild(input);
+    div.appendChild(removeBtn);
+    inputGroup.appendChild(div);
+  });
+}
+
 export function applyGenericField(container, field, value) {
   const key = field.key;
   const input = container.querySelector(`[name="${key}"]`);

@@ -258,6 +258,24 @@
     color: var(--field-type-link-text);
 }
 
+/* Tags */
+.field-list-item[data-type="tags"] {
+    background-color: var(--field-type-tags-bg);
+    border-left: 4px solid var(--field-type-tags-border);
+    color: var(--field-type-tags-text);
+}
+
+.field-type.type-tags {
+    background-color: var(--field-type-tags-badge);
+    color: var(--field-type-tags-text);
+}
+
+#field-edit-modal.modal-tags {
+    background-color: var(--field-type-tags-modal);
+    border-left: 6px solid var(--field-type-tags-border);
+    color: var(--field-type-tags-text);
+}
+
 /* Guid */
 .field-list-item[data-type="guid"] {
     background-color: var(--field-type-guid-bg);

@@ -73,6 +73,11 @@ async function loadAndRenderForm(templateName, dataFile) {
 
   let html = marked.parse(md);
 
+  // Convert inline #tags to styled spans
+  html = html.replace(/(^|[\s>])#([\w.\-]+)/g, (match, prefix, tag) => {
+    return `${prefix}<span class="inline-tag">#${tag}</span>`;
+  });
+
   html = html.replace(
     /<a\s+href="\/template\/[^"]+\/form\/[^"]+">([^<]+)<\/a>/gi,
     (full, text) => {

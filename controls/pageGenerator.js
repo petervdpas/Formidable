@@ -109,6 +109,17 @@ function compilePageTemplate() {
       color: #4a90e2;
       background: #f2f2ff;
     }
+    .inline-tag {
+      display: inline-block;
+      background-color: #3d5a3d;
+      color: #f0fff0;
+      border: 1px solid #81c784;
+      padding: 2px 6px;
+      margin: 0 4px 2px 0;
+      border-radius: 4px;
+      font-size: 0.85em;
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>

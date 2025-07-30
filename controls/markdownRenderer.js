@@ -59,6 +59,12 @@ const defaultRenderers = {
     );
     return v.map((val) => map.get(val) || val).join(", ");
   },
+  tags: (value = []) => {
+    if (!Array.isArray(value)) return "";
+    return value
+      .map((tag) => `#${tag.toLowerCase().replace(/\s+/g, "-")}`)
+      .join(", ");
+  },
   textarea: (v) => v,
   image: (filename, field, template, filePrefix = true) => {
     if (!filename || typeof filename !== "string") return "";
@@ -308,6 +314,19 @@ function registerHelpers(filePrefix = true) {
 
     return parts.join(", ");
   });
+
+  Handlebars.registerHelper("tags", function (array = [], options) {
+    if (!Array.isArray(array)) return "";
+
+    const withHash = options?.hash?.withHash ?? true;
+
+    return array
+      .map((tag) => {
+        const safe = String(tag).toLowerCase().replace(/\s+/g, "-");
+        return withHash ? `#${safe}` : safe;
+      })
+      .join(", ");
+  });
 }
 
 function renderMarkdown(formData, templateYaml, filePrefix = true) {
@@ -375,4 +394,9 @@ function filterFrontmatter(data = {}, keepKeys = []) {
   return filtered;
 }
 
-module.exports = { renderMarkdown, parseFrontmatter, buildFrontmatter, filterFrontmatter };
+module.exports = {
+  renderMarkdown,
+  parseFrontmatter,
+  buildFrontmatter,
+  filterFrontmatter,
+};

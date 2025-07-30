@@ -108,6 +108,10 @@
   --meta-section-text-color: #333;
   --meta-section-font-size: 0.8rem;
 
+  --tag-bg: #f0f4c3;
+  --tag-border: #cddc39;
+  --tag-text: #333;
+
   --flagged-circle-bg: #e0e0e0;
   --flagged-color: #28a745;
   --unflagged-color: #ccc;
@@ -201,6 +205,12 @@
   --field-type-link-modal: #7b1e3a;
   --field-type-link-badge: #d46a85;
   --field-type-link-text: #fff;
+
+  --field-type-tags-bg: #4caf50;
+  --field-type-tags-border: #81c784;
+  --field-type-tags-modal: #388e3c;
+  --field-type-tags-badge: #66bb6a;
+  --field-type-tags-text: #ffffff;
 
   --field-type-guid-bg: #444c54;
   --field-type-guid-border: #888c95;
