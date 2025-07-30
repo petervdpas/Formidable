@@ -37,8 +37,15 @@ function parseMiniExpr(expr, originalContext = {}) {
   */
 
   // ─── Evaluate text ────────────────────────────────────────
-  let rawResult = safeEval(parser, rawTextExpr, context);
-  if (!rawResult) rawResult = safeVmEval(rawTextExpr, context);
+  let rawResult;
+
+  const needsVm = /[?:{}]/.test(rawTextExpr); // detect ternary or object syntax
+  if (needsVm) {
+    rawResult = safeVmEval(rawTextExpr, context);
+  } else {
+    rawResult = safeEval(parser, rawTextExpr, context);
+    if (!rawResult) rawResult = safeVmEval(rawTextExpr, context); // fallback
+  }
 
   if (rawResult === undefined) {
     const msg = `[miniExprParser] Failed to evaluate expression: ${rawTextExpr}`;
@@ -49,7 +56,11 @@ function parseMiniExpr(expr, originalContext = {}) {
   // ─── Normalize result ─────────────────────────────────────
   let normalized = {};
 
-  if (typeof rawResult === "object" && rawResult !== null && "text" in rawResult) {
+  if (
+    typeof rawResult === "object" &&
+    rawResult !== null &&
+    "text" in rawResult
+  ) {
     normalized = { ...rawResult };
   } else {
     normalized = { text: String(rawResult) };

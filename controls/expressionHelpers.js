@@ -9,7 +9,6 @@ function stringSimilarity(a, b) {
   b = b.toLowerCase();
 
   const matrix = Array.from({ length: a.length + 1 }, () => []);
-
   for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
   for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
 
@@ -17,9 +16,9 @@ function stringSimilarity(a, b) {
     for (let j = 1; j <= b.length; j++) {
       const cost = a[i - 1] === b[j - 1] ? 0 : 1;
       matrix[i][j] = Math.min(
-        matrix[i - 1][j] + 1, // deletion
-        matrix[i][j - 1] + 1, // insertion
-        matrix[i - 1][j - 1] + cost // substitution
+        matrix[i - 1][j] + 1,
+        matrix[i][j - 1] + 1,
+        matrix[i - 1][j - 1] + cost
       );
     }
   }
@@ -32,19 +31,14 @@ function stringSimilarity(a, b) {
 /**
  * Returns true if the similarity between two strings is ≥ threshold (0–1).
  * Example: isSimilar(F["name"], "audit control", 0.8)
- * or: isSimilar(F["nameA"], F["nameB"], 0.8)
  */
 function isSimilar(a, b, threshold = 0.8) {
   return stringSimilarity(a, b) >= threshold;
 }
 
 /**
- * Returns the type of the value: "string", "number", "boolean", "object", "array", "null", or "undefined".
+ * Returns the type of the value.
  * Example: typeOf(F["amount"]) => "number"
- * Or: [typeOf(F["summary"]) === "string" ? F["summary"] : "⚠️ Not a string"]
- * Or: [typeOf(F["tags"]) === "array"
- *       ? { text: "Tags OK", color: "green" }
- *       : { text: "Tags missing", color: "red" }]
  */
 function typeOf(val) {
   if (val === null) return "null";
@@ -52,59 +46,47 @@ function typeOf(val) {
   return typeof val;
 }
 
+function normalizeDate(input) {
+  if (!input || typeof input !== "string") return input;
+  if (/^\d{2}-\d{2}-\d{4}$/.test(input)) {
+    const [dd, mm, yyyy] = input.split("-");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+  return input;
+}
+
 /**
- * Returns today's date as YYYY-MM-DD.
- * Example: today() => "2025-07-30"
+ * Returns today's date in YYYY-MM-DD format.
  */
 function today() {
   return new Date().toISOString().slice(0, 10);
 }
 
 /**
- * Returns true if the given date is before today, or not present.
- * Example: isOverdue(F["due-date"]) => true if overdue or missing
+ * Returns true if the given date is before today or not present.
+ * Example: isOverdue(F["due-date"])
  */
 function isOverdue(val) {
   if (!val) return true;
-  return String(val) < today();
-}
-
-/**
- * Returns true if the given date is within `days` after today.
- * Example: isDueSoon(F["deadline"], 7) => true if due in next 7 days
- */
-function isDueSoon(val, days = 0) {
-  if (!val) return false;
-  const diff = daysBetween(today(), val);
-  return diff >= 0 && diff <= days;
-}
-
-/**
- * Returns true if the given date is within `days` before today (overdue or nearly overdue).
- * Example: isOverdueInDays(F["review-date"], 3) => true if within 3 days before today
- */
-function isOverdueInDays(val, days = 0) {
-  if (!val) return false;
-  const diff = daysBetween(val, today());
-  return diff >= 0 && diff <= days;
+  return normalizeDate(val) < today();
 }
 
 /**
  * Returns true if the given date is after today.
- * Example: isFuture(F["planned-date"]) => true if in future
+ * Example: isFuture(F["start-date"])
  */
 function isFuture(val) {
   if (!val) return false;
-  return String(val) > today();
+  return normalizeDate(val) > today();
 }
 
 /**
  * Returns true if the given date is today.
- * Example: isToday(F["event-date"]) => true if it's today
+ * Example: isToday(F["event-date"])
  */
 function isToday(val) {
   if (!val) return false;
-  return String(val) === today();
+  return normalizeDate(val) === today();
 }
 
 /**
@@ -113,35 +95,75 @@ function isToday(val) {
  */
 function daysBetween(date1, date2) {
   try {
-    const d1 = new Date(date1);
-    const d2 = new Date(date2);
+    const d1 = new Date(normalizeDate(date1));
+    const d2 = new Date(normalizeDate(date2));
     const msPerDay = 1000 * 60 * 60 * 24;
     return Math.floor((d2 - d1) / msPerDay);
-  } catch (err) {
+  } catch {
     return null;
   }
 }
 
 /**
- * Returns the number of days between the given date and today.
- * Example: ageInDays(F["created"]) => days since creation
+ * Returns true if date is within `days` after today.
+ * Example: isDueSoon(F["deadline"], 7)
+ */
+function isDueSoon(val, days = 0) {
+  if (!val) return false;
+  const diff = daysBetween(today(), normalizeDate(val));
+  return diff >= 0 && diff <= days;
+}
+
+/**
+ * Returns true if date is within `days` before today.
+ * Example: isOverdueInDays(F["review-date"], 3)
+ */
+function isOverdueInDays(val, days = 0) {
+  if (!val) return false;
+  const diff = daysBetween(normalizeDate(val), today());
+  return diff >= 0 && diff <= days;
+}
+
+/**
+ * Returns true if (val + days) is before today (i.e. expired).
+ * Example: isExpiredAfter("2025-07-01", 30) => true on 2025-07-30
+ */
+function isExpiredAfter(val, days = 0) {
+  if (!val) return true;
+  const base = new Date(normalizeDate(val));
+  base.setDate(base.getDate() + days);
+  return base.toISOString().slice(0, 10) < today();
+}
+
+/**
+ * Returns true if today is before (val - days).
+ * Example: isUpcomingBefore("2025-08-01", 5) => true on 2025-07-25
+ */
+function isUpcomingBefore(val, days = 0) {
+  if (!val) return false;
+  const base = new Date(normalizeDate(val));
+  base.setDate(base.getDate() - days);
+  return base.toISOString().slice(0, 10) > today();
+}
+
+/**
+ * Returns how many days since the given date.
+ * Example: ageInDays(F["created"])
  */
 function ageInDays(val) {
   return daysBetween(val, today());
 }
 
 /**
- * Returns the value if it's not null/empty, otherwise returns fallback.
- * Example: defaultText(F["summary"], "No summary") => summary or fallback
+ * Returns fallback if value is empty.
+ * Example: defaultText(F["summary"], "No summary")
  */
 function defaultText(val, fallback = "") {
   return val != null && val !== "" ? val : fallback;
 }
 
 /**
- * Returns true if the value is not null, undefined, or empty.
- * Works on arrays, strings, numbers, booleans.
- * Example: notEmpty(F["notes"]) => true if filled
+ * Returns true if value is not null/empty.
  */
 function notEmpty(val) {
   if (Array.isArray(val)) return val.length > 0;
@@ -149,8 +171,8 @@ function notEmpty(val) {
 }
 
 /**
- * Logs value(s) to console and returns the first argument.
- * Example: log(F["status"]) => logs and returns status
+ * Logs value(s) and returns first one.
+ * Example: log(F["status"])
  */
 function log(...args) {
   console.log("[miniExpr] log:", ...args);
@@ -164,6 +186,8 @@ module.exports = {
   isOverdue,
   isDueSoon,
   isOverdueInDays,
+  isExpiredAfter,
+  isUpcomingBefore,
   isFuture,
   isToday,
   daysBetween,
