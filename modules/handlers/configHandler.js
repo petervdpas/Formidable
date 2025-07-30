@@ -71,7 +71,6 @@ export async function handleConfigUpdate(partial) {
 
     // FINAL STEP: Always update user:config VFS key!
     const fullConfig = await window.api.config.loadUserConfig();
-    console.log("[ConfigHandler] Full user config:", fullConfig);
     await EventBus.emit("vfs:update", {
       id: "user:config",
       value: fullConfig,

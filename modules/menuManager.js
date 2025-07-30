@@ -350,7 +350,7 @@ export async function handleMenuAction(action) {
     case "get-internal-server-status":
       EventBus.emit("server:status", {
         callback: (server) => {
-          console.log("[Menu] Server status:", server);
+          EventBus.emit("logging:default", ["[Menu] Server status:", server]);
           EventBus.emit("ui:toast", {
             message: `Server: ${
               server.running ? "Running" : "Stopped"

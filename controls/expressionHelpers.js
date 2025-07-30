@@ -1,5 +1,7 @@
 // controls/expressionHelpers.js
 
+const { log: logging } = require("./nodeLogger");
+
 /**
  * Returns a similarity ratio (0–1) between two strings using Levenshtein distance.
  */
@@ -172,10 +174,10 @@ function notEmpty(val) {
 
 /**
  * Logs value(s) and returns first one.
- * Example: log(F["status"])
+ * Example: debug(F["status"])
  */
-function log(...args) {
-  console.log("[miniExpr] log:", ...args);
+function debug(...args) {
+  logging("[miniExpr] debug:", ...args);
   return args[0];
 }
 
@@ -194,5 +196,5 @@ module.exports = {
   ageInDays,
   defaultText,
   notEmpty,
-  log,
+  debug,
 };

@@ -157,7 +157,10 @@ export async function renderGitStatus(container) {
           flagNode.appendChild(discardBtn);
         },
         onItemClick: (filePath) => {
-          console.log("[GitStatus] Selected file:", filePath);
+          EventBus.emit("logging:default", [
+            "[GitStatus] Selected file:",
+            filePath,
+          ]);
         },
       });
 

@@ -149,7 +149,7 @@ function registerHelpers(filePrefix = true) {
   });
 
   Handlebars.registerHelper("isSelected", function (array, value, options) {
-    console.log("[Renderer] isSelected called with:", { array, value });
+    log("[Renderer] isSelected called with:", { array, value });
     return Array.isArray(array) && array.includes(value)
       ? options.fn(this)
       : options.inverse(this);

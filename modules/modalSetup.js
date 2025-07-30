@@ -41,9 +41,9 @@ export function setupProfileModal() {
         EventBus.emit("config:profile:current", { callback: resolve });
       });
 
-      console.log(
-        `[ProfileModal] Current profile: ${currentProfile || "None"}`
-      );
+      EventBus.emit("logging:default", [
+        `[ProfileModal] Current profile: ${currentProfile || "None"}`,
+      ]);
       if (currentProfile) {
         EventBus.emit("profile:list:highlighted", {
           listId: "profile-list",

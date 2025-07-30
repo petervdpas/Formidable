@@ -14,11 +14,16 @@ export function makeSelectableList(
       const isButtonClick =
         e.target.closest("button") || e.target.closest(".btn");
       if (isButtonClick) {
-        console.log("[SelectableList] Ignoring click on button inside item");
+        EventBus.emit("logging:default", [
+          "[SelectableList] Ignoring click on button inside item",
+        ]);
         return;
       }
 
-      console.log("[SelectableList] Selecting item:", item.value);
+      EventBus.emit("logging:default", [
+        "[SelectableList] Selecting item:",
+        item.value,
+      ]);
       items.forEach(({ element }) => element.classList.remove(selectedClass));
       el.classList.add(selectedClass);
 

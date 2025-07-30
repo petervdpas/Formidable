@@ -10,6 +10,7 @@ const {
   loadTemplateYaml,
 } = require("./serverDataProvider");
 const configManager = require("./configManager");
+const { log } = require("./nodeLogger");
 
 let server = null;
 let currentPort = null;
@@ -17,7 +18,7 @@ const sockets = new Set();
 
 function startInternalServer(port = 8383) {
   if (server) {
-    console.log(`[InternalServer] Already running on port ${currentPort}`);
+    log(`[InternalServer] Already running on port ${currentPort}`);
     return;
   }
 
@@ -233,7 +234,7 @@ function startInternalServer(port = 8383) {
   server = app.listen(port, () => {
     const addr = server.address();
     currentPort = addr && typeof addr === "object" ? addr.port : port;
-    console.log(`[InternalServer] Running at http://localhost:${currentPort}/`);
+    log(`[InternalServer] Running at http://localhost:${currentPort}/`);
   });
 
   // Track sockets
@@ -248,7 +249,7 @@ function startInternalServer(port = 8383) {
 function stopInternalServer() {
   return new Promise((resolve, reject) => {
     if (server) {
-      console.log(
+      log(
         `[InternalServer] Stopping server... closing connections (${sockets.size})`
       );
 
@@ -258,10 +259,10 @@ function stopInternalServer() {
 
       server.close((err) => {
         if (err) {
-          console.log(`[InternalServer] Error stopping:`, err);
+          log(`[InternalServer] Error stopping:`, err);
           return reject(err);
         }
-        console.log(`[InternalServer] Stopped`);
+        log(`[InternalServer] Stopped`);
         server = null;
         currentPort = null;
         resolve();

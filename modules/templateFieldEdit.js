@@ -30,9 +30,9 @@ function setupFieldEditor(container, onChange, allFields = []) {
     twoColumnRow: container
       .querySelector("#edit-two-column")
       ?.closest(".switch-row"),
-    sidebarItem: container.querySelector("#edit-sidebar-item"),
-    sidebarItemRow: container
-      .querySelector("#edit-sidebar-item")
+    expressionItem: container.querySelector("#edit-expression-item"),
+    expressionItemRow: container
+      .querySelector("#edit-expression-item")
       ?.closest(".switch-row"),
     default: container.querySelector("#edit-default"),
     options: container.querySelector("#edit-options"),
@@ -73,7 +73,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
     dom.label.value = isGuid ? "GUID" : field.label || "";
     dom.description.value = field.description || "";
     dom.twoColumn.checked = !!field.two_column;
-    dom.sidebarItem.checked = !!field.sidebar_item;
+    dom.expressionItem.checked = !!field.sidebar_item;
     dom.default.value = field.default ?? "";
 
     labelLocked = field.label?.trim().length > 0 && field.label !== field.key;
@@ -177,7 +177,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
       label: isGuid ? "GUID" : dom.label.value.trim(),
       description: dom.description.value.trim(),
       two_column: dom.twoColumn.checked,
-      sidebar_item: dom.sidebarItem.checked,
+      sidebar_item: dom.expressionItem.checked,
       default: dom.default.value,
       options,
       type,

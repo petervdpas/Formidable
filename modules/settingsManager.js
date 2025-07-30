@@ -87,9 +87,9 @@ export async function renderSettings() {
 
   tabDisplay.appendChild(
     createSwitch(
-      "show-sidebar-expressions-toggle",
-      "Sidebar Expressions",
-      config.use_sidebar_expressions ?? true,
+      "show-expressions-toggle",
+      "Expressions",
+      config.use_expressions ?? true,
       null,
       "block",
       ["Show", "Hide"]
@@ -259,8 +259,8 @@ function setupBindings(config, gitRootPicker) {
   bindThemeSwitch("theme-toggle", "theme");
   bindToggleSwitch("show-icons-toggle", "show_icon_buttons");
   bindToggleSwitch(
-    "show-sidebar-expressions-toggle",
-    "use_sidebar_expressions"
+    "show-expressions-toggle",
+    "use_expressions"
   );
 
   bindToggleSwitch("plugin-toggle", "enable_plugins");

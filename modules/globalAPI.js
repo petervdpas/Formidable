@@ -33,7 +33,7 @@ export function exposeGlobalAPI() {
       decrypt: encryptionUtils.decrypt,
       encryptionAvailable: encryptionUtils.encryptionAvailable,
     },
-    
+
     // Plugin management utilities
     plugin: {
       getConfig: pluginUtils.getUserConfig,
@@ -143,5 +143,7 @@ export function exposeGlobalAPI() {
   window.on = EventBus.on;
   window.once = EventBus.once;
 
-  console.log("[GlobalAPI] FormidableGlobalAPI exposed.");
+  EventBus.emit("logging:default", [
+    "[GlobalAPI] FormidableGlobalAPI exposed.",
+  ]);
 }

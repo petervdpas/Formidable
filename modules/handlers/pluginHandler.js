@@ -225,16 +225,16 @@ export async function handleCreatePlugin(
   { folder, target = "frontend" },
   callback
 ) {
-  console.log(
-    `[PluginHandler] Creating plugin: "${folder}" with target: "${target}"`
-  );
+  EventBus.emit("logging:default", [
+    `[PluginHandler] Creating plugin: "${folder}" with target: "${target}"`,
+  ]);
 
   try {
     const result = await window.api.plugin.createPlugin({ folder, target });
-    console.log(
+    EventBus.emit("logging:default", [
       `[PluginHandler] Plugin "${folder}" created successfully:`,
-      result
-    );
+      result,
+    ]);
     callback?.(result);
   } catch (err) {
     console.error("[PluginHandler] createPlugin failed:", err);

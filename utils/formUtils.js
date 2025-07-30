@@ -5,7 +5,7 @@ import { fieldTypes } from "./fieldTypes.js";
 
 export function extractFieldDefinition({
   keyId = "edit-key",
-  sidebarItemId = "edit-sidebar-item",
+  expressionItemId = "edit-expression-item",
   twoColumnId = "edit-two-column",
   labelId = "edit-label",
   descriptionId = "edit-description",
@@ -14,7 +14,7 @@ export function extractFieldDefinition({
   optionsId = "edit-options",
 }) {
   const key = document.getElementById(keyId)?.value.trim();
-  const sidebarItem = document.getElementById(sidebarItemId)?.checked || false;
+  const expressionItem = document.getElementById(expressionItemId)?.checked || false;
   const twoColumn = document.getElementById(twoColumnId)?.checked || false;
   const label = document.getElementById(labelId)?.value.trim();
   const description = document.getElementById(descriptionId)?.value.trim();
@@ -73,7 +73,7 @@ export function extractFieldDefinition({
 
   const field = { key, label, type };
   if (def) field.default = def;
-  if (sidebarItem) field.sidebar_item = true;
+  if (expressionItem) field.sidebar_item = true;
   if (twoColumn) field.two_column = true;
   if (description) field.description = description;
   if (options.length > 0) field.options = options;

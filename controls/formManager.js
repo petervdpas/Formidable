@@ -34,7 +34,7 @@ async function extendedListForms(templateFilename) {
   const fields = template?.fields || [];
 
   // Find special fields
-  const sidebarFields = fields.filter((f) => f.sidebar_item);
+  const expressionFields = fields.filter((f) => f.sidebar_item);
 
   const results = [];
 
@@ -43,19 +43,19 @@ async function extendedListForms(templateFilename) {
       const raw = metaRepo.loadFromBase(storagePath, filename);
       const sanitized = metaSchema.sanitize(raw, fields);
 
-      const sidebarItems = {};
+      const expressionItems = {};
 
-      for (const field of sidebarFields) {
+      for (const field of expressionFields) {
         const value = sanitized.data?.[field.key];
         if (value !== undefined && value !== null && value !== "") {
-          sidebarItems[field.key] = value;
+          expressionItems[field.key] = value;
         }
       }
 
       const result = {
         filename,
         meta: sanitized.meta || {},
-        sidebarItems,  // <── THIS you want!
+        expressionItems,
       };
 
       results.push(result);

@@ -133,7 +133,7 @@ export function createStorageListManager(formManager, modal) {
           value: entry.filename,
           flagged: entry.meta?.flagged || false,
           id: entry.meta?.id || "",
-          sidebarContext: entry.sidebarItems || {},
+          sidebarContext: entry.expressionItems || {},
           sidebarExpr: sidebarExpr,
         };
       });
@@ -157,7 +157,7 @@ export function createStorageListManager(formManager, modal) {
 
       subLabelNode.innerHTML = "";
 
-      const enabled = await getUserConfig("use_sidebar_expressions");
+      const enabled = await getUserConfig("use_expressions");
       if (!enabled || !rawData.sidebarExpr || !rawData.sidebarContext) return;
 
       try {

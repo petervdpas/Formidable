@@ -5,7 +5,7 @@ let cachedConfig = null;
 const defaultAllowedConfigKeys = [
   "theme",
   "show_icon_buttons",
-  "use_sidebar_expressions",
+  "use_expressions",
   "font_size",
   "development_enable",
   "logging_enabled",

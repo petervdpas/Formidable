@@ -130,7 +130,11 @@ export async function reloadVFS() {
 // Utility: Update a single VFS key/value
 // ─────────────────────────────────────────────
 export async function updateVFSKey({ id, value }) {
-  console.log("[VFSHandler] updateVFSKey called:", id, value);
+  EventBus.emit("logging:default", [
+    "[VFSHandler] updateVFSKey called:",
+    id,
+    value,
+  ]);
   try {
     await EventBus.emit("cache:put", {
       storeName: "vfs",

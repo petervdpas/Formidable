@@ -39,7 +39,9 @@ export function handleStatusUpdate(message) {
   const last = messageTimestamps.get(message) || 0;
 
   if (now - last < 500) {
-    console.log("[StatusHandler] Skipped message (too soon):", message);
+    EventBus.emit("logging:default", [
+      `[StatusHandler] Skipped message (too soon): "${message}"`,
+    ]);
     return;
   }
 

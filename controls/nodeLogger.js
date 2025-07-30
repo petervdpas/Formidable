@@ -6,9 +6,18 @@ const path = require("path");
 let loggingEnabled = true;
 let loggingWrite = true;
 
-const pathToExe = process.execPath;
-const exeDir = path.dirname(pathToExe);
-const logFile = path.join(exeDir, "formidable.log");
+// Determine log file location based on mode
+const isPackaged = !!process.mainModule?.filename.includes("app.asar"); // crude but works
+const logDir = isPackaged ? path.dirname(process.execPath) : process.cwd();
+const logFile = path.join(logDir, "formidable.log");
+
+// Clear log file on startup
+try {
+  fs.writeFileSync(logFile, "");
+  console.log("[LOGGER] Log file cleared:", logFile);
+} catch (err) {
+  console.error("[LOGGER] Failed to clear log file:", err.message);
+}
 
 function setLoggingEnabled(enabled) {
   loggingEnabled = enabled;
