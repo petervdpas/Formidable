@@ -485,15 +485,34 @@ export function copyToClipboard(
 }
 
 /**
- * Initializes a Sortable.js instance with consistent styling and behavior.
- * @param {HTMLElement} container - The DOM element to make sortable.
- * @param {Object} options - Additional options (handle, group, etc.).
+ * Create a scoped, predicate-aware Sortable instance.
+ * @param {HTMLElement} container - The parent container of sortable items
+ * @param {Object} options
+ * @param {string} options.handle - Selector for the drag handle
+ * @param {string} [options.group="loop-items"] - Group name for sortable
+ * @param {boolean|function} [options.allowDrag] - false = collapsed only, function = custom predicate
+ * @param {string} [options.itemSelector=".loop-item"] - Selector for sortable children
  */
-export function createSortable(container, { handle, group = "loop-items" } = {}) {
+export function createSortable(
+  container,
+  {
+    handle,
+    group = "loop-items",
+    allowDrag = false,
+    itemSelector = ".loop-item",
+  } = {}
+) {
   if (!container || !(container instanceof HTMLElement)) {
     EventBus.emit("logging:error", ["[createSortable] Invalid container"]);
     return;
   }
+
+  const isAllowed =
+    typeof allowDrag === "function"
+      ? allowDrag
+      : (el) => allowDrag || el.classList.contains("collapsed");
+
+  let lastToastTime = 0;
 
   Sortable.create(container, {
     animation: 150,
@@ -506,10 +525,43 @@ export function createSortable(container, { handle, group = "loop-items" } = {})
     fallbackOnBody: true,
     fallbackTolerance: 3,
     setPlaceholderSize: true,
+
+    filter: (evt) => {
+      const now = Date.now();
+      const item = evt.target.closest(itemSelector);
+      const fromHandle = evt.target.closest(handle);
+
+      const blocked =
+        !item || !container.contains(item) || !fromHandle || !isAllowed(item);
+
+      const isPointerDown =
+        (evt.originalEvent?.type || evt.type) === "mousedown" ||
+        (evt.originalEvent?.type || evt.type) === "pointerdown" ||
+        (evt.originalEvent?.type || evt.type) === "touchstart";
+
+      if (
+        blocked &&
+        isPointerDown &&
+        fromHandle &&
+        now - lastToastTime > 1500
+      ) {
+        lastToastTime = now;
+        EventBus.emit("ui:toast", {
+          message: "Collapse the item before dragging.",
+          variant: "info",
+          duration: 2500,
+        });
+      }
+
+      return blocked;
+    },
+
+    preventOnFilter: true,
+
     onStart: (evt) => {
       const original = evt.item;
       requestAnimationFrame(() => {
-        const drag = document.querySelector(".sortable-drag");
+        const drag = container.querySelector(".sortable-drag");
         if (drag && original) {
           const style = getComputedStyle(original);
           drag.style.height = `${original.offsetHeight}px`;

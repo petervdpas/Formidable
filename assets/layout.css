@@ -84,21 +84,6 @@ img {
   margin: 0 2px;
 }
 
-.drag-handle {
-  cursor: grab;
-  width: 1.5em;
-  text-align: left;
-  opacity: 0.4;
-  user-select: none;
-  font-size: 16px;
-  font-family: system-ui, sans-serif, "Segoe UI Symbol", "Symbola", "Noto Sans Symbols";
-}
-
-.drag-handle:active {
-  cursor: grabbing;
-  opacity: 1;
-}
-
 .clearform-message {
   display: flex;
   justify-content: center;
