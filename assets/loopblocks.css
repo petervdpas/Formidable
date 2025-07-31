@@ -27,7 +27,7 @@
 /* ─── Loop Item ────────────────────────────────── */
 .loop-container .loop-item {
   position: relative;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   padding: 12px 36px 8px 28px;
   border: 1px solid var(--loop-border-color, #ddd);
   border-radius: 4px;
@@ -73,6 +73,34 @@
   background-color: var(--color-accent, #2196f3);
   border-radius: 2px;
   transition: all 0.2s ease-in-out;
+}
+
+.loop-item.collapsed .loop-fields {
+  display: none;
+}
+
+.loop-item-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  height: 16px;
+}
+
+.collapse-toggle {
+  padding: 2px;
+  font-size: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.4;
+  color: inherit;
+}
+
+.loop-item .collapse-toggle {
+  position: absolute;
+  left: 24px;
+  top: 8px;
+  line-height: 1.2;
 }
 
 /* ─── Sub-loop Container (Nested) ───────────────── */

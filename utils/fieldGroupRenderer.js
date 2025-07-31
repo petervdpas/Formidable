@@ -2,7 +2,7 @@
 
 import { addContainerElement } from "./elementBuilders.js";
 import { collectLoopGroup, createLoopDefaults } from "./formUtils.js";
-import { applyValueToField } from "./domUtils.js";
+import { applyValueToField, createSortable } from "./domUtils.js";
 import {
   createAddLoopItemButton,
   createDeleteLoopItemButton,
@@ -38,7 +38,8 @@ export async function fieldGroupRenderer(
   fields,
   metaData,
   template,
-  eventFunctions = {}
+  eventFunctions = {},
+  loopKeyChain = []
 ) {
   const loopGroupKeys = new Set();
   let i = 0;
@@ -52,6 +53,7 @@ export async function fieldGroupRenderer(
       group.forEach((f) => loopGroupKeys.add(f.key));
       i = stopIdx + 1;
 
+      const nestingDepth = loopKeyChain.length || 0;
       const loopData = Array.isArray(metaData[loopKey])
         ? metaData[loopKey]
         : [{}];
@@ -86,7 +88,7 @@ export async function fieldGroupRenderer(
           complete,
           template,
           eventFunctions,
-          [loopKey]
+          [...loopKeyChain, loopKey]
         );
         loopList.appendChild(itemWrapper);
       }
@@ -97,7 +99,7 @@ export async function fieldGroupRenderer(
           {},
           template,
           eventFunctions,
-          [loopKey]
+          [...loopKeyChain, loopKey]
         );
         loopList.appendChild(newItem);
       });
@@ -106,34 +108,10 @@ export async function fieldGroupRenderer(
       loopContainer.appendChild(addButton);
       container.appendChild(loopContainer);
 
-      Sortable.create(loopList, {
-        animation: 150,
-        handle: ".drag-handle",
-        ghostClass: "sortable-ghost",
-        chosenClass: "sortable-chosen",
-        dragClass: "sortable-drag",
-        group: "loop-items",
-        forceFallback: true,
-        fallbackOnBody: true,
-        fallbackTolerance: 3,
-        setPlaceholderSize: true,
-        onStart: (evt) => {
-          const original = evt.item;
-          requestAnimationFrame(() => {
-            const drag = document.querySelector(".sortable-drag");
-            if (drag && original) {
-              const style = getComputedStyle(original);
-              drag.style.height = `${original.offsetHeight}px`;
-              drag.style.width = `${original.offsetWidth}px`;
-              drag.style.padding = style.padding;
-              drag.style.margin = style.margin;
-              drag.style.borderRadius = style.borderRadius;
-              drag.style.opacity = "0.95";
-              drag.style.background = "var(--sortable-drag-bg, #ffe082)";
-            }
-          });
-        },
+      createSortable(loopList, {
+        handle: `.drag-handle.depth-${nestingDepth + 1}`,
       });
+
     } else {
       if (loopGroupKeys.has(field.key)) {
         i++;
@@ -171,13 +149,32 @@ async function createLoopItem(
   const itemWrapper = document.createElement("div");
   itemWrapper.className = "loop-item";
 
-  // Drag handle
-  const dragHandle = document.createElement("div");
-  dragHandle.className = "drag-handle";
-  dragHandle.textContent = "⠿";
-  itemWrapper.appendChild(dragHandle);
+  // ─── Header Row ───
+  const header = document.createElement("div");
+  header.className = "loop-item-header";
 
-  // Remove button with confirmation
+  // Drag handle
+  const nestingDepth = loopKeyChain.length || 0;
+  const dragClass = `drag-handle depth-${nestingDepth}`;
+
+  const dragHandle = document.createElement("div");
+  dragHandle.className = dragClass;
+
+  dragHandle.textContent = "⠿";
+  header.appendChild(dragHandle);
+
+  // Collapse toggle
+  const collapseBtn = document.createElement("button");
+  collapseBtn.className = "collapse-toggle";
+  collapseBtn.innerHTML = "▼";
+
+  collapseBtn.addEventListener("click", () => {
+    const isCollapsed = itemWrapper.classList.toggle("collapsed");
+    collapseBtn.innerHTML = isCollapsed ? "▶" : "▼";
+  });
+  header.appendChild(collapseBtn);
+
+  // Remove button
   const firstField = groupFields[0];
   const firstKey = firstField?.key || "(unknown)";
   const label = firstField?.label || firstKey;
@@ -191,16 +188,21 @@ async function createLoopItem(
     );
     if (confirmed) itemWrapper.remove();
   });
+  header.appendChild(removeBtn);
 
-  itemWrapper.appendChild(removeBtn);
+  itemWrapper.appendChild(header);
 
-  // Iterate through all fields in the group
+  // ─── Loop Fields Container ───
+  const fieldsContainer = document.createElement("div");
+  fieldsContainer.className = "loop-fields";
+
+  // ─── Iterate through fields ───
   let i = 0;
   while (i < groupFields.length) {
     const field = groupFields[i];
 
     if (field.type === "loopstart") {
-      // ───── Nested Loop Detected ─────
+      // ───── Nested Loop ─────
       const nestedKey = field.key;
       const { group: nestedGroup, stopIdx } = collectLoopGroup(
         groupFields,
@@ -240,6 +242,11 @@ async function createLoopItem(
       const nestedList = document.createElement("div");
       nestedList.className = "loop-list";
 
+      const nestedDepth = nestedLoopKeyChain.length || 0;
+      createSortable(nestedList, {
+        handle: `.drag-handle.depth-${nestedDepth}`,
+      });
+
       for (const entry of nestedLoopData) {
         const complete = { ...createLoopDefaults(nestedGroup), ...entry };
         const nestedItem = await createLoopItem(
@@ -265,7 +272,7 @@ async function createLoopItem(
 
       nestedContainer.appendChild(nestedList);
       nestedContainer.appendChild(addNestedButton);
-      itemWrapper.appendChild(nestedContainer);
+      fieldsContainer.appendChild(nestedContainer);
     } else {
       // ───── Regular Field ─────
       const fieldKey = field.key;
@@ -290,9 +297,9 @@ async function createLoopItem(
         eventFunctions
       );
       if (row) {
-        itemWrapper.appendChild(row);
+        fieldsContainer.appendChild(row);
         await applyValueToField(
-          itemWrapper,
+          fieldsContainer,
           fieldCopy,
           dataEntry[fieldKey],
           template,
@@ -303,5 +310,6 @@ async function createLoopItem(
     }
   }
 
+  itemWrapper.appendChild(fieldsContainer);
   return itemWrapper;
 }

@@ -483,3 +483,44 @@ export function copyToClipboard(
         });
       });
 }
+
+/**
+ * Initializes a Sortable.js instance with consistent styling and behavior.
+ * @param {HTMLElement} container - The DOM element to make sortable.
+ * @param {Object} options - Additional options (handle, group, etc.).
+ */
+export function createSortable(container, { handle, group = "loop-items" } = {}) {
+  if (!container || !(container instanceof HTMLElement)) {
+    EventBus.emit("logging:error", ["[createSortable] Invalid container"]);
+    return;
+  }
+
+  Sortable.create(container, {
+    animation: 150,
+    handle,
+    group,
+    ghostClass: "sortable-ghost",
+    chosenClass: "sortable-chosen",
+    dragClass: "sortable-drag",
+    forceFallback: true,
+    fallbackOnBody: true,
+    fallbackTolerance: 3,
+    setPlaceholderSize: true,
+    onStart: (evt) => {
+      const original = evt.item;
+      requestAnimationFrame(() => {
+        const drag = document.querySelector(".sortable-drag");
+        if (drag && original) {
+          const style = getComputedStyle(original);
+          drag.style.height = `${original.offsetHeight}px`;
+          drag.style.width = `${original.offsetWidth}px`;
+          drag.style.padding = style.padding;
+          drag.style.margin = style.margin;
+          drag.style.borderRadius = style.borderRadius;
+          drag.style.opacity = "0.95";
+          drag.style.background = "var(--sortable-drag-bg, #ffe082)";
+        }
+      });
+    },
+  });
+}
