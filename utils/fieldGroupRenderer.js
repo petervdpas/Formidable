@@ -88,7 +88,9 @@ export async function fieldGroupRenderer(
           complete,
           template,
           eventFunctions,
-          [...loopKeyChain, loopKey]
+          [...loopKeyChain, loopKey],
+          field,
+          metaData
         );
         loopList.appendChild(itemWrapper);
       }
@@ -99,7 +101,9 @@ export async function fieldGroupRenderer(
           {},
           template,
           eventFunctions,
-          [...loopKeyChain, loopKey]
+          [...loopKeyChain, loopKey],
+          field,
+          metaData
         );
         loopList.appendChild(newItem);
       });
@@ -138,12 +142,29 @@ export async function fieldGroupRenderer(
   }
 }
 
+function getLoopSummaryField(loopStartField, groupFields, dataEntry = {}) {
+  const summaryKey = loopStartField?.summary_field;
+  const summaryField = summaryKey
+    ? groupFields.find((f) => f.key === summaryKey)
+    : groupFields.find(
+        (f) => f.key && f.type !== "loopstart" && f.type !== "loopstop"
+      );
+
+  const key = summaryField?.key || "(unknown)";
+  const label = summaryField?.label || key;
+  const value = dataEntry?.[key] || "(empty)";
+
+  return { key, label, value };
+}
+
 async function createLoopItem(
   groupFields,
   dataEntry = {},
   template,
   eventFunctions = {},
-  loopKeyChain = []
+  loopKeyChain = [],
+  loopStartField = null,
+  metaData = {}
 ) {
   const itemWrapper = document.createElement("div");
   itemWrapper.className = "loop-item";
@@ -158,7 +179,6 @@ async function createLoopItem(
 
   const dragHandle = document.createElement("div");
   dragHandle.className = dragClass;
-
   dragHandle.textContent = "⠿";
   header.appendChild(dragHandle);
 
@@ -166,28 +186,53 @@ async function createLoopItem(
   const collapseBtn = document.createElement("button");
   collapseBtn.className = "collapse-toggle";
   collapseBtn.innerHTML = "▼";
-
   collapseBtn.addEventListener("click", () => {
     const isCollapsed = itemWrapper.classList.toggle("collapsed");
     collapseBtn.innerHTML = isCollapsed ? "▶" : "▼";
   });
   header.appendChild(collapseBtn);
 
-  // Remove button
-  const firstField = groupFields[0];
-  const firstKey = firstField?.key || "(unknown)";
-  const label = firstField?.label || firstKey;
+  const {
+    key: previewKey,
+    label: previewLabel,
+    value: previewValue,
+  } = getLoopSummaryField(loopStartField, groupFields, dataEntry);
 
+  // Remove button
   const removeBtn = createDeleteLoopItemButton(async () => {
-    const value = dataEntry[firstKey] || "(empty)";
     const confirmed = await showConfirmModal(
       `<div>Are you sure you want to remove this loop item?</div>
-       <div class="modal-message-highlight"><strong>${label}</strong>: <em>${value}</em></div>`,
+     <div class="modal-message-highlight"><strong>${previewLabel}</strong>: <em>${previewValue}</em></div>`,
       { okText: "Delete", cancelText: "Cancel", width: "auto", height: "auto" }
     );
     if (confirmed) itemWrapper.remove();
   });
+
   header.appendChild(removeBtn);
+
+  // ─── Summary Line (Shown When Collapsed) ───
+  if (loopStartField?.summary_field) {
+    const summaryEl = document.createElement("div");
+    summaryEl.className = "loop-item-summary";
+
+    const firstLine = (previewValue || "").split("\n")[0].trim() || "(empty)";
+    summaryEl.textContent = firstLine;
+    header.appendChild(summaryEl);
+
+    setTimeout(() => {
+      const fieldSelector = `[name="${previewKey}"]`;
+      const inputEl = itemWrapper.querySelector(fieldSelector);
+      if (inputEl) {
+        const updateSummary = () => {
+          const raw = inputEl.value || "";
+          const firstLine = raw.split("\n")[0].trim() || "(empty)";
+          summaryEl.textContent = firstLine;
+        };
+        inputEl.addEventListener("input", updateSummary);
+        updateSummary();
+      }
+    }, 50);
+  }
 
   itemWrapper.appendChild(header);
 
@@ -250,7 +295,9 @@ async function createLoopItem(
           complete,
           template,
           eventFunctions,
-          nestedLoopKeyChain
+          nestedLoopKeyChain,
+          field,
+          metaData
         );
         nestedList.appendChild(nestedItem);
       }
@@ -265,7 +312,9 @@ async function createLoopItem(
           {},
           template,
           eventFunctions,
-          nestedLoopKeyChain
+          nestedLoopKeyChain,
+          field,
+          metaData
         );
         nestedList.appendChild(newItem);
       });

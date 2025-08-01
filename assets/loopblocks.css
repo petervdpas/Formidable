@@ -82,7 +82,8 @@
   display: flex;
   align-items: center;
   gap: 0.5em;
-  height: 16px;
+  min-height: 24px;
+  flex-wrap: nowrap; 
 }
 
 .collapse-toggle {
@@ -100,6 +101,22 @@
   left: 24px;
   top: 8px;
   line-height: 1.2;
+}
+
+.loop-item-summary {
+  pointer-events: none;
+  user-select: text;
+  display: none;
+  font-style: italic;
+  opacity: 0.8;
+  padding-left: 1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.loop-item.collapsed .loop-item-summary {
+  display: block;
 }
 
 /* ─── Sub-loop Container (Nested) ───────────────── */

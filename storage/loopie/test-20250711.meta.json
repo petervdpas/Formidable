@@ -4,7 +4,7 @@
     "author_email": "regular@example.com",
     "template": "loopie.yaml",
     "created": "2025-07-11T06:10:16.683Z",
-    "updated": "2025-07-31T23:09:04.577Z",
+    "updated": "2025-08-01T23:15:13.446Z",
     "flagged": false
   },
   "data": {
@@ -12,7 +12,7 @@
     "looper": [
       {
         "inloop_title": "Once upon a time...",
-        "inloop_description": "**Once upon a time** there was a ~~little~~ princess... It was a tiny princess! You could hardly see her.",
+        "inloop_description": "**Once upon a time** there was a ~~little~~ princess... It was a tiny princess! You could hardly see her. And in the mean time...: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
         "subloop": [
           {
             "subloop_title": "This is Crazy!!"
@@ -33,10 +33,10 @@
         "inloop_description": "Are crackling **splut sound** was the last we've heard.... \nYou guessed it... ~~The princess was no more!~~ That does it!",
         "subloop": [
           {
-            "subloop_title": "What he said! This does it!"
+            "subloop_title": "Is this really how the story evolved?"
           },
           {
-            "subloop_title": "Is this really how the story evolved?"
+            "subloop_title": "What he said! This does it!"
           }
         ]
       }
