@@ -492,6 +492,7 @@ export function copyToClipboard(
  * @param {string} [options.group="loop-items"] - Group name for sortable
  * @param {boolean|function} [options.allowDrag] - false = collapsed only, function = custom predicate
  * @param {string} [options.itemSelector=".loop-item"] - Selector for sortable children
+ * @param {boolean} [options.preventOnFilter=false] - If true, prevents all pointer interaction when filtered
  */
 export function createSortable(
   container,
@@ -500,6 +501,7 @@ export function createSortable(
     group = "loop-items",
     allowDrag = false,
     itemSelector = ".loop-item",
+    preventOnFilter = false,
   } = {}
 ) {
   if (!container || !(container instanceof HTMLElement)) {
@@ -556,7 +558,7 @@ export function createSortable(
       return blocked;
     },
 
-    preventOnFilter: true,
+    preventOnFilter,
 
     onStart: (evt) => {
       const original = evt.item;
