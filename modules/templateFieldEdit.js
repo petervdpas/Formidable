@@ -3,7 +3,6 @@
 import { setupFieldEditModal } from "./modalSetup.js";
 import { showConfirmModal } from "../utils/modalUtils.js";
 import { applyModalTypeClass } from "../utils/domUtils.js";
-import { createDropdown } from "../utils/dropdownUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 import { validateField } from "../utils/templateValidation.js";
 import { applyFieldAttributeDisabling } from "../utils/formUtils.js";
@@ -27,9 +26,8 @@ function setupFieldEditor(container, onChange, allFields = []) {
     primaryKey: container.querySelector("#edit-primary-key"),
     label: container.querySelector("#edit-label"),
     description: container.querySelector("#edit-description"),
-    // summaryField: container.querySelector("#edit-summary-field"),
-    summaryFieldContainer: container.querySelector(
-      "#edit-summary-field-container"
+    summaryField: container.querySelector(
+      "#edit-summary-field-container select"
     ),
     expressionItem: container.querySelector("#edit-expression-item"),
     expressionItemRow: container
@@ -65,29 +63,6 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
   function setField(field) {
     originalKey = field.key?.trim();
-
-    // Collect dropdown options from all non-loop fields
-    const summaryOptions = allFields
-      .filter((f) => f.type !== "loopstart" && f.type !== "loopstop")
-      .map((f) => ({
-        value: f.key,
-        label: `${f.label || f.key} (${f.key})`,
-      }));
-
-    summaryOptions.unshift({ value: "", label: "(none)" });
-
-    const summaryFieldDropdown = createDropdown({
-      containerId: "edit-summary-field-container",
-      labelText: "Summary Field",
-      selectedValue: field.summary_field || "",
-      options: summaryOptions,
-      onChange: (val) => {
-        validate(); // optional
-      },
-    });
-
-    dom.summaryField = summaryFieldDropdown.selectElement;
-    dom.summaryFieldDropdown = summaryFieldDropdown.selectElement;
 
     dom.key.classList.remove("input-error");
     confirmBtn = document.getElementById("btn-field-edit-confirm");
@@ -189,6 +164,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
   function getField() {
     const type = dom.type?.value || "text";
     const isGuid = type === "guid";
+    const summaryField = dom.summaryField?.value || "";
 
     const supportsOptions = getSupportedOptionTypes();
 
@@ -206,7 +182,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
       key: isGuid ? "id" : dom.key.value.trim(),
       label: isGuid ? "GUID" : dom.label.value.trim(),
       description: dom.description.value.trim(),
-      summary_field: dom.summaryField.getSelected?.() || "",
+      summary_field: summaryField,
       expression_item: dom.expressionItem.checked,
       sidebar_item: dom.expressionItem.checked,
       two_column: dom.twoColumn.checked,
@@ -327,7 +303,7 @@ let cachedFieldEditSetup = null;
 export function showFieldEditorModal(field, allFields = [], onConfirm) {
   let editor;
 
-  const { modal } = setupFieldEditModal(() => {
+  const { modal } = setupFieldEditModal(field, allFields, () => {
     const confirmedField = editor.getField();
 
     if (confirmedField.type === "looper") {

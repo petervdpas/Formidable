@@ -103,7 +103,7 @@ fields:
     type: loopstart
     label: Chapters
     description: Enter your chapters here...!
-    summary_field: ''
+    summary_field: title
     sidebar_item: false
     expression_item: false
     two_column: false
@@ -131,7 +131,7 @@ fields:
     type: loopstart
     label: Subloop
     description: Enter paragraphs here...!
-    summary_field: ''
+    summary_field: subloop_title
     sidebar_item: false
     expression_item: false
     two_column: false

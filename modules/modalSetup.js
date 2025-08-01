@@ -80,11 +80,10 @@ export function setuHelpModal() {
     resizable: true,
     width: "60em",
     height: "auto",
-    maxHeight: "80vh", 
+    maxHeight: "80vh",
     onOpen: async () => {
       const ok = await renderHelp();
-      if (!ok)
-        EventBus.emit("logging:warning", ["Help container not found"]);
+      if (!ok) EventBus.emit("logging:warning", ["Help container not found"]);
     },
   });
 }
@@ -251,7 +250,6 @@ export function setupPluginModal() {
             selectedTarget = val;
           },
         });
-
       } catch (err) {
         console.error("[PluginModal] Failed to render plugin manager:", err);
         container.innerHTML = `<p class="error">Failed to load plugin manager.</p>`;
@@ -352,7 +350,7 @@ export function setupRenderModal() {
   });
 }
 
-export function setupFieldEditModal(onConfirm) {
+export function setupFieldEditModal(field, allFields, onConfirm) {
   const modal = setupModal("field-edit-modal", {
     closeBtn: "field-edit-close",
     escToClose: true,
@@ -370,6 +368,7 @@ export function setupFieldEditModal(onConfirm) {
   // Sort: Looper first
   typeOptions.sort((a, b) => (a.value === "looper" ? -1 : 1));
 
+  // Create the type dropdown
   const typeDropdown = createDropdown({
     containerId: "edit-type-container",
     labelText: "Type",
@@ -379,6 +378,27 @@ export function setupFieldEditModal(onConfirm) {
       const modalEl = document.getElementById("field-edit-modal");
       if (!modalEl) return;
       applyModalCssClass(modalEl, fieldTypes[val]);
+    },
+  });
+
+  // Collect dropdown options from all non-loop fields
+  const summaryOptions = allFields
+    .filter((f) => f.type !== "loopstart" && f.type !== "loopstop")
+    .map((f) => ({
+      value: f.key,
+      label: `${f.label || f.key} (${f.key})`,
+    }));
+
+  summaryOptions.unshift({ value: "", label: "(none)" });
+
+  // Create the summary field dropdown
+  const summaryFieldDropdown = createDropdown({
+    containerId: "edit-summary-field-container",
+    labelText: "Summary Field",
+    options: summaryOptions,
+    selectedValue: field.summary_field || "",
+    onChange: (val) => {
+      validate(); // optional
     },
   });
 
@@ -400,7 +420,10 @@ export function setupFieldEditModal(onConfirm) {
       }
 
       try {
-        const field = extractFieldDefinition({ typeDropdown });
+        const field = extractFieldDefinition({
+          typeDropdown: typeDropdown,
+          summaryDropdown: summaryFieldDropdown,
+        });
         onConfirm(field);
         modal.hide();
       } catch (err) {
@@ -430,4 +453,3 @@ export function setupFieldEditModal(onConfirm) {
     typeDropdown,
   };
 }
-

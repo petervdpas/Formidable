@@ -5,7 +5,7 @@ import { fieldTypes, getFieldTypeDef } from "./fieldTypes.js";
 
 export function extractFieldDefinition({
   keyId = "edit-key",
-  summaryFieldId = "edit-summary-field",
+  summaryDropdown,
   expressionItemId = "edit-expression-item",
   twoColumnId = "edit-two-column",
   labelId = "edit-label",
@@ -15,7 +15,7 @@ export function extractFieldDefinition({
   optionsId = "edit-options",
 }) {
   const key = document.getElementById(keyId)?.value.trim();
-  const summaryField = document.getElementById(summaryFieldId)?.value.trim();
+  const summaryField = summaryDropdown?.getSelected() || "";
   const expressionItem =
     document.getElementById(expressionItemId)?.checked || false;
   const twoColumn = document.getElementById(twoColumnId)?.checked || false;
