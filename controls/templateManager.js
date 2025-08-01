@@ -2,7 +2,8 @@
 
 const fileManager = require("./fileManager");
 const configManager = require("./configManager");
-const schema = require("../schemas/template.schema");
+const schemaTemplate = require("../schemas/template.schema");
+const schemaField = require("../schemas/field.schema");
 const { log, warn, error } = require("./nodeLogger");
 
 const basicYamlName = "basic.yaml";
@@ -30,7 +31,7 @@ function loadTemplate(name) {
   const filePath = getTemplatePath(name);
   try {
     const raw = fileManager.loadFile(filePath, { format: "yaml" });
-    return schema.sanitize(raw, name);
+    return schemaTemplate.sanitize(raw, name);
   } catch (err) {
     error("[TemplateManager] Failed to load:", filePath, err);
     return null;
@@ -41,13 +42,23 @@ function saveTemplate(name, data) {
   try {
     if (!data.filename) data.filename = name;
 
+    const sanitizedFields = Array.isArray(data.fields)
+      ? data.fields.map((f) => {
+          const clean = schemaField.sanitize(f);
+          if (clean.type !== "loopstart") {
+            delete clean.summary_field;
+          }
+          return clean;
+        })
+      : [];
+
     const ordered = {
       name: data.name || "",
       filename: data.filename,
       markdown_template: data.markdown_template || "",
       sidebar_handling: data.sidebar_handling || "",
       enable_collection: data.enable_collection === true,
-      fields: Array.isArray(data.fields) ? data.fields : [],
+      fields: sanitizedFields,
     };
 
     // Add extra custom keys if any

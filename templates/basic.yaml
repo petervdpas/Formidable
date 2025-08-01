@@ -243,31 +243,43 @@ sidebar_handling: >-
 enable_collection: true
 fields:
   - key: id
-    label: GUID
     type: guid
+    label: GUID
+    description: ''
+    sidebar_item: false
+    expression_item: false
+    two_column: false
+    default: ''
+    options: &ref_0 []
     primary_key: true
   - key: test
-    label: Test
     type: text
+    label: Test
     description: A basic text input for demonstration purposes.
-    two_column: true
     sidebar_item: true
+    expression_item: true
+    two_column: true
     default: Default value
+    options: *ref_0
   - key: check
-    label: Check
     type: boolean
+    label: Check
     description: Enable or disable this feature using a checkbox.
-    two_column: true
     sidebar_item: true
+    expression_item: true
+    two_column: true
+    default: ''
     options:
       - value: true
         label: 'On'
       - value: false
         label: 'Off'
   - key: dropdown
-    label: Dropdown
     type: dropdown
+    label: Dropdown
     description: Select a single value from a dropdown menu.
+    sidebar_item: false
+    expression_item: false
     two_column: true
     default: R
     options:
@@ -276,10 +288,13 @@ fields:
       - value: R
         label: Right
   - key: multichoice
-    label: Multiple Choice
     type: multioption
+    label: Multiple Choice
     description: Choose one or more options from a list of checkboxes.
+    sidebar_item: false
+    expression_item: false
     two_column: true
+    default: ''
     options:
       - value: A
         label: Option A
@@ -288,9 +303,11 @@ fields:
       - value: C
         label: Option C
   - key: radio
-    label: Radio
     type: radio
+    label: Radio
     description: Pick one option using radio buttons.
+    sidebar_item: false
+    expression_item: false
     two_column: true
     default: DOG
     options:
@@ -301,19 +318,29 @@ fields:
       - value: BIRD
         label: Bird
   - key: mline
-    label: Mline
     type: textarea
+    label: Mline
     description: Enter longer text, such as notes or paragraphs.
+    sidebar_item: false
+    expression_item: false
+    two_column: false
     default: A whole lot of prefab text...
+    options: *ref_0
   - key: numpy
-    label: Numpy
     type: number
+    label: Numpy
     description: A numeric input field. Only accepts numbers.
+    sidebar_item: false
+    expression_item: false
+    two_column: false
     default: '17'
+    options: *ref_0
   - key: rangie
-    label: Rangie
     type: range
+    label: Rangie
     description: A Range slider. Values are set by sliding the value
+    sidebar_item: false
+    expression_item: false
     two_column: true
     default: '20'
     options:
@@ -324,18 +351,31 @@ fields:
       - value: step
         label: '5'
   - key: bday
-    label: Birthday
     type: date
+    label: Birthday
     description: Select a date from the calendar picker.
+    sidebar_item: false
+    expression_item: false
+    two_column: false
     default: '1968-12-23'
+    options: *ref_0
   - key: listy
-    label: Listy
     type: list
+    label: Listy
     description: Add multiple short entries in list format.
+    sidebar_item: false
+    expression_item: false
+    two_column: false
+    default: ''
+    options: *ref_0
   - key: datable
-    label: Table
     type: table
+    label: Table
     description: Enter rows of structured data using defined columns.
+    sidebar_item: false
+    expression_item: false
+    two_column: false
+    default: ''
     options:
       - value: col1
         label: Column 1
@@ -344,14 +384,29 @@ fields:
       - value: col3
         label: Column 3
   - key: design
-    label: Design
     type: image
+    label: Design
     description: Printing an image
+    sidebar_item: false
+    expression_item: false
+    two_column: false
+    default: ''
+    options: *ref_0
   - key: linktest
-    label: Linktest
     type: link
+    label: Linktest
     description: A link test
+    sidebar_item: false
+    expression_item: false
+    two_column: false
+    default: ''
+    options: *ref_0
   - key: ttags
-    label: Tags
     type: tags
+    label: Tags
     description: Add any tag you feel like!
+    sidebar_item: false
+    expression_item: false
+    two_column: false
+    default: ''
+    options: *ref_0

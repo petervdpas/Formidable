@@ -1,10 +1,11 @@
 // utils/formUtils.js
 
 import { EventBus } from "../modules/eventBus.js";
-import { fieldTypes } from "./fieldTypes.js";
+import { fieldTypes, getFieldTypeDef } from "./fieldTypes.js";
 
 export function extractFieldDefinition({
   keyId = "edit-key",
+  summaryFieldId = "edit-summary-field",
   expressionItemId = "edit-expression-item",
   twoColumnId = "edit-two-column",
   labelId = "edit-label",
@@ -14,7 +15,9 @@ export function extractFieldDefinition({
   optionsId = "edit-options",
 }) {
   const key = document.getElementById(keyId)?.value.trim();
-  const expressionItem = document.getElementById(expressionItemId)?.checked || false;
+  const summaryField = document.getElementById(summaryFieldId)?.value.trim();
+  const expressionItem =
+    document.getElementById(expressionItemId)?.checked || false;
   const twoColumn = document.getElementById(twoColumnId)?.checked || false;
   const label = document.getElementById(labelId)?.value.trim();
   const description = document.getElementById(descriptionId)?.value.trim();
@@ -73,6 +76,7 @@ export function extractFieldDefinition({
 
   const field = { key, label, type };
   if (def) field.default = def;
+  if (summaryField) field.summary_field = summaryField;
   if (expressionItem) field.sidebar_item = true;
   if (twoColumn) field.two_column = true;
   if (description) field.description = description;
@@ -310,9 +314,10 @@ export function injectFieldDefaults(fields, metaData) {
   }
 }
 
+
 export function applyFieldAttributeDisabling(dom, fieldTypeKey) {
-  const typeDef = fieldTypes[fieldTypeKey];
-  const disabled = new Set(typeDef?.disabledAttributes || []);
+  const typeDef = getFieldTypeDef(fieldTypeKey);
+  const disabled = new Set(typeDef.disabledAttributes || []);
 
   Object.entries(dom).forEach(([key, el]) => {
     if (!el) return;
@@ -330,6 +335,7 @@ export function applyFieldAttributeDisabling(dom, fieldTypeKey) {
     }
   });
 }
+
 export function clearContainerUI(
   container,
   label = "Select or create a form-file to begin."

@@ -91,36 +91,76 @@ sidebar_handling: >-
 enable_collection: false
 fields:
   - key: title
-    label: Title
     type: text
+    label: Title
     description: This is just a title....
     sidebar_item: true
+    expression_item: true
+    two_column: false
+    default: ''
+    options: &ref_0 []
   - key: looper
-    label: Chapters
     type: loopstart
+    label: Chapters
     description: Enter your chapters here...!
+    summary_field: ''
+    sidebar_item: false
+    expression_item: false
+    two_column: false
+    default: ''
+    options: *ref_0
   - key: inloop_title
+    type: text
     label: Inloop Title
-    type: text
     description: This is a title inside the looper....
+    sidebar_item: false
+    expression_item: false
+    two_column: false
     default: Wauwie... I'm inside the looper
+    options: *ref_0
   - key: inloop_description
-    label: Inloop - Description
     type: textarea
+    label: Inloop - Description
     description: This is a description inside the looper...
+    sidebar_item: false
+    expression_item: false
+    two_column: false
     default: Describe how it feels to be inside a looper....
+    options: *ref_0
   - key: subloop
-    label: Subloop
     type: loopstart
-    description: Enter paragraphs here...!
-  - key: subloop_title
-    label: Sub loop
-    type: text
-    description: A title field inside a loop inside a parent loop
-    default: This is Crazy!!
-  - key: subloop
     label: Subloop
+    description: Enter paragraphs here...!
+    summary_field: ''
+    sidebar_item: false
+    expression_item: false
+    two_column: false
+    default: ''
+    options: *ref_0
+  - key: subloop_title
+    type: text
+    label: Sub loop titel
+    description: A title field inside a loop inside a parent loop
+    sidebar_item: false
+    expression_item: false
+    two_column: false
+    default: This is Crazy!!
+    options: *ref_0
+  - key: subloop
     type: loopstop
+    label: Subloop
+    description: ''
+    sidebar_item: false
+    expression_item: false
+    two_column: false
+    default: ''
+    options: *ref_0
   - key: looper
-    label: Chapters
     type: loopstop
+    label: Chapters
+    description: ''
+    sidebar_item: false
+    expression_item: false
+    two_column: false
+    default: ''
+    options: *ref_0

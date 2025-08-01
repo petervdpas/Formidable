@@ -3,6 +3,7 @@
 import { setupFieldEditModal } from "./modalSetup.js";
 import { showConfirmModal } from "../utils/modalUtils.js";
 import { applyModalTypeClass } from "../utils/domUtils.js";
+import { createDropdown } from "../utils/dropdownUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 import { validateField } from "../utils/templateValidation.js";
 import { applyFieldAttributeDisabling } from "../utils/formUtils.js";
@@ -26,13 +27,17 @@ function setupFieldEditor(container, onChange, allFields = []) {
     primaryKey: container.querySelector("#edit-primary-key"),
     label: container.querySelector("#edit-label"),
     description: container.querySelector("#edit-description"),
-    twoColumn: container.querySelector("#edit-two-column"),
-    twoColumnRow: container
-      .querySelector("#edit-two-column")
-      ?.closest(".switch-row"),
+    // summaryField: container.querySelector("#edit-summary-field"),
+    summaryFieldContainer: container.querySelector(
+      "#edit-summary-field-container"
+    ),
     expressionItem: container.querySelector("#edit-expression-item"),
     expressionItemRow: container
       .querySelector("#edit-expression-item")
+      ?.closest(".switch-row"),
+    twoColumn: container.querySelector("#edit-two-column"),
+    twoColumnRow: container
+      .querySelector("#edit-two-column")
       ?.closest(".switch-row"),
     default: container.querySelector("#edit-default"),
     options: container.querySelector("#edit-options"),
@@ -61,6 +66,29 @@ function setupFieldEditor(container, onChange, allFields = []) {
   function setField(field) {
     originalKey = field.key?.trim();
 
+    // Collect dropdown options from all non-loop fields
+    const summaryOptions = allFields
+      .filter((f) => f.type !== "loopstart" && f.type !== "loopstop")
+      .map((f) => ({
+        value: f.key,
+        label: `${f.label || f.key} (${f.key})`,
+      }));
+
+    summaryOptions.unshift({ value: "", label: "(none)" });
+
+    const summaryFieldDropdown = createDropdown({
+      containerId: "edit-summary-field-container",
+      labelText: "Summary Field",
+      selectedValue: field.summary_field || "",
+      options: summaryOptions,
+      onChange: (val) => {
+        validate(); // optional
+      },
+    });
+
+    dom.summaryField = summaryFieldDropdown.selectElement;
+    dom.summaryFieldDropdown = summaryFieldDropdown.selectElement;
+
     dom.key.classList.remove("input-error");
     confirmBtn = document.getElementById("btn-field-edit-confirm");
     if (confirmBtn) confirmBtn.disabled = false;
@@ -72,8 +100,10 @@ function setupFieldEditor(container, onChange, allFields = []) {
     if (dom.primaryKey) dom.primaryKey.value = isGuid ? "true" : "false";
     dom.label.value = isGuid ? "GUID" : field.label || "";
     dom.description.value = field.description || "";
-    dom.twoColumn.checked = !!field.two_column;
+    dom.summaryField.value = field.summary_field || "";
+    dom.expressionItem.checked = !!field.expression_item;
     dom.expressionItem.checked = !!field.sidebar_item;
+    dom.twoColumn.checked = !!field.two_column;
     dom.default.value = field.default ?? "";
 
     labelLocked = field.label?.trim().length > 0 && field.label !== field.key;
@@ -176,8 +206,10 @@ function setupFieldEditor(container, onChange, allFields = []) {
       key: isGuid ? "id" : dom.key.value.trim(),
       label: isGuid ? "GUID" : dom.label.value.trim(),
       description: dom.description.value.trim(),
-      two_column: dom.twoColumn.checked,
+      summary_field: dom.summaryField.getSelected?.() || "",
+      expression_item: dom.expressionItem.checked,
       sidebar_item: dom.expressionItem.checked,
+      two_column: dom.twoColumn.checked,
       default: dom.default.value,
       options,
       type,
