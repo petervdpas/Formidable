@@ -94,7 +94,6 @@ fields:
     type: text
     label: Title
     description: This is just a title....
-    sidebar_item: true
     expression_item: true
     two_column: false
     default: ''
@@ -104,7 +103,6 @@ fields:
     label: Chapters
     description: Enter your chapters here...!
     summary_field: inloop_title
-    sidebar_item: false
     expression_item: false
     two_column: false
     default: ''
@@ -113,7 +111,6 @@ fields:
     type: text
     label: Inloop Title
     description: This is a title inside the looper....
-    sidebar_item: false
     expression_item: false
     two_column: false
     default: Wauwie... I'm inside the looper
@@ -122,7 +119,6 @@ fields:
     type: textarea
     label: Inloop - Description
     description: This is a description inside the looper...
-    sidebar_item: false
     expression_item: false
     two_column: false
     default: Describe how it feels to be inside a looper....
@@ -132,7 +128,6 @@ fields:
     label: Subloop
     description: Enter paragraphs here...!
     summary_field: subloop_title
-    sidebar_item: false
     expression_item: false
     two_column: false
     default: ''
@@ -141,7 +136,6 @@ fields:
     type: text
     label: Sub loop titel
     description: A title field inside a loop inside a parent loop
-    sidebar_item: false
     expression_item: false
     two_column: false
     default: This is Crazy!!
@@ -150,7 +144,6 @@ fields:
     type: loopstop
     label: Subloop
     description: ''
-    sidebar_item: false
     expression_item: false
     two_column: false
     default: ''
@@ -159,7 +152,6 @@ fields:
     type: loopstop
     label: Chapters
     description: ''
-    sidebar_item: false
     expression_item: false
     two_column: false
     default: ''

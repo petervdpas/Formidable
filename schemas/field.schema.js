@@ -27,7 +27,6 @@ module.exports = {
     label: "",
     description: "",
     summary_field: "",
-    sidebar_item: false,
     expression_item: false,
     two_column: false,
     default: "",
@@ -48,12 +47,7 @@ module.exports = {
     }
 
     // Ensure boolean normalization
-    field.sidebar_item = !!field.sidebar_item;
-    field.expression_item =
-      typeof raw.expression_item === "undefined"
-        ? !!field.sidebar_item
-        : !!raw.expression_item;
-
+    field.expression_item = !!field.expression_item;
     field.two_column = !!field.two_column;
 
     // Only allow summary_field on loopstart

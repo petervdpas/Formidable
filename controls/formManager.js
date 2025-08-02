@@ -34,7 +34,7 @@ async function extendedListForms(templateFilename) {
   const fields = template?.fields || [];
 
   // Find special fields
-  const expressionFields = fields.filter((f) => f.sidebar_item);
+  const expressionFields = fields.filter((f) => f.expression_item);
 
   const results = [];
 

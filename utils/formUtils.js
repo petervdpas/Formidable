@@ -77,7 +77,7 @@ export function extractFieldDefinition({
   const field = { key, label, type };
   if (def) field.default = def;
   if (summaryField) field.summary_field = summaryField;
-  if (expressionItem) field.sidebar_item = true;
+  if (expressionItem) field.expression_item = true;
   if (twoColumn) field.two_column = true;
   if (description) field.description = description;
   if (options.length > 0) field.options = options;

@@ -57,11 +57,6 @@ function sanitizeField(f) {
     field.expression_item = true;
   }
 
-  // obsolete: phase out sidebar_item
-  if (f.sidebar_item) {
-    field.sidebar_item = true;
-  }
-
   if (f.two_column) {
     field.two_column = true;
   }
@@ -159,7 +154,7 @@ export function initTemplateEditor(containerId, onSaveCallback) {
 
     setupFieldset.appendChild(templateRow);
 
-    // Sidebar Handling input row
+    // Expression Handling input row
     const sidebarRow = createFormRowInput({
       id: "sidebar-handling",
       label: "Sidebar Handling",

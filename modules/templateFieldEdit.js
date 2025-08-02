@@ -77,7 +77,6 @@ function setupFieldEditor(container, onChange, allFields = []) {
     dom.description.value = field.description || "";
     dom.summaryField.value = field.summary_field || "";
     dom.expressionItem.checked = !!field.expression_item;
-    dom.expressionItem.checked = !!field.sidebar_item;
     dom.twoColumn.checked = !!field.two_column;
     dom.default.value = field.default ?? "";
 
@@ -184,7 +183,6 @@ function setupFieldEditor(container, onChange, allFields = []) {
       description: dom.description.value.trim(),
       summary_field: summaryField,
       expression_item: dom.expressionItem.checked,
-      sidebar_item: dom.expressionItem.checked,
       two_column: dom.twoColumn.checked,
       default: dom.default.value,
       options,

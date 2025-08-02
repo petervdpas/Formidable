@@ -128,7 +128,7 @@ export async function filterFrontmatter(data = {}, keepKeys = []) {
 } 
 
 /**
- * Evaluates a sidebar expression and returns rich output.
+ * Evaluates a expression (for expression items) and returns rich output.
  * Always attempts evaluation; caller decides whether to use it.
  */
 export async function evaluateExpression({
