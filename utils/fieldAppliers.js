@@ -4,6 +4,7 @@ import { EventBus } from "../modules/eventBus.js";
 import { createLinkOpenButton } from "../modules/uiButtons.js";
 import { ensureVirtualLocation } from "./vfsUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
+import { createSortable } from "./domUtils.js";
 
 export function applyGuidField(container, field, value) {
   const key = field.key;
@@ -79,7 +80,6 @@ export function applyListField(
   const listWrapper = container.querySelector(`[data-list-field="${key}"]`);
   if (!listWrapper) return;
 
-  // Find the Add (+) button safely
   const addButton = Array.from(listWrapper.children).find(
     (el) => el.tagName === "BUTTON" && el.textContent.trim() === "+"
   );
@@ -91,18 +91,25 @@ export function applyListField(
     return;
   }
 
-  // Remove existing list items
+  // Remove existing items
   const existingItems = listWrapper.querySelectorAll(".list-field-item");
   existingItems.forEach((item) => item.remove());
 
-  // Add new items from value
+  // Add new ones from value
   (value || []).forEach((item) => {
     const itemWrapper = document.createElement("div");
     itemWrapper.className = "list-field-item";
 
+    // ✅ Add drag handle for existing (applied) items
+    const dragHandle = document.createElement("span");
+    dragHandle.className = "drag-handle";
+    dragHandle.textContent = "☰";
+    dragHandle.style = "cursor: grab; margin-right: 0.5em;";
+    itemWrapper.appendChild(dragHandle);
+
     const input = document.createElement("input");
     input.type = "text";
-    input.name = "list-item"; // ✅ must match renderListField!
+    input.name = "list-item";
     input.className = "list-input";
     input.value = item;
 
@@ -122,7 +129,6 @@ export function applyListField(
     }
 
     const removeBtn = document.createElement("button");
-    removeBtn.type = "button";
     removeBtn.className = "remove-btn";
     removeBtn.textContent = "-";
     removeBtn.onclick = () => itemWrapper.remove();
@@ -131,6 +137,13 @@ export function applyListField(
     itemWrapper.appendChild(removeBtn);
 
     listWrapper.insertBefore(itemWrapper, addButton);
+  });
+
+  createSortable(listWrapper, {
+    handle: ".drag-handle",
+    group: "list-items",
+    allowDrag: true,
+    itemSelector: ".list-field-item",
   });
 }
 

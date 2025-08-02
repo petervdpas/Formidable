@@ -1,5 +1,5 @@
 {
-  "theme": "light",
+  "theme": "dark",
   "show_icon_buttons": false,
   "use_expressions": true,
   "font_size": 14,
@@ -18,9 +18,9 @@
   "enable_internal_server": true,
   "internal_server_port": 8383,
   "window_bounds": {
-    "width": 1279,
-    "height": 935,
-    "x": 270,
-    "y": 51
+    "width": 1936,
+    "height": 1048,
+    "x": -8,
+    "y": -8
   }
 }

@@ -600,8 +600,7 @@ async function createListItem(value, options = []) {
     parent: container,
     tag: "button",
     textContent: "-",
-    className: "remove-btn",
-    attributes: { type: "button" },
+    className: "remove-btn"
   });
 
   removeBtn.onclick = () => container.remove();
