@@ -50,6 +50,7 @@ function createWindow() {
       `--appInfo=${JSON.stringify({
         name: packageJson.name,
         version: packageJson.version,
+        language: userConfig.language || "en",
       })}`,
     ],
     webPreferences: {

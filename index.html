@@ -66,15 +66,21 @@
       <!-- Template Form Editor Context -->
       <div id="template-container">
         <div id="template-sidebar">
-          <h3>Templates</h3>
+          <h3 data-i18n="sidebar.templates.title">Templates</h3>
           <div id="template-list"></div>
         </div>
         <div id="template-splitter">
-          <div id="template-resizeHandle" title="Drag to Resize"></div>
+          <div
+            id="template-resizeHandle"
+            title="Drag to Resize"
+            data-i18n-title="resize.handle.title"
+          ></div>
         </div>
         <div id="template-workspace">
           <section id="template-content">
-            <p>Select or create a template-file to begin editing.</p>
+            <p data-i18n="sidebar.templates.placeholder">
+              Select or create a template-file to begin editing.
+            </p>
           </section>
         </div>
       </div>
@@ -83,21 +89,27 @@
       <div id="storage-container" style="display: none">
         <div id="storage-sidebar">
           <div id="template-selector"></div>
-          <h3>Forms</h3>
+          <h3 data-i18n="sidebar.forms.title">Forms</h3>
           <div id="storage-list"></div>
         </div>
         <div id="storage-splitter">
-          <div id="storage-resizeHandle" title="Drag to Resize"></div>
+          <div
+            id="template-resizeHandle"
+            title="Drag to Resize"
+            data-i18n-title="resize.handle.title"
+          ></div>
         </div>
         <div id="storage-workspace">
           <section id="storage-content">
-            <p>Select or create a form-file to begin.</p>
+            <p data-i18n="sidebar.forms.placeholder">
+              Select or create a form-file to begin.
+            </p>
           </section>
         </div>
       </div>
       <!-- Shared Status Bar -->
       <div id="status-bar">
-        <div id="status-bar-message">Ready.</div>
+        <div id="status-bar-message" data-i18n="status.ready">Ready.</div>
         <div id="status-bar-info"></div>
       </div>
     </div>
@@ -106,7 +118,7 @@
     <div id="profile-modal" class="modal">
       <div class="modal-header">
         <div class="modal-title-row">
-          <h2>Switch User Profile</h2>
+          <h2 data-i18n="modal.profile.title">Switch User Profile</h2>
         </div>
       </div>
       <div class="modal-body" id="profile-body">
@@ -118,7 +130,7 @@
     <div id="settings-modal" class="modal">
       <div class="modal-header">
         <div class="modal-title-row">
-          <h2>Settings</h2>
+          <h2 data-i18n="modal.settings.title">Settings</h2>
         </div>
       </div>
       <div class="modal-body" id="settings-body">
@@ -130,7 +142,7 @@
     <div id="workspace-modal" class="modal">
       <div class="modal-header">
         <div class="modal-title-row">
-          <h2>Workspace Settings</h2>
+          <h2 data-i18n="modal.workspace.title">Workspace Settings</h2>
         </div>
       </div>
       <div class="modal-body" id="workspace-body">
@@ -139,19 +151,23 @@
     </div>
 
     <!-- Template Creation Modal -->
+    <!-- Template Creation Modal -->
     <div id="template-modal" class="modal">
       <div class="modal-header">
         <div class="modal-title-row">
-          <h2>New Template</h2>
+          <h2 data-i18n="modal.template.title">New Template</h2>
         </div>
       </div>
       <div class="modal-body">
         <div class="modal-form-row">
-          <label for="template-name">Filename</label>
+          <label for="template-name" data-i18n="modal.template.label.filename"
+            >Filename</label
+          >
           <input
             type="text"
             id="template-name"
             placeholder="e.g., user-survey"
+            data-i18n-placeholder="modal.template.placeholder.filename"
           />
         </div>
         <div id="template-modal-buttons-wrapper"></div>
@@ -162,20 +178,28 @@
     <div id="entry-modal" class="modal">
       <div class="modal-header">
         <div class="modal-title-row">
-          <h2>New Entry</h2>
+          <h2 data-i18n="modal.entry.title">New Entry</h2>
         </div>
       </div>
       <div class="modal-body">
         <div class="modal-form-row">
-          <label for="entry-name">Enter a name for this entry:</label>
+          <label for="entry-name" data-i18n="modal.entry.label.name">
+            Enter a name for this entry:
+          </label>
           <input
             type="text"
             id="entry-name"
             placeholder="e.g. my-article-title"
+            data-i18n-placeholder="modal.entry.placeholder.name"
           />
         </div>
         <div class="modal-form-row switch-row">
-          <label for="entry-append-date">Append date (YYYYMMDD)</label>
+          <label
+            for="entry-append-date"
+            data-i18n="modal.entry.label.appendDate"
+          >
+            Append date (YYYYMMDD)
+          </label>
           <label class="switch">
             <input type="checkbox" id="entry-append-date" checked />
             <span class="slider"></span>
@@ -189,7 +213,7 @@
     <div id="field-edit-modal" class="modal">
       <div class="modal-header">
         <div class="modal-title-row">
-          <h2>Edit Field</h2>
+          <h2 data-i18n="modal.field.title">Edit Field</h2>
         </div>
       </div>
       <div class="modal-body">
@@ -197,7 +221,7 @@
           <input type="hidden" id="edit-primary-key" value="false" />
         </div>
         <div class="modal-form-row">
-          <label for="edit-key">Key</label>
+          <label for="edit-key" data-i18n="field.key">Key</label>
           <input type="text" id="edit-key" />
         </div>
         <div class="modal-form-row" id="edit-type-container">
@@ -207,45 +231,54 @@
           <!-- Dropdown will be injected here -->
         </div>
         <div class="modal-form-row switch-row">
-          <label for="edit-expression-item">Expression field</label>
+          <label for="edit-expression-item" data-i18n="field.expression"
+            >Expression field</label
+          >
           <label class="switch">
             <input type="checkbox" id="edit-expression-item" />
             <span class="slider"></span>
           </label>
         </div>
         <div class="modal-form-row switch-row">
-          <label for="edit-two-column">Two columns</label>
+          <label for="edit-two-column" data-i18n="field.twoColumn"
+            >Two columns</label
+          >
           <label class="switch">
             <input type="checkbox" id="edit-two-column" />
             <span class="slider"></span>
           </label>
         </div>
         <div class="modal-form-row">
-          <label for="edit-label">Label</label>
+          <label for="edit-label" data-i18n="field.label">Label</label>
           <input type="text" id="edit-label" />
         </div>
         <div class="modal-form-row">
-          <label for="edit-description">Description</label>
+          <label for="edit-description" data-i18n="field.description"
+            >Description</label
+          >
           <textarea
             id="edit-description"
             rows="2"
             placeholder="Optional description"
+            data-i18n-placeholder="field.placeholder.description"
           ></textarea>
         </div>
         <div class="modal-form-row">
-          <label for="edit-default">Default</label>
+          <label for="edit-default" data-i18n="field.default">Default</label>
           <textarea
             id="edit-default"
             rows="2"
             placeholder="Set the default value for this field"
+            data-i18n-placeholder="field.placeholder.default"
           ></textarea>
         </div>
         <div class="modal-form-row">
-          <label for="edit-options">Options</label>
+          <label for="edit-options" data-i18n="field.options">Options</label>
           <textarea
             id="edit-options"
             rows="2"
             placeholder="Comma-separated"
+            data-i18n-placeholder="field.placeholder.options"
           ></textarea>
         </div>
         <div id="field-edit-buttons-wrapper"></div>
@@ -256,21 +289,21 @@
     <div id="render-modal" class="modal large">
       <div class="modal-header">
         <div class="modal-title-row">
-          <h2>Render Markdown &amp; Preview</h2>
+          <h2 data-i18n="modal.render.title">Render Markdown &amp; Preview</h2>
           <!-- Toggle buttons will be injected here -->
         </div>
       </div>
       <div class="modal-body two-pane">
         <div class="pane raw-pane">
           <div class="pane-header">
-            <h4>Markdown</h4>
+            <h4 data-i18n="pane.markdown">Markdown</h4>
             <div id="copy-markdown-button-wrapper"></div>
           </div>
           <pre id="render-output" class="output-block"></pre>
         </div>
         <div class="pane html-pane">
           <div class="pane-header">
-            <h4>Preview</h4>
+            <h4 data-i18n="pane.preview">Preview</h4>
             <div id="copy-preview-button-wrapper"></div>
           </div>
           <div id="render-preview" class="output-block preview-block"></div>
@@ -281,7 +314,9 @@
     <!-- Confirm Modal -->
     <div id="confirm-modal" class="modal hidden">
       <div class="modal-content">
-        <p id="confirm-message">Are you sure?</p>
+        <p id="confirm-message" data-i18n="modal.confirm.message">
+          Are you sure?
+        </p>
         <div id="confirm-buttons-wrapper"></div>
       </div>
     </div>
@@ -290,7 +325,7 @@
     <div id="git-actions-modal" class="modal">
       <div class="modal-header">
         <div class="modal-title-row">
-          <h2>Git Actions</h2>
+          <h2 data-i18n="modal.git.title">Git Actions</h2>
         </div>
       </div>
       <div class="modal-body" id="git-modal-body">
@@ -302,7 +337,7 @@
     <div id="plugin-manager-modal" class="modal">
       <div class="modal-header">
         <div class="modal-title-row">
-          <h2>Plugin Manager</h2>
+          <h2 data-i18n="modal.plugin.title">Plugin Manager</h2>
         </div>
       </div>
       <div class="modal-body" id="plugin-manager-body">
@@ -314,7 +349,7 @@
     <div id="help-modal" class="modal">
       <div class="modal-header">
         <div class="modal-title-row">
-          <h2>Formidable Help Pages</h2>
+          <h2 data-i18n="modal.help.title">Formidable Help Pages</h2>
         </div>
       </div>
       <div class="modal-body" id="help-body">
@@ -326,7 +361,7 @@
     <div id="about-modal" class="modal">
       <div class="modal-header">
         <div class="modal-title-row">
-          <h2 id="about-title">AppTitle</h2>
+          <h2 id="about-title" data-i18n="modal.about.title">AppTitle</h2>
         </div>
       </div>
       <div class="modal-body">
@@ -337,8 +372,10 @@
             class="about-icon"
           />
           <div class="about-text">
-            <p>Formidable is a Template/Form Editor created in Electron.</p>
-            <p>© 2025 Peter van de Pas</p>
+            <p data-i18n="modal.about.description">
+              Formidable is a Template/Form Editor created in Electron.
+            </p>
+            <p data-i18n="modal.about.copyright">© 2025 Peter van de Pas</p>
           </div>
         </div>
       </div>

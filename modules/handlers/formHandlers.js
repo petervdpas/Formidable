@@ -2,6 +2,7 @@
 
 import { EventBus } from "../eventBus.js";
 import { clearContainerUI } from "../../utils/formUtils.js";
+import { t } from "../../utils/i18n.js";
 
 let formManager = null;
 let storageListManager = null;
@@ -191,7 +192,11 @@ export async function handleDeleteForm(
       EventBus.emit("form:list:reload");
 
       if (container) {
-        clearContainerUI(container);
+        clearContainerUI(
+          container,
+          "sidebar.forms.placeholder",
+          "Select or create a form-file to begin."
+        );
       }
 
       const templateName = (templateFilename || "").replace(/\.yaml$/, "");

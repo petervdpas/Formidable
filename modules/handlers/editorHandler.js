@@ -4,6 +4,7 @@ import { EventBus } from "../eventBus.js";
 import { getValue as getMarkdownTemplate } from "../templateCodemirror.js";
 import { showConfirmModal } from "../../utils/modalUtils.js";
 import { clearContainerUI } from "../../utils/formUtils.js";
+import { t } from "../../utils/i18n.js";
 
 export async function handleSaveTemplate({ container, fields, callback }) {
   const name = container.querySelector("#yaml-name").value.trim();
@@ -18,7 +19,7 @@ export async function handleSaveTemplate({ container, fields, callback }) {
     markdown_template: markdownTemplate,
     sidebar_handling: sidebarHandling,
     enable_collection: enableCollection,
-    fields
+    fields,
   };
 
   // 🔍 Validatie
@@ -72,7 +73,8 @@ export async function handleDeleteTemplate(container) {
   if (success) {
     clearContainerUI(
       container,
-      "Select or create a template-file to begin editing."
+      "sidebar.templates.placeholder",
+      "Select or create a template-file to begin."
     );
 
     EventBus.emit("status:update", `Deleted template: ${template}`);

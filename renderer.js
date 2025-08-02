@@ -1,6 +1,7 @@
 // renderer.js
 
 // ───── Imports ──────────────────────────────
+import { loadLocale, translateDOM } from "./utils/i18n.js";
 import { EventBus } from "./modules/eventBus.js";
 import { exposeGlobalAPI } from "./modules/globalAPI.js";
 import { initEventRouter } from "./modules/eventRouter.js";
@@ -88,6 +89,9 @@ window.addEventListener("DOMContentLoaded", async () => {
   const config = await new Promise((resolve) => {
     EventBus.emit("config:load", (cfg) => resolve(cfg));
   });
+
+  await loadLocale(config.language || "en");
+  translateDOM();
 
   if (config?.author_name) {
     setStatusInfo(`User Profile: ${config.author_name}`);

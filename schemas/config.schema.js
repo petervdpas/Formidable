@@ -15,6 +15,7 @@ module.exports = {
     selected_data_file: "",
     author_name: "unknown",
     author_email: "unknown@example.com",
+    language: "en",
     encryption_key: "",
     use_git: false,
     git_root: "",

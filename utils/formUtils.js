@@ -2,6 +2,7 @@
 
 import { EventBus } from "../modules/eventBus.js";
 import { fieldTypes, getFieldTypeDef } from "./fieldTypes.js";
+import { t } from "./i18n.js";
 
 export function extractFieldDefinition({
   keyId = "edit-key",
@@ -314,7 +315,6 @@ export function injectFieldDefaults(fields, metaData) {
   }
 }
 
-
 export function applyFieldAttributeDisabling(dom, fieldTypeKey) {
   const typeDef = getFieldTypeDef(fieldTypeKey);
   const disabled = new Set(typeDef.disabledAttributes || []);
@@ -338,8 +338,10 @@ export function applyFieldAttributeDisabling(dom, fieldTypeKey) {
 
 export function clearContainerUI(
   container,
-  label = "Select or create a form-file to begin."
+  labelKey = null,
+  fallback = "Select or create an item to begin."
 ) {
+  const label = typeof labelKey === "string" ? t(labelKey, fallback) : fallback;
   container.innerHTML = `<p class="clearform-message">${label}</p>`;
   EventBus.emit("logging:default", ["[clearContainerUI] Form UI cleared."]);
 }

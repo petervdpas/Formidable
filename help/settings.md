@@ -6,60 +6,75 @@ order: 2
 
 ## Configuration Settings
 
-Formidable allows you to customize its behavior and appearance for a certain profile (user.json by default) through the **Settings** modal. This includes global options such as theme, author identity, directory paths, plugin support, and server configuration.
+Formidable allows you to customize its behavior and appearance per profile (e.g. `user.json`) using the **Settings** modal. This includes identity settings, visual preferences, storage paths, plugin control, development mode, and server behavior.
 
-To access it, choose **`Config → Settings...`** from the main menu.
+To access the settings, open the **`Config → Settings...`** menu option.
 
 ---
 
 ### General
 
-Configure author identity, enable plugin functionality, and control logging behavior.
+Set author identity used in forms and outputs.
 
 ![Settings – General](images/settings-general.png)
 
-- **Author Name / Email**: Used in metadata and rendered output.
-- **Enable Plugins**: Turns plugin functionality on or off.
-- **Enable Logging**: Controls runtime logging behavior.
+- **Author Name** – Used in metadata and rendered output.
+- **Author Email** – Used in metadata and rendered output.
 
 ---
 
 ### Display
 
-Configure how Formidable looks and feels.
+Customize Formidable’s appearance and UI features.
 
 ![Settings – Display](images/settings-display.png)
 
-- **Display Theme**: Toggle between Light and Dark mode.
-- **Icon Buttons**: Enable or disable icon-based controls (experimental).
+- **Display Theme** – Toggle between Light and Dark mode.
+- **Expressions** – Show or hide inline expression results in sidebars.
+- **Icon Buttons** – Use icon-only buttons (experimental).
 
 ---
 
 ### Directories
 
-Define the base folder for context (templates, storage) and optionally enable Git.
+Define where your context lives and configure Git usage.
 
 ![Settings – Directories](images/settings-directories.png)
 
-- **Context Folder**: Sets the root folder for working templates and data.
-- **Use Git Repository**: Enables Git integration.
-- **Git Root Directory**: Select the folder where Git operations will take place.
+- **Context Folder** – Sets the base folder for your templates and form data.
+- **Use Git Repository** – Enables Git tracking and version control features.
+- **Git Root Directory** – Path used for Git operations.
 
-_Notes: The context folder is where your templates and filled forms are stored. Ensure it is set to a location that suits your workflow.
-If you enable Git, Formidable will activate the **Git Actions...** menu, allowing you to perform Git operations directly from the application._
+> *The context folder is where your templates and filled forms are stored. If you enable Git, Formidable will use the specified Git root directory for version control operations.*
+> *When Git is enabled, the **Git Actions...** menu becomes available for staging, committing, and syncing files.*
 
 ---
 
 ### Internal Server
 
-Enable and configure Formidable's built-in preview server.
+Configure Formidable’s built-in Markdown preview server.
 
 ![Settings – Internal Server](images/settings-server.png)
 
-- **Internal Server**: Enable/disable the built-in server.
-- **Server Port**: Port number the server listens on (default: `8383`).
+- **Internal Server** – Toggle the server on or off.
+- **Server Port** – Specify the port for preview access (default: `8383`).
 
-You can preview Markdown output in your browser at [http://localhost:8383](http://localhost:8383) when the server is active.
+> *With the server enabled, preview Markdown in your browser via `http://localhost:8383`.*
+
+---
+
+### Advanced
+
+Access system-level features and development controls.
+
+![Settings – Advanced](images/settings-advanced.png)
+
+- **Enable Plugins** – Turn plugin support on or off.
+- **Secret Decryption Key** – Enter the key to decrypt encrypted field values.
+- **Development Mode** – Enables developer features for debugging or custom extensions.
+- **Enable Logging** – Capture detailed runtime logs for diagnostics.
+
+---
 
 ### Related Topics
 
