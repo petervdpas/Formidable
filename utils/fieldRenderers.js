@@ -525,21 +525,27 @@ export async function renderListField(field, value = "") {
   wrapper.dataset.type = "list";
   wrapper.dataset.listField = field.key;
 
+  // Add sortable container inside wrapper
+  const sortableList = document.createElement("div");
+  sortableList.className = "sortable-list";
+  wrapper.appendChild(sortableList);
+
   for (const item of items) {
     const row = await createListItem(item, field.options || []);
-    wrapper.appendChild(row);
+    sortableList.appendChild(row);
   }
 
   const addBtn = addContainerElement({
     parent: wrapper,
     tag: "button",
+    className: "add-list-button",
     textContent: "+",
     attributes: { type: "button" },
   });
 
   addBtn.addEventListener("click", async () => {
     const row = await createListItem("", field.options || []);
-    wrapper.insertBefore(row, addBtn);
+    sortableList.appendChild(row);
     const input = row.querySelector("input");
     if (input && input.readOnly && typeof input.onclick === "function") {
       input.focus();
@@ -566,6 +572,14 @@ async function createListItem(value, options = []) {
   const container = addContainerElement({
     tag: "div",
     className: "list-field-item",
+  });
+
+    // Add drag handle
+  addContainerElement({
+    parent: container,
+    tag: "span",
+    className: "drag-handle",
+    textContent: "↕",
   });
 
   const input = addContainerElement({
@@ -600,7 +614,7 @@ async function createListItem(value, options = []) {
     parent: container,
     tag: "button",
     textContent: "-",
-    className: "remove-btn"
+    className: "remove-btn",
   });
 
   removeBtn.onclick = () => container.remove();
@@ -629,6 +643,8 @@ export async function renderTableField(field, value = "") {
   const thead = addContainerElement({ parent: table, tag: "thead" });
   const headRow = addContainerElement({ parent: thead, tag: "tr" });
 
+  addContainerElement({ parent: headRow, tag: "th", textContent: "" }); // drag handle column header
+
   columns.forEach((col) => {
     const { label } = resolveOption(col);
     addContainerElement({
@@ -645,6 +661,16 @@ export async function renderTableField(field, value = "") {
   function createRow(values = []) {
     const tr = addContainerElement({ tag: "tr" });
 
+    // Drag handle column
+    const dragTd = addContainerElement({ parent: tr, tag: "td" });
+    addContainerElement({
+      parent: dragTd,
+      tag: "span",
+      className: "drag-handle",
+      textContent: "↕", // optional visual icon
+    });
+
+    // Data columns
     columns.forEach((col, colIdx) => {
       const { value } = resolveOption(col);
       const td = addContainerElement({ parent: tr, tag: "td" });
@@ -662,6 +688,7 @@ export async function renderTableField(field, value = "") {
       });
     });
 
+    // Remove button column
     const tdRemove = addContainerElement({ parent: tr, tag: "td" });
     const removeBtn = addContainerElement({
       parent: tdRemove,
@@ -736,7 +763,8 @@ export async function renderImageField(field, value = "", template) {
     parent: wrapper,
     tag: "img",
     attributes: {
-      style: "display: none; cursor: zoom-in; max-width: 200px; max-height: 200px;",
+      style:
+        "display: none; cursor: zoom-in; max-width: 200px; max-height: 200px;",
       alt: "Image preview",
     },
   });

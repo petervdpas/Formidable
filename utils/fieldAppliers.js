@@ -80,19 +80,18 @@ export function applyListField(
   const listWrapper = container.querySelector(`[data-list-field="${key}"]`);
   if (!listWrapper) return;
 
-  const addButton = Array.from(listWrapper.children).find(
-    (el) => el.tagName === "BUTTON" && el.textContent.trim() === "+"
-  );
+  const sortableList = listWrapper.querySelector(".sortable-list");
+  const addButton = listWrapper.querySelector("button.add-list-button");
 
-  if (!addButton) {
+  if (!sortableList || !addButton) {
     EventBus.emit("logging:error", [
-      `[applyListField] Could not find Add (+) button for key "${key}".`,
+      `[applyListField] Could not find sortable-list or add button for key "${key}".`,
     ]);
     return;
   }
 
   // Remove existing items
-  const existingItems = listWrapper.querySelectorAll(".list-field-item");
+  const existingItems = sortableList.querySelectorAll(".list-field-item");
   existingItems.forEach((item) => item.remove());
 
   // Add new ones from value
@@ -100,13 +99,14 @@ export function applyListField(
     const itemWrapper = document.createElement("div");
     itemWrapper.className = "list-field-item";
 
-    // ✅ Add drag handle for existing (applied) items
+    // Drag handle
     const dragHandle = document.createElement("span");
     dragHandle.className = "drag-handle";
     dragHandle.textContent = "☰";
-    dragHandle.style = "cursor: grab; margin-right: 0.5em;";
+    dragHandle.style.cursor = "grab";
     itemWrapper.appendChild(dragHandle);
 
+    // Input
     const input = document.createElement("input");
     input.type = "text";
     input.name = "list-item";
@@ -121,13 +121,14 @@ export function applyListField(
         typeof opt === "string" ? opt === item : opt.value === item
       );
 
-      if (!isValid) {
+      if (!isValid && item) {
         input.classList.add("invalid-option");
         input.placeholder = "⚠ Not in list";
         input.title = "This value is not in the allowed options";
       }
     }
 
+    // Remove button
     const removeBtn = document.createElement("button");
     removeBtn.className = "remove-btn";
     removeBtn.textContent = "-";
@@ -136,10 +137,10 @@ export function applyListField(
     itemWrapper.appendChild(input);
     itemWrapper.appendChild(removeBtn);
 
-    listWrapper.insertBefore(itemWrapper, addButton);
+    sortableList.appendChild(itemWrapper);
   });
 
-  createSortable(listWrapper, {
+  createSortable(sortableList, {
     handle: ".drag-handle",
     group: "list-items",
     allowDrag: true,
@@ -165,6 +166,16 @@ export function applyTableField(
   value.forEach((row) => {
     const tr = document.createElement("tr");
 
+    // Optional: add a drag handle in the first cell
+    const handleCell = document.createElement("td");
+    const dragHandle = document.createElement("span");
+    dragHandle.className = "drag-handle";
+    dragHandle.textContent = "☰";
+    dragHandle.style = "cursor: grab;";
+    handleCell.appendChild(dragHandle);
+    tr.appendChild(handleCell);
+
+    // Add data columns
     row.forEach((cellValue) => {
       const td = document.createElement("td");
       const input = document.createElement("input");
@@ -174,6 +185,7 @@ export function applyTableField(
       tr.appendChild(td);
     });
 
+    // Add remove button cell
     const tdRemove = document.createElement("td");
     const removeBtn = document.createElement("button");
     removeBtn.textContent = "-";
@@ -183,6 +195,14 @@ export function applyTableField(
     tr.appendChild(tdRemove);
 
     tbody.appendChild(tr);
+  });
+
+  // Enable drag-to-reorder on table rows
+  createSortable(tbody, {
+    handle: ".drag-handle",
+    group: "table-rows",
+    allowDrag: true,
+    itemSelector: "tr",
   });
 }
 

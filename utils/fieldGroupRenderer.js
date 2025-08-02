@@ -114,6 +114,7 @@ export async function fieldGroupRenderer(
 
       createSortable(loopList, {
         handle: `.drag-handle.depth-${nestingDepth + 1}`,
+        group: `loop-${loopKey}`,
       });
     } else {
       if (loopGroupKeys.has(field.key)) {
@@ -304,6 +305,7 @@ async function createLoopItem(
 
       createSortable(nestedList, {
         handle: `.drag-handle.depth-${nestedDepth}`,
+        group: `loop-${nestedKey}`,
       });
 
       const addNestedButton = createAddLoopItemButton(async () => {
