@@ -2,10 +2,6 @@
 
 const { contextBridge, ipcRenderer } = require("electron");
 
-// Parse additional argument passed from main.js
-const appInfoArg = process.argv.find((arg) => arg.startsWith("--appInfo="));
-const appInfo = appInfoArg ? JSON.parse(arg.slice(10)) : {};
-
 // ---------- Helpers ----------
 function buildGroup(methods) {
   const group = {};
@@ -181,7 +177,4 @@ const electronAPI = {
   contextBridge.exposeInMainWorld("getAppInfo", () =>
     ipcRenderer.invoke("get-app-info")
   );
-  contextBridge.exposeInMainWorld("formidableConfig", {
-    language: appInfo.language || "en",
-  });
 })();

@@ -77,6 +77,14 @@ window.addEventListener("DOMContentLoaded", async () => {
   console.log("[Renderer] Exposing Plugin API...");
   exposeGlobalAPI();
 
+  // ── Emit config stuff and start with translations ──
+  const config = await new Promise((resolve) => {
+    EventBus.emit("config:load", (cfg) => resolve(cfg));
+  });
+
+  await loadLocale(config.language || "en");
+  translateDOM();
+
   // ── Menu ──
   buildMenu("app-menu", handleMenuAction);
   initStatusHandler("status-bar");
@@ -84,14 +92,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   // ── Grab DOM Elements ──
   const templateContainer = document.getElementById("template-container");
   const storageContainer = document.getElementById("storage-container");
-
-  // ── Emit config stuff ──
-  const config = await new Promise((resolve) => {
-    EventBus.emit("config:load", (cfg) => resolve(cfg));
-  });
-
-  await loadLocale(config.language || "en");
-  translateDOM();
 
   if (config?.author_name) {
     setStatusInfo(`User Profile: ${config.author_name}`);

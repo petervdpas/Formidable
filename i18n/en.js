@@ -1,9 +1,65 @@
 // i18n/en.js
 
 export default {
+  // ── Menu: File ───────────────────────────────
+  "menu.file": "File",
+  "menu.file.openTemplateFolder": "Open Template Folder",
+  "menu.file.openStorageFolder": "Open Storage Folder",
+  "menu.file.openPluginsFolder": "Open Plugins Folder",
+  "menu.file.quit": "Quit",
+
+  // ── Menu: Config ─────────────────────────────
+  "menu.config": "Config",
+  "menu.config.switchProfile": "Switch Profile...",
+  "menu.config.settings": "Settings...",
+  "menu.config.workspace": "Workspace...",
+
+  // ── Menu: Git ────────────────────────────────
+  "menu.git": "Git",
+  "menu.git.actions": "Git Actions...",
+
+  // ── Menu: Server ─────────────────────────────
+  "menu.server": "Server",
+  "menu.server.start": "Start Server",
+  "menu.server.stop": "Stop Server",
+  "menu.server.status": "Server Status",
+  "menu.server.browser": "Open in Browser",
+
+  // ── Menu: Plugins ────────────────────────────
+  "menu.plugins": "Plugins",
+  "menu.plugins.manager": "Plugin Manager...",
+
+  // ── Menu: View ───────────────────────────────
+  "menu.view": "View",
+  "menu.view.reload": "Reload",
+  "menu.view.devtools": "Toggle DevTools",
+
+  // ── Menu: Help ───────────────────────────────
+  "menu.help": "Help",
+  "menu.help.pages": "Help Pages",
+  "menu.help.about": "About",
+
+  // ── Menu: Context Toggle ─────────────────────
+  "menu.context.label": "Context Mode:",
+  "menu.context.option.storage": "Storage",
+  "menu.context.option.template": "Template",
+
+  // Toast messages
+  "toast.noTemplateSelected":
+    "No template selected. Please select a template first.",
+  "toast.serverStarted": "Internal server was started.",
+  "toast.serverAlreadyRunning": "Internal server is already running.",
+  "toast.serverStopped": "Internal server was stopped.",
+  "toast.serverNotRunning": "Internal server wasn't running.",
+  "toast.serverStatus": "Server",
+  "toast.running": "Running",
+  "toast.stopped": "Stopped",
+  "toast.onPort": "on port",
+
   // ── Menus & Sidebars ─────────────────────────
   "sidebar.templates.title": "Templates",
-  "sidebar.templates.placeholder": "Select or create a template-file to begin editing.",
+  "sidebar.templates.placeholder":
+    "Select or create a template-file to begin editing.",
   "sidebar.forms.title": "Forms",
   "sidebar.forms.placeholder": "Select or create a form-file to begin.",
   "status.ready": "Ready.",
@@ -43,9 +99,9 @@ export default {
   "field.placeholder.options": "Comma-separated",
 
   // ── Modals: Render Preview ───────────────────
-  "modal.render.title": "Render Markdown & Preview",
+  "modal.render.title": "Render Markdown & HTML Preview",
   "pane.markdown": "Markdown",
-  "pane.preview": "Preview",
+  "pane.preview": "HTML Preview",
 
   // ── Modals: Confirm ──────────────────────────
   "modal.confirm.message": "Are you sure?",
@@ -60,7 +116,8 @@ export default {
   "modal.help.title": "Formidable Help Pages",
 
   // ── Modals: About ────────────────────────────
-  "modal.about.title": "Formidable",
-  "modal.about.description": "Formidable is a Template/Form Editor created in Electron.",
+  "modal.about.title": "About Formidable",
+  "modal.about.description":
+    "Formidable is a Template/Form Editor created in Electron.",
   "modal.about.copyright": "© 2025 Peter van de Pas",
 };

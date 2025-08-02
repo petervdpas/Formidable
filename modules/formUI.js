@@ -20,11 +20,6 @@ export function createFormManager(containerId) {
     return;
   }
 
-  EventBus.emit("logging:default", [
-    "[createFormManager] Initialized with container:",
-    containerId,
-  ]);
-
   async function loadTemplate(templateYaml) {
     if (!templateYaml) {
       EventBus.emit("logging:warning", [
@@ -50,7 +45,6 @@ export function createFormManager(containerId) {
 
   async function loadFormData(metaData, datafile) {
     currentDatafile = datafile;
-    EventBus.emit("logging:default", ["[loadFormData] datafile:", datafile]);
 
     if (!metaData && currentTemplate?.virtualLocation && currentDatafile) {
       metaData = await new Promise((resolve) => {
@@ -64,11 +58,6 @@ export function createFormManager(containerId) {
           resolve
         );
       });
-
-      EventBus.emit("logging:default", [
-        "[loadFormData] loaded metaData from EventBus:",
-        metaData,
-      ]);
     }
 
     metaData ||= {};

@@ -3,6 +3,7 @@
 import { EventBus } from "./eventBus.js";
 import { bindActionHandlers } from "../utils/domUtils.js";
 import { createSwitch } from "../utils/elementBuilders.js";
+import { t } from "../utils/i18n.js";
 
 let cachedConfig = null;
 let pluginMap = new Map(); // name → pluginMeta
@@ -33,25 +34,25 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
 
   // ─── File & Config Menu ─────────────────────
   menuBar.append(
-    createMenuGroup("File", [
-      { label: "Open Template Folder", action: "open-template-folder" },
-      { label: "Open Storage Folder", action: "open-storage-folder" },
-      { label: "Open Plugins Folder", action: "open-plugins-folder" },
+    createMenuGroup("menu.file", [
+      { label: "menu.file.openTemplateFolder", action: "open-template-folder" },
+      { label: "menu.file.openStorageFolder", action: "open-storage-folder" },
+      { label: "menu.file.openPluginsFolder", action: "open-plugins-folder" },
       "separator",
-      { label: "Quit", action: "quit" },
+      { label: "menu.file.quit", action: "quit" },
     ]),
-    createMenuGroup("Config", [
-      { label: "Switch Profile...", action: "open-profile-switcher" },
-      { label: "Settings...", action: "open-settings" },
-      { label: "Workspace...", action: "open-workspace-settings" },
+    createMenuGroup("menu.config", [
+      { label: "menu.config.switchProfile", action: "open-profile-switcher" },
+      { label: "menu.config.settings", action: "open-settings" },
+      { label: "menu.config.workspace", action: "open-workspace-settings" },
     ])
   );
 
   // ─── Git Menu ────────────────────────────────
   if (cachedConfig.use_git) {
     menuBar.append(
-      createMenuGroup("Git", [
-        { label: "Git Actions...", action: "open-git-modal" },
+      createMenuGroup("menu.git", [
+        { label: "menu.git.actions", action: "open-git-modal" },
       ])
     );
   }
@@ -59,11 +60,14 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   // ─── Server Menu ─────────────────────────────
   if (cachedConfig.enable_internal_server) {
     menuBar.append(
-      createMenuGroup("Server", [
-        { label: "Start Server", action: "start-internal-server" },
-        { label: "Stop Server", action: "stop-internal-server" },
-        { label: "Server Status", action: "get-internal-server-status" },
-        { label: "Open in Browser", action: "open-internal-server-browser" },
+      createMenuGroup("menu.server", [
+        { label: "menu.server.start", action: "start-internal-server" },
+        { label: "menu.server.stop", action: "stop-internal-server" },
+        { label: "menu.server.status", action: "get-internal-server-status" },
+        {
+          label: "menu.server.browser",
+          action: "open-internal-server-browser",
+        },
       ])
     );
   }
@@ -71,7 +75,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   // ─── Plugins Menu ────────────────────────────
   if (cachedConfig.enable_plugins) {
     const pluginItems = [
-      { label: "Plugin Manager...", action: "open-plugin-manager" },
+      { label: "menu.plugins.manager", action: "open-plugin-manager" },
     ];
 
     const plugins = await EventBus.emitWithResponse("plugin:list", null);
@@ -90,20 +94,20 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
       }
     }
 
-    menuBar.append(createMenuGroup("Plugins", pluginItems));
+    menuBar.append(createMenuGroup("menu.plugins", pluginItems));
   }
 
   // ─── View, Help, Context Toggle ───────────────
   menuBar.append(
-    createMenuGroup("View", [
-      { label: "Reload", action: "reload" },
+    createMenuGroup("menu.view", [
+      { label: "menu.view.reload", action: "reload" },
       ...(cachedConfig.development_enable
-        ? [{ label: "Toggle DevTools", action: "devtools" }]
+        ? [{ label: "menu.view.devtools", action: "devtools" }]
         : []),
     ]),
-    createMenuGroup("Help", [
-      { label: "Help Pages", action: "open-help" },
-      { label: "About", action: "open-about" },
+    createMenuGroup(t("menu.help"), [
+      { label: "menu.help.pages", action: "open-help" },
+      { label: "menu.help.about", action: "open-about" },
     ]),
     createContextToggleItem()
   );
@@ -121,10 +125,10 @@ export function getPluginMeta(name) {
   return pluginMap.get(name) || null;
 }
 
-function createMenuGroup(title, items) {
+function createMenuGroup(titleKey, items) {
   const li = document.createElement("li");
   li.className = "menu-item";
-  li.textContent = title;
+  li.textContent = t(titleKey);
 
   const submenu = document.createElement("ul");
   submenu.className = "submenu";
@@ -134,7 +138,7 @@ function createMenuGroup(title, items) {
     if (item === "separator") {
       child.className = "separator";
     } else {
-      child.textContent = item.label;
+      child.textContent = t(item.label);
       child.dataset.action = item.action;
     }
     submenu.appendChild(child);
@@ -152,7 +156,7 @@ function createContextToggleItem() {
   const isStorage = cachedConfig?.context_mode === "storage";
   const toggle = createSwitch(
     "context-toggle-menu",
-    "Context Mode:",
+    t("menu.context.label"),
     isStorage,
     (checked) => {
       EventBus.emit("logging:default", [
@@ -161,7 +165,7 @@ function createContextToggleItem() {
       EventBus.emit("context:toggle", checked);
     },
     "inline",
-    ["Storage", "Template"]
+    [t("menu.context.option.storage"), t("menu.context.option.template")]
   );
 
   li.appendChild(toggle);
@@ -211,7 +215,7 @@ export async function handleMenuAction(action) {
             "[Menu] No selected_template entry found.",
           ]);
           EventBus.emit("ui:toast", {
-            message: "No template selected. Please select a template first.",
+            message: t("toast.noTemplateSelected"),
             variant: "warning",
           });
           return;
@@ -314,12 +318,12 @@ export async function handleMenuAction(action) {
               EventBus.emit("server:start", { port });
             }
             EventBus.emit("ui:toast", {
-              message: "Internal server was started.",
+              message: t("toast.serverStarted"),
               variant: "success",
             });
           } else {
             EventBus.emit("ui:toast", {
-              message: "Internal server is already running.",
+              message: t("toast.serverAlreadyRunning"),
               variant: "success",
             });
           }
@@ -334,12 +338,12 @@ export async function handleMenuAction(action) {
           if (server.running) {
             EventBus.emit("server:stop");
             EventBus.emit("ui:toast", {
-              message: "Internal server was stopped.",
+              message: t("toast.serverStopped"),
               variant: "warning",
             });
           } else {
             EventBus.emit("ui:toast", {
-              message: "Internal server wasn't running.",
+              message: t("toast.serverNotRunning"),
               variant: "warning",
             });
           }
@@ -352,9 +356,9 @@ export async function handleMenuAction(action) {
         callback: (server) => {
           EventBus.emit("logging:default", ["[Menu] Server status:", server]);
           EventBus.emit("ui:toast", {
-            message: `Server: ${
-              server.running ? "Running" : "Stopped"
-            } on port ${server.port || "-"}`,
+            message: `${t("toast.serverStatus")}: ${
+              server.running ? t("toast.running") : t("toast.stopped")
+            } ${t("toast.onPort")} ${server.port || "-"}`,
             variant: server.running ? "success" : "info",
           });
         },
@@ -370,7 +374,7 @@ export async function handleMenuAction(action) {
             EventBus.emit("file:openExternal", { url });
           } else {
             EventBus.emit("ui:toast", {
-              message: "Internal server isn't running.",
+              message: t("toast.serverNotRunning"),
               variant: "warning",
             });
           }
