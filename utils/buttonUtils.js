@@ -116,7 +116,7 @@ export function disableButton(btn, state = true) {
 /* Specialized button creators */
 
 export function createCancelButton({
-  text = t("button.cancel", "Cancel"),
+  text = t("standard.cancel", "Cancel"),
   onClick = () => {},
   id = "modal-cancel",
   className = "btn-default",
@@ -130,7 +130,7 @@ export function createCancelButton({
 }
 
 export function createConfirmButton({
-  text = t("button.confirm", "Confirm"),
+  text = t("standard.confirm", "Confirm"),
   onClick = () => {},
   id = "modal-confirm",
   className = "btn-okay",

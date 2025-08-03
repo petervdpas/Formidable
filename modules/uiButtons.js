@@ -5,7 +5,7 @@ import { t } from "../utils/i18n.js";
 
 export function createProfileAddButton(onClick) {
   return createButton({
-    text: t("button.create"),
+    text: t("standard.create"),
     className: "btn-info btn-input-height",
     identifier: "create-profile",
     onClick,
@@ -19,13 +19,13 @@ export function createFieldEditIconButton(idx, onClick) {
     identifier: "field-edit-${idx}",
     onClick,
     attributes: { "data-idx": idx, "data-action": "edit" },
-    ariaLabel: t("aria.edit"),
+    ariaLabel: t("standard.edit"),
   });
 }
 
 export function createFieldEditButton(idx, onClick) {
   return createButton({
-    text: t("button.edit"),
+    text: t("standard.edit"),
     className: "btn-warn",
     identifier: `field-edit-${idx}`,
     onClick,
@@ -39,13 +39,13 @@ export function createFieldDeleteIconButton(idx, onClick) {
     identifier: `field-delete-${idx}`,
     onClick,
     attributes: { "data-idx": idx, "data-action": "delete" },
-    ariaLabel: t("aria.delete"),
+    ariaLabel: t("standard.delete"),
   });
 }
 
 export function createFieldDeleteButton(idx, onClick) {
   return createButton({
-    text: t("button.delete"),
+    text: t("standard.delete"),
     className: "btn-danger",
     identifier: `field-delete-${idx}`,
     onClick,
@@ -55,25 +55,25 @@ export function createFieldDeleteButton(idx, onClick) {
 
 export function createReorderUpButton(idx, disabled, onClick) {
   return createButton({
-    text: t("button.moveUp"),
+    text: t("standard.up.sign"),
     className: "btn-light",
     identifier: `field-up-${idx}`,
     onClick,
     disabled,
     attributes: { "data-idx": idx, "data-action": "up" },
-    ariaLabel: t("aria.moveUp"),
+    ariaLabel: t("standard.moveUp"),
   });
 }
 
 export function createReorderDownButton(idx, total, onClick) {
   return createButton({
-    text: t("button.moveDown"),
+    text: t("standard.down.sign"),
     className: "btn-light",
     identifier: `field-down-${idx}`,
     onClick,
     disabled: idx === total - 1,
     attributes: { "data-idx": idx, "data-action": "down" },
-    ariaLabel: t("aria.moveDown"),
+    ariaLabel: t("standard.moveDown"),
   });
 }
 
@@ -92,13 +92,13 @@ export function createTemplateSaveIconButton(onClick) {
     className: "btn-icon btn-icon-warn",
     identifier: "template-save",
     onClick,
-    ariaLabel: t("aria.save"),
+    ariaLabel: t("standard.save"),
   });
 }
 
 export function createTemplateSaveButton(onClick) {
   return createButton({
-    text: t("button.save"),
+    text: t("standard.save"),
     className: "btn-default btn-warn",
     identifier: "template-save",
     onClick,
@@ -111,13 +111,13 @@ export function createTemplateDeleteIconButton(onClick) {
     className: "btn-icon btn-icon-danger",
     identifier: "template-delete",
     onClick,
-    ariaLabel: t("aria.delete"),
+    ariaLabel: t("standard.delete"),
   });
 }
 
 export function createTemplateDeleteButton(onClick) {
   return createButton({
-    text: t("button.delete"),
+    text: t("standard.delete"),
     className: "btn-default btn-danger",
     identifier: "template-delete",
     onClick,
@@ -135,7 +135,7 @@ export function createTemplateGeneratorButton(onClick) {
 
 export function createFormSaveButton(onClick) {
   return createButton({
-    text: t("button.save"),
+    text: t("standard.save"),
     className: "btn-default btn-warn",
     identifier: "form-save",
     onClick,
@@ -148,13 +148,13 @@ export function createFormSaveIconButton(onClick) {
     className: "btn-icon btn-icon-warn",
     identifier: "form-save-icon",
     onClick,
-    ariaLabel: t("aria.save"),
+    ariaLabel: t("standard.save"),
   });
 }
 
 export function createFormDeleteButton(onClick) {
   return createButton({
-    text: t("button.delete"),
+    text: t("standard.delete"),
     className: "btn-default btn-danger",
     identifier: "form-delete",
     onClick,
@@ -167,13 +167,13 @@ export function createFormDeleteIconButton(onClick) {
     className: "btn-icon btn-icon-danger",
     identifier: "form-delete-icon",
     onClick,
-    ariaLabel: t("aria.delete"),
+    ariaLabel: t("standard.delete"),
   });
 }
 
 export function createFormRenderButton(onClick) {
   return createButton({
-    text: t("button.render"),
+    text: t("standard.render"),
     className: "btn-default btn-info",
     identifier: "form-render",
     onClick,
@@ -186,46 +186,46 @@ export function createFormRenderIconButton(onClick) {
     className: "btn-icon btn-icon-info",
     identifier: "form-render-icon",
     onClick,
-    ariaLabel: t("aria.render"),
+    ariaLabel: t("standard.render"),
   });
 }
 
 export function createGitCommitButton(onClick, disabled = false) {
   return createButton({
-    text: t("button.commit"),
+    text: t("standard.commit"),
     className: "btn-info",
     identifier: "git-commit",
     onClick,
     disabled,
-    ariaLabel: t("aria.commit"),
+    ariaLabel: t("standard.commit"),
   });
 }
 
 export function createGitPushButton(onClick, disabled = false) {
   return createButton({
-    text: t("button.push"),
+    text: t("standard.push"),
     className: "btn-info",
     identifier: "git-push",
     onClick,
     disabled,
-    ariaLabel: t("aria.push"),
+    ariaLabel: t("standard.push"),
   });
 }
 
 export function createGitPullButton(onClick, disabled = false) {
   return createButton({
-    text: t("button.pull"),
+    text: t("standard.pull"),
     className: "btn-info",
     identifier: "git-pull",
     onClick,
     disabled,
-    ariaLabel: t("aria.pull"),
+    ariaLabel: t("standard.pull"),
   });
 }
 
 export function createGitDiscardButton(filePath, onClick) {
   return createButton({
-    text: t("button.discard"),
+    text: t("standard.discard"),
     className: "btn-warn btn-discard",
     onClick,
     attributes: {
@@ -239,7 +239,7 @@ export function createFlaggedToggleButton(initialFlagged, onClick) {
     iconClass: "fa fa-flag",
     className: initialFlagged ? "btn-flagged" : "btn-unflagged",
     identifier: "form-flagged-toggle",
-    ariaLabel: initialFlagged ? t("special.unflag") : t("special.flag"),
+    ariaLabel: initialFlagged ? t("standard.unflag") : t("standard.flag"),
   });
 
   btn._flagged = initialFlagged;
@@ -253,7 +253,7 @@ export function createFlaggedToggleButton(initialFlagged, onClick) {
 
     btn.setAttribute(
       "aria-label",
-      btn._flagged ? t("special.unflag") : t("special.flag")
+      btn._flagged ? t("standard.unflag") : t("standard.flag")
     );
 
     if (typeof onClick === "function") {
@@ -284,7 +284,7 @@ export function createShowPreviewButton(onClick) {
 
 export function createCopyMarkdownButton(onClick) {
   return createButton({
-    text: t("button.copy"),
+    text: t("standard.copy.sign"),
     className: "copy-btn",
     identifier: "copy-markdown",
     onClick,
@@ -294,7 +294,7 @@ export function createCopyMarkdownButton(onClick) {
 
 export function createCopyPreviewButton(onClick) {
   return createButton({
-    text: t("button.copy"),
+    text: t("standard.copy.sign"),
     className: "copy-btn",
     identifier: "copy-preview",
     onClick,
@@ -304,7 +304,7 @@ export function createCopyPreviewButton(onClick) {
 
 export function createPaneCloseButton(targetPaneClass, onClick) {
   return createButton({
-    text: t("button.close"),
+    text: t("standard.close.sign"),
     className: "btn-close-special",
     identifier: `close-${targetPaneClass}`,
     onClick,
@@ -313,7 +313,7 @@ export function createPaneCloseButton(targetPaneClass, onClick) {
 }
 
 export function createAddButton({
-  label = t("button.add"),
+  label = t("standard.add"),
   onClick,
   id = "",
   className = "btn-okay",
@@ -337,7 +337,7 @@ export function createAddLoopItemButton(onClick, key, idx = 0) {
 
 export function createDeleteLoopItemButton(onClick, identifier = "") {
   return createButton({
-    text: t("button.close"),
+    text: t("standard.close.sign"),
     className: "btn-close-special btn-danger loop-item-remove",
     identifier: identifier || "loop-item-delete",
     onClick,
@@ -346,7 +346,7 @@ export function createDeleteLoopItemButton(onClick, identifier = "") {
 
 export function createRemoveImageButton(onClick, identifier = "") {
   return createButton({
-    text: t("button.close"),
+    text: t("standard.close.sign"),
     className: "btn-close-special btn-remove-image",
     identifier: identifier || "remove-image",
     onClick,
@@ -394,7 +394,7 @@ export function createPluginUploadButton(onClick) {
 
 export function createPluginDeleteButton(name, onClick) {
   return createButton({
-    text: t("button.delete"),
+    text: t("standard.delete"),
     className: "btn-danger btn-small",
     identifier: `plugin-delete-${name}`,
     onClick,
@@ -404,12 +404,12 @@ export function createPluginDeleteButton(name, onClick) {
 
 export function createPluginToggleButton(name, enabled, onClick) {
   return createButton({
-    text: enabled ? t("button.disable") : t("button.enable"),
+    text: enabled ? t("standard.disable") : t("standard.enable"),
     className: "btn-small",
     identifier: `plugin-toggle-${name}`,
     onClick,
     ariaLabel: `${
-      enabled ? t("button.disable") : t("button.enable")
+      enabled ? t("standard.disable") : t("standard.enable")
     } plugin ${name}`,
   });
 }

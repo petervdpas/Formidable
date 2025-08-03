@@ -405,7 +405,7 @@ export function setupFieldEditModal(field, allFields, onConfirm) {
 
   const confirmBtn = createButton({
     id: "field-edit-confirm",
-    text: t("button.confirm"),
+    text: t("standard.confirm"),
     onClick: () => {
       const keyInput = document.getElementById("edit-key");
       const rawKey = keyInput?.value.trim();

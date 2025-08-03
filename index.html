@@ -66,7 +66,7 @@
       <!-- Template Form Editor Context -->
       <div id="template-container">
         <div id="template-sidebar">
-          <h3 data-i18n="sidebar.templates.title">Templates</h3>
+          <h3 data-i18n="standard.templates">Templates</h3>
           <div id="template-list"></div>
         </div>
         <div id="template-splitter">
@@ -89,7 +89,7 @@
       <div id="storage-container" style="display: none">
         <div id="storage-sidebar">
           <div id="template-selector"></div>
-          <h3 data-i18n="sidebar.forms.title">Forms</h3>
+          <h3 data-i18n="standard.forms">Forms</h3>
           <div id="storage-list"></div>
         </div>
         <div id="storage-splitter">
@@ -109,7 +109,7 @@
       </div>
       <!-- Shared Status Bar -->
       <div id="status-bar">
-        <div id="status-bar-message" data-i18n="status.ready">Ready.</div>
+        <div id="status-bar-message" data-i18n="standard.ready">Ready.</div>
         <div id="status-bar-info"></div>
       </div>
     </div>
@@ -130,7 +130,7 @@
     <div id="settings-modal" class="modal">
       <div class="modal-header">
         <div class="modal-title-row">
-          <h2 data-i18n="modal.settings.title">Settings</h2>
+          <h2 data-i18n="standard.settings">Settings</h2>
         </div>
       </div>
       <div class="modal-body" id="settings-body">
@@ -160,9 +160,7 @@
       </div>
       <div class="modal-body">
         <div class="modal-form-row">
-          <label for="template-name" data-i18n="modal.template.label.filename"
-            >Filename</label
-          >
+          <label for="template-name" data-i18n="standard.filename">Filename</label>
           <input
             type="text"
             id="template-name"
@@ -221,7 +219,7 @@
           <input type="hidden" id="edit-primary-key" value="false" />
         </div>
         <div class="modal-form-row">
-          <label for="edit-key" data-i18n="field.key">Key</label>
+          <label for="edit-key" data-i18n="standard.key">Key</label>
           <input type="text" id="edit-key" />
         </div>
         <div class="modal-form-row" id="edit-type-container">
@@ -249,11 +247,11 @@
           </label>
         </div>
         <div class="modal-form-row">
-          <label for="edit-label" data-i18n="field.label">Label</label>
+          <label for="edit-label" data-i18n="standard.label">Label</label>
           <input type="text" id="edit-label" />
         </div>
         <div class="modal-form-row">
-          <label for="edit-description" data-i18n="field.description"
+          <label for="edit-description" data-i18n="standard.description"
             >Description</label
           >
           <textarea
@@ -264,7 +262,7 @@
           ></textarea>
         </div>
         <div class="modal-form-row">
-          <label for="edit-default" data-i18n="field.default">Default</label>
+          <label for="edit-default" data-i18n="standard.default">Default</label>
           <textarea
             id="edit-default"
             rows="2"
@@ -273,7 +271,7 @@
           ></textarea>
         </div>
         <div class="modal-form-row">
-          <label for="edit-options" data-i18n="field.options">Options</label>
+          <label for="edit-options" data-i18n="standard.options">Options</label>
           <textarea
             id="edit-options"
             rows="2"
@@ -296,14 +294,14 @@
       <div class="modal-body two-pane">
         <div class="pane raw-pane">
           <div class="pane-header">
-            <h4 data-i18n="pane.markdown">Markdown</h4>
+            <h4 data-i18n="standard.markdown">Markdown</h4>
             <div id="copy-markdown-button-wrapper"></div>
           </div>
           <pre id="render-output" class="output-block"></pre>
         </div>
         <div class="pane html-pane">
           <div class="pane-header">
-            <h4 data-i18n="pane.preview">Preview</h4>
+            <h4 data-i18n="standard.preview">Preview</h4>
             <div id="copy-preview-button-wrapper"></div>
           </div>
           <div id="render-preview" class="output-block preview-block"></div>

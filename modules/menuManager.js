@@ -34,14 +34,14 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
 
   // ─── File & Config Menu ─────────────────────
   menuBar.append(
-    createMenuGroup("menu.file", [
+    createMenuGroup("standard.file", [
       { label: "menu.file.openTemplateFolder", action: "open-template-folder" },
       { label: "menu.file.openStorageFolder", action: "open-storage-folder" },
       { label: "menu.file.openPluginsFolder", action: "open-plugins-folder" },
       "separator",
-      { label: "menu.file.quit", action: "quit" },
+      { label: "standard.quit", action: "quit" },
     ]),
-    createMenuGroup("menu.config", [
+    createMenuGroup("standard.config", [
       { label: "menu.config.switchProfile", action: "open-profile-switcher" },
       { label: "menu.config.settings", action: "open-settings" },
       { label: "menu.config.workspace", action: "open-workspace-settings" },
@@ -51,7 +51,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   // ─── Git Menu ────────────────────────────────
   if (cachedConfig.use_git) {
     menuBar.append(
-      createMenuGroup("menu.git", [
+      createMenuGroup("standard.git", [
         { label: "menu.git.actions", action: "open-git-modal" },
       ])
     );
@@ -60,7 +60,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   // ─── Server Menu ─────────────────────────────
   if (cachedConfig.enable_internal_server) {
     menuBar.append(
-      createMenuGroup("menu.server", [
+      createMenuGroup("standard.server", [
         { label: "menu.server.start", action: "start-internal-server" },
         { label: "menu.server.stop", action: "stop-internal-server" },
         { label: "menu.server.status", action: "get-internal-server-status" },
@@ -94,18 +94,18 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
       }
     }
 
-    menuBar.append(createMenuGroup("menu.plugins", pluginItems));
+    menuBar.append(createMenuGroup("standard.plugins", pluginItems));
   }
 
   // ─── View, Help, Context Toggle ───────────────
   menuBar.append(
-    createMenuGroup("menu.view", [
-      { label: "menu.view.reload", action: "reload" },
+    createMenuGroup("standard.view", [
+      { label: "standard.reload", action: "reload" },
       ...(cachedConfig.development_enable
         ? [{ label: "menu.view.devtools", action: "devtools" }]
         : []),
     ]),
-    createMenuGroup(t("menu.help"), [
+    createMenuGroup(t("standard.help"), [
       { label: "menu.help.pages", action: "open-help" },
       { label: "menu.help.about", action: "open-about" },
     ]),

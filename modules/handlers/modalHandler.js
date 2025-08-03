@@ -20,7 +20,7 @@ export function handleTemplateConfirm({ modal, callback }) {
 
   const confirmBtn = createConfirmButton({
     id: "template-confirm",
-    text: t("button.confirm"),
+    text: t("standard.confirm"),
     onClick: () => {
       const raw = nameInput.value.trim();
       if (!raw) return;
@@ -64,7 +64,7 @@ export function handleEntryConfirm({ modal, callback }) {
 
   const confirmBtn = createConfirmButton({
     id: "entry-confirm",
-    text: t("button.confirm"),
+    text: t("standard.confirm"),
     className: "btn-okay",
     onClick: () => {
       const raw = input.value.trim();
