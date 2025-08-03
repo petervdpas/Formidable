@@ -61,6 +61,7 @@ export default {
   "standard.file": "Bestand",
   "standard.filename": "Bestandsnaam",
   "standard.files": "Bestanden",
+  "standard.file.s": "Bestand(en)",
   "standard.id": "ID",
   "standard.author": "Auteur",
   "standard.name": "Naam",
@@ -69,6 +70,7 @@ export default {
   "standard.created": "Aangemaakt",
   "standard.updated": "Bijgewerkt",
   "standard.new": "Nieuw",
+  "standard.none": "Geen",
   "standard.open": "Openen",
   "standard.config": "Configuratie",
   "standard.git": "Git",
@@ -119,6 +121,17 @@ export default {
   "standard.ready": "Klaar",
   "standard.settings": "Instellingen",
   "standard.status": "Status",
+  "standard.branch": "Tak",
+  "standard.tracked": "Bijgehouden",
+  "standard.un.tracked": "Niet bijgehouden",
+  "standard.change": "Wijziging",
+  "standard.change.s": "Wijziging(en)",
+  "standard.changes": "Wijzigingen",
+  "standard.no.changes": "Geen wijzigingen",
+  "standard.staged": "Geselecteerd",
+  "standard.unstaged": "Niet geselecteerd",
+  "standard.remote": "Afgelegen",
+  "standard.loading": "Laden...",
 
   // ── Button Labels ───────────────────────────
   "button.addField": "+ Veld Toevoegen",
@@ -165,6 +178,7 @@ export default {
 
   // ── Modals ───────────────────
 
+  // "modal.settings.title": "Instellingen",
   "modal.settings.tab.general": "Algemeen",
   "modal.settings.tab.general.description":
     "Configureer auteurgegevens zoals naam, e-mail en taal.",
@@ -198,7 +212,33 @@ export default {
   "modal.settings.advanced.logging.enabled": "Logging inschakelen",
 
   "modal.profile.title": "Wissel gebruikersprofiel",
-  "modal.settings.title": "Instellingen",
+  "modal.profile.label.newProfile": "Nieuw profiel",
+  "modal.profile.placeholder.newProfile": "bijv. jack.json",
+  "modal.profile.noProfiles": "Geen profielen gevonden.",
+  "modal.profile.toast.invalidName":
+    "Gebruik kleine letters, koppeltekens en eindig met .json",
+  "modal.profile.toast.profileExists": "Profiel bestaat al.",
+  "modal.profile.toast.switchFailed": "Wisselen van profiel is mislukt.",
+
+  "modal.git.title": "Git-acties",
+  "modal.git.loading.status": "Git-status wordt geladen...",
+  "modal.git.error.status":
+    "⚠️ Kan Git-status niet ophalen. Zorg ervoor dat Git is geïnstalleerd en dat de map een geldige Git-repository is.",
+  "modal.git.no.changes.detected": "Geen wijzigingen gevonden",
+  "modal.git.discard.sure":
+    "Weet je zeker dat je de wijzigingen wilt verwerpen in",
+  "modal.git.none.found": "Niets gevonden.",
+  "modal.git.committed": "Gecommit",
+  "modal.git.commit.complete": "Commit voltooid.",
+  "modal.git.commit.message": "Commitbericht",
+  "modal.git.commit.placeholder":
+    "bijv. README bijgewerkt en typefouten gecorrigeerd",
+  "modal.git.commit.noMessage": "Kan niet committen: geen bericht opgegeven.",
+  "modal.git.pushed": "Ge-pusht",
+  "modal.git.push.complete": "Push voltooid.",
+  "modal.git.pulled": "Ge-pulled",
+  "modal.git.pull.complete": "Pull voltooid.",
+
   "modal.workspace.title": "Werkruimte-instellingen",
   "modal.template.title": "Nieuw sjabloon",
   "modal.template.label.filename": "Bestandsnaam",
@@ -211,7 +251,6 @@ export default {
   "modal.render.title": "Genereer Markdown & HTML Voorbeeld",
   "pane.preview": "HTML Voorbeeld",
   "modal.confirm.message": "Weet je het zeker?",
-  "modal.git.title": "Git Acties",
   "modal.plugins.title": "Pluginbeheer",
   "modal.help.title": "Formidable Help-pagina's",
   "modal.about.title": "Over Formidable",

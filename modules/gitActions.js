@@ -11,9 +11,10 @@ import {
 import { createFormRowInput } from "../utils/elementBuilders.js";
 import { createListManager } from "../utils/listUtils.js";
 import { showConfirmModal } from "../utils/modalUtils.js";
+import { t } from "../utils/i18n.js";
 
 export async function renderGitStatus(container) {
-  container.innerHTML = "Loading Git status...";
+  container.innerHTML = t("modal.git.loading.status");
 
   const config = await new Promise((resolve) => {
     EventBus.emit("config:load", (cfg) => resolve(cfg));
@@ -27,7 +28,7 @@ export async function renderGitStatus(container) {
     folderPath: gitPath,
     callback: async (status) => {
       if (!status) {
-        container.innerHTML = `<p>⚠️ Failed to fetch Git status.</p>`;
+        container.innerHTML = `<p>${t("modal.git.error.status")}</p>`;
         return;
       }
 
@@ -40,12 +41,12 @@ export async function renderGitStatus(container) {
         <p style="margin-bottom: 0.3em;"><strong>Branch:</strong> ${
           status.current
         }</p>
-        <p style="margin-bottom: 0.3em;"><strong>Tracking:</strong> ${
-          status.tracking || "(none)"
+        <p style="margin-bottom: 0.3em;"><strong>Tracked:</strong> ${
+          status.tracking || t("standard.none")
         }</p>
-        <p style="margin-bottom: 0.3em;"><strong>Changes:</strong> ${
-          status.files.length
-        } file(s)</p>
+        <p style="margin-bottom: 0.3em;"><strong>${t(
+          "standard.change.s"
+        )}:</strong> ${status.files.length} ${t("standard.file.s")}</p>
       `;
       container.appendChild(summary);
 
@@ -57,7 +58,7 @@ export async function renderGitStatus(container) {
       const gitListManager = createListManager({
         elementId: gitFileListId,
         itemClass: "git-list-item",
-        emptyMessage: "No changes detected.",
+        emptyMessage: t("modal.git.no.changes.detected"),
         fetchListFunction: async () => {
           const result = await new Promise((resolve) =>
             EventBus.emit("git:status", {
@@ -123,11 +124,13 @@ export async function renderGitStatus(container) {
           // ─── Discard Button ──────────────────────────────────
           const discardBtn = createGitDiscardButton(rawData.value, async () => {
             const confirmed = await showConfirmModal(
-              `<div>Are you sure you want to discard changes in:</div>
-                <div class="modal-message-highlight"><code>${rawData.value}</code></div>`,
+              `<div>${t("modal.git.discard.sure")}:</div>
+                <div class="modal-message-highlight"><code>${
+                  rawData.value
+                }</code></div>`,
               {
-                okText: "Discard",
-                cancelText: "Cancel",
+                okText: t("standard.discard"),
+                cancelText: t("standard.cancel"),
                 variant: "danger",
                 width: "auto",
                 height: "auto",
@@ -169,14 +172,18 @@ export async function renderGitStatus(container) {
       // ─── Remotes Info ───────────────────────────────────
       const remoteBox = document.createElement("div");
       remoteBox.className = "git-remote-info";
-      remoteBox.innerHTML = `<p style="margin-bottom: 0.3em;"><strong>Remotes:</strong> <em>Loading...</em></p>`;
+      remoteBox.innerHTML = `<p style="margin-bottom: 0.3em;"><strong>Remote:</strong> <em>${t(
+        "standard.loading"
+      )}</em></p>`;
       container.appendChild(remoteBox);
 
       EventBus.emit("git:remote-info", {
         folderPath: gitPath,
         callback: (info) => {
           if (!info || !info.remotes.length) {
-            remoteBox.innerHTML = `<p><strong>Remotes:</strong> None found</p>`;
+            remoteBox.innerHTML = `<p><strong>Remote:</strong> ${t(
+              "modal.git.none.found"
+            )}</p>`;
             return;
           }
 
@@ -188,7 +195,7 @@ export async function renderGitStatus(container) {
             .join("<br>");
 
           remoteBox.innerHTML = `
-            <p style="margin-bottom: 0.3em;"><strong>Remotes:</strong></p>
+            <p style="margin-bottom: 0.3em;"><strong>Remote:</strong></p>
             <p style="font-family: monospace; font-size: 13px; margin: 0;">${remoteList}</p>
           `;
         },
@@ -202,11 +209,11 @@ export async function renderGitStatus(container) {
 
       const inputRow = createFormRowInput({
         id: "git-commit-message",
-        label: "Commit Message",
+        label: t("modal.git.commit.message"),
         value: "",
         type: "textarea",
         multiline: true,
-        placeholder: "e.g. Update README and fix typos",
+        placeholder: t("modal.git.commit.placeholder"),
         onSave: (msg) => {
           commitMessage = msg.trim();
           commitBtn.disabled = !(hasChanges && commitMessage);
@@ -222,7 +229,7 @@ export async function renderGitStatus(container) {
       const commitBtn = createGitCommitButton(() => {
         if (!commitMessage) {
           EventBus.emit("ui:toast", {
-            message: "Cannot commit: no message.",
+            message: t("modal.git.commit.noMessage"),
             variant: "warning",
           });
           return;
@@ -237,8 +244,8 @@ export async function renderGitStatus(container) {
                 typeof result === "string"
                   ? result
                   : result?.summary
-                  ? `Committed: ${result.summary.changes} change(s)`
-                  : "Git operation complete.",
+                  ? `${t("modal.git.committed")}: ${result.summary.changes} ${t("standard.change.s")}`
+                  : t("modal.git.commit.complete"),
               variant: "success",
             });
             refresh();
@@ -255,8 +262,8 @@ export async function renderGitStatus(container) {
                 typeof result === "string"
                   ? result
                   : result?.summary
-                  ? `Pushed: ${result.summary.changes ?? "✓"} change(s)`
-                  : "Push complete.",
+                  ? `${t("modal.git.pushed")}: ${result.summary.changes ?? "✓"} ${t("standard.change.s")}`
+                  : t("modal.git.push.complete"),
               variant: "success",
             });
             refresh();
@@ -273,8 +280,8 @@ export async function renderGitStatus(container) {
                 typeof result === "string"
                   ? result
                   : result?.files?.length
-                  ? `Pulled: ${result.files.length} file(s)`
-                  : "Pull complete.",
+                  ? `${t("modal.git.pulled")}: ${result.files.length} ${t("standard.file.s")}`
+                  : t("modal.git.pull.complete"),
               variant: "success",
             });
             refresh();

@@ -56,6 +56,7 @@ export default {
   "standard.file": "File",
   "standard.filename": "Filename",
   "standard.files": "Files",
+  "standard.file.s": "File(s)",
   "standard.id": "ID",
   "standard.author": "Author",
   "standard.name": "Name",
@@ -64,6 +65,7 @@ export default {
   "standard.created": "Created",
   "standard.updated": "Updated",
   "standard.new": "New",
+  "standard.none": "None",
   "standard.open": "Open",
   "standard.config": "Config",
   "standard.git": "Git",
@@ -114,6 +116,17 @@ export default {
   "standard.ready": "Ready",
   "standard.settings": "Settings",
   "standard.status": "Status",
+  "standard.branch": "Branch",
+  "standard.tracked": "Tracked",
+  "standard.un.tracked": "Untracked",
+  "standard.change": "Change",
+  "standard.change.s": "Change(s)",
+  "standard.changes": "Changes",
+  "standard.no.changes": "No Changes",
+  "standard.staged": "Staged",
+  "standard.unstaged": "Unstaged",
+  "standard.remote": "Remote",
+  "standard.loading": "Loading...",
 
   // ── Button Labels ───────────────────────────
   "button.addField": "+ Add Field",
@@ -159,16 +172,22 @@ export default {
 
   // ── Modals ───────────────────
 
+  // "modal.settings.title": "Settings",
   "modal.settings.tab.general": "General",
-  "modal.settings.tab.general.description": "Configure author details like name, email and language.",
+  "modal.settings.tab.general.description":
+    "Configure author details like name, email and language.",
   "modal.settings.tab.display": "Display",
-  "modal.settings.tab.display.description": "Configure the display theme and toggle icon-based buttons.",
+  "modal.settings.tab.display.description":
+    "Configure the display theme and toggle icon-based buttons.",
   "modal.settings.tab.directories": "Directories",
-  "modal.settings.tab.directories.description": "Configure the context folder and, if enabled, the Git root directory.",
+  "modal.settings.tab.directories.description":
+    "Configure the context folder and, if enabled, the Git root directory.",
   "modal.settings.tab.internal": "Internal Server",
-  "modal.settings.tab.internal.description": "Configure the built-in server and set the listening port.",
+  "modal.settings.tab.internal.description":
+    "Configure the built-in server and set the listening port.",
   "modal.settings.tab.advanced": "Advanced",
-  "modal.settings.tab.advanced.description": "Advanced system options. Use with caution.",
+  "modal.settings.tab.advanced.description":
+    "Advanced system options. Use with caution.",
   "modal.settings.author.name": "Author Name",
   "modal.settings.author.email": "Author Email",
   "modal.settings.author.language": "Language (Requires restart)",
@@ -186,8 +205,32 @@ export default {
   "modal.settings.advanced.developmentMode": "Development Mode",
   "modal.settings.advanced.logging.enabled": "Enable Logging",
 
-
   "modal.profile.title": "Switch User Profile",
+  "modal.profile.label.newProfile": "New Profile",
+  "modal.profile.placeholder.newProfile": "e.g., jack.json",
+  "modal.profile.noProfiles": "No profiles found.",
+  "modal.profile.toast.invalidName":
+    "Use lowercase, hyphens, and end with .json",
+  "modal.profile.toast.profileExists": "Profile already exists.",
+  "modal.profile.toast.switchFailed": "Failed to switch profile.",
+
+  "modal.git.title": "Git Actions",
+  "modal.git.loading.status": "Loading Git Status...",
+  "modal.git.error.status":
+    "⚠️ Failed to fetch Git status. Please ensure Git is installed and the directory is a valid Git repository.",
+  "modal.git.no.changes.detected": "No Changes Detected",
+  "modal.git.discard.sure": "Are you sure you want to discard changes in",
+  "modal.git.none.found": "None found.",
+  "modal.git.committed": "Committed",
+  "modal.git.commit.complete": "Commit complete.",
+  "modal.git.commit.message": "Commit Message",
+  "modal.git.commit.placeholder": "e.g. Update README and fix typos",
+  "modal.git.commit.noMessage": "Cannot commit: no message.",
+  "modal.git.pushed": "Pushed",
+  "modal.git.push.complete": "Push complete.",
+  "modal.git.pulled": "Pulled",
+  "modal.git.pull.complete": "Pull complete.",
+
   "modal.workspace.title": "Workspace Settings",
   "modal.template.title": "New Template",
   "modal.template.label.filename": "Filename",
@@ -200,7 +243,6 @@ export default {
   "modal.render.title": "Render Markdown & HTML Preview",
   "pane.preview": "HTML Preview",
   "modal.confirm.message": "Are you sure?",
-  "modal.git.title": "Git Actions",
   "modal.plugins.title": "Plugin Manager",
   "modal.help.title": "Formidable Help Pages",
   "modal.about.title": "About Formidable",

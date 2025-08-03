@@ -3,6 +3,7 @@
 import { EventBus } from "./eventBus.js";
 import { createListManager } from "../utils/listUtils.js";
 import { createProfileAddButton } from "./uiButtons.js";
+import { t } from "../utils/i18n.js";
 
 export function createProfileListManager() {
   // Build input + button row (but don’t attach it yet)
@@ -11,12 +12,12 @@ export function createProfileListManager() {
 
   const label = document.createElement("label");
   label.setAttribute("for", "new-profile-name");
-  label.textContent = "New Profile";
+  label.textContent = t("modal.profile.label.newProfile");
 
   const input = document.createElement("input");
   input.id = "new-profile-name";
   input.type = "text";
-  input.placeholder = "e.g., jack.json";
+  input.placeholder = t("modal.profile.placeholder.newProfile");
 
   const button = createProfileAddButton(async () => {
     const name = input.value.trim();
@@ -26,7 +27,7 @@ export function createProfileListManager() {
 
     if (!valid) {
       EventBus.emit("ui:toast", {
-        message: "Use lowercase, hyphens, and end with .json",
+        message: t("modal.profile.toast.invalidName"),
         variant: "error",
       });
       return;
@@ -37,7 +38,7 @@ export function createProfileListManager() {
 
     if (exists) {
       EventBus.emit("ui:toast", {
-        message: "Profile already exists.",
+        message: t("modal.profile.toast.profileExists"),
         variant: "warning",
       });
       return;
@@ -54,7 +55,7 @@ export function createProfileListManager() {
       window.electron.window.reload();
     } else {
       EventBus.emit("ui:toast", {
-        message: "Failed to switch profile.",
+        message: t("modal.profile.toast.switchFailed"),
         variant: "error",
       });
     }
@@ -85,7 +86,7 @@ export function createProfileListManager() {
         window.electron.window.reload();
       } else {
         EventBus.emit("ui:toast", {
-          message: "Failed to switch profile.",
+          message: t("modal.profile.toast.switchFailed"),
           variant: "error",
         });
       }
@@ -106,7 +107,7 @@ export function createProfileListManager() {
       itemNode.appendChild(subtitle);
     },
 
-    emptyMessage: "No profiles found.",
+    emptyMessage: t("modal.profile.noProfiles"),
   });
 
   return {
