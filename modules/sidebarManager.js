@@ -210,19 +210,6 @@ export function createStorageListManager(formManager, modal) {
     }),
   });
 
-  toggle.addEventListener("change", async () => {
-    showOnlyFlagged = toggle.checked;
-
-    const selected_datafile = await getUserConfig("selected_data_file");
-    const name = window.currentSelectedDataFile || selected_datafile;
-
-    listManager.renderList(undefined, () => {
-      if (name) {
-        EventBus.emit("form:list:highlighted", name);
-      }
-    });
-  });
-
   return {
     ...listManager,
     reloadList: () => listManager.loadList(),
