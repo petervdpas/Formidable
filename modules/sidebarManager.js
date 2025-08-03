@@ -82,6 +82,10 @@ export function createTemplateListManager(modal, dropdown = null) {
 }
 
 export function createStorageListManager(formManager, modal) {
+  let showOnlyFlagged = false;
+  let listManager = null;
+
+  // MOVE toggle creation ABOVE listManager so `wrapper` exists
   const { input: toggle, element: wrapper } = buildSwitchElement({
     id: "flagged-toggle",
     checked: false,
@@ -100,9 +104,7 @@ export function createStorageListManager(formManager, modal) {
     },
   });
 
-  let showOnlyFlagged = false;
-
-  const listManager = createListManager({
+  listManager = createListManager({
     elementId: "storage-list",
     itemClass: "storage-item",
 
@@ -189,7 +191,7 @@ export function createStorageListManager(formManager, modal) {
     },
 
     filterFunction: (item) => !showOnlyFlagged || item.flagged,
-    filterUI: wrapper,
+    filterUI: wrapper, // ← wrapper now exists
     addButton: createAddButton({
       label: t("button.addEntry"),
       onClick: async () => {
