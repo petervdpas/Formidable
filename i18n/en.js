@@ -114,6 +114,7 @@ export default {
   "standard.hide": "Hide",
   "standard.markdown": "Markdown",
   "standard.preview": "Preview",
+  "standard.preview.html": "HTML Preview",
   "standard.ready": "Ready",
   "standard.settings": "Settings",
   "standard.status": "Status",

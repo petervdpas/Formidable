@@ -119,6 +119,7 @@ export default {
   "standard.hide": "Verberg",
   "standard.markdown": "Markdown",
   "standard.preview": "Voorbeeld",
+  "standard.preview.html": "HTML Voorbeeld",
   "standard.ready": "Klaar",
   "standard.settings": "Instellingen",
   "standard.status": "Status",
