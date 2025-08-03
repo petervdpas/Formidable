@@ -61,7 +61,7 @@ export function createReorderUpButton(idx, disabled, onClick) {
     onClick,
     disabled,
     attributes: { "data-idx": idx, "data-action": "up" },
-    ariaLabel: t("standard.moveUp"),
+    ariaLabel: t("aria.moveUp"),
   });
 }
 
@@ -73,7 +73,7 @@ export function createReorderDownButton(idx, total, onClick) {
     onClick,
     disabled: idx === total - 1,
     attributes: { "data-idx": idx, "data-action": "down" },
-    ariaLabel: t("standard.moveDown"),
+    ariaLabel: t("aria.moveDown"),
   });
 }
 
@@ -197,7 +197,7 @@ export function createGitCommitButton(onClick, disabled = false) {
     identifier: "git-commit",
     onClick,
     disabled,
-    ariaLabel: t("standard.commit"),
+    ariaLabel: t("aria.commit"),
   });
 }
 
@@ -208,7 +208,7 @@ export function createGitPushButton(onClick, disabled = false) {
     identifier: "git-push",
     onClick,
     disabled,
-    ariaLabel: t("standard.push"),
+    ariaLabel: t("aria.push"),
   });
 }
 
@@ -219,7 +219,7 @@ export function createGitPullButton(onClick, disabled = false) {
     identifier: "git-pull",
     onClick,
     disabled,
-    ariaLabel: t("standard.pull"),
+    ariaLabel: t("aria.pull"),
   });
 }
 

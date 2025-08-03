@@ -35,6 +35,10 @@ export default {
   "toast.stopped": "Gestopt",
   "toast.onPort": "op poort",
 
+  "special.showAll": "Toon alles",
+  "special.showFlagged": "Gemarkeerd weergeven",
+  "special.noTemplatesFound": "Geen sjabloonbestanden gevonden.",
+
   // ── Standard Translation ─────────────────────
   "standard.storage": "Opslag",
   "standard.template": "Sjabloon",
@@ -43,6 +47,9 @@ export default {
   "standard.forms": "Formulieren",
   "standard.flag": "Markeren",
   "standard.unflag": "Demarkeren",
+  "standard.off": "Uit",
+  "standard.on": "Aan",
+  "standard.on.experimental": "Aan (Experimenteel)",
   "standard.cancel": "Annuleren",
   "standard.confirm": "Bevestigen",
   "standard.create": "Aanmaken",
@@ -53,6 +60,14 @@ export default {
   "standard.quit": "Afsluiten",
   "standard.file": "Bestand",
   "standard.filename": "Bestandsnaam",
+  "standard.files": "Bestanden",
+  "standard.id": "ID",
+  "standard.author": "Auteur",
+  "standard.name": "Naam",
+  "standard.email": "E-mail",
+  "standard.password": "Wachtwoord",
+  "standard.created": "Aangemaakt",
+  "standard.updated": "Bijgewerkt",
   "standard.new": "Nieuw",
   "standard.open": "Openen",
   "standard.config": "Configuratie",
@@ -78,7 +93,9 @@ export default {
   "standard.close": "Sluiten",
   "standard.close.sign": "✕",
   "standard.enable": "Inschakelen",
+  "standard.enabled": "Ingeschakeld",
   "standard.disable": "Uitschakelen",
+  "standard.disabled": "Uitgeschakeld",
   "standard.upload": "Uploaden",
   "standard.reload": "Herladen",
   "standard.unload": "Ontladen",
@@ -94,6 +111,9 @@ export default {
   "standard.default": "Standaard",
   "standard.options": "Opties",
   "standard.expression": "Expressie",
+  "standard.expressions": "Expressies",
+  "standard.show": "Toon",
+  "standard.hide": "Verberg",
   "standard.markdown": "Markdown",
   "standard.preview": "Voorbeeld",
   "standard.ready": "Klaar",
@@ -115,17 +135,16 @@ export default {
   "button.uploadPlugin": "Plugin Uploaden",
 
   // ── ARIA Labels ───────────────────────────
+  "aria.push": "Pushen naar remote",
+  "aria.pull": "Pullen van remote",
   "aria.commit": "Wijzigingen committen",
   "aria.moveUp": "Veld omhoog verplaatsen",
   "aria.moveDown": "Veld omlaag verplaatsen",
-  "aria.push": "Pushen naar remote",
-  "aria.pull": "Pullen van remote",
   "aria.copyMarkdown": "Markdown kopiëren",
   "aria.copyHtml": "HTML kopiëren",
   "aria.open": "{{name}} openen",
   "aria.deletePlugin": "Plugin {{name}} verwijderen",
   "aria.togglePlugin": "{{action}} plugin {{name}}",
-  "aria.close": "Sluiten",
 
   // ── Menus & Sidebars ─────────────────────────
   "sidebar.templates.title": "Sjablonen",
@@ -145,6 +164,39 @@ export default {
   "field.placeholder.options": "Komma-gescheiden",
 
   // ── Modals ───────────────────
+
+  "modal.settings.tab.general": "Algemeen",
+  "modal.settings.tab.general.description":
+    "Configureer auteurgegevens zoals naam, e-mail en taal.",
+  "modal.settings.tab.display": "Weergave",
+  "modal.settings.tab.display.description":
+    "Configureer het weergavethema en schakel op pictogrammen gebaseerde knoppen in.",
+  "modal.settings.tab.directories": "Mappen",
+  "modal.settings.tab.directories.description":
+    "Configureer de contextmap en, indien ingeschakeld, de Git-rootmap.",
+  "modal.settings.tab.internal": "Interne Server",
+  "modal.settings.tab.internal.description":
+    "Configureer de ingebouwde server en stel de luisterpoort in.",
+  "modal.settings.tab.advanced": "Geavanceerd",
+  "modal.settings.tab.advanced.description":
+    "Geavanceerde systeemopties. Gebruik met voorzichtigheid.",
+  "modal.settings.author.name": "Auteur Naam",
+  "modal.settings.author.email": "Auteur E-mail",
+  "modal.settings.author.language": "Taal (Vereist herstart)",
+  "modal.settings.display.theme": "Weergave Thema",
+  "modal.settings.display.theme.light": "Licht",
+  "modal.settings.display.theme.dark": "Donker",
+  "modal.settings.icon.buttons": "Pictogram knoppen",
+  "modal.settings.context.folder": "Contextmap",
+  "modal.settings.git.root": "Git-rootmap",
+  "modal.settings.git.enabled": "Git inschakelen",
+  "modal.settings.internal.enabled": "Interne Server",
+  "modal.settings.internal.port": "Luisterpoort",
+  "modal.settings.advanced.plugins.enabled": "Plugins inschakelen",
+  "modal.settings.advanced.secretKey": "Decryptiesleutel",
+  "modal.settings.advanced.developmentMode": "Ontwikkelingsmodus",
+  "modal.settings.advanced.logging.enabled": "Logging inschakelen",
+
   "modal.profile.title": "Wissel gebruikersprofiel",
   "modal.settings.title": "Instellingen",
   "modal.workspace.title": "Werkruimte-instellingen",

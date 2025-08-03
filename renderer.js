@@ -1,7 +1,7 @@
 // renderer.js
 
 // ───── Imports ──────────────────────────────
-import { loadLocale, translateDOM } from "./utils/i18n.js";
+import { loadLocale, t, translateDOM } from "./utils/i18n.js";
 import { EventBus } from "./modules/eventBus.js";
 import { exposeGlobalAPI } from "./modules/globalAPI.js";
 import { initEventRouter } from "./modules/eventRouter.js";
@@ -123,7 +123,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   // ── Template Dropdown ──
   const templateDropdown = createDropdown({
     containerId: "template-selector",
-    labelText: "Template",
+    labelText: t("standard.templates"),
     options: [],
     onChange: async (selectedName) => {
       EventBus.emit("logging:default", [

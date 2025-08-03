@@ -10,6 +10,7 @@ import {
   createFormRowInput,
   addContainerElement,
 } from "../utils/elementBuilders.js";
+import { t } from "../utils/i18n.js";
 
 let cachedConfig = null;
 
@@ -33,14 +34,20 @@ export async function renderSettings() {
   container.innerHTML = "";
 
   // ─── Tabs ─────────────────────────────
+  const tabGeneralLabel = t("modal.settings.tab.general");
+  const tabDisplayLabel = t("modal.settings.tab.display");
+  const tabDirectoriesLabel = t("modal.settings.tab.directories");
+  const tabInternalLabel = t("modal.settings.tab.internal");
+  const tabAdvancedLabel = t("modal.settings.tab.advanced");
+
   const tabButtons = document.createElement("div");
   tabButtons.className = "tab-buttons";
   tabButtons.innerHTML = `
-    <button class="tab-btn">General</button>
-    <button class="tab-btn">Display</button>
-    <button class="tab-btn">Directories</button>
-    <button class="tab-btn">Internal Server</button>
-    <button class="tab-btn">Advanced</button>
+    <button class="tab-btn">${tabGeneralLabel}</button>
+    <button class="tab-btn">${tabDisplayLabel}</button>
+    <button class="tab-btn">${tabDirectoriesLabel}</button>
+    <button class="tab-btn">${tabInternalLabel}</button>
+    <button class="tab-btn">${tabAdvancedLabel}</button>
   `;
 
   // ─── General Settings ─────────────────
@@ -51,16 +58,19 @@ export async function renderSettings() {
     parent: tabGeneral,
     tag: "p",
     className: "form-info-text",
-    textContent:
-      "Configure author details and your secret key. The secret key is used to encrypt/decrypt sensitive data.",
+    textContent: t("modal.settings.tab.general.description"),
   });
 
   tabGeneral.appendChild(
-    bindFormInput("author-name", "author_name", "Author Name")
+    bindFormInput("author-name", "author_name", t("modal.settings.author.name"))
   );
 
   tabGeneral.appendChild(
-    bindFormInput("author-email", "author_email", "Author Email")
+    bindFormInput(
+      "author-email",
+      "author_email",
+      t("modal.settings.author.email")
+    )
   );
 
   // ─── Display Settings ─────────────────
@@ -71,39 +81,42 @@ export async function renderSettings() {
     parent: tabDisplay,
     tag: "p",
     className: "form-info-text",
-    textContent: "Configure the display theme and toggle icon-based buttons.",
+    textContent: t("modal.settings.tab.display.description"),
   });
 
   tabDisplay.appendChild(
     createSwitch(
       "theme-toggle",
-      "Display Theme",
+      t("modal.settings.display.theme"),
       config.theme === "dark",
       null,
       "block",
-      ["Dark", "Light"]
+      [
+        t("modal.settings.display.theme.dark"),
+        t("modal.settings.display.theme.light"),
+      ]
     )
   );
 
   tabDisplay.appendChild(
     createSwitch(
       "show-expressions-toggle",
-      "Expressions",
+      t("standard.expressions"),
       config.use_expressions ?? true,
       null,
       "block",
-      ["Show", "Hide"]
+      [t("standard.show"), t("standard.hide")]
     )
   );
 
   tabDisplay.appendChild(
     createSwitch(
       "show-icons-toggle",
-      "Icon Buttons",
+      t("modal.settings.icon.buttons"),
       config.show_icon_buttons ?? true,
       null,
       "block",
-      ["On (Experimental)", "Off"]
+      [t("standard.on.experimental"), t("standard.off")]
     )
   );
 
@@ -115,13 +128,12 @@ export async function renderSettings() {
     parent: tabDirs,
     tag: "p",
     className: "form-info-text",
-    textContent:
-      "Configure the context folder and, if enabled, the Git root directory.",
+    textContent: t("modal.settings.tab.directories.description"),
   });
 
   const contextFolderPicker = createDirectoryPicker({
     id: "settings-context-folder",
-    label: "Context Folder",
+    label: t("modal.settings.context.folder"),
     value: config.context_folder || "./",
     outerClass: "modal-form-row tight-gap",
   });
@@ -129,17 +141,17 @@ export async function renderSettings() {
 
   const useGitSwitch = createSwitch(
     "settings-use-git",
-    "Use Git Repository",
+    t("modal.settings.git.enabled"),
     config.use_git ?? false,
     null,
     "block",
-    ["Enabled", "Disabled"]
+    [t("standard.enabled"), t("standard.disabled")]
   );
   tabDirs.appendChild(useGitSwitch);
 
   const gitRootPicker = createDirectoryPicker({
     id: "settings-git-root",
-    label: "Git Root Directory",
+    label: t("modal.settings.git.root"),
     value: config.git_root || "",
     outerClass: "modal-form-row tight-gap",
   });
@@ -159,22 +171,22 @@ export async function renderSettings() {
     parent: tabServer,
     tag: "p",
     className: "form-info-text",
-    textContent: "Configure the built-in server and set the listening port.",
+    textContent: t("modal.settings.tab.internal.description"),
   });
 
   tabServer.appendChild(
     createSwitch(
       "internal-server-toggle",
-      "Internal Server",
+      t("modal.settings.internal.enabled"),
       config.enable_internal_server ?? false,
       null,
       "block",
-      ["On", "Off"]
+      [t("standard.on"), t("standard.off")]
     )
   );
 
   tabServer.appendChild(
-    bindFormInput("internal-server-port", "internal_server_port", "Server Port")
+    bindFormInput("internal-server-port", "internal_server_port", t("modal.settings.internal.port"))
   );
 
   // ─── Advanced Settings ──────────────────────
@@ -185,24 +197,24 @@ export async function renderSettings() {
     parent: tabAdvanced,
     tag: "p",
     className: "form-info-text",
-    textContent: "Advanced system options. Use with caution.",
+    textContent: t("modal.settings.tab.advanced.description"),
   });
 
   tabAdvanced.appendChild(
     createSwitch(
       "plugin-toggle",
-      "Enable Plugins",
+      t("modal.settings.advanced.plugins.enabled"),
       config.enable_plugins ?? false,
       null,
       "block",
-      ["Enabled", "Disabled"]
+      [t("standard.enabled"), t("standard.disabled")]
     )
   );
 
   tabAdvanced.appendChild(
     createFormRowInput({
       id: "encryption-key",
-      label: "Secret Decryption Key",
+      label: t("modal.settings.advanced.secretKey"),
       type: "password",
       value: config.encryption_key,
       configKey: "encryption_key",
@@ -217,22 +229,22 @@ export async function renderSettings() {
   tabAdvanced.appendChild(
     createSwitch(
       "settings-development-toggle",
-      "Development Mode",
+      t("modal.settings.advanced.developmentMode"),
       config.development_enable ?? false,
       null,
       "block",
-      ["Enabled", "Disabled"]
+      [t("standard.enabled"), t("standard.disabled")]
     )
   );
 
   tabAdvanced.appendChild(
     createSwitch(
       "logging-toggle",
-      "Enable Logging",
+      t("modal.settings.advanced.logging.enabled"),
       config.logging_enabled,
       null,
       "block",
-      ["On", "Off"]
+      [t("standard.enabled"), t("standard.disabled")]
     )
   );
 
@@ -258,10 +270,7 @@ export async function renderSettings() {
 function setupBindings(config, gitRootPicker) {
   bindThemeSwitch("theme-toggle", "theme");
   bindToggleSwitch("show-icons-toggle", "show_icon_buttons");
-  bindToggleSwitch(
-    "show-expressions-toggle",
-    "use_expressions"
-  );
+  bindToggleSwitch("show-expressions-toggle", "use_expressions");
 
   bindToggleSwitch("plugin-toggle", "enable_plugins");
   bindToggleSwitch("settings-development-toggle", "development_enable");

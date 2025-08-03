@@ -27,7 +27,7 @@ export function createTemplateListManager(modal, dropdown = null) {
     onItemClick: (templateItem) =>
       EventBus.emit("template:list:itemClicked", templateItem),
 
-    emptyMessage: "No template files found.",
+    emptyMessage: t("special.noTemplatesFound"),
 
     addButton: createAddButton({
       label: t("button.addTemplate"),
@@ -45,7 +45,9 @@ export function createTemplateListManager(modal, dropdown = null) {
                 });
               });
 
-              if (!success) throw new Error("Save failed");
+              if (!success) {
+                throw new Error("Save failed");
+              }
 
               await listManager.loadList();
 
@@ -83,7 +85,7 @@ export function createStorageListManager(formManager, modal) {
   const { input: toggle, element: wrapper } = buildSwitchElement({
     id: "flagged-toggle",
     checked: false,
-    trailingLabel: ["Show only flagged", "Show all"],
+    trailingLabel: [t("special.showFlagged"), t("special.showAll")],
     onFlip: async (value) => {
       showOnlyFlagged = value;
 
