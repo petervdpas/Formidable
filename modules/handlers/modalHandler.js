@@ -7,6 +7,7 @@ import {
 } from "../../utils/buttonUtils.js";
 import { sanitize } from "../../utils/stringUtils.js";
 import { getCompactDate } from "../../utils/dateUtils.js";
+import { t } from "../../utils/i18n.js";
 
 // ─────────────────────────────────────────────────────────────
 // Handle creation of a new template via modal
@@ -19,7 +20,7 @@ export function handleTemplateConfirm({ modal, callback }) {
 
   const confirmBtn = createConfirmButton({
     id: "template-confirm",
-    text: "Create",
+    text: t("button.confirm"),
     onClick: () => {
       const raw = nameInput.value.trim();
       if (!raw) return;
@@ -63,7 +64,7 @@ export function handleEntryConfirm({ modal, callback }) {
 
   const confirmBtn = createConfirmButton({
     id: "entry-confirm",
-    text: "Confirm",
+    text: t("button.confirm"),
     className: "btn-okay",
     onClick: () => {
       const raw = input.value.trim();

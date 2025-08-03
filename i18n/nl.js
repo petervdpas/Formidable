@@ -1,50 +1,36 @@
 // i18n/nl.js
 
 export default {
-  // ── Menu: File ───────────────────────────────
+  // ── Menu ───────────────────────────────
   "menu.file": "Bestand",
   "menu.file.openTemplateFolder": "Open sjablonenmap",
   "menu.file.openStorageFolder": "Open opslagmap",
   "menu.file.openPluginsFolder": "Open pluginmap",
   "menu.file.quit": "Afsluiten",
-
-  // ── Menu: Config ─────────────────────────────
   "menu.config": "Configuratie",
   "menu.config.switchProfile": "Wissel profiel...",
   "menu.config.settings": "Instellingen...",
   "menu.config.workspace": "Werkruimte...",
-
-  // ── Menu: Git ────────────────────────────────
   "menu.git": "Git",
   "menu.git.actions": "Git-acties...",
-
-  // ── Menu: Server ─────────────────────────────
   "menu.server": "Server",
   "menu.server.start": "Start server",
   "menu.server.stop": "Stop server",
   "menu.server.status": "Serverstatus",
   "menu.server.browser": "Open in browser",
-
-  // ── Menu: Plugins ────────────────────────────
   "menu.plugins": "Plugins",
   "menu.plugins.manager": "Pluginbeheer...",
-
-  // ── Menu: View ───────────────────────────────
   "menu.view": "Weergave",
   "menu.view.reload": "Herladen",
   "menu.view.devtools": "Ontwikkelaarstools",
-
-  // ── Menu: Help ───────────────────────────────
   "menu.help": "Help",
   "menu.help.pages": "Helppagina's",
   "menu.help.about": "Over",
-
-  // ── Menu: Context Toggle ─────────────────────
   "menu.context.label": "Context Modus:",
   "menu.context.option.storage": "Opslag",
   "menu.context.option.template": "Sjabloon",
 
-  // Toast messages
+  // ─ Toast Messages ─────────────────────
   "toast.noTemplateSelected":
     "Geen sjabloon geselecteerd. Selecteer eerst een sjabloon.",
   "toast.serverStarted": "Interne server is gestart.",
@@ -56,6 +42,58 @@ export default {
   "toast.stopped": "Gestopt",
   "toast.onPort": "op poort",
 
+  // ── Special Actions ─────────────────────
+  "special.flag": "Markeren",
+  "special.unflag": "Demarkeren",
+
+  // ── Button Labels ───────────────────────────
+  "button.cancel": "Annuleren",
+  "button.confirm": "Bevestigen",
+  "button.create": "Aanmaken",
+  "button.edit": "Bewerken",
+  "button.delete": "Verwijderen",
+  "button.addField": "+ Veld Toevoegen",
+  "button.save": "Opslaan",
+  "button.generateTemplate": "Genereer Template",
+  "button.render": "Renderen",
+  "button.commit": "Commit",
+  "button.push": "Pushen",
+  "button.pull": "Pullen",
+  "button.discard": "Verwerpen",
+  "button.markdown.arrow": "🡐 Markdown",
+  "button.preview.arrow": "HTML Voorbeeld 🡒",
+  "button.moveUp": "▲",
+  "button.moveDown": "▼",
+  "button.copy": "⧉",
+  "button.close": "✕",
+  "button.add": "+ Toevoegen",
+  "button.addEntry": "+ Nieuwe Invoer",
+  "button.addItem": "+ Item Toevoegen",
+  "button.addField": "+ Veld Toevoegen",
+  "button.addTemplate": "+ Sjabloon Toevoegen",
+  "button.addLoopItem": "+ Lus-item Toevoegen",
+  "button.reloadPlugins": "Plugins Herladen",
+  "button.createPlugin": "Plugin Aanmaken",
+  "button.uploadPlugin": "Plugin Uploaden",
+  "button.enable": "Inschakelen",
+  "button.disable": "Uitschakelen",
+
+  // ── ARIA Labels ───────────────────────────
+  "aria.edit": "Bewerken",
+  "aria.delete": "Verwijderen",
+  "aria.save": "Opslaan",
+  "aria.commit": "Wijzigingen committen",
+  "aria.moveUp": "Veld omhoog verplaatsen",
+  "aria.moveDown": "Veld omlaag verplaatsen",
+  "aria.push": "Pushen naar remote",
+  "aria.pull": "Pullen van remote",
+  "aria.copyMarkdown": "Markdown kopiëren",
+  "aria.copyHtml": "HTML kopiëren",
+  "aria.open": "{{name}} openen",
+  "aria.deletePlugin": "Plugin {{name}} verwijderen",
+  "aria.togglePlugin": "{{action}} plugin {{name}}",
+  "aria.close": "Sluiten",
+
   // ── Menus & Sidebars ─────────────────────────
   "sidebar.templates.title": "Sjablonen",
   "sidebar.templates.placeholder":
@@ -66,28 +104,7 @@ export default {
   "status.ready": "Klaar.",
   "resize.handle.title": "Sleep om te vergroten/verkleinen",
 
-  // ── Modals: Profile Switch ───────────────────
-  "modal.profile.title": "Wissel gebruikersprofiel",
-
-  // ── Modals: Settings ─────────────────────────
-  "modal.settings.title": "Instellingen",
-
-  // ── Modals: Workspace Settings ───────────────
-  "modal.workspace.title": "Werkruimte-instellingen",
-
-  // ── Modals: New Template ─────────────────────
-  "modal.template.title": "Nieuw sjabloon",
-  "modal.template.label.filename": "Bestandsnaam",
-  "modal.template.placeholder.filename": "bijv. gebruikers-enquête",
-
-  // ── Modals: New Entry ────────────────────────
-  "modal.entry.title": "Nieuwe invoer",
-  "modal.entry.label.name": "Voer een naam in voor deze invoer:",
-  "modal.entry.placeholder.name": "bijv. mijn-artikel-titel",
-  "modal.entry.label.appendDate": "Datum toevoegen (JJJJMMDD)",
-
-  // ── Modals: Field Edit ───────────────────────
-  "modal.field.title": "Veld bewerken",
+  // Fields
   "field.key": "Sleutel",
   "field.label": "Label",
   "field.description": "Beschrijving",
@@ -99,24 +116,25 @@ export default {
   "field.placeholder.default": "Stel de standaardwaarde in voor dit veld",
   "field.placeholder.options": "Komma-gescheiden",
 
-  // ── Modals: Render Preview ───────────────────
+  // ── Modals ───────────────────
+  "modal.profile.title": "Wissel gebruikersprofiel",
+  "modal.settings.title": "Instellingen",
+  "modal.workspace.title": "Werkruimte-instellingen",
+  "modal.template.title": "Nieuw sjabloon",
+  "modal.template.label.filename": "Bestandsnaam",
+  "modal.template.placeholder.filename": "bijv. gebruikers-enquête",
+  "modal.entry.title": "Nieuwe invoer",
+  "modal.entry.label.name": "Geef deze invoer een naam:",
+  "modal.entry.placeholder.name": "bijv. mijn-artikel-titel",
+  "modal.entry.label.appendDate": "Datum toevoegen (JJJJMMDD)",
+  "modal.field.title": "Veld bewerken",
   "modal.render.title": "Genereer Markdown & HTML Voorbeeld",
   "pane.markdown": "Markdown",
   "pane.preview": "HTML Voorbeeld",
-
-  // ── Modals: Confirm ──────────────────────────
   "modal.confirm.message": "Weet je het zeker?",
-
-  // ── Modals: Git Actions ──────────────────────
   "modal.git.title": "Git Acties",
-
-  // ── Modals: Plugin Manager ───────────────────
   "modal.plugins.title": "Pluginbeheer",
-
-  // ── Modals: Help ─────────────────────────────
   "modal.help.title": "Formidable Help-pagina's",
-
-  // ── Modals: About ────────────────────────────
   "modal.about.title": "Over Formidable",
   "modal.about.description":
     "Formidable is een Sjabloon/Formulier Editor gebouwd met Electron.",

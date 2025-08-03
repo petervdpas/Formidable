@@ -4,7 +4,7 @@ markdown_template: |-
   ---
   title: Auto-generated Report
   author: Formidable Generator
-  date: 2025-07-20
+  date: 2025-08-03
   toc: true
   toc-title: Contents
   toc-own-page: true
@@ -51,11 +51,14 @@ markdown_template: |-
 
   _{{fieldDescription "inloop_description"}}_
 
+
   ```sh
   [LOG]
   {{json (fieldRaw "inloop_description")}}
   ```
+
   {{field "inloop_description"}}
+
   ---
 
 
@@ -73,7 +76,7 @@ markdown_template: |-
   {{field "subloop_index"}}
   ---
 
-  #### Sub loop
+  #### Sub loop titel
 
   _{{fieldDescription "subloop_title"}}_
 

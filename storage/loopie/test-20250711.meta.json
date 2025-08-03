@@ -4,7 +4,7 @@
     "author_email": "regular@example.com",
     "template": "loopie.yaml",
     "created": "2025-07-11T06:10:16.683Z",
-    "updated": "2025-08-02T15:32:11.043Z",
+    "updated": "2025-08-03T00:31:25.105Z",
     "flagged": false
   },
   "data": {
@@ -12,7 +12,7 @@
     "looper": [
       {
         "inloop_title": "Once upon a time...",
-        "inloop_description": "**Once upon a time** there was a ~~little~~ princess... It was a tiny princess! You could hardly see her. And in the mean time...: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+        "inloop_description": "**Once upon a time** there was a ~~little~~ princess... \nIt was a tiny princess! You could hardly see her. And in the mean time...: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
         "subloop": [
           {
             "subloop_title": "This is Crazy!!"

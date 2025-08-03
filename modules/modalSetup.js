@@ -20,6 +20,7 @@ import {
   createPluginReloadButton,
   createPluginCreateButton,
 } from "./uiButtons.js";
+import { t } from "../utils/i18n.js";
 
 export function setupProfileModal() {
   return setupModal("profile-modal", {
@@ -404,7 +405,7 @@ export function setupFieldEditModal(field, allFields, onConfirm) {
 
   const confirmBtn = createButton({
     id: "field-edit-confirm",
-    text: "Confirm",
+    text: t("button.confirm"),
     onClick: () => {
       const keyInput = document.getElementById("edit-key");
       const rawKey = keyInput?.value.trim();

@@ -1,50 +1,36 @@
 // i18n/en.js
 
 export default {
-  // ── Menu: File ───────────────────────────────
+  // ── Menu ───────────────────────────────
   "menu.file": "File",
   "menu.file.openTemplateFolder": "Open Template Folder",
   "menu.file.openStorageFolder": "Open Storage Folder",
   "menu.file.openPluginsFolder": "Open Plugins Folder",
   "menu.file.quit": "Quit",
-
-  // ── Menu: Config ─────────────────────────────
   "menu.config": "Config",
   "menu.config.switchProfile": "Switch Profile...",
   "menu.config.settings": "Settings...",
   "menu.config.workspace": "Workspace...",
-
-  // ── Menu: Git ────────────────────────────────
   "menu.git": "Git",
   "menu.git.actions": "Git Actions...",
-
-  // ── Menu: Server ─────────────────────────────
   "menu.server": "Server",
   "menu.server.start": "Start Server",
   "menu.server.stop": "Stop Server",
   "menu.server.status": "Server Status",
   "menu.server.browser": "Open in Browser",
-
-  // ── Menu: Plugins ────────────────────────────
   "menu.plugins": "Plugins",
   "menu.plugins.manager": "Plugin Manager...",
-
-  // ── Menu: View ───────────────────────────────
   "menu.view": "View",
   "menu.view.reload": "Reload",
   "menu.view.devtools": "Toggle DevTools",
-
-  // ── Menu: Help ───────────────────────────────
   "menu.help": "Help",
   "menu.help.pages": "Help Pages",
   "menu.help.about": "About",
-
-  // ── Menu: Context Toggle ─────────────────────
   "menu.context.label": "Context Mode:",
   "menu.context.option.storage": "Storage",
   "menu.context.option.template": "Template",
 
-  // Toast messages
+  // ── Toast Messages ─────────────────────
   "toast.noTemplateSelected":
     "No template selected. Please select a template first.",
   "toast.serverStarted": "Internal server was started.",
@@ -56,6 +42,57 @@ export default {
   "toast.stopped": "Stopped",
   "toast.onPort": "on port",
 
+  // ── Special Actions ─────────────────────
+  "special.flag": "Flag",
+  "special.unflag": "Unflag",
+
+  // ── Button Labels ───────────────────────────
+  "button.cancel": "Cancel",
+  "button.confirm": "Confirm",
+  "button.create": "Create",
+  "button.edit": "Edit",
+  "button.delete": "Delete",
+  "button.addField": "+ Add Field",
+  "button.save": "Save",
+  "button.generateTemplate": "Generate Template",
+  "button.render": "Render",
+  "button.commit": "Commit",
+  "button.push": "Push",
+  "button.pull": "Pull",
+  "button.discard": "Discard",
+  "button.markdown": "🡐 Markdown",
+  "button.preview": "HTML Preview 🡒",
+  "button.moveUp": "▲",
+  "button.moveDown": "▼",
+  "button.copy": "⧉",
+  "button.close": "✕",
+  "button.add": "+ Add",
+  "button.addEntry": "+ New Entry",
+  "button.addItem": "+ Add Item",
+  "button.addField": "+ Add Field",
+  "button.addTemplate": "+ Add Template",
+  "button.addLoopItem": "+ Add Loop Item",
+  "button.reloadPlugins": "Reload Plugins",
+  "button.createPlugin": "Create Plugin",
+  "button.uploadPlugin": "Upload Plugin",
+  "button.enable": "Enable",
+  "button.disable": "Disable",
+
+  // ── ARIA Labels ───────────────────────────
+  "aria.edit": "Edit",
+  "aria.delete": "Delete",
+  "aria.save": "Save",
+  "aria.commit": "Commit changes",
+  "aria.moveUp": "Move field up",
+  "aria.moveDown": "Move field down",
+  "aria.push": "Push to remote",
+  "aria.pull": "Pull from remote",
+  "aria.copyMarkdown": "Copy Markdown",
+  "aria.copyHtml": "Copy HTML",
+  "aria.open": "Open {{name}}",
+  "aria.deletePlugin": "Delete plugin {{name}}",
+  "aria.togglePlugin": "{{action}} plugin {{name}}",
+
   // ── Menus & Sidebars ─────────────────────────
   "sidebar.templates.title": "Templates",
   "sidebar.templates.placeholder":
@@ -65,28 +102,7 @@ export default {
   "status.ready": "Ready.",
   "resize.handle.title": "Drag to Resize",
 
-  // ── Modals: Profile Switch ───────────────────
-  "modal.profile.title": "Switch User Profile",
-
-  // ── Modals: Settings ─────────────────────────
-  "modal.settings.title": "Settings",
-
-  // ── Modals: Workspace Settings ───────────────
-  "modal.workspace.title": "Workspace Settings",
-
-  // ── Modals: New Template ─────────────────────
-  "modal.template.title": "New Template",
-  "modal.template.label.filename": "Filename",
-  "modal.template.placeholder.filename": "e.g., user-survey",
-
-  // ── Modals: New Entry ────────────────────────
-  "modal.entry.title": "New Entry",
-  "modal.entry.label.name": "Enter a name for this entry:",
-  "modal.entry.placeholder.name": "e.g. my-article-title",
-  "modal.entry.label.appendDate": "Append date (YYYYMMDD)",
-
-  // ── Modals: Field Edit ───────────────────────
-  "modal.field.title": "Edit Field",
+  // Fields
   "field.key": "Key",
   "field.label": "Label",
   "field.description": "Description",
@@ -98,24 +114,25 @@ export default {
   "field.placeholder.default": "Set the default value for this field",
   "field.placeholder.options": "Comma-separated",
 
-  // ── Modals: Render Preview ───────────────────
+  // ── Modals ───────────────────
+  "modal.profile.title": "Switch User Profile",
+  "modal.settings.title": "Settings",
+  "modal.workspace.title": "Workspace Settings",
+  "modal.template.title": "New Template",
+  "modal.template.label.filename": "Filename",
+  "modal.template.placeholder.filename": "e.g., user-survey",
+  "modal.entry.title": "New Entry",
+  "modal.entry.label.name": "Name this entry:",
+  "modal.entry.placeholder.name": "e.g. my-article-title",
+  "modal.entry.label.appendDate": "Append date (YYYYMMDD)",
+  "modal.field.title": "Edit Field",
   "modal.render.title": "Render Markdown & HTML Preview",
   "pane.markdown": "Markdown",
   "pane.preview": "HTML Preview",
-
-  // ── Modals: Confirm ──────────────────────────
   "modal.confirm.message": "Are you sure?",
-
-  // ── Modals: Git Actions ──────────────────────
   "modal.git.title": "Git Actions",
-
-  // ── Modals: Plugin Manager ───────────────────
   "modal.plugins.title": "Plugin Manager",
-
-  // ── Modals: Help ─────────────────────────────
   "modal.help.title": "Formidable Help Pages",
-
-  // ── Modals: About ────────────────────────────
   "modal.about.title": "About Formidable",
   "modal.about.description":
     "Formidable is a Template/Form Editor created in Electron.",

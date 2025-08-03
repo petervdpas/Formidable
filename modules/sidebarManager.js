@@ -11,6 +11,7 @@ import {
 } from "../utils/elementBuilders.js";
 import { createListManager } from "../utils/listUtils.js";
 import { createAddButton } from "./uiButtons.js";
+import { t } from "../utils/i18n.js";
 
 export function createTemplateListManager(modal, dropdown = null) {
   const listManager = createListManager({
@@ -29,7 +30,7 @@ export function createTemplateListManager(modal, dropdown = null) {
     emptyMessage: "No template files found.",
 
     addButton: createAddButton({
-      label: "+ Add Template",
+      label: t("button.addTemplate"),
       onClick: async () => {
         EventBus.emit("modal:template:confirm", {
           modal,
@@ -188,7 +189,7 @@ export function createStorageListManager(formManager, modal) {
     filterFunction: (item) => !showOnlyFlagged || item.flagged,
     filterUI: wrapper,
     addButton: createAddButton({
-      label: "+ Add Entry",
+      label: t("button.addEntry"),
       onClick: async () => {
         const template = window.currentSelectedTemplate;
         if (!template) {
