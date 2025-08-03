@@ -38,6 +38,7 @@ export default {
   "special.showAll": "Toon alles",
   "special.showFlagged": "Gemarkeerd weergeven",
   "special.noTemplatesFound": "Geen sjabloonbestanden gevonden.",
+  "special.noMetadataFilesFound": "Geen metadata-bestanden gevonden.",
 
   // ── Standard Translation ─────────────────────
   "standard.storage": "Opslag",
@@ -228,16 +229,19 @@ export default {
   "modal.git.discard.sure":
     "Weet je zeker dat je de wijzigingen wilt verwerpen in",
   "modal.git.none.found": "Niets gevonden.",
-  "modal.git.committed": "Gecommit",
-  "modal.git.commit.complete": "Commit voltooid.",
   "modal.git.commit.message": "Commitbericht",
   "modal.git.commit.placeholder":
     "bijv. README bijgewerkt en typefouten gecorrigeerd",
-  "modal.git.commit.noMessage": "Kan niet committen: geen bericht opgegeven.",
-  "modal.git.pushed": "Ge-pusht",
-  "modal.git.push.complete": "Push voltooid.",
-  "modal.git.pulled": "Ge-pulled",
-  "modal.git.pull.complete": "Pull voltooid.",
+
+  "toast.git.committed": "Gecommit",
+  "toast.git.commit.complete": "Commit voltooid.",
+  "toast.git.pushed": "Ge-pusht",
+  "toast.git.push.complete": "Push voltooid.",
+  "toast.git.pulled": "Ge-pulled",
+  "toast.git.pull.complete": "Pull voltooid.",
+  "toast.git.discard.failed": "Verwerpen mislukt",
+  "toast.git.discarded.changes.in": "Wijzigingen verworpen in",
+  "toast.git.commit.noMessage": "Kan niet committen: geen bericht opgegeven.",
 
   "modal.workspace.title": "Werkruimte-instellingen",
   "modal.template.title": "Nieuw sjabloon",

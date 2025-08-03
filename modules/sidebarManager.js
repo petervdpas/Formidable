@@ -145,7 +145,7 @@ export function createStorageListManager(formManager, modal) {
     onItemClick: (storageItem) =>
       EventBus.emit("form:list:itemClicked", storageItem),
 
-    emptyMessage: "No metadata files found.",
+    emptyMessage: t("special.noMetadataFilesFound"),
 
     renderItemExtra: async ({ subLabelNode, flagNode, rawData }) => {
       if (rawData.flagged) {

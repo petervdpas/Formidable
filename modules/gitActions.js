@@ -45,7 +45,7 @@ export async function renderGitStatus(container) {
           status.tracking || t("standard.none")
         }</p>
         <p style="margin-bottom: 0.3em;"><strong>${t(
-          "standard.change.s"
+          "standard.changes"
         )}:</strong> ${status.files.length} ${t("standard.file.s")}</p>
       `;
       container.appendChild(summary);
@@ -145,13 +145,13 @@ export async function renderGitStatus(container) {
 
             if (result?.success) {
               EventBus.emit("ui:toast", {
-                message: `Discarded changes in ${rawData.value}`,
+                message: `${t("toast.git.discarded.changes.in")} ${rawData.value}`,
                 variant: "info",
               });
               await gitListManager.loadList();
             } else {
               EventBus.emit("ui:toast", {
-                message: `Failed to discard ${rawData.value}`,
+                message: `${t("toast.git.discard.failed")} ${rawData.value}`,
                 variant: "error",
               });
             }
@@ -229,7 +229,7 @@ export async function renderGitStatus(container) {
       const commitBtn = createGitCommitButton(() => {
         if (!commitMessage) {
           EventBus.emit("ui:toast", {
-            message: t("modal.git.commit.noMessage"),
+            message: t("toast.git.commit.noMessage"),
             variant: "warning",
           });
           return;
@@ -244,8 +244,8 @@ export async function renderGitStatus(container) {
                 typeof result === "string"
                   ? result
                   : result?.summary
-                  ? `${t("modal.git.committed")}: ${result.summary.changes} ${t("standard.change.s")}`
-                  : t("modal.git.commit.complete"),
+                  ? `${t("toast.git.committed")}: ${result.summary.changes} ${t("standard.change.s")}`
+                  : t("toast.git.commit.complete"),
               variant: "success",
             });
             refresh();
@@ -262,8 +262,8 @@ export async function renderGitStatus(container) {
                 typeof result === "string"
                   ? result
                   : result?.summary
-                  ? `${t("modal.git.pushed")}: ${result.summary.changes ?? "✓"} ${t("standard.change.s")}`
-                  : t("modal.git.push.complete"),
+                  ? `${t("toast.git.pushed")}: ${result.summary.changes ?? "✓"} ${t("standard.change.s")}`
+                  : t("toast.git.push.complete"),
               variant: "success",
             });
             refresh();
@@ -280,8 +280,8 @@ export async function renderGitStatus(container) {
                 typeof result === "string"
                   ? result
                   : result?.files?.length
-                  ? `${t("modal.git.pulled")}: ${result.files.length} ${t("standard.file.s")}`
-                  : t("modal.git.pull.complete"),
+                  ? `${t("toast.git.pulled")}: ${result.files.length} ${t("standard.file.s")}`
+                  : t("toast.git.pull.complete"),
               variant: "success",
             });
             refresh();

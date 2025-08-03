@@ -163,6 +163,17 @@ img {
   overflow-y: auto;
 }
 
+.empty-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 1.2em;
+  color: #888;
+  text-align: center;
+  padding: 1em;
+}
+
 .scroll-box {
   max-height: 140px;
   overflow-y: auto;

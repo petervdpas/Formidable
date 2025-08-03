@@ -33,6 +33,7 @@ export default {
   "special.showAll": "Show All",
   "special.showFlagged": "Show Flagged",
   "special.noTemplatesFound": "No template files found.",
+  "special.noMetadataFilesFound": "No metadata files found.",
 
   // ── Standard translation ─────────────────────
   "standard.storage": "Storage",
@@ -221,15 +222,18 @@ export default {
   "modal.git.no.changes.detected": "No Changes Detected",
   "modal.git.discard.sure": "Are you sure you want to discard changes in",
   "modal.git.none.found": "None found.",
-  "modal.git.committed": "Committed",
-  "modal.git.commit.complete": "Commit complete.",
   "modal.git.commit.message": "Commit Message",
   "modal.git.commit.placeholder": "e.g. Update README and fix typos",
-  "modal.git.commit.noMessage": "Cannot commit: no message.",
-  "modal.git.pushed": "Pushed",
-  "modal.git.push.complete": "Push complete.",
-  "modal.git.pulled": "Pulled",
-  "modal.git.pull.complete": "Pull complete.",
+
+  "toast.git.committed": "Committed",
+  "toast.git.commit.complete": "Commit complete.",
+  "toast.git.pushed": "Pushed",
+  "toast.git.push.complete": "Push complete.",
+  "toast.git.pulled": "Pulled",
+  "toast.git.pull.complete": "Pull complete.",
+  "toast.git.discard.failed": "Failed to discard",
+  "toast.git.discarded.changes.in": "Discarded changes in",
+  "toast.git.commit.noMessage": "Cannot commit: no message.",
 
   "modal.workspace.title": "Workspace Settings",
   "modal.template.title": "New Template",
