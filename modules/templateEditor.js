@@ -25,6 +25,7 @@ import {
   createTemplateDeleteIconButton,
   createTemplateGeneratorButton,
 } from "./uiButtons.js";
+import { t } from "../utils/i18n.js";
 
 window.showConfirmModal = showConfirmModal;
 
@@ -50,9 +51,9 @@ function sanitizeField(f) {
   }
 
   if (f.summary_field?.trim()) {
-    field.summary_field = f.summary_field.trim(); 
+    field.summary_field = f.summary_field.trim();
   }
-  
+
   if (f.expression_item) {
     field.expression_item = true;
   }
@@ -122,7 +123,7 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     // Name field
     const nameRow = createFormRowInput({
       id: "yaml-name",
-      label: "Name",
+      label: t("modal.template.label.name"),
       value: currentData.name || "",
     });
     setupFieldset.appendChild(nameRow);
@@ -133,7 +134,9 @@ export function initTemplateEditor(containerId, onSaveCallback) {
 
     const label = document.createElement("label");
     label.setAttribute("for", "markdown-template");
-    label.innerHTML = "Template Code <small>CTRL+ENTER for full screen</small>";
+    label.innerHTML = `<span>${t(
+      "modal.template.label.code"
+    )}</span> <small>${t("modal.template.label.code.expand")}</small>`;
 
     const editorWrapperDiv = document.createElement("div");
     editorWrapperDiv.className = "editor-wrapper";
@@ -156,9 +159,9 @@ export function initTemplateEditor(containerId, onSaveCallback) {
 
     // Expression Handling input row
     const sidebarRow = createFormRowInput({
-      id: "sidebar-handling",
-      label: "Sidebar Handling",
-      value: currentData.sidebar_handling || "",
+      id: "sidebar-expression",
+      label: t("modal.template.label.sidebar"),
+      value: currentData.sidebar_expression || "",
       multiline: true,
     });
     setupFieldset.appendChild(sidebarRow);
@@ -166,7 +169,7 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     // ─── Enable Collection Switch ──────
     collectionSwitch = createSwitch(
       "template-enable-collection",
-      "Enable Collection",
+      t("modal.template.enable.collection"),
       currentData.enable_collection === true,
       () => {
         const hasGuid = currentData.fields.some((f) => f.type === "guid");
@@ -175,14 +178,13 @@ export function initTemplateEditor(containerId, onSaveCallback) {
         if (!hasGuid) {
           checkbox.checked = false;
           EventBus.emit("ui:toast", {
-            message:
-              "`Enable Collection` requires at least one GUID field in the template.",
+            message: t("toast.template.enable.collection"),
             variant: "warn",
           });
         }
       },
       "block",
-      ["Enabled", "Disabled"]
+      [t("standard.enabled"), t("standard.disabled")]
     );
     setupFieldset.appendChild(collectionSwitch);
 
@@ -190,7 +192,7 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     const fieldsFieldset = document.createElement("fieldset");
 
     const legend2 = document.createElement("legend");
-    legend2.textContent = "Fields";
+    legend2.textContent = t("standard.fields");
     fieldsFieldset.appendChild(legend2);
 
     const fieldList = document.createElement("ul");
@@ -250,8 +252,8 @@ export function initTemplateEditor(containerId, onSaveCallback) {
             name:
               container.querySelector("#yaml-name")?.value.trim() || "Unnamed",
             markdown_template: getEditor()?.getValue() || "",
-            sidebar_handling:
-              container.querySelector("#sidebar-handling")?.value.trim() || "",
+            sidebar_expression:
+              container.querySelector("#sidebar-expression")?.value.trim() || "",
             enable_collection: hasGuidField
               ? collectionElement?.checked === true
               : false,
@@ -288,7 +290,7 @@ export function initTemplateEditor(containerId, onSaveCallback) {
           const filename = window.currentSelectedTemplateName || "Unknown";
           EventBus.emit("status:update", `Template saved: ${filename}`);
           EventBus.emit("ui:toast", {
-            message: `Template saved successfully: ${filename}`,
+            message: `${t("toast.template.save.success")}: ${filename}`,
             variant: "success",
           });
         },

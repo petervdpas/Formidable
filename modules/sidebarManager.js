@@ -123,7 +123,7 @@ export function createStorageListManager(formManager, modal) {
         });
       });
 
-      const sidebarExpr = descriptor?.yaml?.sidebar_handling || null;
+      const sidebarExpr = descriptor?.yaml?.sidebar_expression || null;
 
       const entries = await new Promise((resolve) => {
         EventBus.emit("form:extendedList", {

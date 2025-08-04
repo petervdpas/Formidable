@@ -1,11 +1,11 @@
 {
   "meta": {
     "id": "5a7bec64-f3f2-47cc-a836-2e4643e4f9a9",
-    "author_name": "Regular user",
+    "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-08-04T00:28:54.186Z",
+    "updated": "2025-08-04T08:34:51.387Z",
     "flagged": true
   },
   "data": {
@@ -28,6 +28,11 @@
     ],
     "datable": [
       [
+        "One",
+        "Two",
+        "Three"
+      ],
+      [
         "Add",
         "in",
         "middle"
@@ -36,11 +41,6 @@
         "Because",
         "is with",
         "B"
-      ],
-      [
-        "One",
-        "Two",
-        "Three"
       ]
     ],
     "design": "formidable.png",

@@ -28,8 +28,6 @@ export default {
   "menu.context.option.template": "Sjabloon",
 
   // ─ Toast Messages ─────────────────────
-  "toast.noTemplateSelected":
-    "Geen sjabloon geselecteerd. Selecteer eerst een sjabloon.",
   "toast.serverStarted": "Interne server is gestart.",
   "toast.serverAlreadyRunning": "Interne server draait al.",
   "toast.serverStopped": "Interne server is gestopt.",
@@ -40,7 +38,12 @@ export default {
   "toast.onPort": "op poort",
 
   "toast.save.success": "Succesvol opgeslagen",
-  "toast.save.error": "Opslaan mislukt",
+  "toast.save.error": "Opslaan mislukt.",
+  "toast.key.required": "Sleutel mag niet leeg zijn.",
+  "toast.folder.required": "Folder naam is vereist.",
+
+  "toast.plugin.created": "Plugin aangemaakt.",
+  "toast.plugin.delete.failed": "Verwijderen van plugin mislukt.",
 
   "toast.git.committed": "Gecommit",
   "toast.git.commit.complete": "Commit voltooid.",
@@ -52,7 +55,19 @@ export default {
   "toast.git.discarded.changes.in": "Wijzigingen verworpen in",
   "toast.git.commit.noMessage": "Kan niet committen: geen bericht opgegeven.",
 
+  "toast.profile.invalidName":
+    "Gebruik kleine letters, koppeltekens en eindig met .json",
+  "toast.profile.exists": "Profiel bestaat al.",
+  "toast.profile.switchFailed": "Wisselen van profiel mislukt.",
+
+  "toast.template.not.selected":
+    "Geen sjabloon geselecteerd. Selecteer eerst een sjabloon.",
+  "toast.template.enable.collection":
+    "`Inschakelen Verzameling` vereist minimaal één GUID-veld in het sjabloon.",
+  "toast.template.save.success": "Sjabloon succesvol opgeslagen.",
+
   // ── Special ─────────────────────────
+  "special.user.profile": "Gebruikersprofiel",
   "special.templates.placeholder":
     "Selecteer of maak een sjabloonbestand om te bewerken.",
   "special.forms.placeholder":
@@ -61,12 +76,16 @@ export default {
   "special.showFlagged": "Gemarkeerd weergeven",
   "special.noTemplatesFound": "Geen sjabloonbestanden gevonden.",
   "special.noMetadataFilesFound": "Geen metadata-bestanden gevonden.",
+  "special.noPluginsFound": "Geen plugins gevonden.",
+  "special.noProfilesFound": "Geen profielen gevonden.",
   "special.template.delete.sure":
     "Weet je zeker dat je dit sjabloon wilt verwijderen?",
   "special.field.delete.sure":
     "Weet je zeker dat je dit veld wilt verwijderen?",
   "special.file.delete.sure":
     "Weet je zeker dat je dit bestand wilt verwijderen?",
+  "special.plugin.delete.sure":
+    "Weet je zeker dat je deze plugin wilt verwijderen?",
 
   // ── Standard Translation ─────────────────────
   "standard.storage": "Opslag",
@@ -74,6 +93,8 @@ export default {
   "standard.templates": "Sjablonen",
   "standard.form": "Formulier",
   "standard.forms": "Formulieren",
+  "standard.field": "Veld",
+  "standard.fields": "Velden",
   "standard.flag": "Markeren",
   "standard.unflag": "Demarkeren",
   "standard.off": "Uit",
@@ -91,7 +112,8 @@ export default {
   "standard.filename": "Bestandsnaam",
   "standard.files": "Bestanden",
   "standard.file.s": "Bestand(en)",
-  "standard.id": "ID",
+  "standard.id": "Id",
+  "standard.guid": "Guid",
   "standard.author": "Auteur",
   "standard.name": "Naam",
   "standard.email": "E-mail",
@@ -108,6 +130,7 @@ export default {
   "standard.running": "Actief",
   "standard.stop": "Stoppen",
   "standard.stopped": "Gestopt",
+  "standard.plugin": "Plugin",
   "standard.plugins": "Plugins",
   "standard.view": "Weergave",
   "standard.help": "Hulp",
@@ -236,11 +259,6 @@ export default {
   "modal.profile.title": "Wissel gebruikersprofiel",
   "modal.profile.label.newProfile": "Nieuw profiel",
   "modal.profile.placeholder.newProfile": "bijv. jack.json",
-  "modal.profile.noProfiles": "Geen profielen gevonden.",
-  "modal.profile.toast.invalidName":
-    "Gebruik kleine letters, koppeltekens en eindig met .json",
-  "modal.profile.toast.profileExists": "Profiel bestaat al.",
-  "modal.profile.toast.switchFailed": "Wisselen van profiel is mislukt.",
 
   "modal.git.title": "Git-acties",
   "modal.git.loading.status": "Git-status wordt geladen...",
@@ -257,8 +275,13 @@ export default {
   "modal.workspace.title": "Werkruimte-instellingen",
 
   "modal.template.title": "Nieuw sjabloon",
+  "modal.template.label.name": "Sjabloonnaam",
   "modal.template.label.filename": "Bestandsnaam",
+  "modal.template.label.sidebar": "Sidebar Expressie",
   "modal.template.placeholder.filename": "bijv. gebruikers-enquête",
+  "modal.template.enable.collection": "Inschakelen Verzameling",
+  "modal.template.label.code": "Sjablooncode",
+  "modal.template.label.code.expand": "CTRL+ENTER voor volledig scherm",
 
   "modal.entry.title": "Nieuwe invoer",
   "modal.entry.label.name": "Geef deze invoer een naam:",

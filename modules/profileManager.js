@@ -27,7 +27,7 @@ export function createProfileListManager() {
 
     if (!valid) {
       EventBus.emit("ui:toast", {
-        message: t("modal.profile.toast.invalidName"),
+        message: t("toast.profile.invalidName"),
         variant: "error",
       });
       return;
@@ -38,7 +38,7 @@ export function createProfileListManager() {
 
     if (exists) {
       EventBus.emit("ui:toast", {
-        message: t("modal.profile.toast.profileExists"),
+        message: t("toast.profile.exists"),
         variant: "warning",
       });
       return;
@@ -55,7 +55,7 @@ export function createProfileListManager() {
       window.electron.window.reload();
     } else {
       EventBus.emit("ui:toast", {
-        message: t("modal.profile.toast.switchFailed"),
+        message: t("toast.profile.switchFailed"),
         variant: "error",
       });
     }
@@ -86,7 +86,7 @@ export function createProfileListManager() {
         window.electron.window.reload();
       } else {
         EventBus.emit("ui:toast", {
-          message: t("modal.profile.toast.switchFailed"),
+          message: t("toast.profile.switchFailed"),
           variant: "error",
         });
       }
@@ -107,7 +107,7 @@ export function createProfileListManager() {
       itemNode.appendChild(subtitle);
     },
 
-    emptyMessage: t("modal.profile.noProfiles"),
+    emptyMessage: t("special.noProfilesFound"),
   });
 
   return {

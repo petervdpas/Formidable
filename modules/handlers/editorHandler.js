@@ -11,13 +11,13 @@ export async function handleSaveTemplate({ container, fields, callback }) {
   const markdownTemplate = getMarkdownTemplate();
   const enableCollection =
     document.getElementById("template-enable-collection")?.checked === true;
-  const sidebarHandling =
-    container.querySelector("#sidebar-handling")?.value.trim() || "";
+  const sidebarExpression =
+    container.querySelector("#sidebar-expression")?.value.trim() || "";
 
   const updated = {
     name,
     markdown_template: markdownTemplate,
-    sidebar_handling: sidebarHandling,
+    sidebar_expression: sidebarExpression,
     enable_collection: enableCollection,
     fields,
   };

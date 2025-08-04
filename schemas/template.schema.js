@@ -7,7 +7,7 @@ module.exports = {
     name: "",
     filename: "",
     markdown_template: "",
-    sidebar_handling: "",
+    sidebar_expression: "",
     enable_collection: false,
     fields: [],
   },
@@ -20,8 +20,8 @@ module.exports = {
     const result = {
       name: obj.name || "",
       filename: obj.filename || filename || "",
-      markdown_template: obj.markdown_template,
-      sidebar_handling: obj.sidebar_handling,
+      markdown_template: obj.markdown_template || "",
+      sidebar_expression: obj.sidebar_expression || "",
       enable_collection: obj.enable_collection === true,
       fields: Array.isArray(obj.fields)
         ? obj.fields.map((f) => fieldSchema.sanitize(f))
@@ -35,7 +35,7 @@ module.exports = {
           "name",
           "filename",
           "markdown_template",
-          "sidebar_handling",
+          "sidebar_expression",
           "enable_collection",
           "fields",
         ].includes(key)

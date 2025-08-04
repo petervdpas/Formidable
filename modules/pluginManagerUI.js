@@ -8,6 +8,7 @@ import {
   createPluginDeleteButton,
 } from "./uiButtons.js";
 import { showConfirmModal } from "../utils/modalUtils.js";
+import { t, tLow } from "../utils/i18n.js";
 
 export async function renderPluginManager(container) {
   const listManager = createListManager({
@@ -47,14 +48,16 @@ export async function renderPluginManager(container) {
 
           if (result?.success) {
             EventBus.emit("ui:toast", {
-              message: `Plugin "${rawData.name}" ${
-                newState ? "enabled" : "disabled"
+              message: `${t("standard.plugin")} "${rawData.name}" ${
+                newState ? tLow("standard.enabled") : tLow("standard.disabled")
               }.`,
               variant: newState ? "success" : "warn",
             });
           } else {
             EventBus.emit("ui:toast", {
-              message: `Failed to update plugin "${rawData.name}": ${result?.error}`,
+              message: `${t("toast.plugin.update.failed")} "${rawData.name}": ${
+                result?.error
+              }`,
               variant: "error",
             });
           }
@@ -65,11 +68,13 @@ export async function renderPluginManager(container) {
 
       const deleteBtn = createPluginDeleteButton(rawData.name, async () => {
         const confirmed = await showConfirmModal(
-          `<div>Are you sure you want to delete this plugin?</div>
-     <div class="modal-message-highlight"><strong>${rawData.name}</strong></div>`,
+          `<div>${t("special.plugin.delete.sure")}</div>
+           <div class="modal-message-highlight"><strong>${
+             rawData.name
+           }</strong></div>`,
           {
-            okText: "Delete",
-            cancelText: "Cancel",
+            okText: t("standard.delete"),
+            cancelText: t("standard.cancel"),
             width: "auto",
             height: "auto",
           }
@@ -83,12 +88,16 @@ export async function renderPluginManager(container) {
 
         if (result?.success) {
           EventBus.emit("ui:toast", {
-            message: `Plugin "${rawData.name}" deleted.`,
+            message: `${t("standard.plugin")} "${rawData.name}" ${tLow(
+              "standard.deleted"
+            )}.`,
             variant: "success",
           });
         } else {
           EventBus.emit("ui:toast", {
-            message: `Failed to delete plugin "${rawData.name}": ${result?.error}`,
+            message: `${t("toast.plugin.delete.failed")} "${rawData.name}": ${
+              result?.error
+            }`,
             variant: "error",
           });
         }
@@ -102,7 +111,7 @@ export async function renderPluginManager(container) {
 
     onItemClick: () => {},
 
-    emptyMessage: "No plugins found.",
+    emptyMessage: t("special.noPluginsFound"),
   });
 
   await listManager.loadList();

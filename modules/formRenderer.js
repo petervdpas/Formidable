@@ -14,6 +14,7 @@ import {
   createFormRenderIconButton,
 } from "./uiButtons.js";
 import { fieldGroupRenderer } from "../utils/fieldGroupRenderer.js";
+import { t, tUp } from "../utils/i18n.js";
 
 // ─────────────────────────────────────────────
 // Generic Events helper
@@ -62,20 +63,20 @@ async function buildMetaSection(
   const metaText = document.createElement("div");
   metaText.className = "meta-text";
 
-  const metaLines = [`Filename: ${filename || ""}`];
+  const metaLines = [`${t("standard.filename")}: ${filename || ""}`];
 
   if (meta.id) {
-    metaLines.push(`ID: ${meta.id}`);
+    metaLines.push(`${tUp("standard.id")}: ${meta.id}`);
   } else if (meta.guid) {
-    metaLines.push(`GUID: ${meta.guid}`);
+    metaLines.push(`${tUp("standard.guid")}: ${meta.guid}`);
   }
 
   metaLines.push(
-    `Author: ${meta.author_name || ""}`,
-    `Email: ${meta.author_email || ""}`,
-    `Template: ${meta.template || ""}`,
-    `Created: ${meta.created || ""}`,
-    `Updated: ${meta.updated || ""}`
+    `${t("standard.author")}: ${meta.author_name || ""}`,
+    `${t("standard.email")}: ${meta.author_email || ""}`,
+    `${t("standard.template")}: ${meta.template || ""}`,
+    `${t("standard.created")}: ${meta.created || ""}`,
+    `${t("standard.updated")}: ${meta.updated || ""}`
   );
 
   metaLines.forEach((line) => {

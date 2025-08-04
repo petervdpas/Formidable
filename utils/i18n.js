@@ -24,6 +24,20 @@ export function t(key, fallback = "") {
 }
 
 /**
+ * Lowercase variant of translation
+ */
+export function tLow(key, fallback = "") {
+  return t(key, fallback).toLowerCase();
+}
+
+/**
+ * Uppercase variant of translation
+ */
+export function tUp(key, fallback = "") {
+  return t(key, fallback).toUpperCase();
+}
+
+/**
  * Apply translations to all elements with [data-i18n]
  */
 export function translateDOM(root = document.body) {

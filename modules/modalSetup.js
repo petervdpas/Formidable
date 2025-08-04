@@ -213,7 +213,7 @@ export function setupPluginModal() {
           const folder = folderInput.value.trim();
           if (!folder) {
             EventBus.emit("ui:toast", {
-              message: "Folder name is required.",
+              message: t("toast.folder.required"),
               variant: "error",
             });
             return;
@@ -224,7 +224,7 @@ export function setupPluginModal() {
             target: selectedTarget,
           }).then((result) => {
             EventBus.emit("ui:toast", {
-              message: result.message || result.error || "Plugin created.",
+              message: result.message || result.error || t("toast.plugin.created"),
               variant: result.error ? "error" : "success",
             });
             listManager.loadList();
@@ -414,7 +414,7 @@ export function setupFieldEditModal(field, allFields, onConfirm) {
         keyInput.classList.add("input-error");
         confirmBtn.disabled = true;
         EventBus.emit("ui:toast", {
-          message: "Key cannot be empty.",
+          message: t("toast.key.required"),
           variant: "error",
         });
         return;

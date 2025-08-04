@@ -215,7 +215,7 @@ export async function handleMenuAction(action) {
             "[Menu] No selected_template entry found.",
           ]);
           EventBus.emit("ui:toast", {
-            message: t("toast.noTemplateSelected"),
+            message: t("toast.template.not.selected"),
             variant: "warning",
           });
           return;

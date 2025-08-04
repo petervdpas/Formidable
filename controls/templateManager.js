@@ -56,7 +56,7 @@ function saveTemplate(name, data) {
       name: data.name || "",
       filename: data.filename,
       markdown_template: data.markdown_template || "",
-      sidebar_handling: data.sidebar_handling || "",
+      sidebar_expression: data.sidebar_expression || "",
       enable_collection: data.enable_collection === true,
       fields: sanitizedFields,
     };
@@ -68,7 +68,7 @@ function saveTemplate(name, data) {
           "name",
           "filename",
           "markdown_template",
-          "sidebar_handling",
+          "sidebar_expression",
           "enable_collection",
           "fields",
         ].includes(key)

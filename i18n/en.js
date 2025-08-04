@@ -26,8 +26,6 @@ export default {
   "menu.context.option.template": "Template",
 
   // ── Toast Messages ─────────────────────
-  "toast.noTemplateSelected":
-    "No template selected. Please select a template first.",
   "toast.serverStarted": "Internal server was started.",
   "toast.serverAlreadyRunning": "Internal server is already running.",
   "toast.serverStopped": "Internal server was stopped.",
@@ -36,6 +34,11 @@ export default {
 
   "toast.save.success": "Successfully saved",
   "toast.save.error": "Failed to save",
+  "toast.key.required": "Key cannot be empty.",
+  "toast.folder.required": "Folder name is required.",
+
+  "toast.plugin.created": "Plugin created.",
+  "toast.plugin.delete.failed": "Failed to delete plugin.",
 
   "toast.git.committed": "Committed",
   "toast.git.commit.complete": "Commit complete.",
@@ -47,7 +50,18 @@ export default {
   "toast.git.discarded.changes.in": "Discarded changes in",
   "toast.git.commit.noMessage": "Cannot commit: no message.",
 
+  "toast.profile.invalidName": "Use lowercase, hyphens, and end with .json",
+  "toast.profile.exists": "Profile already exists.",
+  "toast.profile.switchFailed": "Failed to switch profile.",
+
+  "toast.template.not.selected":
+    "No template selected. Please select a template first.",
+  "toast.template.enable.collection":
+    "`Enable Collection` requires at least one GUID field in the template.",
+  "toast.template.save.success": "Template saved successfully",
+
   // ── Special ─────────────────────────
+  "special.user.profile": "User Profile",
   "special.templates.placeholder":
     "Select or create a template-file to begin editing.",
   "special.forms.placeholder": "Select or create a form-file to begin.",
@@ -55,10 +69,13 @@ export default {
   "special.showFlagged": "Show Flagged",
   "special.noTemplatesFound": "No template files found.",
   "special.noMetadataFilesFound": "No metadata files found.",
+  "special.noPluginsFound": "No plugins found.",
+  "special.noProfilesFound": "No profiles found.",
   "special.template.delete.sure":
     "Are you sure you want to delete this template?",
   "special.field.delete.sure": "Are you sure you want to delete this field?",
   "special.file.delete.sure": "Are you sure you want to delete this file?",
+  "special.plugin.delete.sure": "Are you sure you want to delete this plugin?",
 
   // ── Standard translation ─────────────────────
   "standard.storage": "Storage",
@@ -66,6 +83,8 @@ export default {
   "standard.templates": "Templates",
   "standard.form": "Form",
   "standard.forms": "Forms",
+  "standard.field": "Field",
+  "standard.fields": "Fields",
   "standard.flag": "Flag",
   "standard.unflag": "Unflag",
   "standard.off": "Off",
@@ -83,7 +102,8 @@ export default {
   "standard.filename": "Filename",
   "standard.files": "Files",
   "standard.file.s": "File(s)",
-  "standard.id": "ID",
+  "standard.id": "Id",
+  "standard.guid": "Guid",
   "standard.author": "Author",
   "standard.name": "Name",
   "standard.email": "Email",
@@ -100,6 +120,7 @@ export default {
   "standard.running": "Running",
   "standard.stop": "Stop",
   "standard.stopped": "Stopped",
+  "standard.plugin": "Plugin",
   "standard.plugins": "Plugins",
   "standard.view": "View",
   "standard.help": "Help",
@@ -228,11 +249,6 @@ export default {
   "modal.profile.title": "Switch User Profile",
   "modal.profile.label.newProfile": "New Profile",
   "modal.profile.placeholder.newProfile": "e.g., jack.json",
-  "modal.profile.noProfiles": "No profiles found.",
-  "modal.profile.toast.invalidName":
-    "Use lowercase, hyphens, and end with .json",
-  "modal.profile.toast.profileExists": "Profile already exists.",
-  "modal.profile.toast.switchFailed": "Failed to switch profile.",
 
   "modal.git.title": "Git Actions",
   "modal.git.loading.status": "Loading Git Status...",
@@ -247,8 +263,13 @@ export default {
   "modal.workspace.title": "Workspace Settings",
 
   "modal.template.title": "New Template",
+  "modal.template.label.name": "Template Name",
   "modal.template.label.filename": "Filename",
+  "modal.template.label.sidebar": "Sidebar Expression",
   "modal.template.placeholder.filename": "e.g., user-survey",
+  "modal.template.enable.collection": "Enable Collection",
+  "modal.template.label.code": "Template Code",
+  "modal.template.label.code.expand": "CTRL+ENTER for full screen",
 
   "modal.entry.title": "New Entry",
   "modal.entry.label.name": "Name this entry:",
