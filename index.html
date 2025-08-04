@@ -131,6 +131,7 @@
       <div class="modal-header">
         <div class="modal-title-row">
           <h2 data-i18n="standard.settings">Settings</h2>
+          <div id="settings-inject-button"></div>
         </div>
       </div>
       <div class="modal-body" id="settings-body">
@@ -151,7 +152,6 @@
     </div>
 
     <!-- Template Creation Modal -->
-    <!-- Template Creation Modal -->
     <div id="template-modal" class="modal">
       <div class="modal-header">
         <div class="modal-title-row">
@@ -160,7 +160,9 @@
       </div>
       <div class="modal-body">
         <div class="modal-form-row">
-          <label for="template-name" data-i18n="standard.filename">Filename</label>
+          <label for="template-name" data-i18n="standard.filename"
+            >Filename</label
+          >
           <input
             type="text"
             id="template-name"
@@ -287,7 +289,9 @@
     <div id="render-modal" class="modal large">
       <div class="modal-header">
         <div class="modal-title-row">
-          <h2 data-i18n="modal.render.title">Render Markdown &amp; HTML Preview</h2>
+          <h2 data-i18n="modal.render.title">
+            Render Markdown &amp; HTML Preview
+          </h2>
           <!-- Toggle buttons will be injected here -->
         </div>
       </div>

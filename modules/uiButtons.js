@@ -3,6 +3,21 @@
 import { createButton, createIconButton } from "../utils/buttonUtils.js";
 import { t } from "../utils/i18n.js";
 
+export function createSettingsRestartIconButton(onClick, disabled = false) {
+  return createIconButton({
+    iconClass: "fa fa-refresh",
+    className: "btn-icon btn-icon-default btn-icon-small",
+    identifier: "settings-restart",
+    onClick,
+    disabled,
+    attributes: {
+      title: t("tooltip.restart.formidable"),
+      "data-i18n-title": "tooltip.restart.formidable",
+    },
+    ariaLabel: t("aria.restartApp"),
+  });
+}
+
 export function createProfileAddButton(onClick) {
   return createButton({
     text: t("standard.create"),

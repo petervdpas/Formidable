@@ -9,6 +9,7 @@ import {
 } from "../modules/uiButtons.js";
 import { showConfirmModal } from "./modalUtils.js";
 import { fieldTypes } from "./fieldTypes.js";
+import { t } from "./i18n.js";
 
 async function renderFieldElement(
   field,
@@ -202,9 +203,14 @@ async function createLoopItem(
   // Remove button
   const removeBtn = createDeleteLoopItemButton(async () => {
     const confirmed = await showConfirmModal(
-      `<div>Are you sure you want to remove this loop item?</div>
+      `<div>${t("special.loop.delete.sure")}</div>
      <div class="modal-message-highlight"><strong>${previewLabel}</strong>: <em>${previewValue}</em></div>`,
-      { okText: "Delete", cancelText: "Cancel", width: "auto", height: "auto" }
+      {
+        okText: t("standard.delete"),
+        cancelText: t("standard.cancel"),
+        width: "auto",
+        height: "auto",
+      }
     );
     if (confirmed) itemWrapper.remove();
   });

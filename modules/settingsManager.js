@@ -10,7 +10,8 @@ import {
   createFormRowInput,
   addContainerElement,
 } from "../utils/elementBuilders.js";
-import { t } from "../utils/i18n.js";
+import { createDropdown } from "../utils/dropdownUtils.js";
+import { t, getAvailableLanguages } from "../utils/i18n.js";
 
 let cachedConfig = null;
 
@@ -54,12 +55,18 @@ export async function renderSettings() {
   const tabGeneral = document.createElement("div");
   tabGeneral.className = "tab-panel tab-general";
 
+  const languageRow = document.createElement("div");
+  languageRow.id = "settings-language";
+  languageRow.className = "modal-form-row";
+
   addContainerElement({
     parent: tabGeneral,
     tag: "p",
     className: "form-info-text",
     textContent: t("modal.settings.tab.general.description"),
   });
+
+  tabGeneral.appendChild(languageRow);
 
   tabGeneral.appendChild(
     bindFormInput("author-name", "author_name", t("modal.settings.author.name"))
@@ -186,7 +193,11 @@ export async function renderSettings() {
   );
 
   tabServer.appendChild(
-    bindFormInput("internal-server-port", "internal_server_port", t("modal.settings.internal.port"))
+    bindFormInput(
+      "internal-server-port",
+      "internal_server_port",
+      t("modal.settings.internal.port")
+    )
   );
 
   // ─── Advanced Settings ──────────────────────
@@ -263,6 +274,7 @@ export async function renderSettings() {
     },
   });
 
+  setupLanguageDropdown(config);
   setupBindings(config, gitRootPicker);
   return true;
 }
@@ -363,4 +375,33 @@ function bindDirButton(fieldId, configKey) {
 
     EventBus.emit("status:update", `Updated ${configKey}: ${relative}`);
   };
+}
+
+function setupLanguageDropdown(config) {
+
+  createDropdown({
+    containerId: "settings-language",
+    labelText: t("modal.settings.author.language", "Language"),
+    selectedValue: config.language || "en",
+    options: getAvailableLanguages(),
+    onChange: async (value) => {
+      // Persist
+      await EventBus.emit("config:update", { language: value });
+      cachedConfig = await reloadConfig();
+
+      // Load & apply translations immediately
+      try {
+        await loadLocale(value);
+        translateDOM();
+        EventBus.emit("status:update", `Language set to ${value}`);
+        EventBus.emit("i18n:changed", value); // optional hook for other modules
+      } catch (err) {
+        EventBus.emit("logging:error", [
+          "[Settings] Failed to switch language",
+          err,
+        ]);
+        EventBus.emit("status:update", `Failed to switch language to ${value}`);
+      }
+    },
+  });
 }

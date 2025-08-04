@@ -168,6 +168,13 @@ button:disabled,
   color: var(--generic-border-default);
 }
 
+.btn.icon-button.btn-icon-small {
+  font-size: 1.25em;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+}
+
 /* ───── Text Shadow on the icon itself ───── */
 .btn.icon-button i {
   pointer-events: none;

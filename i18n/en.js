@@ -81,6 +81,13 @@ export default {
   "special.field.delete.sure": "Are you sure you want to delete this field?",
   "special.file.delete.sure": "Are you sure you want to delete this file?",
   "special.plugin.delete.sure": "Are you sure you want to delete this plugin?",
+  "special.loop.delete.sure": "Are you sure you want to remove this loop item?",
+  "special.system.restart.sure": "Are you sure you want to restart the system?",
+
+  // ── Language ───────────────────────────
+  "lang.select": "Select Language",
+  "lang.en": "English",
+  "lang.nl": "Dutch",
 
   // ── Standard translation ─────────────────────
   "standard.storage": "Storage",
@@ -94,6 +101,8 @@ export default {
   "standard.unflag": "Unflag",
   "standard.off": "Off",
   "standard.on": "On",
+  "standard.yes": "Yes",
+  "standard.no": "No",
   "standard.on.experimental": "On (Experimental)",
   "standard.cancel": "Cancel",
   "standard.confirm": "Confirm",
@@ -184,6 +193,9 @@ export default {
   "standard.crashed": "Crashed",
   "standard.error": "Error",
 
+  // ── Tooltips ─────────────────────────────
+  "tooltip.restart.formidable": "Restart Formidable",
+
   // ── Button Labels ───────────────────────────
   "button.addField": "+ Add Field",
   "button.generateTemplate": "Generate Template",
@@ -209,6 +221,7 @@ export default {
   "aria.open": "Open {{name}}",
   "aria.deletePlugin": "Delete plugin {{name}}",
   "aria.togglePlugin": "{{action}} plugin {{name}}",
+  "aria.restartApp": "Restart the application",
 
   // Fields
   "field.type": "Field Type",
@@ -239,7 +252,7 @@ export default {
     "Advanced system options. Use with caution.",
   "modal.settings.author.name": "Author Name",
   "modal.settings.author.email": "Author Email",
-  "modal.settings.author.language": "Language (Requires restart)",
+  "modal.settings.author.language": "Language",
   "modal.settings.display.theme": "Display Theme",
   "modal.settings.display.theme.light": "Light",
   "modal.settings.display.theme.dark": "Dark",

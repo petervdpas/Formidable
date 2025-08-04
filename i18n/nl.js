@@ -91,6 +91,13 @@ export default {
     "Weet je zeker dat je dit bestand wilt verwijderen?",
   "special.plugin.delete.sure":
     "Weet je zeker dat je deze plugin wilt verwijderen?",
+  "special.loop.delete.sure":
+    "Weet je zeker dat je dit lusitem wilt verwijderen?",
+  "special.system.restart.sure": "Weet je zeker dat je het systeem wilt herstarten?",
+
+  // ── Language ───────────────────────────
+  "lang.en": "Engels",
+  "lang.nl": "Nederlands",
 
   // ── Standard Translation ─────────────────────
   "standard.storage": "Opslag",
@@ -104,6 +111,8 @@ export default {
   "standard.unflag": "Demarkeren",
   "standard.off": "Uit",
   "standard.on": "Aan",
+  "standard.yes": "Ja",
+  "standard.no": "Nee",
   "standard.on.experimental": "Aan (Experimenteel)",
   "standard.cancel": "Annuleren",
   "standard.confirm": "Bevestigen",
@@ -194,6 +203,9 @@ export default {
   "standard.crashed": "Gecrasht",
   "standard.error": "Fout",
 
+  // ── Tooltips ─────────────────────────────
+  "tooltip.restart.formidable": "Herstart Formidable",
+
   // ── Button Labels ───────────────────────────
   "button.addField": "+ Veld Toevoegen",
   "button.generateTemplate": "Genereer Template",
@@ -219,6 +231,7 @@ export default {
   "aria.open": "{{name}} openen",
   "aria.deletePlugin": "Plugin {{name}} verwijderen",
   "aria.togglePlugin": "{{action}} plugin {{name}}",
+  "aria.restartApp": "Herstart de applicatie",
 
   // Fields
   "field.type": "Veldtype",
@@ -249,7 +262,7 @@ export default {
     "Geavanceerde systeemopties. Gebruik met voorzichtigheid.",
   "modal.settings.author.name": "Auteur Naam",
   "modal.settings.author.email": "Auteur E-mail",
-  "modal.settings.author.language": "Taal (Vereist herstart)",
+  "modal.settings.author.language": "Taal",
   "modal.settings.display.theme": "Weergave Thema",
   "modal.settings.display.theme.light": "Licht",
   "modal.settings.display.theme.dark": "Donker",

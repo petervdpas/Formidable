@@ -1,5 +1,11 @@
 // utils/i18n.js
 
+const options = [
+  { value: "en" },
+  { value: "nl" },
+  // more...
+];
+
 let currentLocale = "en";
 let translations = {};
 
@@ -54,4 +60,14 @@ export function translateDOM(root = document.body) {
     const value = t(key);
     if (value) el.setAttribute("title", value);
   }
+}
+
+/**
+ * Return a list of available languages with translated labels
+ */
+export function getAvailableLanguages() {
+  return options.map(({ value }) => ({
+    value,
+    label: t(`lang.${value}`),
+  }));
 }

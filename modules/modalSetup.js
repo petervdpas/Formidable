@@ -14,6 +14,7 @@ import { renderPluginManager } from "./pluginManagerUI.js";
 import { renderHelp } from "./helperUI.js";
 import { renderGitStatus } from "./gitActions.js";
 import {
+  createSettingsRestartIconButton,
   createShowMarkdownButton,
   createShowPreviewButton,
   createPaneCloseButton,
@@ -66,9 +67,31 @@ export function setupSettingsModal() {
     width: "36em",
     height: "20em",
     onOpen: async () => {
+      const injectButton = document.getElementById("settings-inject-button");
+      if (injectButton) {
+        injectButton.innerHTML = "";
+        injectButton.appendChild(
+          createSettingsRestartIconButton(async () => {
+            const confirmed = await showConfirmModal(
+              `<div>${t("special.system.restart.sure")}</div>`,
+              {
+                okText: t("standard.yes"),
+                cancelText: t("standard.no"),
+                width: "auto",
+                height: "auto",
+              }
+            );
+            if (!confirmed) return;
+
+            location.reload();
+          })
+        );
+      }
+
       const ok = await renderSettings();
-      if (!ok)
+      if (!ok) {
         EventBus.emit("logging:warning", ["Settings container not found"]);
+      }
     },
   });
 }
@@ -224,7 +247,8 @@ export function setupPluginModal() {
             target: selectedTarget,
           }).then((result) => {
             EventBus.emit("ui:toast", {
-              message: result.message || result.error || t("toast.plugin.created"),
+              message:
+                result.message || result.error || t("toast.plugin.created"),
               variant: result.error ? "error" : "success",
             });
             listManager.loadList();
