@@ -160,7 +160,7 @@ export async function handleSaveForm(payload, respond) {
       EventBus.emit("status:update", `Failed to save: ${result.error}`);
 
       EventBus.emit("ui:toast", {
-        message: `${t("toast.save.error")}: ${shortName}`,
+        message: `${t("toast.save.failed")}: ${shortName}`,
         variant: "error",
         duration: 4000,
       });

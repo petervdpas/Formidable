@@ -3,6 +3,7 @@
 import { EventBus } from "../modules/eventBus.js";
 import { fieldTypes } from "./fieldTypes.js";
 import * as fieldRenderers from "./fieldRenderers.js";
+import { t } from "./i18n.js";
 
 export function waitForElement(selector, root = document.body, timeout = 5000) {
   return new Promise((resolve, reject) => {
@@ -455,8 +456,8 @@ export function copyToClipboard(
   button,
   contentFn,
   {
-    successMessage = "Copied to clipboard",
-    errorMessage = "Failed to copy",
+    successMessage = `${t("toast.copy.clipboard")}.`,
+    errorMessage = `${t("toast.copy.failed")}.`,
   } = {}
 ) {
   if (!button) {
@@ -549,7 +550,7 @@ export function createSortable(
       ) {
         lastToastTime = now;
         EventBus.emit("ui:toast", {
-          message: "Collapse the item before dragging.",
+          message: t("toast.dragging.item.collapse"),
           variant: "info",
           duration: 2500,
         });

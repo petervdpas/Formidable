@@ -33,12 +33,17 @@ export default {
   "toast.onPort": "on port",
 
   "toast.save.success": "Successfully saved",
-  "toast.save.error": "Failed to save",
+  "toast.copy.clipboard": "Copied to clipboard",
+  "toast.copy.failed": "Failed to copy",
+  "toast.save.failed": "Failed to save",
   "toast.key.required": "Key cannot be empty.",
   "toast.folder.required": "Folder name is required.",
+  "toast.dragging.item.collapse": "Collapse the item before dragging.",
+  "toast.markdown.saved": "Saved markdown to",
 
   "toast.plugin.created": "Plugin created.",
   "toast.plugin.delete.failed": "Failed to delete plugin.",
+  "toast.plugin.run": "Plugin run",
 
   "toast.git.committed": "Committed",
   "toast.git.commit.complete": "Commit complete.",
@@ -175,6 +180,9 @@ export default {
   "standard.unstaged": "Unstaged",
   "standard.remote": "Remote",
   "standard.loading": "Loading...",
+  "standard.crash": "Crash",
+  "standard.crashed": "Crashed",
+  "standard.error": "Error",
 
   // ── Button Labels ───────────────────────────
   "button.addField": "+ Add Field",

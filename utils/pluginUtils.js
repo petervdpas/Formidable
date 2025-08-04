@@ -12,6 +12,7 @@ import {
   getUserConfig as baseGetUserConfig,
   saveUserConfig,
 } from "./configUtil.js";
+import { t } from "./i18n.js";
 
 // Plugin-specific allowed keys
 const pluginAllowedKeys = [
@@ -255,7 +256,7 @@ export async function saveMarkdownTo({
 
   if (showToast) {
     EventBus.emit("ui:toast", {
-      message: `Saved markdown to ${markdownFilePath}`,
+      message: `${t("toast.markdown.saved")} ${markdownFilePath}`,
       variant: "success",
     });
   }

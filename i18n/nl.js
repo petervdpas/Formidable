@@ -38,12 +38,17 @@ export default {
   "toast.onPort": "op poort",
 
   "toast.save.success": "Succesvol opgeslagen",
-  "toast.save.error": "Opslaan mislukt.",
+  "toast.copy.clipboard": "Gekopieerd naar klembord",
+  "toast.copy.failed": "Kopiëren mislukt",
+  "toast.save.failed": "Opslaan mislukt",
   "toast.key.required": "Sleutel mag niet leeg zijn.",
   "toast.folder.required": "Folder naam is vereist.",
+  "toast.dragging.item.collapse": "Vouw het item samen voordat je het sleept.",
+  "toast.markdown.saved": "Markdown opgeslagen in",
 
   "toast.plugin.created": "Plugin aangemaakt.",
   "toast.plugin.delete.failed": "Verwijderen van plugin mislukt.",
+  "toast.plugin.run": "Plugin uitgevoerd",
 
   "toast.git.committed": "Gecommit",
   "toast.git.commit.complete": "Commit voltooid.",
@@ -185,6 +190,9 @@ export default {
   "standard.unstaged": "Niet geselecteerd",
   "standard.remote": "Afgelegen",
   "standard.loading": "Laden...",
+  "standard.crash": "Crash",
+  "standard.crashed": "Gecrasht",
+  "standard.error": "Fout",
 
   // ── Button Labels ───────────────────────────
   "button.addField": "+ Veld Toevoegen",
@@ -277,7 +285,7 @@ export default {
   "modal.template.title": "Nieuw sjabloon",
   "modal.template.label.name": "Sjabloonnaam",
   "modal.template.label.filename": "Bestandsnaam",
-  "modal.template.label.sidebar": "Sidebar Expressie",
+  "modal.template.label.sidebar": "Zijpaneel Expressie",
   "modal.template.placeholder.filename": "bijv. gebruikers-enquête",
   "modal.template.enable.collection": "Inschakelen Verzameling",
   "modal.template.label.code": "Sjablooncode",

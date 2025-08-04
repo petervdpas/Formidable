@@ -1,6 +1,7 @@
 // modules/handlers/pluginHandler.js
 
 import { EventBus } from "../eventBus.js";
+import { t, tLow } from "../../utils/i18n.js";
 
 // ─────────────────────────────────────────────────────────────
 // Persistent plugin event registry (FIX: survives reloads)
@@ -161,7 +162,7 @@ export async function handleRunPlugin(
     const variant = result?.error ? "error" : "success";
 
     EventBus.emit("ui:toast", {
-      message: `Plugin run: ${name} (${target})`,
+      message: `${t("toast.plugin.run")}: ${name} (${target})`,
       variant,
     });
 
@@ -173,7 +174,7 @@ export async function handleRunPlugin(
     ]);
 
     EventBus.emit("ui:toast", {
-      message: `Plugin "${name}" (${target}) crashed.`,
+      message: `${t("standard.plugin")} "${name}" (${target}) ${tLow("standard.crashed")}.`,
       variant: "error",
     });
 
