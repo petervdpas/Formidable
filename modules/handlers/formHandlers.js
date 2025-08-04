@@ -146,7 +146,7 @@ export async function handleSaveForm(payload, respond) {
       EventBus.emit("status:update", `Saved data: ${shortName}`);
 
       EventBus.emit("ui:toast", {
-        message: `Successfully saved data: ${shortName}`,
+        message: `${t("toast.save.success")}: ${shortName}`,
         variant: "success",
         duration: 4000,
       });
@@ -160,7 +160,7 @@ export async function handleSaveForm(payload, respond) {
       EventBus.emit("status:update", `Failed to save: ${result.error}`);
 
       EventBus.emit("ui:toast", {
-        message: `Failed to save data: ${shortName}`,
+        message: `${t("toast.save.error")}: ${shortName}`,
         variant: "error",
         duration: 4000,
       });
@@ -194,7 +194,7 @@ export async function handleDeleteForm(
       if (container) {
         clearContainerUI(
           container,
-          "sidebar.forms.placeholder",
+          "special.forms.placeholder",
           "Select or create a form-file to begin."
         );
       }

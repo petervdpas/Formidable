@@ -10,6 +10,7 @@ import {
   createCopyMarkdownButton,
   createCopyPreviewButton,
 } from "./uiButtons.js";
+import { t } from "../utils/i18n.js";
 
 const log = (...args) => EventBus.emit("logging:default", args);
 const warn = (...args) => EventBus.emit("logging:warning", args);
@@ -99,11 +100,11 @@ export async function deleteForm(container, template, datafile) {
   }
 
   const confirmed = await showConfirmModal(
-    `<div>Are you sure you want to delete this file?</div>
+    `<div>${t("special.file.delete.sure")}</div>
      <div class="modal-message-highlight"><em>${datafile}</em></div>`,
     {
-      okText: "Delete",
-      cancelText: "Cancel",
+      okText: t("standard.delete"),
+      cancelText: t("standard.cancel"),
       width: "auto",
       height: "auto",
     }

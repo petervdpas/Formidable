@@ -1,6 +1,10 @@
 // i18n/en.js
 
 export default {
+  // ── General ───────────────────────────────
+  "status.ready": "Ready.",
+  "resize.handle.title": "Drag to Resize",
+
   // ── Menu ───────────────────────────────
   "menu.file.openTemplateFolder": "Open Template Folder",
   "menu.file.openStorageFolder": "Open Storage Folder",
@@ -30,10 +34,31 @@ export default {
   "toast.serverNotRunning": "Internal server wasn't running.",
   "toast.onPort": "on port",
 
+  "toast.save.success": "Successfully saved",
+  "toast.save.error": "Failed to save",
+
+  "toast.git.committed": "Committed",
+  "toast.git.commit.complete": "Commit complete.",
+  "toast.git.pushed": "Pushed",
+  "toast.git.push.complete": "Push complete.",
+  "toast.git.pulled": "Pulled",
+  "toast.git.pull.complete": "Pull complete.",
+  "toast.git.discard.failed": "Failed to discard",
+  "toast.git.discarded.changes.in": "Discarded changes in",
+  "toast.git.commit.noMessage": "Cannot commit: no message.",
+
+  // ── Special ─────────────────────────
+  "special.templates.placeholder":
+    "Select or create a template-file to begin editing.",
+  "special.forms.placeholder": "Select or create a form-file to begin.",
   "special.showAll": "Show All",
   "special.showFlagged": "Show Flagged",
   "special.noTemplatesFound": "No template files found.",
   "special.noMetadataFilesFound": "No metadata files found.",
+  "special.template.delete.sure":
+    "Are you sure you want to delete this template?",
+  "special.field.delete.sure": "Are you sure you want to delete this field?",
+  "special.file.delete.sure": "Are you sure you want to delete this file?",
 
   // ── Standard translation ─────────────────────
   "standard.storage": "Storage",
@@ -156,17 +181,10 @@ export default {
   "aria.deletePlugin": "Delete plugin {{name}}",
   "aria.togglePlugin": "{{action}} plugin {{name}}",
 
-  // ── Menus & Sidebars ─────────────────────────
-  "sidebar.templates.title": "Templates",
-  "sidebar.templates.placeholder":
-    "Select or create a template-file to begin editing.",
-  "sidebar.forms.title": "Forms",
-  "sidebar.forms.placeholder": "Select or create a form-file to begin.",
-  "status.ready": "Ready.",
-  "resize.handle.title": "Drag to Resize",
-
   // Fields
+  "field.type": "Field Type",
   "field.expression": "Expression field",
+  "field.summary": "Summary field",
   "field.twoColumn": "Two columns",
   "field.placeholder.description": "Optional description",
   "field.placeholder.default": "Set the default value for this field",
@@ -226,30 +244,27 @@ export default {
   "modal.git.commit.message": "Commit Message",
   "modal.git.commit.placeholder": "e.g. Update README and fix typos",
 
-  "toast.git.committed": "Committed",
-  "toast.git.commit.complete": "Commit complete.",
-  "toast.git.pushed": "Pushed",
-  "toast.git.push.complete": "Push complete.",
-  "toast.git.pulled": "Pulled",
-  "toast.git.pull.complete": "Pull complete.",
-  "toast.git.discard.failed": "Failed to discard",
-  "toast.git.discarded.changes.in": "Discarded changes in",
-  "toast.git.commit.noMessage": "Cannot commit: no message.",
-
   "modal.workspace.title": "Workspace Settings",
+
   "modal.template.title": "New Template",
   "modal.template.label.filename": "Filename",
   "modal.template.placeholder.filename": "e.g., user-survey",
+
   "modal.entry.title": "New Entry",
   "modal.entry.label.name": "Name this entry:",
   "modal.entry.placeholder.name": "e.g. my-article-title",
   "modal.entry.label.appendDate": "Append date (YYYYMMDD)",
+
   "modal.field.title": "Edit Field",
+
   "modal.render.title": "Render Markdown & HTML Preview",
-  "pane.preview": "HTML Preview",
+
   "modal.confirm.message": "Are you sure?",
+
   "modal.plugins.title": "Plugin Manager",
+
   "modal.help.title": "Formidable Help Pages",
+
   "modal.about.title": "About Formidable",
   "modal.about.description":
     "Formidable is a Template/Form Editor created in Electron.",

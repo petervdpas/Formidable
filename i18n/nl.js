@@ -1,6 +1,10 @@
 // i18n/nl.js
 
 export default {
+  // ── General ───────────────────────────────
+  "status.ready": "Klaar.",
+  "resize.handle.title": "Sleep om te vergroten/verkleinen",
+
   // ── Menu ───────────────────────────────
   "menu.file.openTemplateFolder": "Open sjablonenmap",
   "menu.file.openStorageFolder": "Open opslagmap",
@@ -35,10 +39,34 @@ export default {
   "toast.stopped": "Gestopt",
   "toast.onPort": "op poort",
 
+  "toast.save.success": "Succesvol opgeslagen",
+  "toast.save.error": "Opslaan mislukt",
+
+  "toast.git.committed": "Gecommit",
+  "toast.git.commit.complete": "Commit voltooid.",
+  "toast.git.pushed": "Ge-pusht",
+  "toast.git.push.complete": "Push voltooid.",
+  "toast.git.pulled": "Ge-pulled",
+  "toast.git.pull.complete": "Pull voltooid.",
+  "toast.git.discard.failed": "Verwerpen mislukt",
+  "toast.git.discarded.changes.in": "Wijzigingen verworpen in",
+  "toast.git.commit.noMessage": "Kan niet committen: geen bericht opgegeven.",
+
+  // ── Special ─────────────────────────
+  "special.templates.placeholder":
+    "Selecteer of maak een sjabloonbestand om te bewerken.",
+  "special.forms.placeholder":
+    "Selecteer of maak een formulierbestand om te beginnen.",
   "special.showAll": "Toon alles",
   "special.showFlagged": "Gemarkeerd weergeven",
   "special.noTemplatesFound": "Geen sjabloonbestanden gevonden.",
   "special.noMetadataFilesFound": "Geen metadata-bestanden gevonden.",
+  "special.template.delete.sure":
+    "Weet je zeker dat je dit sjabloon wilt verwijderen?",
+  "special.field.delete.sure":
+    "Weet je zeker dat je dit veld wilt verwijderen?",
+  "special.file.delete.sure":
+    "Weet je zeker dat je dit bestand wilt verwijderen?",
 
   // ── Standard Translation ─────────────────────
   "standard.storage": "Opslag",
@@ -161,18 +189,10 @@ export default {
   "aria.deletePlugin": "Plugin {{name}} verwijderen",
   "aria.togglePlugin": "{{action}} plugin {{name}}",
 
-  // ── Menus & Sidebars ─────────────────────────
-  "sidebar.templates.title": "Sjablonen",
-  "sidebar.templates.placeholder":
-    "Selecteer of maak een sjabloonbestand om te bewerken.",
-  "sidebar.forms.title": "Formulieren",
-  "sidebar.forms.placeholder":
-    "Selecteer of maak een formulierbestand om te beginnen.",
-  "status.ready": "Klaar.",
-  "resize.handle.title": "Sleep om te vergroten/verkleinen",
-
   // Fields
+  "field.type": "Veldtype",
   "field.expression": "Expressieveld",
+  "field.summary": "Samenvattingsveld",
   "field.twoColumn": "Twee kolommen",
   "field.placeholder.description": "Optionele beschrijving",
   "field.placeholder.default": "Stel de standaardwaarde in voor dit veld",
@@ -234,30 +254,27 @@ export default {
   "modal.git.commit.placeholder":
     "bijv. README bijgewerkt en typefouten gecorrigeerd",
 
-  "toast.git.committed": "Gecommit",
-  "toast.git.commit.complete": "Commit voltooid.",
-  "toast.git.pushed": "Ge-pusht",
-  "toast.git.push.complete": "Push voltooid.",
-  "toast.git.pulled": "Ge-pulled",
-  "toast.git.pull.complete": "Pull voltooid.",
-  "toast.git.discard.failed": "Verwerpen mislukt",
-  "toast.git.discarded.changes.in": "Wijzigingen verworpen in",
-  "toast.git.commit.noMessage": "Kan niet committen: geen bericht opgegeven.",
-
   "modal.workspace.title": "Werkruimte-instellingen",
+
   "modal.template.title": "Nieuw sjabloon",
   "modal.template.label.filename": "Bestandsnaam",
   "modal.template.placeholder.filename": "bijv. gebruikers-enquête",
+
   "modal.entry.title": "Nieuwe invoer",
   "modal.entry.label.name": "Geef deze invoer een naam:",
   "modal.entry.placeholder.name": "bijv. mijn-artikel-titel",
   "modal.entry.label.appendDate": "Datum toevoegen (JJJJMMDD)",
+
   "modal.field.title": "Veld bewerken",
+
   "modal.render.title": "Genereer Markdown & HTML Voorbeeld",
-  "pane.preview": "HTML Voorbeeld",
+
   "modal.confirm.message": "Weet je het zeker?",
+
   "modal.plugins.title": "Pluginbeheer",
+
   "modal.help.title": "Formidable Help-pagina's",
+
   "modal.about.title": "Over Formidable",
   "modal.about.description":
     "Formidable is een Sjabloon/Formulier Editor gebouwd met Electron.",

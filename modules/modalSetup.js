@@ -372,7 +372,7 @@ export function setupFieldEditModal(field, allFields, onConfirm) {
   // Create the type dropdown
   const typeDropdown = createDropdown({
     containerId: "edit-type-container",
-    labelText: "Type",
+    labelText: t("field.type"),
     options: typeOptions,
     selectedValue: "text",
     onChange: (val) => {
@@ -395,7 +395,7 @@ export function setupFieldEditModal(field, allFields, onConfirm) {
   // Create the summary field dropdown
   const summaryFieldDropdown = createDropdown({
     containerId: "edit-summary-field-container",
-    labelText: "Summary Field",
+    labelText: t("field.summary"),
     options: summaryOptions,
     selectedValue: field.summary_field || "",
     onChange: (val) => {

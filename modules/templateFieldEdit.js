@@ -19,6 +19,7 @@ import {
   getSupportedOptionTypes,
   setupOptionsEditor,
 } from "../utils/optionsEditor.js";
+import { t } from "../utils/i18n.js";
 
 function setupFieldEditor(container, onChange, allFields = []) {
   const dom = {
@@ -354,11 +355,11 @@ export function renderFieldList(
       const removedType = removed.type;
 
       const confirmed = await showConfirmModal(
-        `<div>Are you sure you want to delete this field?</div>
+        `<div>${t("special.field.delete.sure")}</div>
          <div class="modal-message-highlight"><strong>${removedLabel}</strong></div>`,
         {
-          okText: "Delete",
-          cancelText: "Cancel",
+          okText: t("standard.delete"),
+          cancelText: t("standard.cancel"),
           variant: "danger",
           width: "auto",
           height: "auto",

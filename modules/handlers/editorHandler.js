@@ -4,6 +4,7 @@ import { EventBus } from "../eventBus.js";
 import { getValue as getMarkdownTemplate } from "../templateCodemirror.js";
 import { showConfirmModal } from "../../utils/modalUtils.js";
 import { clearContainerUI } from "../../utils/formUtils.js";
+import { t } from "../../utils/i18n.js";
 
 export async function handleSaveTemplate({ container, fields, callback }) {
   const name = container.querySelector("#yaml-name").value.trim();
@@ -53,11 +54,11 @@ export async function handleDeleteTemplate(container) {
   }
 
   const confirmed = await showConfirmModal(
-    `<div>Are you sure you want to delete this template?</div>
+    `<div>${t("special.template.delete.sure")}</div>
      <div class="modal-message-highlight"><em>${template}</em></div>`,
     {
-      okText: "Delete",
-      cancelText: "Cancel",
+      okText: t("standard.delete"),
+      cancelText: t("standard.cancel"),
       width: "auto",
       height: "auto",
     }
@@ -72,7 +73,7 @@ export async function handleDeleteTemplate(container) {
   if (success) {
     clearContainerUI(
       container,
-      "sidebar.templates.placeholder",
+      "special.templates.placeholder",
       "Select or create a template-file to begin."
     );
 
