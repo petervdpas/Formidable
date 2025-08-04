@@ -10,7 +10,7 @@ import {
 import { showConfirmModal } from "../utils/modalUtils.js";
 import { t, tLow } from "../utils/i18n.js";
 
-export async function renderPluginManager(container) {
+export async function renderPluginManager(container, modalApi) {
   const listManager = createListManager({
     elementId: "plugin-list",
     itemClass: "plugin-list-item",
@@ -18,15 +18,13 @@ export async function renderPluginManager(container) {
 
     fetchListFunction: async () => {
       const result = await EventBus.emitWithResponse("plugin:list", null);
-      return (result || []).map((p) => ({
-        ...p,
-        display: p.name,
-      }));
+      return (result || []).map((p) => ({ ...p, display: p.name }));
     },
 
     renderItemExtra: async ({ subLabelNode, flagNode, rawData }) => {
       subLabelNode.textContent = rawData.description || "(No description)";
 
+      // Toggle enable/disable
       const toggleBtn = createPluginToggleButton(
         rawData.name,
         rawData.enabled,
@@ -35,38 +33,47 @@ export async function renderPluginManager(container) {
 
           if (typeof rawData.name !== "string") {
             EventBus.emit("logging:error", [
-              `[PluginToggle] Invalid plugin name.`,
+              "[PluginToggle] Invalid plugin name.",
               rawData,
             ]);
             return;
           }
 
-          const result = await EventBus.emitWithResponse("plugin:update", {
-            folder: rawData.name,
-            updates: { enabled: newState },
-          });
+          modalApi?.setDisabled();
+          try {
+            const result = await EventBus.emitWithResponse("plugin:update", {
+              folder: rawData.name,
+              updates: { enabled: newState },
+            });
 
-          if (result?.success) {
-            EventBus.emit("ui:toast", {
-              message: `${t("standard.plugin")} "${rawData.name}" ${
-                newState ? tLow("standard.enabled") : tLow("standard.disabled")
-              }.`,
-              variant: newState ? "success" : "warn",
-            });
-          } else {
-            EventBus.emit("ui:toast", {
-              message: `${t("toast.plugin.update.failed")} "${rawData.name}": ${
-                result?.error
-              }`,
-              variant: "error",
-            });
+            if (result?.success) {
+              EventBus.emit("ui:toast", {
+                message: `${t("standard.plugin")} "${rawData.name}" ${
+                  newState
+                    ? tLow("standard.enabled")
+                    : tLow("standard.disabled")
+                }.`,
+                variant: newState ? "success" : "warn",
+              });
+            } else {
+              EventBus.emit("ui:toast", {
+                message: `${t("toast.plugin.update.failed")} "${
+                  rawData.name
+                }": ${result?.error}`,
+                variant: "error",
+              });
+            }
+
+            await listManager.loadList();
+          } finally {
+            modalApi?.setEnabled();
           }
-
-          await listManager.loadList();
         }
       );
 
       const deleteBtn = createPluginDeleteButton(rawData.name, async () => {
+        modalApi?.setDisabled();
+
         const confirmed = await showConfirmModal(
           `<div>${t("special.plugin.delete.sure")}</div>
            <div class="modal-message-highlight"><strong>${
@@ -80,29 +87,36 @@ export async function renderPluginManager(container) {
           }
         );
 
-        if (!confirmed) return;
-
-        const result = await EventBus.emitWithResponse("plugin:delete", {
-          folder: rawData.name,
-        });
-
-        if (result?.success) {
-          EventBus.emit("ui:toast", {
-            message: `${t("standard.plugin")} "${rawData.name}" ${tLow(
-              "standard.deleted"
-            )}.`,
-            variant: "success",
-          });
-        } else {
-          EventBus.emit("ui:toast", {
-            message: `${t("toast.plugin.delete.failed")} "${rawData.name}": ${
-              result?.error
-            }`,
-            variant: "error",
-          });
+        if (!confirmed) {
+          modalApi?.setEnabled();
+          return;
         }
 
-        await listManager.loadList();
+        try {
+          const result = await EventBus.emitWithResponse("plugin:delete", {
+            folder: rawData.name,
+          });
+
+          if (result?.success) {
+            EventBus.emit("ui:toast", {
+              message: `${t("standard.plugin")} "${rawData.name}" ${tLow(
+                "standard.deleted"
+              )}.`,
+              variant: "success",
+            });
+          } else {
+            EventBus.emit("ui:toast", {
+              message: `${t("toast.plugin.delete.failed")} "${rawData.name}": ${
+                result?.error
+              }`,
+              variant: "error",
+            });
+          }
+
+          await listManager.loadList();
+        } finally {
+          modalApi?.setEnabled();
+        }
       });
 
       const btnGroup = buildButtonGroup(toggleBtn, deleteBtn);
@@ -110,7 +124,6 @@ export async function renderPluginManager(container) {
     },
 
     onItemClick: () => {},
-
     emptyMessage: t("special.noPluginsFound"),
   });
 

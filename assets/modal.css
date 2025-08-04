@@ -41,6 +41,22 @@
     pointer-events: auto;
 }
 
+/* ───── Modal Disabled State ───── */
+.modal.modal-disabled {
+  pointer-events: none;
+  opacity: 0.9;
+  transition: opacity 0.1s ease;
+}
+
+.modal.modal-disabled * {
+  pointer-events: none !important;
+}
+
+.modal.modal-disabled .btn-close,
+.modal.modal-disabled .modal-resizer {
+  display: none !important;
+}
+
 .modal-message-highlight {
     margin-top: 0.75em;
     padding: 8px 12px;

@@ -38,18 +38,31 @@ export function setupModal(
     height = "70%",
     maxHeight = null,
     resizable = true,
+    inertBackground = false,
+    disableCloseWhenDisabled = true,
   } = {}
 ) {
   const modal = document.getElementById(modalId);
   const backdrop = document.getElementById("modalBackdrop");
+  if (!modal) {
+    console.warn(`[setupModal] Modal #${modalId} not found`);
+    return {
+      show: () => {},
+      hide: () => {},
+      setDisabled: () => {},
+      setEnabled: () => {},
+      isDisabled: () => false,
+    };
+  }
 
+  // Resolve open trigger
   const open =
     typeof openBtn === "string" ? document.getElementById(openBtn) : openBtn;
 
+  // Resolve/create close button
   let close = closeBtn;
-
   if (typeof closeBtn === "string") {
-    const header = modal?.querySelector(".modal-header");
+    const header = modal.querySelector(".modal-header");
     header?.querySelectorAll(".btn-close")?.forEach((el) => el.remove());
 
     const newBtn = createModalCloseButton({
@@ -64,26 +77,96 @@ export function setupModal(
     close = newBtn;
   }
 
+  // Dimensions (skip if modal has a fixed "large" class)
   if (!modal.classList.contains("large")) {
     modal.style.width = width;
     modal.style.height = height;
   }
+  if (maxHeight) modal.style.maxHeight = maxHeight;
 
-  if (maxHeight) {
-    modal.style.maxHeight = maxHeight;
-  }
-
+  // Optional resizer
+  let resizer = null;
   if (resizable) {
-    const resizer = document.createElement("div");
+    resizer = document.createElement("div");
     resizer.classList.add("modal-resizer");
     modal.appendChild(resizer);
     enableElementResizing(modal, resizer);
   }
 
+  // ────────────────────────────────────────────────────────────
+  // Disabled / Inert handling
+  // ────────────────────────────────────────────────────────────
   let removeEscListener = null;
+  let isDisabled = false;
+  let inertSet = false;
+  let previouslyInert = [];
 
+  function setBackgroundInert(excludeEl) {
+    if (inertSet) return;
+    previouslyInert = [];
+    const siblings = document.querySelectorAll("body > *:not(script):not(style)");
+    siblings.forEach((el) => {
+      // Only mark true siblings (exclude modal itself and its descendants)
+      if (el !== excludeEl && !excludeEl.contains(el)) {
+        el.setAttribute("inert", "");
+        el.setAttribute("aria-hidden", "true");
+        previouslyInert.push(el);
+      }
+    });
+    inertSet = true;
+  }
+
+  function unsetBackgroundInert() {
+    if (!inertSet) return;
+    previouslyInert.forEach((el) => {
+      el.removeAttribute("inert");
+      el.removeAttribute("aria-hidden");
+    });
+    previouslyInert = [];
+    inertSet = false;
+  }
+
+  function setDisabled() {
+    if (isDisabled) return;
+    isDisabled = true;
+    modal.classList.add("modal-disabled");
+    modal.setAttribute("aria-busy", "true");
+
+    if (disableCloseWhenDisabled && close) {
+      try { close.disabled = true; } catch (_) {}
+    }
+    if (resizer) resizer.style.display = "none";
+
+    // Disable ESC while disabled
+    if (removeEscListener) {
+      removeEscListener();
+      removeEscListener = null;
+    }
+  }
+
+  function setEnabled() {
+    if (!isDisabled) return;
+    isDisabled = false;
+    modal.classList.remove("modal-disabled");
+    modal.removeAttribute("aria-busy");
+
+    if (disableCloseWhenDisabled && close) {
+      try { close.disabled = false; } catch (_) {}
+    }
+    if (resizer) resizer.style.display = "";
+
+    // Re-enable ESC if desired and still open
+    if (escToClose && modal.classList.contains("show") && !removeEscListener) {
+      removeEscListener = enableEscToClose(hide);
+    }
+  }
+
+  // ────────────────────────────────────────────────────────────
+  // Show / Hide
+  // ────────────────────────────────────────────────────────────
   const show = () => {
-    onOpen(modal);
+    // Allow onOpen to run before we mark visible (so it can inject UI)
+    onOpen(modal, api);
     modal.classList.add("show");
 
     if (backdrop) {
@@ -91,12 +174,17 @@ export function setupModal(
       backdrop.classList.add("show");
     }
 
-    if (escToClose) {
+    if (inertBackground) setBackgroundInert(modal);
+
+    if (escToClose && !isDisabled) {
       removeEscListener = enableEscToClose(hide);
     }
   };
 
   const hide = () => {
+    // Do nothing if disabled
+    if (isDisabled) return;
+
     modal.classList.remove("show");
 
     if (backdrop && openModalCount > 0) {
@@ -106,23 +194,41 @@ export function setupModal(
       }
     }
 
-    onClose(modal);
+    unsetBackgroundInert();
+    onClose(modal, api);
+
     if (removeEscListener) {
       removeEscListener();
       removeEscListener = null;
     }
   };
 
+  // ────────────────────────────────────────────────────────────
+  // Listeners
+  // ────────────────────────────────────────────────────────────
   if (open) open.addEventListener("click", show);
-  if (close) close.addEventListener("click", hide);
-
-  if (backdropClick) {
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) hide();
+  if (close) {
+    close.addEventListener("click", () => {
+      if (!isDisabled) hide();
     });
   }
 
-  return { show, hide };
+  if (backdropClick) {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal && !isDisabled) hide();
+    });
+  }
+
+  // Public API
+  const api = {
+    show,
+    hide,
+    setDisabled,
+    setEnabled,
+    isDisabled: () => isDisabled,
+  };
+
+  return api;
 }
 
 export function setupPluginModal({
@@ -131,9 +237,12 @@ export function setupPluginModal({
   body = "",
   width = "40%",
   height = "auto",
+  maxHeight = null,
   resizable = true,
   escToClose = true,
   backdropClick = true,
+  inertBackground = false,
+  disableCloseWhenDisabled = true,
   onOpen = () => {},
   onClose = () => {},
   prepareBody = null,
@@ -146,6 +255,7 @@ export function setupPluginModal({
     existing.remove();
   }
 
+  // ── Shell
   const modal = document.createElement("div");
   modal.id = id;
   modal.className = "modal";
@@ -195,25 +305,57 @@ export function setupPluginModal({
     }
   }
 
-  // ── Assemble
+  // Assemble into DOM
   modal.appendChild(header);
   modal.appendChild(bodyEl);
-
   const host = document.getElementById("plugin-executor") || document.body;
   host.appendChild(modal);
 
-  const { show, hide } = setupModal(id, {
-    closeBtn: `${id}-close`,
+  // We want plugin onOpen/onClose to receive the full plugin API (incl. disable funcs).
+  // Use a closure that we fill after setupModal returns.
+  let pluginApi = null;
+  const wrappedOnOpen = (el, baseApi) => {
+    try {
+      onOpen(el, pluginApi || baseApi);
+    } catch (err) {
+      EventBus.emit("logging:error", ["[setupPluginModal] onOpen failed:", err]);
+    }
+  };
+  const wrappedOnClose = (el, baseApi) => {
+    try {
+      onClose(el, pluginApi || baseApi);
+    } catch (err) {
+      EventBus.emit("logging:error", ["[setupPluginModal] onClose failed:", err]);
+    }
+  };
+
+  // Delegate to setupModal for behavior and controls.
+  const baseApi = setupModal(id, {
+    closeBtn: `${id}-close`,        // setupModal will create/attach the close button
     escToClose,
     backdropClick,
     width,
     height,
+    maxHeight,
     resizable,
-    onOpen,
-    onClose,
+    inertBackground,
+    disableCloseWhenDisabled,
+    onOpen: wrappedOnOpen,
+    onClose: wrappedOnClose,
   });
 
-  return { modal, show, hide, changeBody };
+  // Compose and return the full plugin API (now includes disable controls).
+  pluginApi = {
+    modal,
+    changeBody,
+    show: baseApi.show,
+    hide: baseApi.hide,
+    setDisabled: baseApi.setDisabled,
+    setEnabled: baseApi.setEnabled,
+    isDisabled: baseApi.isDisabled,
+  };
+
+  return pluginApi;
 }
 
 export function setupPopup(popupId, defaultOptions = {}) {

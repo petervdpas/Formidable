@@ -59,41 +59,55 @@ export function setupProfileModal() {
 }
 
 export function setupSettingsModal() {
-  return setupModal("settings-modal", {
+  const modal = setupModal("settings-modal", {
     closeBtn: "settings-close",
     escToClose: true,
     backdropClick: true,
     resizable: true,
     width: "36em",
     height: "20em",
-    onOpen: async () => {
-      const injectButton = document.getElementById("settings-inject-button");
-      if (injectButton) {
-        injectButton.innerHTML = "";
-        injectButton.appendChild(
-          createSettingsRestartIconButton(async () => {
-            const confirmed = await showConfirmModal(
-              `<div>${t("special.system.restart.sure")}</div>`,
-              {
-                okText: t("standard.yes"),
-                cancelText: t("standard.no"),
-                width: "auto",
-                height: "auto",
-              }
-            );
-            if (!confirmed) return;
 
-            location.reload();
-          })
-        );
-      }
+    onOpen: async (_el, api) => {
+      // disable while initializing
+      api.setDisabled();
+      try {
+        const injectButton = document.getElementById("settings-inject-button");
+        if (injectButton) {
+          injectButton.innerHTML = "";
+          const btn = createSettingsRestartIconButton(async () => {
+            // prevent double-presses during confirm
+            api.setDisabled();
+            try {
+              const confirmed = await showConfirmModal(
+                `<div>${t("special.system.restart.sure")}</div>`,
+                {
+                  okText: t("standard.yes"),
+                  cancelText: t("standard.no"),
+                  width: "auto",
+                  height: "auto",
+                }
+              );
+              if (!confirmed) return;
+              location.reload();
+            } finally {
+              // only re-enable if we did NOT reload
+              if (!document.hidden) api.setEnabled();
+            }
+          });
+          injectButton.appendChild(btn);
+        }
 
-      const ok = await renderSettings();
-      if (!ok) {
-        EventBus.emit("logging:warning", ["Settings container not found"]);
+        const ok = await renderSettings();
+        if (!ok) {
+          EventBus.emit("logging:warning", ["Settings container not found"]);
+        }
+      } finally {
+        api.setEnabled();
       }
     },
   });
+
+  return modal;
 }
 
 export function setuHelpModal() {
@@ -176,7 +190,7 @@ export function setupTemplateModal() {
 }
 
 export function setupPluginModal() {
-  return setupModal("plugin-manager-modal", {
+  const modal = setupModal("plugin-manager-modal", {
     closeBtn: "plugin-manager-close",
     escToClose: true,
     backdropClick: true,
@@ -199,13 +213,18 @@ export function setupPluginModal() {
         listWrapper.id = "plugin-list";
         container.appendChild(listWrapper);
 
-        const listManager = await renderPluginManager(container);
+        // Pass the modal API we just created
+        const listManager = await renderPluginManager(container, modal);
 
         // ─── Reload Button ──────────────────────────────
-        const reloadBtn = createPluginReloadButton(() => {
-          EventBus.emitWithResponse("plugin:reload", null).then(() => {
-            listManager.loadList();
-          });
+        const reloadBtn = createPluginReloadButton(async () => {
+          modal.setDisabled();
+          try {
+            await EventBus.emitWithResponse("plugin:reload", null);
+            await listManager.loadList();
+          } finally {
+            modal.setEnabled();
+          }
         });
         container.insertBefore(reloadBtn, listWrapper);
 
@@ -217,9 +236,8 @@ export function setupPluginModal() {
         header.textContent = "Create New Plugin";
         uploadWrapper.appendChild(header);
 
-        // ── Form Row: Input + Dropdown + Button ─────────
         const row = document.createElement("div");
-        row.className = "plugin-create-row"; // Requires CSS for flex layout
+        row.className = "plugin-create-row";
 
         const folderInput = document.createElement("input");
         folderInput.type = "text";
@@ -232,7 +250,9 @@ export function setupPluginModal() {
         dropdownContainer.style.flex = "1";
         row.appendChild(dropdownContainer);
 
-        const createBtn = createPluginCreateButton(() => {
+        let selectedTarget = "frontend";
+
+        const createBtn = createPluginCreateButton(async () => {
           const folder = folderInput.value.trim();
           if (!folder) {
             EventBus.emit("ui:toast", {
@@ -242,30 +262,34 @@ export function setupPluginModal() {
             return;
           }
 
-          EventBus.emitWithResponse("plugin:create", {
-            folder,
-            target: selectedTarget,
-          }).then((result) => {
+          modal.setDisabled();
+          try {
+            const result = await EventBus.emitWithResponse("plugin:create", {
+              folder,
+              target: selectedTarget,
+            });
+
             EventBus.emit("ui:toast", {
               message:
                 result.message || result.error || t("toast.plugin.created"),
               variant: result.error ? "error" : "success",
             });
-            listManager.loadList();
+
+            await listManager.loadList();
             folderInput.value = "";
-          });
+          } finally {
+            modal.setEnabled();
+          }
         });
         row.appendChild(createBtn);
 
         uploadWrapper.appendChild(row);
         container.appendChild(uploadWrapper);
 
-        // ── Initialize Dropdown ─────────────────────────
-        let selectedTarget = "frontend";
-
+        // Target dropdown
         createDropdown({
           containerId: "plugin-target-dropdown",
-          labelText: "", // omit label for compact layout
+          labelText: "",
           selectedValue: selectedTarget,
           options: [
             { value: "frontend", label: "Frontend" },
@@ -276,11 +300,12 @@ export function setupPluginModal() {
           },
         });
       } catch (err) {
-        console.error("[PluginModal] Failed to render plugin manager:", err);
         container.innerHTML = `<p class="error">Failed to load plugin manager.</p>`;
       }
     },
   });
+
+  return modal;
 }
 
 export function setupAboutModal() {
