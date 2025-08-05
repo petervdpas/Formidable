@@ -54,16 +54,15 @@ export async function handleDeleteTemplate(container) {
   }
 
   const confirmed = await showConfirmModal(
-    `<div>${t("special.template.delete.sure")}</div>
-     <div class="modal-message-highlight"><em>${template}</em></div>`,
+    "special.template.delete.sure",
+    `<div class="modal-message-highlight"><em>${template}</em></div>`,
     {
-      okText: t("standard.delete"),
-      cancelText: t("standard.cancel"),
+      okKey: "standard.delete",
+      cancelKey: "standard.cancel",
       width: "auto",
       height: "auto",
     }
   );
-
   if (!confirmed) return;
 
   const success = await new Promise((resolve) => {

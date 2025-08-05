@@ -355,17 +355,15 @@ export function renderFieldList(
       const removedType = removed.type;
 
       const confirmed = await showConfirmModal(
-        `<div>${t("special.field.delete.sure")}</div>
-         <div class="modal-message-highlight"><strong>${removedLabel}</strong></div>`,
+        "special.field.delete.sure",
+        `<div class="modal-message-highlight"><strong>${removedLabel}</strong></div>`,
         {
-          okText: t("standard.delete"),
-          cancelText: t("standard.cancel"),
-          variant: "danger",
+          okKey: "standard.delete",
+          cancelKey: "standard.cancel",
           width: "auto",
           height: "auto",
         }
       );
-
       if (!confirmed) return;
 
       fields.splice(idx, 1);

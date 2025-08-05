@@ -79,15 +79,17 @@ export function setupSettingsModal() {
             api.setDisabled();
             try {
               const confirmed = await showConfirmModal(
-                `<div>${t("special.system.restart.sure")}</div>`,
+                "special.system.restart.sure",
+                null,
                 {
-                  okText: t("standard.yes"),
-                  cancelText: t("standard.no"),
+                  okKey: "standard.yes",
+                  cancelKey: "standard.no",
                   width: "auto",
                   height: "auto",
                 }
               );
               if (!confirmed) return;
+
               location.reload();
             } finally {
               // only re-enable if we did NOT reload
@@ -144,7 +146,7 @@ export function setupWorkspaceModal() {
 }
 
 export function setupGitModal() {
-  return setupModal("git-actions-modal", {
+  const modal = setupModal("git-actions-modal", {
     closeBtn: "git-actions-close",
     escToClose: true,
     backdropClick: true,
@@ -152,9 +154,11 @@ export function setupGitModal() {
     height: "auto",
     onOpen: async () => {
       const container = document.getElementById("git-modal-body");
-      if (container) await renderGitStatus(container);
+      if (container) await renderGitStatus(container, modal);
     },
   });
+
+  return modal;
 }
 
 export function setupEntryModal() {

@@ -13,7 +13,7 @@ import { createListManager } from "../utils/listUtils.js";
 import { showConfirmModal } from "../utils/modalUtils.js";
 import { t } from "../utils/i18n.js";
 
-export async function renderGitStatus(container) {
+export async function renderGitStatus(container, modalApi) {
   container.innerHTML = t("modal.git.loading.status");
 
   const config = await new Promise((resolve) => {
@@ -123,20 +123,23 @@ export async function renderGitStatus(container) {
 
           // ─── Discard Button ──────────────────────────────────
           const discardBtn = createGitDiscardButton(rawData.value, async () => {
+            modalApi.setDisabled(); // <- make modal inert
+
             const confirmed = await showConfirmModal(
-              `<div>${t("modal.git.discard.sure")}:</div>
-                <div class="modal-message-highlight"><code>${
-                  rawData.value
-                }</code></div>`,
+              "special.git.discard.sure",
+              `<div class="modal-message-highlight"><code>${rawData.value}</code></div>`,
               {
-                okText: t("standard.discard"),
-                cancelText: t("standard.cancel"),
-                variant: "danger",
+                okKey: "standard.discard",
+                cancelKey: "standard.cancel",
                 width: "auto",
                 height: "auto",
               }
             );
-            if (!confirmed) return;
+
+            if (!confirmed) {
+              modalApi.setEnabled(); // <- re-enable modal early if cancelled
+              return;
+            }
 
             const result = await EventBus.emitWithResponse("git:discard", {
               folderPath: gitPath,
@@ -145,7 +148,9 @@ export async function renderGitStatus(container) {
 
             if (result?.success) {
               EventBus.emit("ui:toast", {
-                message: `${t("toast.git.discarded.changes.in")} ${rawData.value}`,
+                message: `${t("toast.git.discarded.changes.in")} ${
+                  rawData.value
+                }`,
                 variant: "info",
               });
               await gitListManager.loadList();
@@ -155,6 +160,8 @@ export async function renderGitStatus(container) {
                 variant: "error",
               });
             }
+
+            modalApi.setEnabled(); // <- always re-enable modal at the end
           });
 
           flagNode.appendChild(discardBtn);
@@ -244,7 +251,9 @@ export async function renderGitStatus(container) {
                 typeof result === "string"
                   ? result
                   : result?.summary
-                  ? `${t("toast.git.committed")}: ${result.summary.changes} ${t("standard.change.s")}`
+                  ? `${t("toast.git.committed")}: ${result.summary.changes} ${t(
+                      "standard.change.s"
+                    )}`
                   : t("toast.git.commit.complete"),
               variant: "success",
             });
@@ -262,7 +271,9 @@ export async function renderGitStatus(container) {
                 typeof result === "string"
                   ? result
                   : result?.summary
-                  ? `${t("toast.git.pushed")}: ${result.summary.changes ?? "✓"} ${t("standard.change.s")}`
+                  ? `${t("toast.git.pushed")}: ${
+                      result.summary.changes ?? "✓"
+                    } ${t("standard.change.s")}`
                   : t("toast.git.push.complete"),
               variant: "success",
             });
@@ -280,7 +291,9 @@ export async function renderGitStatus(container) {
                 typeof result === "string"
                   ? result
                   : result?.files?.length
-                  ? `${t("toast.git.pulled")}: ${result.files.length} ${t("standard.file.s")}`
+                  ? `${t("toast.git.pulled")}: ${result.files.length} ${t(
+                      "standard.file.s"
+                    )}`
                   : t("toast.git.pull.complete"),
               variant: "success",
             });

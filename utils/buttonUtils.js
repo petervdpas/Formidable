@@ -142,29 +142,40 @@ export function disableButton(btn, state = true) {
 /* Specialized button creators */
 
 export function createCancelButton({
-  text = t("standard.cancel", "Cancel"),
+  text = null,
   onClick = () => {},
   id = "modal-cancel",
   className = "btn-default",
 }) {
+  const fallbackKey = "standard.cancel";
+  const label = text ?? t(fallbackKey, "Cancel");
+
   return createButton({
-    text,
+    text: label,
+    i18nKey: text ? "" : fallbackKey, // only set if using default
     className,
     identifier: id,
     onClick,
+    ariaLabel: label,
   });
 }
 
 export function createConfirmButton({
-  text = t("standard.confirm", "Confirm"),
+  text = null,
   onClick = () => {},
   id = "modal-confirm",
   className = "btn-okay",
+  variant = "okay",
 }) {
+  const fallbackKey = "standard.confirm";
+  const label = text ?? t(fallbackKey, "Confirm");
+
   return createButton({
-    text,
-    className,
+    text: label,
+    i18nKey: text ? "" : fallbackKey, // only set if using default
+    className: `btn-${variant} ${className}`.trim(),
     identifier: id,
     onClick,
+    ariaLabel: label,
   });
 }

@@ -8,6 +8,7 @@ import {
   createConfirmButton,
   buildButtonGroup,
 } from "./buttonUtils.js";
+import { t, translateDOM } from "./i18n.js";
 
 function createModalCloseButton({
   onClick = () => {},
@@ -104,7 +105,9 @@ export function setupModal(
   function setBackgroundInert(excludeEl) {
     if (inertSet) return;
     previouslyInert = [];
-    const siblings = document.querySelectorAll("body > *:not(script):not(style)");
+    const siblings = document.querySelectorAll(
+      "body > *:not(script):not(style)"
+    );
     siblings.forEach((el) => {
       // Only mark true siblings (exclude modal itself and its descendants)
       if (el !== excludeEl && !excludeEl.contains(el)) {
@@ -133,7 +136,9 @@ export function setupModal(
     modal.setAttribute("aria-busy", "true");
 
     if (disableCloseWhenDisabled && close) {
-      try { close.disabled = true; } catch (_) {}
+      try {
+        close.disabled = true;
+      } catch (_) {}
     }
     if (resizer) resizer.style.display = "none";
 
@@ -151,7 +156,9 @@ export function setupModal(
     modal.removeAttribute("aria-busy");
 
     if (disableCloseWhenDisabled && close) {
-      try { close.disabled = false; } catch (_) {}
+      try {
+        close.disabled = false;
+      } catch (_) {}
     }
     if (resizer) resizer.style.display = "";
 
@@ -318,20 +325,26 @@ export function setupPluginModal({
     try {
       onOpen(el, pluginApi || baseApi);
     } catch (err) {
-      EventBus.emit("logging:error", ["[setupPluginModal] onOpen failed:", err]);
+      EventBus.emit("logging:error", [
+        "[setupPluginModal] onOpen failed:",
+        err,
+      ]);
     }
   };
   const wrappedOnClose = (el, baseApi) => {
     try {
       onClose(el, pluginApi || baseApi);
     } catch (err) {
-      EventBus.emit("logging:error", ["[setupPluginModal] onClose failed:", err]);
+      EventBus.emit("logging:error", [
+        "[setupPluginModal] onClose failed:",
+        err,
+      ]);
     }
   };
 
   // Delegate to setupModal for behavior and controls.
   const baseApi = setupModal(id, {
-    closeBtn: `${id}-close`,        // setupModal will create/attach the close button
+    closeBtn: `${id}-close`, // setupModal will create/attach the close button
     escToClose,
     backdropClick,
     width,
@@ -483,7 +496,7 @@ export function applyModalCssClass(modalEl, typeDef) {
   }
 }
 
-export function showConfirmModal(message, { ...options } = {}) {
+export function showConfirmModal(i18nKey, extraHtml = null, options = {}) {
   const modal = setupModal("confirm-modal", {
     escToClose: true,
     backdropClick: true,
@@ -496,11 +509,15 @@ export function showConfirmModal(message, { ...options } = {}) {
   const messageEl = document.getElementById("confirm-message");
   const buttonWrapper = document.getElementById("confirm-buttons-wrapper");
 
-  messageEl.innerHTML = message;
+  // Set translation key
+  messageEl.innerHTML = `<div data-i18n-html="${i18nKey}">${t(i18nKey)}</div>${extraHtml || ""}`;
 
   return new Promise((resolve) => {
     const okBtn = createConfirmButton({
-      text: options.okText || "OK",
+      text:
+        options.okText ||
+        (options.okKey ? t(options.okKey) : t("standard.confirm")),
+      variant: options.variant || "okay",
       onClick: () => {
         modal.hide();
         resolve(true);
@@ -508,7 +525,9 @@ export function showConfirmModal(message, { ...options } = {}) {
     });
 
     const cancelBtn = createCancelButton({
-      text: options.cancelText || "Cancel",
+      text:
+        options.cancelText ||
+        (options.cancelKey ? t(options.cancelKey) : t("standard.cancel")),
       onClick: () => {
         modal.hide();
         resolve(false);
@@ -517,6 +536,9 @@ export function showConfirmModal(message, { ...options } = {}) {
 
     buttonWrapper.innerHTML = "";
     buttonWrapper.appendChild(buildButtonGroup(okBtn, cancelBtn));
+
+    translateDOM(modal.element || document.getElementById("confirm-modal"));
+
     modal.show();
   });
 }

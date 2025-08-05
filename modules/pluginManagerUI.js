@@ -75,13 +75,11 @@ export async function renderPluginManager(container, modalApi) {
         modalApi?.setDisabled();
 
         const confirmed = await showConfirmModal(
-          `<div>${t("special.plugin.delete.sure")}</div>
-           <div class="modal-message-highlight"><strong>${
-             rawData.name
-           }</strong></div>`,
+          "special.plugin.delete.sure",
+          `<div class="modal-message-highlight"><strong>${rawData.name}</strong></div>`,
           {
-            okText: t("standard.delete"),
-            cancelText: t("standard.cancel"),
+            okKey: "standard.delete",
+            cancelKey: "standard.cancel",
             width: "auto",
             height: "auto",
           }

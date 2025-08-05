@@ -104,6 +104,8 @@ export default {
     "Weet je zeker dat je dit veld wilt verwijderen?",
   "special.file.delete.sure":
     "Weet je zeker dat je dit bestand wilt verwijderen?",
+  "special.git.discard.sure":
+    "Weet je zeker dat je de wijzigingen wilt verwerpen in",
   "special.plugin.delete.sure":
     "Weet je zeker dat je deze plugin wilt verwijderen?",
   "special.loop.delete.sure":
@@ -302,8 +304,6 @@ export default {
   "modal.git.error.status":
     "⚠️ Kan Git-status niet ophalen. Zorg ervoor dat Git is geïnstalleerd en dat de map een geldige Git-repository is.",
   "modal.git.no.changes.detected": "Geen wijzigingen gevonden",
-  "modal.git.discard.sure":
-    "Weet je zeker dat je de wijzigingen wilt verwerpen in",
   "modal.git.none.found": "Niets gevonden.",
   "modal.git.commit.message": "Commitbericht",
   "modal.git.commit.placeholder":

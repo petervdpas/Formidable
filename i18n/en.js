@@ -94,6 +94,7 @@ export default {
     "Are you sure you want to delete this template?",
   "special.field.delete.sure": "Are you sure you want to delete this field?",
   "special.file.delete.sure": "Are you sure you want to delete this file?",
+  "special.git.discard.sure": "Are you sure you want to discard changes in",
   "special.plugin.delete.sure": "Are you sure you want to delete this plugin?",
   "special.loop.delete.sure": "Are you sure you want to remove this loop item?",
   "special.system.restart.sure": "Are you sure you want to restart the system?",
@@ -290,7 +291,6 @@ export default {
   "modal.git.error.status":
     "⚠️ Failed to fetch Git status. Please ensure Git is installed and the directory is a valid Git repository.",
   "modal.git.no.changes.detected": "No Changes Detected",
-  "modal.git.discard.sure": "Are you sure you want to discard changes in",
   "modal.git.none.found": "None found.",
   "modal.git.commit.message": "Commit Message",
   "modal.git.commit.placeholder": "e.g. Update README and fix typos",

@@ -203,16 +203,18 @@ async function createLoopItem(
   // Remove button
   const removeBtn = createDeleteLoopItemButton(async () => {
     const confirmed = await showConfirmModal(
-      `<div>${t("special.loop.delete.sure")}</div>
-     <div class="modal-message-highlight"><strong>${previewLabel}</strong>: <em>${previewValue}</em></div>`,
+      "special.loop.delete.sure",
+      `<div class="modal-message-highlight"><strong>${previewLabel}</strong>: <em>${previewValue}</em></div>`,
       {
-        okText: t("standard.delete"),
-        cancelText: t("standard.cancel"),
+        okKey: "standard.delete",
+        cancelKey: "standard.cancel",
         width: "auto",
         height: "auto",
       }
     );
-    if (confirmed) itemWrapper.remove();
+    if (confirmed) {
+      itemWrapper.remove();
+    }
   });
 
   header.appendChild(removeBtn);
