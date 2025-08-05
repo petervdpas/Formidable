@@ -96,36 +96,39 @@ export async function renderSettings() {
   tabDisplay.appendChild(
     createSwitch(
       "theme-toggle",
-      t("modal.settings.display.theme"),
+      "modal.settings.display.theme",
       config.theme === "dark",
       null,
       "block",
       [
-        t("modal.settings.display.theme.dark"),
-        t("modal.settings.display.theme.light"),
-      ]
+        "modal.settings.display.theme.dark",
+        "modal.settings.display.theme.light",
+      ],
+      true
     )
   );
 
   tabDisplay.appendChild(
     createSwitch(
       "show-expressions-toggle",
-      t("standard.expressions"),
+      "standard.expressions",
       config.use_expressions ?? true,
       null,
       "block",
-      [t("standard.show"), t("standard.hide")]
+      ["standard.show", "standard.hide"],
+      true
     )
   );
 
   tabDisplay.appendChild(
     createSwitch(
       "show-icons-toggle",
-      t("modal.settings.icon.buttons"),
+      "modal.settings.icon.buttons",
       config.show_icon_buttons ?? true,
       null,
       "block",
-      [t("standard.on.experimental"), t("standard.off")]
+      ["standard.on.experimental", "standard.off"],
+      true
     )
   );
 
@@ -151,11 +154,12 @@ export async function renderSettings() {
 
   const useGitSwitch = createSwitch(
     "settings-use-git",
-    t("modal.settings.git.enabled"),
+    "modal.settings.git.enabled",
     config.use_git ?? false,
     null,
     "block",
-    [t("standard.enabled"), t("standard.disabled")]
+    ["standard.enabled", "standard.disabled"],
+    true
   );
   tabDirs.appendChild(useGitSwitch);
 
@@ -188,11 +192,12 @@ export async function renderSettings() {
   tabServer.appendChild(
     createSwitch(
       "internal-server-toggle",
-      t("modal.settings.internal.enabled"),
+      "modal.settings.internal.enabled",
       config.enable_internal_server ?? false,
       null,
       "block",
-      [t("standard.on"), t("standard.off")]
+      ["standard.on", "standard.off"],
+      true
     )
   );
 
@@ -219,11 +224,12 @@ export async function renderSettings() {
   tabAdvanced.appendChild(
     createSwitch(
       "plugin-toggle",
-      t("modal.settings.advanced.plugins.enabled"),
+      "modal.settings.advanced.plugins.enabled",
       config.enable_plugins ?? false,
       null,
       "block",
-      [t("standard.enabled"), t("standard.disabled")]
+      ["standard.enabled", "standard.disabled"],
+      true
     )
   );
 
@@ -245,22 +251,24 @@ export async function renderSettings() {
   tabAdvanced.appendChild(
     createSwitch(
       "settings-development-toggle",
-      t("modal.settings.advanced.developmentMode"),
+      "modal.settings.advanced.developmentMode",
       config.development_enable ?? false,
       null,
       "block",
-      [t("standard.enabled"), t("standard.disabled")]
+      ["standard.enabled", "standard.disabled"],
+      
     )
   );
 
   tabAdvanced.appendChild(
     createSwitch(
       "logging-toggle",
-      t("modal.settings.advanced.logging.enabled"),
+      "modal.settings.advanced.logging.enabled",
       config.logging_enabled,
       null,
       "block",
-      [t("standard.enabled"), t("standard.disabled")]
+      ["standard.enabled", "standard.disabled"],
+      true
     )
   );
 

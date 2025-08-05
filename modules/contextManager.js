@@ -65,7 +65,7 @@ export async function renderWorkspaceModal() {
   // Context toggle
   const contextSwitch = createSwitch(
     "context-toggle",
-    "Context Mode",
+    "menu.context.label",
     isStorage,
     (checked) => {
       const contextMode = checked ? "storage" : "template";
@@ -80,7 +80,8 @@ export async function renderWorkspaceModal() {
       });
     },
     "block",
-    ["Storage", "Template"]
+    ["menu.context.option.storage", "menu.context.option.template"],
+    true
   );
   container.appendChild(contextSwitch);
 

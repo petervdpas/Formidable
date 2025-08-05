@@ -357,8 +357,8 @@ export function buildSwitchElement({
   name = null,
   checked = false,
   onFlip = null,
-  trailingLabel = null,        // raw labels
-  trailingI18nKeys = null,     // optional: [onKey, offKey]
+  trailingValues = null,
+  i18nEnabled = false,
 } = {}) {
   const input = document.createElement("input");
   input.type = "checkbox";
@@ -379,25 +379,29 @@ export function buildSwitchElement({
   container.appendChild(switchWrapper);
 
   let trailing = null;
-  if ((trailingLabel && Array.isArray(trailingLabel)) || trailingI18nKeys) {
-    trailing = document.createElement("div");
-    trailing.className = "trailing-label";
-    container.appendChild(trailing);
-  }
 
   const updateTrailingText = (isChecked) => {
-    if (!trailing) return;
-    if (trailingI18nKeys && Array.isArray(trailingI18nKeys)) {
-      trailing.textContent = t(isChecked ? trailingI18nKeys[0] : trailingI18nKeys[1]);
-    } else if (trailingLabel && Array.isArray(trailingLabel)) {
-      trailing.textContent = isChecked ? trailingLabel[0] : trailingLabel[1];
+    if (!trailing || !Array.isArray(trailingValues)) return;
+
+    if (i18nEnabled) {
+      const key = isChecked ? trailingValues[0] : trailingValues[1];
+      trailing.setAttribute("data-i18n", key);
+      trailing.textContent = t(key); // immediate update; translateDOM can override later
+    } else {
+      trailing.removeAttribute("data-i18n");
+      trailing.textContent = isChecked ? trailingValues[0] : trailingValues[1];
     }
   };
 
-  // Initial state
-  requestAnimationFrame(() => updateTrailingText(input.checked));
+  if (Array.isArray(trailingValues)) {
+    trailing = document.createElement("div");
+    trailing.className = "trailing-label";
+    container.appendChild(trailing);
 
-  // Change event
+    // Initial render
+    requestAnimationFrame(() => updateTrailingText(input.checked));
+  }
+
   input.addEventListener("change", (e) => {
     const isChecked = e.target.checked;
     if (typeof onFlip === "function") onFlip(isChecked);
@@ -409,19 +413,26 @@ export function buildSwitchElement({
 
 export function createSwitch(
   id,
-  label = "",
+  labelOrKey = "",
   checked = false,
   onFlip = null,
   layout = "block",
-  trailingLabel = null,
-  i18nKey = null
+  trailingValues = null,
+  i18nEnabled = false
 ) {
   const { input, element: switchWithLabel } = buildSwitchElement({
     id,
     name: id,
     checked,
     onFlip,
-    trailingLabel,
+    trailingValues,
+    i18nEnabled,
+  });
+
+  const labelEl = createLabelElement({
+    text: i18nEnabled ? t(labelOrKey) : labelOrKey,
+    forId: id,
+    i18nKey: i18nEnabled ? labelOrKey : null,
   });
 
   if (layout === "inline") {
@@ -431,13 +442,7 @@ export function createSwitch(
     inline.style.alignItems = "center";
     inline.style.gap = "6px";
 
-    const span = createLabelElement({
-      text: label,
-      forId: id,
-      i18nKey,
-    });
-
-    inline.appendChild(span);
+    inline.appendChild(labelEl);
     inline.appendChild(switchWithLabel);
     return inline;
   }
@@ -449,12 +454,6 @@ export function createSwitch(
     const left = document.createElement("div");
     const right = document.createElement("div");
 
-    const labelEl = createLabelElement({
-      text: label,
-      forId: id,
-      i18nKey,
-    });
-
     left.appendChild(labelEl);
     right.appendChild(switchWithLabel);
     wrapper.appendChild(left);
@@ -463,12 +462,6 @@ export function createSwitch(
   }
 
   // default: block
-  const labelEl = createLabelElement({
-    text: label,
-    forId: id,
-    i18nKey,
-  });
-
   const container = document.createElement("div");
   container.className = "modal-form-row switch-row";
   container.appendChild(labelEl);

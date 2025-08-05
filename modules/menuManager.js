@@ -156,7 +156,7 @@ function createContextToggleItem() {
   const isStorage = cachedConfig?.context_mode === "storage";
   const toggle = createSwitch(
     "context-toggle-menu",
-    t("menu.context.label"),
+    "menu.context.label",
     isStorage,
     (checked) => {
       EventBus.emit("logging:default", [
@@ -165,7 +165,8 @@ function createContextToggleItem() {
       EventBus.emit("context:toggle", checked);
     },
     "inline",
-    [t("menu.context.option.storage"), t("menu.context.option.template")]
+    ["menu.context.option.storage", "menu.context.option.template"],
+    true
   );
 
   li.appendChild(toggle);

@@ -157,11 +157,12 @@ export async function renderTextField(field, value = "") {
 // ─────────────────────────────────────────────
 // Type: boolean
 export async function renderBooleanField(field, value = "") {
-  let trailingLabel = null;
+  let trailingValues = ['On', 'Off'];
+
   if (Array.isArray(field.options) && field.options.length >= 2) {
     const first = resolveOption(field.options[0]);
     const second = resolveOption(field.options[1]);
-    trailingLabel = [first.label, second.label];
+    trailingValues = [first.label, second.label];
   }
 
   const v = resolveValue(field, value);
@@ -173,7 +174,7 @@ export async function renderBooleanField(field, value = "") {
     name: field.key,
     checked: isChecked,
     onFlip: null,
-    trailingLabel,
+    trailingValues,
   });
 
   applyFieldContextAttributes(toggle, {

@@ -169,7 +169,7 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     // ─── Enable Collection Switch ──────
     collectionSwitch = createSwitch(
       "template-enable-collection",
-      t("modal.template.enable.collection"),
+      "modal.template.enable.collection",
       currentData.enable_collection === true,
       () => {
         const hasGuid = currentData.fields.some((f) => f.type === "guid");
@@ -184,7 +184,8 @@ export function initTemplateEditor(containerId, onSaveCallback) {
         }
       },
       "block",
-      [t("standard.enabled"), t("standard.disabled")]
+      ["standard.enabled", "standard.disabled"],
+      true
     );
     setupFieldset.appendChild(collectionSwitch);
 
@@ -253,7 +254,8 @@ export function initTemplateEditor(containerId, onSaveCallback) {
               container.querySelector("#yaml-name")?.value.trim() || "Unnamed",
             markdown_template: getEditor()?.getValue() || "",
             sidebar_expression:
-              container.querySelector("#sidebar-expression")?.value.trim() || "",
+              container.querySelector("#sidebar-expression")?.value.trim() ||
+              "",
             enable_collection: hasGuidField
               ? collectionElement?.checked === true
               : false,
