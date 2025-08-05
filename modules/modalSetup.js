@@ -260,7 +260,7 @@ export function setupPluginModal() {
           const folder = folderInput.value.trim();
           if (!folder) {
             EventBus.emit("ui:toast", {
-              message: t("toast.folder.required"),
+              languageKey: "toast.folder.required",
               variant: "error",
             });
             return;
@@ -467,7 +467,7 @@ export function setupFieldEditModal(field, allFields, onConfirm) {
         keyInput.classList.add("input-error");
         confirmBtn.disabled = true;
         EventBus.emit("ui:toast", {
-          message: t("toast.key.required"),
+          languageKey: "toast.key.required",
           variant: "error",
         });
         return;

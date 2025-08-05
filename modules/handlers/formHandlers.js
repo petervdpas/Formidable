@@ -146,7 +146,8 @@ export async function handleSaveForm(payload, respond) {
       EventBus.emit("status:update", `Saved data: ${shortName}`);
 
       EventBus.emit("ui:toast", {
-        message: `${t("toast.save.success")}: ${shortName}`,
+        languageKey: "toast.save.success",
+        args: [shortName],
         variant: "success",
         duration: 4000,
       });
@@ -160,7 +161,8 @@ export async function handleSaveForm(payload, respond) {
       EventBus.emit("status:update", `Failed to save: ${result.error}`);
 
       EventBus.emit("ui:toast", {
-        message: `${t("toast.save.failed")}: ${shortName}`,
+        languageKey: "toast.save.failed",
+        args: [shortName],
         variant: "error",
         duration: 4000,
       });

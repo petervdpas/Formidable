@@ -148,19 +148,19 @@ export async function renderGitStatus(container, modalApi) {
 
             if (result?.success) {
               EventBus.emit("ui:toast", {
-                message: `${t("toast.git.discarded.changes.in")} ${
-                  rawData.value
-                }`,
+                languageKey: "toast.git.discarded.changes.in",
+                args: [rawData.value],
                 variant: "info",
               });
+
               await gitListManager.loadList();
             } else {
               EventBus.emit("ui:toast", {
-                message: `${t("toast.git.discard.failed")} ${rawData.value}`,
+                languageKey: "toast.git.discard.failed",
+                args: [rawData.value],
                 variant: "error",
               });
             }
-
             modalApi.setEnabled(); // <- always re-enable modal at the end
           });
 
@@ -237,7 +237,7 @@ export async function renderGitStatus(container, modalApi) {
       const commitBtn = createGitCommitButton(() => {
         if (!commitMessage) {
           EventBus.emit("ui:toast", {
-            message: t("toast.git.commit.noMessage"),
+            languageKey: "toast.git.commit.noMessage",
             variant: "warning",
           });
           return;
@@ -247,17 +247,18 @@ export async function renderGitStatus(container, modalApi) {
           folderPath: gitPath,
           message: commitMessage,
           callback: (result) => {
-            EventBus.emit("ui:toast", {
-              message:
-                typeof result === "string"
-                  ? result
-                  : result?.summary
-                  ? `${t("toast.git.committed")}: ${result.summary.changes} ${t(
-                      "standard.change.s"
-                    )}`
-                  : t("toast.git.commit.complete"),
-              variant: "success",
-            });
+            if (typeof result === "string") {
+              EventBus.emit("ui:toast", {
+                languageKey: "toast.git.commit.complete",
+                variant: "success",
+              });
+            } else if (result?.summary?.changes != null) {
+              EventBus.emit("ui:toast", {
+                languageKey: "toast.git.commit.success",
+                args: [result.summary.changes],
+                variant: "success",
+              });
+            }
             refresh();
           },
         });
@@ -267,17 +268,18 @@ export async function renderGitStatus(container, modalApi) {
         EventBus.emit("git:push", {
           folderPath: gitPath,
           callback: (result) => {
-            EventBus.emit("ui:toast", {
-              message:
-                typeof result === "string"
-                  ? result
-                  : result?.summary
-                  ? `${t("toast.git.pushed")}: ${
-                      result.summary.changes ?? "✓"
-                    } ${t("standard.change.s")}`
-                  : t("toast.git.push.complete"),
-              variant: "success",
-            });
+            if (typeof result === "string") {
+              EventBus.emit("ui:toast", {
+                languageKey: "toast.git.push.complete",
+                variant: "success",
+              });
+            } else if (result?.summary?.changes != null) {
+              EventBus.emit("ui:toast", {
+                languageKey: "toast.git.push.success",
+                args: [result.summary.changes],
+                variant: "success",
+              });
+            }
             refresh();
           },
         });
@@ -287,17 +289,18 @@ export async function renderGitStatus(container, modalApi) {
         EventBus.emit("git:pull", {
           folderPath: gitPath,
           callback: (result) => {
-            EventBus.emit("ui:toast", {
-              message:
-                typeof result === "string"
-                  ? result
-                  : result?.files?.length
-                  ? `${t("toast.git.pulled")}: ${result.files.length} ${t(
-                      "standard.file.s"
-                    )}`
-                  : t("toast.git.pull.complete"),
-              variant: "success",
-            });
+            if (typeof result === "string") {
+              EventBus.emit("ui:toast", {
+                languageKey: "toast.git.pull.complete",
+                variant: "success",
+              });
+            } else if (result?.summary?.changes != null) {
+              EventBus.emit("ui:toast", {
+                languageKey: "toast.git.pull.success",
+                args: [result.summary.changes],
+                variant: "success",
+              });
+            }
             refresh();
           },
         });

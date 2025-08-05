@@ -153,8 +153,8 @@ export async function renderFormPreview(container, template) {
   const markdownBtn = createCopyMarkdownButton();
   const previewBtn = createCopyPreviewButton();
 
-  copyToClipboard(markdownBtn, () => markdown, "Markdown");
-  copyToClipboard(previewBtn, () => html, "HTML");
+  copyToClipboard(markdownBtn, () => markdown, ["Markdown"]);
+  copyToClipboard(previewBtn, () => html, ["HTML"]);
 
   markdownWrapper.appendChild(markdownBtn);
   previewWrapper.appendChild(previewBtn);

@@ -162,7 +162,8 @@ export async function handleRunPlugin(
     const variant = result?.error ? "error" : "success";
 
     EventBus.emit("ui:toast", {
-      message: `${t("toast.plugin.run")}: ${name} (${target})`,
+      languageKey: "toast.plugin.run",
+      args: [name, target],
       variant,
     });
 
@@ -174,7 +175,8 @@ export async function handleRunPlugin(
     ]);
 
     EventBus.emit("ui:toast", {
-      message: `${t("standard.plugin")} "${name}" (${target}) ${tLow("standard.crashed")}.`,
+      languageKey: "toast.plugin.crashed",
+      args: [name, target],
       variant: "error",
     });
 
@@ -299,7 +301,6 @@ export async function handleSavePluginSettings({ name, settings }, callback) {
 }
 
 export async function handlePluginProxyFetch(payload, callback) {
-
   const { url, options = {} } = payload || {};
 
   if (!url || typeof url !== "string") {

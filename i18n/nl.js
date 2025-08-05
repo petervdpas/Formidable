@@ -43,19 +43,18 @@ export default {
   "menu.context.option.template": "Sjabloon",
 
   // ─ Toast Messages ─────────────────────
-  "toast.serverStarted": "Interne server is gestart.",
-  "toast.serverAlreadyRunning": "Interne server draait al.",
-  "toast.serverStopped": "Interne server is gestopt.",
-  "toast.serverNotRunning": "Interne server draaide niet.",
-  "toast.serverStatus": "Server",
-  "toast.running": "Actief",
-  "toast.stopped": "Gestopt",
-  "toast.onPort": "op poort",
+  "toast.server.Started": "Interne server is gestart.",
+  "toast.server.AlreadyRunning": "Interne server draait al.",
+  "toast.server.Stopped": "Interne server is gestopt.",
+  "toast.server.NotRunning": "Interne server draaide niet.",
+  "toast.server.status": "Server is {0} op poort: {1}",
+  "toast.server.running": "actief",
+  "toast.server.stopped": "gestopt",
 
-  "toast.save.success": "Succesvol opgeslagen",
-  "toast.copy.clipboard": "Gekopieerd naar klembord",
-  "toast.copy.failed": "Kopiëren mislukt",
-  "toast.save.failed": "Opslaan mislukt",
+  "toast.save.success": "{0} is succesvol opgeslagen.",
+  "toast.save.failed": "{0} kon niet worden opgeslagen.",
+  "toast.copy.clipboard": "{0} is gekopieerd naar klembord.",
+  "toast.copy.failed": "Kopiëren van {0} is mislukt.",
   "toast.key.required": "Sleutel mag niet leeg zijn.",
   "toast.folder.required": "Folder naam is vereist.",
   "toast.dragging.item.collapse": "Vouw het item samen voordat je het sleept.",
@@ -63,16 +62,17 @@ export default {
 
   "toast.plugin.created": "Plugin aangemaakt.",
   "toast.plugin.delete.failed": "Verwijderen van plugin mislukt.",
-  "toast.plugin.run": "Plugin uitgevoerd",
+  "toast.plugin.run": "Plugin uitgevoerd: {0} ({1})",
+  "toast.plugin.crashed": "Plugin {0} {1} is gecrasht.",
 
-  "toast.git.committed": "Gecommit",
+  "toast.git.commit.success": "Gecommit: {0} wijziging(en)",
   "toast.git.commit.complete": "Commit voltooid.",
-  "toast.git.pushed": "Ge-pusht",
+  "toast.git.push.success": "Ge-pusht: {0} wijziging(en)",
   "toast.git.push.complete": "Push voltooid.",
-  "toast.git.pulled": "Ge-pulled",
+  "toast.git.pull.success": "Ge-pulled: {0} wijziging(en)",
   "toast.git.pull.complete": "Pull voltooid.",
-  "toast.git.discard.failed": "Verwerpen mislukt",
-  "toast.git.discarded.changes.in": "Wijzigingen verworpen in",
+  "toast.git.discard.failed": "Verwerpen van wijzigingen in {0} is mislukt.",
+  "toast.git.discarded.changes.in": "Wijzigingen verworpen in {0}",
   "toast.git.commit.noMessage": "Kan niet committen: geen bericht opgegeven.",
 
   "toast.profile.invalidName":
@@ -87,6 +87,8 @@ export default {
   "toast.template.save.success": "Sjabloon succesvol opgeslagen.",
 
   // ── Special ─────────────────────────
+  "special.html.span.small":
+    "<span {key[0]}>{0}</span> <small {key[1]}>{1}</small>",
   "special.user.profile": "Gebruikersprofiel: {0}",
   "special.templates.placeholder":
     "Selecteer of maak een sjabloonbestand om te bewerken.",
@@ -311,6 +313,8 @@ export default {
 
   "modal.workspace.title": "Werkruimte-instellingen",
 
+  "modal.template.legend.setup": "Opzetinformatie",
+  "modal.template.legend.fields": "Veldinformatie",
   "modal.template.title": "Nieuw sjabloon",
   "modal.template.label.name": "Sjabloonnaam",
   "modal.template.label.filename": "Bestandsnaam",

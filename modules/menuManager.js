@@ -274,7 +274,7 @@ export async function handleMenuAction(action) {
             "[Menu] No selected_template entry found.",
           ]);
           EventBus.emit("ui:toast", {
-            message: t("toast.template.not.selected"),
+            languageKey: "toast.template.not.selected",
             variant: "warning",
           });
           return;
@@ -377,18 +377,17 @@ export async function handleMenuAction(action) {
               EventBus.emit("server:start", { port });
             }
             EventBus.emit("ui:toast", {
-              message: t("toast.serverStarted"),
+              languageKey: "toast.server.Started",
               variant: "success",
             });
           } else {
             EventBus.emit("ui:toast", {
-              message: t("toast.serverAlreadyRunning"),
+              languageKey: "toast.server.AlreadyRunning",
               variant: "success",
             });
           }
         },
       });
-
       break;
 
     case "stop-internal-server":
@@ -397,12 +396,12 @@ export async function handleMenuAction(action) {
           if (server.running) {
             EventBus.emit("server:stop");
             EventBus.emit("ui:toast", {
-              message: t("toast.serverStopped"),
+              languageKey: "toast.server.Stopped",
               variant: "warning",
             });
           } else {
             EventBus.emit("ui:toast", {
-              message: t("toast.serverNotRunning"),
+              languageKey: "toast.server.NotRunning",
               variant: "warning",
             });
           }
@@ -414,10 +413,14 @@ export async function handleMenuAction(action) {
       EventBus.emit("server:status", {
         callback: (server) => {
           EventBus.emit("logging:default", ["[Menu] Server status:", server]);
+
+          const statusKey = server.running
+            ? "toast.server.running"
+            : "toast.server.stopped";
+
           EventBus.emit("ui:toast", {
-            message: `${t("toast.serverStatus")}: ${
-              server.running ? t("toast.running") : t("toast.stopped")
-            } ${t("toast.onPort")} ${server.port || "-"}`,
+            languageKey: "toast.server.status",
+            args: [t(statusKey), server.port || "-"],
             variant: server.running ? "success" : "info",
           });
         },
@@ -433,7 +436,7 @@ export async function handleMenuAction(action) {
             EventBus.emit("file:openExternal", { url });
           } else {
             EventBus.emit("ui:toast", {
-              message: t("toast.serverNotRunning"),
+              languageKey: "toast.server.NotRunning",
               variant: "warning",
             });
           }

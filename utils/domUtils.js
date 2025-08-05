@@ -3,7 +3,6 @@
 import { EventBus } from "../modules/eventBus.js";
 import { fieldTypes } from "./fieldTypes.js";
 import * as fieldRenderers from "./fieldRenderers.js";
-import { t } from "./i18n.js";
 
 export function waitForElement(selector, root = document.body, timeout = 5000) {
   return new Promise((resolve, reject) => {
@@ -455,9 +454,10 @@ export function syncScroll(el1, el2) {
 export function copyToClipboard(
   button,
   contentFn,
+  args = [],
   {
-    successMessage = `${t("toast.copy.clipboard")}.`,
-    errorMessage = `${t("toast.copy.failed")}.`,
+    successMessage = "toast.copy.clipboard",
+    errorMessage = "toast.copy.failed",
   } = {}
 ) {
   if (!button) {
@@ -472,14 +472,16 @@ export function copyToClipboard(
       .writeText(contentFn())
       .then(() =>
         EventBus.emit("ui:toast", {
-          message: successMessage,
+          languageKey: successMessage,
+          args,
           variant: "success",
         })
       )
       .catch((e) => {
         EventBus.emit("logging:error", ["[Clipboard] Copy failed", e]);
         EventBus.emit("ui:toast", {
-          message: errorMessage,
+          languageKey: errorMessage,
+          args,
           variant: "error",
         });
       });
@@ -550,7 +552,7 @@ export function createSortable(
       ) {
         lastToastTime = now;
         EventBus.emit("ui:toast", {
-          message: t("toast.dragging.item.collapse"),
+          languageKey: "toast.dragging.item.collapse",
           variant: "info",
           duration: 2500,
         });

@@ -40,16 +40,18 @@ export default {
   "menu.context.option.template": "Template",
 
   // ── Toast Messages ─────────────────────
-  "toast.serverStarted": "Internal server was started.",
-  "toast.serverAlreadyRunning": "Internal server is already running.",
-  "toast.serverStopped": "Internal server was stopped.",
-  "toast.serverNotRunning": "Internal server wasn't running.",
-  "toast.onPort": "on port",
+  "toast.server.Started": "Internal server was started.",
+  "toast.server.AlreadyRunning": "Internal server is already running.",
+  "toast.server.Stopped": "Internal server was stopped.",
+  "toast.server.NotRunning": "Internal server wasn't running.",
+  "toast.server.status": "Server is {0} on port: {1}",
+  "toast.server.running": "running",
+  "toast.server.stopped": "stopped",
 
-  "toast.save.success": "Successfully saved",
-  "toast.copy.clipboard": "Copied to clipboard",
-  "toast.copy.failed": "Failed to copy",
-  "toast.save.failed": "Failed to save",
+  "toast.save.success": "{0} was saved successfully.",
+  "toast.save.failed": "{0} could not be saved.",
+  "toast.copy.clipboard": "Copied {0} to clipboard.",
+  "toast.copy.failed": "Failed to copy {0}.",
   "toast.key.required": "Key cannot be empty.",
   "toast.folder.required": "Folder name is required.",
   "toast.dragging.item.collapse": "Collapse the item before dragging.",
@@ -57,16 +59,17 @@ export default {
 
   "toast.plugin.created": "Plugin created.",
   "toast.plugin.delete.failed": "Failed to delete plugin.",
-  "toast.plugin.run": "Plugin run",
+  "toast.plugin.run": "Plugin run: {0} ({1})",
+  "toast.plugin.crashed": "Plugin {0} {1} crashed",
 
-  "toast.git.committed": "Committed",
+  "toast.git.commit.success": "Committed: {0} change(s)",
   "toast.git.commit.complete": "Commit complete.",
-  "toast.git.pushed": "Pushed",
+  "toast.git.push.success": "Pushed: {0} change(s)",
   "toast.git.push.complete": "Push complete.",
-  "toast.git.pulled": "Pulled",
+  "toast.git.pull.success": "Pulled: {0} change(s)",
   "toast.git.pull.complete": "Pull complete.",
-  "toast.git.discard.failed": "Failed to discard",
-  "toast.git.discarded.changes.in": "Discarded changes in",
+  "toast.git.discard.failed": "Failed to discard changes in {0}",
+  "toast.git.discarded.changes.in": "Discarded changes in {0}",
   "toast.git.commit.noMessage": "Cannot commit: no message.",
 
   "toast.profile.invalidName": "Use lowercase, hyphens, and end with .json",
@@ -80,6 +83,8 @@ export default {
   "toast.template.save.success": "Template saved successfully",
 
   // ── Special ─────────────────────────
+  "special.html.span.small":
+    "<span {key[0]}>{0}</span> <small {key[1]}>{1}</small>",
   "special.user.profile": "User Profile: {0}",
   "special.templates.placeholder":
     "Select or create a template-file to begin editing.",
@@ -297,6 +302,8 @@ export default {
 
   "modal.workspace.title": "Workspace Settings",
 
+  "modal.template.legend.setup": "Setup Information",
+  "modal.template.legend.fields": "Field Information",
   "modal.template.title": "New Template",
   "modal.template.label.name": "Template Name",
   "modal.template.label.filename": "Filename",

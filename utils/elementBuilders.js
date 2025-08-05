@@ -94,6 +94,19 @@ export function createLabelElement({
   return label;
 }
 
+export function createFormLegend(i18nKeyOrText, i18nEnabled = false) {
+  const legend = document.createElement("legend");
+
+  if (i18nEnabled) {
+    legend.setAttribute("data-i18n", i18nKeyOrText);
+    legend.textContent = t(i18nKeyOrText);
+  } else {
+    legend.textContent = i18nKeyOrText;
+  }
+
+  return legend;
+}
+
 export function createFormRowInput({
   id,
   labelOrKey,
@@ -141,6 +154,41 @@ export function createFormRowInput({
   }
 
   return row;
+}
+
+export function buildCompositeElement({
+  forId,
+  labelOrKey = "NOT SET",
+  args = [],
+  i18nEnabled = false,
+}) {
+  const label = document.createElement("label");
+  if (forId) label.htmlFor = forId;
+
+  const template = t(labelOrKey);
+  if (!template || !template.includes("{0}")) {
+    console.warn(
+      "[buildCompositeElement] Missing or invalid template:",
+      labelOrKey
+    );
+    label.textContent = template || labelOrKey;
+    return label;
+  }
+
+  let rendered = template.replace(/{(\d+)}/g, (_, i) => {
+    const key = args[i];
+    return t(key);
+  });
+
+  rendered = rendered.replace(/{key\[(\d+)\]}/g, (_, i) => {
+    if (!i18nEnabled) return "";
+    const key = args[i];
+    return `data-i18n="${key}"`;
+  });
+
+  label.innerHTML = rendered;
+
+  return label;
 }
 
 export function buildExpressionLabel({

@@ -11,7 +11,12 @@ import { generateTemplateCode } from "../utils/templateGenerator.js";
 import { formatError } from "../utils/templateValidation.js";
 import { ensureVirtualLocation } from "../utils/vfsUtils.js";
 import { createToggleButtons } from "../utils/buttonUtils.js";
-import { createFormRowInput, createSwitch } from "../utils/elementBuilders.js";
+import {
+  createFormLegend,
+  createFormRowInput,
+  createSwitch,
+  buildCompositeElement,
+} from "../utils/elementBuilders.js";
 import {
   getEditor,
   handleEditorKey,
@@ -115,10 +120,9 @@ export function initTemplateEditor(containerId, onSaveCallback) {
 
     // ─── Setup Info Fieldset ─────
     const setupFieldset = document.createElement("fieldset");
-
-    const legend1 = document.createElement("legend");
-    legend1.textContent = "Setup Info";
-    setupFieldset.appendChild(legend1);
+    setupFieldset.appendChild(
+      createFormLegend("modal.template.legend.setup", true)
+    );
 
     // Name field
     const nameRow = createFormRowInput({
@@ -133,11 +137,12 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     const templateRow = document.createElement("div");
     templateRow.className = "modal-form-row full-editor-row";
 
-    const label = document.createElement("label");
-    label.setAttribute("for", "markdown-template");
-    label.innerHTML = `<span>${t(
-      "modal.template.label.code"
-    )}</span> <small>${t("modal.template.label.code.expand")}</small>`;
+    const label = buildCompositeElement({
+      forId: "markdown-template",
+      labelOrKey: "special.html.span.small",
+      args: ["modal.template.label.code", "modal.template.label.code.expand"],
+      i18nEnabled: true,
+    });
 
     const editorWrapperDiv = document.createElement("div");
     editorWrapperDiv.className = "editor-wrapper";
@@ -193,10 +198,9 @@ export function initTemplateEditor(containerId, onSaveCallback) {
 
     // ─── Fields Fieldset ────────────────
     const fieldsFieldset = document.createElement("fieldset");
-
-    const legend2 = document.createElement("legend");
-    legend2.textContent = t("standard.fields");
-    fieldsFieldset.appendChild(legend2);
+    fieldsFieldset.appendChild(
+      createFormLegend("modal.template.legend.fields", true)
+    );
 
     const fieldList = document.createElement("ul");
     fieldList.id = "fields-list";
