@@ -48,18 +48,14 @@ export async function renderPluginManager(container, modalApi) {
 
             if (result?.success) {
               EventBus.emit("ui:toast", {
-                message: `${t("standard.plugin")} "${rawData.name}" ${
-                  newState
-                    ? tLow("standard.enabled")
-                    : tLow("standard.disabled")
-                }.`,
+                languageKey: "toast.plugin.status",
+                args: [rawData.name, newState ? tLow("standard.enabled") : tLow("standard.disabled")],
                 variant: newState ? "success" : "warn",
               });
             } else {
               EventBus.emit("ui:toast", {
-                message: `${t("toast.plugin.update.failed")} "${
-                  rawData.name
-                }": ${result?.error}`,
+                languageKey: "toast.plugin.update.failed",
+                args: [rawData.name, result?.error],
                 variant: "error",
               });
             }
@@ -97,16 +93,14 @@ export async function renderPluginManager(container, modalApi) {
 
           if (result?.success) {
             EventBus.emit("ui:toast", {
-              message: `${t("standard.plugin")} "${rawData.name}" ${tLow(
-                "standard.deleted"
-              )}.`,
+              languageKey: "toast.plugin.delete",
+              args: [rawData.name],
               variant: "success",
             });
           } else {
             EventBus.emit("ui:toast", {
-              message: `${t("toast.plugin.delete.failed")} "${rawData.name}": ${
-                result?.error
-              }`,
+              languageKey: "toast.plugin.delete.failed",
+              args: [rawData.name, result?.error],
               variant: "error",
             });
           }

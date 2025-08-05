@@ -61,6 +61,9 @@ export default {
   "toast.plugin.delete.failed": "Failed to delete plugin.",
   "toast.plugin.run": "Plugin run: {0} ({1})",
   "toast.plugin.crashed": "Plugin {0} {1} crashed",
+  "toast.plugin.status": "Plugin {0} is {1}",
+  "toast.plugin.delete": "Plugin {0} was deleted.",
+  "toast.plugin.delete.failed": "Failed to delete plugin {0}: {1}",
 
   "toast.git.commit.success": "Committed: {0} change(s)",
   "toast.git.commit.complete": "Commit complete.",

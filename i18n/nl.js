@@ -64,6 +64,9 @@ export default {
   "toast.plugin.delete.failed": "Verwijderen van plugin mislukt.",
   "toast.plugin.run": "Plugin uitgevoerd: {0} ({1})",
   "toast.plugin.crashed": "Plugin {0} {1} is gecrasht.",
+  "toast.plugin.status": "Plugin {0} is {1}",
+  "toast.plugin.delete": "Plugin {0} is verwijderd.",
+  "toast.plugin.delete.failed": "Verwijderen van plugin {0} mislukt: {1}",
 
   "toast.git.commit.success": "Gecommit: {0} wijziging(en)",
   "toast.git.commit.complete": "Commit voltooid.",
