@@ -268,20 +268,30 @@ export async function renderGitStatus(container, modalApi) {
         EventBus.emit("git:push", {
           folderPath: gitPath,
           callback: (result) => {
-            if (typeof result === "string") {
+            const updates = result?.update;
+            const updateKeys = updates ? Object.keys(updates) : [];
+
+            if (updateKeys.length > 0) {
+              // Assume single branch push for now
+              const ref = updateKeys[0];
+              const { old, new: newHash } = updates[ref];
+
+              const branch = ref.replace("refs/heads/", "");
+              const fromShort = old?.substring(0, 7) || "unknown";
+              const toShort = newHash?.substring(0, 7) || "unknown";
+
+              EventBus.emit("ui:toast", {
+                languageKey: "toast.git.push.range",
+                args: [branch, fromShort, toShort],
+                variant: "success",
+              });
+            } else {
               EventBus.emit("ui:toast", {
                 languageKey: "toast.git.push.complete",
                 variant: "success",
               });
-            } else if (result?.summary?.changes != null) {
-              EventBus.emit("ui:toast", {
-                languageKey: "toast.git.push.success",
-                args: [result.summary.changes],
-                variant: "success",
-              });
-            } else {
-              console.log(result);
             }
+
             refresh();
           },
         });

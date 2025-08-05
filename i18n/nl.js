@@ -70,7 +70,7 @@ export default {
 
   "toast.git.commit.success": "Gecommit: {0} wijziging(en)",
   "toast.git.commit.complete": "Commit voltooid.",
-  "toast.git.push.success": "Ge-pusht: {0} wijziging(en)",
+  "toast.git.push.range": "Ge-pusht naar {0}: {1} → {2}",
   "toast.git.push.complete": "Push voltooid.",
   "toast.git.pull.success": "Ge-pulled: {0} wijziging(en)",
   "toast.git.pull.complete": "Pull voltooid.",

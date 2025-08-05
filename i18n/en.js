@@ -67,7 +67,7 @@ export default {
 
   "toast.git.commit.success": "Committed: {0} change(s)",
   "toast.git.commit.complete": "Commit complete.",
-  "toast.git.push.success": "Pushed: {0} change(s)",
+  "toast.git.push.range": "Pushed to {0}: {1} → {2}",
   "toast.git.push.complete": "Push complete.",
   "toast.git.pull.success": "Pulled: {0} change(s)",
   "toast.git.pull.complete": "Pull complete.",
