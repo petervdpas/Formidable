@@ -268,6 +268,9 @@ export async function renderGitStatus(container, modalApi) {
         EventBus.emit("git:push", {
           folderPath: gitPath,
           callback: (result) => {
+
+            console.log("[GitPush] Result:", result);
+            
             const updates = result?.update;
             const updateKeys = updates ? Object.keys(updates) : [];
 
