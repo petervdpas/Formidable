@@ -12,6 +12,7 @@ import {
 } from "../utils/elementBuilders.js";
 import { createDropdown } from "../utils/dropdownUtils.js";
 import { t, tKey, loadLocale, getAvailableLanguages, translateDOM } from "../utils/i18n.js";
+import { rebuildMenu } from "../modules/menuManager.js";
 
 let cachedConfig = null;
 
@@ -408,6 +409,9 @@ function setupLanguageDropdown(config) {
       try {
         await loadLocale(value);
         translateDOM();
+
+        await rebuildMenu();
+
         EventBus.emit("status:update", tKey("status.language.set.", value));
       } catch (err) {
         EventBus.emit("logging:error", [

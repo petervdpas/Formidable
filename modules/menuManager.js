@@ -35,16 +35,36 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   // ─── File & Config Menu ─────────────────────
   menuBar.append(
     createMenuGroup("standard.file", [
-      { label: "menu.file.openTemplateFolder", action: "open-template-folder" },
-      { label: "menu.file.openStorageFolder", action: "open-storage-folder" },
-      { label: "menu.file.openPluginsFolder", action: "open-plugins-folder" },
+      {
+        label: "menu.file.openTemplateFolder",
+        i18n: true,
+        action: "open-template-folder",
+      },
+      {
+        label: "menu.file.openStorageFolder",
+        i18n: true,
+        action: "open-storage-folder",
+      },
+      {
+        label: "menu.file.openPluginsFolder",
+        i18n: true,
+        action: "open-plugins-folder",
+      },
       "separator",
-      { label: "standard.quit", action: "quit" },
+      { label: "standard.quit", i18n: true, action: "quit" },
     ]),
     createMenuGroup("standard.config", [
-      { label: "menu.config.switchProfile", action: "open-profile-switcher" },
-      { label: "menu.config.settings", action: "open-settings" },
-      { label: "menu.config.workspace", action: "open-workspace-settings" },
+      {
+        label: "menu.config.switchProfile",
+        i18n: true,
+        action: "open-profile-switcher",
+      },
+      { label: "menu.config.settings", i18n: true, action: "open-settings" },
+      {
+        label: "menu.config.workspace",
+        i18n: true,
+        action: "open-workspace-settings",
+      },
     ])
   );
 
@@ -52,7 +72,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   if (cachedConfig.use_git) {
     menuBar.append(
       createMenuGroup("standard.git", [
-        { label: "menu.git.actions", action: "open-git-modal" },
+        { label: "menu.git.actions", i18n: true, action: "open-git-modal" },
       ])
     );
   }
@@ -61,11 +81,24 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   if (cachedConfig.enable_internal_server) {
     menuBar.append(
       createMenuGroup("standard.server", [
-        { label: "menu.server.start", action: "start-internal-server" },
-        { label: "menu.server.stop", action: "stop-internal-server" },
-        { label: "menu.server.status", action: "get-internal-server-status" },
+        {
+          label: "menu.server.start",
+          i18n: true,
+          action: "start-internal-server",
+        },
+        {
+          label: "menu.server.stop",
+          i18n: true,
+          action: "stop-internal-server",
+        },
+        {
+          label: "menu.server.status",
+          i18n: true,
+          action: "get-internal-server-status",
+        },
         {
           label: "menu.server.browser",
+          i18n: true,
           action: "open-internal-server-browser",
         },
       ])
@@ -75,7 +108,11 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   // ─── Plugins Menu ────────────────────────────
   if (cachedConfig.enable_plugins) {
     const pluginItems = [
-      { label: "menu.plugins.manager", action: "open-plugin-manager" },
+      {
+        label: "menu.plugins.manager",
+        i18n: true,
+        action: "open-plugin-manager",
+      },
     ];
 
     const plugins = await EventBus.emitWithResponse("plugin:list", null);
@@ -88,6 +125,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
         for (const plugin of enabledPlugins) {
           pluginItems.push({
             label: plugin.name,
+            i18n: false,
             action: `plugin:run:${plugin.name}`,
           });
         }
@@ -100,14 +138,14 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   // ─── View, Help, Context Toggle ───────────────
   menuBar.append(
     createMenuGroup("standard.view", [
-      { label: "standard.reload", action: "reload" },
+      { label: "standard.reload", i18n: true, action: "reload" },
       ...(cachedConfig.development_enable
-        ? [{ label: "menu.view.devtools", action: "devtools" }]
+        ? [{ label: "menu.view.devtools", i18n: true, action: "devtools" }]
         : []),
     ]),
     createMenuGroup(t("standard.help"), [
-      { label: "menu.help.pages", action: "open-help" },
-      { label: "menu.help.about", action: "open-about" },
+      { label: "menu.help.pages", i18n: true, action: "open-help" },
+      { label: "menu.help.about", i18n: true, action: "open-about" },
     ]),
     createContextToggleItem()
   );
@@ -128,19 +166,39 @@ export function getPluginMeta(name) {
 function createMenuGroup(titleKey, items) {
   const li = document.createElement("li");
   li.className = "menu-item";
-  li.textContent = t(titleKey);
+
+  const useI18nForTitle =
+    typeof titleKey === "string" && titleKey.includes(".");
+  if (useI18nForTitle) {
+    li.setAttribute("data-i18n", titleKey);
+    li.textContent = t(titleKey);
+  } else {
+    li.textContent = titleKey;
+  }
 
   const submenu = document.createElement("ul");
   submenu.className = "submenu";
 
   for (const item of items) {
     const child = document.createElement("li");
+
     if (item === "separator") {
       child.className = "separator";
     } else {
-      child.textContent = t(item.label);
+      const label = item.label;
+      const useI18n =
+        item.i18n === true && typeof label === "string" && label.includes(".");
+
+      if (useI18n) {
+        child.setAttribute("data-i18n", label);
+        child.textContent = t(label);
+      } else {
+        child.textContent = label;
+      }
+
       child.dataset.action = item.action;
     }
+
     submenu.appendChild(child);
   }
 
@@ -394,4 +452,12 @@ export async function handleMenuAction(action) {
     default:
       EventBus.emit("logging:warning", [`[Menu] Unhandled action: ${action}`]);
   }
+}
+
+export async function rebuildMenu() {
+  const menuBar = document.getElementById("app-menu");
+  if (!menuBar) return;
+
+  menuBar.innerHTML = "";
+  await buildMenu("app-menu", handleMenuAction);
 }
