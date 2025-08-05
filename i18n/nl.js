@@ -87,7 +87,7 @@ export default {
   "toast.template.save.success": "Sjabloon succesvol opgeslagen.",
 
   // ── Special ─────────────────────────
-  "special.user.profile": "Gebruikersprofiel",
+  "special.user.profile": "Gebruikersprofiel: {0}",
   "special.templates.placeholder":
     "Selecteer of maak een sjabloonbestand om te bewerken.",
   "special.forms.placeholder":

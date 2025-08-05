@@ -94,7 +94,10 @@ window.addEventListener("DOMContentLoaded", async () => {
   const storageContainer = document.getElementById("storage-container");
 
   if (config?.author_name) {
-    setStatusInfo(`${t("special.user.profile")}: ${config.author_name}`);
+    setStatusInfo("special.user.profile", {
+      i18nEnabled: true,
+      args: [config.author_name],
+    });
   }
 
   // ── Modals ──

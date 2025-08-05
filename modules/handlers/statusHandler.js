@@ -1,6 +1,7 @@
 // modules/handlers/statusHandler.js
 
 import { EventBus } from "../eventBus.js";
+import { t } from "../../utils/i18n.js";
 
 const messageTimestamps = new Map();
 
@@ -59,13 +60,39 @@ export function handleStatusUpdate(message) {
   }
 }
 
-export function setStatusInfo(text) {
-  if (infoEl) {
-    infoEl.textContent = text;
-    EventBus.emit("logging:default", [`[StatusHandler] Info set: "${text}"`]);
-  } else {
+export function setStatusInfo(textOrKey, options = {}) {
+  const { i18nEnabled = false, args = [] } = options;
+
+  if (!infoEl) {
     EventBus.emit("logging:warning", [
       `[StatusHandler] No info element available.`,
+    ]);
+    return;
+  }
+
+  infoEl.innerHTML = ""; // Clear previous content
+
+  if (i18nEnabled && typeof textOrKey === "string") {
+    const span = document.createElement("span");
+    span.setAttribute("data-i18n", textOrKey);
+    if (args.length) {
+      span.setAttribute("data-i18n-args", JSON.stringify(args));
+    }
+    // Initial render
+    let translated = t(textOrKey);
+    translated = translated.replace(/{(\d+)}/g, (match, index) =>
+      args[index] !== undefined ? String(args[index]) : match
+    );
+    span.textContent = translated;
+
+    infoEl.appendChild(span);
+    EventBus.emit("logging:default", [
+      `[StatusHandler] Info set (i18n): "${translated}"`,
+    ]);
+  } else {
+    infoEl.textContent = String(textOrKey);
+    EventBus.emit("logging:default", [
+      `[StatusHandler] Info set (raw): "${textOrKey}"`,
     ]);
   }
 }

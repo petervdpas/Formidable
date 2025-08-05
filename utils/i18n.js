@@ -55,11 +55,24 @@ export function tUp(key, fallback = "") {
  * Apply translations to all elements with [data-i18n]
  */
 export function translateDOM(root = document.body) {
-  // textContent
+  // textContent translation with optional args
   const elements = root.querySelectorAll("[data-i18n]");
   for (const el of elements) {
     const key = el.getAttribute("data-i18n");
-    const value = t(key);
+    let value = t(key);
+
+    const argsAttr = el.getAttribute("data-i18n-args");
+    if (argsAttr) {
+      try {
+        const args = JSON.parse(argsAttr);
+        value = value.replace(/{(\d+)}/g, (match, index) =>
+          args[index] !== undefined ? String(args[index]) : match
+        );
+      } catch (e) {
+        console.warn("[translateDOM] Invalid JSON in data-i18n-args:", argsAttr);
+      }
+    }
+
     if (value) el.textContent = value;
   }
 

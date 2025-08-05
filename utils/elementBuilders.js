@@ -80,9 +80,23 @@ export function addContainerElement({
   return el;
 }
 
+export function createLabelElement({
+  text = "",
+  forId = null,
+  className = "",
+  i18nKey = null,
+} = {}) {
+  const label = document.createElement("label");
+  if (text) label.textContent = text;
+  if (forId) label.htmlFor = forId;
+  if (className) label.className = className;
+  if (i18nKey) label.setAttribute("data-i18n", i18nKey);
+  return label;
+}
+
 export function createFormRowInput({
   id,
-  label,
+  labelOrKey,
   value,
   placeholder = "",
   type = "text",
@@ -90,13 +104,16 @@ export function createFormRowInput({
   onSave = null,
   multiline = false,
   append = null,
+  i18nEnabled = false,
 }) {
   const row = document.createElement("div");
   row.className = "modal-form-row";
 
-  const labelEl = document.createElement("label");
-  labelEl.setAttribute("for", id);
-  labelEl.textContent = label;
+  const labelEl = createLabelElement({
+    text: i18nEnabled ? t(labelOrKey) : labelOrKey,
+    forId: id,
+    i18nKey: i18nEnabled ? labelOrKey : null,
+  });
 
   const input = multiline
     ? document.createElement("textarea")
@@ -259,20 +276,6 @@ export function createFilePicker({
   wrapper.appendChild(button);
 
   return { element: wrapper, input, button };
-}
-
-export function createLabelElement({
-  text = "",
-  forId = null,
-  className = "",
-  i18nKey = null,
-} = {}) {
-  const label = document.createElement("label");
-  if (text) label.textContent = text;
-  if (forId) label.htmlFor = forId;
-  if (className) label.className = className;
-  if (i18nKey) label.setAttribute("data-i18n", i18nKey);
-  return label;
 }
 
 export function wrapInputWithLabel(

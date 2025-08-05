@@ -216,7 +216,7 @@ export async function renderGitStatus(container, modalApi) {
 
       const inputRow = createFormRowInput({
         id: "git-commit-message",
-        label: t("modal.git.commit.message"),
+        labelOrKey: "modal.git.commit.message",
         value: "",
         type: "textarea",
         multiline: true,
@@ -225,6 +225,7 @@ export async function renderGitStatus(container, modalApi) {
           commitMessage = msg.trim();
           commitBtn.disabled = !(hasChanges && commitMessage);
         },
+        i18nEnabled: true,
       });
 
       const inputField = inputRow.querySelector("textarea, input");

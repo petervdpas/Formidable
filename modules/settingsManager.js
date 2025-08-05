@@ -45,11 +45,11 @@ export async function renderSettings() {
   const tabButtons = document.createElement("div");
   tabButtons.className = "tab-buttons";
   tabButtons.innerHTML = `
-    <button class="tab-btn">${tabGeneralLabel}</button>
-    <button class="tab-btn">${tabDisplayLabel}</button>
-    <button class="tab-btn">${tabDirectoriesLabel}</button>
-    <button class="tab-btn">${tabInternalLabel}</button>
-    <button class="tab-btn">${tabAdvancedLabel}</button>
+    <button class="tab-btn" data-i18n="modal.settings.tab.general">${tabGeneralLabel}</button>
+    <button class="tab-btn" data-i18n="modal.settings.tab.display">${tabDisplayLabel}</button>
+    <button class="tab-btn" data-i18n="modal.settings.tab.directories">${tabDirectoriesLabel}</button>
+    <button class="tab-btn" data-i18n="modal.settings.tab.internal">${tabInternalLabel}</button>
+    <button class="tab-btn" data-i18n="modal.settings.tab.advanced">${tabAdvancedLabel}</button>
   `;
 
   // ─── General Settings ─────────────────
@@ -71,14 +71,14 @@ export async function renderSettings() {
   tabGeneral.appendChild(languageRow);
 
   tabGeneral.appendChild(
-    bindFormInput("author-name", "author_name", t("modal.settings.author.name"))
+    bindFormInput("author-name", "author_name", "modal.settings.author.name")
   );
 
   tabGeneral.appendChild(
     bindFormInput(
       "author-email",
       "author_email",
-      t("modal.settings.author.email")
+      "modal.settings.author.email"
     )
   );
 
@@ -206,7 +206,7 @@ export async function renderSettings() {
     bindFormInput(
       "internal-server-port",
       "internal_server_port",
-      t("modal.settings.internal.port")
+      "modal.settings.internal.port"
     )
   );
 
@@ -237,7 +237,7 @@ export async function renderSettings() {
   tabAdvanced.appendChild(
     createFormRowInput({
       id: "encryption-key",
-      label: t("modal.settings.advanced.secretKey"),
+      labelOrKey: "modal.settings.advanced.secretKey",
       type: "password",
       value: config.encryption_key,
       configKey: "encryption_key",
@@ -246,6 +246,7 @@ export async function renderSettings() {
         cachedConfig = await reloadConfig();
         EventBus.emit("status:update", t("status.secret.key.updated"));
       },
+      i18nEnabled: true,
     })
   );
 
@@ -257,7 +258,7 @@ export async function renderSettings() {
       null,
       "block",
       ["standard.enabled", "standard.disabled"],
-      
+      true
     )
   );
 
@@ -357,10 +358,10 @@ function bindToggleSwitch(switchId, configKey, onExtra = null) {
   };
 }
 
-function bindFormInput(id, configKey, label) {
+function bindFormInput(id, configKey, key) {
   return createFormRowInput({
     id,
-    label,
+    labelOrKey: key,
     value: cachedConfig[configKey],
     configKey,
     onSave: async (val) => {
@@ -368,6 +369,7 @@ function bindFormInput(id, configKey, label) {
       cachedConfig = await reloadConfig();
       EventBus.emit("status:update", `${label} ${t("status.set.to")} ${val}`);
     },
+    i18nEnabled: true,
   });
 }
 

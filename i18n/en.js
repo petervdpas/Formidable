@@ -80,7 +80,7 @@ export default {
   "toast.template.save.success": "Template saved successfully",
 
   // ── Special ─────────────────────────
-  "special.user.profile": "User Profile",
+  "special.user.profile": "User Profile: {0}",
   "special.templates.placeholder":
     "Select or create a template-file to begin editing.",
   "special.forms.placeholder": "Select or create a form-file to begin.",

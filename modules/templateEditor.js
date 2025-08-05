@@ -123,8 +123,9 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     // Name field
     const nameRow = createFormRowInput({
       id: "yaml-name",
-      label: t("modal.template.label.name"),
+      labelOrKey: "modal.template.label.name",
       value: currentData.name || "",
+      i18nEnabled: true,
     });
     setupFieldset.appendChild(nameRow);
 
@@ -160,9 +161,10 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     // Expression Handling input row
     const sidebarRow = createFormRowInput({
       id: "sidebar-expression",
-      label: t("modal.template.label.sidebar"),
+      labelOrKey: "modal.template.label.sidebar",
       value: currentData.sidebar_expression || "",
       multiline: true,
+      i18nEnabled: true,
     });
     setupFieldset.appendChild(sidebarRow);
 
