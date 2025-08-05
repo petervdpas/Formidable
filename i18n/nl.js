@@ -5,6 +5,21 @@ export default {
   "status.ready": "Klaar.",
   "resize.handle.title": "Sleep om te vergroten/verkleinen",
 
+  // ── Status Messages ─────────────────────
+  "status.language.set.en": "Taal ingesteld op Engels",
+  "status.language.set.fail.en": "Kon taal niet instellen op Engels",
+  "status.language.set.nl": "Taal ingesteld op Nederlands",
+  "status.language.set.fail.nl": "Kon taal niet instellen op Nederlands",
+  "status.save.cannot": "Kan niet opslaan",
+  "status.delete.cannot": "Kan niet verwijderen",
+  "status.template.no.selected": "Geen sjabloon geselecteerd.",
+  "status.datafile.filename":
+    "Voer een bestandsnaam in voor het gegevensbestand.",
+  "status.secret.key.updated": "Geheime sleutel bijgewerkt.",
+  "status.theme.set.to": "is ingesteld als",
+  "status.theme.set.light": "Thema is ingesteld op licht.",
+  "status.theme.set.dark": "Thema is ingesteld op donker.",
+
   // ── Menu ───────────────────────────────
   "menu.file.openTemplateFolder": "Open sjablonenmap",
   "menu.file.openStorageFolder": "Open opslagmap",
@@ -93,7 +108,8 @@ export default {
     "Weet je zeker dat je deze plugin wilt verwijderen?",
   "special.loop.delete.sure":
     "Weet je zeker dat je dit lusitem wilt verwijderen?",
-  "special.system.restart.sure": "Weet je zeker dat je het systeem wilt herstarten?",
+  "special.system.restart.sure":
+    "Weet je zeker dat je het systeem wilt herstarten?",
 
   // ── Language ───────────────────────────
   "lang.en": "Engels",

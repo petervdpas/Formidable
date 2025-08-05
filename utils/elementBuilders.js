@@ -1,5 +1,7 @@
 // utils/elementBuilders.js
 
+import { t } from "./i18n.js";
+
 export function createStyledLabel(
   text,
   { forId = null, className = "", styles = {} } = {}
@@ -49,6 +51,7 @@ export function addContainerElement({
   className = "",
   textContent = "",
   attributes = {},
+  i18nKey = "",
   callback = null,
 } = {}) {
   const el = document.createElement(tag);
@@ -60,6 +63,11 @@ export function addContainerElement({
   Object.entries(attributes).forEach(([key, value]) => {
     el.setAttribute(key, value);
   });
+
+  // If translation key is provided, add data-i18n
+  if (i18nKey) {
+    el.setAttribute("data-i18n", i18nKey);
+  }
 
   // Run optional callback to set properties
   if (typeof callback === "function") {
@@ -253,12 +261,28 @@ export function createFilePicker({
   return { element: wrapper, input, button };
 }
 
+export function createLabelElement({
+  text = "",
+  forId = null,
+  className = "",
+  i18nKey = null,
+} = {}) {
+  const label = document.createElement("label");
+  if (text) label.textContent = text;
+  if (forId) label.htmlFor = forId;
+  if (className) label.className = className;
+  if (i18nKey) label.setAttribute("data-i18n", i18nKey);
+  return label;
+}
+
 export function wrapInputWithLabel(
   inputElement,
   labelText,
   descriptionText = "",
   layout = "single",
-  wrapperClass = "form-row"
+  wrapperClass = "form-row",
+  forId = null,
+  i18nKey = null
 ) {
   const isTwoColumn = layout === true || layout === "two-column";
 
@@ -271,13 +295,17 @@ export function wrapInputWithLabel(
   const wrapper = document.createElement("div");
   wrapper.className = classes.join(" ");
 
+  const labelEl = createLabelElement({
+    text: labelText,
+    forId,
+    i18nKey,
+  });
+
   if (isTwoColumn && !wrapperClass?.includes("modal-form-row")) {
     const left = document.createElement("div");
     const right = document.createElement("div");
 
-    const label = document.createElement("label");
-    label.textContent = labelText;
-    left.appendChild(label);
+    left.appendChild(labelEl);
 
     if (descriptionText) {
       const desc = document.createElement("div");
@@ -290,9 +318,7 @@ export function wrapInputWithLabel(
     wrapper.appendChild(left);
     wrapper.appendChild(right);
   } else {
-    const label = document.createElement("label");
-    label.textContent = labelText;
-    wrapper.appendChild(label);
+    wrapper.appendChild(labelEl);
 
     if (descriptionText) {
       const desc = document.createElement("div");
@@ -331,7 +357,8 @@ export function buildSwitchElement({
   name = null,
   checked = false,
   onFlip = null,
-  trailingLabel = null,
+  trailingLabel = null,        // raw labels
+  trailingI18nKeys = null,     // optional: [onKey, offKey]
 } = {}) {
   const input = document.createElement("input");
   input.type = "checkbox";
@@ -352,28 +379,29 @@ export function buildSwitchElement({
   container.appendChild(switchWrapper);
 
   let trailing = null;
-  if (trailingLabel && Array.isArray(trailingLabel)) {
+  if ((trailingLabel && Array.isArray(trailingLabel)) || trailingI18nKeys) {
     trailing = document.createElement("div");
     trailing.className = "trailing-label";
     container.appendChild(trailing);
   }
 
-  // wait for DOM attachment before resolving label
-  requestAnimationFrame(() => {
-    if (trailing) {
-      trailing.textContent = input.checked
-        ? trailingLabel?.[0]
-        : trailingLabel?.[1];
+  const updateTrailingText = (isChecked) => {
+    if (!trailing) return;
+    if (trailingI18nKeys && Array.isArray(trailingI18nKeys)) {
+      trailing.textContent = t(isChecked ? trailingI18nKeys[0] : trailingI18nKeys[1]);
+    } else if (trailingLabel && Array.isArray(trailingLabel)) {
+      trailing.textContent = isChecked ? trailingLabel[0] : trailingLabel[1];
     }
-  });
+  };
 
+  // Initial state
+  requestAnimationFrame(() => updateTrailingText(input.checked));
+
+  // Change event
   input.addEventListener("change", (e) => {
-    if (typeof onFlip === "function") onFlip(e.target.checked);
-    if (trailing) {
-      trailing.textContent = e.target.checked
-        ? trailingLabel?.[0]
-        : trailingLabel?.[1];
-    }
+    const isChecked = e.target.checked;
+    if (typeof onFlip === "function") onFlip(isChecked);
+    updateTrailingText(isChecked);
   });
 
   return { input, element: container };
@@ -385,7 +413,8 @@ export function createSwitch(
   checked = false,
   onFlip = null,
   layout = "block",
-  trailingLabel = null
+  trailingLabel = null,
+  i18nKey = null
 ) {
   const { input, element: switchWithLabel } = buildSwitchElement({
     id,
@@ -402,8 +431,11 @@ export function createSwitch(
     inline.style.alignItems = "center";
     inline.style.gap = "6px";
 
-    const span = document.createElement("span");
-    span.textContent = label;
+    const span = createLabelElement({
+      text: label,
+      forId: id,
+      i18nKey,
+    });
 
     inline.appendChild(span);
     inline.appendChild(switchWithLabel);
@@ -417,9 +449,11 @@ export function createSwitch(
     const left = document.createElement("div");
     const right = document.createElement("div");
 
-    const labelEl = document.createElement("label");
-    labelEl.htmlFor = id;
-    labelEl.textContent = label;
+    const labelEl = createLabelElement({
+      text: label,
+      forId: id,
+      i18nKey,
+    });
 
     left.appendChild(labelEl);
     right.appendChild(switchWithLabel);
@@ -429,9 +463,11 @@ export function createSwitch(
   }
 
   // default: block
-  const labelEl = document.createElement("label");
-  labelEl.htmlFor = id;
-  labelEl.textContent = label;
+  const labelEl = createLabelElement({
+    text: label,
+    forId: id,
+    i18nKey,
+  });
 
   const container = document.createElement("div");
   container.className = "modal-form-row switch-row";

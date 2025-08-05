@@ -30,6 +30,14 @@ export function t(key, fallback = "") {
 }
 
 /**
+ * Translate with dynamic key extension
+ */
+export function tKey(base, extension, fallback = "") {
+  const fullKey = base + extension;
+  return t(fullKey, fallback);
+}
+
+/**
  * Lowercase variant of translation
  */
 export function tLow(key, fallback = "") {
@@ -47,6 +55,7 @@ export function tUp(key, fallback = "") {
  * Apply translations to all elements with [data-i18n]
  */
 export function translateDOM(root = document.body) {
+  // textContent
   const elements = root.querySelectorAll("[data-i18n]");
   for (const el of elements) {
     const key = el.getAttribute("data-i18n");
@@ -54,11 +63,20 @@ export function translateDOM(root = document.body) {
     if (value) el.textContent = value;
   }
 
+  // title attribute
   const titleElements = root.querySelectorAll("[data-i18n-title]");
   for (const el of titleElements) {
     const key = el.getAttribute("data-i18n-title");
     const value = t(key);
     if (value) el.setAttribute("title", value);
+  }
+
+  // aria-label attribute
+  const ariaElements = root.querySelectorAll("[data-i18n-aria]");
+  for (const el of ariaElements) {
+    const key = el.getAttribute("data-i18n-aria");
+    const value = t(key);
+    if (value) el.setAttribute("aria-label", value);
   }
 }
 

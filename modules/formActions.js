@@ -30,7 +30,7 @@ export async function saveForm(container, template) {
   try {
     template = await ensureVirtualLocation(template);
     if (!template?.virtualLocation) {
-      EventBus.emit("status:update", "No template selected.");
+      EventBus.emit("status:update", t("status.save.cannot"));
       return;
     }
 
@@ -38,7 +38,7 @@ export async function saveForm(container, template) {
       container.querySelector("#meta-json-filename")
     );
     if (!datafile) {
-      EventBus.emit("status:update", "Please enter a filename for datafile.");
+      EventBus.emit("status:update", t("status.datafile.filename"));
       return;
     }
 
@@ -95,7 +95,10 @@ export async function deleteForm(container, template, datafile) {
   template = await ensureVirtualLocation(template);
   if (!template || !template.virtualLocation) {
     warn("[deleteForm] No template selected for deletion.");
-    EventBus.emit("status:update", "Cannot delete: template not selected.");
+    EventBus.emit(
+      "status:update",
+      `${t("status.delete.cannot")}: ${t("status.template.no.selected")}`
+    );
     return;
   }
 

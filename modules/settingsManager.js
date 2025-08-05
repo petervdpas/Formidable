@@ -11,7 +11,7 @@ import {
   addContainerElement,
 } from "../utils/elementBuilders.js";
 import { createDropdown } from "../utils/dropdownUtils.js";
-import { t, getAvailableLanguages } from "../utils/i18n.js";
+import { t, tKey, loadLocale, getAvailableLanguages, translateDOM } from "../utils/i18n.js";
 
 let cachedConfig = null;
 
@@ -64,6 +64,7 @@ export async function renderSettings() {
     tag: "p",
     className: "form-info-text",
     textContent: t("modal.settings.tab.general.description"),
+    i18nKey: "modal.settings.tab.general.description",
   });
 
   tabGeneral.appendChild(languageRow);
@@ -89,6 +90,7 @@ export async function renderSettings() {
     tag: "p",
     className: "form-info-text",
     textContent: t("modal.settings.tab.display.description"),
+    i18nKey: "modal.settings.tab.display.description",
   });
 
   tabDisplay.appendChild(
@@ -136,6 +138,7 @@ export async function renderSettings() {
     tag: "p",
     className: "form-info-text",
     textContent: t("modal.settings.tab.directories.description"),
+    i18nKey: "modal.settings.tab.directories.description",
   });
 
   const contextFolderPicker = createDirectoryPicker({
@@ -179,6 +182,7 @@ export async function renderSettings() {
     tag: "p",
     className: "form-info-text",
     textContent: t("modal.settings.tab.internal.description"),
+    i18nKey: "modal.settings.tab.internal.description",
   });
 
   tabServer.appendChild(
@@ -209,6 +213,7 @@ export async function renderSettings() {
     tag: "p",
     className: "form-info-text",
     textContent: t("modal.settings.tab.advanced.description"),
+    i18nKey: "modal.settings.tab.advanced.description"
   });
 
   tabAdvanced.appendChild(
@@ -232,7 +237,7 @@ export async function renderSettings() {
       onSave: async (val) => {
         await EventBus.emit("config:update", { encryption_key: val });
         cachedConfig = await reloadConfig();
-        EventBus.emit("status:update", "Secret key updated");
+        EventBus.emit("status:update", t("status.secret.key.updated"));
       },
     })
   );
@@ -323,7 +328,7 @@ function bindThemeSwitch(switchId, configKey) {
     await EventBus.emit("config:update", { [configKey]: theme });
     cachedConfig = await reloadConfig();
     EventBus.emit("theme:toggle", theme);
-    EventBus.emit("status:update", `Theme set to ${theme}`);
+    EventBus.emit("status:update", tKey("status.theme.set.", theme));
   };
 }
 
@@ -352,7 +357,7 @@ function bindFormInput(id, configKey, label) {
     onSave: async (val) => {
       EventBus.emit("config:update", { [configKey]: val });
       cachedConfig = await reloadConfig();
-      EventBus.emit("status:update", `${label} set to ${val}`);
+      EventBus.emit("status:update", `${label} ${t("status.set.to")} ${val}`);
     },
   });
 }
@@ -373,12 +378,14 @@ function bindDirButton(fieldId, configKey) {
     await EventBus.emit("config:update", { [configKey]: relative });
     cachedConfig = await reloadConfig();
 
-    EventBus.emit("status:update", `Updated ${configKey}: ${relative}`);
+    EventBus.emit(
+      "status:update",
+      `${t("standard.updated")} ${configKey}: ${relative}`
+    );
   };
 }
 
 function setupLanguageDropdown(config) {
-
   createDropdown({
     containerId: "settings-language",
     labelText: t("modal.settings.author.language", "Language"),
@@ -393,14 +400,13 @@ function setupLanguageDropdown(config) {
       try {
         await loadLocale(value);
         translateDOM();
-        EventBus.emit("status:update", `Language set to ${value}`);
-        EventBus.emit("i18n:changed", value); // optional hook for other modules
+        EventBus.emit("status:update", tKey("status.language.set.", value));
       } catch (err) {
         EventBus.emit("logging:error", [
           "[Settings] Failed to switch language",
           err,
         ]);
-        EventBus.emit("status:update", `Failed to switch language to ${value}`);
+        EventBus.emit("status:update", tKey("status.language.set.fail.", value));
       }
     },
   });

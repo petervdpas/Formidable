@@ -5,6 +5,7 @@ import { t } from "./i18n.js";
 
 export function createButton({
   text,
+  i18nKey = "",
   className = "",
   identifier = "",
   onClick = () => {},
@@ -13,6 +14,7 @@ export function createButton({
   ariaLabel = "",
 }) {
   const btn = document.createElement("button");
+
   btn.textContent = text;
   btn.id = identifier
     ? `btn-${identifier}`
@@ -20,6 +22,10 @@ export function createButton({
   btn.className = `btn ${className}`.trim();
   btn.disabled = disabled;
   btn.onclick = onClick;
+
+  if (i18nKey) {
+    btn.setAttribute("data-i18n", i18nKey);
+  }
 
   if (ariaLabel) {
     btn.setAttribute("aria-label", ariaLabel);
@@ -35,13 +41,15 @@ export function createButton({
 }
 
 export function createIconButton({
-  iconClass = "", // ie. "fa fa-flag"
+  iconClass = "",
   className = "",
   identifier = "",
   onClick = () => {},
   disabled = false,
   attributes = {},
   ariaLabel = "",
+  i18nTitle = "",
+  i18nAria = "",
 }) {
   const btn = document.createElement("button");
   btn.id = identifier ? `btn-${identifier}` : `btn-icon-button`;
@@ -49,18 +57,36 @@ export function createIconButton({
   btn.disabled = disabled;
   btn.onclick = onClick;
 
-  if (ariaLabel) {
-    btn.setAttribute("aria-label", ariaLabel);
-    btn.setAttribute("role", "button");
-    btn.setAttribute("data-tooltip", ariaLabel);
-  }
-
   // Icon element
   const icon = document.createElement("i");
   icon.className = iconClass;
   btn.appendChild(icon);
 
-  // Set extra attributes
+  // Handle i18nTitle
+  if (i18nTitle) {
+    const translatedTitle = t(i18nTitle);
+    btn.setAttribute("title", translatedTitle);
+    btn.setAttribute("data-i18n-title", i18nTitle);
+    btn.setAttribute("data-tooltip", translatedTitle);
+  }
+
+  // Handle i18nAria
+  if (i18nAria) {
+    const translatedAria = t(i18nAria);
+    btn.setAttribute("aria-label", translatedAria);
+    btn.setAttribute("data-i18n-aria", i18nAria);
+  }
+
+  // Fallback aria-label and tooltip if no i18n keys
+  if (!i18nAria && ariaLabel) {
+    btn.setAttribute("aria-label", ariaLabel);
+    btn.setAttribute("data-tooltip", ariaLabel);
+  }
+
+  // Always add role
+  btn.setAttribute("role", "button");
+
+  // Apply extra attributes last
   for (const [key, value] of Object.entries(attributes)) {
     btn.setAttribute(key, value);
   }

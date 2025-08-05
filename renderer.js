@@ -164,7 +164,10 @@ window.addEventListener("DOMContentLoaded", async () => {
         EventBus.emit("logging:warning", [
           "[YamlEditor] No template selected.",
         ]);
-        EventBus.emit("status:update", "Cannot save: no template selected.");
+        EventBus.emit(
+          "status:update",
+          `${t("status.save.cannot")}: ${t("status.template.no.selected")}`
+        );
         return;
       }
 

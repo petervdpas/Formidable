@@ -3,24 +3,25 @@
 import { createButton, createIconButton } from "../utils/buttonUtils.js";
 import { t } from "../utils/i18n.js";
 
-export function createSettingsRestartIconButton(onClick, disabled = false) {
+export function createSettingsRestartIconButton(
+  handleClick,
+  isDisabled = false
+) {
   return createIconButton({
     iconClass: "fa fa-refresh",
     className: "btn-icon btn-icon-default btn-icon-small",
     identifier: "settings-restart",
-    onClick,
-    disabled,
-    attributes: {
-      title: t("tooltip.restart.formidable"),
-      "data-i18n-title": "tooltip.restart.formidable",
-    },
-    ariaLabel: t("aria.restartApp"),
+    onClick: handleClick,
+    disabled: isDisabled,
+    i18nTitle: "tooltip.restart.formidable",
+    i18nAria: "aria.restartApp",
   });
 }
 
 export function createProfileAddButton(onClick) {
   return createButton({
     text: t("standard.create"),
+    i18nKey: "standard.create",
     className: "btn-info btn-input-height",
     identifier: "create-profile",
     onClick,
@@ -41,6 +42,7 @@ export function createFieldEditIconButton(idx, onClick) {
 export function createFieldEditButton(idx, onClick) {
   return createButton({
     text: t("standard.edit"),
+    i18nKey: "standard.edit",
     className: "btn-warn",
     identifier: `field-edit-${idx}`,
     onClick,
@@ -61,6 +63,7 @@ export function createFieldDeleteIconButton(idx, onClick) {
 export function createFieldDeleteButton(idx, onClick) {
   return createButton({
     text: t("standard.delete"),
+    i18nKey: "standard.delete",
     className: "btn-danger",
     identifier: `field-delete-${idx}`,
     onClick,
@@ -71,6 +74,7 @@ export function createFieldDeleteButton(idx, onClick) {
 export function createReorderUpButton(idx, disabled, onClick) {
   return createButton({
     text: t("standard.up.sign"),
+    i18nKey: "standard.up.sign",
     className: "btn-light",
     identifier: `field-up-${idx}`,
     onClick,
@@ -83,6 +87,7 @@ export function createReorderUpButton(idx, disabled, onClick) {
 export function createReorderDownButton(idx, total, onClick) {
   return createButton({
     text: t("standard.down.sign"),
+    i18nKey: "standard.down.sign",
     className: "btn-light",
     identifier: `field-down-${idx}`,
     onClick,
@@ -95,6 +100,7 @@ export function createReorderDownButton(idx, total, onClick) {
 export function createTemplateAddFieldButton(onClick) {
   return createButton({
     text: t("button.addField"),
+    i18nKey: "button.addField",
     className: "btn-info",
     identifier: "template-add-field",
     onClick,
@@ -114,6 +120,7 @@ export function createTemplateSaveIconButton(onClick) {
 export function createTemplateSaveButton(onClick) {
   return createButton({
     text: t("standard.save"),
+    i18nKey: "standard.save",
     className: "btn-default btn-warn",
     identifier: "template-save",
     onClick,
@@ -133,6 +140,7 @@ export function createTemplateDeleteIconButton(onClick) {
 export function createTemplateDeleteButton(onClick) {
   return createButton({
     text: t("standard.delete"),
+    i18nKey: "standard.delete",
     className: "btn-default btn-danger",
     identifier: "template-delete",
     onClick,
@@ -142,6 +150,7 @@ export function createTemplateDeleteButton(onClick) {
 export function createTemplateGeneratorButton(onClick) {
   return createButton({
     text: t("button.generateTemplate"),
+    i18nKey: "button.generateTemplate",
     className: "btn-default btn-info",
     identifier: "template-generate",
     onClick,
@@ -151,6 +160,7 @@ export function createTemplateGeneratorButton(onClick) {
 export function createFormSaveButton(onClick) {
   return createButton({
     text: t("standard.save"),
+    i18nKey: "standard.save",
     className: "btn-default btn-warn",
     identifier: "form-save",
     onClick,
@@ -170,6 +180,7 @@ export function createFormSaveIconButton(onClick) {
 export function createFormDeleteButton(onClick) {
   return createButton({
     text: t("standard.delete"),
+    i18nKey: "standard.delete",
     className: "btn-default btn-danger",
     identifier: "form-delete",
     onClick,
@@ -189,6 +200,7 @@ export function createFormDeleteIconButton(onClick) {
 export function createFormRenderButton(onClick) {
   return createButton({
     text: t("standard.render"),
+    i18nKey: "standard.render",
     className: "btn-default btn-info",
     identifier: "form-render",
     onClick,
@@ -208,6 +220,7 @@ export function createFormRenderIconButton(onClick) {
 export function createGitCommitButton(onClick, disabled = false) {
   return createButton({
     text: t("standard.commit"),
+    i18nKey: "standard.commit",
     className: "btn-info",
     identifier: "git-commit",
     onClick,
@@ -219,6 +232,7 @@ export function createGitCommitButton(onClick, disabled = false) {
 export function createGitPushButton(onClick, disabled = false) {
   return createButton({
     text: t("standard.push"),
+    i18nKey: "standard.push",
     className: "btn-info",
     identifier: "git-push",
     onClick,
@@ -230,6 +244,7 @@ export function createGitPushButton(onClick, disabled = false) {
 export function createGitPullButton(onClick, disabled = false) {
   return createButton({
     text: t("standard.pull"),
+    i18nKey: "standard.pull",
     className: "btn-info",
     identifier: "git-pull",
     onClick,
@@ -241,6 +256,7 @@ export function createGitPullButton(onClick, disabled = false) {
 export function createGitDiscardButton(filePath, onClick) {
   return createButton({
     text: t("standard.discard"),
+    i18nKey: "standard.discard",
     className: "btn-warn btn-discard",
     onClick,
     attributes: {
@@ -250,26 +266,34 @@ export function createGitDiscardButton(filePath, onClick) {
 }
 
 export function createFlaggedToggleButton(initialFlagged, onClick) {
+  const i18nFlag = "standard.flag";
+  const i18nUnflag = "standard.unflag";
+
   const btn = createIconButton({
     iconClass: "fa fa-flag",
     className: initialFlagged ? "btn-flagged" : "btn-unflagged",
     identifier: "form-flagged-toggle",
-    ariaLabel: initialFlagged ? t("standard.unflag") : t("standard.flag"),
+    i18nAria: initialFlagged ? i18nUnflag : i18nFlag,
   });
 
+  // Store both keys for toggling
   btn._flagged = initialFlagged;
+  btn._i18nFlag = i18nFlag;
+  btn._i18nUnflag = i18nUnflag;
 
   btn.onclick = () => {
     btn._flagged = !btn._flagged;
 
-    // Toggle classes zonder inhoud te verwijderen
+    // Toggle class
     btn.classList.toggle("btn-flagged", btn._flagged);
     btn.classList.toggle("btn-unflagged", !btn._flagged);
 
-    btn.setAttribute(
-      "aria-label",
-      btn._flagged ? t("standard.unflag") : t("standard.flag")
-    );
+    // Update aria-label + data-i18n-aria
+    const key = btn._flagged ? btn._i18nUnflag : btn._i18nFlag;
+    const label = t(key);
+
+    btn.setAttribute("aria-label", label);
+    btn.setAttribute("data-i18n-aria", key);
 
     if (typeof onClick === "function") {
       onClick(btn._flagged);
@@ -282,6 +306,7 @@ export function createFlaggedToggleButton(initialFlagged, onClick) {
 export function createShowMarkdownButton(onClick) {
   return createButton({
     text: t("button.markdown.arrow"),
+    i18nKey: "button.markdown.arrow",
     className: "modal-header-button",
     identifier: "show-markdown",
     onClick,
@@ -291,6 +316,7 @@ export function createShowMarkdownButton(onClick) {
 export function createShowPreviewButton(onClick) {
   return createButton({
     text: t("button.preview.arrow"),
+    i18nKey: "button.preview.arrow",
     className: "modal-header-button",
     identifier: "show-preview",
     onClick,
@@ -300,6 +326,7 @@ export function createShowPreviewButton(onClick) {
 export function createCopyMarkdownButton(onClick) {
   return createButton({
     text: t("standard.copy.sign"),
+    i18nKey: "standard.copy.sign",
     className: "copy-btn",
     identifier: "copy-markdown",
     onClick,
@@ -310,6 +337,7 @@ export function createCopyMarkdownButton(onClick) {
 export function createCopyPreviewButton(onClick) {
   return createButton({
     text: t("standard.copy.sign"),
+    i18nKey: "standard.copy.sign",
     className: "copy-btn",
     identifier: "copy-preview",
     onClick,
@@ -320,6 +348,7 @@ export function createCopyPreviewButton(onClick) {
 export function createPaneCloseButton(targetPaneClass, onClick) {
   return createButton({
     text: t("standard.close.sign"),
+    i18nKey: "standard.close.sign",
     className: "btn-close-special",
     identifier: `close-${targetPaneClass}`,
     onClick,
@@ -329,12 +358,14 @@ export function createPaneCloseButton(targetPaneClass, onClick) {
 
 export function createAddButton({
   label = t("standard.add"),
+  i18nKey = "standard.add",
   onClick,
   id = "",
   className = "btn-okay",
 }) {
   return createButton({
     text: label,
+    i18nKey,
     className,
     identifier: id || label.toLowerCase().replace(/\s+/g, "-"),
     onClick,
@@ -344,6 +375,7 @@ export function createAddButton({
 export function createAddLoopItemButton(onClick, key, idx = 0) {
   return createButton({
     text: t("button.addLoopItem"),
+    i18nKey: "button.addLoopItem",
     className: "btn-okay add-loop-item-btn",
     identifier: "add-loop-item",
     onClick,
@@ -353,6 +385,7 @@ export function createAddLoopItemButton(onClick, key, idx = 0) {
 export function createDeleteLoopItemButton(onClick, identifier = "") {
   return createButton({
     text: t("standard.close.sign"),
+    i18nKey: "standard.close.sign",
     className: "btn-close-special btn-danger loop-item-remove",
     identifier: identifier || "loop-item-delete",
     onClick,
@@ -362,6 +395,7 @@ export function createDeleteLoopItemButton(onClick, identifier = "") {
 export function createRemoveImageButton(onClick, identifier = "") {
   return createButton({
     text: t("standard.close.sign"),
+    i18nKey: "standard.close.sign",
     className: "btn-close-special btn-remove-image",
     identifier: identifier || "remove-image",
     onClick,
@@ -383,6 +417,7 @@ export function createLinkOpenButton(linkText, onClick, disabled = false) {
 export function createPluginReloadButton(onClick) {
   return createButton({
     text: t("button.reloadPlugins"),
+    i18nKey: "button.reloadPlugins",
     className: "btn-default btn-fullwidth",
     identifier: "reload-plugins",
     onClick,
@@ -392,6 +427,7 @@ export function createPluginReloadButton(onClick) {
 export function createPluginCreateButton(onClick) {
   return createButton({
     text: t("button.createPlugin"),
+    i18nKey: "button.createPlugin",
     className: "btn-okay",
     identifier: "create-plugin",
     onClick,
@@ -401,6 +437,7 @@ export function createPluginCreateButton(onClick) {
 export function createPluginUploadButton(onClick) {
   return createButton({
     text: t("button.uploadPlugin"),
+    i18nKey: "button.uploadPlugin",
     className: "btn-okay",
     identifier: "upload-plugin",
     onClick,
@@ -410,6 +447,7 @@ export function createPluginUploadButton(onClick) {
 export function createPluginDeleteButton(name, onClick) {
   return createButton({
     text: t("standard.delete"),
+    i18nKey: "standard.delete",
     className: "btn-danger btn-small",
     identifier: `plugin-delete-${name}`,
     onClick,
@@ -420,6 +458,7 @@ export function createPluginDeleteButton(name, onClick) {
 export function createPluginToggleButton(name, enabled, onClick) {
   return createButton({
     text: enabled ? t("standard.disable") : t("standard.enable"),
+    i18nKey: enabled ? "standard.disable" : "standard.enable",
     className: "btn-small",
     identifier: `plugin-toggle-${name}`,
     onClick,

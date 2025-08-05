@@ -5,6 +5,20 @@ export default {
   "status.ready": "Ready.",
   "resize.handle.title": "Drag to Resize",
 
+  // ── Status Messages ─────────────────────
+  "status.language.set.en": "Language set to English",
+  "status.language.set.fail.en": "Failed to set language to English",
+  "status.language.set.nl": "Language set to Dutch",
+  "status.language.set.fail.nl": "Failed to set language to Dutch",
+  "status.save.cannot": "Cannot save",
+  "status.delete.cannot": "Cannot delete",
+  "status.template.no.selected": "No template selected.",
+  "status.datafile.filename": "Please enter a filename for datafile.",
+  "status.secret.key.updated": "Secret key updated.",
+  "status.theme.set.to": "set to",
+  "status.theme.set.light": "Theme is set to light.",
+  "status.theme.set.dark": "Theme is set to dark.",
+
   // ── Menu ───────────────────────────────
   "menu.file.openTemplateFolder": "Open Template Folder",
   "menu.file.openStorageFolder": "Open Storage Folder",
