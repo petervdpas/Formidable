@@ -279,6 +279,8 @@ export async function renderGitStatus(container, modalApi) {
                 args: [result.summary.changes],
                 variant: "success",
               });
+            } else {
+              console.log(result);
             }
             refresh();
           },
