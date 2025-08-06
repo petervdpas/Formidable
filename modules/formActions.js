@@ -30,7 +30,11 @@ export async function saveForm(container, template) {
   try {
     template = await ensureVirtualLocation(template);
     if (!template?.virtualLocation) {
-      EventBus.emit("status:update", t("status.save.cannot"));
+      EventBus.emit("status:update", {
+        message: "status.save.cannot",
+        languageKey: "status.save.cannot",
+        i18nEnabled: true,
+      });
       return;
     }
 
@@ -38,7 +42,11 @@ export async function saveForm(container, template) {
       container.querySelector("#meta-json-filename")
     );
     if (!datafile) {
-      EventBus.emit("status:update", t("status.datafile.filename"));
+      EventBus.emit("status:update", {
+        message: "status.datafile.filename",
+        languageKey: "status.datafile.filename",
+        i18nEnabled: true,
+      });
       return;
     }
 

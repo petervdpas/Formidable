@@ -5,10 +5,11 @@ import { t } from "../../utils/i18n.js";
 
 const messageTimestamps = new Map();
 
-let messageEl = null;
+let messageWrapper = null; // #status-bar-message
+let messageSpan = null; // #status-bar-message > span
 let infoEl = null;
 
-export function initStatusHandler(statusBarId) {
+export function initStatusHandler(statusBarId = "status-bar") {
   const container = document.getElementById(statusBarId);
   if (!container) {
     EventBus.emit("logging:warning", [
@@ -17,12 +18,13 @@ export function initStatusHandler(statusBarId) {
     return;
   }
 
-  messageEl = container.querySelector("#status-bar-message");
+  messageWrapper = container.querySelector("#status-bar-message");
+  messageSpan = messageWrapper?.querySelector("span") || null;
   infoEl = container.querySelector("#status-bar-info");
 
-  if (!messageEl) {
+  if (!messageSpan) {
     EventBus.emit("logging:warning", [
-      `[StatusHandler] Missing #status-bar-message inside #${statusBarId}.`,
+      `[StatusHandler] Missing <span> inside #status-bar-message.`,
     ]);
   }
 
@@ -35,29 +37,63 @@ export function initStatusHandler(statusBarId) {
   EventBus.emit("logging:default", [`[StatusHandler] Initialized.`]);
 }
 
-export function handleStatusUpdate(message) {
-  const now = Date.now();
-  const last = messageTimestamps.get(message) || 0;
-
-  if (now - last < 500) {
-    EventBus.emit("logging:default", [
-      `[StatusHandler] Skipped message (too soon): "${message}"`,
+export function handleStatusUpdate({
+  message,
+  languageKey = null,
+  i18nEnabled = false,
+  args = [],
+}) {
+  if (!messageSpan) {
+    EventBus.emit("logging:warning", [
+      `[StatusHandler] No message <span> found in #status-bar-message.`,
     ]);
     return;
   }
 
-  messageTimestamps.set(message, now);
+  let displayMessage = message;
+  let messageId =
+    i18nEnabled && languageKey ? `${languageKey}:${args.join("|")}` : message;
 
-  if (messageEl) {
-    messageEl.textContent = message;
+  const now = Date.now();
+  const last = messageTimestamps.get(messageId) || 0;
+
+  if (now - last < 500) {
     EventBus.emit("logging:default", [
-      `[StatusHandler] Status message updated: "${message}"`,
+      `[StatusHandler] Skipped message (too soon): "${messageId}"`,
+    ]);
+    return;
+  }
+
+  messageTimestamps.set(messageId, now);
+
+  if (i18nEnabled && languageKey) {
+    messageSpan.setAttribute("data-i18n", languageKey);
+    if (args.length) {
+      messageSpan.setAttribute("data-i18n-args", JSON.stringify(args));
+    } else {
+      messageSpan.removeAttribute("data-i18n-args");
+    }
+
+    let translated = t(languageKey);
+    translated = translated.replace(/{(\d+)}/g, (match, index) =>
+      args[index] !== undefined ? String(args[index]) : match
+    );
+
+    displayMessage = translated;
+
+    EventBus.emit("logging:default", [
+      `[StatusHandler] Status updated (i18n): "${translated}"`,
     ]);
   } else {
-    EventBus.emit("logging:warning", [
-      `[StatusHandler] No status message element available.`,
+    messageSpan.removeAttribute("data-i18n");
+    messageSpan.removeAttribute("data-i18n-args");
+
+    EventBus.emit("logging:default", [
+      `[StatusHandler] Status updated (plain): "${message}"`,
     ]);
   }
+
+  messageSpan.textContent = displayMessage;
 }
 
 export function setStatusInfo(textOrKey, options = {}) {
@@ -70,7 +106,7 @@ export function setStatusInfo(textOrKey, options = {}) {
     return;
   }
 
-  infoEl.innerHTML = ""; // Clear previous content
+  infoEl.innerHTML = "";
 
   if (i18nEnabled && typeof textOrKey === "string") {
     const span = document.createElement("span");
@@ -78,14 +114,15 @@ export function setStatusInfo(textOrKey, options = {}) {
     if (args.length) {
       span.setAttribute("data-i18n-args", JSON.stringify(args));
     }
-    // Initial render
+
     let translated = t(textOrKey);
     translated = translated.replace(/{(\d+)}/g, (match, index) =>
       args[index] !== undefined ? String(args[index]) : match
     );
-    span.textContent = translated;
 
+    span.textContent = translated;
     infoEl.appendChild(span);
+
     EventBus.emit("logging:default", [
       `[StatusHandler] Info set (i18n): "${translated}"`,
     ]);

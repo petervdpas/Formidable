@@ -11,7 +11,13 @@ import {
   addContainerElement,
 } from "../utils/elementBuilders.js";
 import { createDropdown } from "../utils/dropdownUtils.js";
-import { t, tKey, loadLocale, getAvailableLanguages, translateDOM } from "../utils/i18n.js";
+import {
+  t,
+  tKey,
+  loadLocale,
+  getAvailableLanguages,
+  translateDOM,
+} from "../utils/i18n.js";
 import { rebuildMenu } from "../modules/menuManager.js";
 
 let cachedConfig = null;
@@ -75,11 +81,7 @@ export async function renderSettings() {
   );
 
   tabGeneral.appendChild(
-    bindFormInput(
-      "author-email",
-      "author_email",
-      "modal.settings.author.email"
-    )
+    bindFormInput("author-email", "author_email", "modal.settings.author.email")
   );
 
   // ─── Display Settings ─────────────────
@@ -219,7 +221,7 @@ export async function renderSettings() {
     tag: "p",
     className: "form-info-text",
     textContent: t("modal.settings.tab.advanced.description"),
-    i18nKey: "modal.settings.tab.advanced.description"
+    i18nKey: "modal.settings.tab.advanced.description",
   });
 
   tabAdvanced.appendChild(
@@ -244,7 +246,8 @@ export async function renderSettings() {
       onSave: async (val) => {
         await EventBus.emit("config:update", { encryption_key: val });
         cachedConfig = await reloadConfig();
-        EventBus.emit("status:update", t("status.secret.key.updated"));
+
+        emitConfigStatus("encryption_key", "•••••");
       },
       i18nEnabled: true,
     })
@@ -338,7 +341,8 @@ function bindThemeSwitch(switchId, configKey) {
     await EventBus.emit("config:update", { [configKey]: theme });
     cachedConfig = await reloadConfig();
     EventBus.emit("theme:toggle", theme);
-    EventBus.emit("status:update", tKey("status.theme.set.", theme));
+
+    emitConfigStatus(configKey, theme);
   };
 }
 
@@ -351,10 +355,8 @@ function bindToggleSwitch(switchId, configKey, onExtra = null) {
     await EventBus.emit("config:update", { [configKey]: enabled });
     if (typeof onExtra === "function") await onExtra(enabled);
     cachedConfig = await reloadConfig();
-    EventBus.emit(
-      "status:update",
-      `${configKey.replace(/_/g, " ")} ${enabled ? "enabled" : "disabled"}`
-    );
+
+    emitConfigStatus(configKey, enabled);
   };
 }
 
@@ -367,7 +369,7 @@ function bindFormInput(id, configKey, key) {
     onSave: async (val) => {
       EventBus.emit("config:update", { [configKey]: val });
       cachedConfig = await reloadConfig();
-      EventBus.emit("status:update", `${label} ${t("status.set.to")} ${val}`);
+      emitConfigStatus(configKey, val);
     },
     i18nEnabled: true,
   });
@@ -389,10 +391,7 @@ function bindDirButton(fieldId, configKey) {
     await EventBus.emit("config:update", { [configKey]: relative });
     cachedConfig = await reloadConfig();
 
-    EventBus.emit(
-      "status:update",
-      `${t("standard.updated")} ${configKey}: ${relative}`
-    );
+    emitConfigStatus(configKey, relative);
   };
 }
 
@@ -411,17 +410,66 @@ function setupLanguageDropdown(config) {
       try {
         await loadLocale(value);
         translateDOM();
-
         await rebuildMenu();
 
-        EventBus.emit("status:update", tKey("status.language.set.", value));
+        EventBus.emit("status:update", {
+          languageKey: `status.language.set.${value}`,
+          i18nEnabled: true,
+        });
       } catch (err) {
         EventBus.emit("logging:error", [
           "[Settings] Failed to switch language",
           err,
         ]);
-        EventBus.emit("status:update", tKey("status.language.set.fail.", value));
+        EventBus.emit("status:update", {
+          languageKey: `status.language.set.fail.${value}`,
+          i18nEnabled: true,
+        });
       }
     },
   });
+}
+
+function emitConfigStatus(configKey, value, success = true) {
+  const labelKey = `config.${configKey}`;
+  const label = t(labelKey);
+
+  if (success === false) {
+    EventBus.emit("status:update", {
+      message: `${configKey} update failed`,
+      languageKey: "status.config.failed",
+      i18nEnabled: true,
+      args: [label],
+    });
+    return;
+  }
+
+  // ── Theme-specific message ──
+  if (configKey === "theme" && (value === "dark" || value === "light")) {
+    EventBus.emit("status:update", {
+      message: `Theme is set to ${value}`,
+      languageKey: `status.theme.set.${value}`,
+      i18nEnabled: true,
+    });
+    return;
+  }
+
+  if (typeof value === "boolean") {
+    const statusKey = value
+      ? "status.config.enabled"
+      : "status.config.disabled";
+    EventBus.emit("status:update", {
+      message: `${configKey} ${value ? "enabled" : "disabled"}`,
+      languageKey: statusKey,
+      i18nEnabled: true,
+      args: [label],
+    });
+  } else {
+    EventBus.emit("status:update", {
+      message: `${configKey} set to ${value}`,
+      languageKey: "status.config.setTo",
+      i18nEnabled: true,
+      args: [label, value],
+    });
+  }
 }

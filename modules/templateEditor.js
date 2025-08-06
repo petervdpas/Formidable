@@ -276,10 +276,12 @@ export function initTemplateEditor(containerId, onSaveCallback) {
           });
 
           if (errors?.length > 0) {
-            EventBus.emit(
-              "status:update",
-              `Validation failed: ${errors.length} error(s).`
-            );
+            EventBus.emit("status:update", {
+              message: "status.template.validation.error",
+              languageKey: "status.template.validation.error",
+              i18nEnabled: true,
+              args: [errors.length],
+            });
             errors.forEach((err) =>
               EventBus.emit("ui:toast", {
                 message: formatError(err),
@@ -296,7 +298,13 @@ export function initTemplateEditor(containerId, onSaveCallback) {
           });
 
           const filename = window.currentSelectedTemplateName || "Unknown";
-          EventBus.emit("status:update", `Template saved: ${filename}`);
+
+          EventBus.emit("status:update", {
+            message: "status.template.save.success",
+            languageKey: "status.template.save.success",
+            i18nEnabled: true,
+            args: [filename],
+          });
           EventBus.emit("ui:toast", {
             languageKey: "toast.template.save.success",
             args: [filename],

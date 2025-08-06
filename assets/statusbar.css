@@ -25,6 +25,13 @@
   text-overflow: ellipsis;
 }
 
+#status-bar-message span {
+  display: inline-block;
+  /* Optional extras: */
+  /* color: var(--status-color); */
+  /* transition: opacity 0.3s ease; */
+}
+
 #status-bar-info {
   flex-shrink: 0;
   margin-left: 12px;

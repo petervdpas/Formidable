@@ -159,8 +159,11 @@ export function createFormRowInput({
 
   input.onchange = async () => {
     const newVal = input.value.trim();
-    if (onSave) onSave(newVal);
-    else EventBus.emit("status:update", `${label} set to ${newVal}`);
+    if (onSave) {
+      onSave(newVal);
+    } else {
+      EventBus.emit("status:update", `${label} set to ${newVal}`);
+    }
   };
 
   row.appendChild(labelEl);

@@ -59,5 +59,9 @@ export async function handleContextToggle(isStorage) {
     }
   }
 
-  EventBus.emit("status:update", `Context set to ${mode}`);
+  EventBus.emit("status:update", {
+    message: `status.context.set.${mode}`,
+    languageKey: `status.context.set.${mode}`,
+    i18nEnabled: true,
+  });
 }

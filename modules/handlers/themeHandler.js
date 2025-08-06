@@ -13,5 +13,10 @@ export async function handleThemeToggle(theme) {
   setCodeMirrorTheme(theme);
 
   await window.api.config.updateUserConfig({ theme });
-  EventBus.emit("status:update", `Theme set to ${isDark ? "Dark" : "Light"}`);
+  
+  EventBus.emit("status:update", {
+    message: `status.theme.set.${isDark ? "dark" : "light"}`,
+    languageKey: `status.theme.set.${isDark ? "dark" : "light"}`,
+    i18nEnabled: true,
+  });
 }

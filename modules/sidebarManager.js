@@ -77,16 +77,22 @@ export function createTemplateListManager(modal, dropdown = null) {
                 yaml,
               });
 
-              EventBus.emit(
-                "status:update",
-                `Created new template: ${template}`
-              );
+              EventBus.emit("status:update", {
+                message: "status.template.create.new",
+                languageKey: "status.template.create.new",
+                i18nEnabled: true,
+                args: [template],
+              });
             } catch (err) {
               EventBus.emit("logging:error", [
                 "[AddTemplate] Failed to save:",
                 err,
               ]);
-              EventBus.emit("status:update", "Error creating new template.");
+              EventBus.emit("status:update", {
+                message: "status.template.create.new.error",
+                languageKey: "status.template.create.new.error",
+                i18nEnabled: true,
+              });
             }
           },
         });
@@ -216,7 +222,11 @@ export function createStorageListManager(formManager, modal) {
       onClick: async () => {
         const template = window.currentSelectedTemplate;
         if (!template) {
-          EventBus.emit("status:update", "Please select a template first.");
+          EventBus.emit("status:update", {
+            message: "status.template.first.select",
+            languageKey: "status.template.first.select",
+            i18nEnabled: true,
+          });
           return;
         }
 
@@ -224,7 +234,11 @@ export function createStorageListManager(formManager, modal) {
           modal,
           callback: async (datafile) => {
             await formManager.loadFormData({}, datafile);
-            EventBus.emit("status:update", "New metadata entry ready.");
+            EventBus.emit("status:update", {
+              message: "status.metadata.new.ready",
+              languageKey: "status.metadata.new.ready",
+              i18nEnabled: true,
+            });
           },
         });
       },
