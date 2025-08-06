@@ -6,7 +6,7 @@
   "development_enable": true,
   "logging_enabled": true,
   "enable_plugins": true,
-  "context_mode": "storage",
+  "context_mode": "template",
   "context_folder": "./",
   "selected_template": "basic.yaml",
   "selected_data_file": "sane-20250530.meta.json",

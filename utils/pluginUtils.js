@@ -256,7 +256,8 @@ export async function saveMarkdownTo({
 
   if (showToast) {
     EventBus.emit("ui:toast", {
-      message: `${t("toast.markdown.saved")} ${markdownFilePath}`,
+      languageKey: "toast.markdown.saved",
+      args: [markdownFilePath],
       variant: "success",
     });
   }

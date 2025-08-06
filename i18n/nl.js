@@ -58,7 +58,7 @@ export default {
   "toast.key.required": "Sleutel mag niet leeg zijn.",
   "toast.folder.required": "Folder naam is vereist.",
   "toast.dragging.item.collapse": "Vouw het item samen voordat je het sleept.",
-  "toast.markdown.saved": "Markdown opgeslagen in",
+  "toast.markdown.saved": "Markdown opgeslagen in {0}.",
 
   "toast.plugin.created": "Plugin aangemaakt.",
   "toast.plugin.delete.failed": "Verwijderen van plugin mislukt.",
@@ -89,7 +89,7 @@ export default {
     "Geen sjabloon geselecteerd. Selecteer eerst een sjabloon.",
   "toast.template.enable.collection":
     "`Inschakelen Verzameling` vereist minimaal één GUID-veld in het sjabloon.",
-  "toast.template.save.success": "Sjabloon succesvol opgeslagen.",
+  "toast.template.save.success": "Sjabloon {0} is succesvol opgeslagen.",
 
   // ── Special ─────────────────────────
   "special.html.span.small":

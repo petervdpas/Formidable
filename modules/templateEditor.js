@@ -185,7 +185,7 @@ export function initTemplateEditor(containerId, onSaveCallback) {
         if (!hasGuid) {
           checkbox.checked = false;
           EventBus.emit("ui:toast", {
-            message: t("toast.template.enable.collection"),
+            languageKey: "toast.template.enable.collection",
             variant: "warn",
           });
         }
@@ -298,7 +298,8 @@ export function initTemplateEditor(containerId, onSaveCallback) {
           const filename = window.currentSelectedTemplateName || "Unknown";
           EventBus.emit("status:update", `Template saved: ${filename}`);
           EventBus.emit("ui:toast", {
-            message: `${t("toast.template.save.success")}: ${filename}`,
+            languageKey: "toast.template.save.success",
+            args: [filename],
             variant: "success",
           });
         },

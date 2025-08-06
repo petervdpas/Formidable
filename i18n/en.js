@@ -55,7 +55,7 @@ export default {
   "toast.key.required": "Key cannot be empty.",
   "toast.folder.required": "Folder name is required.",
   "toast.dragging.item.collapse": "Collapse the item before dragging.",
-  "toast.markdown.saved": "Saved markdown to",
+  "toast.markdown.saved": "Saved markdown to {0}.",
 
   "toast.plugin.created": "Plugin created.",
   "toast.plugin.delete.failed": "Failed to delete plugin.",
@@ -85,7 +85,7 @@ export default {
     "No template selected. Please select a template first.",
   "toast.template.enable.collection":
     "`Enable Collection` requires at least one GUID field in the template.",
-  "toast.template.save.success": "Template saved successfully",
+  "toast.template.save.success": "Template {0} was saved successfully.",
 
   // ── Special ─────────────────────────
   "special.html.span.small":
