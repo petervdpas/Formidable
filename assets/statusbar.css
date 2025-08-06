@@ -27,9 +27,24 @@
 
 #status-bar-message span {
   display: inline-block;
-  /* Optional extras: */
-  /* color: var(--status-color); */
-  /* transition: opacity 0.3s ease; */
+  color: var(--status-message-color);
+}
+
+/* Status message variants */
+#status-bar-message span.status-info {
+  color: var(--status-message-color); /* default */
+}
+
+#status-bar-message span.status-success {
+  color: var(--status-success-color);
+}
+
+#status-bar-message span.status-warning {
+  color: var(--status-warning-color);
+}
+
+#status-bar-message span.status-error {
+  color: var(--status-error-color);
 }
 
 #status-bar-info {

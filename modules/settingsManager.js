@@ -440,17 +440,14 @@ function emitConfigStatus(configKey, value, success = true) {
       languageKey: "status.config.failed",
       i18nEnabled: true,
       args: [label],
+      variant: "error",
     });
     return;
   }
 
   // ── Theme-specific message ──
   if (configKey === "theme" && (value === "dark" || value === "light")) {
-    EventBus.emit("status:update", {
-      message: `Theme is set to ${value}`,
-      languageKey: `status.theme.set.${value}`,
-      i18nEnabled: true,
-    });
+    // Special handling for theme changes happens in themeHandler.js
     return;
   }
 
@@ -463,6 +460,7 @@ function emitConfigStatus(configKey, value, success = true) {
       languageKey: statusKey,
       i18nEnabled: true,
       args: [label],
+      variant: value ? "default" : "warning",
     });
   } else {
     EventBus.emit("status:update", {

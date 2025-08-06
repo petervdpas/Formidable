@@ -139,7 +139,9 @@ export async function handleListItemClicked({ listId, name }) {
         message: "status.datafile.ready",
         languageKey: "status.datafile.ready",
         i18nEnabled: true,
-        args: [name],});
+        args: [name],
+        variant: "success",
+      });
     }
   } catch (err) {
     EventBus.emit("status:update", {

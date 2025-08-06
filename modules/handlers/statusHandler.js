@@ -3,7 +3,7 @@
 import { EventBus } from "../eventBus.js";
 import { t } from "../../utils/i18n.js";
 
-const PROCESS_INTERVAL_MESSAGE = 500;
+const PROCESS_INTERVAL_MESSAGE = 700;
 const PROCESS_INTERVAL_INFO = 100;
 
 const messageTimestamps = new Map();
@@ -77,6 +77,7 @@ function processNextStatusMessage() {
     log = false,
     logLevel = "default",
     logOrigin = null,
+    variant = "info",
   } = messageQueue.shift();
 
   let displayMessage = message;
@@ -122,6 +123,15 @@ function processNextStatusMessage() {
       logEmittedStatus(displayMessage, logOrigin || "StatusHandler", logLevel);
     }
   }
+
+  // Apply variant class
+  messageSpan.classList.remove(
+    "status-info",
+    "status-success",
+    "status-warning",
+    "status-error"
+  );
+  messageSpan.classList.add(`status-${variant}`);
 
   messageSpan.textContent = displayMessage;
   isProcessingMessage = false;

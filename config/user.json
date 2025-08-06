@@ -12,16 +12,16 @@
   "selected_data_file": "sane-20250530.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
-  "language": "en",
+  "language": "nl",
   "encryption_key": "",
   "use_git": true,
   "git_root": "./",
   "enable_internal_server": true,
   "internal_server_port": 8383,
   "window_bounds": {
-    "width": 1282,
-    "height": 928,
-    "x": 230,
-    "y": 71
+    "width": 1238,
+    "height": 957,
+    "x": 270,
+    "y": 32
   }
 }

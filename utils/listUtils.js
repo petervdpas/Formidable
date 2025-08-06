@@ -177,13 +177,6 @@ export function createListManager({
     if (typeof postRender === "function") {
       setTimeout(postRender, 0);
     }
-
-    EventBus.emit("status:update", {
-      message: "status.loaded.items",
-      languageKey: "status.loaded.items",
-      i18nEnabled: true,
-      args: [filteredItems.length],
-    });
   }
 
   return {
@@ -195,5 +188,9 @@ export function createListManager({
         filterWrapper.appendChild(node);
       }
     },
+    getItemCount: () => fullList.length,
+    getFilteredCount: () => {
+      return listWrapper.querySelectorAll(`.${itemClass}`).length;
+    }
   };
 }

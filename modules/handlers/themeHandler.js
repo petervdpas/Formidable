@@ -18,5 +18,6 @@ export async function handleThemeToggle(theme) {
     message: `status.theme.set.${isDark ? "dark" : "light"}`,
     languageKey: `status.theme.set.${isDark ? "dark" : "light"}`,
     i18nEnabled: true,
+    variant: isDark ? "warning" : "default",
   });
 }

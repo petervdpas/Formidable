@@ -39,6 +39,7 @@ export async function initCache(dbName, version, stores) {
     languageKey: "status.cache.init",
     i18nEnabled: true,
     args: [dbName, version],
+    variant: "warning",
     log: true,
     logLevel: "default",
     logOrigin: "CacheHandler",

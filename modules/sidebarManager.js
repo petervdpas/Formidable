@@ -125,6 +125,13 @@ export function createStorageListManager(formManager, modal) {
         if (name) {
           EventBus.emit("form:list:highlighted", name);
         }
+
+        EventBus.emit("status:update", {
+          message: "status.loaded.items",
+          languageKey: "status.loaded.items",
+          i18nEnabled: true,
+          args: [listManager.getFilteredCount(), listManager.getItemCount()],
+        });
       });
     },
   });
@@ -234,12 +241,6 @@ export function createStorageListManager(formManager, modal) {
           modal,
           callback: async (datafile) => {
             await formManager.loadFormData({}, datafile);
-            EventBus.emit("status:update", {
-              message: "status.datafile.ready",
-              languageKey: "status.datafile.ready",
-              i18nEnabled: true,
-              args: [datafile],
-            });
           },
         });
       },
