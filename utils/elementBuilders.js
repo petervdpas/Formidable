@@ -85,12 +85,30 @@ export function createLabelElement({
   forId = null,
   className = "",
   i18nKey = null,
+  isDynamic = false,
+  value = "",
 } = {}) {
   const label = document.createElement("label");
-  if (text) label.textContent = text;
   if (forId) label.htmlFor = forId;
   if (className) label.className = className;
-  if (i18nKey) label.setAttribute("data-i18n", i18nKey);
+
+  if (isDynamic && i18nKey) {
+    const keySpan = document.createElement("span");
+    keySpan.setAttribute("data-i18n", i18nKey);
+    keySpan.textContent = t(i18nKey);
+
+    const valueSpan = document.createElement("span");
+    valueSpan.textContent = `: ${value}`;
+
+    label.appendChild(keySpan);
+    label.appendChild(valueSpan);
+  } else {
+    label.textContent = text;
+    if (i18nKey) {
+      label.setAttribute("data-i18n", i18nKey);
+    }
+  }
+
   return label;
 }
 

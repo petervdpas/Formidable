@@ -139,10 +139,22 @@ function renderContextDropdown(isStorage, config) {
             EventBus.emit("template:list", { callback: resolve });
           });
 
-          return templates.map((t) => ({
-            value: t,
-            label: t.replace(/\.yaml$/, ""),
-          }));
+          return await Promise.all(
+            templates.map(async (t) => {
+              const descriptor = await new Promise((resolve) => {
+                EventBus.emit("template:descriptor", {
+                  name: t,
+                  callback: resolve,
+                });
+              });
+
+              return {
+                value: t,
+                label:
+                  descriptor?.yaml?.name?.trim() || t.replace(/\.yaml$/, ""),
+              };
+            })
+          );
         }
       } catch (err) {
         EventBus.emit("logging:error", [

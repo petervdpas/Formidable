@@ -19,9 +19,28 @@ export function createTemplateListManager(modal, dropdown = null) {
     itemClass: "template-item",
 
     fetchListFunction: async () => {
-      return await new Promise((resolve) => {
+      const filenames = await new Promise((resolve) => {
         EventBus.emit("template:list", { callback: resolve });
       });
+
+      const enriched = await Promise.all(
+        filenames.map(async (filename) => {
+          const descriptor = await new Promise((resolve) => {
+            EventBus.emit("template:descriptor", {
+              name: filename,
+              callback: resolve,
+            });
+          });
+
+          return {
+            display: descriptor?.yaml?.name || stripMetaExtension(filename),
+            value: filename,
+            rawData: descriptor, // optional if you need to pass full YAML later
+          };
+        })
+      );
+
+      return enriched;
     },
 
     onItemClick: (templateItem) =>

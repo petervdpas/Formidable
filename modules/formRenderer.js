@@ -1,6 +1,9 @@
 // modules/formRenderer.js
 
-import { buildHiddenInput } from "../utils/elementBuilders.js";
+import {
+  buildHiddenInput,
+  createLabelElement,
+} from "../utils/elementBuilders.js";
 import { buildButtonGroup, createToggleButtons } from "../utils/buttonUtils.js";
 import { injectFieldDefaults } from "../utils/formUtils.js";
 import { focusFirstInput } from "../utils/domUtils.js";
@@ -14,7 +17,6 @@ import {
   createFormRenderIconButton,
 } from "./uiButtons.js";
 import { fieldGroupRenderer } from "../utils/fieldGroupRenderer.js";
-import { t, tUp } from "../utils/i18n.js";
 
 // ─────────────────────────────────────────────
 // Generic Events helper
@@ -44,6 +46,7 @@ async function buildMetaSection(
   const section = document.createElement("div");
   section.className = "meta-section";
 
+  // ─── Flag Toggle ─────────────────────────────────────────────
   if (typeof onFlagChange === "function") {
     let flagged = flaggedInitial;
 
@@ -60,33 +63,36 @@ async function buildMetaSection(
     section.appendChild(flaggedContainer);
   }
 
+  // ─── Meta Text ────────────────────────────────────────────────
   const metaText = document.createElement("div");
   metaText.className = "meta-text";
 
-  const metaLines = [`${t("standard.filename")}: ${filename || ""}`];
+  const lines = [
+    { key: "standard.filename", value: filename || "" },
+    {
+      key: meta.id ? "standard.id.upper" : "standard.guid.upper",
+      value: meta.id || meta.guid || "",
+    },
+    { key: "standard.author", value: meta.author_name || "" },
+    { key: "standard.email", value: meta.author_email || "" },
+    { key: "standard.template", value: meta.template || "" },
+    { key: "standard.created", value: meta.created || "" },
+    { key: "standard.updated", value: meta.updated || "" },
+  ];
 
-  if (meta.id) {
-    metaLines.push(`${tUp("standard.id")}: ${meta.id}`);
-  } else if (meta.guid) {
-    metaLines.push(`${tUp("standard.guid")}: ${meta.guid}`);
-  }
-
-  metaLines.push(
-    `${t("standard.author")}: ${meta.author_name || ""}`,
-    `${t("standard.email")}: ${meta.author_email || ""}`,
-    `${t("standard.template")}: ${meta.template || ""}`,
-    `${t("standard.created")}: ${meta.created || ""}`,
-    `${t("standard.updated")}: ${meta.updated || ""}`
-  );
-
-  metaLines.forEach((line) => {
-    const div = document.createElement("div");
-    div.textContent = line;
-    metaText.appendChild(div);
+  lines.forEach(({ key, value }) => {
+    if (!value) return;
+    const labelEl = createLabelElement({
+      i18nKey: key,
+      value,
+      isDynamic: true,
+    });
+    metaText.appendChild(labelEl);
   });
 
   section.appendChild(metaText);
 
+  // ─── Buttons ─────────────────────────────────────────────────
   const buttons = await createToggleButtons(
     {
       save: onSave,

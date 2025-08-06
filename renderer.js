@@ -33,7 +33,6 @@ import {
 } from "./modules/sidebarManager.js";
 
 import { createTemplateSelector } from "./utils/templateSelector.js";
-
 import { setContextView } from "./modules/contextManager.js";
 
 import { bindContextDependencies } from "./modules/handlers/contextHandlers.js";
@@ -140,10 +139,20 @@ window.addEventListener("DOMContentLoaded", async () => {
         EventBus.emit("template:list", { callback: resolve });
       });
 
-      return templates.map((name) => ({
-        value: name,
-        label: name.replace(/\.yaml$/, ""),
-      }));
+      const options = await Promise.all(
+        templates.map(async (name) => {
+          const descriptor = await new Promise((resolve) => {
+            EventBus.emit("template:descriptor", { name, callback: resolve });
+          });
+          return {
+            value: name,
+            label:
+              descriptor?.yaml?.name?.trim() || name.replace(/\.yaml$/, ""),
+          };
+        })
+      );
+
+      return options;
     },
   });
 
