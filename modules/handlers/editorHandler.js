@@ -4,7 +4,6 @@ import { EventBus } from "../eventBus.js";
 import { getValue as getMarkdownTemplate } from "../templateCodemirror.js";
 import { showConfirmModal } from "../../utils/modalUtils.js";
 import { clearContainerUI } from "../../utils/formUtils.js";
-import { t } from "../../utils/i18n.js";
 
 export async function handleSaveTemplate({ container, fields, callback }) {
   const name = container.querySelector("#yaml-name").value.trim();
@@ -46,13 +45,13 @@ export async function handleSaveTemplate({ container, fields, callback }) {
 export async function handleDeleteTemplate(container) {
   const template = window.currentSelectedTemplateName;
   if (!template) {
-    EventBus.emit("logging:warning", [
-      "[EditorHandler] No template selected to delete.",
-    ]);
     EventBus.emit("status:update", {
       message: "status.template.no.selected",
       languageKey: "status.template.no.selected",
       i18nEnabled: true,
+      log: true,
+      logLevel: "warning",
+      logOrigin: "EditorHandler:handleDeleteTemplate",
     });
     return;
   }
@@ -80,31 +79,28 @@ export async function handleDeleteTemplate(container) {
       "Select or create a template-file to begin."
     );
 
-    EventBus.emit("logging:default", [
-      "[EditorHandler] Deleted template:",
-      template,
-    ]);
-
     EventBus.emit("status:update", {
       message: `status.template.deleted`,
       languageKey: `status.template.deleted`,
       i18nEnabled: true,
       args: [template],
+      log: true,
+      logLevel: "default",
+      logOrigin: "EditorHandler:handleDeleteTemplate",
     });
 
     window.currentSelectedTemplate = null;
     window.currentSelectedTemplateName = null;
     window.templateListManager?.loadList?.();
   } else {
-    EventBus.emit("logging:warning", [
-      "[EditorHandler] Failed to delete template:",
-      template,
-    ]);
     EventBus.emit("status:update", {
       message: "status.template.delete.failed",
       languageKey: "status.template.delete.failed",
       i18nEnabled: true,
       args: [template],
+      log: true,
+      logLevel: "error",
+      logOrigin: "EditorHandler:handleDeleteTemplate",
     });
   }
 }

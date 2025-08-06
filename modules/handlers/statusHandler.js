@@ -3,11 +3,18 @@
 import { EventBus } from "../eventBus.js";
 import { t } from "../../utils/i18n.js";
 
-const messageTimestamps = new Map();
+const PROCESS_INTERVAL_MESSAGE = 500;
+const PROCESS_INTERVAL_INFO = 100;
 
-let messageWrapper = null; // #status-bar-message
-let messageSpan = null; // #status-bar-message > span
+const messageTimestamps = new Map();
+const messageQueue = [];
+const infoQueue = [];
+
+let messageWrapper = null;
+let messageSpan = null;
 let infoEl = null;
+let isProcessingMessage = false;
+let isProcessingInfo = false;
 
 export function initStatusHandler(statusBarId = "status-bar") {
   const container = document.getElementById(statusBarId);
@@ -34,21 +41,43 @@ export function initStatusHandler(statusBarId = "status-bar") {
     ]);
   }
 
+  setInterval(processNextStatusMessage, PROCESS_INTERVAL_MESSAGE);
+  setInterval(processNextStatusInfo, PROCESS_INTERVAL_INFO);
+
   EventBus.emit("logging:default", [`[StatusHandler] Initialized.`]);
 }
 
-export function handleStatusUpdate({
+function logEmittedStatus(
   message,
-  languageKey = null,
-  i18nEnabled = false,
-  args = [],
-}) {
-  if (!messageSpan) {
-    EventBus.emit("logging:warning", [
-      `[StatusHandler] No message <span> found in #status-bar-message.`,
-    ]);
-    return;
-  }
+  logOrigin = "StatusHandler",
+  logLevel = "default"
+) {
+  EventBus.emit(`logging:${logLevel}`, [`[${logOrigin}] ${message}`]);
+}
+
+// Enqueue status message
+export function handleStatusUpdate(payload) {
+  messageQueue.push(payload);
+}
+
+// Enqueue status info
+export function setStatusInfo(textOrKey, options = {}) {
+  infoQueue.push({ textOrKey, options });
+}
+
+function processNextStatusMessage() {
+  if (isProcessingMessage || messageQueue.length === 0 || !messageSpan) return;
+  isProcessingMessage = true;
+
+  const {
+    message,
+    languageKey = null,
+    i18nEnabled = false,
+    args = [],
+    log = false,
+    logLevel = "default",
+    logOrigin = null,
+  } = messageQueue.shift();
 
   let displayMessage = message;
   let messageId =
@@ -59,8 +88,9 @@ export function handleStatusUpdate({
 
   if (now - last < 500) {
     EventBus.emit("logging:default", [
-      `[StatusHandler] Skipped message (too soon): "${messageId}"`,
+      `[StatusHandler] Skipped duplicate message: "${messageId}"`,
     ]);
+    isProcessingMessage = false;
     return;
   }
 
@@ -81,30 +111,28 @@ export function handleStatusUpdate({
 
     displayMessage = translated;
 
-    EventBus.emit("logging:default", [
-      `[StatusHandler] Status updated (i18n): "${translated}"`,
-    ]);
+    if (log) {
+      logEmittedStatus(displayMessage, logOrigin || "StatusHandler", logLevel);
+    }
   } else {
     messageSpan.removeAttribute("data-i18n");
     messageSpan.removeAttribute("data-i18n-args");
 
-    EventBus.emit("logging:default", [
-      `[StatusHandler] Status updated (plain): "${message}"`,
-    ]);
+    if (log) {
+      logEmittedStatus(displayMessage, logOrigin || "StatusHandler", logLevel);
+    }
   }
 
   messageSpan.textContent = displayMessage;
+  isProcessingMessage = false;
 }
 
-export function setStatusInfo(textOrKey, options = {}) {
-  const { i18nEnabled = false, args = [] } = options;
+function processNextStatusInfo() {
+  if (isProcessingInfo || infoQueue.length === 0 || !infoEl) return;
+  isProcessingInfo = true;
 
-  if (!infoEl) {
-    EventBus.emit("logging:warning", [
-      `[StatusHandler] No info element available.`,
-    ]);
-    return;
-  }
+  const { textOrKey, options } = infoQueue.shift();
+  const { i18nEnabled = false, args = [] } = options;
 
   infoEl.innerHTML = "";
 
@@ -132,4 +160,6 @@ export function setStatusInfo(textOrKey, options = {}) {
       `[StatusHandler] Info set (raw): "${textOrKey}"`,
     ]);
   }
+
+  isProcessingInfo = false;
 }

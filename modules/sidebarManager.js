@@ -84,14 +84,14 @@ export function createTemplateListManager(modal, dropdown = null) {
                 args: [template],
               });
             } catch (err) {
-              EventBus.emit("logging:error", [
-                "[AddTemplate] Failed to save:",
-                err,
-              ]);
               EventBus.emit("status:update", {
                 message: "status.template.create.new.error",
                 languageKey: "status.template.create.new.error",
                 i18nEnabled: true,
+                args: [err.message],
+                log: true,
+                logLevel: "error",
+                logOrigin: "sidebarManager:AddTemplate",
               });
             }
           },
@@ -235,9 +235,10 @@ export function createStorageListManager(formManager, modal) {
           callback: async (datafile) => {
             await formManager.loadFormData({}, datafile);
             EventBus.emit("status:update", {
-              message: "status.metadata.new.ready",
-              languageKey: "status.metadata.new.ready",
+              message: "status.datafile.ready",
+              languageKey: "status.datafile.ready",
               i18nEnabled: true,
+              args: [datafile],
             });
           },
         });

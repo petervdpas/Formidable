@@ -93,13 +93,13 @@ export async function handleListItemClicked({ listId, name }) {
 
     if (listId === "storage-list") {
       if (!window.currentSelectedTemplate) {
-        EventBus.emit("logging:warning", [
-          "[handleListItemClicked] No template selected for entry.",
-        ]);
         EventBus.emit("status:update", {
           message: "status.template.first.select",
           languageKey: "status.template.first.select",
           i18nEnabled: true,
+          log: true,
+          logLevel: "warning",
+          logOrigin: "ListHandlers:handleListItemClicked",
         });
         return;
       }
@@ -136,21 +136,20 @@ export async function handleListItemClicked({ listId, name }) {
 
       EventBus.emit("form:selected", name);
       EventBus.emit("status:update", {
-        message: "status.metadata.new.ready",
-        languageKey: "status.metadata.new.ready",
+        message: "status.datafile.ready",
+        languageKey: "status.datafile.ready",
         i18nEnabled: true,
         args: [name],});
     }
   } catch (err) {
-    EventBus.emit("logging:error", [
-      `[handleListItemClicked] Failed to load item "${name}" for ${listId}:`,
-      err,
-    ]);
     EventBus.emit("status:update", {
       message: "status.item.load.failed",
       languageKey: "status.item.load.failed",
       i18nEnabled: true,
       args: [name, listId],
+      log: true,
+      logLevel: "error",
+      logOrigin: "ListHandlers:handleListItemClicked",
     });
   }
 }

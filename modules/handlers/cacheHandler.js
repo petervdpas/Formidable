@@ -39,13 +39,10 @@ export async function initCache(dbName, version, stores) {
     languageKey: "status.cache.init",
     i18nEnabled: true,
     args: [dbName, version],
+    log: true,
+    logLevel: "default",
+    logOrigin: "CacheHandler",
   });
-  EventBus.emit("logging:default", [
-    "[CacheHandler] Cache initialized with DB:",
-    dbName,
-    "version:",
-    version,
-  ]);
 }
 
 export async function handleCacheLoadFromDisk({ storeName, baseDir }) {

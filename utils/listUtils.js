@@ -81,17 +81,17 @@ export function createListManager({
 
       renderList(); // initial render
     } catch (err) {
-      EventBus.emit("logging:error", [
-        "[createListManager] Failed to load list:",
-        err,
-      ]);
       listWrapper.innerHTML =
         "<div class='empty-message'>Error loading list.</div>";
+        
       EventBus.emit("status:update", {
         message: "status.error.loading.list",
         languageKey: "status.error.loading.list",
         i18nEnabled: true,
         args: [err.message],
+        log: true,
+        logLevel: "error",
+        logOrigin: "listUtils:createListManager",
       });
     }
   }

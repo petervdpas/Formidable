@@ -417,13 +417,13 @@ function setupLanguageDropdown(config) {
           i18nEnabled: true,
         });
       } catch (err) {
-        EventBus.emit("logging:error", [
-          "[Settings] Failed to switch language",
-          err,
-        ]);
         EventBus.emit("status:update", {
           languageKey: `status.language.set.fail.${value}`,
           i18nEnabled: true,
+          args: [err.message],
+          log: true,
+          logLevel: "error",
+          logOrigin: "settingsManager:setupLanguageDropdown",
         });
       }
     },

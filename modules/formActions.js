@@ -10,7 +10,6 @@ import {
   createCopyMarkdownButton,
   createCopyPreviewButton,
 } from "./uiButtons.js";
-import { t } from "../utils/i18n.js";
 
 const log = (...args) => EventBus.emit("logging:default", args);
 const warn = (...args) => EventBus.emit("logging:warning", args);
@@ -102,11 +101,14 @@ export async function saveForm(container, template) {
 export async function deleteForm(container, template, datafile) {
   template = await ensureVirtualLocation(template);
   if (!template || !template.virtualLocation) {
-    warn("[deleteForm] No template selected for deletion.");
-    EventBus.emit(
-      "status:update",
-      `${t("status.delete.cannot")}: ${t("status.template.no.selected")}`
-    );
+    EventBus.emit("status:update", {
+      message: "status.delete.cannot.no.template",
+      languageKey: "status.delete.cannot.no.template",
+      i18nEnabled: true,
+      log: true,
+      logLevel: "warning",
+      logOrigin: "formActions:deleteForm",
+    });
     return;
   }
 

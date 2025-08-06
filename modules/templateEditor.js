@@ -30,7 +30,6 @@ import {
   createTemplateDeleteIconButton,
   createTemplateGeneratorButton,
 } from "./uiButtons.js";
-import { t } from "../utils/i18n.js";
 
 window.showConfirmModal = showConfirmModal;
 

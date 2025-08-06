@@ -2,7 +2,6 @@
 
 import { EventBus } from "../eventBus.js";
 import { clearContainerUI } from "../../utils/formUtils.js";
-import { t } from "../../utils/i18n.js";
 
 let formManager = null;
 let storageListManager = null;

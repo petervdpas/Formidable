@@ -35,9 +35,11 @@ export default {
   "status.config.disabled": "{0} uitgeschakeld",
   "status.config.failed": "Kon {0} niet bijwerken",
   "status.language.set.en": "Taal ingesteld op Engels",
-  "status.language.set.fail.en": "Kon taal niet instellen op Engels",
+  "status.language.set.fail.en":
+    "Kon taal niet instellen op Engels door fout: {0}",
   "status.language.set.nl": "Taal ingesteld op Nederlands",
-  "status.language.set.fail.nl": "Kon taal niet instellen op Nederlands",
+  "status.language.set.fail.nl":
+    "Kon taal niet instellen op Nederlands door fout: {0}",
   "status.logging.enabled": "Logging is ingeschakeld",
   "status.logging.disabled": "Logging is uitgeschakeld",
   "status.theme.set.dark": "Thema is ingesteld op Donker",
@@ -50,15 +52,24 @@ export default {
   "status.save.success": "{0} was succesvol opgeslagen.",
   "status.save.failed": "{0} kon niet worden opgeslagen met fout: {1}.",
   "status.save.cannot": "Kan niet opslaan.",
+  "status.save.cannot.no.template":
+    "Kan niet opslaan... geen sjabloon geselecteerd.",
+  "status.save.cannot.no.storage":
+    "Kan niet opslaan... geen opslag geselecteerd.",
   "status.delete.cannot": "Kan niet verwijderen.",
-  "status.delete.success": "{0} succesvol verwijderd.",
+  "status.delete.success": "{0} is succesvol verwijderd.",
   "status.delete.failed": "Kon {0} niet verwijderen.",
+  "status.delete.cannot.no.template":
+    "Kan niet verwijderen... geen sjabloon geselecteerd.",
+  "status.delete.cannot.no.storage":
+    "Kan niet verwijderen... geen opslag geselecteerd.",
   "status.save.cannot.no.template":
     "Kan niet opslaan... geen sjabloon geselecteerd.",
   "status.save.cannot.no.storage":
     "Kan niet opslaan... geen opslag geselecteerd.",
   "status.datafile.filename":
     "Voer een bestandsnaam in voor het gegevensbestand.",
+  "status.datafile.ready": "Klaar voor gegevensinvoer: {0}.",
   "status.datafile.exists": "Gegevensbestand {0} bestaat al.",
   "status.datafile.created": "Gegevensbestand {0} succesvol aangemaakt.",
   "status.datafile.load.failed": "Kon gegevensbestand niet laden: {0}.",
@@ -71,7 +82,8 @@ export default {
   "status.template.save.error": "Fout bij het opslaan van sjabloon {0}.",
   "status.template.load.success": "Sjabloon {0} succesvol geladen.",
   "status.template.load.failed": "Kon sjabloon niet laden: {0}.",
-  "status.template.select.failed": "Kon sjabloon {0} niet selecteren met fout: {1}.",
+  "status.template.select.failed":
+    "Kon sjabloon {0} niet selecteren met fout: {1}.",
   "status.template.first.select": "Selecteer eerst een sjabloon.",
   "status.template.no.selected": "Geen sjabloon geselecteerd.",
   "status.template.deleted": "Sjabloon {0} verwijderd.",
@@ -79,7 +91,6 @@ export default {
   "status.template.validation.success": "Sjabloonvalidatie is geslaagd.",
   "status.template.validation.error":
     "Sjabloonvalidatie is mislukt: {0} fout(en).",
-  "status.metadata.new.ready": "Nieuwe metadata-invoer gereed.",
 
   // ── Menu ───────────────────────────────
   "menu.file.openTemplateFolder": "Open sjablonenmap",

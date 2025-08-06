@@ -57,12 +57,14 @@ export function createTemplateSelector({ templateDropdown }) {
         yaml: result.yaml,
       });
     } catch (err) {
-      EventBus.emit("logging:error", ["[SelectTemplate] Error:", err]);
       EventBus.emit("status:update", {
         message: "status.template.select.failed",
         languageKey: "status.template.select.failed",
         i18nEnabled: true,
         args: [name, err.message],
+        log: true,
+        logLevel: "error",
+        logOrigin: "cacheHandler:selectTemplate",
       });
     }
   }

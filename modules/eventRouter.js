@@ -125,13 +125,16 @@ export function initEventRouter() {
   EventBus.on("help:list", helpHandler.handleHelpList);
   EventBus.on("help:get", helpHandler.handleHelpGet);
 
-  // Logging
+  // Logging + Core events
   EventBus.off("logging:toggle", loggingHandler.handleLoggingToggle);
   EventBus.off("logging:default", loggingHandler.handleLogDefault);
   EventBus.off("logging:warning", loggingHandler.handleLogWarning);
   EventBus.off("logging:error", loggingHandler.handleLogError);
 
   EventBus.off("ui:toast", toastHandler.handleToast);
+  EventBus.off("screen:fullscreen", screenHandlers.handleFullscreenToggle);
+  EventBus.off("theme:toggle", themeHandler.handleThemeToggle);
+  EventBus.off("status:update", statusHandler.handleStatusUpdate);
 
   EventBus.on("logging:toggle", loggingHandler.handleLoggingToggle);
   EventBus.on("logging:default", loggingHandler.handleLogDefault);
@@ -139,12 +142,6 @@ export function initEventRouter() {
   EventBus.on("logging:error", loggingHandler.handleLogError);
 
   EventBus.on("ui:toast", toastHandler.handleToast);
-
-  // Core events
-  EventBus.off("screen:fullscreen", screenHandlers.handleFullscreenToggle);
-  EventBus.off("theme:toggle", themeHandler.handleThemeToggle);
-  EventBus.off("status:update", statusHandler.handleStatusUpdate);
-
   EventBus.on("screen:fullscreen", screenHandlers.handleFullscreenToggle);
   EventBus.on("theme:toggle", themeHandler.handleThemeToggle);
   EventBus.on("status:update", statusHandler.handleStatusUpdate);
