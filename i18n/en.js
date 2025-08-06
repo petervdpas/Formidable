@@ -69,8 +69,10 @@ export default {
   "toast.git.commit.complete": "Commit complete.",
   "toast.git.push.range": "Pushed to {0}: {1} → {2}",
   "toast.git.push.complete": "Push complete.",
-  "toast.git.pull.success": "Pulled: {0} change(s)",
+  "toast.git.pull.changes":
+    "Pulled: {0} changes, {1} deletions, {2} insertions.",
   "toast.git.pull.complete": "Pull complete.",
+  "toast.git.pull.noChanges": "No changes to pull.",
   "toast.git.discard.failed": "Failed to discard changes in {0}",
   "toast.git.discarded.changes.in": "Discarded changes in {0}",
   "toast.git.commit.noMessage": "Cannot commit: no message.",

@@ -268,8 +268,6 @@ export async function renderGitStatus(container, modalApi) {
         EventBus.emit("git:push", {
           folderPath: gitPath,
           callback: (result) => {
-            console.log("[GitPush] Result:", result);
-
             const hash = result?.update?.hash;
             const head = result?.update?.head;
 
@@ -300,18 +298,33 @@ export async function renderGitStatus(container, modalApi) {
         EventBus.emit("git:pull", {
           folderPath: gitPath,
           callback: (result) => {
+            console.log("[GitPull] Result:", result);
+
+            const summary = result?.summary;
+            const hasChanges =
+              summary &&
+              (summary.changes > 0 ||
+                summary.deletions > 0 ||
+                summary.insertions > 0);
+
             if (typeof result === "string") {
               EventBus.emit("ui:toast", {
                 languageKey: "toast.git.pull.complete",
                 variant: "success",
               });
-            } else if (result?.summary?.changes != null) {
+            } else if (hasChanges) {
               EventBus.emit("ui:toast", {
-                languageKey: "toast.git.pull.success",
-                args: [result.summary.changes],
+                languageKey: "toast.git.pull.changes",
+                args: [summary.changes, summary.deletions, summary.insertions],
                 variant: "success",
               });
+            } else {
+              EventBus.emit("ui:toast", {
+                languageKey: "toast.git.pull.noChanges",
+                variant: "info",
+              });
             }
+
             refresh();
           },
         });

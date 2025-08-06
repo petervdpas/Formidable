@@ -70,13 +70,15 @@ export default {
 
   "toast.git.commit.success": "Gecommit: {0} wijziging(en)",
   "toast.git.commit.complete": "Commit voltooid.",
-  "toast.git.push.range": "Ge-pusht naar {0}: {1} → {2}",
+  "toast.git.push.range": "Push naar {0}: {1} → {2}",
   "toast.git.push.complete": "Push voltooid.",
-  "toast.git.pull.success": "Ge-pulled: {0} wijziging(en)",
-  "toast.git.pull.complete": "Pull voltooid.",
+  "toast.git.pull.changes":
+    "Opgehaald: {0} wijzigingen, {1} verwijderingen, {2} toevoegingen.",
+  "toast.git.pull.complete": "Ophalen voltooid.",
+  "toast.git.pull.noChanges": "Geen nieuwe wijzigingen gevonden.",
   "toast.git.discard.failed": "Verwerpen van wijzigingen in {0} is mislukt.",
   "toast.git.discarded.changes.in": "Wijzigingen verworpen in {0}",
-  "toast.git.commit.noMessage": "Kan niet committen: geen bericht opgegeven.",
+  "toast.git.commit.noMessage": "Kan commit niet uitvoeren: geen bericht opgegeven.",
 
   "toast.profile.invalidName":
     "Gebruik kleine letters, koppeltekens en eindig met .json",
