@@ -268,20 +268,16 @@ export async function renderGitStatus(container, modalApi) {
         EventBus.emit("git:push", {
           folderPath: gitPath,
           callback: (result) => {
-
             console.log("[GitPush] Result:", result);
-            
-            const updates = result?.update;
-            const updateKeys = updates ? Object.keys(updates) : [];
 
-            if (updateKeys.length > 0) {
-              // Assume single branch push for now
-              const ref = updateKeys[0];
-              const { old, new: newHash } = updates[ref];
+            const hash = result?.update?.hash;
+            const head = result?.update?.head;
 
-              const branch = ref.replace("refs/heads/", "");
-              const fromShort = old?.substring(0, 7) || "unknown";
-              const toShort = newHash?.substring(0, 7) || "unknown";
+            if (hash?.from && hash?.to) {
+              const branch =
+                head?.local?.replace("refs/heads/", "") || "unknown";
+              const fromShort = hash.from.substring(0, 7);
+              const toShort = hash.to.substring(0, 7);
 
               EventBus.emit("ui:toast", {
                 languageKey: "toast.git.push.range",
