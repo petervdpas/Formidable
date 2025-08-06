@@ -5,7 +5,7 @@ export default {
   "status.ready": "Klaar.",
   "resize.handle.title": "Sleep om te vergroten/verkleinen",
 
-    // ── Config Keys ───────────────────────────
+  // ── Config Keys ───────────────────────────
   "config.theme": "Thema",
   "config.show_icon_buttons": "Pictogramknoppen",
   "config.use_expressions": "Expressies",
@@ -27,31 +27,58 @@ export default {
   "config.internal_server_port": "Serverpoort",
 
   // ── Status Messages ─────────────────────
+  "status.cache.init": "Cache geïnitialiseerd met DB: {0} versie {1}.",
+  "status.basic.setTo": "{0} ingesteld op {1}",
+  "status.error.loading.list": "Fout bij het laden van de lijst: {0}",
+  "status.loaded.items": "{0} item(s) geladen.",
   "status.config.enabled": "{0} ingeschakeld",
   "status.config.disabled": "{0} uitgeschakeld",
-  "status.config.setTo": "{0} ingesteld op {1}",
   "status.config.failed": "Kon {0} niet bijwerken",
   "status.language.set.en": "Taal ingesteld op Engels",
   "status.language.set.fail.en": "Kon taal niet instellen op Engels",
   "status.language.set.nl": "Taal ingesteld op Nederlands",
   "status.language.set.fail.nl": "Kon taal niet instellen op Nederlands",
+  "status.logging.enabled": "Logging is ingeschakeld",
+  "status.logging.disabled": "Logging is uitgeschakeld",
   "status.theme.set.dark": "Thema is ingesteld op Donker",
   "status.theme.set.light": "Thema is ingesteld op Licht",
   "status.context.set.storage": "Context ingesteld op Opslag",
   "status.context.set.template": "Context ingesteld op Sjabloon",
+  "status.context.not.template": "Je bevindt zich niet in de sjablooncontext.",
+  "status.context.not.storage": "Je bevindt zich niet in de opslagcontext.",
   "status.secret.key.updated": "Geheime sleutel bijgewerkt.",
+  "status.save.success": "{0} was succesvol opgeslagen.",
+  "status.save.failed": "{0} kon niet worden opgeslagen met fout: {1}.",
   "status.save.cannot": "Kan niet opslaan.",
   "status.delete.cannot": "Kan niet verwijderen.",
-  "status.save.cannot.no.template": "Kan niet opslaan... geen sjabloon geselecteerd.",
-  "status.save.cannot.no.storage": "Kan niet opslaan... geen opslag geselecteerd.",
-  "status.datafile.filename": "Voer een bestandsnaam in voor het gegevensbestand.",
+  "status.delete.success": "{0} succesvol verwijderd.",
+  "status.delete.failed": "Kon {0} niet verwijderen.",
+  "status.save.cannot.no.template":
+    "Kan niet opslaan... geen sjabloon geselecteerd.",
+  "status.save.cannot.no.storage":
+    "Kan niet opslaan... geen opslag geselecteerd.",
+  "status.datafile.filename":
+    "Voer een bestandsnaam in voor het gegevensbestand.",
+  "status.datafile.exists": "Gegevensbestand {0} bestaat al.",
+  "status.datafile.created": "Gegevensbestand {0} succesvol aangemaakt.",
+  "status.datafile.load.failed": "Kon gegevensbestand niet laden: {0}.",
+  "status.item.load.failed": "Fout bij het laden van item: {0} - {1}.",
   "status.template.create.new": "Nieuwe sjabloon aanmaken: {0}.",
   "status.template.create.new.success": "Sjabloon {0} succesvol aangemaakt.",
-  "status.template.create.new.error": "Fout bij het aanmaken van nieuwe sjabloon.",
+  "status.template.create.new.error":
+    "Fout bij het aanmaken van nieuwe sjabloon.",
   "status.template.save.success": "Sjabloon {0} succesvol opgeslagen.",
   "status.template.save.error": "Fout bij het opslaan van sjabloon {0}.",
+  "status.template.load.success": "Sjabloon {0} succesvol geladen.",
+  "status.template.load.failed": "Kon sjabloon niet laden: {0}.",
+  "status.template.select.failed": "Kon sjabloon {0} niet selecteren met fout: {1}.",
   "status.template.first.select": "Selecteer eerst een sjabloon.",
-  "status.template.validation.error": "Sjabloon validatie mislukt: {0} fout(en).",
+  "status.template.no.selected": "Geen sjabloon geselecteerd.",
+  "status.template.deleted": "Sjabloon {0} verwijderd.",
+  "status.template.delete.failed": "Kon sjabloon {0} niet verwijderen.",
+  "status.template.validation.success": "Sjabloonvalidatie is geslaagd.",
+  "status.template.validation.error":
+    "Sjabloonvalidatie is mislukt: {0} fout(en).",
   "status.metadata.new.ready": "Nieuwe metadata-invoer gereed.",
 
   // ── Menu ───────────────────────────────
@@ -112,7 +139,8 @@ export default {
   "toast.git.pull.noChanges": "Geen nieuwe wijzigingen gevonden.",
   "toast.git.discard.failed": "Verwerpen van wijzigingen in {0} is mislukt.",
   "toast.git.discarded.changes.in": "Wijzigingen verworpen in {0}",
-  "toast.git.commit.noMessage": "Kan commit niet uitvoeren: geen bericht opgegeven.",
+  "toast.git.commit.noMessage":
+    "Kan commit niet uitvoeren: geen bericht opgegeven.",
 
   "toast.profile.invalidName":
     "Gebruik kleine letters, koppeltekens en eindig met .json",

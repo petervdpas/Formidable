@@ -162,7 +162,12 @@ export function createFormRowInput({
     if (onSave) {
       onSave(newVal);
     } else {
-      EventBus.emit("status:update", `${label} set to ${newVal}`);
+      EventBus.emit("status:update", {
+        message: "status.basic.setTo",
+        languageKey: "status.basic.setTo",
+        i18nEnabled: true,
+        args: [labelOrKey, newVal],
+      });
     }
   };
 

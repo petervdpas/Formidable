@@ -50,7 +50,12 @@ export async function handleFormidableNavigate(data) {
   });
 
   if (!yaml) {
-    EventBus.emit("status:update", `Failed to load template: ${template}`);
+    EventBus.emit("status:update", {
+      message: "status.template.load.failed",
+      languageKey: "status.template.load.failed",
+      i18nEnabled: true,
+      args: [template],
+    });
     return;
   }
 

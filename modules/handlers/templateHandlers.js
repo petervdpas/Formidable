@@ -118,12 +118,22 @@ export async function handleSaveTemplate({ name, data, callback }) {
   try {
     const result = await window.api.templates.saveTemplate(name, data);
     if (result) {
-      EventBus.emit("status:update", `Saved template: ${name}`);
+      EventBus.emit("status:update", {
+        message: "status.template.save.success",
+        languageKey: "status.template.save.success",
+        i18nEnabled: true,
+        args: [name],
+      });
 
       const templateName = name.replace(/\.yaml$/, "");
       EventBus.emit("vfs:refreshTemplate", { templateName });
     } else {
-      EventBus.emit("status:update", `Failed to save template: ${name}`);
+      EventBus.emit("status:update", {
+        message: "status.template.save.error",
+        languageKey: "status.template.save.error",
+        i18nEnabled: true,
+        args: [name],
+      });
     }
     callback?.(result);
   } catch (err) {

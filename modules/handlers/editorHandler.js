@@ -49,7 +49,11 @@ export async function handleDeleteTemplate(container) {
     EventBus.emit("logging:warning", [
       "[EditorHandler] No template selected to delete.",
     ]);
-    EventBus.emit("status:update", "No template selected.");
+    EventBus.emit("status:update", {
+      message: "status.template.no.selected",
+      languageKey: "status.template.no.selected",
+      i18nEnabled: true,
+    });
     return;
   }
 
@@ -76,11 +80,18 @@ export async function handleDeleteTemplate(container) {
       "Select or create a template-file to begin."
     );
 
-    EventBus.emit("status:update", `Deleted template: ${template}`);
     EventBus.emit("logging:default", [
       "[EditorHandler] Deleted template:",
       template,
     ]);
+
+    EventBus.emit("status:update", {
+      message: `status.template.deleted`,
+      languageKey: `status.template.deleted`,
+      i18nEnabled: true,
+      args: [template],
+    });
+
     window.currentSelectedTemplate = null;
     window.currentSelectedTemplateName = null;
     window.templateListManager?.loadList?.();
@@ -89,6 +100,11 @@ export async function handleDeleteTemplate(container) {
       "[EditorHandler] Failed to delete template:",
       template,
     ]);
-    EventBus.emit("status:update", "Failed to delete template.");
+    EventBus.emit("status:update", {
+      message: "status.template.delete.failed",
+      languageKey: "status.template.delete.failed",
+      i18nEnabled: true,
+      args: [template],
+    });
   }
 }

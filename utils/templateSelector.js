@@ -58,7 +58,12 @@ export function createTemplateSelector({ templateDropdown }) {
       });
     } catch (err) {
       EventBus.emit("logging:error", ["[SelectTemplate] Error:", err]);
-      EventBus.emit("status:update", "Error selecting template.");
+      EventBus.emit("status:update", {
+        message: "status.template.select.failed",
+        languageKey: "status.template.select.failed",
+        i18nEnabled: true,
+        args: [name, err.message],
+      });
     }
   }
 

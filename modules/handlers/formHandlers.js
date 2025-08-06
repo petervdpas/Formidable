@@ -143,7 +143,12 @@ export async function handleSaveForm(payload, respond) {
       datafile || result.path?.split(/[/\\]/).pop() || "unknown.json";
 
     if (result.success) {
-      EventBus.emit("status:update", `Saved data: ${shortName}`);
+      EventBus.emit("status:update", {
+        message: "status.save.success",
+        languageKey: "status.save.success",
+        i18nEnabled: true,
+        args: [shortName],
+      });
 
       EventBus.emit("ui:toast", {
         languageKey: "toast.save.success",
@@ -158,7 +163,12 @@ export async function handleSaveForm(payload, respond) {
       const templateName = (templateFilename || "").replace(/\.yaml$/, "");
       EventBus.emit("vfs:refreshTemplate", { templateName: templateName });
     } else {
-      EventBus.emit("status:update", `Failed to save: ${result.error}`);
+      EventBus.emit("status:update", {
+        message: "status.save.failed",
+        languageKey: "status.save.failed",
+        i18nEnabled: true,
+        args: [shortName, result.error || "Unknown error"],
+      });
 
       EventBus.emit("ui:toast", {
         languageKey: "toast.save.failed",
@@ -190,7 +200,13 @@ export async function handleDeleteForm(
     );
 
     if (result) {
-      EventBus.emit("status:update", `Deleted data: ${datafile}`);
+      EventBus.emit("status:update", {
+        message: "status.delete.success",
+        languageKey: "status.delete.success",
+        i18nEnabled: true,
+        args: [datafile],
+      });
+
       EventBus.emit("form:list:reload");
 
       if (container) {
@@ -204,7 +220,12 @@ export async function handleDeleteForm(
       const templateName = (templateFilename || "").replace(/\.yaml$/, "");
       EventBus.emit("vfs:refreshTemplate", { templateName: templateName });
     } else {
-      EventBus.emit("status:update", "Failed to delete data file.");
+      EventBus.emit("status:update", {
+        message: "status.delete.failed",
+        languageKey: "status.delete.failed",
+        i18nEnabled: true,
+        args: [datafile],
+      });
     }
 
     callback?.(result);

@@ -467,7 +467,7 @@ function emitConfigStatus(configKey, value, success = true) {
   } else {
     EventBus.emit("status:update", {
       message: `${configKey} set to ${value}`,
-      languageKey: "status.config.setTo",
+      languageKey: "status.basic.setTo",
       i18nEnabled: true,
       args: [label, value],
     });

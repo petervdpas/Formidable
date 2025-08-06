@@ -34,7 +34,12 @@ export async function initCache(dbName, version, stores) {
   cache = new IndexedDBController(dbName, version);
   await cache.open(stores);
 
-  EventBus.emit("status:update", "Cache initialized.");
+  EventBus.emit("status:update", {
+    message: "status.cache.init",
+    languageKey: "status.cache.init",
+    i18nEnabled: true,
+    args: [dbName, version],
+  });
   EventBus.emit("logging:default", [
     "[CacheHandler] Cache initialized with DB:",
     dbName,

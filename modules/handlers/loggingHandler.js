@@ -9,7 +9,11 @@ export function handleLoggingToggle(enabled) {
   if (loggingEnabled) {
     console.log("[Handler] Logging toggled:", enabled);
   }
-  EventBus.emit("status:update", `Logging ${enabled ? "enabled" : "disabled"}`);
+  EventBus.emit("status:update", {
+    message: `status.logging.${enabled ? "enabled" : "disabled"}`,
+    languageKey: `status.logging.${enabled ? "enabled" : "disabled"}`,
+    i18nEnabled: true,
+  });
 }
 
 export function handleLogDefault(args) {

@@ -87,7 +87,12 @@ export function createListManager({
       ]);
       listWrapper.innerHTML =
         "<div class='empty-message'>Error loading list.</div>";
-      EventBus.emit("status:update", "Error loading list.");
+      EventBus.emit("status:update", {
+        message: "status.error.loading.list",
+        languageKey: "status.error.loading.list",
+        i18nEnabled: true,
+        args: [err.message],
+      });
     }
   }
 
@@ -173,7 +178,12 @@ export function createListManager({
       setTimeout(postRender, 0);
     }
 
-    EventBus.emit("status:update", `Loaded ${filteredItems.length} item(s).`);
+    EventBus.emit("status:update", {
+      message: "status.loaded.items",
+      languageKey: "status.loaded.items",
+      i18nEnabled: true,
+      args: [filteredItems.length],
+    });
   }
 
   return {

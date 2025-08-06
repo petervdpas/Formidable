@@ -71,14 +71,24 @@ export async function handleListItemClicked({ listId, name }) {
         .catch(() => "template");
 
       if (currentContext !== "template") {
-        EventBus.emit("status:update", "You are not in Template context.");
+        EventBus.emit("status:update", {
+          message: "status.context.not.template",
+          languageKey: "status.context.not.template",
+          i18nEnabled: true,
+        });
         return;
       }
 
       const data = await EventBus.emitWithResponse("template:load", { name });
 
       EventBus.emit("template:selected", { name, yaml: data });
-      EventBus.emit("status:update", `Loaded Template: ${name}`);
+
+      EventBus.emit("status:update", {
+        message: "status.template.load.success",
+        languageKey: "status.template.load.success",
+        i18nEnabled: true,
+        args: [name],
+      });
     }
 
     if (listId === "storage-list") {
@@ -86,7 +96,11 @@ export async function handleListItemClicked({ listId, name }) {
         EventBus.emit("logging:warning", [
           "[handleListItemClicked] No template selected for entry.",
         ]);
-        EventBus.emit("status:update", "Please select a template first.");
+        EventBus.emit("status:update", {
+          message: "status.template.first.select",
+          languageKey: "status.template.first.select",
+          i18nEnabled: true,
+        });
         return;
       }
 
@@ -101,7 +115,12 @@ export async function handleListItemClicked({ listId, name }) {
       });
 
       if (!data) {
-        EventBus.emit("status:update", "Failed to load metadata entry.");
+        EventBus.emit("status:update", {
+          message: "status.datafile.load.failed",
+          languageKey: "status.datafile.load.failed",
+          i18nEnabled: true,
+          args: [name],
+        });
         return;
       }
 
@@ -116,13 +135,22 @@ export async function handleListItemClicked({ listId, name }) {
       await formManager.loadFormData(data, name);
 
       EventBus.emit("form:selected", name);
-      EventBus.emit("status:update", `Loaded metadata: ${name}`);
+      EventBus.emit("status:update", {
+        message: "status.metadata.new.ready",
+        languageKey: "status.metadata.new.ready",
+        i18nEnabled: true,
+        args: [name],});
     }
   } catch (err) {
     EventBus.emit("logging:error", [
       `[handleListItemClicked] Failed to load item "${name}" for ${listId}:`,
       err,
     ]);
-    EventBus.emit("status:update", `Error loading ${listId} item.`);
+    EventBus.emit("status:update", {
+      message: "status.item.load.failed",
+      languageKey: "status.item.load.failed",
+      i18nEnabled: true,
+      args: [name, listId],
+    });
   }
 }
