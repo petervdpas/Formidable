@@ -4,7 +4,7 @@
   "use_expressions": true,
   "font_size": 14,
   "development_enable": true,
-  "logging_enabled": true,
+  "logging_enabled": false,
   "enable_plugins": true,
   "context_mode": "storage",
   "context_folder": "./",

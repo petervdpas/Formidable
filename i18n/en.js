@@ -60,7 +60,7 @@ export default {
   "status.delete.cannot.no.template": "Cannot delete... no template selected.",
   "status.delete.cannot.no.storage": "Cannot delete... no storage selected.",
   "status.datafile.filename": "Please enter a filename for datafile.",
-  "status.datafile.ready": "Ready for data entry: {0}.",
+  "status.datafile.ready": "Ready for data input: {0}.",
   "status.datafile.exists": "Datafile {0} already exists.",
   "status.datafile.created": "Datafile {0} created successfully.",
   "status.datafile.load.failed": "Failed to load datafile: {0}.",
