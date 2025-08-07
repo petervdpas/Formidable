@@ -433,5 +433,5 @@ export default {
   "modal.about.title": "Over Formidable",
   "modal.about.description":
     "Formidable is een Sjabloon/Formulier Editor gebouwd met Electron.",
-  "modal.about.copyright": "© 2025 Peter van de Pas",
+  "modal.about.copyright": "©2025 Peter van de Pas",
 };

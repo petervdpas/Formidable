@@ -412,5 +412,5 @@ export default {
   "modal.about.title": "About Formidable",
   "modal.about.description":
     "Formidable is a Template/Form Editor created in Electron.",
-  "modal.about.copyright": "© 2025 Peter van de Pas",
+  "modal.about.copyright": "©2025 Peter van de Pas",
 };

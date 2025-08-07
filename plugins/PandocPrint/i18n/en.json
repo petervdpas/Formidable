@@ -1,0 +1,5 @@
+{
+  "plugin.PandocPrint.title": "PandocPrint Plugin",
+  "plugin.PandocPrint.description": "This is the PandocPrint plugin.",
+  "plugin.PandocPrint.button.run": "Run Plugin"
+}

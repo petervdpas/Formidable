@@ -331,6 +331,8 @@ function createPlugin(folderName, target = "frontend") {
   const pluginFile = fileManager.joinPath(pluginDir, "plugin.js");
   const metaFile = fileManager.joinPath(pluginDir, "plugin.json");
   const settingsFile = fileManager.joinPath(pluginDir, "settings.json");
+  const i18nDir = fileManager.joinPath(pluginDir, "i18n");
+  const i18nFile = fileManager.joinPath(i18nDir, "en.json");
 
   const boilerplateCode =
     target === "frontend"
@@ -352,12 +354,26 @@ function createPlugin(folderName, target = "frontend") {
     }),
   };
 
+  const defaultTranslations = {
+    [`plugin.${safeName}.title`]: `${safeName} Plugin`,
+    [`plugin.${safeName}.description`]: `This is the ${safeName} plugin.`,
+    [`plugin.${safeName}.button.run`]: "Run Plugin",
+  };
+
   try {
+    // Create main plugin folder
     fileManager.ensureDirectory(pluginDir, {
       label: `Plugin<${safeName}>`,
       silent: true,
     });
 
+    // Create i18n folder
+    fileManager.ensureDirectory(i18nDir, {
+      label: `Plugin<${safeName}> i18n`,
+      silent: true,
+    });
+
+    // Save plugin files
     fileManager.saveFile(pluginFile, boilerplateCode, {
       format: "text",
       silent: false,
@@ -368,15 +384,15 @@ function createPlugin(folderName, target = "frontend") {
       silent: true,
     });
 
-    // 🔧 Write an empty settings file
-    fileManager.saveFile(
-      settingsFile,
-      {},
-      {
-        format: "json",
-        silent: true,
-      }
-    );
+    fileManager.saveFile(settingsFile, {}, {
+      format: "json",
+      silent: true,
+    });
+
+    fileManager.saveFile(i18nFile, defaultTranslations, {
+      format: "json",
+      silent: true,
+    });
 
     log(`[PluginManager] Created plugin "${safeName}" (${target})`);
     reloadPlugins();
