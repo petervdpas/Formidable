@@ -1,9 +1,10 @@
 // modules/modalSetup.js
 
 import { EventBus } from "./eventBus.js";
+import { reloadUserConfig } from "../utils/configUtil.js";
 import { buildButtonGroup, createButton } from "../utils/buttonUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
-import { renderSettings, getCachedConfig } from "./settingsManager.js";
+import { renderSettings } from "./settingsManager.js";
 import { renderWorkspaceModal } from "./contextManager.js";
 import { applyModalCssClass, setupModal } from "../utils/modalUtils.js";
 import { extractFieldDefinition } from "../utils/formUtils.js";
@@ -182,12 +183,7 @@ export function setupTemplateModal() {
       const modal = document.getElementById("template-modal");
       const input = modal?.querySelector("input#context-folder");
       if (!input) return;
-
-      const config =
-        getCachedConfig() ||
-        (await new Promise((resolve) => {
-          EventBus.emit("config:load", (cfg) => resolve(cfg));
-        }));
+      const config = await reloadUserConfig();
       input.value = config.context_folder || "./";
     },
   });

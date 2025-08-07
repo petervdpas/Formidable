@@ -12,17 +12,17 @@
   "selected_data_file": "sane-20250530.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
-  "language": "en",
+  "language": "nl",
   "encryption_key": "",
   "use_git": true,
   "git_root": "./",
   "enable_internal_server": true,
   "internal_server_port": 8383,
   "window_bounds": {
-    "width": 1936,
-    "height": 1048,
-    "x": -8,
-    "y": -8
+    "width": 1334,
+    "height": 941,
+    "x": 206,
+    "y": 27
   },
   "template_sidebar_width": 317,
   "storage_sidebar_width": 327

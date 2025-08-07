@@ -1,6 +1,7 @@
 // modules/menuManager.js
 
 import { EventBus } from "./eventBus.js";
+import { reloadUserConfig } from "../utils/configUtil.js";
 import { bindActionHandlers } from "../utils/domUtils.js";
 import { createSwitch } from "../utils/elementBuilders.js";
 import { t } from "../utils/i18n.js";
@@ -19,12 +20,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
     return;
   }
 
-  // Load config if not cached
-  cachedConfig =
-    cachedConfig ||
-    (await new Promise((resolve) => {
-      EventBus.emit("config:load", resolve);
-    }));
+  cachedConfig = cachedConfig || await reloadUserConfig();
 
   // Reset plugin map
   pluginMap.clear();
@@ -264,9 +260,7 @@ export async function handleMenuAction(action) {
 
     case "open-storage-folder": {
       try {
-        const config = await new Promise((resolve) => {
-          EventBus.emit("config:load", (cfg) => resolve(cfg));
-        });
+        const config = await reloadUserConfig();
         const templateName = config.selected_template;
         // TODO: Reevaluate if virtualstructure is needed here
         if (!templateName) {

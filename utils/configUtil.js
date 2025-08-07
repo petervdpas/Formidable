@@ -16,22 +16,35 @@ const defaultAllowedConfigKeys = [
   "selected_data_file",
   "author_name",
   "author_email",
+  "language",
   "encryption_key",
   "use_git",
   "git_root",
   "enable_internal_server",
   "internal_server_port",
   "window_bounds",
+  "template_sidebar_width",
+  "storage_sidebar_width",
 ];
+
+export async function reloadUserConfig() {
+  return new Promise((resolve) => {
+    EventBus.emit("config:load", (cfg) => resolve(cfg));
+  });
+}
+
+// Clear the local cache (e.g., after settings update)
+export function invalidateUserConfig() {
+  EventBus.emit("config:invalidate");
+  cachedConfig = null;
+}
 
 // Get full config or one key (optionally scoped to allowedKeys)
 export async function getUserConfig(key, options = {}) {
   const allowedKeys = options.allowedKeys ?? defaultAllowedConfigKeys;
 
   if (!cachedConfig) {
-    cachedConfig = await new Promise((resolve) => {
-      EventBus.emit("config:load", (config) => resolve(config || {}));
-    });
+    cachedConfig = await reloadUserConfig();
   }
 
   if (typeof key === "string") {
@@ -43,11 +56,6 @@ export async function getUserConfig(key, options = {}) {
   }
 
   return cachedConfig;
-}
-
-// Clear the local cache (e.g., after settings update)
-export function invalidateUserConfig() {
-  cachedConfig = null;
 }
 
 // Save and optionally invalidate cache

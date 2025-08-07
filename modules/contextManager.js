@@ -1,6 +1,7 @@
 // modules/contextManager.js
 
 import { EventBus } from "./eventBus.js";
+import { reloadUserConfig } from "../utils/configUtil.js";
 import { ensureVirtualLocation } from "../utils/vfsUtils.js";
 import { setupSplitter } from "../utils/resizing.js";
 import { createSwitch, addContainerElement } from "../utils/elementBuilders.js";
@@ -92,10 +93,8 @@ export async function renderWorkspaceModal() {
   const container = document.getElementById("workspace-body");
   if (!container) return false;
 
-  cachedConfig = await new Promise((resolve) => {
-    EventBus.emit("config:load", (cfg) => resolve(cfg));
-  });
-  const config = cachedConfig;
+  cachedConfig = await reloadUserConfig();
+  const config = cachedConfig || {};
   const isStorage = config.context_mode === "storage";
 
   container.innerHTML = "";

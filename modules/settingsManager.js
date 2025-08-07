@@ -17,28 +17,20 @@ import {
   getAvailableLanguages,
   translateDOM,
 } from "../utils/i18n.js";
-import { invalidateUserConfig } from "../utils/configUtil.js";
+import { reloadUserConfig, invalidateUserConfig } from "../utils/configUtil.js";
 import { rebuildMenu } from "../modules/menuManager.js";
 
 let cachedConfig = null;
-
-export function getCachedConfig() {
-  return cachedConfig;
-}
-
-export function invalidateCachedConfig() {
-  EventBus.emit("config:invalidate");
-  cachedConfig = null;
-  invalidateUserConfig();
-}
 
 export async function renderSettings() {
   const container = document.getElementById("settings-body");
   if (!container) return false;
 
-  cachedConfig = await new Promise((resolve) => {
-    EventBus.emit("config:load", (cfg) => resolve(cfg));
-  });
+  // Invalidate cache to ensure we get fresh config
+  invalidateUserConfig();
+
+  // Reload config to ensure we have the latest values
+  cachedConfig = await reloadUserConfig();
   const config = cachedConfig;
 
   container.innerHTML = "";
@@ -247,7 +239,7 @@ export async function renderSettings() {
       configKey: "encryption_key",
       onSave: async (val) => {
         await EventBus.emit("config:update", { encryption_key: val });
-        cachedConfig = await reloadConfig();
+        cachedConfig = await reloadUserConfig();
 
         emitConfigStatus("encryption_key", "•••••");
       },
@@ -325,12 +317,7 @@ function setupBindings(config, gitRootPicker) {
   bindToggleSwitch("internal-server-toggle", "enable_internal_server");
 }
 
-async function reloadConfig() {
-  invalidateCachedConfig();
-  return new Promise((resolve) => {
-    EventBus.emit("config:load", (cfg) => resolve(cfg));
-  });
-}
+
 
 function bindThemeSwitch(switchId, configKey) {
   const el = document.getElementById(switchId);
@@ -342,7 +329,7 @@ function bindThemeSwitch(switchId, configKey) {
   el.onchange = async () => {
     const theme = el.checked ? "dark" : "light";
     await EventBus.emit("config:update", { [configKey]: theme });
-    cachedConfig = await reloadConfig();
+    cachedConfig = await reloadUserConfig();
     EventBus.emit("theme:toggle", theme);
 
     emitConfigStatus(configKey, theme);
@@ -357,7 +344,7 @@ function bindToggleSwitch(switchId, configKey, onExtra = null) {
     const enabled = el.checked;
     await EventBus.emit("config:update", { [configKey]: enabled });
     if (typeof onExtra === "function") await onExtra(enabled);
-    cachedConfig = await reloadConfig();
+    cachedConfig = await reloadUserConfig();
 
     emitConfigStatus(configKey, enabled);
   };
@@ -371,7 +358,7 @@ function bindFormInput(id, configKey, key) {
     configKey,
     onSave: async (val) => {
       EventBus.emit("config:update", { [configKey]: val });
-      cachedConfig = await reloadConfig();
+      cachedConfig = await reloadUserConfig();
       emitConfigStatus(configKey, val);
     },
     i18nEnabled: true,
@@ -392,7 +379,7 @@ function bindDirButton(fieldId, configKey) {
 
     input.value = relative;
     await EventBus.emit("config:update", { [configKey]: relative });
-    cachedConfig = await reloadConfig();
+    cachedConfig = await reloadUserConfig();
 
     emitConfigStatus(configKey, relative);
   };
@@ -407,7 +394,7 @@ function setupLanguageDropdown(config) {
     onChange: async (value) => {
       // Persist
       await EventBus.emit("config:update", { language: value });
-      cachedConfig = await reloadConfig();
+      cachedConfig = await reloadUserConfig();
 
       // Load & apply translations immediately
       try {
