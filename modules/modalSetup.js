@@ -293,7 +293,7 @@ export function setupPluginModal() {
         // Target dropdown
         createDropdown({
           containerId: "plugin-target-dropdown",
-          labelText: "",
+          labelTextOrKey: "",
           selectedValue: selectedTarget,
           options: [
             { value: "frontend", label: "Frontend" },
@@ -425,7 +425,7 @@ export function setupFieldEditModal(field, allFields, onConfirm) {
   // Create the type dropdown
   const typeDropdown = createDropdown({
     containerId: "edit-type-container",
-    labelText: t("field.type"),
+    labelTextOrKey: "field.type",
     options: typeOptions,
     selectedValue: "text",
     onChange: (val) => {
@@ -433,6 +433,7 @@ export function setupFieldEditModal(field, allFields, onConfirm) {
       if (!modalEl) return;
       applyModalCssClass(modalEl, fieldTypes[val]);
     },
+    i18nEnabled: true,
   });
 
   // Collect dropdown options from all non-loop fields
@@ -448,12 +449,13 @@ export function setupFieldEditModal(field, allFields, onConfirm) {
   // Create the summary field dropdown
   const summaryFieldDropdown = createDropdown({
     containerId: "edit-summary-field-container",
-    labelText: t("field.summary"),
+    labelTextOrKey: "field.summary",
     options: summaryOptions,
     selectedValue: field.summary_field || "",
     onChange: (val) => {
       validate(); // optional
     },
+    i18nEnabled: true,
   });
 
   const confirmBtn = createButton({

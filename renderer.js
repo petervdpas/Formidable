@@ -125,7 +125,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   // ── Template Dropdown ──
   const templateDropdown = createDropdown({
     containerId: "template-selector",
-    labelText: t("standard.templates"),
+    labelTextOrKey: "dropdown.templates",
     options: [],
     onChange: async (selectedName) => {
       EventBus.emit("logging:default", [
@@ -154,6 +154,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
       return options;
     },
+    i18nEnabled: true,
   });
 
   // ── Template Editor ──

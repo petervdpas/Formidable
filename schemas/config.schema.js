@@ -25,6 +25,8 @@ module.exports = {
       width: 1024,
       height: 800,
     },
+    template_sidebar_width: 300,
+    storage_sidebar_width: 300,
   },
 
   sanitize(raw) {

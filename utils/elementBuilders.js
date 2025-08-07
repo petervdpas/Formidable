@@ -4,10 +4,15 @@ import { t } from "./i18n.js";
 
 export function createStyledLabel(
   text,
-  { forId = null, className = "", styles = {} } = {}
+  {
+    forId = null,
+    className = "",
+    styles = {},
+    i18nKey = null,
+  } = {}
 ) {
   const label = document.createElement("label");
-  label.textContent = text;
+
   if (forId) label.htmlFor = forId;
   if (className) label.className = className;
 
@@ -17,6 +22,13 @@ export function createStyledLabel(
     marginBottom: "6px",
     ...styles,
   });
+
+  if (i18nKey) {
+    label.setAttribute("data-i18n", i18nKey);
+    label.textContent = t(i18nKey) || text;
+  } else {
+    label.textContent = text;
+  }
 
   return label;
 }

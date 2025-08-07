@@ -3,7 +3,7 @@
 import { EventBus } from "./eventBus.js";
 import { ensureVirtualLocation } from "../utils/vfsUtils.js";
 import { setupSplitter } from "../utils/resizing.js";
-import { createSwitch } from "../utils/elementBuilders.js";
+import { createSwitch, addContainerElement } from "../utils/elementBuilders.js";
 import { createDropdown } from "../utils/dropdownUtils.js";
 
 let templateSplitterInitialized = false;
@@ -17,6 +17,7 @@ function initSplitters(mode) {
       right: document.getElementById("template-workspace"),
       container: document.getElementById("template-container"),
       min: 150,
+      configKey: "template_sidebar_width",
     });
     templateSplitterInitialized = true;
   }
@@ -28,6 +29,7 @@ function initSplitters(mode) {
       right: document.getElementById("storage-workspace"),
       container: document.getElementById("storage-container"),
       min: 150,
+      configKey: "storage_sidebar_width",
     });
     storageSplitterInitialized = true;
   }
@@ -35,9 +37,45 @@ function initSplitters(mode) {
 
 export function setContextView(mode, containers) {
   const isStorage = mode === "storage";
+
   containers.templateContainer.style.display = isStorage ? "none" : "flex";
   containers.storageContainer.style.display = isStorage ? "flex" : "none";
+
   initSplitters(mode);
+
+  // Restore sidebar width from config
+  EventBus.emit("config:load", (config) => {
+    const key = isStorage
+      ? "storage_sidebar_width"
+      : "template_sidebar_width";
+    const width = config[key];
+
+    if (typeof width === "number") {
+      const sidebar = isStorage
+        ? document.getElementById("storage-sidebar")
+        : document.getElementById("template-sidebar");
+      const container = isStorage
+        ? document.getElementById("storage-container")
+        : document.getElementById("template-container");
+      const splitter = isStorage
+        ? document.getElementById("storage-splitter")
+        : document.getElementById("template-splitter");
+      const workspace = isStorage
+        ? document.getElementById("storage-workspace")
+        : document.getElementById("template-workspace");
+
+      const totalWidth = container.clientWidth;
+      sidebar.style.width = `${width}px`;
+      workspace.style.width = `${
+        totalWidth - width - splitter.offsetWidth
+      }px`;
+
+      // Disable flex auto sizing
+      sidebar.style.flex = "none";
+      workspace.style.flex = "none";
+    }
+  });
+
   EventBus.emit("logging:default", ["[Context] Switched to:", mode]);
 }
 
@@ -88,13 +126,18 @@ export async function renderWorkspaceModal() {
   // Dropdown wrapper
   const contextWrapper = document.createElement("div");
   contextWrapper.id = "context-selection-wrapper";
-  contextWrapper.className = "context-wrapper";
-  contextWrapper.style.marginTop = "12px";
-  contextWrapper.innerHTML = `
-    <div style="font-size: 0.9em; color: var(--input-fg); opacity: 0.8;">
-      This section will show available forms or templates depending on context mode.
-    </div>
-  `;
+
+  addContainerElement({
+    parent: contextWrapper,
+    tag: "div",
+    className: "context-wrapper",
+    i18nKey: "special.context.selection.hint",
+    attributes: {
+      style:
+        "margin-top: 12px; font-size: 0.9em; color: var(--input-fg); opacity: 0.8;",
+    },
+  });
+
   container.appendChild(contextWrapper);
 
   // Initial dropdown render
@@ -112,7 +155,7 @@ function renderContextDropdown(isStorage, config) {
 
   const dropdown = createDropdown({
     containerId: "context-selection-wrapper",
-    labelText: isStorage ? "Available Forms" : "Available Templates",
+    labelTextOrKey: isStorage ? "dropdown.forms.available" : "dropdown.templates.available",
     selectedValue: isStorage
       ? window.currentSelectedFormName
       : window.currentSelectedTemplateName,
@@ -173,6 +216,7 @@ function renderContextDropdown(isStorage, config) {
         EventBus.emit("template:list:highlighted", val);
       }
     },
+    i18nEnabled: true,
   });
 
   dropdown?.refresh();

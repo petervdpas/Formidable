@@ -2,6 +2,7 @@
 
 import { EventBus } from "../modules/eventBus.js";
 import { createStyledLabel, createStyledSelect } from "./elementBuilders.js";
+import { t } from "./i18n.js";
 
 export function populateSelectOptions(
   selectElement,
@@ -24,11 +25,12 @@ export function populateSelectOptions(
 
 export function createDropdown({
   containerId,
-  labelText,
+  labelTextOrKey,
   selectedValue = "",
   options = [],
   onChange,
   onRefresh,
+  i18nEnabled = false,
 }) {
   const container = document.getElementById(containerId);
   if (!container) {
@@ -40,7 +42,12 @@ export function createDropdown({
 
   container.innerHTML = ""; // Clear old content
 
-  const label = createStyledLabel(labelText);
+  const translatedLabel = i18nEnabled ? t(labelTextOrKey) : labelTextOrKey;
+
+  const label = createStyledLabel(translatedLabel, {
+    i18nKey: i18nEnabled ? labelTextOrKey : null,
+  });
+
   const select = createStyledSelect();
 
   populateSelectOptions(select, options, selectedValue);
@@ -58,10 +65,7 @@ export function createDropdown({
 
   return {
     selectElement: select,
-    getSelected: () => {
-      const val = select.value;
-      return val;
-    },
+    getSelected: () => select.value,
     setSelected: (value) => {
       select.value = value;
       if (onChange) onChange(value);

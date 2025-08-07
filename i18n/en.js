@@ -171,6 +171,15 @@ export default {
   "special.plugin.delete.sure": "Are you sure you want to delete this plugin?",
   "special.loop.delete.sure": "Are you sure you want to remove this loop item?",
   "special.system.restart.sure": "Are you sure you want to restart the system?",
+  "special.context.selection.hint":
+    "This section will show available forms or templates depending on context mode.",
+
+  // ── dropdown ───────────────────────────
+  "dropdown.select": "Select...",
+  "dropdown.templates": "Templates",
+  "dropdown.forms": "Forms",
+  "dropdown.templates.available": "Available Templates",
+  "dropdown.forms.available": "Available Forms",
 
   // ── Language ───────────────────────────
   "lang.select": "Select Language",

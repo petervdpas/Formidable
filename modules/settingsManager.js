@@ -398,7 +398,7 @@ function bindDirButton(fieldId, configKey) {
 function setupLanguageDropdown(config) {
   createDropdown({
     containerId: "settings-language",
-    labelText: t("modal.settings.author.language", "Language"),
+    labelTextOrKey: "modal.settings.author.language",
     selectedValue: config.language || "en",
     options: getAvailableLanguages(),
     onChange: async (value) => {
@@ -427,6 +427,7 @@ function setupLanguageDropdown(config) {
         });
       }
     },
+    i18nEnabled: true,
   });
 }
 

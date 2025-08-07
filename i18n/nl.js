@@ -192,6 +192,15 @@ export default {
     "Weet je zeker dat je dit lusitem wilt verwijderen?",
   "special.system.restart.sure":
     "Weet je zeker dat je het systeem wilt herstarten?",
+  "special.context.selection.hint":
+    "Deze sectie toont beschikbare formulieren of sjablonen, afhankelijk van de contextmodus.",
+
+  // ── dropdown ───────────────────────────
+  "dropdown.select": "Selecteer...",
+  "dropdown.templates": "Sjablonen",
+  "dropdown.forms": "Formulieren",
+  "dropdown.templates.available": "Beschikbare Sjablonen",
+  "dropdown.forms.available": "Beschikbare Formulieren",
 
   // ── Language ───────────────────────────
   "lang.en": "Engels",

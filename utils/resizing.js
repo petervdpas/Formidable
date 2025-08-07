@@ -1,7 +1,16 @@
 // utils/resizing.js
 
+import { EventBus } from "../modules/eventBus.js";
+
 // Splitter logic
-export function setupSplitter({ splitter, left, right, container, min = 150 }) {
+export function setupSplitter({
+  splitter,
+  left,
+  right,
+  container,
+  min = 150,
+  configKey = null,
+}) {
   let isDragging = false;
   let startX = 0;
   let startLeftWidth = 0;
@@ -42,6 +51,12 @@ export function setupSplitter({ splitter, left, right, container, min = 150 }) {
     if (isDragging) {
       isDragging = false;
       updateCursor(false);
+
+      if (configKey) {
+        let width = left.offsetWidth;
+        width = Math.max(280, Math.min(520, width));
+        EventBus.emit("config:update", { [configKey]: width });
+      }
     }
   });
 }
