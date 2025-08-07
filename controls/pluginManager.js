@@ -355,9 +355,9 @@ function createPlugin(folderName, target = "frontend") {
   };
 
   const defaultTranslations = {
-    [`plugin.${safeName}.title`]: `${safeName} Plugin`,
-    [`plugin.${safeName}.description`]: `This is the ${safeName} plugin.`,
-    [`plugin.${safeName}.button.run`]: "Run Plugin",
+    [`plugin.title`]: `${safeName} Plugin`,
+    [`plugin.description`]: `This is the ${safeName} plugin.`,
+    [`plugin.button.run`]: "Run Plugin",
   };
 
   try {

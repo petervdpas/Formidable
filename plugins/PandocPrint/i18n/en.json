@@ -1,5 +1,27 @@
 {
-  "plugin.PandocPrint.title": "PandocPrint Plugin",
-  "plugin.PandocPrint.description": "This is the PandocPrint plugin.",
-  "plugin.PandocPrint.button.run": "Run Plugin"
+  "plugin.title": "Pandoc Print",
+  "plugin.description": "Convert Markdown to PDF using Pandoc.",
+  "plugin.button.save.settings": "Save Settings",
+  "plugin.button.render.markdown": "Render Markdown",
+  "plugin.button.generate.pdf": "Generate PDF",
+  "plugin.toast.settings.saved": "Settings saved",
+  "plugin.toast.settings.failed": "Failed to save settings",
+  "plugin.toast.folder.cleared": "Cleared markdown folder: {0}",
+  "plugin.toast.folder.failed": "Failed to clear markdown folder: {0}",
+  "plugin.toast.pdf.success": "PDF generation executed successfully",
+  "plugin.toast.pdf.failed": "PDF generation failed",
+  "plugin.info.hint": "Convert Markdown to PDF using Pandoc. Configure settings per platform. Use placeholders like {InputPath}, {OutputPath}, etc. in your command.",
+
+  "plugin.field.platform": "Platform",
+  "plugin.field.useFormidable": "Use Formidable",
+  "plugin.field.shellCommand": "Shell Command",
+  "plugin.field.inputPath": "Input File",
+  "plugin.field.outputPath": "Output Directory",
+  "plugin.field.templatePath": "Latex Template",
+  "plugin.field.useCurrentDate": "Use Current Date",
+  "plugin.field.powershellScript": "Powershell Script",
+
+  "plugin.platform.windows": "Windows",
+  "plugin.platform.mac": "Mac",
+  "plugin.platform.linux": "Linux"
 }

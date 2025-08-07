@@ -1,5 +1,5 @@
 {
-  "plugin.BackTest.title": "BackTest Plugin",
-  "plugin.BackTest.description": "This is the BackTest plugin.",
-  "plugin.BackTest.button.run": "Run Plugin"
+  "plugin.title": "BackTest Plugin",
+  "plugin.description": "This is the BackTest plugin.",
+  "plugin.button.run": "Run Plugin"
 }

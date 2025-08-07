@@ -123,6 +123,7 @@ export default {
   "toast.plugin.created": "Plugin created.",
   "toast.plugin.delete.failed": "Failed to delete plugin.",
   "toast.plugin.run": "Plugin run: {0} ({1})",
+  "toast.plugin.run.failed": "Running plugin {0} ({1}) has failed",
   "toast.plugin.crashed": "Plugin {0} {1} crashed",
   "toast.plugin.status": "Plugin {0} is {1}",
   "toast.plugin.delete": "Plugin {0} was deleted.",

@@ -13,11 +13,11 @@ import {
 import { createDropdown } from "../utils/dropdownUtils.js";
 import {
   t,
-  tKey,
   loadLocale,
   getAvailableLanguages,
   translateDOM,
 } from "../utils/i18n.js";
+import { invalidateUserConfig } from "../utils/configUtil.js";
 import { rebuildMenu } from "../modules/menuManager.js";
 
 let cachedConfig = null;
@@ -27,7 +27,9 @@ export function getCachedConfig() {
 }
 
 export function invalidateCachedConfig() {
+  EventBus.emit("config:invalidate");
   cachedConfig = null;
+  invalidateUserConfig();
 }
 
 export async function renderSettings() {
@@ -324,6 +326,7 @@ function setupBindings(config, gitRootPicker) {
 }
 
 async function reloadConfig() {
+  invalidateCachedConfig();
   return new Promise((resolve) => {
     EventBus.emit("config:load", (cfg) => resolve(cfg));
   });

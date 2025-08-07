@@ -135,6 +135,7 @@ export default {
   "toast.plugin.created": "Plugin aangemaakt.",
   "toast.plugin.delete.failed": "Verwijderen van plugin mislukt.",
   "toast.plugin.run": "Plugin uitgevoerd: {0} ({1})",
+  "toast.plugin.run.failed": "Uitvoeren van plugin {0} ({1}) is mislukt.",
   "toast.plugin.crashed": "Plugin {0} {1} is gecrasht.",
   "toast.plugin.status": "Plugin {0} is {1}",
   "toast.plugin.delete": "Plugin {0} is verwijderd.",

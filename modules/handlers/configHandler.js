@@ -2,6 +2,17 @@
 
 import { EventBus } from "../eventBus.js";
 
+export async function handleConfigInvalidate() {
+  try {
+    await window.api.config.invalidateConfigCache();
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      "[ConfigHandler] Failed to invalidate config cache:",
+      err,
+    ]);
+  }
+}
+
 export async function handleConfigLoad(callback) {
   try {
     const config = await window.api.config.loadUserConfig();

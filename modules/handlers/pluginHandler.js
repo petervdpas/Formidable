@@ -1,7 +1,7 @@
 // modules/handlers/pluginHandler.js
 
 import { EventBus } from "../eventBus.js";
-import { t, tLow } from "../../utils/i18n.js";
+import { loadPluginTranslations } from "../../utils/pluginUtils.js";
 
 // ─────────────────────────────────────────────────────────────
 // Persistent plugin event registry (FIX: survives reloads)
@@ -159,10 +159,11 @@ export async function handleRunPlugin(
       result = await window.api.plugin.runPlugin(name, context);
     }
 
-    const variant = result?.error ? "error" : "success";
+    const failed = !result?.success;
+    const variant = failed ? "error" : "success";
 
     EventBus.emit("ui:toast", {
-      languageKey: "toast.plugin.run",
+      languageKey: failed ? "toast.plugin.run.failed" : "toast.plugin.run",
       args: [name, target],
       variant,
     });
@@ -316,3 +317,4 @@ export async function handlePluginProxyFetch(payload, callback) {
     callback?.({ success: false, error: err.message || "Unknown error" });
   }
 }
+

@@ -156,6 +156,8 @@ export function initEventRouter() {
   );
 
   // Config events
+  EventBus.off("config:invalidate", configHandler.handleConfigInvalidate);
+  EventBus.on("config:invalidate", configHandler.handleConfigInvalidate);
   EventBus.off("config:load", configHandler.handleConfigLoad);
   EventBus.off("config:update", configHandler.handleConfigUpdate);
   EventBus.on("config:update", configHandler.handleConfigUpdate);

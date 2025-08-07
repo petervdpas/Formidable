@@ -4,18 +4,24 @@ export async function run() {
   const { plugin, button, modal, dom, string } = window.FGA;
   const pluginName = "PandocPrint";
 
+  const lang = await plugin.getConfig("language");
+  console.log(lang);
+  await plugin.loadPluginTranslations(pluginName, lang);
+
+  const t = plugin.getPluginTranslations(pluginName);
+
   setTimeout(async () => {
     const markdownRoot = `plugins/${pluginName}/markdown`;
     try {
       await plugin.emptyFolder(markdownRoot);
       emit("ui:toast", {
-        message: `Cleared markdown folder: ${markdownRoot}`,
+        message: t("plugin.toast.folder.cleared", [markdownRoot]),
         variant: "success",
         duration: 3000,
       });
     } catch (err) {
       emit("ui:toast", {
-        message: `Failed to clear markdown folder: ${err.message}`,
+        message: t("plugin.toast.folder.failed", [err.message]),
         variant: "error",
         duration: 5000,
       });
@@ -24,7 +30,7 @@ export async function run() {
 
   const { show } = modal.setupPluginModal({
     id: "plugin-settings-pandocprint",
-    title: "Pandoc Print",
+    title: t("plugin.title"),
     escToClose: true,
     backdropClick: true,
     width: "44em",
@@ -46,25 +52,49 @@ export async function run() {
       settings.overwrite ??= true;
 
       const platformOptions = [
-        { value: "windows", label: "Windows" },
-        { value: "mac", label: "Mac" },
-        { value: "linux", label: "Linux" },
+        { value: "windows", label: t("plugin.platform.windows") },
+        { value: "mac", label: t("plugin.platform.mac") },
+        { value: "linux", label: t("plugin.platform.linux") },
       ];
 
       const variableFields = [
-        { key: "UseFormidable", type: "boolean", label: "Use Formidable" },
-        { key: "ShellCommand", type: "text", label: "Shell Command" },
-        { key: "InputPath", type: "file", label: "Input File" },
-        { key: "OutputPath", type: "directory", label: "Output Directory" },
-        { key: "TemplatePath", type: "file", label: "Latex Template" },
-        { key: "UseCurrentDate", type: "boolean", label: "Use Current Date" },
-        { key: "PowershellScript", type: "file", label: "Powershell Script" },
+        {
+          key: "UseFormidable",
+          type: "boolean",
+          label: t("plugin.field.useFormidable"),
+        },
+        {
+          key: "ShellCommand",
+          type: "text",
+          label: t("plugin.field.shellCommand"),
+        },
+        { key: "InputPath", type: "file", label: t("plugin.field.inputPath") },
+        {
+          key: "OutputPath",
+          type: "directory",
+          label: t("plugin.field.outputPath"),
+        },
+        {
+          key: "TemplatePath",
+          type: "file",
+          label: t("plugin.field.templatePath"),
+        },
+        {
+          key: "UseCurrentDate",
+          type: "boolean",
+          label: t("plugin.field.useCurrentDate"),
+        },
+        {
+          key: "PowershellScript",
+          type: "file",
+          label: t("plugin.field.powershellScript"),
+        },
       ];
 
       const platformField = {
         key: "platform",
         type: "dropdown",
-        label: "Platform",
+        label: t("plugin.field.platform"),
         options: platformOptions,
         wrapper: "modal-form-row",
         fieldRenderer: "renderDropdownField",
@@ -104,8 +134,7 @@ export async function run() {
         },
         injectBefore: () => {
           const info = document.createElement("p");
-          info.textContent =
-            "Convert Markdown to PDF using Pandoc. Configure settings per platform. Use placeholders like {InputPath}, {OutputPath}, etc. in your command.";
+          info.textContent = t("plugin.info.hint");
           info.className = "form-info-text";
           return info;
         },
@@ -125,7 +154,7 @@ export async function run() {
       });
 
       const saveBtn = button.createButton({
-        text: "Save Settings",
+        text: t("plugin.button.save.settings"),
         className: "btn-warn",
         onClick: async () => {
           const values = fieldManager.getValues();
@@ -147,15 +176,15 @@ export async function run() {
 
           emit("ui:toast", {
             message: result?.success
-              ? "Settings saved"
-              : "Failed to save settings",
+              ? t("plugin.toast.settings.saved")
+              : t("plugin.toast.settings.failed"),
             variant: result?.success ? "success" : "error",
           });
         },
       });
 
       const renderBtn = button.createButton({
-        text: "Render Markdown",
+        text: t("plugin.button.render.markdown"),
         className: "btn-info",
         onClick: async () => {
           // Set InputPath from Formidable-generated Markdown if applicable
@@ -176,7 +205,7 @@ export async function run() {
       });
 
       const previewBtn = button.createButton({
-        text: "Generate PDF",
+        text: t("plugin.button.generate.pdf"),
         className: "btn-info",
         onClick: async () => {
           const values = fieldManager.getValues();
@@ -198,8 +227,8 @@ export async function run() {
           const result = await plugin.executeSystemCommand(finalCommand);
 
           const toastMessage = result.success
-            ? "PDF generation executed successfully"
-            : "PDF generation failed";
+            ? t("plugin.toast.pdf.success")
+            : t("plugin.toast.pdf.failed");
           const toastVariant = result.success ? "success" : "error";
 
           emit("ui:toast", {

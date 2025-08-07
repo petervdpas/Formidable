@@ -1,5 +1,5 @@
 {
-  "plugin.WikiWonder.title": "WikiWonder Plugin",
-  "plugin.WikiWonder.description": "This is the WikiWonder plugin.",
-  "plugin.WikiWonder.button.run": "Run Plugin"
+  "plugin.title": "WikiWonder Plugin",
+  "plugin.description": "This is the WikiWonder plugin.",
+  "plugin.button.run": "Run Plugin"
 }

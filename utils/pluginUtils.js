@@ -12,7 +12,6 @@ import {
   getUserConfig as baseGetUserConfig,
   saveUserConfig,
 } from "./configUtil.js";
-import { t } from "./i18n.js";
 
 // Plugin-specific allowed keys
 const pluginAllowedKeys = [
@@ -26,6 +25,7 @@ const pluginAllowedKeys = [
   "selected_data_file",
   "author_name",
   "author_email",
+  "language",
   "use_git",
   "git_root",
   "enable_internal_server",
@@ -39,6 +39,40 @@ export async function getUserConfig(key) {
 }
 
 export { saveUserConfig };
+
+let pluginTranslationCache = {};
+
+export async function loadPluginTranslations(pluginName, language = "en") {
+  const i18nBasePath = `plugins/${pluginName}/i18n`;
+  const langFile = `${i18nBasePath}/${language}.json`;
+  const fallbackFile = `${i18nBasePath}/en.json`;
+
+  let translations = {};
+
+  if (await fileExists(langFile)) {
+    translations = await loadFile(langFile, { format: "json", silent: true });
+  } else if (await fileExists(fallbackFile)) {
+    translations = await loadFile(fallbackFile, { format: "json", silent: true });
+    console.warn(`[Plugin<${pluginName}>] Falling back to en.json`);
+  } else {
+    console.warn(`[Plugin<${pluginName}>] No translation file found`);
+  }
+
+  pluginTranslationCache[pluginName] = translations;
+}
+
+export function getPluginTranslations(pluginName) {
+  return function t(key, args = [], fallback = "") {
+    const translations = pluginTranslationCache[pluginName] || {};
+    let str = translations[key] || fallback || key;
+    if (Array.isArray(args)) {
+      args.forEach((val, idx) => {
+        str = str.replace(new RegExp(`\\{${idx}\\}`, "g"), val);
+      });
+    }
+    return str;
+  };
+}
 
 export async function getStorageFilesForTemplate(templateFilename) {
   if (!templateFilename) return [];
