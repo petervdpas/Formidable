@@ -3,6 +3,7 @@
 async function performMarkdownExport({
   path,
   plugin,
+  pluginName,
   selectedTemplate,
   selectedDataFile,
   outputDir,
@@ -28,6 +29,7 @@ async function performMarkdownExport({
   };
 
   const imageSet = new Set();
+  const t = plugin.getPluginTranslations(pluginName);
 
   async function renderOneFile(dataFile) {
     const opts = {
@@ -55,7 +57,9 @@ async function performMarkdownExport({
       if (!rawPath) continue;
 
       const filename = rawPath.split(/[\\/]/).pop();
-      const encodedName = encodeFilenames ? encodeURIComponent(filename) : filename;
+      const encodedName = encodeFilenames
+        ? encodeURIComponent(filename)
+        : filename;
       const newPath = `.images/${encodedName}`;
 
       imageSet.add(filename);
@@ -67,8 +71,8 @@ async function performMarkdownExport({
     for (const match of markdown.matchAll(linkPattern)) {
       const [, templateFile, dataFileName] = match;
 
-      const templateSlug = path.stripYamlExtension(templateFile);   // e.g. "aanpak-audit"
-      const dataSlug = path.stripMetaExtension(dataFileName);       // e.g. "aanpak-ch02"
+      const templateSlug = path.stripYamlExtension(templateFile);
+      const dataSlug = path.stripMetaExtension(dataFileName);
 
       // Extract something like "CH.02" from "aanpak-ch02"
       let label = dataSlug;
@@ -109,22 +113,27 @@ async function performMarkdownExport({
       try {
         await plugin.copyFile({ from, to, overwrite: true });
       } catch (err) {
-        console.warn(`[WikiWonder] Failed to copy ${filename}: ${err.message}`);
+        emit("ui:toast", {
+          message: t("plugin.toast.image.copy.failed", [filename, err.message]),
+          variant: "error",
+        });
       }
     }
   }
 
   emit("ui:toast", {
-    message: "Markdown export complete.",
+    message: t("plugin.toast.export.complete"),
     variant: "success",
     duration: 6000,
   });
 }
 
 async function copyToTarget({ plugin, pluginName, targetDir }) {
+  const t = plugin.getPluginTranslations(pluginName);
+
   if (!targetDir) {
     emit("ui:toast", {
-      message: "Please select a target folder first",
+      message: t("plugin.toast.no.target"),
       variant: "error",
     });
     return;
@@ -139,8 +148,8 @@ async function copyToTarget({ plugin, pluginName, targetDir }) {
 
   emit("ui:toast", {
     message: result.success
-      ? "Markdown copied to target folder"
-      : "Failed to copy files",
+      ? t("plugin.toast.copy.success")
+      : t("plugin.toast.copy.failed"),
     variant: result.success ? "success" : "error",
     duration: 7000,
   });
@@ -150,18 +159,22 @@ export async function run() {
   const { path, plugin, button, modal, dom } = window.FGA;
   const pluginName = "WikiWonder";
 
+  const lang = await plugin.getConfig("language");
+  await plugin.loadPluginTranslations(pluginName, lang);
+  const t = plugin.getPluginTranslations(pluginName);
+
   setTimeout(async () => {
     const markdownRoot = `plugins/${pluginName}/markdown`;
     try {
       await plugin.emptyFolder(markdownRoot);
       emit("ui:toast", {
-        message: `Cleared markdown folder: ${markdownRoot}`,
+        message: t("plugin.toast.folder.cleared", [markdownRoot]),
         variant: "success",
         duration: 3000,
       });
     } catch (err) {
       emit("ui:toast", {
-        message: `Failed to clear markdown folder: ${err.message}`,
+        message: t("plugin.toast.folder.failed", [err.message]),
         variant: "error",
         duration: 5000,
       });
@@ -169,11 +182,12 @@ export async function run() {
   }, 100);
 
   const { show } = modal.setupPluginModal({
+    pluginName,
     id: "plugin-settings-wikiwonder",
     title: "WikiWonder",
     escToClose: true,
     backdropClick: true,
-    width: "32em",
+    width: "36em",
     height: "auto",
     resizable: false,
 
@@ -200,11 +214,11 @@ export async function run() {
         {
           key: "frontmatterMode",
           type: "dropdown",
-          label: "Frontmatter Mode",
+          label: t("plugin.field.frontmatterMode"),
           options: [
-            { value: "keep", label: "Keep All" },
-            { value: "remove", label: "Remove All" },
-            { value: "filter", label: "Filter by Key" },
+            { value: "keep", label: t("plugin.option.keep") },
+            { value: "remove", label: t("plugin.option.remove") },
+            { value: "filter", label: t("plugin.option.filter") },
           ],
           wrapper: "modal-form-row",
           fieldRenderer: "renderDropdownField",
@@ -213,7 +227,7 @@ export async function run() {
         {
           key: "frontmatterKeys",
           type: "text",
-          label: "Keys to Keep (CSV)",
+          label: t("plugin.field.frontmatterKeys"),
           wrapper: "modal-form-row",
           fieldRenderer: "renderTextField",
           value: settings.frontmatterKeys,
@@ -222,24 +236,24 @@ export async function run() {
         {
           key: "targetFolder",
           type: "directory",
-          label: "Target Folder",
-          wrapper: "modal-form-row",
+          label: t("plugin.field.targetFolder"),
+          wrapper: "modal-form-row tight-gap",
           fieldRenderer: "renderDirectoryField",
           value: settings.targetFolder,
         },
         {
           key: "bulkMode",
           type: "boolean",
-          label: "Bulk Mode",
-          wrapper: "modal-form-row",
+          label: t("plugin.field.bulkMode"),
+          wrapper: "modal-form-row switch-row",
           fieldRenderer: "renderBooleanField",
           value: settings.bulkMode,
         },
         {
           key: "encodeFilenames",
           type: "boolean",
-          label: "Encode filenames",
-          wrapper: "modal-form-row",
+          label: t("plugin.field.encodeFilenames"),
+          wrapper: "modal-form-row switch-row",
           fieldRenderer: "renderBooleanField",
           value: settings.encodeFilenames,
         },
@@ -257,7 +271,7 @@ export async function run() {
         },
         injectBefore: () => {
           const info = document.createElement("p");
-          info.textContent = `This plugin exports the current form as markdown into "plugins/${pluginName}/markdown/<template>".\n\nIf Bulk Mode is enabled, all .meta.json files for the selected template will be rendered. Otherwise, only the currently selected file will be exported.`;
+          info.textContent = t("plugin.info.markdownExport", [pluginName]);
           info.className = "form-info-text";
           return info;
         },
@@ -266,7 +280,7 @@ export async function run() {
       await fieldManager.renderFields();
 
       const saveBtn = button.createButton({
-        text: "Save Settings",
+        text: t("plugin.button.save.settings"),
         className: "btn-warn",
         onClick: async () => {
           const values = fieldManager.getValues();
@@ -279,21 +293,22 @@ export async function run() {
           const result = await plugin.saveSettings(pluginName, settings);
           emit("ui:toast", {
             message: result?.success
-              ? "Settings saved"
-              : "Failed to save settings",
+              ? t("plugin.toast.settings.saved")
+              : t("plugin.toast.settings.failed"),
             variant: result?.success ? "success" : "error",
           });
         },
       });
 
       const renderBtn = button.createButton({
-        text: "Render Markdown",
+        text: t("plugin.button.render.markdown"),
         className: "btn-info",
         onClick: async () => {
           const values = fieldManager.getValues();
           await performMarkdownExport({
             path,
             plugin,
+            pluginName,
             selectedTemplate,
             selectedDataFile,
             outputDir,
@@ -306,7 +321,7 @@ export async function run() {
       });
 
       const copyBtn = button.createButton({
-        text: "Copy to Target",
+        text: t("plugin.button.copy.target"),
         className: "btn-okay",
         onClick: async () => {
           const targetDir = fieldManager.getValues().targetFolder;

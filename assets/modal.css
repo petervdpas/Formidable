@@ -129,7 +129,7 @@
 }
 
 .modal-form-row label {
-    min-width: 180px;
+    min-width: 220px;
     font-weight: bold;
     text-align: right;
     padding-top: 2px;
@@ -201,7 +201,7 @@
 }
 
 .modal-form-row.tight-gap label {
-    margin-right: 12px;
+    margin-right: 6px;
 }
 
 .modal-form-row.tight-gap input[type="text"] {

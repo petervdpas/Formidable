@@ -5,9 +5,7 @@ export async function run() {
   const pluginName = "PandocPrint";
 
   const lang = await plugin.getConfig("language");
-  console.log(lang);
   await plugin.loadPluginTranslations(pluginName, lang);
-
   const t = plugin.getPluginTranslations(pluginName);
 
   setTimeout(async () => {
@@ -29,6 +27,7 @@ export async function run() {
   }, 100);
 
   const { show } = modal.setupPluginModal({
+    pluginName,
     id: "plugin-settings-pandocprint",
     title: t("plugin.title"),
     escToClose: true,
@@ -62,32 +61,50 @@ export async function run() {
           key: "UseFormidable",
           type: "boolean",
           label: t("plugin.field.useFormidable"),
+          wrapper: "modal-form-row switch-row",
+          fieldRenderer: "renderBooleanField",
         },
         {
           key: "ShellCommand",
           type: "text",
           label: t("plugin.field.shellCommand"),
+          wrapper: "modal-form-row",
+          fieldRenderer: "renderTextField",
         },
-        { key: "InputPath", type: "file", label: t("plugin.field.inputPath") },
+        {
+          key: "InputPath",
+          type: "file",
+          label: t("plugin.field.inputPath"),
+          wrapper: "modal-form-row tight-gap",
+          fieldRenderer: "renderFileField",
+        },
         {
           key: "OutputPath",
           type: "directory",
           label: t("plugin.field.outputPath"),
+          wrapper: "modal-form-row tight-gap",
+          fieldRenderer: "renderDirectoryField",
         },
         {
           key: "TemplatePath",
           type: "file",
           label: t("plugin.field.templatePath"),
+          wrapper: "modal-form-row tight-gap",
+          fieldRenderer: "renderFileField",
         },
         {
           key: "UseCurrentDate",
           type: "boolean",
           label: t("plugin.field.useCurrentDate"),
+          wrapper: "modal-form-row switch-row",
+          fieldRenderer: "renderBooleanField",
         },
         {
           key: "PowershellScript",
           type: "file",
           label: t("plugin.field.powershellScript"),
+          wrapper: "modal-form-row tight-gap",
+          fieldRenderer: "renderFileField",
         },
       ];
 
@@ -116,12 +133,11 @@ export async function run() {
 
       const fields = [
         platformField,
-        ...variableFields.map((f) => ({
-          ...f,
-          wrapper: "modal-form-row tight-gap",
-          fieldRenderer: `render${f.type.charAt(0).toUpperCase()}${f.type.slice(
-            1
-          )}Field`,
+        ...variableFields.map(({ type, wrapper, fieldRenderer, ...rest }) => ({
+          ...rest,
+          type,
+          wrapper,
+          fieldRenderer,
         })),
       ];
 

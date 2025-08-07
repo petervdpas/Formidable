@@ -1,7 +1,6 @@
 // modules/handlers/pluginHandler.js
 
 import { EventBus } from "../eventBus.js";
-import { loadPluginTranslations } from "../../utils/pluginUtils.js";
 
 // ─────────────────────────────────────────────────────────────
 // Persistent plugin event registry (FIX: survives reloads)
@@ -162,18 +161,30 @@ export async function handleRunPlugin(
     const failed = !result?.success;
     const variant = failed ? "error" : "success";
 
-    EventBus.emit("ui:toast", {
-      languageKey: failed ? "toast.plugin.run.failed" : "toast.plugin.run",
-      args: [name, target],
-      variant,
+    EventBus.emit("status:update", {
+      message: failed
+        ? "status.plugin.run.failed"
+        : "status.plugin.run.success",
+      languageKey: failed
+        ? "status.plugin.run.failed"
+        : "status.plugin.run.success",
+      args: [name],
+      i18nEnabled: true,
+      variant: variant,
     });
 
     callback?.(result);
   } catch (err) {
-    EventBus.emit("logging:error", [
-      `[PluginHandler] runPlugin "${name}" failed:`,
-      err,
-    ]);
+    EventBus.emit("status:update", {
+      message: "status.plugin.crash",
+      languageKey: "status.plugin.crash",
+      args: [name, target, err.message],
+      i18nEnabled: true,
+      variant: "error",
+      log: true,
+      logLevel: "default",
+      logOrigin: "PluginHandler:handleRunPlugin",
+    });
 
     EventBus.emit("ui:toast", {
       languageKey: "toast.plugin.crashed",
@@ -317,4 +328,3 @@ export async function handlePluginProxyFetch(payload, callback) {
     callback?.({ success: false, error: err.message || "Unknown error" });
   }
 }
-

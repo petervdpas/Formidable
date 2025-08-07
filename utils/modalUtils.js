@@ -239,6 +239,7 @@ export function setupModal(
 }
 
 export function setupPluginModal({
+  pluginName = "Plugin",
   id = "plugin-modal",
   title = "Plugin Modal",
   body = "",
@@ -340,6 +341,12 @@ export function setupPluginModal({
         err,
       ]);
     }
+    EventBus.emit("status:update", {
+      message: "status.plugin.run.completed",
+      languageKey: "status.plugin.run.completed",
+      i18nEnabled: true,
+      args: [pluginName],
+    });
   };
 
   // Delegate to setupModal for behavior and controls.
@@ -510,7 +517,9 @@ export function showConfirmModal(i18nKey, extraHtml = null, options = {}) {
   const buttonWrapper = document.getElementById("confirm-buttons-wrapper");
 
   // Set translation key
-  messageEl.innerHTML = `<div data-i18n-html="${i18nKey}">${t(i18nKey)}</div>${extraHtml || ""}`;
+  messageEl.innerHTML = `<div data-i18n-html="${i18nKey}">${t(i18nKey)}</div>${
+    extraHtml || ""
+  }`;
 
   return new Promise((resolve) => {
     const okBtn = createConfirmButton({

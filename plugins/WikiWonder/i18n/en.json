@@ -1,5 +1,29 @@
 {
-  "plugin.title": "WikiWonder Plugin",
-  "plugin.description": "This is the WikiWonder plugin.",
-  "plugin.button.run": "Run Plugin"
+  "plugin.title": "WikiWonder",
+  "plugin.info.markdownExport": "This plugin exports the current form as markdown into \"plugins/{0}/markdown/<template>\".\n\nIf Bulk Mode is enabled, all .meta.json files for the selected template will be rendered. Otherwise, only the currently selected file will be exported.",
+
+  "plugin.field.frontmatterMode": "Frontmatter Mode",
+  "plugin.field.frontmatterKeys": "Keys to Keep (CSV)",
+  "plugin.field.targetFolder": "Target Folder",
+  "plugin.field.bulkMode": "Bulk Mode",
+  "plugin.field.encodeFilenames": "Encode filenames",
+
+  "plugin.option.keep": "Keep All",
+  "plugin.option.remove": "Remove All",
+  "plugin.option.filter": "Filter by Key",
+
+  "plugin.button.save.settings": "Save Settings",
+  "plugin.button.render.markdown": "Render Markdown",
+  "plugin.button.copy.target": "Copy to Target",
+
+  "plugin.toast.settings.saved": "Settings saved",
+  "plugin.toast.settings.failed": "Failed to save settings",
+  "plugin.toast.folder.cleared": "Cleared markdown folder: {0}",
+  "plugin.toast.folder.failed": "Failed to clear markdown folder: {0}",
+  "plugin.toast.copy.success": "Markdown copied to target folder",
+  "plugin.toast.copy.failed": "Failed to copy files",
+  "plugin.toast.export.complete": "Markdown export complete.",
+  "plugin.toast.no.target": "Please select a target folder first",
+
+  "plugin.warning.copy.image.failed": "Failed to copy {0}: {1}"
 }

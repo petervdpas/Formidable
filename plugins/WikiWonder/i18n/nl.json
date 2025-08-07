@@ -1,0 +1,29 @@
+{
+  "plugin.title": "WikiWonder",
+  "plugin.info.markdownExport": "Deze plugin exporteert het huidige formulier als Markdown naar \"plugins/{0}/markdown/<template>\".\n\nAls Bulkmodus is ingeschakeld, worden alle .meta.json-bestanden voor het geselecteerde sjabloon gerenderd. Anders wordt alleen het momenteel geselecteerde bestand geëxporteerd.",
+
+  "plugin.field.frontmatterMode": "Frontmatter Modus",
+  "plugin.field.frontmatterKeys": "Te behouden sleutels (CSV)",
+  "plugin.field.targetFolder": "Doelmap",
+  "plugin.field.bulkMode": "Bulk Modus",
+  "plugin.field.encodeFilenames": "Bestandsnamen encoderen",
+
+  "plugin.option.keep": "Alles behouden",
+  "plugin.option.remove": "Alles verwijderen",
+  "plugin.option.filter": "Filteren op sleutel",
+
+  "plugin.button.save.settings": "Instellingen opslaan",
+  "plugin.button.render.markdown": "Genereer Markdown",
+  "plugin.button.copy.target": "Kopieer naar doelmap",
+
+  "plugin.toast.settings.saved": "Instellingen opgeslagen",
+  "plugin.toast.settings.failed": "Opslaan van instellingen mislukt",
+  "plugin.toast.folder.cleared": "Markdown-map geleegd: {0}",
+  "plugin.toast.folder.failed": "Kon markdown-map niet leegmaken: {0}",
+  "plugin.toast.copy.success": "Markdown gekopieerd naar doelmap",
+  "plugin.toast.copy.failed": "Kopiëren van bestanden mislukt",
+  "plugin.toast.export.complete": "Markdown-export voltooid.",
+  "plugin.toast.no.target": "Selecteer eerst een doelmap",
+
+  "plugin.warning.copy.image.failed": "Kopiëren van {0} mislukt: {1}"
+}
