@@ -154,24 +154,32 @@ export async function handleRunPlugin(
 
     if (target === "frontend") {
       result = await runFrontendPlugin(name, context);
+
+      const failed = !result?.success;
+      const variant = failed ? "error" : "success";
+
+      EventBus.emit("status:update", {
+        message: failed
+          ? "status.plugin.run.failed"
+          : "status.plugin.run.success",
+        languageKey: failed
+          ? "status.plugin.run.failed"
+          : "status.plugin.run.success",
+        args: [name],
+        i18nEnabled: true,
+        variant: variant,
+      });
     } else {
       result = await window.api.plugin.runPlugin(name, context);
+
+      EventBus.emit("status:update", {
+        message: "status.plugin.run.backend",
+        languageKey: "status.plugin.run.backend",
+        args: [name],
+        i18nEnabled: true,
+        variant: "warning",
+      });
     }
-
-    const failed = !result?.success;
-    const variant = failed ? "error" : "success";
-
-    EventBus.emit("status:update", {
-      message: failed
-        ? "status.plugin.run.failed"
-        : "status.plugin.run.success",
-      languageKey: failed
-        ? "status.plugin.run.failed"
-        : "status.plugin.run.success",
-      args: [name],
-      i18nEnabled: true,
-      variant: variant,
-    });
 
     callback?.(result);
   } catch (err) {

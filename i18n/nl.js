@@ -50,6 +50,8 @@ export default {
   "status.context.not.storage": "Je bevindt zich niet in de opslagcontext.",
   "status.plugin.run.success": "Plugin {0} wordt uitgevoerd.",
   "status.plugin.run.failed": "Kon plugin {0} niet uitvoeren.",
+  "status.plugin.run.backend":
+    "Backend-plugin {0} wordt uitgevoerd... Hopelijk weet je wat deze plugin doet?!",
   "status.plugin.run.completed": "Plugin {0} is afgesloten.",
   "status.plugin.crash": "Plugin {0} ({1}) is gecrasht met fout: {2}",
   "status.secret.key.updated": "Geheime sleutel bijgewerkt.",

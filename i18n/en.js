@@ -50,6 +50,7 @@ export default {
   "status.context.not.storage": "You are not in Storage context.",
   "status.plugin.run.success": "Running plugin {0}.",
   "status.plugin.run.failed": "Failed to run plugin {0}.",
+  "status.plugin.run.backend": "Running backend plugin {0}... Hopefully you know what this plugin does?!",
   "status.plugin.run.completed": "Plugin {0} was closed.",
   "status.plugin.crash": "Plugin {0} ({1}) crashed with error: {2}",
   "status.secret.key.updated": "Secret key updated.",

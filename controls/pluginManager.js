@@ -271,23 +271,30 @@ function savePluginSettings(name, settings) {
 
 function getFrontendBoilerplate(name) {
   return `// plugins/${name}/plugin.js
-export function run() {
-  const { button, modal } = window.FGA;
-  const { createButton } = button;
-  const { setupPluginModal } = modal;
+export async function run() {
+  const { plugin, button, modal, dom, string } = window.FGA;
+  const pluginName = "${name}";
 
-  const { show } = setupPluginModal({
+  const lang = await plugin.getConfig("language");
+  await plugin.loadPluginTranslations(pluginName, lang);
+  const t = plugin.getPluginTranslations(pluginName);
+
+  const { show } = modal.setupPluginModal({
+    pluginName,
     id: "plugin-example-modal",
-    title: "Plugin Injected",
-    body: "",
+    title: t("plugin.title"),
+    escToClose: true,
+    backdropClick: true,
+    width: "44em",
+    height: "auto",
+    resizable: false,
 
     prepareBody: (modalEl, bodyEl) => {
       const p = document.createElement("p");
-      p.textContent =
-        "Hello to a Formidable World! This is a plugin-injected modal.";
+      p.textContent = t("plugin.description");
       bodyEl.appendChild(p);
 
-      const btn = createButton({
+      const btn = button.createButton({
         text: "Toast!",
         className: "btn-success",
         onClick: () =>
