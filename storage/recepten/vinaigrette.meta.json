@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "author_name": "Utente Ribelle",
+    "author_email": "regular@example.com",
+    "template": "recepten.yaml",
+    "created": "2025-08-08T10:02:49.872Z",
+    "updated": "2025-08-08T10:57:20.878Z",
+    "flagged": false
+  },
+  "data": {
+    "naam": "Vinaigrette",
+    "omschrijving": "Deze basis vinaigrette is niet toe te wijzen aan iemand specifiek. Wel is te zeggen dat het land van oorsprong Frakrijk is (volgens wikipedia althans)",
+    "moeilijkheid": 2,
+    "auteur": "Niemand in het bijzonder",
+    "tickertape": "Basis Vinaigrette",
+    "labels": [
+      "vinaigrette",
+      "groentenschotel"
+    ],
+    "foto": "",
+    "foto_bijschrift": "",
+    "ingredienten": [
+      [
+        "Olijfolie",
+        "4 eetlepels"
+      ],
+      [
+        "Citroen",
+        "het sap ervan"
+      ]
+    ],
+    "bereiding": "Klop de olie druppelgewijs door het citroensap zodat er een emulsie ontstaat. Prima voor bij de spaanse groetenschotel.",
+    "verwante_links": [
+      {
+        "verwant_recept": "formidable://recepten.yaml:groentenschotel.meta.json"
+      }
+    ]
+  }
+}

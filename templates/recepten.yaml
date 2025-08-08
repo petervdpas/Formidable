@@ -1,123 +1,175 @@
 name: Kookrecepten
 filename: recepten.yaml
-markdown_template: |-
+markdown_template: >-
   ---
-  title: Auto-generated Report
-  author: Formidable Generator
-  date: 2025-08-08
+
+  title: Recept
+
+  subtitle: {{field "tickertape"}}
+
+  author: {{field "auteur"}}
+
+  keywords: [recept, {{tags (fieldRaw "labels") withHash=false}}]
+
+  table-use-row-colors: true
+
+  table-row-color: "D3D3D3"
+
   toc: true
-  toc-title: Contents
+
+  toc-title: Inhoudsopgave
+
   toc-own-page: true
+
   ---
 
-  ## Naam van het recept
 
-  _{{fieldDescription "naam"}}_
+  ## {{field "naam"}}
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "naam")}}
-  ```
-  {{field "naam"}}
-  ---
 
-  ## Foto van het bereide recept
+  **Door: {{field "auteur"}}**
 
-  _{{fieldDescription "foto"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "foto")}}
-  ```
+  {{field "omschrijving"}}
+
+
+  > Moeilijkheid (10 is topkok niveau... 1 is, tja wat is 1?): **{{field
+  "moeilijkheid"}}**
+
+
   {{#if (fieldRaw "foto")}}
-  ![Foto van het bereide recept]({{field "foto"}})
+
+  ![{{field "foto_bijschrift"}}]({{field "foto"}})
+
   {{else}}
-  _No image uploaded for Foto van het bereide recept_
+
+  _Er is nog geen foto bij gerecht geplaatst..._
+
   {{/if}}
-  ---
 
-  ## Ingredienten voor het recept
 
-  _{{fieldDescription "ingredienten"}}_
+  ## Ingredienten
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "ingredienten")}}
-  ```
-  {{#each (fieldRaw "ingredienten")}}
-  - {{this}}
+
+  {{#with (fieldMeta "ingredienten" "options") as |headers|}}
+
+  |{{#each headers}}{{label}}{{^label}}{{value}}{{/label}} |{{/each}}
+
+  |{{#each headers}}--|{{/each}}
+    {{/with}}
+    {{#each (fieldRaw "ingredienten")}}
+  |{{#each this}}{{this}} |{{/each}}
+
   {{/each}}
-  ---
 
-  ## Bereiding van het recept
 
-  _{{fieldDescription "bereiding"}}_
+  ## Bereiding
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "bereiding")}}
-  ```
+
   {{field "bereiding"}}
-  ---
 
 
-  ## Loop: verwante_links
+  ## Gerelateerde recepten
+
 
   {{#loop "verwante_links"}}
-  ### verwante_links index
 
-  _{{fieldDescription "verwante_links_index"}}_
+  {{#if (fieldRaw "verwant_recept")}}
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "verwante_links_index")}}
-  ```
-  {{field "verwante_links_index"}}
-  ---
-
-  ### Verwant recept
-
-  _{{fieldDescription "verwant_recept"}}_
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "verwant_recept")}}
-  ```
   {{field "verwant_recept"}}
+
+  {{/if}}
+
   {{/loop}}
 sidebar_expression: >-
-  [ title | { text: title, classes: ["expr-text-white", "expr-bold",
+  [ tickertape | { text: tickertape, classes: ["expr-text-white", "expr-bold",
   "expr-ticker"] } ]
 enable_collection: false
 fields:
   - key: naam
     type: text
-    label: Naam van het recept
-    description: Geef de naam van het recept.
+    label: Naam van het gerecht
+    description: Geef de naam van het gerecht.
     expression_item: false
     two_column: true
     default: ''
     options: &ref_0 []
+  - key: omschrijving
+    type: textarea
+    label: Omschrijving gerecht
+    description: Geef een korte omschrijving van het gerecht.
+    expression_item: false
+    two_column: true
+    default: ''
+    options: *ref_0
+  - key: moeilijkheid
+    type: range
+    label: Moeilijkheid
+    description: Is het gerecht moeilijk om te maken?
+    expression_item: false
+    two_column: true
+    default: '3'
+    options:
+      - value: min
+        label: '1'
+      - value: max
+        label: '10'
+      - value: step
+        label: '1'
+  - key: auteur
+    type: text
+    label: Auteur
+    description: Hier kun je de auteur van her recept opgeven.
+    expression_item: false
+    two_column: true
+    default: ''
+    options: *ref_0
+  - key: tickertape
+    type: text
+    label: Tickertape
+    description: Geef hier de tekst voor de zgn. tickertape
+    expression_item: true
+    two_column: true
+    default: ''
+    options: *ref_0
+  - key: labels
+    type: tags
+    label: Labels (Tags)
+    description: Geef hier tags op die relevant zijn voor het gerecht.
+    expression_item: false
+    two_column: true
+    default: ''
+    options: *ref_0
   - key: foto
     type: image
-    label: Foto van het bereide recept
+    label: Foto van het bereide gerecht
     description: >-
-      Hier kun je een foto uploaden van het bereide recept. Maak er een mooi en
+      Hier kun je een foto uploaden van het bereide gerecht. Maak er een mooi en
       smakelijk plaatje van.
     expression_item: false
     two_column: false
     default: ''
     options: *ref_0
+  - key: foto_bijschrift
+    type: text
+    label: Bijschrift bij foto
+    description: Wanneer je een foto upload ook even het bijschrift van de foto invullen.
+    expression_item: false
+    two_column: true
+    default: ''
+    options: *ref_0
   - key: ingredienten
-    type: list
-    label: Ingredienten voor het recept
-    description: >-
-      Geef hier de ingrediënten op die je nodig hebt in de bereiding van het
-      voedsel. Niets vergeten he?!
+    type: table
+    label: Ingredienten voor het gerecht
+    description: Geef hier de ingredienten voor het recept op
     expression_item: false
     two_column: false
     default: ''
-    options: *ref_0
+    options:
+      - value: ingredient
+        label: Ingrediënt
+      - value: hoeveelheid
+        label: Hoeveelheid / Gewicht
   - key: bereiding
     type: textarea
     label: Bereiding van het recept
@@ -131,7 +183,7 @@ fields:
   - key: verwante_links
     type: loopstart
     label: Verwante recepten
-    description: ''
+    description: Geef hier links op naar verwante gerechten of die hier goed bij passen.
     summary_field: ''
     expression_item: false
     two_column: false

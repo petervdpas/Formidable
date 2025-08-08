@@ -9,7 +9,7 @@
   "context_mode": "storage",
   "context_folder": "./",
   "selected_template": "recepten.yaml",
-  "selected_data_file": null,
+  "selected_data_file": "vinaigrette.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",

@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "author_name": "Utente Ribelle",
+    "author_email": "regular@example.com",
+    "template": "recepten.yaml",
+    "created": "2025-08-08T11:06:20.080Z",
+    "updated": "2025-08-08T11:20:52.822Z",
+    "flagged": false
+  },
+  "data": {
+    "naam": "Groene Tapenade",
+    "omschrijving": "Dit is groene tapenade die bv.goed past bij de Spaanse groentenschotel.",
+    "moeilijkheid": 6,
+    "auteur": "Elly Habraken",
+    "tickertape": "Groene Tapenade",
+    "labels": [
+      "tapenade",
+      "groen"
+    ],
+    "foto": "",
+    "foto_bijschrift": "",
+    "ingredienten": [
+      [
+        "Olijven (groen, zonder pit)",
+        "± 150 g — ca. 40–50 stuks"
+      ],
+      [
+        "Kappertjes (gezouten)",
+        "± 20 g — ca. 2 eetlepels"
+      ],
+      [
+        "Knoflook",
+        "2 tenen — ± 10–12 g"
+      ],
+      [
+        "Dijonmosterd",
+        "1 theelepel — ± 5 g"
+      ],
+      [
+        "Olijfolie",
+        "3 eetlepels — ± 30 ml"
+      ],
+      [
+        "Citroensap",
+        "naar smaak — ± 2 eetlepels"
+      ],
+      [
+        "Pepper (wit) + Zout",
+        "naar smaak"
+      ]
+    ],
+    "bereiding": "Hak de olijven fijn. Doe de kappertjes in een zeef en spoel kort af om overtollig zout te verwijderen.  \nWrijf alle ingrediënten fijn in een vijzel en voeg de olijfolie geleidelijk toe.  \nBreng op smaak met citroensap, witte peper en zout.",
+    "verwante_links": [
+      {
+        "verwant_recept": "formidable://recepten.yaml:groentenschotel.meta.json"
+      }
+    ]
+  }
+}
