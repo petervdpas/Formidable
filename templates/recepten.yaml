@@ -1,0 +1,155 @@
+name: Kookrecepten
+filename: recepten.yaml
+markdown_template: |-
+  ---
+  title: Auto-generated Report
+  author: Formidable Generator
+  date: 2025-08-08
+  toc: true
+  toc-title: Contents
+  toc-own-page: true
+  ---
+
+  ## Naam van het recept
+
+  _{{fieldDescription "naam"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "naam")}}
+  ```
+  {{field "naam"}}
+  ---
+
+  ## Foto van het bereide recept
+
+  _{{fieldDescription "foto"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "foto")}}
+  ```
+  {{#if (fieldRaw "foto")}}
+  ![Foto van het bereide recept]({{field "foto"}})
+  {{else}}
+  _No image uploaded for Foto van het bereide recept_
+  {{/if}}
+  ---
+
+  ## Ingredienten voor het recept
+
+  _{{fieldDescription "ingredienten"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "ingredienten")}}
+  ```
+  {{#each (fieldRaw "ingredienten")}}
+  - {{this}}
+  {{/each}}
+  ---
+
+  ## Bereiding van het recept
+
+  _{{fieldDescription "bereiding"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "bereiding")}}
+  ```
+  {{field "bereiding"}}
+  ---
+
+
+  ## Loop: verwante_links
+
+  {{#loop "verwante_links"}}
+  ### verwante_links index
+
+  _{{fieldDescription "verwante_links_index"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "verwante_links_index")}}
+  ```
+  {{field "verwante_links_index"}}
+  ---
+
+  ### Verwant recept
+
+  _{{fieldDescription "verwant_recept"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "verwant_recept")}}
+  ```
+  {{field "verwant_recept"}}
+  {{/loop}}
+sidebar_expression: >-
+  [ title | { text: title, classes: ["expr-text-white", "expr-bold",
+  "expr-ticker"] } ]
+enable_collection: false
+fields:
+  - key: naam
+    type: text
+    label: Naam van het recept
+    description: Geef de naam van het recept.
+    expression_item: false
+    two_column: true
+    default: ''
+    options: &ref_0 []
+  - key: foto
+    type: image
+    label: Foto van het bereide recept
+    description: >-
+      Hier kun je een foto uploaden van het bereide recept. Maak er een mooi en
+      smakelijk plaatje van.
+    expression_item: false
+    two_column: false
+    default: ''
+    options: *ref_0
+  - key: ingredienten
+    type: list
+    label: Ingredienten voor het recept
+    description: >-
+      Geef hier de ingrediënten op die je nodig hebt in de bereiding van het
+      voedsel. Niets vergeten he?!
+    expression_item: false
+    two_column: false
+    default: ''
+    options: *ref_0
+  - key: bereiding
+    type: textarea
+    label: Bereiding van het recept
+    description: >-
+      Hier kun je de bereiding van het recept invullen. Beschrijf het niet te
+      uitgebreid, want dan is het niet goed te volgen in de keuken.
+    expression_item: false
+    two_column: false
+    default: ''
+    options: *ref_0
+  - key: verwante_links
+    type: loopstart
+    label: Verwante recepten
+    description: ''
+    summary_field: ''
+    expression_item: false
+    two_column: false
+    default: ''
+    options: *ref_0
+  - key: verwant_recept
+    type: link
+    label: Verwant recept
+    description: Geef hier een link op naar recepten die goed bij dit gerecht passen.
+    expression_item: false
+    two_column: false
+    default: ''
+    options: *ref_0
+  - key: verwante_links
+    type: loopstop
+    label: Verwante recepten
+    description: ''
+    expression_item: false
+    two_column: false
+    default: ''
+    options: *ref_0

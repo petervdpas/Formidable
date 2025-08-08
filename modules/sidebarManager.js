@@ -113,8 +113,9 @@ export function createStorageListManager(formManager, modal) {
   // MOVE toggle creation ABOVE listManager so `wrapper` exists
   const { input: toggle, element: wrapper } = buildSwitchElement({
     id: "flagged-toggle",
-    checked: false,
-    trailingLabel: [t("special.showFlagged"), t("special.showAll")],
+    name: "flagged-toggle",
+    checked: showOnlyFlagged,
+    trailingValues: ["special.showFlagged", "special.showAll"],
     onFlip: async (value) => {
       showOnlyFlagged = value;
 
@@ -134,6 +135,7 @@ export function createStorageListManager(formManager, modal) {
         });
       });
     },
+    i18nEnabled: true,
   });
 
   listManager = createListManager({
