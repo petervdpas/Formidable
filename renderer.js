@@ -18,6 +18,8 @@ import {
   addStatusButton,
 } from "./modules/handlers/statusHandler.js";
 import { createStatusCharPickerButtonConfig } from "./modules/uiButtons.js";
+import { createOptionGrid } from "./utils/elementBuilders.js";
+import { setupPopup } from "./utils/modalUtils.js";
 
 import {
   setupProfileModal,
@@ -95,19 +97,33 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   addStatusButton(
     createStatusCharPickerButtonConfig((e, btnEl) => {
-      const chars = [
-        { value: "Ω", label: "Ω", pos: [2, 5] },
-        { value: "→", label: "→" },
-        { value: "←", label: "←" },
-        { value: "↑", label: "↑" },
-        { value: "↓", label: "↓" },
-        // ...more
-      ];
-
-      EventBus.emit("ui:toast", {
-        message: "Character Picker Opened",
-        duration: 2000,
+      const myPopup = setupPopup("status-button-popup", {
+        triggerBtn: btnEl,
+        escToClose: true,
+        position: "above",
       });
+
+      const grid = createOptionGrid(
+        [
+          { value: "Ω", label: "Ω", pos: [2, 5] },
+          { value: "→", label: "→" },
+          { value: "←", label: "←" },
+          { value: "↑", label: "↑" },
+          { value: "↓", label: "↓" },
+          { value: "A", label: "A", pos: [3, 6]  },
+        ],
+        (val) => {
+          console.log("Picked:", val);
+          myPopup.hide();
+        },
+        { gridCols: 6, gridRows: 4, cellSize: 32, gridGap: 2 }
+      );
+
+      myPopup.popup.innerHTML = "";
+      myPopup.popup.appendChild(grid);
+
+      // pass the click event so we anchor to that button
+      myPopup.show(e);
     })
   );
 

@@ -58,20 +58,29 @@
 /* ─────────────────────────────────────────────────────────────
    Popup Panel (e.g., for special editors, settings, etc.)
 ───────────────────────────────────────────────────────────── */
+/* Popup Panel (e.g., for special editors, settings, etc.) */
 .popup-panel {
-  position: absolute;
-  z-index: 1001;
+  position: fixed; /* anchored to viewport */
+  z-index: 9999;
   background-color: var(--popup-bg);
   color: var(--popup-fg);
   border: 1px solid var(--popup-border);
   box-shadow: var(--generic-box-shadow);
-  padding: 12px;
+  padding: 4px;
   max-width: 420px;
   min-width: 300px;
+  /* No fixed width or height — let it auto-size */
   border-radius: 6px;
   font-family: inherit;
   font-size: 0.95em;
   transition: opacity 0.2s ease;
+}
+
+#status-button-popup.popup-panel {
+  min-width: auto;   /* let width shrink to fit content */
+  max-width: none;   /* remove cap so grid can wrap naturally */
+  width: auto;       /* actual autosizing */
+  height: auto;      /* let height fit grid */
 }
 
 .popup-hidden {

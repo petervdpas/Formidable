@@ -567,10 +567,10 @@ export function createOptionGrid(
   onSelect,
   {
     gridCols = 6,
-    gridRows = null,          // null => auto rows based on options
+    gridRows = null,          // null => auto rows
     cellSize = 32,
     gridGap = 2,
-    fillPlaceholders = true,  // keep the grid rectangular visually
+    fillPlaceholders = true,
     className = "",
     ariaLabel = "Option grid",
   } = {}
@@ -584,8 +584,6 @@ export function createOptionGrid(
   grid.style.display = "grid";
   grid.style.gap = `${gridGap}px`;
   grid.style.gridTemplateColumns = `repeat(${gridCols}, ${cellSize}px)`;
-  if (gridRows) grid.style.gridTemplateRows = `repeat(${gridRows}, ${cellSize}px)`;
-  else grid.style.gridAutoRows = `${cellSize}px`;
 
   const byRC = new Map();
   const buttons = [];
@@ -594,13 +592,12 @@ export function createOptionGrid(
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = `popup-option ${opt.className || ""}`.trim();
-    btn.dataset.value = opt.value;
+    btn.dataset.value = opt.value ?? "";
     btn.disabled = !!opt.disabled;
     btn.innerHTML = opt.iconHTML
-      ? `${opt.iconHTML}<span class="popup-option-label">${opt.label ?? opt.value}</span>`
-      : (opt.label ?? opt.value);
+      ? `${opt.iconHTML}<span class="popup-option-label">${opt.label ?? opt.value ?? ""}</span>`
+      : (opt.label ?? opt.value ?? "");
 
-    // make each cell honor cellSize exactly
     btn.style.boxSizing = "border-box";
     btn.style.width = "100%";
     btn.style.height = "100%";
@@ -613,7 +610,7 @@ export function createOptionGrid(
     }
 
     btn.addEventListener("click", () => {
-      if (!opt.disabled) onSelect?.(opt.value, opt);
+      if (!opt.disabled && opt.value != null) onSelect?.(opt.value, opt);
     });
 
     grid.appendChild(btn);
@@ -621,18 +618,27 @@ export function createOptionGrid(
     return btn;
   };
 
-  // compute rows to render
-  const rowsToUse =
-    gridRows ??
-    Math.max(
-      1,
-      Math.ceil(options.filter((o) => !Array.isArray(o.pos)).length / gridCols)
-    );
+  // --- NEW: figure out how many rows we must render ---
+  const maxRowFromPos = options.reduce((m, o) => {
+    if (Array.isArray(o.pos) && o.pos.length === 2) {
+      const r1 = Number(o.pos[0]) || 0; // 1-based
+      return Math.max(m, r1);
+    }
+    return m;
+  }, 0);
 
+  const cellsNeeded = Math.max(options.length, maxRowFromPos * gridCols);
+  const autoRows = Math.max(1, Math.ceil(cellsNeeded / gridCols));
+  const rowsToUse = gridRows ?? autoRows;
+
+  // lock rows so placeholders have somewhere to go
+  grid.style.gridTemplateRows = `repeat(${rowsToUse}, ${cellSize}px)`;
+
+  // fill
   fillGrid(options, makeBtn, {
     gridRows: rowsToUse,
     gridCols,
-    fillPlaceholders,
+    fillPlaceholders: !!fillPlaceholders,
   });
 
   return grid;
@@ -675,4 +681,46 @@ export function createOptionList(
   }
 
   return list;
+}
+
+function fillGrid(options, makeBtn, settings) {
+  const occupied = new Set();
+  const autoFill = [];
+
+  for (const opt of options) {
+    if (Array.isArray(opt.pos) && opt.pos.length === 2) {
+      let [r, c] = opt.pos.map(Number);
+      if (r >= 1 && c >= 1) {
+        r -= 1;
+        c -= 1;
+      } // allow 1-based
+      if (r >= 0 && r < settings.gridRows && c >= 0 && c < settings.gridCols) {
+        makeBtn(opt, r, c);
+        occupied.add(`${r},${c}`);
+      } else {
+        autoFill.push(opt);
+      }
+    } else {
+      autoFill.push(opt);
+    }
+  }
+
+  let r = 0, c = 0;
+  for (const opt of autoFill) {
+    while (occupied.has(`${r},${c}`)) {
+      c++;
+      if (c >= settings.gridCols) {
+        c = 0;
+        r++;
+      }
+    }
+    if (r >= settings.gridRows) break; // grid full
+    makeBtn(opt, r, c);
+    occupied.add(`${r},${c}`);
+    c++;
+    if (c >= settings.gridCols) {
+      c = 0;
+      r++;
+    }
+  }
 }

@@ -383,22 +383,21 @@ export function setupPopup(popupId, defaultOptions = {}) {
     typeof popupId === "string" ? document.getElementById(popupId) : popupId;
 
   if (!popup) {
-    EventBus.emit("logging:warning", [
-      `[setupPopup] Popup not found: ${popupId}`,
-    ]);
+    EventBus.emit("logging:warning", [`[setupPopup] Popup not found: ${popupId}`]);
     return { show: () => {}, hide: () => {}, popup: null };
   }
 
-  // Defaults
   const config = {
-    triggerBtn: null,
+    triggerBtn: null,         // HTMLElement or element id
     onOpen: () => {},
     onClose: () => {},
     escToClose: false,
     resizable: false,
-    width: "20em",
+    width: "auto",            // let content drive width by default
     height: "auto",
-    position: "auto", // "above", "auto", or { top, left }
+    position: "auto",         // "auto" | "above" | {top,left}
+    gutter: 8,                // viewport gutter
+    rightPadding: 12,         // keep away from right edge
     ...defaultOptions,
   };
 
@@ -406,6 +405,7 @@ export function setupPopup(popupId, defaultOptions = {}) {
 
   // Base style
   popup.classList.add("popup-panel");
+  popup.style.position = "fixed"; // predictable placement
 
   const header = popup.querySelector(".popup-header");
   if (header) {
@@ -415,33 +415,98 @@ export function setupPopup(popupId, defaultOptions = {}) {
     header.appendChild(closeBtn);
   }
 
-  function show(event = null, overrides = {}) {
-    const opts = { ...config, ...overrides };
-    popup.style.display = "block";
+  function resolveAnchor(event) {
+    if (event?.currentTarget?.getBoundingClientRect) return event.currentTarget;
+    if (event?.target?.getBoundingClientRect) return event.target;
+    if (config.triggerBtn) {
+      return typeof config.triggerBtn === "string"
+        ? document.getElementById(config.triggerBtn)
+        : config.triggerBtn;
+    }
+    return null;
+  }
 
-    const rect = event?.target?.getBoundingClientRect?.();
-
-    if (opts.position === "above" && rect) {
-      popup.style.left = `${rect.left + window.scrollX}px`;
-      popup.style.top = `${
-        rect.top + window.scrollY - popup.offsetHeight - 8
-      }px`;
-    } else if (opts.position === "auto" && rect) {
-      popup.style.left = `${rect.left + window.scrollX}px`;
-      popup.style.top = `${rect.bottom + window.scrollY + 4}px`;
-    } else if (
-      typeof opts.position === "object" &&
-      opts.position.top &&
-      opts.position.left
-    ) {
-      popup.style.top = opts.position.top;
-      popup.style.left = opts.position.left;
+  function place(rect, popupWidth, popupHeight, mode, gutter, rightPadding) {
+    // Default anchor near left/top if no rect
+    if (!rect) {
+      const left = Math.max(gutter, Math.min(window.innerWidth - popupWidth - rightPadding, gutter));
+      const top  = Math.max(gutter, Math.min(window.innerHeight - popupHeight - gutter, gutter));
+      return { left, top, isAbove: false };
     }
 
+    // space checks
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+
+    let top, isAbove = false;
+    if (mode === "above") {
+      // try above, otherwise fall back below
+      if (spaceAbove >= popupHeight) {
+        top = rect.top - popupHeight;
+        isAbove = true;
+      } else {
+        top = rect.bottom;
+      }
+    } else { // auto
+      if (spaceBelow >= popupHeight || spaceBelow >= spaceAbove) {
+        top = rect.bottom;              // below
+      } else {
+        top = rect.top - popupHeight;   // above
+        isAbove = true;
+      }
+    }
+
+    // horizontal
+    let left = rect.left;
+    if (left + popupWidth + gutter > window.innerWidth - rightPadding) {
+      left = window.innerWidth - popupWidth - gutter - rightPadding;
+    }
+    if (left < gutter) left = gutter;
+
+    // clamp vertical
+    if (top < gutter) top = gutter;
+    if (top + popupHeight > window.innerHeight - gutter) {
+      top = Math.max(gutter, window.innerHeight - popupHeight - gutter);
+    }
+
+    return { left, top, isAbove };
+  }
+
+  function show(event = null, overrides = {}) {
+    const opts = { ...config, ...overrides };
+    const anchorEl = resolveAnchor(event);
+    const rect = anchorEl?.getBoundingClientRect?.();
+
+    // Make it measurable
+    popup.style.visibility = "hidden";
+    popup.style.display = "block";
+    if (opts.width)  popup.style.width  = opts.width;
+    if (opts.height) popup.style.height = opts.height;
+
+    // Force layout, then measure
+    const popupWidth  = popup.offsetWidth;
+    const popupHeight = popup.offsetHeight;
+
+    // Compute placement
+    const { left, top, isAbove } = place(
+      rect,
+      popupWidth,
+      popupHeight,
+      opts.position,
+      opts.gutter,
+      opts.rightPadding
+    );
+
+    // Apply final position
+    popup.style.left = `${left}px`;
+    popup.style.top  = `${top}px`;
+    popup.classList.toggle("is-above", isAbove);
+
+    // Reveal
+    popup.style.visibility = "";
+
     if (opts.escToClose) {
-      escListener = (e) => {
-        if (e.key === "Escape") hide();
-      };
+      escListener = (e) => { if (e.key === "Escape") hide(); };
       window.addEventListener("keydown", escListener);
     }
 
