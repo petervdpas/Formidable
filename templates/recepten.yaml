@@ -184,7 +184,7 @@ fields:
     type: loopstart
     label: Verwante recepten
     description: Geef hier links op naar verwante gerechten of die hier goed bij passen.
-    summary_field: ''
+    summary_field: verwant_recept
     expression_item: false
     two_column: false
     default: ''

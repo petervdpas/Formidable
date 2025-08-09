@@ -5,15 +5,19 @@ import { loadLocale, t, translateDOM } from "./utils/i18n.js";
 import { EventBus } from "./modules/eventBus.js";
 import { exposeGlobalAPI } from "./modules/globalAPI.js";
 import { initEventRouter } from "./modules/eventRouter.js";
-import {
-  initStatusHandler,
-  setStatusInfo,
-} from "./modules/handlers/statusHandler.js";
 
 import { buildMenu, handleMenuAction } from "./modules/menuManager.js";
 import { initTemplateEditor } from "./modules/templateEditor.js";
 import { createFormManager } from "./modules/formUI.js";
 import { createDropdown } from "./utils/dropdownUtils.js";
+
+import {
+  initStatusHandler,
+  setStatusInfo,
+  initStatusButtonsHandler,
+  addStatusButton,
+} from "./modules/handlers/statusHandler.js";
+import { createStatusCharPickerButtonConfig } from "./modules/uiButtons.js";
 
 import {
   setupProfileModal,
@@ -87,6 +91,25 @@ window.addEventListener("DOMContentLoaded", async () => {
   // ── Menu ──
   buildMenu("app-menu", handleMenuAction);
   initStatusHandler("status-bar");
+  initStatusButtonsHandler("status-bar-buttons");
+
+  addStatusButton(
+    createStatusCharPickerButtonConfig((e, btnEl) => {
+      const chars = [
+        { value: "Ω", label: "Ω", pos: [2, 5] },
+        { value: "→", label: "→" },
+        { value: "←", label: "←" },
+        { value: "↑", label: "↑" },
+        { value: "↓", label: "↓" },
+        // ...more
+      ];
+
+      EventBus.emit("ui:toast", {
+        message: "Character Picker Opened",
+        duration: 2000,
+      });
+    })
+  );
 
   // ── Grab DOM Elements ──
   const templateContainer = document.getElementById("template-container");

@@ -557,3 +557,122 @@ export function createSwitch(
   container.appendChild(switchWithLabel);
   return container;
 }
+
+/**
+ * Inline GRID you can mount anywhere.
+ * @returns {HTMLElement} container
+ */
+export function createOptionGrid(
+  options,
+  onSelect,
+  {
+    gridCols = 6,
+    gridRows = null,          // null => auto rows based on options
+    cellSize = 32,
+    gridGap = 2,
+    fillPlaceholders = true,  // keep the grid rectangular visually
+    className = "",
+    ariaLabel = "Option grid",
+  } = {}
+) {
+  const grid = document.createElement("div");
+  grid.className = `option-grid ${className}`.trim();
+  grid.setAttribute("role", "grid");
+  grid.setAttribute("aria-label", ariaLabel);
+
+  // CSS grid sizing
+  grid.style.display = "grid";
+  grid.style.gap = `${gridGap}px`;
+  grid.style.gridTemplateColumns = `repeat(${gridCols}, ${cellSize}px)`;
+  if (gridRows) grid.style.gridTemplateRows = `repeat(${gridRows}, ${cellSize}px)`;
+  else grid.style.gridAutoRows = `${cellSize}px`;
+
+  const byRC = new Map();
+  const buttons = [];
+
+  const makeBtn = (opt, r = null, c = null) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `popup-option ${opt.className || ""}`.trim();
+    btn.dataset.value = opt.value;
+    btn.disabled = !!opt.disabled;
+    btn.innerHTML = opt.iconHTML
+      ? `${opt.iconHTML}<span class="popup-option-label">${opt.label ?? opt.value}</span>`
+      : (opt.label ?? opt.value);
+
+    // make each cell honor cellSize exactly
+    btn.style.boxSizing = "border-box";
+    btn.style.width = "100%";
+    btn.style.height = "100%";
+    btn.style.padding = "0";
+
+    if (r != null && c != null) {
+      btn.style.gridRowStart = String(r + 1);
+      btn.style.gridColumnStart = String(c + 1);
+      byRC.set(`${r},${c}`, btn);
+    }
+
+    btn.addEventListener("click", () => {
+      if (!opt.disabled) onSelect?.(opt.value, opt);
+    });
+
+    grid.appendChild(btn);
+    buttons.push(btn);
+    return btn;
+  };
+
+  // compute rows to render
+  const rowsToUse =
+    gridRows ??
+    Math.max(
+      1,
+      Math.ceil(options.filter((o) => !Array.isArray(o.pos)).length / gridCols)
+    );
+
+  fillGrid(options, makeBtn, {
+    gridRows: rowsToUse,
+    gridCols,
+    fillPlaceholders,
+  });
+
+  return grid;
+}
+
+/**
+ * Inline LIST you can mount anywhere.
+ * @returns {HTMLElement} container
+ */
+export function createOptionList(
+  options,
+  onSelect,
+  {
+    className = "",
+    ariaLabel = "Option list",
+    optionHeight = 28, // purely visual; not used for sizing constraints
+  } = {}
+) {
+  const list = document.createElement("div");
+  list.className = `option-list ${className}`.trim();
+  list.setAttribute("role", "listbox");
+  list.setAttribute("aria-label", ariaLabel);
+
+  for (const opt of options) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `popup-option ${opt.className || ""}`.trim();
+    btn.dataset.value = opt.value;
+    btn.disabled = !!opt.disabled;
+    btn.style.minHeight = `${optionHeight}px`;
+    btn.innerHTML = opt.iconHTML
+      ? `${opt.iconHTML}<span class="popup-option-label">${opt.label ?? opt.value}</span>`
+      : (opt.label ?? opt.value);
+
+    btn.addEventListener("click", () => {
+      if (!opt.disabled) onSelect?.(opt.value, opt);
+    });
+
+    list.appendChild(btn);
+  }
+
+  return list;
+}

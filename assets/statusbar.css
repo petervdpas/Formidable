@@ -61,6 +61,51 @@
   align-items: center;
 }
 
+/* ───── Status Bar Buttons ───── */
+
+#status-bar-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 12px;
+  border-left: 1px solid var(--status-info-divider);
+  padding-left: 8px;
+}
+
+.statusbar-button {
+  height: 20px;
+  line-height: 18px;
+  padding: 0 6px;
+  font-size: 12px;
+  border-radius: 3px;
+  border: 1px solid var(--statusbar-btn-border, #c7c7c7);
+  background: var(--statusbar-btn-bg, #fff);
+  color: var(--statusbar-btn-fg, inherit);
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, transform .05s ease;
+}
+
+.statusbar-button:hover {
+  background: var(--statusbar-btn-bg-hover, #f3f3f3);
+  border-color: var(--statusbar-btn-border-hover, #b7b7b7);
+}
+
+.statusbar-button:active {
+  transform: translateY(0.5px);
+}
+
+.statusbar-button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+/* Compact char-picker button */
+#status-charpicker-btn {
+  min-width: 26px;
+  font-weight: 600;
+  padding: 0 5px;
+}
+
 #main-wrapper {
   height: calc(100vh - 28px);
   /* minus status bar + 4 */

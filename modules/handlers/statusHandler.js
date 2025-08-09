@@ -2,6 +2,7 @@
 
 import { EventBus } from "../eventBus.js";
 import { t } from "../../utils/i18n.js";
+import { createStatusButton as makeBtn } from "../../utils/buttonUtils.js";
 
 const PROCESS_INTERVAL_MESSAGE = 700;
 const PROCESS_INTERVAL_INFO = 100;
@@ -9,6 +10,9 @@ const PROCESS_INTERVAL_INFO = 100;
 const messageTimestamps = new Map();
 const messageQueue = [];
 const infoQueue = [];
+
+let statusButtonContainer = null;
+const statusButtons = new Map();
 
 let messageWrapper = null;
 let messageSpan = null;
@@ -172,4 +176,70 @@ function processNextStatusInfo() {
   }
 
   isProcessingInfo = false;
+}
+
+// Status Buttons
+
+export function initStatusButtonsHandler(containerId = "status-bar-buttons") {
+  statusButtonContainer = document.getElementById(containerId);
+  if (!statusButtonContainer) {
+    EventBus.emit("logging:warning", [
+      `[StatusButtons] Element #${containerId} not found.`,
+    ]);
+    return;
+  }
+  statusButtonContainer.classList.add("status-buttons-host");
+  EventBus.emit("logging:default", ["[StatusButtons] Initialized."]);
+}
+
+export function addStatusButton(cfg = {}) {
+  if (!statusButtonContainer) {
+    EventBus.emit("logging:warning", [
+      "[StatusButtons] Not initialized; call initStatusButtonsHandler() first.",
+    ]);
+    return null;
+  }
+  const { id } = cfg;
+  if (!id) {
+    EventBus.emit("logging:warning", [
+      "[StatusButtons] addStatusButton requires an 'id'.",
+    ]);
+    return null;
+  }
+  if (statusButtons.has(id)) {
+    EventBus.emit("logging:warning", [
+      `[StatusButtons] Button '${id}' already exists; skipping.`,
+    ]);
+    return statusButtons.get(id);
+  }
+  const btn = makeBtn(statusButtonContainer, cfg);
+  if (btn) statusButtons.set(id, btn);
+  return btn;
+}
+
+export function removeStatusButton(id) {
+  const btn = statusButtons.get(id);
+  if (!btn) return false;
+  btn.remove();
+  statusButtons.delete(id);
+  return true;
+}
+
+export function getStatusButton(id) {
+  return statusButtons.get(id) || null;
+}
+
+export function setStatusButtons(buttonCfgs = []) {
+  if (!statusButtonContainer) {
+    EventBus.emit("logging:warning", [
+      "[StatusButtons] Not initialized; call initStatusButtonsHandler() first.",
+    ]);
+    return;
+  }
+  // Clear existing
+  for (const [, btn] of statusButtons) btn.remove();
+  statusButtons.clear();
+
+  // Add new
+  for (const cfg of buttonCfgs) addStatusButton(cfg);
 }

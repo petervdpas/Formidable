@@ -3,6 +3,86 @@
 import { EventBus } from "../modules/eventBus.js";
 import { t } from "./i18n.js";
 
+// Poly-ish: CSS.escape fallback
+const cssEscape = (s) =>
+  (window.CSS && typeof CSS.escape === "function") ? CSS.escape(s) : String(s).replace(/[^a-zA-Z0-9_\-]/g, "\\$&");
+
+export function createStatusButtonConfig({
+  id,
+  label,
+  titleKey = "",
+  title = "",
+  className = "",
+  onClick,
+  ariaKey = "",
+  ariaLabel = "",
+  attributes = {},
+}) {
+  return {
+    id,
+    label,
+    title: titleKey ? t(titleKey) : title,
+    className,
+    onClick,
+    ariaLabel: ariaKey ? t(ariaKey) : ariaLabel,
+    attributes,
+  };
+}
+
+export function createStatusButton(container, cfg = {}) {
+  if (!container) {
+    EventBus.emit("logging:warning", [
+      "[StatusButtons] Missing container element for createStatusButton.",
+    ]);
+    return null;
+  }
+
+  const {
+    id,
+    label = "•",
+    title = "",
+    className = "",
+    onClick,
+    ariaLabel = "",
+    attributes = {},
+  } = cfg;
+
+  if (!id) {
+    EventBus.emit("logging:warning", [
+      "[StatusButtons] createStatusButton requires an 'id'.",
+    ]);
+    return null;
+  }
+
+  if (container.querySelector(`#${cssEscape(id)}`)) {
+    EventBus.emit("logging:warning", [
+      `[StatusButtons] Button '${id}' already exists; skipping.`,
+    ]);
+    return container.querySelector(`#${cssEscape(id)}`);
+  }
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.id = id;
+  btn.className = `statusbar-button ${className}`.trim();
+  btn.title = title;
+  btn.textContent = label;
+
+  if (ariaLabel) btn.setAttribute("aria-label", ariaLabel);
+
+  // apply extra attrs (e.g., data-* hooks)
+  for (const [k, v] of Object.entries(attributes)) {
+    btn.setAttribute(k, v);
+  }
+
+  if (typeof onClick === "function") {
+    btn.addEventListener("click", (e) => onClick(e, btn));
+  }
+
+  container.appendChild(btn);
+  return btn;
+}
+
 export function createButton({
   text,
   i18nKey = "",
@@ -140,7 +220,6 @@ export function disableButton(btn, state = true) {
 }
 
 /* Specialized button creators */
-
 export function createCancelButton({
   text = null,
   onClick = () => {},

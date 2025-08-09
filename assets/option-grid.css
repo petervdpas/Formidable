@@ -1,0 +1,48 @@
+/* option-grid.css */
+:root {
+  --opt-bg: var(--popup-bg, var(--input-bg, #fff));
+  --opt-fg: var(--popup-fg, var(--input-fg, #222));
+  --opt-hover: var(--popup-hover, #f2f2f2);
+  --opt-border: var(--popup-border, var(--input-border-color, #ccc));
+  --opt-gap: 6px;
+  --opt-radius: 6px;
+}
+
+.option-grid {
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 0.9em;
+  color: var(--opt-fg);
+  background: var(--opt-bg);
+  border: 1px solid var(--opt-border);
+  border-radius: var(--opt-radius);
+  padding: var(--opt-gap);
+
+  display: grid;
+  gap: var(--opt-gap);
+}
+
+.option-grid.compact { --opt-gap: 4px; --opt-radius: 4px; font-size: 0.85em; }
+
+.option-grid .popup-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  color: inherit;
+  border: 0;
+  border-radius: 4px;
+  line-height: 1;
+  cursor: pointer;
+  font: inherit;
+  transition: background-color .15s ease, box-shadow .15s ease;
+}
+.option-grid .popup-option:hover,
+.option-grid .popup-option:focus { background: var(--opt-hover); outline: none; }
+.option-grid .popup-option:focus-visible { box-shadow: 0 0 0 2px color-mix(in srgb, var(--opt-border), transparent 50%); }
+.option-grid .popup-option.is-placeholder { opacity: .35; cursor: default; pointer-events: none; }

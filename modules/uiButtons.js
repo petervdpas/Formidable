@@ -1,7 +1,22 @@
 // modules/uiButtons.js
 
-import { createButton, createIconButton } from "../utils/buttonUtils.js";
+import {
+  createStatusButtonConfig,
+  createButton,
+  createIconButton,
+} from "../utils/buttonUtils.js";
 import { t } from "../utils/i18n.js";
+
+export function createStatusCharPickerButtonConfig(onClick) {
+  return createStatusButtonConfig({
+    id: "status-charpicker-btn",
+    label: "Ω",
+    titleKey: "tooltip.characterPicker",
+    ariaKey: "aria.characterPicker",
+    className: "btn-charpicker",
+    onClick,
+  });
+}
 
 export function createSettingsRestartIconButton(
   handleClick,
