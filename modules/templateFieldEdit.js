@@ -19,7 +19,6 @@ import {
   getSupportedOptionTypes,
   setupOptionsEditor,
 } from "../utils/optionsEditor.js";
-import { t } from "../utils/i18n.js";
 
 function setupFieldEditor(container, onChange, allFields = []) {
   const dom = {
@@ -41,6 +40,8 @@ function setupFieldEditor(container, onChange, allFields = []) {
     default: container.querySelector("#edit-default"),
     options: container.querySelector("#edit-options"),
     type: container.querySelector("#edit-type-container select"),
+    formatTextarea: container.querySelector("#edit-format"),
+    formatTextareaRow: container.querySelector("#edit-format-row"),
   };
 
   let labelLocked = false;
@@ -79,6 +80,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
     dom.summaryField.value = field.summary_field || "";
     dom.expressionItem.checked = !!field.expression_item;
     dom.twoColumn.checked = !!field.two_column;
+    dom.formatTextarea.value = field.format || "";
     dom.default.value = field.default ?? "";
 
     labelLocked = field.label?.trim().length > 0 && field.label !== field.key;
@@ -185,6 +187,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
       summary_field: summaryField,
       expression_item: dom.expressionItem.checked,
       two_column: dom.twoColumn.checked,
+      format: dom.formatTextarea.value.trim() || "",
       default: dom.default.value,
       options,
       type,

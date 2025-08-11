@@ -333,12 +333,16 @@ export default {
 
   // Fields
   "field.type": "Field Type",
+  "field.format": "Field Format",
   "field.expression": "Expression field",
   "field.summary": "Summary field",
   "field.twoColumn": "Two columns",
   "field.placeholder.description": "Optional description",
   "field.placeholder.default": "Set the default value for this field",
   "field.placeholder.options": "Comma-separated",
+
+  "field.format.markdown": "Markdown",
+  "field.format.plain": "Plain Text",
 
   // ── Modals ───────────────────
 

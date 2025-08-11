@@ -353,12 +353,16 @@ export default {
 
   // Fields
   "field.type": "Veldtype",
+  "field.format": "Veldformaat",
   "field.expression": "Expressieveld",
   "field.summary": "Samenvattingsveld",
   "field.twoColumn": "Twee kolommen",
   "field.placeholder.description": "Optionele beschrijving",
   "field.placeholder.default": "Stel de standaardwaarde in voor dit veld",
   "field.placeholder.options": "Komma-gescheiden",
+
+    "field.format.markdown": "Markdown",
+  "field.format.plain": "Gewone tekst",
 
   // ── Modals ───────────────────
 
