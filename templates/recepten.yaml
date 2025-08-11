@@ -103,6 +103,7 @@ fields:
     two_column: true
     default: ''
     options: *ref_0
+    format: plain
   - key: moeilijkheid
     type: range
     label: Moeilijkheid
@@ -181,6 +182,7 @@ fields:
     two_column: false
     default: ''
     options: *ref_0
+    format: markdown
   - key: verwante_links
     type: loopstart
     label: Verwante recepten

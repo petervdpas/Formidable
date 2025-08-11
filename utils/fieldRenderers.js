@@ -321,7 +321,7 @@ export async function renderRadioField(field, value = "") {
 export async function renderTextareaField(field, value = "") {
   const v = resolveValue(field, value);
   const wrapper = document.createElement("div");
-  wrapper.className = "markdown-editor-wrapper";
+  wrapper.className = "markdown-editor-wrapper"; // ok for both modes
 
   const textarea = addContainerElement({
     parent: wrapper,
@@ -329,8 +329,7 @@ export async function renderTextareaField(field, value = "") {
     attributes: { name: field.key },
   });
 
-  // Use textContent to avoid HTML parsing issues
-  // This is very important for security and consistency
+  // Prevent HTML interpretation
   textarea.textContent = v;
 
   applyFieldContextAttributes(textarea, {
@@ -339,34 +338,77 @@ export async function renderTextareaField(field, value = "") {
     loopKey: field.loopKey || null,
   });
 
+  // Plain mode: no EasyMDE, but keep counters + auto-grow
+  if (field.format === "plain" || typeof window.EasyMDE !== "function") {
+    // Status bar (lines / words / characters / keystrokes)
+    const status = document.createElement("div");
+    status.className = "textarea-statusbar";
+    status.innerHTML = `
+      <span class="lines">lines: 0</span>
+      <span class="words">words: 0</span>
+      <span class="characters">characters: 0</span>
+      <span class="keystrokes">0 Keystrokes</span>
+    `;
+    wrapper.appendChild(status);
+
+    let keystrokes = 0;
+
+    function updateStatus() {
+      const text = textarea.value || "";
+      const lines = text.split(/\r\n|\r|\n/).length;
+      const words = (text.trim().match(/\S+/g) || []).length;
+      const chars = text.length;
+      status.querySelector(".lines").textContent = `lines: ${lines}`;
+      status.querySelector(".words").textContent = `words: ${words}`;
+      status.querySelector(".characters").textContent = `characters: ${chars}`;
+      status.querySelector(".keystrokes").textContent = `${keystrokes} Keystrokes`;
+    }
+
+    textarea.addEventListener("keydown", () => {
+      keystrokes++;
+    });
+    textarea.addEventListener("input", () => {
+      // keep the <textarea>’s .value as source of truth
+      updateStatus();
+      // optional: auto-grow
+      textarea.style.height = "auto";
+      textarea.style.height = Math.min(textarea.scrollHeight, 600) + "px";
+    });
+
+    // initial layout
+    requestAnimationFrame(() => {
+      textarea.style.minHeight = "80px";
+      textarea.style.height = "auto";
+      textarea.style.height = Math.min(textarea.scrollHeight, 600) + "px";
+      updateStatus();
+    });
+
+    return wrapInputWithLabel(
+      wrapper,
+      field.label,
+      field.description,
+      field.two_column,
+      field.wrapper || "form-row"
+    );
+  }
+
+  // Markdown mode (EasyMDE)
   requestAnimationFrame(() => {
     let keystrokeCount = 0;
-    let editorInstance = null;
-
-    editorInstance = new EasyMDE({
+    let editorInstance = new EasyMDE({
       element: textarea,
       minHeight: "80px",
       theme: getCurrentTheme() === "dark" ? "monokai" : "eclipse",
       toolbar: [
-        "bold",
-        "italic",
-        "strikethrough",
-        "|",
-        "quote",
-        "unordered-list",
-        "ordered-list",
-        "|",
-        "horizontal-rule",
-        "code",
+        "bold","italic","strikethrough","|","quote","unordered-list",
+        "ordered-list","|","horizontal-rule","code",
       ],
       status: [
         "lines",
         "words",
         {
           className: "characters",
-          defaultValue(el) {
-            el.innerHTML = "characters: 0";
-          },
+          defaultValue(el) { el.innerHTML = "characters: 0"; },
           onUpdate(el) {
             const text = editorInstance?.value?.() || "";
             el.innerHTML = `characters: ${text.length}`;
@@ -374,12 +416,8 @@ export async function renderTextareaField(field, value = "") {
         },
         {
           className: "keystrokes",
-          defaultValue(el) {
-            el.innerHTML = "0 Keystrokes";
-          },
-          onUpdate(el) {
-            el.innerHTML = `${keystrokeCount} Keystrokes`;
-          },
+          defaultValue(el) { el.innerHTML = "0 Keystrokes"; },
+          onUpdate(el) { el.innerHTML = `${keystrokeCount} Keystrokes`; },
         },
       ],
       spellChecker: false,
@@ -387,9 +425,7 @@ export async function renderTextareaField(field, value = "") {
     });
 
     const cm = editorInstance.codemirror;
-    cm.on("keydown", () => {
-      keystrokeCount++;
-    });
+    cm.on("keydown", () => { keystrokeCount++; });
     cm.on("change", () => {
       textarea.value = editorInstance.value();
       editorInstance.updateStatusBar();

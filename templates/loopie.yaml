@@ -127,6 +127,7 @@ fields:
     two_column: false
     default: Describe how it feels to be inside a looper....
     options: *ref_0
+    format: markdown
   - key: subloop
     type: loopstart
     label: Subloop

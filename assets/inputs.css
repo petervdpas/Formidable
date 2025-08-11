@@ -108,3 +108,16 @@ input[type="range"]:hover::-webkit-slider-thumb {
   align-items: center;
   justify-content: center;
 }
+
+.textarea-statusbar {
+  font-size: 0.8em;
+  color: #777;
+  margin-top: 0.25em;
+  display: flex;
+  gap: 1em;
+  justify-content: flex-end; /* push to right */
+}
+
+.textarea-statusbar span {
+  white-space: nowrap;
+}

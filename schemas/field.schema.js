@@ -20,6 +20,8 @@ const knownTypes = [
   "tags",
 ];
 
+const textareaFormats = new Set(["markdown", "plain"]);
+
 module.exports = {
   defaults: {
     key: "",
@@ -53,6 +55,13 @@ module.exports = {
     // Only allow summary_field on loopstart
     if (field.type !== "loopstart") {
       field.summary_field = "";
+    }
+
+    if (field.type === "textarea") {
+      const f = String(field.format || "").toLowerCase();
+      field.format = textareaFormats.has(f) ? f : "markdown";
+    } else {
+      delete field.format;
     }
 
     return field;

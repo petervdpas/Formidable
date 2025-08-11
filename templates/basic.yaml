@@ -321,6 +321,7 @@ fields:
     two_column: false
     default: A whole lot of prefab text...
     options: *ref_0
+    format: markdown
   - key: numpy
     type: number
     label: Numpy
