@@ -467,24 +467,76 @@ export function copyToClipboard(
     return;
   }
 
-  button.onclick = () =>
-    navigator.clipboard
-      .writeText(contentFn())
-      .then(() =>
-        EventBus.emit("ui:toast", {
-          languageKey: successMessage,
-          args,
-          variant: "success",
-        })
-      )
-      .catch((e) => {
-        EventBus.emit("logging:error", ["[Clipboard] Copy failed", e]);
-        EventBus.emit("ui:toast", {
-          languageKey: errorMessage,
-          args,
-          variant: "error",
-        });
+  let busy = false;
+  button.onclick = async () => {
+    if (busy) return;
+    busy = true;
+
+    try {
+      const text = await Promise.resolve(contentFn());
+      if (typeof text !== "string")
+        throw new Error("copyToClipboard: contentFn must return a string");
+
+      const canUseClipboard =
+        window.isSecureContext &&
+        navigator.clipboard &&
+        typeof navigator.clipboard.writeText === "function";
+
+      if (canUseClipboard) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        // Fallback: hidden textarea + execCommand
+        const active = document.activeElement;
+        const selection = document.getSelection();
+        const savedRanges = [];
+        if (selection && selection.rangeCount) {
+          for (let i = 0; i < selection.rangeCount; i++)
+            savedRanges.push(selection.getRangeAt(i));
+        }
+
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        // keep it off-screen & minimal layout impact
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.top = "-9999px";
+        ta.style.left = "-9999px";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+
+        ta.select();
+        ta.setSelectionRange(0, ta.value.length);
+
+        const ok = document.execCommand && document.execCommand("copy");
+        document.body.removeChild(ta);
+
+        // Restore selection / focus
+        selection?.removeAllRanges?.();
+        savedRanges.forEach((r) => selection?.addRange?.(r));
+        active?.focus?.();
+
+        if (!ok) throw new Error("execCommand copy failed");
+      }
+
+      EventBus.emit("ui:toast", {
+        languageKey: successMessage,
+        args,
+        variant: "success",
       });
+    } catch (e) {
+      EventBus.emit("logging:error", ["[Clipboard] Copy failed", e]);
+      EventBus.emit("ui:toast", {
+        languageKey: errorMessage,
+        args,
+        variant: "error",
+      });
+    } finally {
+      // tiny debounce to avoid accidental double clicks
+      setTimeout(() => {
+        busy = false;
+      }, 150);
+    }
+  };
 }
 
 /**

@@ -19,7 +19,9 @@ import {
 } from "./modules/handlers/statusHandler.js";
 import { createStatusCharPickerButtonConfig } from "./modules/uiButtons.js";
 import { createOptionGrid } from "./utils/elementBuilders.js";
+import { SelectionStore } from "./utils/selectionStore.js";
 import { setupPopup } from "./utils/modalUtils.js";
+import { allCharacters, toGridOptions } from "./utils/characterUtils.js";
 
 import {
   setupProfileModal,
@@ -97,32 +99,47 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   addStatusButton(
     createStatusCharPickerButtonConfig((e, btnEl) => {
+      // 1) Make the trigger keep focus on the editor and capture caret BEFORE popup opens
+      SelectionStore.attachTriggerKeepingFocus(btnEl, () => {
+        /* noop */
+      });
+
+      // 2) Build + show popup anchored to the button
       const myPopup = setupPopup("status-button-popup", {
         triggerBtn: btnEl,
         escToClose: true,
         position: "above",
+        onClose: () => SelectionStore.clear(),
       });
 
       const grid = createOptionGrid(
-        [
-          { value: "Ω", label: "Ω", pos: [2, 5] },
-          { value: "→", label: "→" },
-          { value: "←", label: "←" },
-          { value: "↑", label: "↑" },
-          { value: "↓", label: "↓" },
-          { value: "A", label: "A", pos: [3, 6]  },
-        ],
+        toGridOptions(allCharacters),
         (val) => {
-          console.log("Picked:", val);
+          // 3) On pick: restore + insert at caret. If it fails, fall back as you like.
+          const ok = SelectionStore.insertText(val);
+          if (!ok) {
+            navigator.clipboard.writeText(val).catch(() => {});
+            EventBus.emit("ui:toast", {
+              languageKey: "toast.copy.clipboard",
+              args: [val],
+              variant: "success",
+            });
+          }
           myPopup.hide();
         },
-        { gridCols: 6, gridRows: 4, cellSize: 32, gridGap: 2 }
+        { gridCols: 16, gridRows: 8, cellSize: 32, gridGap: 2 }
       );
+
+      // 4) Stop the popup from stealing focus while you click
+      SelectionStore.preventPopupFocusSteal(grid);
+
+      // (Nice-to-have) keep tab flow in the editor
+      grid
+        .querySelectorAll("button.popup-option")
+        .forEach((b) => (b.tabIndex = -1));
 
       myPopup.popup.innerHTML = "";
       myPopup.popup.appendChild(grid);
-
-      // pass the click event so we anchor to that button
       myPopup.show(e);
     })
   );
