@@ -1,16 +1,16 @@
 {
   "meta": {
     "id": "c0b845d5-281b-464e-a099-98bdc182946f",
-    "author_name": "Regular user",
+    "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-29T09:32:36.440Z",
-    "updated": "2025-08-04T00:29:00.115Z",
+    "updated": "2025-08-11T00:32:09.567Z",
     "flagged": false
   },
   "data": {
     "id": "c0b845d5-281b-464e-a099-98bdc182946f",
-    "test": "Declined",
+    "test": "Decline This One",
     "check": false,
     "dropdown": "R",
     "multichoice": [

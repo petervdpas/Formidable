@@ -239,8 +239,9 @@ markdown_template: |-
   _No tags specified_
   {{/if}}
 sidebar_expression: >-
-  [ test | check ? { text: test, classes: ["expr-text-green", "expr-bold"] } : {
-  text: test, classes: ["expr-text-red", "expr-bold", "expr-blinking"] } ]
+  [ test | check ? { text: "You approved this!", classes: ["expr-text-green",
+  "expr-bold"] } : { text: "You declined this!", classes: ["expr-text-red",
+  "expr-bold", "expr-blinking"] } ]
 enable_collection: true
 fields:
   - key: id

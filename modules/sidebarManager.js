@@ -168,7 +168,7 @@ export function createStorageListManager(formManager, modal) {
 
       return entries.map((entry) => {
         return {
-          display: stripMetaExtension(entry.filename),
+          display: entry.title || stripMetaExtension(entry.filename),
           value: entry.filename,
           flagged: entry.meta?.flagged || false,
           id: entry.meta?.id || "",

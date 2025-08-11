@@ -4,15 +4,15 @@
     "author_email": "regular@example.com",
     "template": "recepten.yaml",
     "created": "2025-08-08T10:02:49.872Z",
-    "updated": "2025-08-08T10:57:20.878Z",
+    "updated": "2025-08-11T00:30:45.383Z",
     "flagged": false
   },
   "data": {
-    "naam": "Vinaigrette",
+    "naam": "Basis Vinaigrette",
     "omschrijving": "Deze basis vinaigrette is niet toe te wijzen aan iemand specifiek. Wel is te zeggen dat het land van oorsprong Frakrijk is (volgens wikipedia althans)",
     "moeilijkheid": 2,
     "auteur": "Niemand in het bijzonder",
-    "tickertape": "Basis Vinaigrette",
+    "tickertape": "De Spaanse Groetenschotel kan niet zonder!",
     "labels": [
       "vinaigrette",
       "groentenschotel"

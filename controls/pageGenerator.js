@@ -61,6 +61,50 @@ function compilePageTemplate() {
       list-style: lower-alpha;
       margin-top: 0.5em;
     }
+      
+    /* Remove bullet dots and reset padding for both lists */
+    ul.template-list,
+    ul.form-picker-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 1em 0;
+    }
+
+    /* Common item styling */
+    ul.template-list li.template-item,
+    ul.form-picker-list li.form-picker-item {
+      margin-bottom: 0.3em;
+    }
+
+    /* Make each link fill the row */
+    ul.template-list a,
+    ul.form-picker-list a {
+      display: block;
+      padding: 0.4em 0.6em;
+      border-radius: 4px;
+      text-decoration: none;
+      color: #333;
+      background-color: #f7f7f7;
+      border: 1px solid #ddd;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    /* Hover/active effect */
+    ul.template-list a:hover,
+    ul.form-picker-list a:hover {
+      background-color: #e8f0ff;
+      border-color: #4a90e2;
+      color: #4a90e2;
+    }
+
+    /* Selected state example */
+    ul.template-list a.selected,
+    ul.form-picker-list a.selected {
+      background-color: #dce6f9;
+      border-color: #4a90e2;
+      font-weight: 600;
+    }
+      
     table {
       border-collapse: collapse;
       width: 100%;

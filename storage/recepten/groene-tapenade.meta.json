@@ -4,7 +4,7 @@
     "author_email": "regular@example.com",
     "template": "recepten.yaml",
     "created": "2025-08-08T11:06:20.080Z",
-    "updated": "2025-08-08T11:20:52.822Z",
+    "updated": "2025-08-11T00:29:44.063Z",
     "flagged": false
   },
   "data": {
@@ -12,7 +12,7 @@
     "omschrijving": "Dit is groene tapenade die bv.goed past bij de Spaanse groentenschotel.",
     "moeilijkheid": 6,
     "auteur": "Elly Habraken",
-    "tickertape": "Groene Tapenade",
+    "tickertape": "Lekker voor bij de Spaanse Groentenschotel!",
     "labels": [
       "tapenade",
       "groen"

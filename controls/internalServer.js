@@ -41,7 +41,7 @@ function startInternalServer(port = 8383) {
         const yaml = await loadTemplateYaml(templateInfo?.filename);
         const displayName = yaml?.name?.trim() || t;
 
-        return `<li><a href="/template/${encodeURIComponent(
+        return `<li class="template-item"><a href="/template/${encodeURIComponent(
           t
         )}">${displayName}</a></li>`;
       })
@@ -50,7 +50,7 @@ function startInternalServer(port = 8383) {
     const body = `
       <p>Welcome to the Formidable Internal Server.</p>
       <h2>Available Templates</h2>
-      <ul>${templateLinks.join("")}</ul>
+      <ul class="template-list">${templateLinks.join("")}</ul>
       <p><a href="/virtual">View Virtual Structure (JSON)</a></p>
     `;
 
@@ -74,14 +74,30 @@ function startInternalServer(port = 8383) {
   app.get("/template/:template", async (req, res) => {
     const tmpl = req.params.template;
     const vfs = await getVirtualStructure();
-    const metaFiles = vfs.templateStorageFolders?.[tmpl]?.metaFiles || [];
+    const templateInfo = vfs.templateStorageFolders?.[tmpl];
 
-    const formLinks = metaFiles
+    if (!templateInfo?.filename) {
+      res.status(404).send(
+        renderPage({
+          title: "Template Not Found",
+          body: `<p>Template "${tmpl}" not found.</p><p><a href="/">Back to Home</a></p>`,
+          footerNote: `Running on port ${currentPort}`,
+        })
+      );
+      return;
+    }
+
+    // Use extended list to get titles
+    const forms = await extendedListForms(templateInfo.filename);
+
+    const formLinks = forms
       .map(
-        (f) =>
-          `<li><a href="/template/${encodeURIComponent(
+        (form) =>
+          `<li class="form-picker-item"><a href="/template/${encodeURIComponent(
             tmpl
-          )}/form/${encodeURIComponent(f)}">${f}</a></li>`
+          )}/form/${encodeURIComponent(form.filename)}">${
+            form.title || form.filename
+          }</a></li>`
       )
       .join("");
 
@@ -89,7 +105,7 @@ function startInternalServer(port = 8383) {
       <p><a href="/">⬅ Back to Home</a></p>
       <p>Template: <strong>${tmpl}</strong></p>
       <h2>Forms</h2>
-      <ul>${formLinks}</ul>
+      <ul class="form-picker-list">${formLinks}</ul>
     `;
 
     res.send(

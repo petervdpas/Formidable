@@ -32,6 +32,7 @@ async function extendedListForms(templateFilename) {
 
   const template = templateManager.loadTemplate(templateFilename);
   const fields = template?.fields || [];
+  const itemFieldKey = template?.item_field || ""; // <-- new
 
   // Find special fields
   const expressionFields = fields.filter((f) => f.expression_item);
@@ -44,7 +45,6 @@ async function extendedListForms(templateFilename) {
       const sanitized = metaSchema.sanitize(raw, fields);
 
       const expressionItems = {};
-
       for (const field of expressionFields) {
         const value = sanitized.data?.[field.key];
         if (value !== undefined && value !== null && value !== "") {
@@ -52,13 +52,20 @@ async function extendedListForms(templateFilename) {
         }
       }
 
-      const result = {
+      let displayTitle = filename;
+      if (itemFieldKey && sanitized.data?.[itemFieldKey] !== undefined) {
+        const val = sanitized.data[itemFieldKey];
+        if (val !== null && val !== "") {
+          displayTitle = String(val);
+        }
+      }
+
+      results.push({
         filename,
         meta: sanitized.meta || {},
         expressionItems,
-      };
-
-      results.push(result);
+        title: displayTitle,
+      });
     } catch (err) {
       error(
         "[FormManager] Failed to load form (for listForms):",
