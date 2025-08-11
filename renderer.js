@@ -90,6 +90,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
 
   await loadLocale(config.language || "en");
+  document.documentElement.setAttribute("lang", config.language || "en");
   translateDOM();
 
   // ── Menu ──

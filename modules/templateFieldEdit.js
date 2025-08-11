@@ -187,13 +187,17 @@ function setupFieldEditor(container, onChange, allFields = []) {
       summary_field: summaryField,
       expression_item: dom.expressionItem.checked,
       two_column: dom.twoColumn.checked,
-      format: dom.formatTextarea.value.trim() || "",
       default: dom.default.value,
       options,
       type,
     };
 
-    if (isGuid) field.primary_key = true;
+    if (type === "textarea") {
+      field.format = dom.formatTextarea?.value || "markdown"; // "markdown" or "plain"
+    }
+    if (isGuid) {
+      field.primary_key = true;
+    }
     return field;
   }
 

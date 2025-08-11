@@ -67,6 +67,12 @@ function sanitizeField(f) {
     field.two_column = true;
   }
 
+  if (f.type === "textarea") {
+    // Default to markdown if empty or invalid
+    const fmt = String(f.format || "markdown").toLowerCase();
+    field.format = fmt === "plain" ? "plain" : "markdown";
+  }
+
   if (
     f.default !== undefined &&
     f.default !== null &&

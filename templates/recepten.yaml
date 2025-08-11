@@ -103,7 +103,7 @@ fields:
     two_column: true
     default: ''
     options: *ref_0
-    format: markdown
+    format: plain
   - key: moeilijkheid
     type: range
     label: Moeilijkheid

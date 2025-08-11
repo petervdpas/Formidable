@@ -157,7 +157,7 @@ export async function renderTextField(field, value = "") {
 // ─────────────────────────────────────────────
 // Type: boolean
 export async function renderBooleanField(field, value = "") {
-  let trailingValues = ['On', 'Off'];
+  let trailingValues = ["On", "Off"];
 
   if (Array.isArray(field.options) && field.options.length >= 2) {
     const first = resolveOption(field.options[0]);
@@ -361,7 +361,9 @@ export async function renderTextareaField(field, value = "") {
       status.querySelector(".lines").textContent = `lines: ${lines}`;
       status.querySelector(".words").textContent = `words: ${words}`;
       status.querySelector(".characters").textContent = `characters: ${chars}`;
-      status.querySelector(".keystrokes").textContent = `${keystrokes} Keystrokes`;
+      status.querySelector(
+        ".keystrokes"
+      ).textContent = `${keystrokes} Keystrokes`;
     }
 
     textarea.addEventListener("keydown", () => {
@@ -400,15 +402,25 @@ export async function renderTextareaField(field, value = "") {
       minHeight: "80px",
       theme: getCurrentTheme() === "dark" ? "monokai" : "eclipse",
       toolbar: [
-        "bold","italic","strikethrough","|","quote","unordered-list",
-        "ordered-list","|","horizontal-rule","code",
+        "bold",
+        "italic",
+        "strikethrough",
+        "|",
+        "quote",
+        "unordered-list",
+        "ordered-list",
+        "|",
+        "horizontal-rule",
+        "code",
       ],
       status: [
         "lines",
         "words",
         {
           className: "characters",
-          defaultValue(el) { el.innerHTML = "characters: 0"; },
+          defaultValue(el) {
+            el.innerHTML = "characters: 0";
+          },
           onUpdate(el) {
             const text = editorInstance?.value?.() || "";
             el.innerHTML = `characters: ${text.length}`;
@@ -416,8 +428,12 @@ export async function renderTextareaField(field, value = "") {
         },
         {
           className: "keystrokes",
-          defaultValue(el) { el.innerHTML = "0 Keystrokes"; },
-          onUpdate(el) { el.innerHTML = `${keystrokeCount} Keystrokes`; },
+          defaultValue(el) {
+            el.innerHTML = "0 Keystrokes";
+          },
+          onUpdate(el) {
+            el.innerHTML = `${keystrokeCount} Keystrokes`;
+          },
         },
       ],
       spellChecker: false,
@@ -425,7 +441,9 @@ export async function renderTextareaField(field, value = "") {
     });
 
     const cm = editorInstance.codemirror;
-    cm.on("keydown", () => { keystrokeCount++; });
+    cm.on("keydown", () => {
+      keystrokeCount++;
+    });
     cm.on("change", () => {
       textarea.value = editorInstance.value();
       editorInstance.updateStatusBar();
@@ -611,7 +629,7 @@ async function createListItem(value, options = []) {
     className: "list-field-item",
   });
 
-    // Add drag handle
+  // Add drag handle
   addContainerElement({
     parent: container,
     tag: "span",

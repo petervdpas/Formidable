@@ -1,7 +1,7 @@
 // main.js
 
 const packageJson = require("./package.json");
-const { app, BrowserWindow, Menu } = require("electron");
+const { app, BrowserWindow, Menu, session } = require("electron");
 const path = require("path");
 const nodeLogger = require("./controls/nodeLogger");
 const fileManager = require("./controls/fileManager");
@@ -91,6 +91,19 @@ function createWindow() {
 
 app.whenReady().then(() => {
   app.setName("Formidable v" + packageJson.version);
+
+  // Map your config language to a valid BCP-47 code (Chromium expects full tags like "en-US", "nl-NL")
+  const lang = (userConfig.language || "en").toLowerCase();
+  const langMap = {
+    en: "en-US",
+    nl: "nl-NL",
+    de: "de-DE",
+    fr: "fr-FR",
+    // add others if needed
+  };
+
+  const spellLang = langMap[lang] || langMap.en;
+  session.defaultSession.setSpellCheckerLanguages([spellLang]);
 
   const isPackaged = app.isPackaged;
   const root = isPackaged ? app.getAppPath() : process.cwd();
