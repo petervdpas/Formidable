@@ -7,6 +7,7 @@ import { clearContainerUI } from "../../utils/formUtils.js";
 
 export async function handleSaveTemplate({ container, fields, callback }) {
   const name = container.querySelector("#yaml-name").value.trim();
+  const itemfield = container.querySelector("#yaml-item-field").value.trim();
   const markdownTemplate = getMarkdownTemplate();
   const enableCollection =
     document.getElementById("template-enable-collection")?.checked === true;
@@ -15,6 +16,7 @@ export async function handleSaveTemplate({ container, fields, callback }) {
 
   const updated = {
     name,
+    item_field: itemfield,
     markdown_template: markdownTemplate,
     sidebar_expression: sidebarExpression,
     enable_collection: enableCollection,

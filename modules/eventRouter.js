@@ -208,6 +208,11 @@ export function initEventRouter() {
     "template:descriptor",
     templateHandlers.handleGetTemplateDescriptor
   );
+  EventBus.off(
+    "template:itemFields",
+    templateHandlers.handleGetPossibleItemFields
+  );
+
   EventBus.on("template:selected", templateHandlers.handleTemplateSelected);
   EventBus.on("template:list", templateHandlers.handleListTemplates);
   EventBus.on("template:load", templateHandlers.handleLoadTemplate);
@@ -217,6 +222,10 @@ export function initEventRouter() {
   EventBus.on(
     "template:descriptor",
     templateHandlers.handleGetTemplateDescriptor
+  );
+  EventBus.on(
+    "template:itemFields",
+    templateHandlers.handleGetPossibleItemFields
   );
 
   EventBus.off("template:list:reload", listHandlers.handleListReload);

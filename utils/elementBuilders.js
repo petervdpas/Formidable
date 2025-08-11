@@ -1,5 +1,6 @@
 // utils/elementBuilders.js
 
+import { createDropdown } from "./dropdownUtils.js";
 import { t } from "./i18n.js";
 
 export function createStyledLabel(
@@ -192,6 +193,36 @@ export function createFormRowInput({
   }
 
   return row;
+}
+
+export function createFormRowDropdown({
+  id,
+  labelOrKey,
+  selectedValue = "",
+  options = [],
+  onChange = null,
+  onRefresh = null,
+  i18nEnabled = false,
+}) {
+  const row = document.createElement("div");
+  row.className = "modal-form-row";
+  // row.id = `${id}-row`; // optional; not required anymore
+
+  const dd = createDropdown({
+    containerEl: row,          // <— pass the element directly
+    labelTextOrKey: labelOrKey,
+    selectedValue,
+    options,
+    onChange,
+    onRefresh,
+    i18nEnabled,
+  });
+
+  if (dd?.selectElement) {
+    dd.selectElement.id = id;  // so saves can query by #yaml-item-field
+  }
+
+  return { row, dropdown: dd };
 }
 
 export function buildCompositeElement({

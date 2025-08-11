@@ -6,6 +6,7 @@ module.exports = {
   defaults: {
     name: "",
     filename: "",
+    item_field: "",
     markdown_template: "",
     sidebar_expression: "",
     enable_collection: false,
@@ -20,6 +21,7 @@ module.exports = {
     const result = {
       name: obj.name || "",
       filename: obj.filename || filename || "",
+      item_field: obj.item_field || "",
       markdown_template: obj.markdown_template || "",
       sidebar_expression: obj.sidebar_expression || "",
       enable_collection: obj.enable_collection === true,
@@ -34,6 +36,7 @@ module.exports = {
         ![
           "name",
           "filename",
+          "item_field",
           "markdown_template",
           "sidebar_expression",
           "enable_collection",

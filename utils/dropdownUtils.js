@@ -25,6 +25,7 @@ export function populateSelectOptions(
 
 export function createDropdown({
   containerId,
+  containerEl,
   labelTextOrKey,
   selectedValue = "",
   options = [],
@@ -32,24 +33,24 @@ export function createDropdown({
   onRefresh,
   i18nEnabled = false,
 }) {
-  const container = document.getElementById(containerId);
+  const container =
+    containerEl || (containerId ? document.getElementById(containerId) : null);
+
   if (!container) {
     EventBus.emit("logging:warning", [
-      `[DropdownManager] Container #${containerId} not found.`,
+      `[DropdownManager] Container #${containerId ?? "undefined"} not found.`,
     ]);
-    return;
+    return null;
   }
 
-  container.innerHTML = ""; // Clear old content
+  container.innerHTML = "";
 
   const translatedLabel = i18nEnabled ? t(labelTextOrKey) : labelTextOrKey;
-
   const label = createStyledLabel(translatedLabel, {
     i18nKey: i18nEnabled ? labelTextOrKey : null,
   });
 
   const select = createStyledSelect();
-
   populateSelectOptions(select, options, selectedValue);
 
   select.addEventListener("change", (e) => {
@@ -57,7 +58,7 @@ export function createDropdown({
     EventBus.emit("logging:default", [
       `[DropdownManager] Selection changed to: ${selected}`,
     ]);
-    if (onChange) onChange(selected);
+    onChange?.(selected);
   });
 
   container.appendChild(label);
@@ -68,7 +69,7 @@ export function createDropdown({
     getSelected: () => select.value,
     setSelected: (value) => {
       select.value = value;
-      if (onChange) onChange(value);
+      onChange?.(value);
     },
     updateOptions: (newOptions) => {
       populateSelectOptions(select, newOptions, selectedValue);
@@ -88,7 +89,7 @@ export function createDropdown({
         const values = newOptions.map((opt) => opt.value);
         if (!values.includes(current)) {
           select.value = "";
-          if (onChange) onChange("");
+          onChange?.("");
         }
       } catch (err) {
         EventBus.emit("logging:error", [

@@ -1,5 +1,6 @@
 name: Basic example
 filename: basic.yaml
+item_field: test
 markdown_template: |-
   ---
   title: Auto-generated Report

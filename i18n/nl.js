@@ -416,6 +416,7 @@ export default {
   "modal.template.title": "Nieuw sjabloon",
   "modal.template.label.name": "Sjabloonnaam",
   "modal.template.label.filename": "Bestandsnaam",
+  "modal.template.label.itemfield": "Item veld",
   "modal.template.label.sidebar": "Zijpaneel Expressie",
   "modal.template.placeholder.filename": "bijv. gebruikers-enquête",
   "modal.template.enable.collection": "Inschakelen Verzameling",
@@ -440,5 +441,5 @@ export default {
   "modal.about.title": "Over Formidable",
   "modal.about.description":
     "Formidable is een Sjabloon/Formulier Editor gebouwd met Electron.",
-  "modal.about.copyright": "©2025 Peter van de Pas",
+  "modal.about.copyright": "©2025 Roadwarrior",
 };

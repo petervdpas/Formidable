@@ -204,3 +204,41 @@ export async function handleGetTemplateDescriptor({ name, callback }) {
     callback?.(null);
   }
 }
+
+// ITEMFIELD
+export async function handleGetPossibleItemFields(payload) {
+  try {
+    let name, cb;
+    if (typeof payload === "string") {
+      name = payload;
+    } else if (payload && typeof payload === "object") {
+      name = payload.name;
+      cb = payload.callback;
+    }
+
+    const incoming =
+      (typeof name === "string" && name.trim()) ||
+      (window.currentSelectedTemplateName || "");
+
+    if (!incoming) {
+      EventBus.emit("logging:warning", [
+        "[TemplateHandler] No template name for itemFields; returning empty list.",
+      ]);
+      cb?.([]);
+      return [];
+    }
+
+    const safeName = incoming.endsWith(".yaml") ? incoming : `${incoming}.yaml`;
+    const result = await window.api.templates.getItemFields(safeName)
+    const out = Array.isArray(result) ? result : [];
+    cb?.(out);
+    return out;
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[TemplateHandler] Failed to get possible item fields for "${payload?.name ?? payload}":`,
+      err,
+    ]);
+    if (payload && typeof payload === "object") payload.callback?.([]);
+    return [];
+  }
+}

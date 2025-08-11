@@ -14,6 +14,7 @@ import { createToggleButtons } from "../utils/buttonUtils.js";
 import {
   createFormLegend,
   createFormRowInput,
+  createFormRowDropdown,
   createSwitch,
   buildCompositeElement,
 } from "../utils/elementBuilders.js";
@@ -131,6 +132,19 @@ export function initTemplateEditor(containerId, onSaveCallback) {
       i18nEnabled: true,
     });
     setupFieldset.appendChild(nameRow);
+
+    // Item field (dropdown)
+    const { row } = createFormRowDropdown({
+      id: "yaml-item-field",
+      labelOrKey: "modal.template.label.itemfield",
+      selectedValue: currentData.item_field || "",
+      options: await getItemFieldsOptions(),
+      onChange: (val) => {
+        currentData.item_field = val;
+      },
+      i18nEnabled: true,
+    });
+    setupFieldset.appendChild(row);
 
     // Markdown template editor
     const templateRow = document.createElement("div");
@@ -257,6 +271,8 @@ export function initTemplateEditor(containerId, onSaveCallback) {
           const fullTemplate = {
             name:
               container.querySelector("#yaml-name")?.value.trim() || "Unnamed",
+            item_field:
+              container.querySelector("#yaml-item-field")?.value.trim() || "",
             markdown_template: getEditor()?.getValue() || "",
             sidebar_expression:
               container.querySelector("#sidebar-expression")?.value.trim() ||
@@ -389,4 +405,26 @@ export function initTemplateEditor(containerId, onSaveCallback) {
   }
 
   return { render: renderEditor };
+}
+
+async function getItemFieldsOptions() {
+  const templateName = window.currentSelectedTemplateName;
+  const rawOptions = await EventBus.emitWithResponse(
+    "template:itemFields",
+    templateName
+  );
+
+  // Normalize into [{ value, label }]
+  const options = (rawOptions || []).map((opt) => {
+    if (typeof opt === "string") return { value: opt, label: opt };
+    if (opt && typeof opt === "object") {
+      return {
+        value: opt.key || opt.value || "",
+        label: opt.label || opt.key || opt.value || "",
+      };
+    }
+    return { value: String(opt), label: String(opt) };
+  });
+
+  return options;
 }

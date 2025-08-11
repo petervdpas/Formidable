@@ -208,6 +208,9 @@ function registerIpcHandlers() {
   registerIpc("create-basic-template", () =>
     templateManager.createBasicTemplateIfMissing()
   );
+  registerIpc("get-item-fields", (e, name) =>
+    templateManager.getPossibleItemFields(name)
+  );
 
   // Forms (refactored for template-based VFS)
   registerIpc("ensure-form-dir", (e, templateFilename) =>

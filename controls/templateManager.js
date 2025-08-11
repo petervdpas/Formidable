@@ -55,6 +55,7 @@ function saveTemplate(name, data) {
     const ordered = {
       name: data.name || "",
       filename: data.filename,
+      item_field: data.item_field || "",
       markdown_template: data.markdown_template || "",
       sidebar_expression: data.sidebar_expression || "",
       enable_collection: data.enable_collection === true,
@@ -67,6 +68,7 @@ function saveTemplate(name, data) {
         ![
           "name",
           "filename",
+          "item_field",
           "markdown_template",
           "sidebar_expression",
           "enable_collection",
@@ -376,6 +378,28 @@ function createBasicTemplateIfMissing() {
   }
 }
 
+function computeTopLevelTextFields(fields = []) {
+  const opts = [];
+  const stack = []; // loop nesting depth
+
+  for (const f of fields) {
+    if (!f || !f.type) continue;
+
+    if (f.type === "loopstart") { stack.push(f.key); continue; }
+    if (f.type === "loopstop")  { if (stack[stack.length - 1] === f.key) stack.pop(); continue; }
+
+    if (stack.length === 0 && f.type === "text" && f.key) {
+      opts.push({ key: f.key, label: f.label || f.key });
+    }
+  }
+  return opts;
+}
+
+function getPossibleItemFields(name) {
+  const data = loadTemplate(name);
+  return data.fields ? computeTopLevelTextFields(data.fields) : [];
+}
+
 module.exports = {
   ensureTemplateDirectory,
   listTemplates,
@@ -385,4 +409,5 @@ module.exports = {
   validateTemplate,
   getTemplateDescriptor,
   createBasicTemplateIfMissing,
+  getPossibleItemFields
 };

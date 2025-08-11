@@ -1,5 +1,6 @@
 name: Looper example
 filename: loopie.yaml
+item_field: title
 markdown_template: |-
   ---
   title: Auto-generated Report

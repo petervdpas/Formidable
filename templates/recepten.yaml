@@ -1,5 +1,6 @@
 name: Kookrecepten
 filename: recepten.yaml
+item_field: naam
 markdown_template: >-
   ---
 

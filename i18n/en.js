@@ -50,7 +50,8 @@ export default {
   "status.context.not.storage": "You are not in Storage context.",
   "status.plugin.run.success": "Running plugin {0}.",
   "status.plugin.run.failed": "Failed to run plugin {0}.",
-  "status.plugin.run.backend": "Running backend plugin {0}... Hopefully you know what this plugin does?!",
+  "status.plugin.run.backend":
+    "Running backend plugin {0}... Hopefully you know what this plugin does?!",
   "status.plugin.run.completed": "Plugin {0} was closed.",
   "status.plugin.crash": "Plugin {0} ({1}) crashed with error: {2}",
   "status.secret.key.updated": "Secret key updated.",
@@ -393,6 +394,7 @@ export default {
   "modal.template.legend.fields": "Field Information",
   "modal.template.title": "New Template",
   "modal.template.label.name": "Template Name",
+  "modal.template.label.itemfield": "Item Field",
   "modal.template.label.filename": "Filename",
   "modal.template.label.sidebar": "Sidebar Expression",
   "modal.template.placeholder.filename": "e.g., user-survey",
@@ -418,5 +420,5 @@ export default {
   "modal.about.title": "About Formidable",
   "modal.about.description":
     "Formidable is a Template/Form Editor created in Electron.",
-  "modal.about.copyright": "©2025 Peter van de Pas",
+  "modal.about.copyright": "©2025 Roadwarrior",
 };

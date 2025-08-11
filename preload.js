@@ -90,6 +90,7 @@ const api = {
     "delete-template",
     "validate-template",
     "get-template-descriptor",
+    "get-item-fields"
   ]),
   forms: buildGroup([
     "ensure-form-dir",
