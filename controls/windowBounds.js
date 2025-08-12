@@ -2,37 +2,52 @@
 
 const { screen } = require("electron");
 
+function clamp(val, min, max) {
+  return Math.min(Math.max(val, min), max);
+}
+
 function getSafeBounds(bounds = {}) {
   const displays = screen.getAllDisplays();
-  const primary = screen.getPrimaryDisplay().bounds;
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const minW = 600;
+  const minH = 400;
 
-  let width = Math.max(600, bounds.width || 1024);
-  let height = Math.max(400, bounds.height || 800);
+  // Start with sane minimums/defaults
+  let width = Math.max(minW, bounds.width || 1024);
+  let height = Math.max(minH, bounds.height || 800);
 
-  let x = typeof bounds.x === "number" ? bounds.x : undefined;
-  let y = typeof bounds.y === "number" ? bounds.y : undefined;
+  // Determine target display: one containing saved (x,y), else primary
+  const hasXY = typeof bounds.x === "number" && typeof bounds.y === "number";
+  const targetDisplay = hasXY
+    ? displays.find((d) => {
+        const b = d.workArea; // use workArea to avoid taskbars/docks
+        return (
+          bounds.x >= b.x &&
+          bounds.y >= b.y &&
+          bounds.x < b.x + b.width &&
+          bounds.y < b.y + b.height
+        );
+      }) || primaryDisplay
+    : primaryDisplay;
 
-  if (typeof x === "number" && typeof y === "number") {
-    const fitsOnScreen = displays.some((d) => {
-      return (
-        x >= d.bounds.x &&
-        y >= d.bounds.y &&
-        x < d.bounds.x + d.bounds.width &&
-        y < d.bounds.y + d.bounds.height
-      );
-    });
+  const area = targetDisplay.workArea;
 
-    if (!fitsOnScreen) {
-      x = undefined;
-      y = undefined;
-    }
+  // If saved size is larger than the work area, clamp it
+  width = clamp(width, minW, area.width);
+  height = clamp(height, minH, area.height);
+
+  // If we have x/y, clamp them so the window remains fully visible
+  let x, y;
+  if (hasXY) {
+    x = clamp(bounds.x, area.x, area.x + area.width - width);
+    y = clamp(bounds.y, area.y, area.y + area.height - height);
+  } else {
+    // Center on the target display
+    x = area.x + Math.floor((area.width - width) / 2);
+    y = area.y + Math.floor((area.height - height) / 2);
   }
 
-  return {
-    width,
-    height,
-    ...(x != null && y != null ? { x, y } : {}),
-  };
+  return { x, y, width, height };
 }
 
 module.exports = { getSafeBounds };

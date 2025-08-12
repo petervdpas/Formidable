@@ -25,7 +25,7 @@ Om aan de slag te gaan met Formidable, volg je deze stappen:
 
 Het hoofdmenu geeft toegang tot alle essentiële functies van Formidable...
 
-![Hoofdmenu](images/main-menu.png)
+![Hoofdmenu](images/main-menu.nl.png)
 
 Dit menu wordt in de hele documentatie genoemd, dus maak jezelf vertrouwd met de indeling en opties. Het menu kan `groeien` naarmate je plugins installeert of functies activeert, dus houd het in de gaten voor nieuwe opties in je instellingen.
 
@@ -35,8 +35,8 @@ Formidable maakt het eenvoudig om te wisselen tussen **template-modus** en **ops
 
 Het is een eenvoudige schakelaar in de rechterbovenhoek van de interface.
 
-![Template Context](images/context-template.png)
+![Template Context](images/context-template.nl.png)
 
-![Storage Context](images/context-storage.png)
+![Storage Context](images/context-storage.nl.png)
 
 Vergeet niet om de [Instellingen](#settings) te bekijken om je ervaring verder aan te passen, bijvoorbeeld door plugins in te schakelen of het thema te wijzigen.

@@ -1,7 +1,9 @@
 // main.js
 
+const DEBOUNCE_MS = 150;
+
 const packageJson = require("./package.json");
-const { app, BrowserWindow, Menu, session } = require("electron");
+const { app, BrowserWindow, Menu, session, screen } = require("electron");
 const path = require("path");
 const nodeLogger = require("./controls/nodeLogger");
 const fileManager = require("./controls/fileManager");
@@ -17,35 +19,64 @@ if (process.platform === "win32") {
   app.setPath("userData", portableDataPath);
 }
 
-const userConfig = configManager.loadUserConfig();
+// ────────────────────────────────────────────────────────────
+// Helpers
+// ────────────────────────────────────────────────────────────
+function debounce(fn, ms) {
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), ms);
+  };
+}
 
-const iconPath = (() => {
+function wireWindowPersistence(win) {
+  const saveBounds = debounce(() => {
+    if (win.isMinimized() || win.isFullScreen()) return;
+    // Using frame bounds; if you switch to useContentSize, use getContentBounds() instead.
+    const [width, height] = win.getSize();
+    const [x, y] = win.getPosition();
+    configManager.updateUserConfig({ window_bounds: { width, height, x, y } });
+  }, DEBOUNCE_MS);
+
+  win.on("resize", saveBounds);
+  win.on("move", saveBounds);
+  win.on("unmaximize", saveBounds);
+  win.on("leave-full-screen", saveBounds);
+}
+
+function currentIconPath() {
   if (process.platform === "win32") {
     return app.isPackaged
       ? path.join(process.resourcesPath, "assets", "formidable.ico")
       : path.join(__dirname, "assets", "formidable.ico");
   }
-
   if (process.platform === "darwin") {
     return app.isPackaged
       ? path.join(process.resourcesPath, "assets", "formidable.icns")
       : path.join(__dirname, "assets", "formidable.icns");
   }
-
-  // Linux (use PNG)
+  // Linux (PNG)
   return app.isPackaged
     ? path.join(process.resourcesPath, "assets", "formidable.png")
     : path.join(__dirname, "assets", "formidable.png");
-})();
+}
 
+// ────────────────────────────────────────────────────────────
+// Create BrowserWindow with clamped bounds
+// ────────────────────────────────────────────────────────────
 function createWindow() {
+  // Always re-read config so we use the freshest saved bounds
+  const userConfig = configManager.loadUserConfig();
   const bounds = getSafeBounds(userConfig.window_bounds);
 
   const win = new BrowserWindow({
     ...bounds,
     backgroundColor: "#808080",
     show: false,
-    icon: iconPath,
+    icon: currentIconPath(),
+    // If you want content-size semantics, set useContentSize: true and adjust save/restore accordingly.
+    // useContentSize: true,
     additionalArguments: [
       `--appInfo=${JSON.stringify({
         name: packageJson.name,
@@ -57,9 +88,6 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
       enableRemoteModule: false,
-      // sandbox: true,
-      // webSecurity: true,
-      // allowRunningInsecureContent: false,
       preload: path.resolve(__dirname, "preload.js"),
     },
   });
@@ -76,32 +104,28 @@ function createWindow() {
     log("[Main] Set title after load:", versionedTitle);
   });
 
-  win.on("resize", () => {
-    if (!win.isMinimized() && !win.isFullScreen()) {
-      const [width, height] = win.getSize();
-      const [x, y] = win.getPosition();
-      configManager.updateUserConfig({
-        window_bounds: { width, height, x, y },
-      });
-    }
-  });
+  // Persist bounds (debounced) — replaces your old inline resize handler
+  wireWindowPersistence(win);
 
   log("[Main] Created main BrowserWindow and loaded index.html");
+  return win;
 }
 
+// ────────────────────────────────────────────────────────────
+// App lifecycle
+// ────────────────────────────────────────────────────────────
 app.whenReady().then(() => {
+  const userConfig = configManager.loadUserConfig();
   app.setName("Formidable v" + packageJson.version);
 
-  // Map your config language to a valid BCP-47 code (Chromium expects full tags like "en-US", "nl-NL")
+  // Spellchecker language mapping
   const lang = (userConfig.language || "en").toLowerCase();
   const langMap = {
     en: "en-US",
     nl: "nl-NL",
     de: "de-DE",
     fr: "fr-FR",
-    // add others if needed
   };
-
   const spellLang = langMap[lang] || langMap.en;
   session.defaultSession.setSpellCheckerLanguages([spellLang]);
 
@@ -109,18 +133,10 @@ app.whenReady().then(() => {
   const root = isPackaged ? app.getAppPath() : process.cwd();
   fileManager.setAppRoot(root);
 
-  // fileManager.setAppRoot(process.cwd());
-
   pluginManager.loadPlugins();
   registerIpcHandlers();
 
   log("[Main] App is ready. Checking environment...");
-
-  /*
-  log("[DEBUG] app.getAppPath() =", app.getAppPath());
-  log("[DEBUG] process.cwd() =", process.cwd());
-  log("[DEBUG] __dirname =", __dirname);
-  */
 
   templateManager.ensureTemplateDirectory();
   templateManager.createBasicTemplateIfMissing();
@@ -128,13 +144,27 @@ app.whenReady().then(() => {
   nodeLogger.setLoggingEnabled(!!userConfig.logging_enabled);
   nodeLogger.setWriteEnabled(!!userConfig.logging_enabled);
 
-  createWindow();
+  const win = createWindow();
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
     }
   });
+
+  // Re-validate and re-apply safe bounds when displays change
+  const applySafeBounds = debounce(() => {
+    const w = BrowserWindow.getAllWindows()[0];
+    if (!w) return;
+    const cfg = configManager.loadUserConfig();
+    const safe = getSafeBounds(cfg.window_bounds || {});
+    // If you use content-size semantics, switch to setContentBounds(safe)
+    w.setBounds(safe);
+  }, 100);
+
+  screen.on("display-added", applySafeBounds);
+  screen.on("display-removed", applySafeBounds);
+  screen.on("display-metrics-changed", applySafeBounds);
 });
 
 app.on("window-all-closed", () => {
