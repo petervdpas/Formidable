@@ -1,18 +1,21 @@
 /* ───── Popup Panel (general-purpose) ───── */
 .popup-panel {
-  position: fixed;                 /* anchored to viewport */
-  z-index: 9999;
-  background-color: var(--popup-bg);
-  color: var(--popup-fg);
+  position: fixed;
+  z-index: 10000;
+  box-sizing: border-box;
+
+  /* key bits */
+  width: max-content;           /* grow to fit grid width */
+  height: max-content;          /* grow to fit grid height */
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 24px);
+  overflow: auto;               /* scroll if it still exceeds */
+  padding: 8px;
+
+  background: var(--input-bg, #fff);
+  color: var(--input-fg, #111);
+  border: 1px solid var(--input-border-color, #ccc);
   border-radius: 6px;
-  font-family: inherit;
-  font-size: 0.95em;
-  max-width: 420px;
-  min-width: 300px;
-  /* IMPORTANT: no chrome when not open → prevents the 0×0 “dot” */
-  padding: 0;
-  border: 0;
-  box-shadow: none;
 }
 
 /* Only when explicitly opened do we show chrome */

@@ -7,6 +7,7 @@
   --opt-fg: var(--popup-fg, var(--input-fg, #222));
   --opt-hover: var(--popup-hover, #f2f2f2);
   --opt-border: var(--popup-border, var(--input-border-color, #ccc));
+  --opt-padding: 3px;
   --opt-gap: 6px;
   --opt-radius: 6px;
 }
@@ -20,7 +21,7 @@
   background: var(--opt-bg);
   border: 1px solid var(--opt-border);
   border-radius: var(--opt-radius);
-  padding: var(--opt-gap);
+  padding: var(--opt-padding);
 
   display: grid; /* column/row templates are set inline from JS */
   gap: var(--opt-gap);
