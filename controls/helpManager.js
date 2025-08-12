@@ -3,44 +3,140 @@
 const fileManager = require("./fileManager");
 const matter = require("gray-matter");
 
-const helpCache = Object.create(null);
+const helpCache = Object.create(null); // { [lang]: { [id]: HelpTopic } }
 
 function getHelpFolder() {
   return fileManager.resolvePath("help");
 }
 
-function initHelpCache() {
-  const files = fileManager.listDirectoryEntries(getHelpFolder(), { silent: true });
+function parseLangFromFilename(name) {
+  // support: index.md  |  index.nl.md  |  getting-started.en-US.md
+  const m = name.match(/^(.*)\.([a-z]{2}(?:-[A-Z]{2})?)\.md$/);
+  return m
+    ? { base: m[1], lang: m[2] }
+    : { base: name.replace(/\.md$/, ""), lang: null };
+}
 
-  files
-    .filter((entry) => entry.isFile && entry.name.endsWith(".md"))
-    .forEach((entry) => {
-      const fullPath = fileManager.resolvePath(getHelpFolder(), entry.name);
-      const raw = fileManager.loadFile(fullPath, { format: "text", silent: true });
-      const parsed = matter(raw);
-      const id = parsed.data.id || entry.name.replace(/\.md$/, "");
+function collectMarkdownEntries(dirPath) {
+  return (
+    fileManager.listDirectoryEntries(dirPath, { silent: true }) || []
+  ).filter((e) => e.isFile && e.name.endsWith(".md"));
+}
 
-      helpCache[id] = {
+function loadMd(fullPath) {
+  const raw = fileManager.loadFile(fullPath, { format: "text", silent: true });
+  return matter(raw);
+}
+
+function normalizeImageLinks(md, lang) {
+  // Prefer lang-specific folder first
+  const langPrefix   = `help/${lang}/images/`;
+
+  // Markdown image + Markdown link to images/...
+  md = md
+    .replace(/(!\[[^\]]*\]\()\s*(?:\.{0,2}\/)?images\//gi, `$1${langPrefix}`)
+    .replace(/(\[[^\]]*\]\()\s*(?:\.{0,2}\/)?images\//gi, `$1${langPrefix}`);
+
+  // Raw HTML <img src="images/...">
+  md = md.replace(/(<img[^>]*\bsrc=["'])\s*(?:\.{0,2}\/)?images\//gi, `$1${langPrefix}`);
+
+  return md;
+}
+
+/**
+ * Build a language view into cache with fallback chain:
+ * 1) help/<lang>/*.md
+ * 2) help/*.<lang>.md
+ * 3) help/*.md               (neutral default)
+ * Frontmatter may specify { id, title, order, lang } and can override filename-derived lang.
+ */
+function ensureLangLoaded(lang = "en") {
+  if (helpCache[lang]) return;
+
+  const baseDir = getHelpFolder();
+  const langDir = fileManager.resolvePath("help", lang);
+  const result = Object.create(null); // by id
+
+  // 3) Neutral files (lowest precedence)
+  for (const entry of collectMarkdownEntries(baseDir)) {
+    const { base, lang: suffix } = parseLangFromFilename(entry.name);
+    if (suffix) continue; // neutral step only
+    const fullPath = fileManager.resolvePath(baseDir, entry.name);
+    const parsed = loadMd(fullPath);
+    const id = parsed.data.id || base;
+    result[id] = {
+      id,
+      title: parsed.data.title || entry.name,
+      order: parsed.data.order ?? 999,
+      filename: fullPath,
+      content: normalizeImageLinks(parsed.content, lang),
+      data: parsed.data,
+      lang: parsed.data.lang || null,
+      _source: "neutral-root",
+    };
+  }
+
+  // 2) Root files with .<lang>.md (override neutral)
+  for (const entry of collectMarkdownEntries(baseDir)) {
+    const { base, lang: suffix } = parseLangFromFilename(entry.name);
+    if (!suffix || suffix !== lang) continue;
+    const fullPath = fileManager.resolvePath(baseDir, entry.name);
+    const parsed = loadMd(fullPath);
+    const id = parsed.data.id || base;
+    result[id] = {
+      id,
+      title: parsed.data.title || entry.name,
+      order: parsed.data.order ?? result[id]?.order ?? 999,
+      filename: fullPath,
+      content: normalizeImageLinks(parsed.content, lang),
+      data: parsed.data,
+      lang: parsed.data.lang || suffix,
+      _source: "root-suffixed",
+    };
+  }
+
+  // 1) Files in help/<lang>/ (highest precedence)
+  if (fileManager.fileExists(langDir)) {
+    const files = collectMarkdownEntries(langDir);
+    for (const entry of files) {
+      const { base } = parseLangFromFilename(entry.name); // don’t re-parse lang; folder defines it
+      const fullPath = fileManager.resolvePath(langDir, entry.name);
+      const parsed = loadMd(fullPath);
+      const id = parsed.data.id || base;
+      result[id] = {
         id,
         title: parsed.data.title || entry.name,
-        order: parsed.data.order || 999,
-        filename: entry.name,
-        content: parsed.content,
+        order: parsed.data.order ?? result[id]?.order ?? 999,
+        filename: fullPath,
+        content: normalizeImageLinks(parsed.content, lang),
         data: parsed.data,
+        lang: parsed.data.lang || lang,
+        _source: "lang-folder",
       };
-    });
+    }
+  }
+
+  // Normalize to a sorted array when listing
+  helpCache[lang] = result;
 }
 
-function listHelpTopics() {
-  return Object.values(helpCache).sort((a, b) => a.order - b.order);
+function listHelpTopics(lang = "en") {
+  ensureLangLoaded(lang);
+  return Object.values(helpCache[lang]).sort((a, b) => a.order - b.order);
 }
 
-function getHelpTopic(id) {
-  return helpCache[id] || null;
+function getHelpTopic(id, lang = "en") {
+  ensureLangLoaded(lang);
+  if (helpCache[lang][id]) return helpCache[lang][id];
+  // Fallback: try neutral index when specific id missing
+  if (helpCache[lang]["index"]) return helpCache[lang]["index"];
+  // As a last resort, try English cache
+  if (lang !== "en") {
+    ensureLangLoaded("en");
+    return helpCache["en"][id] || helpCache["en"]["index"] || null;
+  }
+  return null;
 }
-
-// Auto-initialize
-initHelpCache();
 
 module.exports = {
   listHelpTopics,

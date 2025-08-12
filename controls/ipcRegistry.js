@@ -171,8 +171,12 @@ function registerIpcHandlers() {
   registerIpc("get-plugin-ipc-map", () => pluginManager.getPluginIpcMap());
 
   // Help
-  registerIpc("list-help-topics", () => helpManager.listHelpTopics());
-  registerIpc("get-help-topic", (e, id) => helpManager.getHelpTopic(id));
+  registerIpc("list-help-topics", (e, lang) =>
+    helpManager.listHelpTopics(lang)
+  );
+  registerIpc("get-help-topic", (e, { id, lang }) =>
+    helpManager.getHelpTopic(id, lang)
+  );
 
   // Git
   registerIpc("is-git-repo", (e, folder) => gitManager.isGitRepo(folder));

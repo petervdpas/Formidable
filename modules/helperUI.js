@@ -34,11 +34,12 @@ export async function renderHelp() {
     const buttons = container.querySelectorAll(".help-nav-btn");
 
     async function loadTopic(id) {
-      const topic = await EventBus.emitWithResponse("help:get", id);
+      const topic = await EventBus.emitWithResponse("help:get", id); // <- handler already wraps it
       const html = await EventBus.emitWithResponse(
         "transform:html",
         topic.content
       );
+
       contentEl.innerHTML = html;
 
       applyExternalLinkBehavior(contentEl);

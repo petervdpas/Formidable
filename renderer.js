@@ -96,13 +96,14 @@ window.addEventListener("DOMContentLoaded", async () => {
   // ── Menu ──
   buildMenu("app-menu", handleMenuAction);
   initStatusHandler("status-bar");
+
   initStatusButtonsHandler("status-bar-buttons");
 
   addStatusButton(
     createStatusCharPickerButtonConfig((e, btnEl) => {
       // 1) Make the trigger keep focus on the editor and capture caret BEFORE popup opens
       SelectionStore.attachTriggerKeepingFocus(btnEl, () => {
-        /* noop */
+        // noop
       });
 
       // 2) Build + show popup anchored to the button

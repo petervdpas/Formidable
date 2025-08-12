@@ -2,11 +2,22 @@
 
 import { EventBus } from "../eventBus.js";
 
+async function getUiLanguage() {
+  try {
+    const cfg = await window.api.config.loadUserConfig();
+    return (cfg && cfg.language) || "en";
+  } catch {
+    return "en";
+  }
+}
+
 export async function handleHelpList() {
-  return await window.api.help.listHelpTopics();
+  const lang = await getUiLanguage();
+  return await window.api.help.listHelpTopics(lang);
 }
 
 export async function handleHelpGet(id) {
   if (typeof id !== "string") return null;
-  return await window.api.help.getHelpTopic(id);
+  const lang = await getUiLanguage();
+  return await window.api.help.getHelpTopic({ id, lang });
 }
