@@ -8,6 +8,8 @@
   --input-icon-bg: #1d1d1d;
   --accent-color: #007bff;
   --hover-bg: #f0f0f0;
+  --badge-bg: #f6f6f6;
+  --muted-fg: #666;
 
   /* ───── Range Slider ───── */
   --range-track-height: 6px;
@@ -32,7 +34,8 @@
   --status-error-color: #e53935;
 
   /* ───── Generic Shadows ───── */
-  --generic-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) --generic-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --generic-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --generic-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
   --generic-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.35);
   --generic-shadow-active: inset 0 1px 2px rgba(0, 0, 0, 0.4);
 

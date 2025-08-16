@@ -60,6 +60,19 @@ export function setupProfileModal() {
 }
 
 export function setupSettingsModal() {
+  function refreshProfileBadge() {
+    const el = document.getElementById("current-profile");
+    if (!el) return;
+
+    EventBus.emit("config:profile:current", {
+      callback: (filename) => {
+        const label = filename || "user.json";
+        el.textContent = label;
+        el.title = label;
+      },
+    });
+  }
+
   const modal = setupModal("settings-modal", {
     closeBtn: "settings-close",
     escToClose: true,
@@ -99,6 +112,8 @@ export function setupSettingsModal() {
           });
           injectButton.appendChild(btn);
         }
+
+        refreshProfileBadge();
 
         const ok = await renderSettings();
         if (!ok) {
