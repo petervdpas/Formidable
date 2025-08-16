@@ -54,9 +54,9 @@ export function createListManager({
   }
 
   // Static part: filter wrapper
-  const filterWrapper = document.createElement("div");
-  filterWrapper.className = "list-filter-wrapper";
-  container.appendChild(filterWrapper);
+  //const filterWrapper = document.createElement("div");
+  //filterWrapper.className = "list-filter-wrapper";
+  //container.appendChild(filterWrapper);
 
   // Dynamic part: list contents
   const listWrapper = document.createElement("div");
@@ -64,8 +64,18 @@ export function createListManager({
   container.appendChild(listWrapper);
 
   // Inject static filter UI if provided
+  let filterWrapper = null;
+  const ensureFilterWrapper = () => {
+    if (!filterWrapper) {
+      filterWrapper = document.createElement("div");
+      filterWrapper.className = "list-filter-wrapper";
+      container.insertBefore(filterWrapper, listWrapper); // boven de lijst
+    }
+    return filterWrapper;
+  };
+
   if (filterUI instanceof HTMLElement) {
-    filterWrapper.appendChild(filterUI);
+    ensureFilterWrapper().appendChild(filterUI);
   }
 
   let fullList = [];
@@ -83,7 +93,7 @@ export function createListManager({
     } catch (err) {
       listWrapper.innerHTML =
         "<div class='empty-message'>Error loading list.</div>";
-        
+
       EventBus.emit("status:update", {
         message: "status.error.loading.list",
         languageKey: "status.error.loading.list",
@@ -185,12 +195,12 @@ export function createListManager({
     filterItems: (fn) => renderList(fn),
     injectFilterControl: (node) => {
       if (node instanceof HTMLElement) {
-        filterWrapper.appendChild(node);
+        ensureFilterWrapper().appendChild(node);
       }
     },
     getItemCount: () => fullList.length,
     getFilteredCount: () => {
       return listWrapper.querySelectorAll(`.${itemClass}`).length;
-    }
+    },
   };
 }

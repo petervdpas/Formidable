@@ -2,31 +2,54 @@
 
 import { EventBus } from "./eventBus.js";
 import { createListManager } from "../utils/listUtils.js";
+import { createFormRowInput } from "../utils/elementBuilders.js";
 import { createProfileAddButton } from "./uiButtons.js";
 import { makePill } from "../utils/domUtils.js";
 import { t } from "../utils/i18n.js";
 
+async function createOrSwitchProfileByName(name) {
+  const valid = /^[a-z0-9-]+\.json$/.test(name);
+  if (!valid) {
+    EventBus.emit("ui:toast", {
+      languageKey: "toast.profile.invalidName",
+      variant: "error",
+    });
+    return false;
+  }
+
+  const fullPath = await window.api.system.resolvePath("config", name);
+  const exists = await window.api.system.fileExists(fullPath);
+  if (exists) {
+    EventBus.emit("ui:toast", {
+      languageKey: "toast.profile.exists",
+      variant: "warning",
+    });
+    return false;
+  }
+
+  const success = await new Promise((resolve) => {
+    EventBus.emit("config:profiles:switch", {
+      filename: name,
+      callback: resolve,
+    });
+  });
+
+  if (!success) {
+    EventBus.emit("ui:toast", {
+      languageKey: "toast.profile.switchFailed",
+      variant: "error",
+    });
+    return false;
+  }
+
+  return true;
+}
+
 export function createProfileListManager({ currentProfile } = {}) {
-  // Build input + button row (but don’t attach it yet)
-  const addNewRow = document.createElement("div");
-  addNewRow.className = "modal-form-row tight-gap";
-
-  const label = document.createElement("label");
-  label.setAttribute("for", "new-profile-name");
-  label.textContent = t("modal.profile.label.newProfile");
-
-  const input = document.createElement("input");
-  input.id = "new-profile-name";
-  input.type = "text";
-  input.placeholder = t("modal.profile.placeholder.newProfile");
-
-  const button = createProfileAddButton(async () => {
-    const name = input.value.trim();
-
-    // Validation: lowercase letters, numbers, hyphens, ends with .json
-    const valid = /^[a-z0-9-]+\.json$/.test(name);
-
-    if (!valid) {
+  const addBtn = createProfileAddButton(async () => {
+    const inputEl = document.getElementById("new-profile-name");
+    const name = (inputEl?.value || "").trim();
+    if (!name) {
       EventBus.emit("ui:toast", {
         languageKey: "toast.profile.invalidName",
         variant: "error",
@@ -34,37 +57,20 @@ export function createProfileListManager({ currentProfile } = {}) {
       return;
     }
 
-    const fullPath = await window.api.system.resolvePath("config", name);
-    const exists = await window.api.system.fileExists(fullPath);
-
-    if (exists) {
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.profile.exists",
-        variant: "warning",
-      });
-      return;
-    }
-
-    const success = await new Promise((resolve) => {
-      EventBus.emit("config:profiles:switch", {
-        filename: name,
-        callback: resolve,
-      });
-    });
-
-    if (success) {
-      window.electron.window.reload();
-    } else {
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.profile.switchFailed",
-        variant: "error",
-      });
-    }
+    const ok = await createOrSwitchProfileByName(name);
+    if (ok) window.electron.window.reload();
   });
 
-  addNewRow.appendChild(label);
-  addNewRow.appendChild(input);
-  addNewRow.appendChild(button);
+  const addNewRow = createFormRowInput({
+    id: "new-profile-name",
+    labelOrKey: "modal.profile.label.newProfile",
+    value: "",
+    placeholder: t("modal.profile.placeholder.newProfile"),
+    type: "text",
+    configKey: "new-profile-name",
+    i18nEnabled: true,
+    append: addBtn, // ← builder will place this next to the input
+  });
 
   const listManager = createListManager({
     elementId: "profile-list",

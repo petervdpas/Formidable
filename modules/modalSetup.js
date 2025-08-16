@@ -29,7 +29,7 @@ export function setupProfileModal() {
     closeBtn: "profile-close",
     escToClose: true,
     backdropClick: true,
-    width: "30em",
+    width: "36em",
     height: "auto",
     onOpen: async () => {
       const container = document.getElementById("profile-body");

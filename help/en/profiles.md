@@ -6,61 +6,66 @@ order: 3
 
 ## User Profiles
 
-Formidable allows you to create and switch between multiple **user profiles**, each with its own configuration (`author`, `theme`, `context folder`, etc.). This makes it easy to tailor the environment for different users or use cases.
+Formidable supports multiple **user profiles**, each stored as a separate `.json` configuration file.  
+Profiles allow you to customize the environment per user or use case (e.g. author info, theme, context folder).
 
 ---
 
 ### Creating a Profile
 
-To create a new profile:
-
-1. Select **`Config → Switch Profile...`** from the main menu.
-2. Enter a profile name like `jack.json` (include the `.json` extension).
+1. Open **`Config ⇨ Switch Profile...`** from the main menu.  
+2. Enter a new profile name such as `jack.json` (always include the `.json` extension).  
 3. Click **Create**.
 
 ![Create New Profile](images/profile-switch-new.png)
 
-Once created, it's automatically activated, and you can start configuring by editing the [settings](#settings).
+> Once created, the new profile is immediately active. You can then configure it through the [Settings](#settings).
 
 ---
 
 ### Switching Profiles
 
-To switch between existing profiles:
+To change between existing profiles:
 
-1. Open the **Switch User Profile** modal by using the menu **`Config → Switch Profile...`**.
+1. Open **`Config ⇨ Switch Profile...`**.  
 2. Click on the profile you want to activate.
 
-Your settings will update immediately to reflect the selected profile.
+The app instantly reloads with that profile’s configuration.
 
 ![Choose Profile](images/profile-switch-added.png)
+
+> 💡 The profile list shows the configured **Author Name**. If not set, it defaults to `unknown`.
 
 ---
 
 ### Editing Profile Settings
 
-After switching, open **[Settings...](#settings)** from the `Config` menu to configure options specific to that profile.
+After switching, open **`Config ⇨ Settings...`** to edit details for the active profile.
 
-Examples:
-
-- Set author name/email.
-- Enable Git, logging, or plugins.
-- Choose dark mode or icon buttons.
+The active profile filename (e.g. `peter.json`) is always shown at the top of the Settings window:
 
 ![Edit Profile Settings](images/profile-switch-edit-settings.png)
 
-Changes are stored in the active profile file (e.g. `user.json`, `jack.json`, etc.).
+You can configure, for example:
+
+- Author name and email  
+- Language preference  
+- Dark mode, icons, or display options  
+- Git, logging, or plugin settings  
+
+All changes are saved back into the active profile file.
 
 ---
 
 ### Profile Files
 
-All profiles are stored as `.json` files in the `config/` folder within your app directory.  
-You can back them up, share them, or version them with Git.
+- Profiles are stored as `.json` files inside the `config/` folder of your app.  
+- They can be backed up, shared, or version-controlled with Git.  
+- Common examples: `user.json`, `jack.json`, `peter.json`.
 
 ---
 
 ### Related Topics
 
-- [Settings](#settings)
+- [Settings](#settings)  
 - [Templates](#templates)

@@ -37,7 +37,7 @@ export function createProfileAddButton(onClick) {
   return createButton({
     text: t("standard.create"),
     i18nKey: "standard.create",
-    className: "btn-info btn-input-height",
+    className: "btn-info",
     identifier: "create-profile",
     onClick,
   });
