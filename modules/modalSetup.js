@@ -37,12 +37,12 @@ export function setupProfileModal() {
 
       container.innerHTML = `<div id="profile-list"></div>`;
 
-      const manager = createProfileListManager();
-      await manager.reloadList();
-
       const currentProfile = await new Promise((resolve) => {
         EventBus.emit("config:profile:current", { callback: resolve });
       });
+
+      const manager = createProfileListManager({ currentProfile });
+      await manager.reloadList();
 
       EventBus.emit("logging:default", [
         `[ProfileModal] Current profile: ${currentProfile || "None"}`,

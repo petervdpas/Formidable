@@ -633,3 +633,52 @@ export function createSortable(
     },
   });
 }
+
+/**
+ * Make a reusable "pilled-badge" (chip).
+ * No dependencies, pure DOM.
+ *
+ * @param {string} text
+ * @param {Object} [opts]
+ * @param {"neutral"|"primary"|"info"|"success"|"warn"|"error"} [opts.variant="neutral"]
+ * @param {"sm"|"lg"|""} [opts.size="sm"]
+ * @param {boolean} [opts.solid=false]
+ * @param {boolean} [opts.outline=false]
+ * @param {boolean} [opts.dot=false]
+ * @param {boolean} [opts.clickable=false]
+ * @param {string}  [opts.title=""]
+ * @returns {HTMLSpanElement}
+ */
+export function makePill(
+  text,
+  {
+    variant = "neutral",
+    size = "sm",
+    solid = false,
+    outline = false,
+    dot = false,
+    clickable = false,
+    title = "",
+  } = {}
+) {
+  const el = document.createElement("span");
+  el.className = [
+    "pilled-badge",
+    variant && `pilled-badge--${variant}`,
+    size === "sm"
+      ? "pilled-badge--sm"
+      : size === "lg"
+      ? "pilled-badge--lg"
+      : "",
+    solid && "pilled-badge--solid",
+    outline && "pilled-badge--outline",
+    dot && "pilled-badge--dot",
+    clickable && "pilled-badge--clickable",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  el.textContent = text;
+  if (title) el.title = title;
+  return el;
+}

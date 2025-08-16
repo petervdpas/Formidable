@@ -3,9 +3,10 @@
 import { EventBus } from "./eventBus.js";
 import { createListManager } from "../utils/listUtils.js";
 import { createProfileAddButton } from "./uiButtons.js";
+import { makePill } from "../utils/domUtils.js";
 import { t } from "../utils/i18n.js";
 
-export function createProfileListManager() {
+export function createProfileListManager({ currentProfile } = {}) {
   // Build input + button row (but don’t attach it yet)
   const addNewRow = document.createElement("div");
   addNewRow.className = "modal-form-row tight-gap";
@@ -93,18 +94,30 @@ export function createProfileListManager() {
     },
 
     renderItemExtra: async ({ itemNode, rawData }) => {
-      const subtitle = document.createElement("small");
-      subtitle.textContent = `[${rawData.value}]`;
+      const full =
+        (rawData && (rawData.value ?? rawData.name)) ||
+        (typeof rawData === "string" ? rawData : "") ||
+        "";
 
-      Object.assign(subtitle.style, {
-        opacity: "0.5",
-        fontSize: "0.75em",
-        marginLeft: "0.5em",
-        fontStyle: "italic",
-        pointerEvents: "none",
+      const base = full.split(/[\\/]/).pop() || full;
+
+      const isCurrent =
+        rawData?.name === currentProfile ||
+        base === currentProfile ||
+        full === currentProfile;
+
+      const pill = makePill(base, {
+        size: "sm",
+        variant: isCurrent ? "success" : "info",
+        solid: isCurrent,
+        outline: !isCurrent,
+        dot: false,
+        title: full,
       });
 
-      itemNode.appendChild(subtitle);
+      pill.style.marginLeft = "0.5em";
+
+      itemNode.appendChild(pill);
     },
 
     emptyMessage: t("special.noProfilesFound"),
