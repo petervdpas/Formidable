@@ -14,7 +14,7 @@ To get started with Formidable, follow these steps:
 
 1. **Installation**: Download and install the latest Formidable installer from [the official website or repository](https://github.com/petervdpas/Formidable/releases).
 2. **Launch Formidable**: Open the application after installation.
-3. **Change your settings**: [Configure your settings](#settings) by navigating to **`Config → Settings...`** in the main menu. Here you can set your author identity, enable plugins, and adjust display options.
+3. **Change your settings**: [Configure your settings](#settings) by navigating to **`Config ⇨ Settings...`** in the main menu. Here you can set your author identity, enable plugins, and adjust display options.
 4. **Create a New [Template](#templates)**: Use the intuitive interface to create a new template by creating fields and arranging them as needed.
 5. **Switch Context**: Use the context switcher to change between template creation or storage, allowing you to manage multiple forms easily.
 6. **Fill out a Form**: Once your template is ready, you can fill out a form using the fields you created.

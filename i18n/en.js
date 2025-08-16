@@ -371,7 +371,7 @@ export default {
   "modal.settings.icon.buttons": "Icon-based Buttons",
   "modal.settings.context.folder": "Context Directory",
   "modal.settings.git.root": "Git Root Directory",
-  "modal.settings.git.enabled": "Enable Git",
+  "modal.settings.git.enabled": "Use Git Repository",
   "modal.settings.internal.enabled": "Internal Server",
   "modal.settings.internal.port": "Listening Port",
   "modal.settings.advanced.plugins.enabled": "Enable Plugins",

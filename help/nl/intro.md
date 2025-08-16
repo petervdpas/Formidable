@@ -14,7 +14,7 @@ Om aan de slag te gaan met Formidable, volg je deze stappen:
 
 1. **Installatie**: Download en installeer de nieuwste Formidable-installer via [de officiële website of repository](https://github.com/petervdpas/Formidable/releases).
 2. **Start Formidable**: Open de applicatie na installatie.
-3. **Wijzig je instellingen**: [Configureer je instellingen](#settings) door in het hoofdmenu naar **`Config → Settings...`** te gaan. Hier kun je je auteursgegevens instellen, plugins inschakelen en weergave-opties aanpassen.
+3. **Wijzig je instellingen**: [Configureer je instellingen](#settings) door in het hoofdmenu naar **`Config ⇨ Settings...`** te gaan. Hier kun je je auteursgegevens instellen, plugins inschakelen en weergave-opties aanpassen.
 4. **Maak een nieuw [Template](#templates)**: Gebruik de intuïtieve interface om een nieuwe template te maken door velden te creëren en deze naar wens te ordenen.
 5. **Wissel context**: Gebruik de contextschakelaar om te wisselen tussen template-modus en opslag-modus, zodat je eenvoudig meerdere formulieren kunt beheren.
 6. **Vul een formulier in**: Zodra je template klaar is, kun je een formulier invullen met de aangemaakte velden.

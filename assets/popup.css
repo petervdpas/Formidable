@@ -4,35 +4,34 @@
   z-index: 10000;
   box-sizing: border-box;
 
-  /* key bits */
-  width: max-content;           /* grow to fit grid width */
-  height: max-content;          /* grow to fit grid height */
+  /* autosize when it has content */
+  width: max-content;
+  height: max-content;
   max-width: calc(100vw - 24px);
   max-height: calc(100vh - 24px);
-  overflow: auto;               /* scroll if it still exceeds */
-  padding: 8px;
+  overflow: auto;
 
+  /* IMPORTANT: no chrome by default -> prevents 18×18 dot */
+  padding: 0;
+  border: 0;
+  box-shadow: none;
   background: var(--input-bg, #fff);
   color: var(--input-fg, #111);
-  border: 1px solid var(--input-border-color, #ccc);
   border-radius: 6px;
+
+  /* just in case some global style leaks */
+  list-style: none;
 }
 
-/* Only when explicitly opened do we show chrome */
+/* Only show chrome when visible */
 .popup-panel.popup-visible {
-  padding: 4px;
-  border: 1px solid var(--popup-border);
+  padding: 8px; /* or 4px if you prefer */
+  border: 1px solid var(--input-border-color, #ccc);
   box-shadow: var(--generic-box-shadow);
-  opacity: 1;
 }
 
-/* Support explicit hidden state */
-.popup-hidden {
-  display: none !important;
-  opacity: 0;
-}
-
-/* Auto-hide empty containers (extra safety) */
+/* Hidden state + safety */
+.popup-hidden { display: none !important; }
 .popup-panel:empty { display: none !important; }
 
 /* Status button popup: natural autosizing */

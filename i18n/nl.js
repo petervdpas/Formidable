@@ -391,7 +391,7 @@ export default {
   "modal.settings.icon.buttons": "Pictogram knoppen",
   "modal.settings.context.folder": "Contextmap",
   "modal.settings.git.root": "Git-rootmap",
-  "modal.settings.git.enabled": "Git inschakelen",
+  "modal.settings.git.enabled": "Gebruik Git-repository",
   "modal.settings.internal.enabled": "Interne Server",
   "modal.settings.internal.port": "Luisterpoort",
   "modal.settings.advanced.plugins.enabled": "Plugins inschakelen",
