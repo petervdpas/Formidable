@@ -21,7 +21,7 @@ h3 {
   margin-block-end: .4em;
   margin-inline-start: 0px;
   margin-inline-end: 0px;
-  padding-left: .75rem;
+  padding-left: 0; /* .75rem; */
   /* room for accent bar */
   font-weight: 700;
   font-size: 14pt;
@@ -29,6 +29,7 @@ h3 {
   color: var(--text-color, #111);
 }
 
+/* Accent bar 
 h3::before {
   content: "";
   position: absolute;
@@ -41,7 +42,7 @@ h3::before {
   box-shadow: var(--generic-shadow, 0 1px 2px rgba(0, 0, 0, .25));
   opacity: .95;
 }
-
+*/
 
 .image-modal-overlay {
   position: fixed;
