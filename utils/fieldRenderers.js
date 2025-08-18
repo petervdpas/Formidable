@@ -168,12 +168,13 @@ export async function renderBooleanField(field, value = "") {
   const v = resolveValue(field, value);
   const normalized = String(v).trim().toLowerCase();
   const isChecked = normalized === "true" || normalized === "1";
+  const onFlip = typeof field.onFlip === "function" ? field.onFlip : null;
 
   const { element: toggle } = buildSwitchElement({
     id: field.key,
     name: field.key,
     checked: isChecked,
-    onFlip: null,
+    onFlip: onFlip,
     trailingValues,
   });
 

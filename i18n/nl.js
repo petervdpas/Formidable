@@ -136,7 +136,7 @@ export default {
   "toast.key.required": "Sleutel mag niet leeg zijn.",
   "toast.folder.required": "Folder naam is vereist.",
   "toast.dragging.item.collapse": "Vouw het item samen voordat je het sleept.",
-  "toast.markdown.saved": "Markdown opgeslagen in {0}.",
+  "toast.markdown.saved": "Markdown opgeslagen in: {0}",
 
   "toast.plugin.created": "Plugin aangemaakt.",
   "toast.plugin.delete.failed": "Verwijderen van plugin mislukt.",

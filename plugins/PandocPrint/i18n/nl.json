@@ -10,6 +10,8 @@
   "plugin.toast.folder.failed": "Kan markdown-map niet leegmaken: {0}",
   "plugin.toast.pdf.success": "PDF-generatie succesvol uitgevoerd",
   "plugin.toast.pdf.failed": "PDF-generatie mislukt",
+  "plugin.toast.missing.selected.template": "Ontbrekende geselecteerde sjabloon",
+  "plugin.toast.missing.selected.storage": "Ontbrekend geselecteerd opslagbestand",
   "plugin.info.hint": "Converteer Markdown naar PDF met behulp van Pandoc. Stel per platform instellingen in. Gebruik placeholders zoals {InputPath}, {OutputPath}, enz. in je opdrachtregel.",
 
   "plugin.field.platform": "Platform",

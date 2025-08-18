@@ -124,7 +124,7 @@ export default {
   "toast.key.required": "Key cannot be empty.",
   "toast.folder.required": "Folder name is required.",
   "toast.dragging.item.collapse": "Collapse the item before dragging.",
-  "toast.markdown.saved": "Saved markdown to {0}.",
+  "toast.markdown.saved": "Saved markdown to: {0}",
 
   "toast.plugin.created": "Plugin created.",
   "toast.plugin.delete.failed": "Failed to delete plugin.",

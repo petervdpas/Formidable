@@ -10,6 +10,8 @@
   "plugin.toast.folder.failed": "Failed to clear markdown folder: {0}",
   "plugin.toast.pdf.success": "PDF generation executed successfully",
   "plugin.toast.pdf.failed": "PDF generation failed",
+  "plugin.toast.missing.selected.template": "Missing selected template",
+  "plugin.toast.missing.selected.storage": "Missing selected storage",
   "plugin.info.hint": "Convert Markdown to PDF using Pandoc. Configure settings per platform. Use placeholders like {InputPath}, {OutputPath}, etc. in your command.",
 
   "plugin.field.platform": "Platform",

@@ -11,6 +11,8 @@ import {
 import {
   getUserConfig as baseGetUserConfig,
   saveUserConfig,
+  reloadUserConfig,
+  invalidateUserConfig,
 } from "./configUtil.js";
 
 // Plugin-specific allowed keys
@@ -38,7 +40,7 @@ export async function getUserConfig(key) {
   return baseGetUserConfig(key, { allowedKeys: pluginAllowedKeys });
 }
 
-export { saveUserConfig };
+export { saveUserConfig, reloadUserConfig, invalidateUserConfig };
 
 let pluginTranslationCache = {};
 

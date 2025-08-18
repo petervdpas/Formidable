@@ -1,5 +1,39 @@
 // plugins/PandocPrint/plugin.js
 
+async function getMarkdownPath(plugin, pluginName, t) {
+
+  await plugin.invalidateConfig();
+
+  const tmpl = await plugin.getConfig("selected_template");
+  const dfile = await plugin.getConfig("selected_data_file");
+
+  if (!tmpl || tmpl === "") {
+    emit("ui:toast", {
+      message: t("plugin.toast.missing.selected.template"),
+      variant: "error",
+    });
+    return;
+  }
+  if (!dfile || dfile === "") {
+    emit("ui:toast", {
+      message: t("plugin.toast.missing.selected.storage"),
+      variant: "error",
+    });
+    return;
+  }
+
+  const opts = {
+    selectedTemplate: tmpl,
+    selectedDataFile: dfile,
+    outputDir: `plugins/${pluginName}/markdown`,
+    filename: null,
+    stripFrontmatter: false,
+    showToast: true,
+  };
+
+  return await plugin.saveMarkdownTo(opts);
+}
+
 export async function run() {
   const { plugin, button, modal, dom, string } = window.FGA;
   const pluginName = "PandocPrint";
@@ -37,13 +71,6 @@ export async function run() {
     resizable: false,
 
     prepareBody: async (modalEl, bodyEl) => {
-      const [contextFolder, selectedTemplate, selectedDataFile] =
-        await Promise.all([
-          plugin.getConfig("context_folder"),
-          plugin.getConfig("selected_template"),
-          plugin.getConfig("selected_data_file"),
-        ]);
-
       let settings = await plugin.getSettings(pluginName);
       if (!settings || typeof settings !== "object") settings = {};
       settings.platform ??= "linux";
@@ -63,6 +90,13 @@ export async function run() {
           label: t("plugin.field.useFormidable"),
           wrapper: "modal-form-row switch-row",
           fieldRenderer: "renderBooleanField",
+          onFlip: async (isChecked) => {
+            if (!isChecked) return;
+            const path = await getMarkdownPath(plugin, pluginName, t);
+            if (path) {
+              fieldManager.setValue("InputPath", path);
+            }
+          },
         },
         {
           key: "ShellCommand",
@@ -203,19 +237,9 @@ export async function run() {
         text: t("plugin.button.render.markdown"),
         className: "btn-info",
         onClick: async () => {
-          // Set InputPath from Formidable-generated Markdown if applicable
-          if (fieldManager.getValue("UseFormidable")) {
-            const markdownPath = await plugin.saveMarkdownTo({
-              selectedTemplate,
-              selectedDataFile,
-              outputDir: `plugins/${pluginName}/markdown`,
-              filename: null,
-              showToast: true,
-            });
-
-            if (markdownPath) {
-              fieldManager.setValue("InputPath", markdownPath);
-            }
+          const markdownPath = await getMarkdownPath(plugin, pluginName, t);
+          if (fieldManager.getValue("UseFormidable") && markdownPath) {
+            fieldManager.setValue("InputPath", markdownPath);
           }
         },
       });
