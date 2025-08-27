@@ -114,8 +114,9 @@ export async function fieldGroupRenderer(
       container.appendChild(loopContainer);
 
       createSortable(loopList, {
-        handle: `.drag-handle.depth-${nestingDepth + 1}`,
+        handle: `.loop-handle.depth-${nestingDepth + 1}`,
         group: `loop-${loopKey}`,
+        itemSelector: ".loop-item"
       });
     } else {
       if (loopGroupKeys.has(field.key)) {
@@ -177,7 +178,7 @@ async function createLoopItem(
 
   // Drag handle
   const nestingDepth = loopKeyChain.length || 0;
-  const dragClass = `drag-handle depth-${nestingDepth}`;
+  const dragClass = `drag-handle loop-handle depth-${nestingDepth}`;
 
   const dragHandle = document.createElement("div");
   dragHandle.className = dragClass;
@@ -314,6 +315,7 @@ async function createLoopItem(
       createSortable(nestedList, {
         handle: `.drag-handle.depth-${nestedDepth}`,
         group: `loop-${nestedKey}`,
+        itemSelector: ".loop-item"
       });
 
       const addNestedButton = createAddLoopItemButton(async () => {

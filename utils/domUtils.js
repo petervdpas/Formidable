@@ -557,6 +557,7 @@ export function createSortable(
     allowDrag = false,
     itemSelector = ".loop-item",
     preventOnFilter = false,
+    innerGuard = false,
   } = {}
 ) {
   if (!container || !(container instanceof HTMLElement)) {
@@ -588,6 +589,9 @@ export function createSortable(
       const item = evt.target.closest(itemSelector);
       const fromHandle = evt.target.closest(handle);
 
+      // If this hit originated in a nested inner DnD, block early.
+      if (!fromHandle && evt.target.closest(".inner-dnd")) return true;
+
       const blocked =
         !item || !container.contains(item) || !fromHandle || !isAllowed(item);
 
@@ -616,6 +620,12 @@ export function createSortable(
     preventOnFilter,
 
     onStart: (evt) => {
+      // If this is an inner sortable, stop bubbling so parent sortables never see it
+      if (innerGuard) {
+        evt?.originalEvent?.stopPropagation?.();
+        document.body.classList.add("inner-dnd-active");
+      }
+
       const original = evt.item;
       requestAnimationFrame(() => {
         const drag = container.querySelector(".sortable-drag");
@@ -630,6 +640,13 @@ export function createSortable(
           drag.style.background = "var(--sortable-drag-bg, #ffe082)";
         }
       });
+    },
+    onEnd: (evt) => {
+      if (innerGuard) {
+        document.body.classList.remove("inner-dnd-active");
+      }
+      evt.item.style.transform = "";
+      evt.item.style.transition = "";
     },
   });
 }

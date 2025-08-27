@@ -1,6 +1,6 @@
 {
   "overwrite": true,
-  "updated": "2025-08-18T23:41:13.780Z",
+  "updated": "2025-08-27T07:41:03.334Z",
   "platform": "windows",
   "platforms": {
     "linux": {
@@ -34,10 +34,10 @@
         "value": "powershell -ExecutionPolicy Bypass -File {script} -InputPath {InputPath} -UseCurrentDate {UseCurrentDate} -TemplatePath {TemplatePath} -OutputPath {OutputPath}"
       },
       "InputPath": {
-        "value": "C:\\Projects\\documentation\\Leerplan Algemeen\\Inwerkdocument.md"
+        "value": "C:\\Projects\\Formidable\\plugins\\PandocPrint\\markdown\\aanpak-ch05.md"
       },
       "OutputPath": {
-        "value": "C:\\Projects\\documentation\\output"
+        "value": "C:\\Projects\\documentation\\output\\audit"
       },
       "TemplatePath": {
         "value": "C:\\Projects\\documentation\\Templates\\eisvogel.latex"

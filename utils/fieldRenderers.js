@@ -581,9 +581,20 @@ export async function renderListField(field, value = "") {
   wrapper.dataset.type = "list";
   wrapper.dataset.listField = field.key;
 
+  wrapper.classList.add("inner-dnd");
+  // Build a unique scope: list:<fieldKey>:<loopChain>:<uid>
+  const loopChain = Array.isArray(field.loopKey)
+    ? field.loopKey.join(".")
+    : field.loopKey || "root";
+  const scope = `list:${field.key}:${loopChain}:${crypto
+    .randomUUID()
+    .slice(0, 8)}`;
+  wrapper.dataset.dndScope = scope;
+
   // Add sortable container inside wrapper
   const sortableList = document.createElement("div");
   sortableList.className = "sortable-list";
+  sortableList.dataset.dndScope = scope;
   wrapper.appendChild(sortableList);
 
   for (const item of items) {
@@ -634,7 +645,7 @@ async function createListItem(value, options = []) {
   addContainerElement({
     parent: container,
     tag: "span",
-    className: "drag-handle",
+    className: "drag-handle list-handle",
     textContent: "↕",
   });
 
@@ -689,6 +700,15 @@ export async function renderTableField(field, value = "") {
   wrapper.className = "table-wrapper";
   wrapper.dataset.type = "table";
   wrapper.dataset.tableField = field.key;
+  wrapper.classList.add("inner-dnd");
+
+  const loopChain = Array.isArray(field.loopKey)
+    ? field.loopKey.join(".")
+    : field.loopKey || "root";
+  const scope = `table:${field.key}:${loopChain}:${crypto
+    .randomUUID()
+    .slice(0, 8)}`;
+  wrapper.dataset.dndScope = scope;
 
   const table = addContainerElement({
     parent: wrapper,
@@ -713,6 +733,7 @@ export async function renderTableField(field, value = "") {
   addContainerElement({ parent: headRow, tag: "th", textContent: "" }); // remove button header
 
   const tbody = addContainerElement({ parent: table, tag: "tbody" });
+  tbody.dataset.dndScope = scope;
 
   function createRow(values = []) {
     const tr = addContainerElement({ tag: "tr" });
@@ -722,7 +743,7 @@ export async function renderTableField(field, value = "") {
     addContainerElement({
       parent: dragTd,
       tag: "span",
-      className: "drag-handle",
+      className: "drag-handle row-handle",
       textContent: "↕", // optional visual icon
     });
 

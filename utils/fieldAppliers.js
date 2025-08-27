@@ -82,6 +82,7 @@ export function applyListField(
 
   const sortableList = listWrapper.querySelector(".sortable-list");
   const addButton = listWrapper.querySelector("button.add-list-button");
+  const scope = sortableList?.dataset?.dndScope || listWrapper?.dataset?.dndScope || `list:${key}:global`;
 
   if (!sortableList || !addButton) {
     EventBus.emit("logging:error", [
@@ -101,7 +102,7 @@ export function applyListField(
 
     // Drag handle
     const dragHandle = document.createElement("span");
-    dragHandle.className = "drag-handle";
+    dragHandle.className = "drag-handle list-handle";
     dragHandle.textContent = "☰";
     dragHandle.style.cursor = "grab";
     itemWrapper.appendChild(dragHandle);
@@ -141,10 +142,11 @@ export function applyListField(
   });
 
   createSortable(sortableList, {
-    handle: ".drag-handle",
-    group: "list-items",
+    handle: ".list-handle",
+    group: { name: scope, pull: true, put: true },
     allowDrag: true,
     itemSelector: ".list-field-item",
+    innerGuard: true,
   });
 }
 
@@ -161,6 +163,7 @@ export function applyTableField(
   if (!tableWrapper || !Array.isArray(value)) return;
 
   const tbody = tableWrapper.querySelector("tbody");
+  const scope = tbody?.dataset?.dndScope || tableWrapper?.dataset?.dndScope || `table:${key}:global`;
   tbody.innerHTML = "";
 
   value.forEach((row) => {
@@ -169,7 +172,7 @@ export function applyTableField(
     // Optional: add a drag handle in the first cell
     const handleCell = document.createElement("td");
     const dragHandle = document.createElement("span");
-    dragHandle.className = "drag-handle";
+    dragHandle.className = "drag-handle row-handle";
     dragHandle.textContent = "☰";
     dragHandle.style = "cursor: grab;";
     handleCell.appendChild(dragHandle);
@@ -199,10 +202,11 @@ export function applyTableField(
 
   // Enable drag-to-reorder on table rows
   createSortable(tbody, {
-    handle: ".drag-handle",
-    group: "table-rows",
+    handle: ".row-handle",
+    group: { name: scope, pull: true, put: true },
     allowDrag: true,
     itemSelector: "tr",
+    innerGuard: true,
   });
 }
 

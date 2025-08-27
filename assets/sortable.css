@@ -1,9 +1,11 @@
+/* ─── Base handle ─────────────────────────────── */
 .drag-handle {
   cursor: grab;
-  width: 1.5em;
-  text-align: left;
-  opacity: 0.6;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   user-select: none;
+  opacity: 0.6;
   font-size: 16px;
   font-family: system-ui, sans-serif, "Segoe UI Symbol", "Symbola", "Noto Sans Symbols";
 }
@@ -13,7 +15,43 @@
   opacity: 1;
 }
 
-/* ─── Dragged Placeholder ───────────────────────── */
+/* ─── Loop header handle ──────────────────────── */
+.loop-item-header .loop-handle {
+  text-align: left;
+  margin-right: .25rem;
+}
+
+/* ─── List item handle ───────────────────────── */
+.list-field-item .list-handle {
+  margin-right: .25rem;
+  position: static; /* override old loop rule */
+}
+
+/* ─── Table row handle ───────────────────────── */
+.dynamic-table .row-handle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  line-height: 1;
+  cursor: grab;
+  user-select: none;
+  /* kill any old absolute positioning from legacy rules */
+  position: static !important;
+  left: auto !important;
+  top: auto !important;
+}
+
+/* ─── Loop header layout ─────────────────────── */
+.loop-item-header {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+/* ─── Dragged Placeholder ────────────────────── */
 .sortable-ghost {
   display: flex;
   justify-content: space-between;
@@ -29,32 +67,17 @@
   pointer-events: none;
 }
 
-/* ─── Chosen Element ───────────────────────────── */
+/* ─── Chosen Element ─────────────────────────── */
 .sortable-chosen {
   opacity: 0.8;
   box-shadow: var(--sortable-box-shadow, 0 2px 6px rgba(0, 0, 0, 0.2));
 }
 
-/* ─── Element Under Cursor ─────────────────────── */
+/* ─── Element Under Cursor ───────────────────── */
 .sortable-drag {
   transform: rotate(.1deg);
   box-shadow: var(--sortable-hover-shadow, 0 4px 16px rgba(0, 0, 0, 0.25));
   z-index: 1000;
-}
-
-/* ───── Dragged Placeholder for Table Row ───── */
-
-.dynamic-table .drag-handle {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  font-size: 1.2em;
-  line-height: 1;
-  cursor: grab;
-  user-select: none;
 }
 
 /* Only apply row-friendly styles if it's a <tr> */
@@ -71,10 +94,6 @@ tr.sortable-ghost td {
   display: table-cell !important;
   border-bottom: 1px solid var(--sortable-border-color, #999);
   opacity: 0.8;
-}
-
-/* Optional: clearer spacing on ghost rows */
-tr.sortable-ghost td {
   padding: 6px 8px;
 }
 
