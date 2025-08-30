@@ -11,10 +11,20 @@ const {
 } = require("./serverDataProvider");
 const configManager = require("./configManager");
 const { log } = require("./nodeLogger");
+const miniExprParser = require("./miniExprParser");
 
 let server = null;
 let currentPort = null;
 const sockets = new Set();
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 function startInternalServer(port = 8383) {
   if (server) {
@@ -89,16 +99,48 @@ function startInternalServer(port = 8383) {
 
     // Use extended list to get titles
     const forms = await extendedListForms(templateInfo.filename);
+    const yaml = await loadTemplateYaml(templateInfo.filename);
+    const sidebarExpr = yaml?.sidebar_expression || null;
 
     const formLinks = forms
-      .map(
-        (form) =>
-          `<li class="form-picker-item"><a href="/template/${encodeURIComponent(
-            tmpl
-          )}/form/${encodeURIComponent(form.filename)}">${
-            form.title || form.filename
-          }</a></li>`
-      )
+      .map((form) => {
+        const href = `/template/${encodeURIComponent(
+          tmpl
+        )}/form/${encodeURIComponent(form.filename)}`;
+        const title = form.title || form.filename;
+
+        // Try to compute the sidebar expression text, if configured
+        let exprHtml = "";
+        if (sidebarExpr && form.expressionItems) {
+          try {
+            const result = miniExprParser.parseMiniExpr(
+              sidebarExpr,
+              form.expressionItems
+            );
+            if (result && typeof result === "object" && result.text) {
+              const classes = Array.isArray(result.classes)
+                ? result.classes.join(" ")
+                : "";
+              exprHtml = `<span class="expr-sublabel ${classes}">${escapeHtml(
+                result.text
+              )}</span>`;
+            } else if (typeof result === "string") {
+              exprHtml = `<span class="expr-sublabel">${escapeHtml(
+                result
+              )}</span>`;
+            }
+          } catch {
+            exprHtml = `<span class="expr-sublabel expr-text-red expr-italic">[EXPR ERROR]</span>`;
+          }
+        }
+
+        return `<li class="form-picker-item">
+          <a href="${href}" class="form-link">
+            <span class="form-link-title">${escapeHtml(title)}</span>
+            ${exprHtml ? `<span class="expr-wrapper">${exprHtml}</span>` : ""}
+          </a>
+        </li>`;
+      })
       .join("");
 
     const body = `

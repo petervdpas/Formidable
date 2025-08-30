@@ -104,7 +104,103 @@ function compilePageTemplate() {
       border-color: #4a90e2;
       font-weight: 600;
     }
-      
+    
+    .form-link-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+
+    ul.form-picker-list a.form-link {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2em;
+    }
+
+    .form-link-title {
+      font-weight: 500;
+    }
+
+    .expr-wrapper {
+      width: 100%;
+      font-size: 0.9em;
+    }
+
+    /* ─────────────────────────────────────────────
+      Expression Wrapper
+    ───────────────────────────────────────────── */
+    .expr-wrapper {
+      display: block;
+      width: 100%;
+    }
+
+    /* ─────────────────────────────────────────────
+      Semantic Colors
+    ───────────────────────────────────────────── */
+    .expr-text-green   { color: green; }
+    .expr-text-blue    { color: blue; }
+    .expr-text-red     { color: red; }
+    .expr-text-orange  { color: orange; }
+    .expr-text-yellow  { color: goldenrod; }
+
+    /* ─────────────────────────────────────────────
+      Neutral & Grayscale
+    ───────────────────────────────────────────── */
+    .expr-text-black      { color: black; }
+    .expr-text-white      { color: white; }
+    .expr-text-gray       { color: gray; }
+    .expr-text-darkgray   { color: #444; }
+    .expr-text-lightgray  { color: #ccc; }
+
+    /* ─────────────────────────────────────────────
+      Accent / UI Colors
+    ───────────────────────────────────────────── */
+    .expr-text-purple  { color: purple; }
+    .expr-text-pink    { color: hotpink; }
+    .expr-text-cyan    { color: cyan; }
+    .expr-text-teal    { color: teal; }
+    .expr-text-brown   { color: brown; }
+    .expr-text-gold    { color: gold; }
+    .expr-text-silver  { color: silver; }
+
+    /* ─────────────────────────────────────────────
+      Text Styles
+    ───────────────────────────────────────────── */
+    .expr-bold {
+      font-weight: bold;
+    }
+
+    .expr-italic {
+      font-style: italic;
+    }
+
+    .expr-underline {
+      text-decoration: underline;
+    }
+
+    /* ─────────────────────────────────────────────
+      Blinking Animation
+    ───────────────────────────────────────────── */
+    .expr-blinking {
+      animation: blinkingText 1.2s infinite;
+    }
+
+    @keyframes blinkingText {
+      0%   { opacity: 1; }
+      49%  { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .expr-ticker-container {
+      overflow: hidden;
+      position: relative;
+      max-width: 100%;
+    }
+
+    .expr-ticker {
+      display: inline-block;
+      white-space: nowrap;
+    }
+
     table {
       border-collapse: collapse;
       width: 100%;
