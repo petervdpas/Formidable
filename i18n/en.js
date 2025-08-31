@@ -99,7 +99,7 @@ export default {
   "menu.server.start": "Start Server",
   "menu.server.stop": "Stop Server",
   "menu.server.status": "Server Status",
-  "menu.server.browser": "Show Wiki",
+  "menu.server.browser": "Show internal Wiki",
   "menu.plugins.manager": "Plugin Manager...",
   "menu.view.devtools": "Toggle DevTools",
   "menu.help.pages": "Help Pages",

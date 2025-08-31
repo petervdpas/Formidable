@@ -110,7 +110,7 @@ export default {
   "menu.server.start": "Start server",
   "menu.server.stop": "Stop server",
   "menu.server.status": "Serverstatus",
-  "menu.server.browser": "Bekijk Wiki",
+  "menu.server.browser": "Bekijk interne Wiki",
   "menu.plugins.manager": "Pluginbeheer...",
   "menu.view.reload": "Herladen",
   "menu.view.devtools": "Ontwikkelaarstools",
