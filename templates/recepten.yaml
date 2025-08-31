@@ -83,7 +83,7 @@ markdown_template: >-
 
   {{/loop}}
 sidebar_expression: >-
-  [ tickertape | { text: tickertape, classes: ["expr-text-white", "expr-bold",
+  [ tickertape | { text: tickertape, classes: ["expr-text-yellow", "expr-bold",
   "expr-ticker"] } ]
 enable_collection: false
 fields:

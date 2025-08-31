@@ -108,16 +108,25 @@ export function highlightAndClickForm(entry, delay = 100) {
 export function applyExternalLinkBehavior(container) {
   if (!container) return;
 
-  container.querySelectorAll("a[href]").forEach((a) => {
-    const url = a.getAttribute("href");
-    if (!url || url.startsWith("#") || url.startsWith("javascript:")) return;
+  container.querySelectorAll('a[href]').forEach((a) => {
+    const url = a.getAttribute('href');
+    if (!url || url.startsWith('#') || url.startsWith('javascript:')) return;
 
-    a.setAttribute("target", "_blank");
-    a.setAttribute("rel", "noopener");
+    // Keep old UX: always open a new window visually
+    a.setAttribute('target', '_blank');
+    a.setAttribute('rel', 'noopener noreferrer'); // small hardening
 
-    a.addEventListener("click", (e) => {
+    // Optional override: <a data-open="tab" href="...">...</a>
+    const variant = a.dataset.open === 'tab' ? 'tab' : undefined;
+
+    a.addEventListener('click', (e) => {
       e.preventDefault();
-      EventBus.emit("file:openExternal", { url });
+      // Back-compat: if no variant specified, emit exactly as before
+      if (variant) {
+        EventBus.emit('file:openExternal', { url, variant });
+      } else {
+        EventBus.emit('file:openExternal', { url });
+      }
     });
   });
 }

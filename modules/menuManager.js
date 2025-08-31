@@ -20,7 +20,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
     return;
   }
 
-  cachedConfig = cachedConfig || await reloadUserConfig();
+  cachedConfig = cachedConfig || (await reloadUserConfig());
 
   // Reset plugin map
   pluginMap.clear();
@@ -142,6 +142,11 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
     createMenuGroup(t("standard.help"), [
       { label: "menu.help.pages", i18n: true, action: "open-help" },
       { label: "menu.help.about", i18n: true, action: "open-about" },
+      {
+        label: "menu.help.formidable.tools",
+        i18n: true,
+        action: "open-formidable-tools",
+      },
     ]),
     createContextToggleItem()
   );
@@ -427,7 +432,7 @@ export async function handleMenuAction(action) {
           if (server.running) {
             const port = server.port || 8383;
             const url = `http://localhost:${port}/`;
-            EventBus.emit("file:openExternal", { url });
+            EventBus.emit("file:openExternal", { url, variant: "tab" });
           } else {
             EventBus.emit("ui:toast", {
               languageKey: "toast.server.NotRunning",
@@ -444,6 +449,13 @@ export async function handleMenuAction(action) {
 
     case "open-about":
       window.openAboutModal?.();
+      break;
+
+    case "open-formidable-tools":
+      EventBus.emit("file:openExternal", {
+        url: "https://formidable.tools",
+        variant: "tab",
+      });
       break;
 
     default:

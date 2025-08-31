@@ -64,6 +64,36 @@ function registerIpcHandlers() {
 
   ipcMain.handle("shell-open-path", (e, path) => shell.openPath(path));
   ipcMain.handle("shell-open-external", (e, url) => shell.openExternal(url));
+  ipcMain.handle(
+    "system:open-external",
+    async (e, { url, variant = "external" }) => {
+      if (!url) return;
+
+      if (variant === "tab") {
+        const win = new BrowserWindow({
+          width: 1200,
+          height: 800,
+          show: true,
+          webPreferences: {
+            contextIsolation: true,
+            nodeIntegration: false,
+            sandbox: true,
+          },
+        });
+
+        win.webContents.setWindowOpenHandler(({ url }) => {
+          shell.openExternal(url);
+          return { action: "deny" };
+        });
+
+        await win.loadURL(url);
+        return;
+      }
+
+      // Default: system browser
+      await shell.openExternal(url);
+    }
+  );
   ipcMain.handle("clipboard-write", (e, text) => clipboard.writeText(text));
   ipcMain.handle("clipboard-read", () => clipboard.readText());
 

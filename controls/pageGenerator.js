@@ -76,31 +76,32 @@ function compilePageTemplate() {
       margin-bottom: 0.3em;
     }
 
-    /* Make each link fill the row */
+    /* Slightly darker tiles + crisper border */
     ul.template-list a,
     ul.form-picker-list a {
       display: block;
-      padding: 0.4em 0.6em;
-      border-radius: 4px;
+      padding: 0.6em 0.8em;
+      border-radius: 6px;
       text-decoration: none;
       color: #333;
-      background-color: #f7f7f7;
-      border: 1px solid #ddd;
-      transition: background-color 0.2s, border-color 0.2s;
+      background-color: #eceff3;     /* was #f7f7f7 */
+      border: 1px solid #cfd4da;     /* was #ddd   */
+      transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
     }
 
-    /* Hover/active effect */
+    /* Hover stays blue-tinted but with a bit more contrast */
     ul.template-list a:hover,
     ul.form-picker-list a:hover {
-      background-color: #e8f0ff;
+      background-color: #e3ebff;     /* was #e8f0ff */
       border-color: #4a90e2;
-      color: #4a90e2;
+      color: #2a5fbf;
+      box-shadow: 0 1px 0 rgba(0,0,0,.02);
     }
 
-    /* Selected state example */
+    /* Selected state a touch darker too */
     ul.template-list a.selected,
     ul.form-picker-list a.selected {
-      background-color: #dce6f9;
+      background-color: #d7e2f7;     /* was #dce6f9 */
       border-color: #4a90e2;
       font-weight: 600;
     }

@@ -129,12 +129,13 @@ export async function handleFileExists({ path }) {
   }
 }
 
-export async function handleOpenExternal({ url }) {
+export async function handleOpenExternal({ url, variant = "external" }) {
   try {
-    await window.api.system.openExternal(url);
+    // Always delegate to main; main decides how to open.
+    await window.api.system.openExternal(url, { variant });
   } catch (err) {
     EventBus.emit("logging:error", [
-      `[SystemHandler] openExternal failed for "${url}":`,
+      `[SystemHandler] openExternal failed for "${url}" (variant="${variant}"):` ,
       err,
     ]);
   }

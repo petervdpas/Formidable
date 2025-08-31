@@ -90,7 +90,7 @@ const api = {
     "delete-template",
     "validate-template",
     "get-template-descriptor",
-    "get-item-fields"
+    "get-item-fields",
   ]),
   forms: buildGroup([
     "ensure-form-dir",
@@ -125,7 +125,8 @@ const api = {
     copyFile: ({ from, to, overwrite = true }) =>
       ipcRenderer.invoke("copy-file", { from, to, overwrite }),
     fileExists: (path) => ipcRenderer.invoke("file-exists", path),
-    openExternal: (url) => ipcRenderer.invoke("shell-open-external", url),
+    openExternal: (url, options = {}) =>
+      ipcRenderer.invoke("system:open-external", { url, ...options }),
     executeCommand: (cmd) => ipcRenderer.invoke("execute-command", cmd),
     proxyFetchRemote: (url, options = {}) =>
       ipcRenderer.invoke("proxy-fetch-remote", { url, options }),
