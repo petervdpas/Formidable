@@ -8,6 +8,7 @@ function compilePageTemplate() {
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <link rel="icon" href="/assets/formidable.ico" type="image/x-icon" />
   <title>{{title}}</title>
   <style>
     body {

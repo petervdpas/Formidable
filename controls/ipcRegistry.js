@@ -6,7 +6,9 @@ const {
   clipboard,
   ipcMain,
   BrowserWindow,
+  app,
 } = require("electron");
+const path = require("path");
 const { registerIpc } = require("./ipcRoutes");
 const { SingleFileRepository } = require("./sfr");
 const { exec } = require("child_process");
@@ -26,6 +28,22 @@ const htmlRenderer = require("./htmlRenderer");
 const miniExprParser = require("./miniExprParser");
 
 const sfr = new SingleFileRepository();
+
+/** Resolve app icon path per platform (dev vs packaged) */
+function pickIcon() {
+  const base = app.isPackaged
+    ? path.join(process.resourcesPath, "assets")
+    : path.join(__dirname, "../assets"); // adjust if file moves
+  if (process.platform === "win32") return path.join(base, "formidable.ico");
+  if (process.platform === "darwin") return path.join(base, "formidable.icns");
+  return path.join(base, "formidable.png"); // linux
+}
+
+/** Decide whether a URL is internal to the Formidable internal server */
+function isInternal(url) {
+  // localhost/127.0.0.1 on any port; extend if you bind to other hosts
+  return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i.test(url);
+}
 
 function registerIpcHandlers() {
   // System
@@ -74,6 +92,7 @@ function registerIpcHandlers() {
           width: 1200,
           height: 800,
           show: true,
+          icon: pickIcon(), // ← give the tab window your app icon
           webPreferences: {
             contextIsolation: true,
             nodeIntegration: false,
@@ -81,9 +100,22 @@ function registerIpcHandlers() {
           },
         });
 
-        win.webContents.setWindowOpenHandler(({ url }) => {
-          shell.openExternal(url);
+        // Any window.open: internal => navigate in-place; external => system browser
+        win.webContents.setWindowOpenHandler(({ url: target }) => {
+          if (isInternal(target)) {
+            win.loadURL(target);
+          } else {
+            shell.openExternal(target);
+          }
           return { action: "deny" };
+        });
+
+        // Also guard normal navigations (non-_blank) to external sites
+        win.webContents.on("will-navigate", (event, target) => {
+          if (!isInternal(target)) {
+            event.preventDefault();
+            shell.openExternal(target);
+          }
         });
 
         await win.loadURL(url);

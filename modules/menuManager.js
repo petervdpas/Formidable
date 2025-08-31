@@ -93,6 +93,11 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
           action: "get-internal-server-status",
         },
         {
+          label: "menu.server.show",
+          i18n: true,
+          action: "open-internal-server-show",
+        },
+        {
           label: "menu.server.browser",
           i18n: true,
           action: "open-internal-server-browser",
@@ -426,13 +431,30 @@ export async function handleMenuAction(action) {
       });
       break;
 
-    case "open-internal-server-browser":
+    case "open-internal-server-show":
       EventBus.emit("server:status", {
         callback: (server) => {
           if (server.running) {
             const port = server.port || 8383;
             const url = `http://localhost:${port}/`;
             EventBus.emit("file:openExternal", { url, variant: "tab" });
+          } else {
+            EventBus.emit("ui:toast", {
+              languageKey: "toast.server.NotRunning",
+              variant: "warning",
+            });
+          }
+        },
+      });
+      break;
+
+    case "open-internal-server-browser":
+      EventBus.emit("server:status", {
+        callback: (server) => {
+          if (server.running) {
+            const port = server.port || 8383;
+            const url = `http://localhost:${port}/`;
+            EventBus.emit("file:openExternal", { url, variant: "external" });
           } else {
             EventBus.emit("ui:toast", {
               languageKey: "toast.server.NotRunning",
@@ -454,7 +476,7 @@ export async function handleMenuAction(action) {
     case "open-formidable-tools":
       EventBus.emit("file:openExternal", {
         url: "https://formidable.tools",
-        variant: "tab",
+        variant: "external",
       });
       break;
 

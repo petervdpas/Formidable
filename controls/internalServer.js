@@ -2,6 +2,7 @@
 
 const path = require("path");
 const express = require("express");
+const { app: electronApp } = require("electron");
 const { renderPage } = require("./pageGenerator");
 const {
   getVirtualStructure,
@@ -32,14 +33,28 @@ function startInternalServer(port = 8383) {
     return;
   }
 
-  const app = express();
+  const app = express(); // <-- this is the Express app (no clash now)
 
-  // Serve storage files (images, etc)
-  app.use(
-    "/storage",
+  // storage (as before)
+  app.use("/storage",
     express.static(path.resolve(configManager.getContextStoragePath()))
   );
 
+  // ----- Assets dir: packaged vs dev
+  const assetsDir = electronApp && electronApp.isPackaged
+    ? path.join(process.resourcesPath, "assets")
+    : path.join(__dirname, "../assets");
+
+  log(`[InternalServer] assetsDir = ${assetsDir}`);
+
+  // static mount
+  app.use("/assets", express.static(assetsDir, { maxAge: "7d", etag: true }));
+
+  // favicon at root (browsers auto-hit /favicon.ico)
+  app.get("/favicon.ico", (req, res) =>
+    res.sendFile(path.join(assetsDir, "formidable.ico"))
+  );
+  
   // Index Page (HTML)
   app.get("/", async (req, res) => {
     const vfs = await getVirtualStructure();
