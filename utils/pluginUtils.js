@@ -45,9 +45,17 @@ export { saveUserConfig, reloadUserConfig, invalidateUserConfig };
 let pluginTranslationCache = {};
 
 export async function loadPluginTranslations(pluginName, language = "en") {
-  const i18nBasePath = `plugins/${pluginName}/i18n`;
-  const langFile = `${i18nBasePath}/${language}.json`;
-  const fallbackFile = `${i18nBasePath}/en.json`;
+  // ── absolute base: <pluginsBase>/<pluginName>/i18n ──────────────
+  const pluginsBase = await EventBus.emitWithResponse("plugin:get-plugins-path", {});
+  if (!pluginsBase) {
+    console.warn(`[Plugin<${pluginName}>] plugins base path not available`);
+    pluginTranslationCache[pluginName] = {};
+    return;
+  }
+
+  const i18nBasePath = await resolvePath(pluginsBase, pluginName, "i18n"); // ← absolute!
+  const langFile     = await resolvePath(i18nBasePath, `${language}.json`);
+  const fallbackFile = await resolvePath(i18nBasePath, "en.json");
 
   let translations = {};
 
@@ -60,7 +68,7 @@ export async function loadPluginTranslations(pluginName, language = "en") {
     console.warn(`[Plugin<${pluginName}>] No translation file found`);
   }
 
-  pluginTranslationCache[pluginName] = translations;
+  pluginTranslationCache[pluginName] = translations; // unchanged cache semantics
 }
 
 export function getPluginTranslations(pluginName) {
