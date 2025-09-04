@@ -162,6 +162,19 @@ export default {
   "toast.git.commit.noMessage":
     "Kan commit niet uitvoeren: geen bericht opgegeven.",
 
+  "toast.git.autosync.disabled": "Git auto-sync is disabled in this profile.",
+  "toast.git.autosync.notRepo":
+    "No Git repository found at the configured path.",
+  "toast.git.autosync.noStatus": "Could not read Git status.",
+  "toast.git.autosync.noTracking":
+    "No tracking branch set — auto-sync skipped.",
+  "toast.git.autosync.localChanges":
+    "Local changes detected — auto-sync skipped.",
+  "toast.git.autosync.ahead":
+    "Your branch is ahead by {0} commit(s) — auto-sync skipped.",
+  "toast.git.autosync.upToDate": "Repository is up to date.",
+  "toast.git.autosync.error": "Auto-sync failed: {0}",
+
   "toast.profile.invalidName":
     "Gebruik kleine letters, koppeltekens en eindig met .json",
   "toast.profile.exists": "Profiel bestaat al.",
@@ -363,7 +376,7 @@ export default {
   "field.placeholder.default": "Stel de standaardwaarde in voor dit veld",
   "field.placeholder.options": "Komma-gescheiden",
 
-    "field.format.markdown": "Markdown",
+  "field.format.markdown": "Markdown",
   "field.format.plain": "Gewone tekst",
 
   // ── Modals ───────────────────

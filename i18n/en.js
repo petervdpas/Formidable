@@ -149,6 +149,19 @@ export default {
   "toast.git.discarded.changes.in": "Discarded changes in {0}",
   "toast.git.commit.noMessage": "Cannot commit: no message.",
 
+  "toast.git.autosync.disabled": "Git auto-sync is disabled in this profile.",
+  "toast.git.autosync.notRepo":
+    "No Git repository found at the configured path.",
+  "toast.git.autosync.noStatus": "Could not read Git status.",
+  "toast.git.autosync.noTracking":
+    "No tracking branch set — auto-sync skipped.",
+  "toast.git.autosync.localChanges":
+    "Local changes detected — auto-sync skipped.",
+  "toast.git.autosync.ahead":
+    "Your branch is ahead by {0} commit(s) — auto-sync skipped.",
+  "toast.git.autosync.upToDate": "Repository is up to date.",
+  "toast.git.autosync.error": "Auto-sync failed: {0}",
+
   "toast.profile.invalidName": "Use lowercase, hyphens, and end with .json",
   "toast.profile.exists": "Profile already exists.",
   "toast.profile.switchFailed": "Failed to switch profile.",

@@ -1,6 +1,7 @@
 // modules/handlers/bootHandlers.js
 
 import { EventBus } from "../eventBus.js";
+import { safeAutoSyncOnReload } from "../../utils/gitUtils.js";
 
 export async function initializeFromConfig(config) {
   const {
@@ -69,4 +70,7 @@ export async function initializeFromConfig(config) {
       }
     });
   }
+
+   // ─── Stage 7: Safe Git auto-sync on reload ─────────────────────
+  await safeAutoSyncOnReload(config);
 }

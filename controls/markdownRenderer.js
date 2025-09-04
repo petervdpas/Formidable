@@ -183,11 +183,9 @@ function registerHelpers(filePrefix = true) {
     const field = fields.find((f) => f.key === key);
     const value = context[key];
 
-    // log(`[FieldHelper] key: ${key}, type: ${field?.type}, value: ${value}`);
-
     if (!field) return `(unknown field: ${key})`;
 
-    // Handle multioption arrays with value/label distinction
+    // Multioption array with value/label mapping
     if (field.type === "multioption" && Array.isArray(value)) {
       const optMap = new Map(
         (field.options || []).map((opt) => {
@@ -201,7 +199,7 @@ function registerHelpers(filePrefix = true) {
         .join(", ");
     }
 
-    // Handle dropdown, radio, table with simple value/label
+    // Dropdown, radio, table with simple value/label mapping
     if (["dropdown", "radio", "table"].includes(field.type)) {
       const optMap = new Map(
         (field.options || []).map((opt) => {
@@ -213,9 +211,8 @@ function registerHelpers(filePrefix = true) {
       return mode === "value" ? value : optMap.get(value) || value;
     }
 
-    // Use render function or default renderer
+    // Choose renderer
     let fn = defaultRenderers.text;
-
     if (typeof field.render === "function") {
       fn = field.render;
     } else if (field.type in defaultRenderers) {
@@ -226,7 +223,16 @@ function registerHelpers(filePrefix = true) {
       field.type === "image"
         ? defaultRenderers.image(value, field, template, filePrefix)
         : fn(value, field, template);
-    return typeof rendered === "string" ? rendered : `${rendered}`;
+
+    const out = typeof rendered === "string" ? rendered : `${rendered}`;
+
+    // IMPORTANT: allow raw Markdown (e.g., fenced ``` blocks) to pass through
+    // so markdown-it + highlight.js can parse it later.
+    if (field.type === "textarea" || field.as_markdown === true) {
+      return new Handlebars.SafeString(out);
+    }
+
+    return out;
   });
 
   Handlebars.registerHelper("fieldRaw", function (key) {
