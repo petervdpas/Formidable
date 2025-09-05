@@ -1,5 +1,6 @@
 // modules/formRenderer.js
 
+import { EventBus } from "./eventBus.js";
 import {
   buildHiddenInput,
   createLabelElement,
@@ -46,6 +47,7 @@ async function buildMetaSection(
 ) {
   const section = document.createElement("div");
   section.className = "meta-section";
+  section.id = "storage-meta";
 
   // ─── Flag Toggle ─────────────────────────────────────────────
   if (typeof onFlagChange === "function") {
@@ -182,6 +184,23 @@ export async function renderFormUI(
   );
   container.appendChild(metaSection);
 
+  // ─── Apply display setting + live updates ─────────────────────
+  const applyMetaVisibility = (show) => {
+    if (!metaSection) return;
+    metaSection.style.display = show ? "" : "none";
+  };
+
+  const cfg = await new Promise((resolve) => {
+    EventBus.emit("config:load", (c) => resolve(c));
+  });
+  applyMetaVisibility(cfg?.show_meta_section !== false);
+
+  // Listen for Settings toggle live-change
+  EventBus.on?.("screen:meta:visibility", (enabled) => {
+    applyMetaVisibility(!!enabled);
+  });
+
+  // ─── Fields ───────────────────────────────────────────────────
   const fields = template.fields || [];
 
   // Inject default values first
@@ -220,6 +239,20 @@ export async function renderFormUI(
           onTrigger: onRender,
           button: render,
           titleKey: "standard.render",
+        },
+        {
+          combo: ["Ctrl+M", "Cmd+M", "Meta+M"],
+          onTrigger: async () => {
+            const cfg = await new Promise((resolve) =>
+              EventBus.emit("config:load", (c) => resolve(c))
+            );
+            const newValue = !(cfg?.show_meta_section ?? true);
+            await EventBus.emit("config:update", {
+              show_meta_section: newValue,
+            });
+            EventBus.emit("screen:meta:visibility", newValue);
+          },
+          titleKey: "modal.settings.display.meta",
         },
       ],
       {

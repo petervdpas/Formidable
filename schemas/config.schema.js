@@ -5,6 +5,7 @@ module.exports = {
     theme: "light",
     show_icon_buttons: false,
     use_expressions: false,
+    show_meta_section: true,
     font_size: 14,
     development_enable: false,
     logging_enabled: false,

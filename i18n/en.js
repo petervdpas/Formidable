@@ -411,6 +411,7 @@ export default {
   "modal.settings.display.theme": "Display Theme",
   "modal.settings.display.theme.light": "Light",
   "modal.settings.display.theme.dark": "Dark",
+  "modal.settings.display.meta": "Show Meta Section",
   "modal.settings.icon.buttons": "Icon-based Buttons",
   "modal.settings.context.folder": "Context Directory",
   "modal.settings.git.root": "Git Root Directory",

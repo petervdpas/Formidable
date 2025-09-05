@@ -133,6 +133,10 @@ export function initEventRouter() {
 
   EventBus.off("ui:toast", toastHandler.handleToast);
   EventBus.off("screen:fullscreen", screenHandlers.handleFullscreenToggle);
+  EventBus.off(
+    "screen:meta:visibility",
+    screenHandlers.handleStorageMetaVisibility
+  );
   EventBus.off("theme:toggle", themeHandler.handleThemeToggle);
   EventBus.off("status:update", statusHandler.handleStatusUpdate);
 
@@ -143,6 +147,11 @@ export function initEventRouter() {
 
   EventBus.on("ui:toast", toastHandler.handleToast);
   EventBus.on("screen:fullscreen", screenHandlers.handleFullscreenToggle);
+  EventBus.on(
+    "screen:meta:visibility",
+    screenHandlers.handleStorageMetaVisibility
+  );
+
   EventBus.on("theme:toggle", themeHandler.handleThemeToggle);
   EventBus.on("status:update", statusHandler.handleStatusUpdate);
 

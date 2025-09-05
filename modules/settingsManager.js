@@ -119,6 +119,18 @@ export async function renderSettings() {
 
   tabDisplay.appendChild(
     createSwitch(
+      "show-meta-toggle",
+      "modal.settings.display.meta",
+      config.show_meta_section ?? true,
+      null,
+      "block",
+      ["standard.show", "standard.hide"],
+      true
+    )
+  );
+
+  tabDisplay.appendChild(
+    createSwitch(
       "show-icons-toggle",
       "modal.settings.icon.buttons",
       config.show_icon_buttons ?? true,
@@ -288,6 +300,10 @@ export async function renderSettings() {
 
   setupLanguageDropdown(config);
   setupBindings(config, gitRootPicker);
+
+  EventBus.off?.("screen:meta:visibility", mirrorMetaSwitchState);
+  EventBus.on?.("screen:meta:visibility", mirrorMetaSwitchState);
+
   return true;
 }
 
@@ -295,7 +311,9 @@ function setupBindings(config, gitRootPicker) {
   bindThemeSwitch("theme-toggle", "theme");
   bindToggleSwitch("show-icons-toggle", "show_icon_buttons");
   bindToggleSwitch("show-expressions-toggle", "use_expressions");
-
+  bindToggleSwitch("show-meta-toggle", "show_meta_section", (enabled) => {
+    EventBus.emit("screen:meta:visibility", enabled);
+  });
   bindToggleSwitch("plugin-toggle", "enable_plugins");
   bindToggleSwitch("settings-development-toggle", "development_enable");
   bindToggleSwitch("logging-toggle", "logging_enabled", (enabled) =>
@@ -316,8 +334,6 @@ function setupBindings(config, gitRootPicker) {
 
   bindToggleSwitch("internal-server-toggle", "enable_internal_server");
 }
-
-
 
 function bindThemeSwitch(switchId, configKey) {
   const el = document.getElementById(switchId);
@@ -460,5 +476,15 @@ function emitConfigStatus(configKey, value, success = true) {
       i18nEnabled: true,
       args: [label, value],
     });
+  }
+}
+
+function mirrorMetaSwitchState(enabled) {
+  const el = document.getElementById("show-meta-toggle");
+  if (!el) return; 
+  el.checked = !!enabled;
+  const label = el.closest(".switch")?.querySelector(".switch-state");
+  if (label) {
+    label.textContent = enabled ? t("standard.show") : t("standard.hide");
   }
 }

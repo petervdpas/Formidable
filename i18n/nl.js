@@ -431,6 +431,7 @@ export default {
   "modal.settings.display.theme": "Weergave Thema",
   "modal.settings.display.theme.light": "Licht",
   "modal.settings.display.theme.dark": "Donker",
+  "modal.settings.display.meta": "Toon Meta Sectie",
   "modal.settings.icon.buttons": "Pictogram knoppen",
   "modal.settings.context.folder": "Contextmap",
   "modal.settings.git.root": "Git-rootmap",

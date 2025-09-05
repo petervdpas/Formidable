@@ -38,3 +38,9 @@ export function handleFullscreenToggle(targetId) {
     hintText: "ESC to exit fullscreen",
   });
 }
+
+export function handleStorageMetaVisibility(enabled) {
+  const el = document.getElementById("storage-meta");
+  if (!el) return;
+  el.style.display = enabled ? "" : "none";
+}
