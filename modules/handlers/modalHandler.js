@@ -60,7 +60,7 @@ export function handleEntryConfirm({ modal, callback }) {
   const wrapper = document.getElementById("entry-modal-buttons-wrapper");
 
   input.value = "";
-  checkbox.checked = true;
+  checkbox.checked = false;
 
   const confirmBtn = createConfirmButton({
     id: "entry-confirm",

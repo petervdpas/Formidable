@@ -25,6 +25,7 @@ export default {
   "config.git_root": "Git Root",
   "config.enable_internal_server": "Internal Server",
   "config.internal_server_port": "Server Port",
+  "config.show_meta_section": "Show Meta Section",
 
   // Errors (template-level)
   "error.template.duplicate_keys": "Duplicate keys: {0}",

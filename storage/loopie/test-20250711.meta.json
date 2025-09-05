@@ -4,8 +4,9 @@
     "author_email": "regular@example.com",
     "template": "loopie.yaml",
     "created": "2025-07-11T06:10:16.683Z",
-    "updated": "2025-08-11T00:27:11.204Z",
-    "flagged": false
+    "updated": "2025-09-05T22:50:40.162Z",
+    "flagged": false,
+    "tags": []
   },
   "data": {
     "title": "This is the main title....",

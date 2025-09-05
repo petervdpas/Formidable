@@ -1,6 +1,7 @@
 // modules/formRenderer.js
 
 import { EventBus } from "./eventBus.js";
+import { t } from "../utils/i18n.js";
 import {
   buildHiddenInput,
   createLabelElement,
@@ -50,7 +51,9 @@ async function buildMetaSection(
   section.id = "storage-meta";
 
   // ─── Flag Toggle ─────────────────────────────────────────────
-  if (typeof onFlagChange === "function") {
+  // Only show when the entry has been persisted (has created/updated in meta)
+  const isSaved = Boolean(meta?.created || meta?.updated);
+  if (isSaved && typeof onFlagChange === "function") {
     let flagged = flaggedInitial;
 
     const flaggedBtn = createFlaggedToggleButton(flagged, () => {
@@ -251,6 +254,16 @@ export async function renderFormUI(
               show_meta_section: newValue,
             });
             EventBus.emit("screen:meta:visibility", newValue);
+
+            const label = t("config.show_meta_section");
+            EventBus.emit("status:update", {
+              languageKey: newValue
+                ? "status.config.enabled"
+                : "status.config.disabled",
+              i18nEnabled: true,
+              args: [label],
+              variant: newValue ? "default" : "warning",
+            });
           },
           titleKey: "modal.settings.display.meta",
         },

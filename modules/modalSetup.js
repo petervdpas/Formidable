@@ -79,7 +79,7 @@ export function setupSettingsModal() {
     backdropClick: true,
     resizable: true,
     width: "36em",
-    height: "20em",
+    height: "22em",
 
     onOpen: async (_el, api) => {
       // disable while initializing

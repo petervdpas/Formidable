@@ -6,7 +6,7 @@
  */
 function parseCombo(combo) {
   if (!combo || typeof combo !== "string") return null;
-  const parts = combo.split("+").map(s => s.trim().toLowerCase());
+  const parts = combo.split("+").map((s) => s.trim().toLowerCase());
 
   const desc = { ctrl: false, meta: false, alt: false, shift: false, key: "" };
   for (const p of parts) {
@@ -40,7 +40,8 @@ export function comboLabel(combo) {
 function isTypingTarget(el) {
   if (!el) return false;
   const tag = (el.tagName || "").toLowerCase();
-  if (tag === "input" || tag === "textarea" || el.isContentEditable) return true;
+  if (tag === "input" || tag === "textarea" || el.isContentEditable)
+    return true;
   return false;
 }
 
@@ -73,20 +74,36 @@ export function bindHotkeys(scopeEl, bindings = [], options = {}) {
     const combos = Array.isArray(b.combo) ? b.combo : [b.combo];
     const parsed = combos.map(parseCombo).filter(Boolean);
     if (!parsed.length || typeof b.onTrigger !== "function") continue;
-    rules.push({ parsed, onTrigger: b.onTrigger, button: b.button, title: b.title, titleKey: b.titleKey, raw: combos });
+    rules.push({
+      parsed,
+      onTrigger: b.onTrigger,
+      button: b.button,
+      title: b.title,
+      titleKey: b.titleKey,
+      raw: combos,
+    });
   }
 
   // Set button tooltips with the combo label
   for (const r of rules) {
     if (r.button) {
+      let rawHint =
+        (r.titleKey && typeof opts.i18n === "function"
+          ? opts.i18n(r.titleKey)
+          : r.title) || "";
+      const isUntranslated = r.titleKey && rawHint === r.titleKey;
       const hint =
-        (r.titleKey && typeof opts.i18n === "function" ? opts.i18n(r.titleKey) : r.title) ||
-        r.button.getAttribute("title") ||
-        "";
+        !rawHint || isUntranslated
+          ? r.button.textContent?.trim() || r.button.getAttribute("title") || ""
+          : rawHint;
+
       const comboText = comboLabel(Array.isArray(r.raw) ? r.raw[0] : r.raw);
       const sep = hint ? " • " : "";
       r.button.setAttribute("title", `${hint}${sep}${comboText}`);
-      r.button.setAttribute("aria-label", `${hint || r.button.textContent} (${comboText})`);
+      r.button.setAttribute(
+        "aria-label",
+        `${hint || "Shortcut"} (${comboText})`
+      );
     }
   }
 
