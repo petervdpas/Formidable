@@ -303,12 +303,16 @@ export function initTemplateEditor(containerId, onSaveCallback) {
               i18nEnabled: true,
               args: [errors.length],
             });
-            errors.forEach((err) =>
+            errors.forEach((err) => {
+              const { key, args } = formatError(err);
               EventBus.emit("ui:toast", {
-                message: formatError(err),
+                message: key,
+                languageKey: key,
                 variant: "error",
-              })
-            );
+                i18nEnabled: true,
+                args: args || [],
+              });
+            });
             return;
           }
 

@@ -246,6 +246,27 @@ function checkLoopNestingDepth(fields, maxDepth = 2) {
   return errors;
 }
 
+function checkSingleTagsField(fields) {
+  const tagKeys = fields
+    .filter((f) => f?.type === "tags")
+    .map((f) => f.key || "(no key)");
+  if (tagKeys.length > 1) {
+    return {
+      type: "multiple-tags-fields",
+      keys: tagKeys,
+      message: `Only one 'tags' field is allowed per template (found: ${tagKeys.join(
+        ", "
+      )})`,
+    };
+  }
+  return null;
+}
+
+function getTagsFieldKey(fields) {
+  const f = fields.find((x) => x?.type === "tags");
+  return f ? f.key : null;
+}
+
 function validateTemplate(template) {
   if (!template || !Array.isArray(template.fields)) {
     return [
@@ -272,6 +293,11 @@ function validateTemplate(template) {
 
   if (collectionError) {
     errors.push(collectionError);
+  }
+
+  const tagsError = checkSingleTagsField(template.fields);
+  if (tagsError) {
+    errors.push(tagsError);
   }
 
   return errors;
@@ -385,8 +411,14 @@ function computeTopLevelTextFields(fields = []) {
   for (const f of fields) {
     if (!f || !f.type) continue;
 
-    if (f.type === "loopstart") { stack.push(f.key); continue; }
-    if (f.type === "loopstop")  { if (stack[stack.length - 1] === f.key) stack.pop(); continue; }
+    if (f.type === "loopstart") {
+      stack.push(f.key);
+      continue;
+    }
+    if (f.type === "loopstop") {
+      if (stack[stack.length - 1] === f.key) stack.pop();
+      continue;
+    }
 
     if (stack.length === 0 && f.type === "text" && f.key) {
       opts.push({ key: f.key, label: f.label || f.key });
@@ -409,5 +441,6 @@ module.exports = {
   validateTemplate,
   getTemplateDescriptor,
   createBasicTemplateIfMissing,
-  getPossibleItemFields
+  getPossibleItemFields,
+  getTagsFieldKey,
 };

@@ -1,35 +1,52 @@
 // utils/templateValidation.js
 
+// -------- Template-level error formatting (array of errors from validateTemplate) --------
 export function formatError(error) {
-  if (error.type === "duplicate-keys") {
-    return `Duplicate keys: ${error.keys.join(", ")}`;
+  switch (error.type) {
+    case "duplicate-keys":
+      return { key: "error.template.duplicate_keys", args: [error.keys.join(", ")] };
+
+    case "unmatched-loopstart":
+      return { key: "error.template.unmatched_loopstart", args: [error.field?.key || "?"] };
+
+    case "unmatched-loopstop":
+      return { key: "error.template.unmatched_loopstop", args: [error.field?.key || "?"] };
+
+    case "nested-loop-not-allowed":
+      return { key: "error.template.nested_loop_not_allowed", args: [error.field?.key || "?"] };
+
+    case "excessive-loop-nesting":
+      return {
+        key: "error.template.excessive_loop_nesting",
+        args: [error.path || error.key || "unknown", error.maxDepth || 2],
+      };
+
+    case "loop-key-mismatch":
+      return {
+        key: "error.template.loop_key_mismatch",
+        args: [error.field?.key || "?", error.expectedKey || "?"],
+      };
+
+    case "multiple-primary-keys":
+      return { key: "error.template.multiple_primary_keys", args: [error.keys.join(", ")] };
+
+    case "missing-guid-for-collection":
+      // Prefer backend-provided message if you ever need fallback, but for i18n we use our key.
+      return { key: "error.template.missing_guid_for_collection", args: [] };
+
+    case "multiple-tags-fields":
+      return { key: "error.template.multiple_tags_fields", args: [error.keys.join(", ")] };
+
+    case "invalid-template":
+      return { key: "error.template.invalid", args: [error.message || ""] };
+
+    default:
+      // Safe fallback
+      return { key: "error.template.unknown", args: [JSON.stringify(error)] };
   }
-  if (error.type === "unmatched-loopstart") {
-    return `Unmatched loop start at: ${error.field?.key || "?"}`;
-  }
-  if (error.type === "unmatched-loopstop") {
-    return `Unmatched loop stop at: ${error.field?.key || "?"}`;
-  }
-  if (error.type === "nested-loop-not-allowed") {
-    return `Only 1 loop level allowed — Found nested loop with key: "${error.field?.key}".`;
-  }
-  if (error.type === "excessive-loop-nesting") {
-    return `Too many nested loops: ${
-      error.path || error.key || "unknown"
-    }. Max depth is ${error.maxDepth || 2}.`;
-  }
-  if (error.type === "loop-key-mismatch") {
-    return `Loopstop key "${error.field?.key}" does not match loopstart key "${error.expectedKey}"`;
-  }
-  if (error.type === "multiple-primary-keys") {
-    return `Multiple primary keys: ${error.keys.join(", ")}`;
-  }
-  if (error.type === "invalid-template") {
-    return `Invalid template: ${error.message}`;
-  }
-  return `Unknown error: ${JSON.stringify(error)}`;
 }
 
+// -------- Field-level (UI) validation while editing a single field --------
 export function validateField(field, allFields = []) {
   const rawKey = (field.key || "").trim();
   const currentType = field.type || "text";
@@ -46,7 +63,20 @@ export function validateField(field, allFields = []) {
     return { valid: false, reason: "guid-key-must-be-id", key: rawKey };
   }
 
-  // Rule: Duplicate key
+  // Rule: Only one 'tags' field allowed in the template (proactive UI check)
+  if (currentType === "tags") {
+    const existingTags = allFields.some(
+      (f) =>
+        f.type === "tags" &&
+        // exclude the one currently being edited (by original key)
+        (!isEditingExisting || f.key !== originalKey)
+    );
+    if (existingTags) {
+      return { valid: false, reason: "only-one-tags-field" };
+    }
+  }
+
+  // Rule: Duplicate key (excluding the same field when editing)
   const isDuplicate = allFields.some(
     (f) => f.key === rawKey && (!isEditingExisting || f.key !== originalKey)
   );
@@ -54,12 +84,11 @@ export function validateField(field, allFields = []) {
     return { valid: false, reason: "duplicate-key", key: rawKey };
   }
 
-  // Rule: Loop start/stop pairs
+  // Rule: Loop start/stop pairs (UI-level sanity: make sure partner exists somewhere)
   if (["loopstart", "loopstop"].includes(currentType)) {
-    const expectedPartnerType =
-      currentType === "loopstart" ? "loopstop" : "loopstart";
+    const expectedPartnerType = currentType === "loopstart" ? "loopstop" : "loopstart";
 
-    const hasAnyLoop = allFields.some(
+    const hasAnyLoopForKey = allFields.some(
       (f) => f.key === rawKey && ["loopstart", "loopstop"].includes(f.type)
     );
 
@@ -67,10 +96,11 @@ export function validateField(field, allFields = []) {
       (f) =>
         f.key === rawKey &&
         f.type === expectedPartnerType &&
+        // exclude "this" field if we’re editing it
         (!isEditingExisting || f.key !== originalKey || f.type !== currentType)
     );
 
-    if (hasAnyLoop && !hasPartner) {
+    if (hasAnyLoopForKey && !hasPartner) {
       return {
         valid: false,
         reason: "unmatched-loop",
@@ -80,6 +110,7 @@ export function validateField(field, allFields = []) {
     }
   }
 
-  // If passed all checks:
+  // Passed all checks
   return { valid: true };
 }
+

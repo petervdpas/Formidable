@@ -4,8 +4,12 @@
     "author_email": "regular@example.com",
     "template": "recepten.yaml",
     "created": "2025-08-08T11:06:20.080Z",
-    "updated": "2025-09-04T23:03:53.090Z",
-    "flagged": false
+    "updated": "2025-09-05T16:23:01.149Z",
+    "flagged": false,
+    "tags": [
+      "groen",
+      "tapenade"
+    ]
   },
   "data": {
     "naam": "Groene Tapenade",
@@ -49,7 +53,7 @@
         "naar smaak"
       ]
     ],
-    "bereiding": "Hak de olijven fijn. Doe de kappertjes in een zeef en spoel kort af om overtollig zout te verwijderen.  \nWrijf alle ingrediënten fijn in een vijzel en voeg de olijfolie geleidelijk toe.  \nBreng op smaak met citroensap, witte peper en zout.\n\n```csharp\npublic class Person\n{\n    public string Name { get; set; }\n    public int Age { get; set; }\n\n    public void SayHello()\n    {\n        Console.WriteLine($\"Hello, my name is {Name} and I am {Age} years old.\");\n    }\n}\n```",
+    "bereiding": "Hak de olijven fijn. Doe de kappertjes in een zeef en spoel kort af om overtollig zout te verwijderen.  \nWrijf alle ingrediënten fijn in een vijzel en voeg de olijfolie geleidelijk toe.  \nBreng op smaak met citroensap, witte peper en zout.",
     "verwante_links": [
       {
         "verwant_recept": "formidable://recepten.yaml:groentenschotel.meta.json"

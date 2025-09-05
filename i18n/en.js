@@ -26,6 +26,33 @@ export default {
   "config.enable_internal_server": "Internal Server",
   "config.internal_server_port": "Server Port",
 
+  // Errors (template-level)
+  "error.template.duplicate_keys": "Duplicate keys: {0}",
+  "error.template.unmatched_loopstart": "Unmatched loop start at: {0}",
+  "error.template.unmatched_loopstop": "Unmatched loop stop at: {0}",
+  "error.template.nested_loop_not_allowed":
+    'Only 1 loop level allowed — found nested loop with key: "{0}".',
+  "error.template.excessive_loop_nesting":
+    "Too many nested loops: {0}. Max depth is {1}.",
+  "error.template.loop_key_mismatch":
+    'Loopstop key "{0}" does not match loopstart key "{1}"',
+  "error.template.multiple_primary_keys": "Multiple primary keys: {0}",
+  "error.template.missing_guid_for_collection":
+    "`Enable Collection` requires at least one GUID field in the template.",
+  "error.template.multiple_tags_fields":
+    "Only one 'tags' field is allowed per template (found: {0}).",
+  "error.template.invalid": "Invalid template: {0}",
+  "error.template.unknown": "Unknown template error: {0}",
+
+  // Errors (field-level, optional if you show inline field messages via i18n too)
+  "error.field.missing_key": "Field key is required.",
+  "error.field.guid_key_must_be_id": 'GUID field key must be "id" (not "{0}").',
+  "error.field.only_one_tags_field":
+    "There can only be one 'tags' field in a template.",
+  "error.field.duplicate_key": 'Duplicate field key: "{0}".',
+  "error.field.unmatched_loop":
+    'Loop {0} for key "{1}" has no matching partner.',
+
   // ── Status Messages ─────────────────────
   "status.cache.init": "Cache initialized with DB: {0} version {1}.",
   "status.basic.setTo": "{0} set to {1}",
@@ -247,6 +274,7 @@ export default {
   "standard.password": "Password",
   "standard.created": "Created",
   "standard.updated": "Updated",
+  "standard.tags": "Tags",
   "standard.new": "New",
   "standard.none": "None",
   "standard.open": "Open",

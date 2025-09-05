@@ -5,8 +5,12 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-29T09:32:36.440Z",
-    "updated": "2025-08-11T00:32:09.567Z",
-    "flagged": false
+    "updated": "2025-09-05T16:23:55.859Z",
+    "flagged": false,
+    "tags": [
+      "ch.01",
+      "you lucky guy"
+    ]
   },
   "data": {
     "id": "c0b845d5-281b-464e-a099-98bdc182946f",

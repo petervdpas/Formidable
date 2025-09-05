@@ -4,6 +4,7 @@ import { EventBus } from "../eventBus.js";
 import { getValue as getMarkdownTemplate } from "../templateCodemirror.js";
 import { showConfirmModal } from "../../utils/modalUtils.js";
 import { clearContainerUI } from "../../utils/formUtils.js";
+import { formatError } from "../../utils/templateValidation.js";
 
 export async function handleSaveTemplate({ container, fields, callback }) {
   const name = container.querySelector("#yaml-name").value.trim();
@@ -30,7 +31,7 @@ export async function handleSaveTemplate({ container, fields, callback }) {
   if (validationErrors.length > 0) {
     const messages = validationErrors.map(formatError);
     EventBus.emit("logging:error", [
-      "[Validator] Template bevat fouten:",
+      "[Validator] Template contains errors:",
       ...messages,
     ]);
     return;

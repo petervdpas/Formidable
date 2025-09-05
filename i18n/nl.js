@@ -26,6 +26,33 @@ export default {
   "config.enable_internal_server": "Interne server",
   "config.internal_server_port": "Serverpoort",
 
+    // Errors (template-level)
+  "error.template.duplicate_keys": "Duplicaat sleutels: {0}",
+  "error.template.unmatched_loopstart": "Niet-overeenkomende lusstart op: {0}",
+  "error.template.unmatched_loopstop": "Niet-overeenkomende lusstop op: {0}",
+  "error.template.nested_loop_not_allowed":
+    'Slechts 1 lusniveau toegestaan - geneste lus gevonden met sleutel: "{0}".',
+  "error.template.excessive_loop_nesting":
+    "Te veel geneste lussen: {0}. Maximale diepte is {1}.",
+  "error.template.loop_key_mismatch":
+    'Loopstop sleutel "{0}" komt niet overeen met loopstart sleutel "{1}"',
+  "error.template.multiple_primary_keys": "Meerdere primaire sleutels: {0}",
+  "error.template.missing_guid_for_collection":
+    "`Enable Collection` vereist minimaal één GUID-veld in de sjabloon.",
+  "error.template.multiple_tags_fields":
+    "Slechts één 'tags'-veld is toegestaan per sjabloon (gevonden: {0}).",
+  "error.template.invalid": "Ongeldige sjabloon: {0}",
+  "error.template.unknown": "Onbekende sjabloonfout: {0}",
+
+  // Errors (field-level, optional if you show inline field messages via i18n too)
+  "error.field.missing_key": "Veldsleutel is vereist.",
+  "error.field.guid_key_must_be_id": 'GUID-veld sleutel moet "id" zijn (niet "{0}").',
+  "error.field.only_one_tags_field":
+    "Er kan slechts één 'tags'-veld in een sjabloon zijn.",
+  "error.field.duplicate_key": 'Duplicaat veld sleutel: "{0}".',
+  "error.field.unmatched_loop":
+    'Loop {0} voor sleutel "{1}" heeft geen bijpassende partner.',
+
   // ── Status Messages ─────────────────────
   "status.cache.init": "Cache geïnitialiseerd met DB: {0} versie {1}.",
   "status.basic.setTo": "{0} ingesteld op {1}",
@@ -267,6 +294,7 @@ export default {
   "standard.password": "Wachtwoord",
   "standard.created": "Aangemaakt",
   "standard.updated": "Bijgewerkt",
+  "standard.tags": "Tags",
   "standard.new": "Nieuw",
   "standard.none": "Geen",
   "standard.open": "Openen",

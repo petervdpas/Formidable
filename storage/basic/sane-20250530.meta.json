@@ -5,8 +5,13 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-08-11T20:21:05.119Z",
-    "flagged": true
+    "updated": "2025-09-05T16:43:51.734Z",
+    "flagged": true,
+    "tags": [
+      "bye",
+      "hi",
+      "now what"
+    ]
   },
   "data": {
     "id": "5a7bec64-f3f2-47cc-a836-2e4643e4f9a9",
@@ -48,7 +53,7 @@
     "ttags": [
       "Hi",
       "Bye",
-      "Now what"
+      "now what"
     ]
   }
 }

@@ -17,6 +17,7 @@ import {
   createFormRenderIconButton,
 } from "./uiButtons.js";
 import { fieldGroupRenderer } from "../utils/fieldGroupRenderer.js";
+import { bindHotkeys, unbindHotkeys } from "../utils/hotkeyUtils.js";
 
 // ─────────────────────────────────────────────
 // Generic Events helper
@@ -73,6 +74,13 @@ async function buildMetaSection(
       key: meta.id ? "standard.id.upper" : "standard.guid.upper",
       value: meta.id || meta.guid || "",
     },
+    {
+      key: "standard.tags",
+      value:
+        Array.isArray(meta.tags) && meta.tags.length
+          ? meta.tags.join(", ")
+          : "",
+    },
     { key: "standard.author", value: meta.author_name || "" },
     { key: "standard.email", value: meta.author_email || "" },
     { key: "standard.template", value: meta.template || "" },
@@ -127,6 +135,9 @@ async function buildMetaSection(
 
   section.appendChild(wrapper);
 
+  // Expose buttons so the caller can bind hotkeys with tooltips
+  section.__metaButtons = buttons;
+
   return section;
 }
 
@@ -139,6 +150,9 @@ export async function renderFormUI(
   onRender
 ) {
   const eventFunctions = getEventFunctions();
+
+  // Clean previous hotkeys when re-rendering
+  unbindHotkeys(container);
 
   container.innerHTML = "";
   await new Promise((resolve) => requestAnimationFrame(resolve));
@@ -181,6 +195,42 @@ export async function renderFormUI(
     template,
     eventFunctions
   );
+
+  // ─── Bind page-scoped hotkeys and annotate buttons ───────────
+  if (metaSection.__metaButtons) {
+    const { save, delete: del, render } = metaSection.__metaButtons;
+
+    bindHotkeys(
+      container,
+      [
+        {
+          combo: ["Ctrl+S", "Cmd+S", "Meta+S"],
+          onTrigger: onSave,
+          button: save,
+          titleKey: "standard.save",
+        },
+        {
+          combo: ["Ctrl+D", "Cmd+D", "Meta+D"],
+          onTrigger: () => onDelete(filename),
+          button: del,
+          titleKey: "standard.delete",
+        },
+        {
+          combo: ["Ctrl+R", "Cmd+R", "Meta+R"],
+          onTrigger: onRender,
+          button: render,
+          titleKey: "standard.render",
+        },
+      ],
+      {
+        allowWhenTyping: false,
+        preventDefault: true,
+        stopPropagation: true,
+        i18n: (key, ...args) =>
+          window.i18n?.t ? window.i18n.t(key, ...args) : key,
+      }
+    );
+  }
 
   focusFirstInput(container);
 }

@@ -87,6 +87,29 @@ export async function saveForm(container, template) {
       },
     };
 
+    // Inject tags from the single `tags` field into _meta.tags
+    const tagFieldKey = (template.fields || []).find(
+      (f) => f.type === "tags"
+    )?.key;
+    if (tagFieldKey) {
+      const raw = data[tagFieldKey];
+      let tags = [];
+      if (Array.isArray(raw)) {
+        tags = raw
+          .map((t) => (typeof t === "string" ? t : t?.value))
+          .filter(Boolean);
+      } else if (typeof raw === "string") {
+        tags = raw
+          .split(/[,;]/)
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }
+      const norm = [
+        ...new Set(tags.map((t) => t.trim().toLowerCase()).filter(Boolean)),
+      ].sort((a, b) => a.localeCompare(b));
+      payload._meta.tags = norm;
+    }
+
     await EventBus.emitWithResponse("form:save", {
       templateFilename: template.filename,
       datafile: datafile,

@@ -12,6 +12,7 @@ module.exports = {
       created = null,
       updated = null,
       flagged = false,
+      tags = [],
     } = {}
   ) {
     const rawData = raw.data || raw;
@@ -48,6 +49,35 @@ module.exports = {
       rawData.id ||
       (templateFields.some((f) => f.type === "guid") ? null : undefined);
 
+          // ── Collect tags from 'tags' fields + merge with provided/injected/meta ──
+    const collected = [];
+
+    // from options.tags (highest intent)
+    if (Array.isArray(tags)) {
+      for (const t of tags) pushNorm(collected, t);
+    }
+
+    // from raw.meta.tags / injected.tags (back-compat)
+    if (Array.isArray(rawMeta.tags)) {
+      for (const t of rawMeta.tags) pushNorm(collected, t);
+    }
+    if (Array.isArray(injected.tags)) {
+      for (const t of injected.tags) pushNorm(collected, t);
+    }
+
+    // from actual data fields of type "tags"
+    for (const f of templateFields) {
+      if (f.type !== "tags") continue;
+      const v = result[f.key];
+      if (Array.isArray(v)) {
+        for (const t of v) pushNorm(collected, typeof t === "string" ? t : t?.value);
+      } else if (typeof v === "string") {
+        for (const piece of v.split(/[,;]/)) pushNorm(collected, piece);
+      }
+    }
+
+    const uniqueTags = [...new Set(collected)].sort((a, b) => a.localeCompare(b));
+
     return {
       meta: {
         id: resolvedId,
@@ -62,6 +92,7 @@ module.exports = {
           new Date().toISOString(),
         updated: updated || injected.updated || new Date().toISOString(),
         flagged: rawMeta.flagged ?? injected.flagged ?? flagged,
+        tags: uniqueTags,
       },
       data: result,
     };
@@ -117,4 +148,10 @@ function getDefaultForType(type) {
     default:
       return "";
   }
+}
+
+function pushNorm(arr, tag) {
+  if (typeof tag !== "string") return;
+  const n = tag.trim().toLowerCase();
+  if (n) arr.push(n);
 }
