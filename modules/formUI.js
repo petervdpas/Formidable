@@ -38,8 +38,8 @@ export function createFormManager(containerId) {
     currentTemplate = await ensureVirtualLocation(templateYaml);
     clearContainerUI(
       container,
-      "special.templates.placeholder",
-      "Select or create a template-file to begin."
+      "special.storage.placeholder",
+      "Select or create a storage-file to begin."
     );
   }
 
@@ -89,8 +89,8 @@ export function createFormManager(containerId) {
       currentDatafile = null;
       clearContainerUI(
         container,
-        "special.forms.placeholder",
-        "Select or create a form-file to begin."
+        "special.storage.placeholder",
+        "Select or create a storage-file to begin."
       );
     },
   };

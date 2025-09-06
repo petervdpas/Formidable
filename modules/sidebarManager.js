@@ -119,6 +119,25 @@ export function createStorageListManager(formManager, modal) {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
 
+  // --- helper: detect whether the template defines a tags field anywhere
+  const hasTagsFieldDeep = (node) => {
+    if (!node) return false;
+    if (Array.isArray(node)) return node.some(hasTagsFieldDeep);
+    if (typeof node === "object") {
+      // direct hits
+      const type = String(
+        node.type || node.component || node.fieldType || ""
+      ).toLowerCase();
+      const idLike = String(
+        node.id || node.key || node.name || ""
+      ).toLowerCase();
+      if (type === "tags" || idLike === "tags") return true;
+      // recurse into values
+      return Object.values(node).some(hasTagsFieldDeep);
+    }
+    return false;
+  };
+
   // ── Flag toggle ─────────────────────────────────────────────
   const { element: flaggedWrapper } = buildSwitchElement({
     id: "flagged-toggle",
@@ -145,7 +164,7 @@ export function createStorageListManager(formManager, modal) {
   // ── Build filter UI (single wrapper is provided by createListManager) ──
   const filterFrag = document.createDocumentFragment();
 
-  // Row 1: label + flag switch
+  // Row 1: label + flag switch (always shown)
   const flaggedRow = document.createElement("div");
   flaggedRow.className = "filter-chunk";
   addContainerElement({
@@ -159,7 +178,7 @@ export function createStorageListManager(formManager, modal) {
   flaggedRow.appendChild(flaggedWrapper);
   filterFrag.appendChild(flaggedRow);
 
-  // Row 2: clearable tag field (ONLY onInput → no duplicate renders)
+  // Row 2: clearable tag field (conditionally shown)
   const tagsField = createFilterField({
     id: "tag-filter-input",
     labelKey: "special.filterByTags",
@@ -173,9 +192,18 @@ export function createStorageListManager(formManager, modal) {
         .filter(Boolean);
       listManager.renderList();
     },
-    // Do NOT pass onClear; clear button already fires an input event.
   });
+  // add now, but we’ll toggle visibility
   filterFrag.appendChild(tagsField.element);
+
+  const setTagsFilterVisible = (visible) => {
+    tagsField.element.style.display = visible ? "" : "none";
+    if (!visible) {
+      // clear any active filter so list isn't “stuck” empty
+      activeTags = [];
+      tagsField.input.value = "";
+    }
+  };
 
   // ── List manager ───────────────────────────────────────────
   listManager = createListManager({
@@ -186,7 +214,11 @@ export function createStorageListManager(formManager, modal) {
       const template = await ensureVirtualLocation(
         window.currentSelectedTemplate
       );
-      if (!template || !template.virtualLocation) return [];
+      if (!template || !template.virtualLocation) {
+        // no template context -> hide tag filter
+        setTagsFilterVisible(false);
+        return [];
+      }
 
       await EventBus.emitWithResponse("form:ensureDir", template.filename);
 
@@ -196,7 +228,13 @@ export function createStorageListManager(formManager, modal) {
           callback: resolve,
         });
       });
-      const sidebarExpr = descriptor?.yaml?.sidebar_expression || null;
+
+      // Toggle tag filter visibility based on template YAML
+      const yaml = descriptor?.yaml || {};
+      const templateHasTags = hasTagsFieldDeep(yaml) === true;
+      setTagsFilterVisible(templateHasTags);
+
+      const sidebarExpr = yaml?.sidebar_expression || null;
 
       const entries = await new Promise((resolve) => {
         EventBus.emit("form:extendedList", {
@@ -271,7 +309,7 @@ export function createStorageListManager(formManager, modal) {
       return activeTags.some((q) => item.tagsNorm.some((tg) => tg.includes(q)));
     },
 
-    // Mounted once; list renders won't touch this.
+    // Injected once; re-renders won’t duplicate it.
     filterUI: filterFrag,
 
     addButton: createAddButton({
@@ -299,4 +337,3 @@ export function createStorageListManager(formManager, modal) {
 
   return { ...listManager, reloadList: () => listManager.loadList() };
 }
-

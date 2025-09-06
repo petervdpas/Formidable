@@ -206,7 +206,8 @@ export default {
   "special.user.profile": "User Profile: {0}",
   "special.templates.placeholder":
     "Select or create a template-file to begin editing.",
-  "special.forms.placeholder": "Select or create a form-file to begin.",
+  "special.storage.placeholder": "Select or create a storage-file to begin.",
+  "special.noDataFilesFound": "No data files found.",
   "special.noTemplatesFound": "No template files found.",
   "special.noMetadataFilesFound": "No metadata files found.",
   "special.noPluginsFound": "No plugins found.",

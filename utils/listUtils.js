@@ -2,16 +2,26 @@
 
 import { EventBus } from "../modules/eventBus.js";
 
-export function makeSelectableList(items, onSelect, selectedClass = "selected") {
+export function makeSelectableList(
+  items,
+  onSelect,
+  selectedClass = "selected"
+) {
   items.forEach((item) => {
     const el = item.element;
     el.addEventListener("click", (e) => {
-      const isButtonClick = e.target.closest("button") || e.target.closest(".btn");
+      const isButtonClick =
+        e.target.closest("button") || e.target.closest(".btn");
       if (isButtonClick) {
-        EventBus.emit("logging:default", ["[SelectableList] Ignoring click on button inside item"]);
+        EventBus.emit("logging:default", [
+          "[SelectableList] Ignoring click on button inside item",
+        ]);
         return;
       }
-      EventBus.emit("logging:default", ["[SelectableList] Selecting item:", item.value]);
+      EventBus.emit("logging:default", [
+        "[SelectableList] Selecting item:",
+        item.value,
+      ]);
       items.forEach(({ element }) => element.classList.remove(selectedClass));
       el.classList.add(selectedClass);
       if (typeof onSelect === "function") onSelect(item.value);
@@ -32,7 +42,9 @@ export function createListManager({
 }) {
   const container = document.getElementById(elementId);
   if (!container) {
-    EventBus.emit("logging:error", [`[createListManager] Element not found: #${elementId}`]);
+    EventBus.emit("logging:error", [
+      `[createListManager] Element not found: #${elementId}`,
+    ]);
     throw new Error(`List container #${elementId} not found.`);
   }
 
@@ -57,21 +69,24 @@ export function createListManager({
   // (Re)mount provided filter UI safely (supports Element or DocumentFragment)
   if (filterUI && (filterUI.nodeType === 1 || filterUI.nodeType === 11)) {
     const host = ensureFilterWrapper();
-    host.innerHTML = "";            // clear any previous controls to avoid doubles
-    host.appendChild(filterUI);     // fragment contents or element
+    host.innerHTML = ""; // clear any previous controls to avoid doubles
+    host.appendChild(filterUI); // fragment contents or element
   }
 
   let fullList = [];
 
   async function loadList() {
-    EventBus.emit("logging:default", [`[createListManager] Loading list into #${elementId}...`]);
+    EventBus.emit("logging:default", [
+      `[createListManager] Loading list into #${elementId}...`,
+    ]);
     listWrapper.innerHTML = "";
     try {
       const items = await fetchListFunction();
       fullList = items;
       renderList(); // initial render
     } catch (err) {
-      listWrapper.innerHTML = "<div class='empty-message'>Error loading list.</div>";
+      listWrapper.innerHTML =
+        "<div class='empty-message'>Error loading list.</div>";
       EventBus.emit("status:update", {
         message: "status.error.loading.list",
         languageKey: "status.error.loading.list",
@@ -98,7 +113,9 @@ export function createListManager({
       const listItems = await Promise.all(
         filteredItems.map(async (raw) => {
           const isObject = typeof raw === "object" && raw !== null;
-          const display = isObject ? raw.display : raw.replace(/\.yaml$|\.md$/i, "");
+          const display = isObject
+            ? raw.display
+            : raw.replace(/\.yaml$|\.md$/i, "");
           const value = isObject ? raw.value : raw;
 
           const item = document.createElement("div");
@@ -174,6 +191,7 @@ export function createListManager({
       }
     },
     getItemCount: () => fullList.length,
-    getFilteredCount: () => listWrapper.querySelectorAll(`.${itemClass}`).length,
+    getFilteredCount: () =>
+      listWrapper.querySelectorAll(`.${itemClass}`).length,
   };
 }

@@ -221,8 +221,8 @@ export default {
   "special.user.profile": "Gebruikersprofiel: {0}",
   "special.templates.placeholder":
     "Selecteer of maak een sjabloonbestand om te bewerken.",
-  "special.forms.placeholder":
-    "Selecteer of maak een formulierbestand om te beginnen.",
+  "special.storage.placeholder":
+    "Selecteer of maak een opslagbestand om te beginnen.",
   "special.noTemplatesFound": "Geen sjabloonbestanden gevonden.",
   "special.noMetadataFilesFound": "Geen metadata-bestanden gevonden.",
   "special.noPluginsFound": "Geen plugins gevonden.",

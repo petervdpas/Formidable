@@ -211,8 +211,8 @@ export async function handleDeleteForm(
       if (container) {
         clearContainerUI(
           container,
-          "special.forms.placeholder",
-          "Select or create a form-file to begin."
+          "special.storage.placeholder",
+          "Select or create a storage-file to begin."
         );
       }
 

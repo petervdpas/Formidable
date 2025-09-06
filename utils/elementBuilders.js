@@ -89,7 +89,7 @@ export function createClearableInput({
 
   const toggle = () => {
     const show = input.value.trim().length > 0 && !input.disabled;
-    btn.classList.toggle("show", show);   // CSS makes it non-interactive when hidden
+    btn.classList.toggle("show", show); // CSS makes it non-interactive when hidden
   };
 
   const emitInput = () => {
@@ -119,7 +119,7 @@ export function createClearableInput({
 
     input.value = "";
     toggle();
-    emitInput();                // propagate the change to listeners
+    emitInput(); // propagate the change to listeners
     input.focus();
     if (typeof onClear === "function") onClear();
   });
@@ -131,13 +131,16 @@ export function createClearableInput({
 
   // convenience
   wrap.getValue = () => input.value;
-  wrap.setValue = (v = "") => { input.value = v; toggle(); emitInput(); };
+  wrap.setValue = (v = "") => {
+    input.value = v;
+    toggle();
+    emitInput();
+  };
   wrap.input = input;
   wrap.button = btn;
 
   return wrap;
 }
-
 
 export function createFilterField({
   id,
