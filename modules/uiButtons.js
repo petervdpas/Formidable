@@ -482,3 +482,35 @@ export function createPluginToggleButton(name, enabled, onClick) {
     } plugin ${name}`,
   });
 }
+
+// --- Loop toolbar builder (collapse/expand all) ---
+export function createLoopToolbar(loopList) {
+  const toolbar = document.createElement("div");
+  toolbar.className = "loop-toolbar";
+
+  const collapseBtn = createButton({
+    text: t("standard.collapse_all"),
+    i18nKey: "standard.collapse_all",
+    className: "btn-ghost btn-sm",
+    identifier: "loop-collapse-all",
+    onClick: () => {
+      loopList.querySelectorAll(":scope > .loop-item")
+        .forEach(it => it.classList.add("collapsed"));
+    },
+  });
+
+  const expandBtn = createButton({
+    text: t("standard.expand_all"),
+    i18nKey: "standard.expand_all",
+    className: "btn-ghost btn-sm",
+    identifier: "loop-expand-all",
+    onClick: () => {
+      loopList.querySelectorAll(":scope > .loop-item")
+        .forEach(it => it.classList.remove("collapsed"));
+    },
+  });
+
+  toolbar.appendChild(collapseBtn);
+  toolbar.appendChild(expandBtn);
+  return toolbar;
+}

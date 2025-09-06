@@ -348,6 +348,13 @@ export default {
   "standard.crash": "Crash",
   "standard.crashed": "Crashed",
   "standard.error": "Error",
+  "standard.warning": "Warning",
+  "standard.info": "Info",
+  "standard.success": "Success",
+  "standard.fatal": "Fatal",
+  "standard.debug": "Debug",
+  "standard.collapse_all": "Collapse All",
+  "standard.expand_all": "Expand All",
 
   // ── Tooltips ─────────────────────────────
   "tooltip.restart.formidable": "Restart Formidable",

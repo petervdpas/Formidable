@@ -37,6 +37,29 @@ button:disabled,
   font-size: 13px;
 }
 
+/* Ghost button: minimal, neutral */
+.btn-ghost {
+  background-color: transparent !important;
+  border: 1px solid transparent;
+  color: var(--generic-fg-default);
+  box-shadow: none !important;
+}
+.btn-ghost:hover {
+  background-color: var(--generic-bg-default-hover);
+  border-color: var(--generic-border-default-hover);
+  color: var(--generic-fg-default-hover);
+}
+
+/* Small size alias (same as your .btn-small) */
+.btn-sm {
+  font-size: 0.8em;
+  padding: 4px 8px;
+  line-height: 1.2;
+  height: auto;
+  min-width: auto;
+  margin-top: 0.3em;
+}
+
 /* ───── Small Button Patch ───── */
 .btn-small {
   font-size: 0.85em;

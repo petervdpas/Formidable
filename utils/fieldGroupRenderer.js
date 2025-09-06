@@ -6,6 +6,7 @@ import { applyValueToField, createSortable } from "./domUtils.js";
 import {
   createAddLoopItemButton,
   createDeleteLoopItemButton,
+  createLoopToolbar,
 } from "../modules/uiButtons.js";
 import { showConfirmModal } from "./modalUtils.js";
 import { fieldTypes } from "./fieldTypes.js";
@@ -109,14 +110,19 @@ export async function fieldGroupRenderer(
         loopList.appendChild(newItem);
       });
 
+      const loopToolbar = createLoopToolbar(loopList);
+      loopContainer.classList.add("has-toolbar");
+
+      loopContainer.appendChild(loopToolbar);
       loopContainer.appendChild(loopList);
       loopContainer.appendChild(addButton);
+
       container.appendChild(loopContainer);
 
       createSortable(loopList, {
         handle: `.loop-handle.depth-${nestingDepth + 1}`,
         group: `loop-${loopKey}`,
-        itemSelector: ".loop-item"
+        itemSelector: ".loop-item",
       });
     } else {
       if (loopGroupKeys.has(field.key)) {
@@ -315,7 +321,7 @@ async function createLoopItem(
       createSortable(nestedList, {
         handle: `.drag-handle.depth-${nestedDepth}`,
         group: `loop-${nestedKey}`,
-        itemSelector: ".loop-item"
+        itemSelector: ".loop-item",
       });
 
       const addNestedButton = createAddLoopItemButton(async () => {
@@ -331,8 +337,13 @@ async function createLoopItem(
         nestedList.appendChild(newItem);
       });
 
+      const nestedToolbar = createLoopToolbar(nestedList);
+      nestedContainer.classList.add("has-toolbar");
+
+      nestedContainer.appendChild(nestedToolbar);
       nestedContainer.appendChild(nestedList);
       nestedContainer.appendChild(addNestedButton);
+
       fieldsContainer.appendChild(nestedContainer);
     } else {
       // ───── Regular Field ─────
@@ -372,5 +383,8 @@ async function createLoopItem(
   }
 
   itemWrapper.appendChild(fieldsContainer);
+  // wrap
+  // itemWrapper.classList.add("collapsed");
+
   return itemWrapper;
 }

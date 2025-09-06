@@ -145,3 +145,21 @@
 .sub-loop-container .add-loop-item-btn:hover {
   background-color: var(--subloop-add-bg-hover, #0062cc);
 }
+
+/* Put the toolbar in the top-right corner of the loop box */
+.loop-container { position: relative; } /* safe to add */
+
+.loop-toolbar {
+  position: absolute;
+  top: 8px;          /* align with your 12px padding nicely */
+  right: 12px;
+  display: inline-flex;
+  gap: .4rem;
+  z-index: 1;
+}
+
+/* ensure the label text never sits under the toolbar */
+.loop-container.has-toolbar .loop-label {
+  padding-right: var(--loop-toolbar-space, 160px);
+  margin-bottom: 8px; /* keep your original spacing */
+}

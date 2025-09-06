@@ -9,8 +9,8 @@
   "enable_plugins": true,
   "context_mode": "storage",
   "context_folder": "./",
-  "selected_template": "basic.yaml",
-  "selected_data_file": "sane-20250530.meta.json",
+  "selected_template": "loopie.yaml",
+  "selected_data_file": "test-20250711.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -22,8 +22,8 @@
   "window_bounds": {
     "width": 1302,
     "height": 969,
-    "x": 309,
-    "y": 47
+    "x": 337,
+    "y": 25
   },
   "template_sidebar_width": 364,
   "storage_sidebar_width": 403
