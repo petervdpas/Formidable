@@ -218,6 +218,17 @@ export async function renderFormUI(
     eventFunctions
   );
 
+  // ---- ADD: bulk collapse/expand helpers (used by hotkeys)
+  function setCollapsedStateForAll(root, collapsed) {
+    root.querySelectorAll(".loop-item").forEach((item) => {
+      item.classList.toggle("collapsed", collapsed);
+      const btn = item.querySelector(".collapse-toggle");
+      if (btn) btn.innerHTML = collapsed ? "▶" : "▼"; // keep arrow in sync
+    });
+  }
+  const collapseAllLoops = () => setCollapsedStateForAll(container, true);
+  const expandAllLoops = () => setCollapsedStateForAll(container, false);
+
   // ─── Bind page-scoped hotkeys and annotate buttons ───────────
   if (metaSection.__metaButtons) {
     const { save, delete: del, render } = metaSection.__metaButtons;
@@ -266,6 +277,16 @@ export async function renderFormUI(
             });
           },
           titleKey: "modal.settings.display.meta",
+        },
+        {
+          combo: ["Ctrl+Shift+C", "Cmd+Shift+C", "Meta+Shift+C"],
+          onTrigger: collapseAllLoops,
+          titleKey: "standard.collapse_all",
+        },
+        {
+          combo: ["Ctrl+Shift+E", "Cmd+Shift+E", "Meta+Shift+E"],
+          onTrigger: expandAllLoops,
+          titleKey: "standard.expand_all",
         },
       ],
       {

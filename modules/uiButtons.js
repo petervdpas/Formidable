@@ -484,31 +484,52 @@ export function createPluginToggleButton(name, enabled, onClick) {
 }
 
 // --- Loop toolbar builder (collapse/expand all) ---
-export function createLoopToolbar(loopList) {
+export function createLoopToolbar(loopList, { asIcons = true } = {}) {
   const toolbar = document.createElement("div");
   toolbar.className = "loop-toolbar";
 
-  const collapseBtn = createButton({
-    text: t("standard.collapse_all"),
-    i18nKey: "standard.collapse_all",
-    className: "btn-ghost btn-sm",
-    identifier: "loop-collapse-all",
-    onClick: () => {
-      loopList.querySelectorAll(":scope > .loop-item")
-        .forEach(it => it.classList.add("collapsed"));
-    },
-  });
+  const collapseHandler = () => {
+    loopList.querySelectorAll(":scope > .loop-item")
+      .forEach(it => it.classList.add("collapsed"));
+  };
+  const expandHandler = () => {
+    loopList.querySelectorAll(":scope > .loop-item")
+      .forEach(it => it.classList.remove("collapsed"));
+  };
 
-  const expandBtn = createButton({
-    text: t("standard.expand_all"),
-    i18nKey: "standard.expand_all",
-    className: "btn-ghost btn-sm",
-    identifier: "loop-expand-all",
-    onClick: () => {
-      loopList.querySelectorAll(":scope > .loop-item")
-        .forEach(it => it.classList.remove("collapsed"));
-    },
-  });
+  const collapseBtn = asIcons
+    ? createIconButton({
+        iconClass: "fa fa-chevron-up",
+        className: "btn icon-button btn-icon-default btn-icon-small",
+        identifier: "loop-collapse-all",
+        onClick: collapseHandler,
+        i18nTitle: "standard.collapse_all",  // tooltip
+        i18nAria:  "standard.collapse_all",  // screen readers
+      })
+    : createButton({
+        text: t("standard.collapse_all"),
+        i18nKey: "standard.collapse_all",
+        className: "btn-default btn-small",
+        identifier: "loop-collapse-all",
+        onClick: collapseHandler,
+      });
+
+  const expandBtn = asIcons
+    ? createIconButton({
+        iconClass: "fa fa-chevron-down",
+        className: "btn icon-button btn-icon-default btn-icon-small",
+        identifier: "loop-expand-all",
+        onClick: expandHandler,
+        i18nTitle: "standard.expand_all",
+        i18nAria:  "standard.expand_all",
+      })
+    : createButton({
+        text: t("standard.expand_all"),
+        i18nKey: "standard.expand_all",
+        className: "btn-default btn-small",
+        identifier: "loop-expand-all",
+        onClick: expandHandler,
+      });
 
   toolbar.appendChild(collapseBtn);
   toolbar.appendChild(expandBtn);
