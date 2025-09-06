@@ -288,6 +288,63 @@ h3::before {
   width: inherit;
 }
 
+.list-filter-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: .5rem;
+  margin: .25rem 0 .75rem;
+
+  /* new visuals using dedicated vars */
+  padding: .5rem .75rem;
+  background-color: var(--filter-bg);
+  border: 1px solid var(--filter-border);
+  border-radius: 8px;
+  box-shadow: var(--filter-shadow);
+  font-size: 0.85em;
+  color: var(--filter-text);
+}
+
+.list-filter-wrapper .filter-chunk {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  width: 100%;
+}
+
+.list-filter-wrapper .filter-label { 
+  white-space: nowrap;
+  color: var(--filter-text);
+}
+
+.list-filter-wrapper .tag-filter-input {
+  flex: 1;
+  min-width: 0;
+  padding: 3px 5px;
+  font-size: inherit;
+}
+
+/* keep switches and trailing text scaled down */
+.list-filter-wrapper .switch-wrapper { font-size: inherit; }
+.list-filter-wrapper .trailing-label { font-size: 0.95em; opacity: .85; }
+
+/* Clearable input */
+.clear-input{ position:relative; width:100%; }
+.clear-input.size-sm input{ padding:3px 26px 3px 6px; font-size:.9em; }
+.clear-input.size-md input{ padding:4px 28px 4px 8px; }
+.clear-input.size-lg input{ padding:6px 32px 6px 10px; font-size:1.05em; }
+
+.clear-input .clear-input-btn{
+  position:absolute; right:6px; top:50%; transform:translateY(-50%);
+  width:20px; height:20px; display:none;
+  border:none; background:transparent; padding:0; cursor:pointer;
+  color:var(--muted-fg); opacity:.6;
+}
+.clear-input .clear-input-btn.show{ display:block; }
+.clear-input .clear-input-btn:hover{ opacity:.95; }
+
+.tag-filter-input{ width:100%; font-size:inherit; }
+
 .list-item {
   display: flex;
   justify-content: space-between;

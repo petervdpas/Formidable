@@ -27,7 +27,7 @@ export default {
   "config.internal_server_port": "Serverpoort",
   "config.show_meta_section": "Toon Meta Sectie",
 
-    // Errors (template-level)
+  // Errors (template-level)
   "error.template.duplicate_keys": "Duplicaat sleutels: {0}",
   "error.template.unmatched_loopstart": "Niet-overeenkomende lusstart op: {0}",
   "error.template.unmatched_loopstop": "Niet-overeenkomende lusstop op: {0}",
@@ -47,7 +47,8 @@ export default {
 
   // Errors (field-level, optional if you show inline field messages via i18n too)
   "error.field.missing_key": "Veldsleutel is vereist.",
-  "error.field.guid_key_must_be_id": 'GUID-veld sleutel moet "id" zijn (niet "{0}").',
+  "error.field.guid_key_must_be_id":
+    'GUID-veld sleutel moet "id" zijn (niet "{0}").',
   "error.field.only_one_tags_field":
     "Er kan slechts één 'tags'-veld in een sjabloon zijn.",
   "error.field.duplicate_key": 'Duplicaat veld sleutel: "{0}".',
@@ -222,8 +223,6 @@ export default {
     "Selecteer of maak een sjabloonbestand om te bewerken.",
   "special.forms.placeholder":
     "Selecteer of maak een formulierbestand om te beginnen.",
-  "special.showAll": "Toon alles",
-  "special.showFlagged": "Gemarkeerd weergeven",
   "special.noTemplatesFound": "Geen sjabloonbestanden gevonden.",
   "special.noMetadataFilesFound": "Geen metadata-bestanden gevonden.",
   "special.noPluginsFound": "Geen plugins gevonden.",
@@ -244,6 +243,11 @@ export default {
     "Weet je zeker dat je het systeem wilt herstarten?",
   "special.context.selection.hint":
     "Deze sectie toont beschikbare formulieren of sjablonen, afhankelijk van de contextmodus.",
+  "special.filterFlagged": "Gemarkeerde items",
+  "special.showAll": "Toon Alles",
+  "special.showFlagged": "Toon Gemarkeerd",
+  "special.filterByTags": "Filter op tag(s)...",
+  "special.filterByTags.placeholder": "Voer tag(s) in om te filteren...",
 
   // ── dropdown ───────────────────────────
   "dropdown.select": "Selecteer...",

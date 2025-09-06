@@ -4,10 +4,11 @@
     "author_email": "regular@example.com",
     "template": "recepten.yaml",
     "created": "2025-08-08T08:30:20.912Z",
-    "updated": "2025-09-05T16:23:26.771Z",
+    "updated": "2025-09-05T23:38:17.666Z",
     "flagged": false,
     "tags": [
       "groentenschotel",
+      "spaans",
       "vinaigrette"
     ]
   },
@@ -19,7 +20,8 @@
     "tickertape": "Lekker met Tapenade... Vergeet de Vinaigrette niet!",
     "labels": [
       "groentenschotel",
-      "vinaigrette"
+      "vinaigrette",
+      "spaans"
     ],
     "foto": "",
     "foto_bijschrift": "",

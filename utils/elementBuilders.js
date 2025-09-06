@@ -5,12 +5,7 @@ import { t } from "./i18n.js";
 
 export function createStyledLabel(
   text,
-  {
-    forId = null,
-    className = "",
-    styles = {},
-    i18nKey = null,
-  } = {}
+  { forId = null, className = "", styles = {}, i18nKey = null } = {}
 ) {
   const label = document.createElement("label");
 
@@ -56,6 +51,136 @@ export function createStyledSelect({
   });
 
   return select;
+}
+
+export function createClearableInput({
+  id,
+  placeholder = "",
+  className = "",
+  type = "text",
+  value = "",
+  disabled = false,
+  size = "md",
+  clearTooltip = "Clear",
+  onInput = null,
+  onClear = null,
+} = {}) {
+  const wrap = document.createElement("div");
+  wrap.className = `clear-input size-${size}`.trim();
+
+  const input = document.createElement("input");
+  input.type = type;
+  input.id = id;
+  input.placeholder = placeholder;
+  input.value = value;
+  input.disabled = !!disabled;
+  input.className = className || "text-input";
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "clear-input-btn";
+  btn.setAttribute("aria-label", clearTooltip);
+  btn.title = clearTooltip;
+  btn.innerHTML = `
+    <svg width="14" height="14" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+      <path d="M4.7 4.7a1 1 0 0 1 1.4 0L10 8.6l3.9-3.9a1 1 0 0 1 1.4 1.4L11.4 10l3.9 3.9a1 1 0 1 1-1.4 1.4L10 11.4l-3.9 3.9a1 1 0 0 1-1.4-1.4L8.6 10 4.7 6.1a1 1 0 0 1 0-1.4z" fill="currentColor"/>
+    </svg>
+  `;
+
+  const toggle = () => {
+    const show = input.value.trim().length > 0 && !input.disabled;
+    btn.classList.toggle("show", show);   // CSS makes it non-interactive when hidden
+  };
+
+  const emitInput = () => {
+    if (typeof onInput === "function") onInput(input.value);
+  };
+
+  input.addEventListener("input", () => {
+    toggle();
+    emitInput();
+  });
+
+  input.addEventListener("keyup", (e) => {
+    if (e.key === "Escape" && input.value) {
+      btn.click();
+      e.stopPropagation();
+    }
+  });
+
+  btn.addEventListener("mousedown", (e) => {
+    // prevent focus flicker/blur on some browsers
+    e.preventDefault();
+  });
+
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    input.value = "";
+    toggle();
+    emitInput();                // propagate the change to listeners
+    input.focus();
+    if (typeof onClear === "function") onClear();
+  });
+
+  requestAnimationFrame(toggle);
+
+  wrap.appendChild(input);
+  wrap.appendChild(btn);
+
+  // convenience
+  wrap.getValue = () => input.value;
+  wrap.setValue = (v = "") => { input.value = v; toggle(); emitInput(); };
+  wrap.input = input;
+  wrap.button = btn;
+
+  return wrap;
+}
+
+
+export function createFilterField({
+  id,
+  labelText = "",
+  labelKey = null, // i18n key
+  placeholder = "",
+  size = "md",
+  disabled = false,
+  onInput = null,
+  onClear = null,
+} = {}) {
+  const row = document.createElement("div");
+  row.className = "filter-chunk filter-field";
+
+  const label = document.createElement("label");
+  label.className = "filter-label";
+  label.htmlFor = id;
+  if (labelKey) {
+    label.setAttribute("data-i18n", labelKey);
+    label.textContent = t(labelKey);
+  } else {
+    label.textContent = labelText;
+  }
+  row.appendChild(label);
+
+  const clearable = createClearableInput({
+    id,
+    placeholder,
+    size,
+    disabled,
+    onInput,
+    onClear,
+    className: "tag-filter-input",
+  });
+  clearable.style.flex = "1";
+  row.appendChild(clearable);
+
+  return {
+    element: row,
+    input: clearable.input,
+    label,
+    clearButton: clearable.button,
+  };
 }
 
 export function addContainerElement({
@@ -209,7 +334,7 @@ export function createFormRowDropdown({
   // row.id = `${id}-row`; // optional; not required anymore
 
   const dd = createDropdown({
-    containerEl: row,          // <— pass the element directly
+    containerEl: row, // <— pass the element directly
     labelTextOrKey: labelOrKey,
     selectedValue,
     options,
@@ -219,7 +344,7 @@ export function createFormRowDropdown({
   });
 
   if (dd?.selectElement) {
-    dd.selectElement.id = id;  // so saves can query by #yaml-item-field
+    dd.selectElement.id = id; // so saves can query by #yaml-item-field
   }
 
   return { row, dropdown: dd };
@@ -598,7 +723,7 @@ export function createOptionGrid(
   onSelect,
   {
     gridCols = 6,
-    gridRows = null,          // null => auto rows
+    gridRows = null, // null => auto rows
     cellSize = 32,
     gridGap = 2,
     fillPlaceholders = true,
@@ -626,8 +751,10 @@ export function createOptionGrid(
     btn.dataset.value = opt.value ?? "";
     btn.disabled = !!opt.disabled;
     btn.innerHTML = opt.iconHTML
-      ? `${opt.iconHTML}<span class="popup-option-label">${opt.label ?? opt.value ?? ""}</span>`
-      : (opt.label ?? opt.value ?? "");
+      ? `${opt.iconHTML}<span class="popup-option-label">${
+          opt.label ?? opt.value ?? ""
+        }</span>`
+      : opt.label ?? opt.value ?? "";
 
     btn.style.boxSizing = "border-box";
     btn.style.width = "100%";
@@ -701,8 +828,10 @@ export function createOptionList(
     btn.disabled = !!opt.disabled;
     btn.style.minHeight = `${optionHeight}px`;
     btn.innerHTML = opt.iconHTML
-      ? `${opt.iconHTML}<span class="popup-option-label">${opt.label ?? opt.value}</span>`
-      : (opt.label ?? opt.value);
+      ? `${opt.iconHTML}<span class="popup-option-label">${
+          opt.label ?? opt.value
+        }</span>`
+      : opt.label ?? opt.value;
 
     btn.addEventListener("click", () => {
       if (!opt.disabled) onSelect?.(opt.value, opt);
@@ -736,7 +865,8 @@ function fillGrid(options, makeBtn, settings) {
     }
   }
 
-  let r = 0, c = 0;
+  let r = 0,
+    c = 0;
   for (const opt of autoFill) {
     while (occupied.has(`${r},${c}`)) {
       c++;

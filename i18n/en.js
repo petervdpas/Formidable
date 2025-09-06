@@ -207,8 +207,6 @@ export default {
   "special.templates.placeholder":
     "Select or create a template-file to begin editing.",
   "special.forms.placeholder": "Select or create a form-file to begin.",
-  "special.showAll": "Show All",
-  "special.showFlagged": "Show Flagged",
   "special.noTemplatesFound": "No template files found.",
   "special.noMetadataFilesFound": "No metadata files found.",
   "special.noPluginsFound": "No plugins found.",
@@ -223,6 +221,11 @@ export default {
   "special.system.restart.sure": "Are you sure you want to restart the system?",
   "special.context.selection.hint":
     "This section will show available forms or templates depending on context mode.",
+  "special.filterFlagged": "Marked items",
+  "special.showAll": "Show All",
+  "special.showFlagged": "Show Flagged",
+  "special.filterByTags": "Filter by tag(s)...",
+  "special.filterByTags.placeholder": "Enter tag(s) to filter...",
 
   // ── dropdown ───────────────────────────
   "dropdown.select": "Select...",

@@ -8,6 +8,8 @@ import { stripMetaExtension } from "../utils/pathUtils.js";
 import {
   buildSwitchElement,
   buildExpressionLabel,
+  addContainerElement,
+  createFilterField,
 } from "../utils/elementBuilders.js";
 import { createListManager } from "../utils/listUtils.js";
 import { createAddButton } from "./uiButtons.js";
@@ -108,25 +110,27 @@ export function createTemplateListManager(modal, dropdown = null) {
 
 export function createStorageListManager(formManager, modal) {
   let showOnlyFlagged = false;
+  let activeTags = [];
   let listManager = null;
 
-  // MOVE toggle creation ABOVE listManager so `wrapper` exists
-  const { input: toggle, element: wrapper } = buildSwitchElement({
+  const norm = (s) =>
+    String(s || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+  // ── Flag toggle ─────────────────────────────────────────────
+  const { element: flaggedWrapper } = buildSwitchElement({
     id: "flagged-toggle",
     name: "flagged-toggle",
     checked: showOnlyFlagged,
     trailingValues: ["special.showFlagged", "special.showAll"],
     onFlip: async (value) => {
       showOnlyFlagged = value;
-
       const selected_datafile = await getUserConfig("selected_data_file");
       const name = window.currentSelectedDataFile || selected_datafile;
-
       listManager.renderList(undefined, () => {
-        if (name) {
-          EventBus.emit("form:list:highlighted", name);
-        }
-
+        if (name) EventBus.emit("form:list:highlighted", name);
         EventBus.emit("status:update", {
           message: "status.loaded.items",
           languageKey: "status.loaded.items",
@@ -138,6 +142,42 @@ export function createStorageListManager(formManager, modal) {
     i18nEnabled: true,
   });
 
+  // ── Build filter UI (single wrapper is provided by createListManager) ──
+  const filterFrag = document.createDocumentFragment();
+
+  // Row 1: label + flag switch
+  const flaggedRow = document.createElement("div");
+  flaggedRow.className = "filter-chunk";
+  addContainerElement({
+    parent: flaggedRow,
+    tag: "label",
+    className: "filter-label",
+    i18nKey: "special.filterFlagged",
+    textContent: t("special.filterFlagged") || "Marked items",
+    attributes: { for: "flagged-toggle" },
+  });
+  flaggedRow.appendChild(flaggedWrapper);
+  filterFrag.appendChild(flaggedRow);
+
+  // Row 2: clearable tag field (ONLY onInput → no duplicate renders)
+  const tagsField = createFilterField({
+    id: "tag-filter-input",
+    labelKey: "special.filterByTags",
+    placeholder:
+      t("special.filterByTags.placeholder") || "Enter tag(s) to filter…",
+    size: "sm",
+    onInput: (val) => {
+      activeTags = (val || "")
+        .split(/[, \t\n]+/)
+        .map((s) => norm(s.trim()))
+        .filter(Boolean);
+      listManager.renderList();
+    },
+    // Do NOT pass onClear; clear button already fires an input event.
+  });
+  filterFrag.appendChild(tagsField.element);
+
+  // ── List manager ───────────────────────────────────────────
   listManager = createListManager({
     elementId: "storage-list",
     itemClass: "storage-item",
@@ -156,7 +196,6 @@ export function createStorageListManager(formManager, modal) {
           callback: resolve,
         });
       });
-
       const sidebarExpr = descriptor?.yaml?.sidebar_expression || null;
 
       const entries = await new Promise((resolve) => {
@@ -166,16 +205,17 @@ export function createStorageListManager(formManager, modal) {
         });
       });
 
-      return entries.map((entry) => {
-        return {
-          display: entry.title || stripMetaExtension(entry.filename),
-          value: entry.filename,
-          flagged: entry.meta?.flagged || false,
-          id: entry.meta?.id || "",
-          sidebarContext: entry.expressionItems || {},
-          sidebarExpr: sidebarExpr,
-        };
-      });
+      return entries.map((entry) => ({
+        display: entry.title || stripMetaExtension(entry.filename),
+        value: entry.filename,
+        flagged: entry.meta?.flagged || false,
+        id: entry.meta?.id || "",
+        sidebarContext: entry.expressionItems || {},
+        sidebarExpr,
+        tagsNorm: Array.isArray(entry.meta?.tags)
+          ? entry.meta.tags.map((s) => norm(s))
+          : [],
+      }));
     },
 
     onItemClick: (storageItem) =>
@@ -185,13 +225,13 @@ export function createStorageListManager(formManager, modal) {
 
     renderItemExtra: async ({ subLabelNode, flagNode, rawData }) => {
       if (rawData.flagged) {
-        const wrapper = document.createElement("span");
-        wrapper.className = "flag-icon-wrapper";
+        const wrap = document.createElement("span");
+        wrap.className = "flag-icon-wrapper";
         const flagIcon = document.createElement("i");
         flagIcon.className = "fa fa-flag";
         flagIcon.style.pointerEvents = "none";
-        wrapper.appendChild(flagIcon);
-        flagNode.appendChild(wrapper);
+        wrap.appendChild(flagIcon);
+        flagNode.appendChild(wrap);
       }
 
       subLabelNode.innerHTML = "";
@@ -214,8 +254,7 @@ export function createStorageListManager(formManager, modal) {
           });
           subLabelNode.appendChild(exprEl);
         }
-      } catch (err) {
-        console.warn("[sidebarManager] Expression failed:", err);
+      } catch {
         const fallback = buildExpressionLabel({
           text: "[EXPR ERROR]",
           classes: ["expr-text-red", "expr-bold"],
@@ -224,8 +263,17 @@ export function createStorageListManager(formManager, modal) {
       }
     },
 
-    filterFunction: (item) => !showOnlyFlagged || item.flagged,
-    filterUI: wrapper, // ← wrapper now exists
+    // Flag + loose tag (ANY) filter
+    filterFunction: (item) => {
+      if (showOnlyFlagged && !item.flagged) return false;
+      if (!activeTags.length) return true;
+      if (!Array.isArray(item.tagsNorm) || !item.tagsNorm.length) return false;
+      return activeTags.some((q) => item.tagsNorm.some((tg) => tg.includes(q)));
+    },
+
+    // Mounted once; list renders won't touch this.
+    filterUI: filterFrag,
+
     addButton: createAddButton({
       label: t("button.addEntry"),
       onClick: async () => {
@@ -249,8 +297,6 @@ export function createStorageListManager(formManager, modal) {
     }),
   });
 
-  return {
-    ...listManager,
-    reloadList: () => listManager.loadList(),
-  };
+  return { ...listManager, reloadList: () => listManager.loadList() };
 }
+
