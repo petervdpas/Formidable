@@ -419,6 +419,7 @@ export default {
   "field.format.markdown": "Markdown",
   "field.format.plain": "Gewone tekst",
 
+  "field.code.label": "Code",
   "field.code.language": "Taal",
   "field.code.language.javascript": "JavaScript",
   "field.code.runmode": "Uitvoeringsmodus",
@@ -427,6 +428,7 @@ export default {
   "field.code.runmode.save": "Bij Opslaan",
   "field.code.allowrun": "Toestaan Uitvoering",
   "field.code.sandbox": "Sandbox",
+  "field.code.fullscreen": "Gebruik F11 voor volledig scherm",
 
   // ── Modals ───────────────────
 

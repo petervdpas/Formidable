@@ -335,6 +335,16 @@
     padding-top: 6px;
 }
 
+/* field-edit modal: small hint under label */
+#field-edit-modal label .cm-f11-hint{
+  display:block;
+  margin-top:4px;
+  font-size:0.85em;
+  line-height:1.2;
+  opacity:.75;              /* subtle */
+  color: var(--text-subtle, currentColor);
+}
+
 /* Inline fullscreen toggle button */
 .cm-inline-controls {
     display: inline-flex;

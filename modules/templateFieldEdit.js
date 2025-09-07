@@ -7,6 +7,7 @@ import { fieldTypes } from "../utils/fieldTypes.js";
 import { validateField } from "../utils/templateValidation.js";
 import { applyFieldAttributeDisabling } from "../utils/formUtils.js";
 import { buildButtonGroup, createToggleButtons } from "../utils/buttonUtils.js";
+import { buildCompositeElementStacked } from "../utils/elementBuilders.js";
 import {
   createFieldEditButton,
   createFieldEditIconButton,
@@ -459,21 +460,19 @@ function maybeSwapDefaultForCode(dom, fieldType) {
   const row = dom.default?.closest(".modal-form-row");
   if (!row || !dom.default) return;
 
-  const labelEl = row.querySelector("label[for='edit-default']");
+  let labelEl = row.querySelector("label[for='edit-default']");
   const isCode = fieldType === "code";
   const isTextarea = dom.default.tagName === "TEXTAREA";
 
   if (isCode) {
-    // make sure no shells exist before creating a new one
+    // Clean up any previous editor/shells
     row.querySelectorAll(".CodeMirror")?.forEach((n) => n.remove());
-
-    // destroy any existing editor
     if (dom.__codeEditor) {
       destroyInlineCodeMirror(dom.__codeEditor);
       dom.__codeEditor = null;
     }
 
-    // ensure a <textarea> for CodeMirror
+    // Ensure a <textarea> for CodeMirror
     if (!isTextarea) {
       const ta = document.createElement("textarea");
       ta.id = "edit-default";
@@ -487,7 +486,33 @@ function maybeSwapDefaultForCode(dom, fieldType) {
       dom.default = ta;
     }
 
-    // modal body for fullscreen sizing
+    // Build stacked label (main + subtext under it)
+    const stacked = buildCompositeElementStacked({
+      forId: "edit-default",
+      labelKey: "field.code.label",
+      subKey: "field.code.fullscreen",
+      i18nEnabled: true,
+      className: labelEl?.className || "",
+    });
+
+    // Fallbacks if keys are missing
+    const mainSpan = stacked.querySelector("span");
+    if (mainSpan && (!mainSpan.textContent || mainSpan.textContent === "field.code.label")) {
+      mainSpan.setAttribute("data-i18n", "field.code.label");
+      mainSpan.textContent =
+        (typeof t === "function" && t("field.code.label")) || "Code";
+    }
+    const subSmall = stacked.querySelector(".label-subtext");
+    if (subSmall && (!subSmall.textContent || subSmall.textContent === "field.code.fullscreen")) {
+      subSmall.setAttribute("data-i18n", "field.code.fullscreen");
+      subSmall.textContent =
+        (typeof t === "function" && t("field.code.fullscreen")) || "Use F11 for fullscreen";
+    }
+
+    if (labelEl) labelEl.replaceWith(stacked);
+    else row.insertBefore(stacked, row.firstChild);
+
+    // Create CodeMirror
     const modal = document.getElementById("field-edit-modal");
     const modalBodyEl = modal?.querySelector(".modal-body") || null;
 
@@ -496,39 +521,15 @@ function maybeSwapDefaultForCode(dom, fieldType) {
       height: 560,
       modalBodyEl,
     });
-
-    // inline Full Screen button (add once)
-    if (!row.querySelector(".cm-inline-controls")) {
-      const lbl = labelEl || row.querySelector("label[for='edit-default']");
-      if (lbl) {
-        const ctrls = document.createElement("span");
-        ctrls.className = "cm-inline-controls";
-        const fsBtn = document.createElement("button");
-        fsBtn.type = "button";
-        fsBtn.className = "btn cm-fs-btn";
-        fsBtn.textContent = "Full Screen";
-        fsBtn.title = "Toggle editor full screen (F11)";
-        fsBtn.addEventListener("click", () =>
-          dom.__codeEditor.toggleModalFullscreen()
-        );
-        ctrls.appendChild(fsBtn);
-        lbl.appendChild(ctrls);
-      }
-    }
-
-    if (labelEl) {
-      labelEl.textContent = "Code";
-      labelEl.removeAttribute("data-i18n");
-    }
   } else {
-    // leaving code → destroy editor and remove any shells
+    // Leaving code → destroy editor and remove shells
     if (dom.__codeEditor) {
       destroyInlineCodeMirror(dom.__codeEditor);
       dom.__codeEditor = null;
     }
     row.querySelectorAll(".CodeMirror")?.forEach((n) => n.remove());
 
-    // swap back to an <input> if needed
+    // Swap back to <input> if needed
     if (isTextarea) {
       const inp = document.createElement("input");
       inp.type = "text";
@@ -538,11 +539,15 @@ function maybeSwapDefaultForCode(dom, fieldType) {
       dom.default = inp;
     }
 
-    if (labelEl) {
-      labelEl.textContent = "Default";
-      labelEl.setAttribute("data-i18n", "standard.default");
-    }
-    // remove inline FS controls, if any
-    row.querySelector(".cm-inline-controls")?.remove();
+    // Restore simple i18n-able "Default" label
+    const restored = document.createElement("label");
+    restored.htmlFor = "edit-default";
+    restored.className = labelEl?.className || "";
+    restored.setAttribute("data-i18n", "standard.default");
+    restored.textContent =
+      (typeof t === "function" && t("standard.default")) || "Default";
+
+    if (labelEl) labelEl.replaceWith(restored);
+    else row.insertBefore(restored, row.firstChild);
   }
 }

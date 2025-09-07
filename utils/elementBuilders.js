@@ -388,6 +388,47 @@ export function buildCompositeElement({
   return label;
 }
 
+/**
+ * A composite <label> with the main text + a subtext stacked underneath.
+ * - Keeps the real <label> element (so `for=` works + existing CSS keeps working)
+ * - Subtext is a <small> with a class you can style (display:block by default)
+ */
+export function buildCompositeElementStacked({
+  forId,
+  labelKey, // e.g. "field.code.label"
+  subKey, // e.g. "field.code.fullscreen"
+  i18nEnabled = false,
+  className = "", // copy classes from the original label if needed
+  smallClass = "label-subtext",
+} = {}) {
+  const label = document.createElement("label");
+  if (forId) label.htmlFor = forId;
+  if (className) label.className = className;
+
+  const main = document.createElement("span");
+  if (i18nEnabled && labelKey) {
+    main.setAttribute("data-i18n", labelKey);
+    main.textContent = t(labelKey);
+  } else {
+    main.textContent = labelKey || "";
+  }
+  label.appendChild(main);
+
+  if (subKey) {
+    const hint = document.createElement("small");
+    hint.className = smallClass;
+    if (i18nEnabled) {
+      hint.setAttribute("data-i18n", subKey);
+      hint.textContent = t(subKey);
+    } else {
+      hint.textContent = subKey;
+    }
+    label.appendChild(hint);
+  }
+
+  return label;
+}
+
 export function buildExpressionLabel({
   text = "",
   classes = [],

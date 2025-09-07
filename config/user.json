@@ -2,7 +2,7 @@
   "theme": "light",
   "show_icon_buttons": false,
   "use_expressions": true,
-  "show_meta_section": false,
+  "show_meta_section": true,
   "font_size": 14,
   "development_enable": true,
   "logging_enabled": false,
@@ -10,10 +10,10 @@
   "context_mode": "template",
   "context_folder": "./",
   "selected_template": "basic.yaml",
-  "selected_data_file": null,
+  "selected_data_file": "sane-20250530.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
-  "language": "en",
+  "language": "nl",
   "encryption_key": "",
   "use_git": true,
   "git_root": "./",
@@ -22,8 +22,8 @@
   "window_bounds": {
     "width": 1280,
     "height": 976,
-    "x": 386,
-    "y": 36
+    "x": 417,
+    "y": 48
   },
   "template_sidebar_width": 364,
   "storage_sidebar_width": 403
