@@ -85,13 +85,24 @@ export function setupModal(
   }
   if (maxHeight) modal.style.maxHeight = maxHeight;
 
-  // Optional resizer
-  let resizer = null;
+  // Optional resizer (idempotent)
+  // Reuse existing resizer if present; only enable once.
+  let resizer = modal.querySelector(".modal-resizer");
   if (resizable) {
-    resizer = document.createElement("div");
-    resizer.classList.add("modal-resizer");
-    modal.appendChild(resizer);
-    enableElementResizing(modal, resizer);
+    if (!resizer) {
+      resizer = document.createElement("div");
+      resizer.classList.add("modal-resizer");
+      modal.appendChild(resizer);
+    }
+    // guard so enableElementResizing isn't attached multiple times
+    if (!resizer.dataset.resizeEnabled) {
+      enableElementResizing(modal, resizer);
+      resizer.dataset.resizeEnabled = "1";
+    }
+    resizer.style.display = "";
+  } else if (resizer) {
+    // If not resizable for this setup, remove (or hide) the resizer
+    resizer.remove();
   }
 
   // ────────────────────────────────────────────────────────────
@@ -383,21 +394,23 @@ export function setupPopup(popupId, defaultOptions = {}) {
     typeof popupId === "string" ? document.getElementById(popupId) : popupId;
 
   if (!popup) {
-    EventBus.emit("logging:warning", [`[setupPopup] Popup not found: ${popupId}`]);
+    EventBus.emit("logging:warning", [
+      `[setupPopup] Popup not found: ${popupId}`,
+    ]);
     return { show: () => {}, hide: () => {}, popup: null };
   }
 
   const config = {
-    triggerBtn: null,         // HTMLElement or element id
+    triggerBtn: null, // HTMLElement or element id
     onOpen: () => {},
     onClose: () => {},
     escToClose: false,
     resizable: false,
-    width: "auto",            // let content drive width by default
+    width: "auto", // let content drive width by default
     height: "auto",
-    position: "auto",         // "auto" | "above" | {top,left}
-    gutter: 8,                // viewport gutter
-    rightPadding: 12,         // keep away from right edge
+    position: "auto", // "auto" | "above" | {top,left}
+    gutter: 8, // viewport gutter
+    rightPadding: 12, // keep away from right edge
     ...defaultOptions,
   };
 
@@ -429,8 +442,14 @@ export function setupPopup(popupId, defaultOptions = {}) {
   function place(rect, popupWidth, popupHeight, mode, gutter, rightPadding) {
     // Default anchor near left/top if no rect
     if (!rect) {
-      const left = Math.max(gutter, Math.min(window.innerWidth - popupWidth - rightPadding, gutter));
-      const top  = Math.max(gutter, Math.min(window.innerHeight - popupHeight - gutter, gutter));
+      const left = Math.max(
+        gutter,
+        Math.min(window.innerWidth - popupWidth - rightPadding, gutter)
+      );
+      const top = Math.max(
+        gutter,
+        Math.min(window.innerHeight - popupHeight - gutter, gutter)
+      );
       return { left, top, isAbove: false };
     }
 
@@ -438,7 +457,8 @@ export function setupPopup(popupId, defaultOptions = {}) {
     const spaceBelow = window.innerHeight - rect.bottom;
     const spaceAbove = rect.top;
 
-    let top, isAbove = false;
+    let top,
+      isAbove = false;
     if (mode === "above") {
       // try above, otherwise fall back below
       if (spaceAbove >= popupHeight) {
@@ -447,11 +467,12 @@ export function setupPopup(popupId, defaultOptions = {}) {
       } else {
         top = rect.bottom;
       }
-    } else { // auto
+    } else {
+      // auto
       if (spaceBelow >= popupHeight || spaceBelow >= spaceAbove) {
-        top = rect.bottom;              // below
+        top = rect.bottom; // below
       } else {
-        top = rect.top - popupHeight;   // above
+        top = rect.top - popupHeight; // above
         isAbove = true;
       }
     }
@@ -480,11 +501,11 @@ export function setupPopup(popupId, defaultOptions = {}) {
     // Make it measurable
     popup.style.visibility = "hidden";
     popup.style.display = "block";
-    if (opts.width)  popup.style.width  = opts.width;
+    if (opts.width) popup.style.width = opts.width;
     if (opts.height) popup.style.height = opts.height;
 
     // Force layout, then measure
-    const popupWidth  = popup.offsetWidth;
+    const popupWidth = popup.offsetWidth;
     const popupHeight = popup.offsetHeight;
 
     // Compute placement
@@ -499,14 +520,16 @@ export function setupPopup(popupId, defaultOptions = {}) {
 
     // Apply final position
     popup.style.left = `${left}px`;
-    popup.style.top  = `${top}px`;
+    popup.style.top = `${top}px`;
     popup.classList.toggle("is-above", isAbove);
 
     // Reveal
     popup.style.visibility = "";
 
     if (opts.escToClose) {
-      escListener = (e) => { if (e.key === "Escape") hide(); };
+      escListener = (e) => {
+        if (e.key === "Escape") hide();
+      };
       window.addEventListener("keydown", escListener);
     }
 

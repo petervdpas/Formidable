@@ -43,18 +43,18 @@
 
 /* ───── Modal Disabled State ───── */
 .modal.modal-disabled {
-  pointer-events: none;
-  opacity: 0.9;
-  transition: opacity 0.1s ease;
+    pointer-events: none;
+    opacity: 0.9;
+    transition: opacity 0.1s ease;
 }
 
 .modal.modal-disabled * {
-  pointer-events: none !important;
+    pointer-events: none !important;
 }
 
 .modal.modal-disabled .btn-close,
 .modal.modal-disabled .modal-resizer {
-  display: none !important;
+    display: none !important;
 }
 
 .modal-message-highlight {
@@ -353,15 +353,15 @@
 }
 
 #render-preview .inline-tag {
-  display: inline-block;
-  background-color: var(--tag-bg, #3d5a3d);
-  color: var(--tag-text, #f0fff0);
-  border: 1px solid var(--tag-border, #81c784);
-  padding: 2px 6px;
-  margin: 0 4px 2px 0;
-  border-radius: 4px;
-  font-size: 0.85em;
-  font-weight: 500;
+    display: inline-block;
+    background-color: var(--tag-bg, #3d5a3d);
+    color: var(--tag-text, #f0fff0);
+    border: 1px solid var(--tag-border, #81c784);
+    padding: 2px 6px;
+    margin: 0 4px 2px 0;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 500;
 }
 
 /* Optional: if using a syntax highlighter later */

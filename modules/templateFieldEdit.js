@@ -19,6 +19,10 @@ import {
   getSupportedOptionTypes,
   setupOptionsEditor,
 } from "../utils/optionsEditor.js";
+import {
+  createInlineCodeMirror,
+  destroyInlineCodeMirror,
+} from "./templateCodemirror.js";
 
 function setupFieldEditor(container, onChange, allFields = []) {
   const dom = {
@@ -69,12 +73,18 @@ function setupFieldEditor(container, onChange, allFields = []) {
   }
 
   function setField(field) {
-    // — hard reset from any previous edit/open —
+    // hard reset any previous CodeMirror cleanly
     if (dom.__codeEditor) {
-      destroyCodeMirrorForDefault(dom); // writes back to <textarea> and removes CM
+      destroyInlineCodeMirror(dom.__codeEditor);
+      dom.__codeEditor = null;
     }
+    // paranoid sweep (covers any historical leftovers)
+    const sweepScope = container; // broader than just the row
+    sweepScope
+      ?.querySelectorAll(".CodeMirror, .cm-inline-controls")
+      ?.forEach((n) => n.remove());
 
-    originalKey = field.key?.trim();
+    originalKey = field.key?.trim() || "";
 
     dom.key.classList.remove("input-error");
     confirmBtn = document.getElementById("btn-field-edit-confirm");
@@ -87,18 +97,14 @@ function setupFieldEditor(container, onChange, allFields = []) {
     if (dom.primaryKey) dom.primaryKey.value = isGuid ? "true" : "false";
     dom.label.value = isGuid ? "GUID" : field.label || "";
     dom.description.value = field.description || "";
-    dom.summaryField.value = field.summary_field || "";
+    if (dom.summaryField) dom.summaryField.value = field.summary_field || "";
     dom.expressionItem.checked = !!field.expression_item;
     dom.twoColumn.checked = !!field.two_column;
-    dom.formatTextarea.value = field.format || "";
+    if (dom.formatTextarea) dom.formatTextarea.value = field.format || "";
     dom.default.value = field.default ?? "";
 
-    // make the Default control match the current type
-    maybeSwapDefaultForCode(dom, field.type);
-
-    labelLocked = field.label?.trim().length > 0 && field.label !== field.key;
-    dom.key.__listenersAttached = false;
-
+    // label auto-sync
+    labelLocked = !!field.label?.trim().length && field.label !== field.key;
     if (!dom.key.__listenersAttached) {
       dom.key.__listenersAttached = true;
 
@@ -108,51 +114,41 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
       dom.key.addEventListener("input", () => {
         const raw = dom.key.value.trim();
-
-        if (!labelLocked && raw.length > 0) {
-          const humanLabel = raw
+        if (!labelLocked && raw) {
+          dom.label.value = raw
             .replace(/[_\-]+/g, " ")
             .replace(/(^\w|\s\w)/g, (m) => m.toUpperCase());
-          dom.label.value = humanLabel;
         }
-
         labelLocked =
           dom.label.value.trim().length > 0 &&
           dom.label.value.toLowerCase() !== dom.key.value.toLowerCase();
-
         validate();
       });
     }
 
+    // type dropdown
     if (dom.type) {
       dom.type.innerHTML = "";
-
       for (const [typeKey, typeDef] of Object.entries(fieldTypes)) {
         const isLoop = typeKey === "loopstart" || typeKey === "loopstop";
         if (isLoop && typeKey !== field.type) continue;
-
-        const option = document.createElement("option");
-        option.value = typeKey;
-        option.textContent = typeDef.label || typeKey;
-        dom.type.appendChild(option);
+        const opt = document.createElement("option");
+        opt.value = typeKey;
+        opt.textContent = typeDef.label || typeKey;
+        dom.type.appendChild(opt);
       }
-
       dom.type.value = field.type || "text";
 
       dom.type.onchange = () => {
         const currentType = dom.type.value;
         const isGuidType = currentType === "guid";
-
         dom.key.value = isGuidType ? "id" : field.key || "";
         dom.key.disabled = isGuidType;
         dom.label.value = isGuidType ? "GUID" : field.label || "";
 
         initializeOptionsEditor(currentType, []);
         applyFieldAttributeDisabling(dom, currentType);
-
-        // swap Default <input>/<textarea> depending on type
         maybeSwapDefaultForCode(dom, currentType);
-
         validate();
       };
     }
@@ -164,6 +160,10 @@ function setupFieldEditor(container, onChange, allFields = []) {
     applyFieldAttributeDisabling(dom, field.type);
     initializeOptionsEditor(field.type, field.options);
 
+    // create CM if needed
+    maybeSwapDefaultForCode(dom, field.type);
+
+    // style the modal for type (no fullscreen hooks!)
     const modal = container.closest(".modal");
     applyModalTypeClass(modal, field.type || "text", fieldTypes, "main");
 
@@ -229,7 +229,13 @@ function setupFieldEditor(container, onChange, allFields = []) {
     return field;
   }
 
-  return { setField, getField };
+  function dispose() {
+    if (dom.__codeEditor) {
+      destroyInlineCodeMirror(dom.__codeEditor);
+      dom.__codeEditor = null;
+    }
+  }
+  return { setField, getField, dispose };
 }
 
 async function listFields(
@@ -371,6 +377,17 @@ export function showFieldEditorModal(field, allFields = [], onConfirm) {
   editor = setupFieldEditor(container, null, allFields);
   editor.setField(field);
   modal.show();
+
+  // ensure cleanup on close
+  const root = document.getElementById("field-edit-modal");
+  const onClosed = () => {
+    editor?.dispose?.();
+    root?.removeEventListener?.("modal:closed", onClosed);
+    root?.removeEventListener?.("hidden", onClosed);
+  };
+  // use whatever your modal emits; we listen to both just in case
+  root?.addEventListener?.("modal:closed", onClosed);
+  root?.addEventListener?.("hidden", onClosed);
 }
 
 export function renderFieldList(
@@ -447,20 +464,16 @@ function maybeSwapDefaultForCode(dom, fieldType) {
   const isTextarea = dom.default.tagName === "TEXTAREA";
 
   if (isCode) {
-    // clean any leftover CM DOM before creating a new one
-    removeStrayCodeMirrorNodes(row);
+    // make sure no shells exist before creating a new one
+    row.querySelectorAll(".CodeMirror")?.forEach((n) => n.remove());
 
-    // If we already have CM, just refresh and bail.
+    // destroy any existing editor
     if (dom.__codeEditor) {
-      dom.__codeEditor.refresh();
-      if (labelEl) {
-        labelEl.textContent = "Code";
-        labelEl.removeAttribute("data-i18n");
-      }
-      return;
+      destroyInlineCodeMirror(dom.__codeEditor);
+      dom.__codeEditor = null;
     }
 
-    // Ensure a <textarea> exists before creating CM
+    // ensure a <textarea> for CodeMirror
     if (!isTextarea) {
       const ta = document.createElement("textarea");
       ta.id = "edit-default";
@@ -474,19 +487,48 @@ function maybeSwapDefaultForCode(dom, fieldType) {
       dom.default = ta;
     }
 
-    createCodeMirrorForDefault(dom);
+    // modal body for fullscreen sizing
+    const modal = document.getElementById("field-edit-modal");
+    const modalBodyEl = modal?.querySelector(".modal-body") || null;
+
+    dom.__codeEditor = createInlineCodeMirror(dom.default, {
+      mode: "javascript",
+      height: 560,
+      modalBodyEl,
+    });
+
+    // inline Full Screen button (add once)
+    if (!row.querySelector(".cm-inline-controls")) {
+      const lbl = labelEl || row.querySelector("label[for='edit-default']");
+      if (lbl) {
+        const ctrls = document.createElement("span");
+        ctrls.className = "cm-inline-controls";
+        const fsBtn = document.createElement("button");
+        fsBtn.type = "button";
+        fsBtn.className = "btn cm-fs-btn";
+        fsBtn.textContent = "Full Screen";
+        fsBtn.title = "Toggle editor full screen (F11)";
+        fsBtn.addEventListener("click", () =>
+          dom.__codeEditor.toggleModalFullscreen()
+        );
+        ctrls.appendChild(fsBtn);
+        lbl.appendChild(ctrls);
+      }
+    }
 
     if (labelEl) {
       labelEl.textContent = "Code";
       labelEl.removeAttribute("data-i18n");
     }
   } else {
-    // Leaving code → destroy CM first so it writes back to the textarea
+    // leaving code → destroy editor and remove any shells
     if (dom.__codeEditor) {
-      destroyCodeMirrorForDefault(dom);
+      destroyInlineCodeMirror(dom.__codeEditor);
+      dom.__codeEditor = null;
     }
+    row.querySelectorAll(".CodeMirror")?.forEach((n) => n.remove());
 
-    // Swap back to an <input> if needed
+    // swap back to an <input> if needed
     if (isTextarea) {
       const inp = document.createElement("input");
       inp.type = "text";
@@ -500,42 +542,7 @@ function maybeSwapDefaultForCode(dom, fieldType) {
       labelEl.textContent = "Default";
       labelEl.setAttribute("data-i18n", "standard.default");
     }
+    // remove inline FS controls, if any
+    row.querySelector(".cm-inline-controls")?.remove();
   }
-}
-
-function createCodeMirrorForDefault(dom) {
-  if (!dom.default || dom.__codeEditor) return;
-
-  const cm = window.CodeMirror.fromTextArea(dom.default, {
-    mode: "javascript",
-    lineNumbers: true,
-    indentUnit: 2,
-    tabSize: 2,
-    lineWrapping: true,
-    theme: document.getElementById("cm-theme")?.href?.includes("monokai")
-      ? "monokai"
-      : "default",
-  });
-
-  Object.defineProperty(dom, "__codeEditor", {
-    value: cm,
-    writable: true,
-    configurable: true,
-    enumerable: false, // ← IMPORTANT
-  });
-
-  setTimeout(() => cm.refresh(), 0);
-}
-
-function destroyCodeMirrorForDefault(dom) {
-  if (!dom.__codeEditor) return;
-  dom.__codeEditor.save(); // push value back to <textarea>
-  dom.__codeEditor.toTextArea();
-  dom.__codeEditor = null;
-}
-
-function removeStrayCodeMirrorNodes(row) {
-  if (!row) return;
-  const shells = row.querySelectorAll(".CodeMirror");
-  shells.forEach((n) => n.remove());
 }

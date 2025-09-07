@@ -405,7 +405,7 @@ fields:
     expression_item: false
     two_column: false
     default: |
-      let test = "Hello World";
+      let hello = "Hello World";
     options: *ref_0
     language: javascript
     run_mode: manual
