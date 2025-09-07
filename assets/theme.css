@@ -232,6 +232,12 @@
   --field-type-guid-badge: #888c95;
   --field-type-guid-text: #fff;
 
+  --field-type-code-bg: #e67e22;
+  --field-type-code-border: #ffb74d;
+  --field-type-code-modal: #cf6d16;
+  --field-type-code-badge: #ffa64d;
+  --field-type-code-text: #fff;
+
   /* ───── Popup Panel ───── */
   --popup-bg: #fff;
   --popup-fg: #000;

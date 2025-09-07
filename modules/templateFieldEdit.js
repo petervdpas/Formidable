@@ -42,6 +42,11 @@ function setupFieldEditor(container, onChange, allFields = []) {
     type: container.querySelector("#edit-type-container select"),
     formatTextarea: container.querySelector("#edit-format"),
     formatTextareaRow: container.querySelector("#edit-format-row"),
+
+    language: container.querySelector("#edit-language"),
+    runmode: container.querySelector("#edit-runmode"),
+    allowRun: container.querySelector("#edit-allowrun"),
+    sandbox: container.querySelector("#edit-sandbox"),
   };
 
   let labelLocked = false;
@@ -64,6 +69,11 @@ function setupFieldEditor(container, onChange, allFields = []) {
   }
 
   function setField(field) {
+    // — hard reset from any previous edit/open —
+    if (dom.__codeEditor) {
+      destroyCodeMirrorForDefault(dom); // writes back to <textarea> and removes CM
+    }
+
     originalKey = field.key?.trim();
 
     dom.key.classList.remove("input-error");
@@ -82,6 +92,9 @@ function setupFieldEditor(container, onChange, allFields = []) {
     dom.twoColumn.checked = !!field.two_column;
     dom.formatTextarea.value = field.format || "";
     dom.default.value = field.default ?? "";
+
+    // make the Default control match the current type
+    maybeSwapDefaultForCode(dom, field.type);
 
     labelLocked = field.label?.trim().length > 0 && field.label !== field.key;
     dom.key.__listenersAttached = false;
@@ -136,6 +149,10 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
         initializeOptionsEditor(currentType, []);
         applyFieldAttributeDisabling(dom, currentType);
+
+        // swap Default <input>/<textarea> depending on type
+        maybeSwapDefaultForCode(dom, currentType);
+
         validate();
       };
     }
@@ -165,6 +182,9 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
   function getField() {
     const type = dom.type?.value || "text";
+    if (dom.__codeEditor) {
+      dom.__codeEditor.save();
+    }
     const isGuid = type === "guid";
     const summaryField = dom.summaryField?.value || "";
 
@@ -198,6 +218,14 @@ function setupFieldEditor(container, onChange, allFields = []) {
     if (isGuid) {
       field.primary_key = true;
     }
+
+    if (type === "code") {
+      field.language = dom.language?.value || "javascript";
+      field.run_mode = dom.runmode?.value || "manual";
+      field.allow_run = !!dom.allowRun?.checked;
+      field.sandbox = !!dom.sandbox?.checked;
+    }
+
     return field;
   }
 
@@ -408,4 +436,106 @@ export function renderFieldList(
       }
     },
   });
+}
+
+function maybeSwapDefaultForCode(dom, fieldType) {
+  const row = dom.default?.closest(".modal-form-row");
+  if (!row || !dom.default) return;
+
+  const labelEl = row.querySelector("label[for='edit-default']");
+  const isCode = fieldType === "code";
+  const isTextarea = dom.default.tagName === "TEXTAREA";
+
+  if (isCode) {
+    // clean any leftover CM DOM before creating a new one
+    removeStrayCodeMirrorNodes(row);
+
+    // If we already have CM, just refresh and bail.
+    if (dom.__codeEditor) {
+      dom.__codeEditor.refresh();
+      if (labelEl) {
+        labelEl.textContent = "Code";
+        labelEl.removeAttribute("data-i18n");
+      }
+      return;
+    }
+
+    // Ensure a <textarea> exists before creating CM
+    if (!isTextarea) {
+      const ta = document.createElement("textarea");
+      ta.id = "edit-default";
+      ta.rows = 8;
+      ta.spellcheck = false;
+      ta.autocapitalize = "off";
+      ta.autocorrect = "off";
+      ta.className = "code-textarea";
+      ta.value = dom.default.value ?? "";
+      dom.default.replaceWith(ta);
+      dom.default = ta;
+    }
+
+    createCodeMirrorForDefault(dom);
+
+    if (labelEl) {
+      labelEl.textContent = "Code";
+      labelEl.removeAttribute("data-i18n");
+    }
+  } else {
+    // Leaving code → destroy CM first so it writes back to the textarea
+    if (dom.__codeEditor) {
+      destroyCodeMirrorForDefault(dom);
+    }
+
+    // Swap back to an <input> if needed
+    if (isTextarea) {
+      const inp = document.createElement("input");
+      inp.type = "text";
+      inp.id = "edit-default";
+      inp.value = dom.default.value ?? "";
+      dom.default.replaceWith(inp);
+      dom.default = inp;
+    }
+
+    if (labelEl) {
+      labelEl.textContent = "Default";
+      labelEl.setAttribute("data-i18n", "standard.default");
+    }
+  }
+}
+
+function createCodeMirrorForDefault(dom) {
+  if (!dom.default || dom.__codeEditor) return;
+
+  const cm = window.CodeMirror.fromTextArea(dom.default, {
+    mode: "javascript",
+    lineNumbers: true,
+    indentUnit: 2,
+    tabSize: 2,
+    lineWrapping: true,
+    theme: document.getElementById("cm-theme")?.href?.includes("monokai")
+      ? "monokai"
+      : "default",
+  });
+
+  Object.defineProperty(dom, "__codeEditor", {
+    value: cm,
+    writable: true,
+    configurable: true,
+    enumerable: false, // ← IMPORTANT
+  });
+
+  setTimeout(() => cm.refresh(), 0);
+}
+
+function destroyCodeMirrorForDefault(dom) {
+  if (!dom.__codeEditor) return;
+  dom.__codeEditor.save(); // push value back to <textarea>
+  dom.__codeEditor.toTextArea();
+  dom.__codeEditor = null;
+}
+
+function removeStrayCodeMirrorNodes(row) {
+  if (!row) return;
+  const shells = row.querySelectorAll(".CodeMirror");
+  shells.forEach((n) => n.remove());
 }

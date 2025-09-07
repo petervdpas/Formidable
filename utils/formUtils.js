@@ -320,19 +320,19 @@ export function applyFieldAttributeDisabling(dom, fieldTypeKey) {
   const disabled = new Set(typeDef.disabledAttributes || []);
 
   Object.entries(dom).forEach(([key, el]) => {
-    if (!el) return;
+    // skip nulls, non-elements, and stuff without classList/closest
+    if (!el || !(el instanceof Element)) return;
 
-    const container =
-      el.classList.contains("modal-form-row") ||
-      el.classList.contains("switch-row")
-        ? el
-        : el.closest(".modal-form-row") || el.closest(".switch-row");
-
-    if (disabled.has(key)) {
-      if (container) container.style.display = "none";
+    // find the “row” container
+    let container;
+    if (el.classList?.contains("modal-form-row") || el.classList?.contains("switch-row")) {
+      container = el;
     } else {
-      if (container) container.style.display = "";
+      container = el.closest?.(".modal-form-row, .switch-row");
     }
+    if (!container) return;
+
+    container.style.display = disabled.has(key) ? "none" : "";
   });
 }
 

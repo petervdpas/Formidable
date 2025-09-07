@@ -398,3 +398,16 @@ fields:
     two_column: false
     default: ''
     options: *ref_0
+  - key: myScript
+    type: code
+    label: MyScript
+    description: Testing script
+    expression_item: false
+    two_column: false
+    default: |
+      let test = "Hello World";
+    options: *ref_0
+    language: javascript
+    run_mode: manual
+    allow_run: false
+    sandbox: true

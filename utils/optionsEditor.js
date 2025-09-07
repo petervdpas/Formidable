@@ -9,6 +9,7 @@ export function getSupportedOptionTypes() {
     "range",
     "list",
     "table",
+    "code",
   ];
 }
 

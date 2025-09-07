@@ -419,6 +419,15 @@ export default {
   "field.format.markdown": "Markdown",
   "field.format.plain": "Gewone tekst",
 
+  "field.code.language": "Taal",
+  "field.code.language.javascript": "JavaScript",
+  "field.code.runmode": "Uitvoeringsmodus",
+  "field.code.runmode.manual": "Handmatig",
+  "field.code.runmode.load": "Bij Laden",
+  "field.code.runmode.save": "Bij Opslaan",
+  "field.code.allowrun": "Toestaan Uitvoering",
+  "field.code.sandbox": "Sandbox",
+
   // ── Modals ───────────────────
 
   // "modal.settings.title": "Instellingen",

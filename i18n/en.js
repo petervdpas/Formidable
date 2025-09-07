@@ -399,6 +399,15 @@ export default {
   "field.format.markdown": "Markdown",
   "field.format.plain": "Plain Text",
 
+  "field.code.language": "Language",
+  "field.code.language.javascript": "JavaScript",
+  "field.code.runmode": "Run Mode",
+  "field.code.runmode.manual": "Manual",
+  "field.code.runmode.load": "On Load",
+  "field.code.runmode.save": "On Save",
+  "field.code.allowrun": "Allow Run",
+  "field.code.sandbox": "Sandbox",
+
   // ── Modals ───────────────────
 
   // "modal.settings.title": "Settings",

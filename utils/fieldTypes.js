@@ -5,14 +5,23 @@ import * as renderers from "./fieldRenderers.js";
 import * as appliers from "./fieldAppliers.js";
 import { generateGuid } from "./domUtils.js";
 
+export const codeSpecific = Object.freeze([
+  "language", // Code language (currently only JS)
+  "runmode", // Execution trigger: manual/load/save
+  "allowRun", // Allow execution at all
+  "sandbox", // Run in sandbox
+]);
+
 export function getFieldTypeDef(type) {
-  return fieldTypes[type] || {
-    label: `(Unknown: ${type})`,
-    cssClass: { main: "modal-unknown" },
-    renderInput: () => document.createTextNode(`(Unknown type: ${type})`),
-    parseValue: () => null,
-    applyValue: () => {},
-  };
+  return (
+    fieldTypes[type] || {
+      label: `(Unknown: ${type})`,
+      cssClass: { main: "modal-unknown" },
+      renderInput: () => document.createTextNode(`(Unknown type: ${type})`),
+      parseValue: () => null,
+      applyValue: () => {},
+    }
+  );
 }
 
 export const fieldTypes = {
@@ -31,6 +40,7 @@ export const fieldTypes = {
       "expressionItemRow",
       "twoColumnRow",
       "formatTextareaRow",
+      ...codeSpecific,
     ],
     defaultValue: () => generateGuid(),
     renderInput: renderers.renderGuidField,
@@ -48,7 +58,8 @@ export const fieldTypes = {
       "options",
       "expressionItemRow",
       "twoColumnRow",
-      "formatTextareaRow"
+      "formatTextareaRow",
+      ...codeSpecific,
     ],
   },
 
@@ -64,7 +75,8 @@ export const fieldTypes = {
       "options",
       "expressionItemRow",
       "twoColumnRow",
-      "formatTextareaRow"
+      "formatTextareaRow",
+      ...codeSpecific,
     ],
     defaultValue: () => "",
     renderInput: renderers.renderLoopstartField,
@@ -81,7 +93,8 @@ export const fieldTypes = {
       "options",
       "expressionItemRow",
       "twoColumnRow",
-      "formatTextareaRow"
+      "formatTextareaRow",
+      ...codeSpecific,
     ],
     defaultValue: () => "",
     renderInput: renderers.renderLoopstopField,
@@ -92,7 +105,7 @@ export const fieldTypes = {
     label: "Text",
     cssClass: { main: "modal-text" },
     selectorAttr: "data-text-field",
-    disabledAttributes: ["summaryField", "formatTextareaRow"],
+    disabledAttributes: ["summaryField", "formatTextareaRow", ...codeSpecific],
     defaultValue: () => "",
     renderInput: renderers.renderTextField,
     parseValue: parsers.parseTextField,
@@ -103,7 +116,7 @@ export const fieldTypes = {
     label: "Checkbox",
     cssClass: { main: "modal-boolean" },
     selectorAttr: "data-boolean-field",
-    disabledAttributes: ["summaryField", "formatTextareaRow"],
+    disabledAttributes: ["summaryField", "formatTextareaRow", ...codeSpecific],
     defaultValue: () => false,
     renderInput: renderers.renderBooleanField,
     parseValue: parsers.parseBooleanField,
@@ -114,7 +127,7 @@ export const fieldTypes = {
     label: "Dropdown",
     cssClass: { main: "modal-dropdown" },
     selectorAttr: "data-dropdown-field",
-    disabledAttributes: ["summaryField", "formatTextareaRow"],
+    disabledAttributes: ["summaryField", "formatTextareaRow", ...codeSpecific],
     defaultValue: () => "",
     renderInput: renderers.renderDropdownField,
     parseValue: parsers.parseDropdownField,
@@ -125,7 +138,7 @@ export const fieldTypes = {
     label: "Multiple Choice",
     cssClass: { main: "modal-multioption" },
     selectorAttr: "data-multioption-field",
-    disabledAttributes: ["summaryField", "formatTextareaRow"],
+    disabledAttributes: ["summaryField", "formatTextareaRow", ...codeSpecific],
     defaultValue: () => [],
     renderInput: renderers.renderMultioptionField,
     parseValue: parsers.parseMultiOptionField,
@@ -136,7 +149,7 @@ export const fieldTypes = {
     label: "Radio Buttons",
     cssClass: { main: "modal-radio" },
     selectorAttr: "data-radio-field",
-    disabledAttributes: ["summaryField", "formatTextareaRow"],
+    disabledAttributes: ["summaryField", "formatTextareaRow", ...codeSpecific],
     defaultValue: () => "",
     renderInput: renderers.renderRadioField,
     parseValue: parsers.parseRadioField,
@@ -147,7 +160,7 @@ export const fieldTypes = {
     label: "Multiline Text",
     cssClass: { main: "modal-textarea" },
     selectorAttr: "data-textarea-field",
-    disabledAttributes: ["summaryField"],
+    disabledAttributes: ["summaryField", ...codeSpecific],
     defaultValue: () => "",
     renderInput: renderers.renderTextareaField,
     parseValue: parsers.parseTextareaField,
@@ -158,7 +171,7 @@ export const fieldTypes = {
     label: "Number",
     cssClass: { main: "modal-number" },
     selectorAttr: "data-number-field",
-    disabledAttributes: ["summaryField", "formatTextareaRow"],
+    disabledAttributes: ["summaryField", "formatTextareaRow", ...codeSpecific],
     defaultValue: () => 0,
     renderInput: renderers.renderNumberField,
     parseValue: parsers.parseNumberField,
@@ -169,7 +182,7 @@ export const fieldTypes = {
     label: "Range Slider",
     cssClass: { main: "modal-range" },
     selectorAttr: "data-range-field",
-    disabledAttributes: ["summaryField", "formatTextareaRow"],
+    disabledAttributes: ["summaryField", "formatTextareaRow", ...codeSpecific],
     defaultValue: () => 50,
     renderInput: renderers.renderRangeField,
     parseValue: parsers.parseRangeField,
@@ -180,7 +193,7 @@ export const fieldTypes = {
     label: "Date",
     cssClass: { main: "modal-date" },
     selectorAttr: "data-date-field",
-    disabledAttributes: ["summaryField", "formatTextareaRow"],
+    disabledAttributes: ["summaryField", "formatTextareaRow", ...codeSpecific],
     defaultValue: () => "",
     renderInput: renderers.renderDateField,
     parseValue: parsers.parseDateField,
@@ -191,7 +204,7 @@ export const fieldTypes = {
     label: "List",
     cssClass: { main: "modal-list" },
     selectorAttr: "data-list-field",
-    disabledAttributes: ["summaryField", "formatTextareaRow"],
+    disabledAttributes: ["summaryField", "formatTextareaRow", ...codeSpecific],
     defaultValue: () => [],
     renderInput: renderers.renderListField,
     parseValue: parsers.parseListField,
@@ -202,7 +215,7 @@ export const fieldTypes = {
     label: "Table",
     cssClass: { main: "modal-table" },
     selectorAttr: "data-table-field",
-    disabledAttributes: ["summaryField", "formatTextareaRow"],
+    disabledAttributes: ["summaryField", "formatTextareaRow", ...codeSpecific],
     defaultValue: () => [],
     renderInput: renderers.renderTableField,
     parseValue: parsers.parseTableField,
@@ -213,7 +226,7 @@ export const fieldTypes = {
     label: "Image Upload",
     cssClass: { main: "modal-image" },
     selectorAttr: "data-image-field",
-    disabledAttributes: ["summaryField", "formatTextareaRow"],
+    disabledAttributes: ["summaryField", "formatTextareaRow", ...codeSpecific],
     defaultValue: () => "",
     renderInput: renderers.renderImageField,
     parseValue: parsers.parseImageField,
@@ -224,7 +237,7 @@ export const fieldTypes = {
     label: "Link",
     cssClass: { main: "modal-link" },
     selectorAttr: "data-link-field",
-    disabledAttributes: ["summaryField", "formatTextareaRow"],
+    disabledAttributes: ["summaryField", "formatTextareaRow", ...codeSpecific],
     defaultValue: () => "",
     renderInput: renderers.renderLinkField,
     parseValue: parsers.parseLinkField,
@@ -235,10 +248,26 @@ export const fieldTypes = {
     label: "Tags",
     cssClass: { main: "modal-tags" },
     selectorAttr: "data-tags-field",
-    disabledAttributes: ["summaryField", "formatTextareaRow"],
+    disabledAttributes: ["summaryField", "formatTextareaRow", ...codeSpecific],
     defaultValue: () => [],
     renderInput: renderers.renderTagsField,
     parseValue: parsers.parseTagsField,
+    applyValue: appliers.applyGenericField,
+  },
+
+  code: {
+    label: "Code (Programmable)",
+    cssClass: { main: "modal-code" },
+    selectorAttr: "data-code-field",
+    disabledAttributes: [
+      "summaryField",
+      "formatTextareaRow",
+      "expressionItemRow", // ← hide “Expression field”
+      "twoColumnRow", // ← hide “Two columns”
+    ],
+    defaultValue: () => "",
+    renderInput: renderers.renderCodeField,
+    parseValue: parsers.parseCodeField,
     applyValue: appliers.applyGenericField,
   },
 };

@@ -293,3 +293,29 @@
     border-left: 6px solid var(--field-type-guid-border);
     color: var(--field-type-guid-text);
 }
+
+/* Code */
+.field-list-item[data-type="code"] {
+  background-color: var(--field-type-code-bg);
+  border-left: 4px solid var(--field-type-code-border);
+  color: var(--field-type-code-text);
+}
+
+.field-type.type-code {
+  background-color: var(--field-type-code-badge);
+  color: var(--field-type-code-text);
+}
+
+#field-edit-modal.modal-code {
+  background-color: var(--field-type-code-modal);
+  border-left: 6px solid var(--field-type-code-border);
+  color: var(--field-type-code-text);
+}
+
+#field-edit-modal .CodeMirror {
+  height: 220px;       /* or auto if you prefer */
+  border: 1px solid var(--input-border-color);
+  background: var(--input-bg);
+  color: var(--input-fg);
+  border-radius: 4px;
+}

@@ -56,7 +56,6 @@
     <!-- EasyMDE Styles -->
     <link rel="stylesheet" href="assets/easymde/easymde.min.css" />
     <link rel="stylesheet" href="assets/hljs/github.min.css" />
-
   </head>
   <body>
     <div id="main-wrapper">
@@ -286,6 +285,76 @@
             data-i18n-placeholder="field.placeholder.description"
           ></textarea>
         </div>
+
+        <!-- Code-specific settings -->
+        <div
+          class="modal-form-row code-only"
+          id="edit-language-row"
+          style="display: none"
+        >
+          <label for="edit-language" data-i18n="field.code.language"
+            >Language</label
+          >
+          <select id="edit-language">
+            <option
+              value="javascript"
+              data-i18n="field.code.language.javascript"
+            >
+              JavaScript
+            </option>
+            <!-- future: more languages -->
+          </select>
+        </div>
+
+        <div
+          class="modal-form-row code-only"
+          id="edit-runmode-row"
+          style="display: none"
+        >
+          <label for="edit-runmode" data-i18n="field.code.runmode"
+            >Run Mode</label
+          >
+          <select id="edit-runmode">
+            <option value="manual" data-i18n="field.code.runmode.manual">
+              Manual
+            </option>
+            <option value="load" data-i18n="field.code.runmode.load">
+              On Load
+            </option>
+            <option value="save" data-i18n="field.code.runmode.save">
+              On Save
+            </option>
+          </select>
+        </div>
+
+        <div
+          class="modal-form-row switch-row code-only"
+          id="edit-allowrun-row"
+          style="display: none"
+        >
+          <label for="edit-allowrun" data-i18n="field.code.allowrun"
+            >Allow Execution</label
+          >
+          <label class="switch">
+            <input type="checkbox" id="edit-allowrun" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div
+          class="modal-form-row switch-row code-only"
+          id="edit-sandbox-row"
+          style="display: none"
+        >
+          <label for="edit-sandbox" data-i18n="field.code.sandbox"
+            >Sandbox</label
+          >
+          <label class="switch">
+            <input type="checkbox" id="edit-sandbox" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
         <div class="modal-form-row">
           <label for="edit-default" data-i18n="standard.default">Default</label>
           <textarea
@@ -417,6 +486,7 @@
     <!-- CodeMirror Scripts -->
     <script src="assets/codemirror/codemirror.js"></script>
     <script src="assets/codemirror/yaml.js"></script>
+    <script src="assets/codemirror/javascript.js"></script>
 
     <!-- SortableJs -->
     <script src="assets/sortable/sortable.min.js"></script>
