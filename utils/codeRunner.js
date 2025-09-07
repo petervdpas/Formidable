@@ -76,7 +76,6 @@ function runInPage({ code, input, timeout }) {
 }
 
 // ---------- Iframe sandbox (blob HTML + blob module) ----------
-// utils/codeRunner.js
 function runInSandbox({ code, input, timeout }) {
   return new Promise((resolve) => {
     // 1) Build the iframe boot module as a Blob URL (no inline scripts anywhere)
