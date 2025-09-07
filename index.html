@@ -7,9 +7,13 @@
       content="
   default-src 'self';
   script-src 'self' blob:;
-  img-src 'self' data:;
+  img-src 'self' data: blob:;
   style-src 'self' 'unsafe-inline';
   font-src 'self' data:;
+  frame-src 'self' blob: about: data:;
+  child-src 'self' blob: about: data:;
+  worker-src 'self' blob:;
+  connect-src 'self' data: blob:;
 "
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

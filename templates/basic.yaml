@@ -414,6 +414,6 @@ fields:
       })();
     options: *ref_0
     language: javascript
-    run_mode: save
+    run_mode: manual
     allow_run: true
     sandbox: true

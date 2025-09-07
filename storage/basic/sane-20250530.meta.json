@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-09-07T18:41:30.773Z",
+    "updated": "2025-09-07T23:04:11.990Z",
     "flagged": true,
     "tags": [
       "bye",
@@ -55,6 +55,6 @@
       "Bye",
       "now what"
     ],
-    "myScript": "let hello = \"Hello World\";\n"
+    "myScript": "a-b-c"
   }
 }

@@ -17,6 +17,7 @@ import { showOptionPopup } from "./popupUtils.js";
 import { getCurrentTheme } from "../modules/themeToggle.js";
 import { createRemoveImageButton } from "../modules/uiButtons.js";
 import { createIconButton } from "./buttonUtils.js";
+import { runUserCode } from "./codeRunner.js";
 
 function resolveOption(opt) {
   return typeof opt === "string"
@@ -1364,4 +1365,134 @@ export async function renderPasswordField(field, value = "") {
     field.two_column,
     field.wrapper || "modal-form-row"
   );
+}
+
+// ─────────────────────────────────────────────
+// Type: code (programmable) — plain <textarea>, no CM init
+export async function renderCodeField(field, value = "") {
+  const src = field.default || null;
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "code-field";
+  wrapper.dataset.codeField = field.key;
+
+  // the *persisted* value
+  const hidden = document.createElement("input");
+  hidden.type = "hidden";
+  hidden.name = field.key; // <-- key is the real data field
+  hidden.value = encode(value);
+
+  // give the persisted control the context attrs
+  applyFieldContextAttributes(hidden, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
+
+  const hint = document.createElement("div");
+  hint.className = "code-hint";
+  hint.textContent = "Code lives in the template (read-only).";
+
+  const bar = document.createElement("div");
+  bar.className = "code-toolbar";
+
+  const runBtn = document.createElement("button");
+  runBtn.type = "button";
+  runBtn.className = "btn run-btn";
+  runBtn.textContent = "Run";
+  runBtn.style.display = field.allow_run ? "" : "none";
+
+  const spinner = document.createElement("span");
+  spinner.className = "spinner";
+  spinner.style.display = "none";
+  spinner.textContent = "⏳";
+
+  const status = document.createElement("span");
+  status.className = "status";
+
+  bar.appendChild(runBtn);
+  bar.appendChild(spinner);
+  bar.appendChild(status);
+
+  // optional: keep output area for logs/result
+  const out = document.createElement("pre");
+  out.className = "code-output";
+  out.setAttribute("aria-live", "polite");
+
+  async function doRun() {
+    if (!src) {
+      status.textContent = "No code in template";
+      out.textContent = "";
+      return;
+    }
+
+    spinner.style.display = "inline-block";
+    status.textContent = "Running…";
+    out.textContent = "";
+
+    const res = await runUserCode({
+      code: String(src),
+      input: {},
+      sandbox: field.sandbox !== false,
+      timeout: 3000,
+    });
+
+    spinner.style.display = "none";
+    status.textContent = res.ok ? "OK" : "Error";
+
+    const lines = [];
+    if (res.logs?.length) lines.push(`// console\n${res.logs.join("\n")}`);
+    lines.push(
+      res.ok
+        ? `// result\n${fmt(res.result)}`
+        : `// error\n${String(res.error)}`
+    );
+    out.textContent = lines.join("\n\n");
+
+    if (res.ok) {
+      hidden.value = encode(res.result);
+      hidden.dispatchEvent(new Event("input", { bubbles: true }));
+      hidden.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  }
+
+  if (
+    String(field.run_mode || "manual").toLowerCase() === "load" &&
+    field.allow_run
+  ) {
+    queueMicrotask(doRun);
+  }
+  runBtn.addEventListener("click", doRun);
+
+  // compose — no textarea
+  wrapper.appendChild(hint);
+  wrapper.appendChild(bar);
+  wrapper.appendChild(out);
+  wrapper.appendChild(hidden);
+
+  applyFieldContextAttributes(wrapper, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
+
+  return wrapInputWithLabel(
+    wrapper,
+    field.label || "Code",
+    field.description || "Runs the template’s script",
+    field.two_column,
+    field.wrapper || "form-row"
+  );
+
+  function fmt(v) {
+    try {
+      return typeof v === "string" ? v : JSON.stringify(v, null, 2);
+    } catch {
+      return String(v);
+    }
+  }
+  function encode(v) {
+    if (v == null) return "";
+    return typeof v === "string" ? v : JSON.stringify(v);
+  }
 }

@@ -336,13 +336,14 @@
 }
 
 /* field-edit modal: small hint under label */
-#field-edit-modal label .cm-f11-hint{
-  display:block;
-  margin-top:4px;
-  font-size:0.85em;
-  line-height:1.2;
-  opacity:.75;              /* subtle */
-  color: var(--text-subtle, currentColor);
+#field-edit-modal label .cm-f11-hint {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.85em;
+    line-height: 1.2;
+    opacity: .75;
+    /* subtle */
+    color: var(--text-subtle, currentColor);
 }
 
 /* Inline fullscreen toggle button */
@@ -389,4 +390,30 @@
 
 body.cm-no-scroll {
     overflow: hidden !important;
+}
+
+.code-field .code-toolbar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.code-field .code-textarea {
+    width: 100%;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.code-field .code-output {
+    background: rgba(0, 0, 0, .04);
+    padding: 8px;
+    margin-top: 6px;
+    max-height: 220px;
+    overflow: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    white-space: pre-wrap;
+}
+
+.code-field .spinner {
+    opacity: .8;
 }
