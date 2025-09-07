@@ -320,7 +320,7 @@
     height: 100px !important;
     border: 1px solid rgba(0, 0, 0, .15);
     border-radius: 4px;
-    color: inherit;
+    color: var(--text-color, #111);
 }
 
 /* Fallback textarea before CodeMirror loads */

@@ -404,10 +404,16 @@ fields:
     description: Testing script
     expression_item: false
     two_column: false
-    default: |
-      let hello = "Hello World";
+    default: |-
+      return (async () => {
+        // simulate async work
+        await new Promise(r => setTimeout(r, 50));
+        const value = ["a","b","c"].join("-");
+        console.log("async value:", value);
+        return value;
+      })();
     options: *ref_0
     language: javascript
-    run_mode: manual
-    allow_run: false
+    run_mode: save
+    allow_run: true
     sandbox: true
