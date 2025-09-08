@@ -1,5 +1,3 @@
-// schemas/field.schema.js
-
 const knownTypes = [
   "guid",
   "loopstart",
@@ -49,7 +47,7 @@ module.exports = {
   sanitize(raw) {
     const field = { ...this.defaults, ...raw };
 
-    // valid type?
+    // type check
     if (!knownTypes.includes(field.type)) {
       field.type = "text";
     }
@@ -78,25 +76,25 @@ module.exports = {
 
     // code-specific
     if (field.type === "code") {
-      // merge defaults first so we can normalize after
+      // merge defaults first
       Object.assign(field, { ...codeDefaults, ...raw });
 
-      // run_mode
+      // normalize run_mode
       const rm = String(field.run_mode || "manual").toLowerCase();
       field.run_mode = ["manual", "load", "save"].includes(rm) ? rm : "manual";
 
-      // allow_run
+      // normalize allow_run
       field.allow_run = !!field.allow_run;
 
-      // input_mode
+      // normalize input_mode
       const im = String(field.input_mode || "safe").toLowerCase();
       field.input_mode = im === "raw" ? "raw" : "safe";
 
-      // api_mode
+      // normalize api_mode
       const am = String(field.api_mode || "frozen").toLowerCase();
       field.api_mode = am === "raw" ? "raw" : "frozen";
 
-      // api_pick (top-level keys only, strings, trimmed)
+      // normalize api_pick
       field.api_pick = Array.isArray(field.api_pick)
         ? field.api_pick
             .filter((k) => typeof k === "string")
@@ -104,21 +102,22 @@ module.exports = {
             .filter(Boolean)
         : [];
 
-      // default value must be a string; force multiline so YAML uses block scalar
+      // default value must be string; force multiline so YAML block scalar is used
       field.default = typeof field.default === "string" ? field.default : "";
       if (field.default && !field.default.includes("\n")) {
         field.default += "\n";
       }
 
-      // lock these off for code fields
+      // lock these off
       field.expression_item = false;
       field.two_column = false;
 
-      // ensure no legacy props linger
+      // scrub legacy props
       delete field.language;
       delete field.sandbox;
+      delete field.api;
     } else {
-      // make sure code-only props don't leak to other types
+      // scrub code-only props
       delete field.run_mode;
       delete field.allow_run;
       delete field.input_mode;
@@ -126,6 +125,7 @@ module.exports = {
       delete field.api_pick;
       delete field.language;
       delete field.sandbox;
+      delete field.api;
     }
 
     return field;

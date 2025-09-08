@@ -4,6 +4,7 @@
 import { loadLocale, t, translateDOM } from "./utils/i18n.js";
 import { EventBus } from "./modules/eventBus.js";
 import { exposeGlobalAPI } from "./modules/globalAPI.js";
+import { exposeCodeFieldAPI } from "./modules/codeFieldAPI.js";
 import { initEventRouter } from "./modules/eventRouter.js";
 
 import { buildMenu, handleMenuAction } from "./modules/menuManager.js";
@@ -83,6 +84,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   // ── Plugin API ──
   console.log("[Renderer] Exposing Plugin API...");
   exposeGlobalAPI();
+  // expose CFA right after FGA
+  exposeCodeFieldAPI();
 
   // ── Emit config stuff and start with translations ──
   const config = await new Promise((resolve) => {

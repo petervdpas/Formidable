@@ -1453,9 +1453,7 @@ export async function renderCodeField(field, value = "") {
       input: pick(field, "input") ?? {},
       timeout: Number(pick(field, "timeout")) || 3000,
       inputMode,
-      api:
-        pick(field, "api") ??
-        (typeof window !== "undefined" ? window.FGA : null),
+      api: window.CFA || {}, 
       apiPick,
       apiMode,
     };

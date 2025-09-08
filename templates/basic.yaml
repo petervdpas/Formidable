@@ -401,19 +401,31 @@ fields:
   - key: myScript
     type: code
     label: MyScript
-    description: Testing script
+    description: Path + string test
     expression_item: false
     two_column: false
     default: |-
-      return (async () => {
-        await new Promise(r => setTimeout(r, 50));
-        const value = ["a","b","c"].join("-");
-        console.log("async value:", value);
-        return value;
-      })();
+      return (async (input, api) => {
+        // Example absolute path + app root
+        const absPath = "C:/Users/Utente/projects/formidable/data/file.yaml";
+        const appRoot = "C:/Users/Utente/projects/formidable";
+
+        // Use CFA.path.formatAsRelativePath
+        const rel = api.path.formatAsRelativePath(absPath, appRoot);
+
+        // Use CFA.string.capitalize
+        const cap = api.string.capitalize("relative ok");
+
+        console.log("Relative path:", rel);
+        console.log("Capitalized:", cap);
+
+        return { rel, cap };
+      })(input, api);
     options: *ref_0
     run_mode: manual
     allow_run: true
     input_mode: safe
     api_mode: frozen
-    api_pick: []
+    api_pick:
+      - path
+      - string

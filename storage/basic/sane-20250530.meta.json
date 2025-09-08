@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-09-07T23:49:48.377Z",
+    "updated": "2025-09-08T22:42:50.769Z",
     "flagged": true,
     "tags": [
       "bye",
@@ -55,6 +55,9 @@
       "Bye",
       "now what"
     ],
-    "myScript": "a-b-c"
+    "myScript": {
+      "rel": "./data/file.yaml",
+      "cap": "Relative ok"
+    }
   }
 }

@@ -104,8 +104,7 @@ async function executeValidatedModule({ mod, url, input, api, timeout }) {
  *   input?: any,
  *   timeout?: number,
  *   inputMode?: 'safe' | 'raw',        // default 'safe'
- *   api?: object,                      // e.g. window.FGA
- *   apiPick?: string[],                // whitelist top-level keys: ['path','string']
+ *   apiPick?: string[],                // whitelist top-level CFA keys
  *   apiMode?: 'frozen' | 'raw',        // default 'frozen'
  * })
  */
@@ -114,7 +113,6 @@ export async function handleCodeExecute({
   input = {},
   timeout = 2500,
   inputMode = "safe",
-  api = null,
   apiPick = null,
   apiMode = "frozen",
 } = {}) {
@@ -125,17 +123,19 @@ export async function handleCodeExecute({
 
     // 1) compile-only validation
     const compiled = await compileForValidation(code);
-    if (!compiled.ok) return { ok: false, error: compiled.error || "Invalid code", logs: [] };
+    if (!compiled.ok) {
+      return { ok: false, error: compiled.error || "Invalid code", logs: [] };
+    }
 
     // 2) prepare input
     const preparedInput = inputMode === "raw" ? input : toSerializable(input);
 
-    // 3) prepare API (optional)
-    let preparedApi = api;
-    if (preparedApi && Array.isArray(apiPick) && apiPick.length) {
+    // 3) prepare API → always start from CFA
+    let preparedApi = window.CFA || {};
+    if (Array.isArray(apiPick) && apiPick.length) {
       preparedApi = pickKeys(preparedApi, apiPick);
     }
-    if (preparedApi && apiMode === "frozen") {
+    if (apiMode === "frozen") {
       try { preparedApi = deepFreeze(preparedApi); } catch {}
     }
 
