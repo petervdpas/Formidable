@@ -406,7 +406,6 @@ fields:
     two_column: false
     default: |-
       return (async () => {
-        // simulate async work
         await new Promise(r => setTimeout(r, 50));
         const value = ["a","b","c"].join("-");
         console.log("async value:", value);

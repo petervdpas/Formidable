@@ -115,7 +115,6 @@ function runInSandbox({ code, input, timeout }) {
       <!doctype html>
       <html>
         <head>
-          <!-- Tight CSP for the iframe document: allow only blob: scripts -->
           <meta http-equiv="Content-Security-Policy"
                 content="default-src 'none'; script-src blob:; connect-src 'none'; img-src 'none'; style-src 'none'">
         </head>
@@ -125,12 +124,14 @@ function runInSandbox({ code, input, timeout }) {
       </html>
     `;
 
-    // 3) Create the iframe. Important: allow-same-origin so blob: imports work in Chromium/Electron.
+    // 3) Create the iframe inside the sandbox pool
     const iframe = document.createElement("iframe");
     iframe.style.display = "none";
     iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
     iframe.srcdoc = html;
-    document.body.appendChild(iframe);
+
+    const pool = document.getElementById("sandbox-pool") || document.body;
+    pool.appendChild(iframe);
 
     let finished = false;
     let to = null;
@@ -161,7 +162,6 @@ function runInSandbox({ code, input, timeout }) {
       clearTimeout(loadFail);
       window.addEventListener("message", onMsg);
       to = setTimeout(() => finish({ ok: false, error: "Timeout", logs: [] }), timeout);
-      // Kick it off — no inline code, just postMessage
       iframe.contentWindow.postMessage({ code, input }, "*");
     });
   });
