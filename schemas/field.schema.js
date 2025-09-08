@@ -22,13 +22,15 @@ const knownTypes = [
 ];
 
 const textareaFormats = new Set(["markdown", "plain"]);
-const codeLanguages = new Set(["javascript"]);
 
 const codeDefaults = {
-  language: "javascript",
   run_mode: "manual", // "manual" | "load" | "save"
   allow_run: false,
-  sandbox: true,
+
+  // execution hints for handler
+  input_mode: "safe", // "safe" | "raw"
+  api_mode: "frozen", // "frozen" | "raw"
+  api_pick: [], // string[]
 };
 
 module.exports = {
@@ -47,25 +49,26 @@ module.exports = {
   sanitize(raw) {
     const field = { ...this.defaults, ...raw };
 
-    // Sanity: valid type?
+    // valid type?
     if (!knownTypes.includes(field.type)) {
-      field.type = "text"; // fallback
+      field.type = "text";
     }
 
-    // Clean up options
+    // options as array
     if (!Array.isArray(field.options)) {
       field.options = [];
     }
 
-    // Ensure boolean normalization
+    // booleans
     field.expression_item = !!field.expression_item;
     field.two_column = !!field.two_column;
 
-    // Only allow summary_field on loopstart
+    // summary_field only for loopstart
     if (field.type !== "loopstart") {
       field.summary_field = "";
     }
 
+    // textarea-specific
     if (field.type === "textarea") {
       const f = String(field.format || "").toLowerCase();
       field.format = textareaFormats.has(f) ? f : "markdown";
@@ -75,31 +78,53 @@ module.exports = {
 
     // code-specific
     if (field.type === "code") {
-      // merge code-only defaults now
+      // merge defaults first so we can normalize after
       Object.assign(field, { ...codeDefaults, ...raw });
 
-      const lang = String(field.language || "javascript").toLowerCase();
-      field.language = codeLanguages.has(lang) ? lang : "javascript";
-
+      // run_mode
       const rm = String(field.run_mode || "manual").toLowerCase();
       field.run_mode = ["manual", "load", "save"].includes(rm) ? rm : "manual";
 
+      // allow_run
       field.allow_run = !!field.allow_run;
-      field.sandbox = field.sandbox !== false;
-      field.default = typeof field.default === "string" ? field.default : "";
 
-      // Force multiline so js-yaml emits a block scalar (| or |-)
+      // input_mode
+      const im = String(field.input_mode || "safe").toLowerCase();
+      field.input_mode = im === "raw" ? "raw" : "safe";
+
+      // api_mode
+      const am = String(field.api_mode || "frozen").toLowerCase();
+      field.api_mode = am === "raw" ? "raw" : "frozen";
+
+      // api_pick (top-level keys only, strings, trimmed)
+      field.api_pick = Array.isArray(field.api_pick)
+        ? field.api_pick
+            .filter((k) => typeof k === "string")
+            .map((k) => k.trim())
+            .filter(Boolean)
+        : [];
+
+      // default value must be a string; force multiline so YAML uses block scalar
+      field.default = typeof field.default === "string" ? field.default : "";
       if (field.default && !field.default.includes("\n")) {
         field.default += "\n";
       }
 
+      // lock these off for code fields
       field.expression_item = false;
       field.two_column = false;
-    } else {
-      // make sure no code props leak into other types
+
+      // ensure no legacy props linger
       delete field.language;
+      delete field.sandbox;
+    } else {
+      // make sure code-only props don't leak to other types
       delete field.run_mode;
       delete field.allow_run;
+      delete field.input_mode;
+      delete field.api_mode;
+      delete field.api_pick;
+      delete field.language;
       delete field.sandbox;
     }
 

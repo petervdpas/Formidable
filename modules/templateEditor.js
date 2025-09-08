@@ -37,9 +37,9 @@ window.showConfirmModal = showConfirmModal;
 const Sortable = window.Sortable;
 
 let keyboardListenerAttached = false;
+let collectionSwitch = null;
 let editorWrapper = null;
 let typeDropdown = null;
-let collectionSwitch = null;
 
 function sanitizeField(f) {
   const isGuid = f.type === "guid";
@@ -73,19 +73,27 @@ function sanitizeField(f) {
     field.options = f.options;
   }
 
-  // ✅ PRESERVE code-specific settings
+  // PRESERVE code-specific settings
   if (f.type === "code") {
-    const lang = String(f.language || "javascript").toLowerCase();
     const rm = String(f.run_mode || "manual").toLowerCase();
-    field.language = ["javascript"].includes(lang) ? lang : "javascript";
     field.run_mode = ["manual", "load", "save"].includes(rm) ? rm : "manual";
     field.allow_run = !!f.allow_run;
-    field.sandbox = f.sandbox !== false;
+
+    const im = String(f.input_mode || "safe").toLowerCase();
+    field.input_mode = im === "raw" ? "raw" : "safe";
+
+    const am = String(f.api_mode || "frozen").toLowerCase();
+    field.api_mode = am === "raw" ? "raw" : "frozen";
+
+    field.api_pick = Array.isArray(f.api_pick)
+      ? f.api_pick
+          .filter((k) => typeof k === "string" && k.trim())
+          .map((k) => k.trim())
+      : [];
   }
 
   return field;
 }
-
 
 export function initTemplateEditor(containerId, onSaveCallback) {
   const container = document.getElementById(containerId);

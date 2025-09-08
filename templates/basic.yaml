@@ -412,7 +412,8 @@ fields:
         return value;
       })();
     options: *ref_0
-    language: javascript
     run_mode: manual
     allow_run: true
-    sandbox: true
+    input_mode: safe
+    api_mode: frozen
+    api_pick: []

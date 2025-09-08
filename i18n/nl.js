@@ -420,14 +420,20 @@ export default {
   "field.format.plain": "Gewone tekst",
 
   "field.code.label": "Code",
-  "field.code.language": "Taal",
-  "field.code.language.javascript": "JavaScript",
   "field.code.runmode": "Uitvoeringsmodus",
   "field.code.runmode.manual": "Handmatig",
   "field.code.runmode.load": "Bij Laden",
   "field.code.runmode.save": "Bij Opslaan",
   "field.code.allowrun": "Toestaan Uitvoering",
-  "field.code.sandbox": "Sandbox",
+  "field.code.inputmode": "Invoermodus",
+  "field.code.inputmode.safe": "Veilig (alleen data)",
+  "field.code.inputmode.raw": "Raw (zelfde domein)",
+  "field.code.apimode": "API Blootstelling",
+  "field.code.apimode.frozen": "Bevroren (alleen-lezen)",
+  "field.code.apimode.raw": "Raw (live objecten)",
+  "field.code.apipick": "API Whitelist",
+  "field.code.apipick.placeholder": "bijv. pad,string,plugin",
+  "field.code.apipick.hint": "Welke API-sleutels bloot te stellen?",
   "field.code.fullscreen": "Gebruik F11 voor volledig scherm",
 
   // ── Modals ───────────────────

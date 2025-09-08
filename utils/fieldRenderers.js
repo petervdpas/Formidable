@@ -17,7 +17,6 @@ import { showOptionPopup } from "./popupUtils.js";
 import { getCurrentTheme } from "../modules/themeToggle.js";
 import { createRemoveImageButton } from "../modules/uiButtons.js";
 import { createIconButton } from "./buttonUtils.js";
-import { runUserCode } from "./codeRunner.js";
 
 function resolveOption(opt) {
   return typeof opt === "string"
@@ -1376,13 +1375,11 @@ export async function renderCodeField(field, value = "") {
   wrapper.className = "code-field";
   wrapper.dataset.codeField = field.key;
 
-  // the *persisted* value
   const hidden = document.createElement("input");
   hidden.type = "hidden";
-  hidden.name = field.key; // <-- key is the real data field
+  hidden.name = field.key;
   hidden.value = encode(value);
 
-  // give the persisted control the context attrs
   applyFieldContextAttributes(hidden, {
     key: field.key,
     type: field.type,
@@ -1414,10 +1411,15 @@ export async function renderCodeField(field, value = "") {
   bar.appendChild(spinner);
   bar.appendChild(status);
 
-  // optional: keep output area for logs/result
   const out = document.createElement("pre");
   out.className = "code-output";
   out.setAttribute("aria-live", "polite");
+
+  // small helper to support snake_case + camelCase
+  const pick = (obj, ...keys) => {
+    for (const k of keys) if (obj[k] !== undefined) return obj[k];
+    return undefined;
+  };
 
   async function doRun() {
     if (!src) {
@@ -1430,26 +1432,49 @@ export async function renderCodeField(field, value = "") {
     status.textContent = "Running…";
     out.textContent = "";
 
-    const res = await runUserCode({
+    const emitWithResponse =
+      (typeof window !== "undefined" && window.emitWithResponse) ||
+      ((evt, payload) => EventBus.emitWithResponse(evt, payload));
+
+    const inputMode = pick(field, "input_mode", "inputMode") || "safe";
+    const apiMode = pick(field, "api_mode", "apiMode") || "frozen";
+    const apiPickRaw = pick(field, "api_pick", "apiPick");
+    const apiPick = Array.isArray(apiPickRaw)
+      ? apiPickRaw
+      : typeof apiPickRaw === "string"
+      ? apiPickRaw
+          .split(/[,\s]+/)
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : null;
+
+    const payload = {
       code: String(src),
-      input: {},
-      sandbox: field.sandbox !== false,
-      timeout: 3000,
-    });
+      input: pick(field, "input") ?? {},
+      timeout: Number(pick(field, "timeout")) || 3000,
+      inputMode,
+      api:
+        pick(field, "api") ??
+        (typeof window !== "undefined" ? window.FGA : null),
+      apiPick,
+      apiMode,
+    };
+
+    const res = await emitWithResponse("code:execute", payload);
 
     spinner.style.display = "none";
-    status.textContent = res.ok ? "OK" : "Error";
+    status.textContent = res?.ok ? "OK" : "Error";
 
     const lines = [];
-    if (res.logs?.length) lines.push(`// console\n${res.logs.join("\n")}`);
+    if (res?.logs?.length) lines.push(`// console\n${res.logs.join("\n")}`);
     lines.push(
-      res.ok
+      res?.ok
         ? `// result\n${fmt(res.result)}`
-        : `// error\n${String(res.error)}`
+        : `// error\n${String(res?.error ?? "Unknown error")}`
     );
     out.textContent = lines.join("\n\n");
 
-    if (res.ok) {
+    if (res?.ok) {
       hidden.value = encode(res.result);
       hidden.dispatchEvent(new Event("input", { bubbles: true }));
       hidden.dispatchEvent(new Event("change", { bubbles: true }));
@@ -1464,7 +1489,6 @@ export async function renderCodeField(field, value = "") {
   }
   runBtn.addEventListener("click", doRun);
 
-  // compose — no textarea
   wrapper.appendChild(hint);
   wrapper.appendChild(bar);
   wrapper.appendChild(out);

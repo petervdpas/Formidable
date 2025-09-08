@@ -48,10 +48,11 @@ function setupFieldEditor(container, onChange, allFields = []) {
     formatTextarea: container.querySelector("#edit-format"),
     formatTextareaRow: container.querySelector("#edit-format-row"),
 
-    language: container.querySelector("#edit-language"),
     runmode: container.querySelector("#edit-runmode"),
     allowRun: container.querySelector("#edit-allowrun"),
-    sandbox: container.querySelector("#edit-sandbox"),
+    inputMode: container.querySelector("#edit-inputmode"),
+    apiMode: container.querySelector("#edit-apimode"),
+    apiPick: container.querySelector("#edit-apipick"),
   };
 
   let labelLocked = false;
@@ -151,13 +152,25 @@ function setupFieldEditor(container, onChange, allFields = []) {
         applyFieldAttributeDisabling(dom, currentType);
         maybeSwapDefaultForCode(dom, currentType);
 
-        // If switching to code, seed UI controls with either existing field values or sensible defaults
+        // seed code controls when switching to code
         if (currentType === "code") {
-          dom.language && (dom.language.value = field.language || "javascript");
           dom.runmode &&
             (dom.runmode.value = (field.run_mode || "manual").toLowerCase());
           dom.allowRun && (dom.allowRun.checked = !!field.allow_run);
-          dom.sandbox && (dom.sandbox.checked = field.sandbox !== false);
+          dom.inputMode &&
+            (dom.inputMode.value =
+              (field.input_mode || "safe").toLowerCase() === "raw"
+                ? "raw"
+                : "safe");
+          dom.apiMode &&
+            (dom.apiMode.value =
+              (field.api_mode || "frozen").toLowerCase() === "raw"
+                ? "raw"
+                : "frozen");
+          dom.apiPick &&
+            (dom.apiPick.value = Array.isArray(field.api_pick)
+              ? field.api_pick.join(", ")
+              : "");
         }
         validate();
       };
@@ -172,11 +185,21 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
     // Populate code-specific controls when editing an existing "code" field
     if (field.type === "code") {
-      dom.language && (dom.language.value = field.language || "javascript");
       dom.runmode &&
         (dom.runmode.value = (field.run_mode || "manual").toLowerCase());
       dom.allowRun && (dom.allowRun.checked = !!field.allow_run);
-      dom.sandbox && (dom.sandbox.checked = field.sandbox !== false);
+      dom.inputMode &&
+        (dom.inputMode.value =
+          (field.input_mode || "safe").toLowerCase() === "raw" ? "raw" : "safe");
+      dom.apiMode &&
+        (dom.apiMode.value =
+          (field.api_mode || "frozen").toLowerCase() === "raw"
+            ? "raw"
+            : "frozen");
+      dom.apiPick &&
+        (dom.apiPick.value = Array.isArray(field.api_pick)
+          ? field.api_pick.join(", ")
+          : "");
     }
 
     // create CM if needed
@@ -229,12 +252,30 @@ function setupFieldEditor(container, onChange, allFields = []) {
       field.primary_key = true;
     }
 
-    // ✅ collect code props for persistence
+    // collect code props for persistence (schema-aligned)
     if (type === "code") {
-      field.language = dom.language?.value || "javascript";
-      field.run_mode = dom.runmode?.value || "manual";
+      field.run_mode = (dom.runmode?.value || "manual").toLowerCase();
+      if (!["manual", "load", "save"].includes(field.run_mode)) {
+        field.run_mode = "manual";
+      }
       field.allow_run = !!dom.allowRun?.checked;
-      field.sandbox = dom.sandbox?.checked !== false;
+
+      field.input_mode =
+        (dom.inputMode?.value || "safe").toLowerCase() === "raw"
+          ? "raw"
+          : "safe";
+
+      field.api_mode =
+        (dom.apiMode?.value || "frozen").toLowerCase() === "raw"
+          ? "raw"
+          : "frozen";
+
+      // split comma/space list -> array of non-empty strings
+      const pickRaw = dom.apiPick?.value || "";
+      field.api_pick = pickRaw
+        .split(/[,\s]+/)
+        .map((s) => s.trim())
+        .filter(Boolean);
     }
 
     return field;
@@ -476,6 +517,7 @@ export function renderFieldList(
   });
 }
 
+// — code editor wiring (always JS now)
 function maybeSwapDefaultForCode(dom, fieldType) {
   const row = dom.default?.closest(".modal-form-row");
   if (!row || !dom.default) return;
@@ -513,24 +555,15 @@ function maybeSwapDefaultForCode(dom, fieldType) {
     });
 
     const mainSpan = stacked.querySelector("span");
-    if (
-      mainSpan &&
-      (!mainSpan.textContent || mainSpan.textContent === "field.code.label")
-    ) {
+    if (mainSpan && (!mainSpan.textContent || mainSpan.textContent === "field.code.label")) {
       mainSpan.setAttribute("data-i18n", "field.code.label");
-      mainSpan.textContent =
-        (typeof t === "function" && t("field.code.label")) || "Code";
+      mainSpan.textContent = (typeof t === "function" && t("field.code.label")) || "Code";
     }
     const subSmall = stacked.querySelector(".label-subtext");
-    if (
-      subSmall &&
-      (!subSmall.textContent ||
-        subSmall.textContent === "field.code.fullscreen")
-    ) {
+    if (subSmall && (!subSmall.textContent || subSmall.textContent === "field.code.fullscreen")) {
       subSmall.setAttribute("data-i18n", "field.code.fullscreen");
       subSmall.textContent =
-        (typeof t === "function" && t("field.code.fullscreen")) ||
-        "Use F11 for fullscreen";
+        (typeof t === "function" && t("field.code.fullscreen")) || "Use F11 for fullscreen";
     }
 
     if (labelEl) labelEl.replaceWith(stacked);
@@ -539,21 +572,11 @@ function maybeSwapDefaultForCode(dom, fieldType) {
     const modal = document.getElementById("field-edit-modal");
     const modalBodyEl = modal?.querySelector(".modal-body") || null;
 
-    // use currently selected language (defaults to js)
-    const mode = (dom.language?.value || "javascript").toLowerCase();
-
+    // always JS
     dom.__codeEditor = createInlineCodeMirror(dom.default, {
-      mode,
+      mode: "javascript",
       height: 560,
       modalBodyEl,
-    });
-
-    // keep CM mode in sync with the language dropdown
-    dom.language?.addEventListener("change", () => {
-      const newMode = (dom.language.value || "javascript").toLowerCase();
-      try {
-        dom.__codeEditor.setOption("mode", newMode);
-      } catch {}
     });
   } else {
     if (dom.__codeEditor) {
@@ -575,10 +598,10 @@ function maybeSwapDefaultForCode(dom, fieldType) {
     restored.htmlFor = "edit-default";
     restored.className = labelEl?.className || "";
     restored.setAttribute("data-i18n", "standard.default");
-    restored.textContent =
-      (typeof t === "function" && t("standard.default")) || "Default";
+    restored.textContent = (typeof t === "function" && t("standard.default")) || "Default";
 
     if (labelEl) labelEl.replaceWith(restored);
     else row.insertBefore(restored, row.firstChild);
   }
 }
+

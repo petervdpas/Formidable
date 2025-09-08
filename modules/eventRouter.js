@@ -26,6 +26,7 @@ import * as transformHandler from "./handlers/transformHandler.js";
 import * as editorHandler from "./handlers/editorHandler.js";
 import * as linkHandler from "./handlers/linkHandler.js";
 import * as toastHandler from "./handlers/toastHandler.js";
+import * as codeExecHandler from "./handlers/codeExecHandler.js";
 
 let routerInitialized = false;
 let autobindRegistered = false;
@@ -410,6 +411,9 @@ export function initEventRouter() {
     "vfs:getTemplateMetaFiles",
     vfsHandler.handleGetTemplateMetaFiles
   );
+
+  EventBus.off("code:execute", codeExecHandler.handleCodeExecute);
+  EventBus.on("code:execute", codeExecHandler.handleCodeExecute);
 
   EventBus.off("boot:initialize", bootHandlers.initializeFromConfig);
   EventBus.on("boot:initialize", async (config) => {

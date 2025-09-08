@@ -6,10 +6,12 @@ import * as appliers from "./fieldAppliers.js";
 import { generateGuid } from "./domUtils.js";
 
 export const codeSpecific = Object.freeze([
-  "language", // Code language (currently only JS)
   "runmode", // Execution trigger: manual/load/save
   "allowRun", // Allow execution at all
-  "sandbox", // Run in sandbox
+  "inputMode", // 'safe' | 'raw'
+  "api", // e.g. window.FGA
+  "apiPick", // whitelist top-level keys: ['path','string']
+  "apiMode", // 'frozen' | 'raw'
 ]);
 
 export function getFieldTypeDef(type) {
