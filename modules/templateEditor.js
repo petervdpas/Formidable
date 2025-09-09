@@ -2,6 +2,7 @@
 
 import { EventBus } from "./eventBus.js";
 import { showConfirmModal } from "../utils/modalUtils.js";
+import { bindHotkeys, unbindHotkeys } from "../utils/hotkeyUtils.js";
 import {
   renderFieldList,
   showFieldEditorModal,
@@ -120,6 +121,9 @@ export function initTemplateEditor(containerId, onSaveCallback) {
       ]);
       return;
     }
+
+    // Clean previous hotkeys when re-rendering
+    unbindHotkeys(container);
 
     data = await ensureVirtualLocation(data);
 
@@ -270,83 +274,78 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     );
 
     // ─── Save + Delete Buttons ──────────
-    const { save, delete: del } = await createToggleButtons(
-      {
-        save: async () => {
-          const fieldsSanitized = currentData.fields.map((f) =>
-            sanitizeField(f)
-          );
-          const collectionElement = document.getElementById(
-            "template-enable-collection"
-          );
-          const hasGuidField = fieldsSanitized.some((f) => f.type === "guid");
+    const onSave = async () => {
+      const fieldsSanitized = currentData.fields.map((f) => sanitizeField(f));
+      const collectionElement = document.getElementById(
+        "template-enable-collection"
+      );
+      const hasGuidField = fieldsSanitized.some((f) => f.type === "guid");
 
-          const fullTemplate = {
-            name:
-              container.querySelector("#yaml-name")?.value.trim() || "Unnamed",
-            item_field:
-              container.querySelector("#yaml-item-field")?.value.trim() || "",
-            markdown_template: getEditor()?.getValue() || "",
-            sidebar_expression:
-              container.querySelector("#sidebar-expression")?.value.trim() ||
-              "",
-            enable_collection: hasGuidField
-              ? collectionElement?.checked === true
-              : false,
-            fields: fieldsSanitized,
-          };
+      const fullTemplate = {
+        name: container.querySelector("#yaml-name")?.value.trim() || "Unnamed",
+        item_field:
+          container.querySelector("#yaml-item-field")?.value.trim() || "",
+        markdown_template: getEditor()?.getValue() || "",
+        sidebar_expression:
+          container.querySelector("#sidebar-expression")?.value.trim() || "",
+        enable_collection: hasGuidField
+          ? collectionElement?.checked === true
+          : false,
+        fields: fieldsSanitized,
+      };
 
-          const errors = await new Promise((resolve) => {
-            EventBus.emit("template:validate", {
-              data: fullTemplate,
-              callback: resolve,
-            });
-          });
+      const errors = await new Promise((resolve) => {
+        EventBus.emit("template:validate", {
+          data: fullTemplate,
+          callback: resolve,
+        });
+      });
 
-          if (errors?.length > 0) {
-            EventBus.emit("status:update", {
-              message: "status.template.validation.error",
-              languageKey: "status.template.validation.error",
-              i18nEnabled: true,
-              args: [errors.length],
-            });
-            errors.forEach((err) => {
-              const { key, args } = formatError(err);
-              EventBus.emit("ui:toast", {
-                message: key,
-                languageKey: key,
-                variant: "error",
-                i18nEnabled: true,
-                args: args || [],
-              });
-            });
-            return;
-          }
-
-          EventBus.emit("editor:save", {
-            container,
-            fields: fullTemplate.fields,
-            callback: onSaveCallback,
-          });
-
-          const filename = window.currentSelectedTemplateName || "Unknown";
-
-          EventBus.emit("status:update", {
-            message: "status.template.save.success",
-            languageKey: "status.template.save.success",
-            i18nEnabled: true,
-            args: [filename],
-          });
+      if (errors?.length > 0) {
+        EventBus.emit("status:update", {
+          message: "status.template.validation.error",
+          languageKey: "status.template.validation.error",
+          i18nEnabled: true,
+          args: [errors.length],
+        });
+        errors.forEach((err) => {
+          const { key, args } = formatError(err);
           EventBus.emit("ui:toast", {
-            languageKey: "toast.template.save.success",
-            args: [filename],
-            variant: "success",
+            message: key,
+            languageKey: key,
+            variant: "error",
+            i18nEnabled: true,
+            args: args || [],
           });
-        },
-        delete: () => {
-          EventBus.emit("editor:delete", container);
-        },
-      },
+        });
+        return;
+      }
+
+      EventBus.emit("editor:save", {
+        container,
+        fields: fullTemplate.fields,
+        callback: onSaveCallback,
+      });
+
+      const filename = window.currentSelectedTemplateName || "Unknown";
+
+      EventBus.emit("status:update", {
+        message: "status.template.save.success",
+        languageKey: "status.template.save.success",
+        i18nEnabled: true,
+        args: [filename],
+      });
+      EventBus.emit("ui:toast", {
+        languageKey: "toast.template.save.success",
+        args: [filename],
+        variant: "success",
+      });
+    };
+    const onDelete = () => {
+      EventBus.emit("editor:delete", container);
+    };
+    const { save, delete: del } = await createToggleButtons(
+      { save: onSave, delete: onDelete },
       {
         icon: {
           save: createTemplateSaveIconButton,
@@ -361,6 +360,33 @@ export function initTemplateEditor(containerId, onSaveCallback) {
 
     actionsRow.appendChild(save);
     actionsRow.appendChild(del);
+
+    // ─── Bind page-scoped hotkeys ─────────────────────────────
+    bindHotkeys(
+      container,
+      [
+        {
+          combo: ["Ctrl+S", "Cmd+S", "Meta+S"],
+          onTrigger: onSave,
+          button: save,
+          titleKey: "standard.save",
+        },
+        {
+          combo: ["Ctrl+D", "Cmd+D", "Meta+D"],
+          onTrigger: onDelete,
+          button: del,
+          titleKey: "standard.delete",
+        },
+      ],
+      {
+        // allow inside CodeMirror
+        allowWhenTyping: true,
+        preventDefault: true,
+        stopPropagation: true,
+        i18n: (key, ...args) =>
+          window.i18n?.t ? window.i18n.t(key, ...args) : key,
+      }
+    );
 
     // ─── Editor Change → Show/Hide Generate Button ─────
     const editor = getEditor();

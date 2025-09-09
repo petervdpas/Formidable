@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-09-08T22:42:50.769Z",
+    "updated": "2025-09-09T21:19:50.513Z",
     "flagged": true,
     "tags": [
       "bye",
@@ -56,8 +56,14 @@
       "now what"
     ],
     "myScript": {
-      "rel": "./data/file.yaml",
-      "cap": "Relative ok"
+      "fromOption": "Peter",
+      "age": 57,
+      "final": {
+        "user": {
+          "name": "Peter",
+          "age": 57
+        }
+      }
     }
   }
 }

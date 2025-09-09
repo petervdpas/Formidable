@@ -406,26 +406,26 @@ fields:
     two_column: false
     default: |-
       return (async (input, api) => {
-        // Example absolute path + app root
-        const absPath = "C:/Users/Utente/projects/formidable/data/file.yaml";
-        const appRoot = "C:/Users/Utente/projects/formidable";
+        // options become variables here: myName, myAge
 
-        // Use CFA.path.formatAsRelativePath
-        const rel = api.path.formatAsRelativePath(absPath, appRoot);
+        let obj = { user: { name: myName } };
 
-        // Use CFA.string.capitalize
-        const cap = api.string.capitalize("relative ok");
+        api.transform.setValueAtKey(obj, "user.age", Number(myAge));
 
-        console.log("Relative path:", rel);
-        console.log("Capitalized:", cap);
+        const age = api.transform.getValueAtKey(obj, "user.age");
 
-        return { rel, cap };
+        console.log("After transform:", obj);
+
+        return { fromOption: myName, age, final: obj };
       })(input, api);
-    options: *ref_0
+    options:
+      - value: myName
+        label: Peter
+      - value: myAge
+        label: '57'
     run_mode: manual
     allow_run: true
     input_mode: safe
     api_mode: frozen
     api_pick:
-      - path
-      - string
+      - transform

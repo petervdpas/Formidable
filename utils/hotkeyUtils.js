@@ -46,6 +46,37 @@ function isTypingTarget(el) {
 }
 
 /**
+ * Check if a container element is visible/active in the DOM.
+ * Uses layout presence (client rects) + computed style; no offsetParent.
+ */
+export function isContainerActive(el) {
+  if (!el || !el.isConnected) return false;
+  const cs = getComputedStyle(el);
+  if (cs.display === "none" || cs.visibility === "hidden") return false;
+  // Hidden ancestors via attributes
+  if (el.closest("[hidden], [inert], [aria-hidden='true']")) return false;
+  // Has render box?
+  return el.getClientRects().length > 0;
+}
+
+/**
+ * Wrap a handler so it only runs when `container` is the active/visible context
+ * and (optionally) the event target is inside that container.
+ */
+export function withContext(
+  container,
+  fn,
+  { requireTargetInScope = true } = {}
+) {
+  return (e) => {
+    if (!isContainerActive(container)) return;
+    const t = e?.target || document.activeElement;
+    if (requireTargetInScope && t && !container.contains(t)) return;
+    return fn(e);
+  };
+}
+
+/**
  * Bind a set of hotkeys scoped to a container (page/section).
  *
  * @param {HTMLElement} scopeEl - The element whose lifecycle will own the binding (use your top-level container).
@@ -54,7 +85,9 @@ function isTypingTarget(el) {
  *   - allowWhenTyping?: boolean (default: false)
  *   - stopPropagation?: boolean (default: true)
  *   - preventDefault?: boolean (default: true)
- *   - i18n?: (key: string, ...args:any[]) => string  (if you want i18n titles)
+ *   - requireScopeVisible?: boolean (default: true)
+ *   - requireTargetInScope?: boolean (default: false)  // <- relaxed default
+ *   - i18n?: (key: string, ...args:any[]) => string
  */
 export function bindHotkeys(scopeEl, bindings = [], options = {}) {
   if (!scopeEl) throw new Error("bindHotkeys: scopeEl is required");
@@ -64,6 +97,8 @@ export function bindHotkeys(scopeEl, bindings = [], options = {}) {
     allowWhenTyping: false,
     stopPropagation: true,
     preventDefault: true,
+    requireScopeVisible: true,
+    requireTargetInScope: false, // only visible context gates by default
     i18n: null,
     ...options,
   };
@@ -108,6 +143,12 @@ export function bindHotkeys(scopeEl, bindings = [], options = {}) {
   }
 
   const handler = (e) => {
+    // Context gating: only fire when this scope is visible
+    if (opts.requireScopeVisible && !isContainerActive(scopeEl)) return;
+    // Optionally require the event target to be inside scope
+    if (opts.requireTargetInScope && e.target && !scopeEl.contains(e.target))
+      return;
+
     // Ignore when typing if desired
     if (!opts.allowWhenTyping && isTypingTarget(e.target)) return;
 
@@ -122,12 +163,9 @@ export function bindHotkeys(scopeEl, bindings = [], options = {}) {
 
     for (const r of rules) {
       for (const d of r.parsed) {
-        // Match the key (letters/digits: normalize to lower)
         const keyMatch =
           d.key === key ||
-          // Function keys (F1, F2, ...):
           (d.key.startsWith("f") && key === d.key) ||
-          // Allow '+' as key
           (d.key === "+" && e.key === "+");
 
         if (
@@ -139,7 +177,7 @@ export function bindHotkeys(scopeEl, bindings = [], options = {}) {
         ) {
           if (opts.preventDefault) e.preventDefault();
           if (opts.stopPropagation) e.stopPropagation();
-          r.onTrigger();
+          r.onTrigger(e);
           return;
         }
       }
@@ -147,7 +185,7 @@ export function bindHotkeys(scopeEl, bindings = [], options = {}) {
   };
 
   window.addEventListener("keydown", handler);
-  scopeEl.__hotkeyHandler = handler; // store for cleanup
+  scopeEl.__hotkeyHandler = handler;
 }
 
 /**

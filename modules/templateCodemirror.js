@@ -134,6 +134,15 @@ export function createInlineCodeMirror(textarea, opts = {}) {
     cm.setSize("100%", height);
   });
 
+  // ── Always mirror buffer → textarea so rebuilds use latest content
+  cm.on("change", () => {
+    cm.save(); // writes to textarea.value
+    // bubble an input event so any validators see live changes
+    try {
+      textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    } catch {}
+  });
+
   // ── NEW: track inline editor for retheming
   registry.inlines.add(cm);
 
@@ -147,16 +156,22 @@ export function createInlineCodeMirror(textarea, opts = {}) {
 
     cm.toggleModalFullscreen = () =>
       cmIsModalFullscreen(cm)
-        ? cmExitModalFullscreen(cm)
-        : cmEnterModalFullscreen(cm);
+        ? (cm.save(), cmExitModalFullscreen(cm))
+        : (cm.save(), cmEnterModalFullscreen(cm));
     cm.enterModalFullscreen = () => cmEnterModalFullscreen(cm);
     cm.exitModalFullscreen = () => cmExitModalFullscreen(cm);
     cm.isModalFullscreen = () => cmIsModalFullscreen(cm);
 
+    // Capture F11 inside CM and prevent bubbling to the app
     cm.addKeyMap({
-      F11: () => cm.toggleModalFullscreen(),
-      Esc: () => {
-        if (cm.isModalFullscreen()) cm.exitModalFullscreen();
+      F11: (cmInst) => {
+        cmInst.save();
+        cmInst.toggleModalFullscreen();
+        return true; // consumes key
+      },
+      Esc: (cmInst) => {
+        if (cmInst.isModalFullscreen()) cmInst.exitModalFullscreen();
+        return true;
       },
     });
   }

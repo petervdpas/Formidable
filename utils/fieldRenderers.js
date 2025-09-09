@@ -1448,14 +1448,18 @@ export async function renderCodeField(field, value = "") {
           .filter(Boolean)
       : null;
 
+    const opts = optsToObject(field.options);
+
     const payload = {
       code: String(src),
       input: pick(field, "input") ?? {},
       timeout: Number(pick(field, "timeout")) || 3000,
       inputMode,
-      api: window.CFA || {}, 
+      api: window.CFA || {},
       apiPick,
       apiMode,
+      opts: opts,
+      optsAsVars: Array.isArray(field.options) && field.options.length > 0,
     };
 
     const res = await emitWithResponse("code:execute", payload);
@@ -1516,5 +1520,38 @@ export async function renderCodeField(field, value = "") {
   function encode(v) {
     if (v == null) return "";
     return typeof v === "string" ? v : JSON.stringify(v);
+  }
+
+  function optsToObject(opts) {
+    if (!opts) return {};
+    const out = {};
+    if (Array.isArray(opts)) {
+      for (const it of opts) {
+        // Support {value,label}
+        if (it && typeof it === "object") {
+          if ("value" in it) {
+            const k = String(it.value).trim();
+            const v = "label" in it ? String(it.label) : "";
+            out[k] = v;
+            continue;
+          }
+          if ("key" in it) {
+            out[String(it.key)] = String(it.value ?? "");
+            continue;
+          }
+        }
+        if (Array.isArray(it) && it.length >= 2) {
+          out[String(it[0])] = String(it[1]);
+          continue;
+        }
+        if (typeof it === "string" && it.includes("=")) {
+          const [k, ...rest] = it.split("=");
+          out[k.trim()] = rest.join("=").trim();
+        }
+      }
+      return out;
+    }
+    if (typeof opts === "object") return { ...opts };
+    return {};
   }
 }
