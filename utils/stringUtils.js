@@ -28,3 +28,23 @@ export function combiMerge(parts, params = {}, fallback = "") {
     .filter(Boolean)
     .join(" ");
 }
+
+export function toCamel(str) {
+  return str.replace(/[_-](\w)/g, (_, c) => c.toUpperCase());
+}
+
+export function toSnake(str) {
+  return str
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .replace(/[-\s]+/g, "_")
+    .toLowerCase();
+}
+
+export function truncate(str, max = 50) {
+  if (typeof str !== "string") return "";
+  return str.length > max ? str.slice(0, max - 1) + "…" : str;
+}
+
+export function withDefault(str, alt = "") {
+  return str == null || str === "" ? alt : str;
+}

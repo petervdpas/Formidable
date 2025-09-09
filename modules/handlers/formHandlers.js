@@ -45,6 +45,7 @@ export async function handleFormSelected(datafile) {
   // If no datafile → just clear
   if (!datafile) {
     formManager.clearForm();
+    EventBus.emit("form:context:update", null);
     return;
   }
 
@@ -116,6 +117,16 @@ export async function handleLoadForm(
       datafile,
       fields
     );
+    if (data) {
+      EventBus.emit("form:context:update", {
+        meta: data.meta || null,
+        data: data.data || {},
+        template: templateFilename || null,
+        filename: datafile || null,
+      });
+    } else {
+      EventBus.emit("form:context:update", null);
+    }
     callback?.(data);
   } catch (err) {
     EventBus.emit("logging:error", [
@@ -142,6 +153,13 @@ export async function handleSaveForm(payload, respond) {
       datafile || result.path?.split(/[/\\]/).pop() || "unknown.json";
 
     if (result.success) {
+      EventBus.emit("form:context:update", {
+        meta: (data && data.meta) || null,
+        data: (data && data.data) || {},
+        template: templateFilename || null,
+        filename: datafile || result.path?.split(/[/\\]/).pop() || null,
+      });
+
       EventBus.emit("status:update", {
         message: "status.save.success",
         languageKey: "status.save.success",
@@ -199,6 +217,11 @@ export async function handleDeleteForm(
     );
 
     if (result) {
+      const snap = await EventBus.emitWithResponse("form:context:get");
+      if (snap?.filename === datafile && snap?.template === templateFilename) {
+        EventBus.emit("form:context:update", null);
+      }
+
       EventBus.emit("status:update", {
         message: "status.delete.success",
         languageKey: "status.delete.success",

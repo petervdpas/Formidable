@@ -1449,10 +1449,11 @@ export async function renderCodeField(field, value = "") {
       : null;
 
     const opts = optsToObject(field.options);
+    const formSnap = await emitWithResponse("form:context:get");
 
     const payload = {
       code: String(src),
-      input: pick(field, "input") ?? {},
+      input: { ...(pick(field, "input") ?? {}), form: formSnap },
       timeout: Number(pick(field, "timeout")) || 3000,
       inputMode,
       api: window.CFA || {},

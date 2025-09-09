@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-09-09T21:19:50.513Z",
+    "updated": "2025-09-09T22:49:17.382Z",
     "flagged": true,
     "tags": [
       "bye",
@@ -56,14 +56,10 @@
       "now what"
     ],
     "myScript": {
-      "fromOption": "Peter",
-      "age": 57,
-      "final": {
-        "user": {
-          "name": "Peter",
-          "age": 57
-        }
-      }
+      "seenTest": "Approve This one",
+      "cleanKey": "some-value-here!",
+      "capName": "Approve This one",
+      "shortFile": "sane-20250530.meta.…"
     }
   }
 }

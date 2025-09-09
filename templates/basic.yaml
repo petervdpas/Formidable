@@ -404,19 +404,16 @@ fields:
     description: Path + string test
     expression_item: false
     two_column: false
-    default: |-
+    default: |
       return (async (input, api) => {
-        // options become variables here: myName, myAge
+        const snap = await api.form.snapshot();  // { meta, data, template, filename }
+        const currentTest = snap?.data?.test ?? "";
 
-        let obj = { user: { name: myName } };
+        const cleanKey  = api.string.sanitize("Some Value Here!");
+        const capName   = api.string.capitalize(currentTest || "unnamed");
+        const shortFile = api.string.truncate(snap?.filename || "", 20);
 
-        api.transform.setValueAtKey(obj, "user.age", Number(myAge));
-
-        const age = api.transform.getValueAtKey(obj, "user.age");
-
-        console.log("After transform:", obj);
-
-        return { fromOption: myName, age, final: obj };
+        return { seenTest: currentTest, cleanKey, capName, shortFile };
       })(input, api);
     options:
       - value: myName
@@ -428,4 +425,5 @@ fields:
     input_mode: safe
     api_mode: frozen
     api_pick:
-      - transform
+      - string
+      - form

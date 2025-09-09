@@ -17,6 +17,7 @@ import * as profileHandler from "./handlers/profileHandler.js";
 import * as contextHandlers from "./handlers/contextHandlers.js";
 import * as templateHandlers from "./handlers/templateHandlers.js";
 import * as formHandlers from "./handlers/formHandlers.js";
+import * as formCtxHandlers from "./handlers/formContextHandlers.js";
 import * as modalHandler from "./handlers/modalHandler.js";
 import * as themeHandler from "./handlers/themeHandler.js";
 import * as statusHandler from "./handlers/statusHandler.js";
@@ -251,6 +252,13 @@ export function initEventRouter() {
   EventBus.on("template:list:highlighted", (name) =>
     listHandlers.handleListHighlighted({ listId: "template-list", name })
   );
+
+  // Form Context events
+  EventBus.off("form:context:get", formCtxHandlers.handleFormContextGet);
+  EventBus.off("form:context:update", formCtxHandlers.handleFormContextUpdate);
+
+  EventBus.on("form:context:update", formCtxHandlers.handleFormContextUpdate);
+  EventBus.on("form:context:get", formCtxHandlers.handleFormContextGet);
 
   // Form events
   EventBus.off("form:selected", formHandlers.handleFormSelected);

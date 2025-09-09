@@ -25,6 +25,20 @@ export function exposeGlobalAPI() {
       addYamlExtension: pathUtils.addYamlExtension,
       stripMetaExtension: pathUtils.stripMetaExtension,
       addMetaExtension: pathUtils.addMetaExtension,
+      normalizeSlashes: pathUtils.normalizeSlashes,
+      getFilename: pathUtils.getFilename,
+      getDirname: pathUtils.getDirname,
+      stripExtension: pathUtils.stripExtension,
+      getExtension: pathUtils.getExtension,
+      joinPaths: pathUtils.joinPaths,
+      isRelative: pathUtils.isRelative ,
+      ensureRelative: pathUtils.ensureRelative,
+      ensureAbsolute: pathUtils.ensureAbsolute,
+      makeRelativeTo: pathUtils.makeRelativeTo,
+      makeAbsoluteTo: pathUtils.makeAbsoluteTo,
+      commonPathPrefix: pathUtils.commonPathPrefix,
+      isSubPath: pathUtils.isSubPath,
+      relativeFrom: pathUtils.relativeFrom,
     },
 
     // Encryption utilities
@@ -134,6 +148,10 @@ export function exposeGlobalAPI() {
       sanitize: stringUtils.sanitize,
       capitalize: stringUtils.capitalize,
       combiMerge: stringUtils.combiMerge,
+      toCamel: stringUtils.toCamel,
+      toSnake: stringUtils.toSnake,
+      truncate: stringUtils.truncate,
+      withDefault: stringUtils.withDefault,
     },
   };
 
