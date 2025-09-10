@@ -1042,6 +1042,9 @@ export async function renderLinkField(
   currentTemplate,
   { fetchTemplates, fetchMetaFiles }
 ) {
+
+  console.log("Rendering LINK FIELD VALUE:", value);
+
   // ── helpers
   const normalize = (v) => {
     if (!v) return { href: "", text: "" };
@@ -1197,7 +1200,7 @@ export async function renderLinkField(
   });
   {
     const lblObj = buildCompositeElementStacked({
-      forId: `${field.key}-text`,
+      forId: `${field.key}-link-text`,
       labelKey: "field.link.text",
       subKey: "field.link.text.hint",
       i18nEnabled: true,
@@ -1209,7 +1212,7 @@ export async function renderLinkField(
     parent: rowBottom,
     tag: "input",
     attributes: {
-      id: `${field.key}-text`,
+      id: `${field.key}-linktext`,
       type: "text",
       placeholder: "", // translator fills via <label small>; keep input clean
       style: "display:block;width:100%;max-width:none;box-sizing:border-box;",

@@ -4,7 +4,7 @@
     "author_email": "regular@example.com",
     "template": "recepten.yaml",
     "created": "2025-08-08T10:02:49.872Z",
-    "updated": "2025-09-05T16:23:29.619Z",
+    "updated": "2025-09-10T17:37:42.489Z",
     "flagged": false,
     "tags": [
       "groentenschotel",
@@ -36,7 +36,10 @@
     "bereiding": "Klop de olie druppelgewijs door het citroensap zodat er een emulsie ontstaat. Prima voor bij de spaanse groetenschotel.",
     "verwante_links": [
       {
-        "verwant_recept": "formidable://recepten.yaml:groentenschotel.meta.json"
+        "verwant_recept": {
+          "href": "formidable://recepten.yaml:groentenschotel.meta.json",
+          "text": "Spaanse Groentenschotel"
+        }
       }
     ]
   }

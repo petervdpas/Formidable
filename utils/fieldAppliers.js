@@ -310,13 +310,18 @@ export async function applyLinkField(
     eventFunctions.fetchMetaFiles || (() => Promise.resolve([]));
 
   // normalize new/legacy value
-  const { href } =
+  const { href, text } =
     typeof value === "string"
       ? { href: value.trim(), text: "" }
       : {
           href: value?.href?.trim?.() || "",
           text: value?.text?.trim?.() || "",
         };
+
+  const textInput = wrapper.querySelector(`#${key}-link-text`);
+  if (textInput) {
+    textInput.value = text || "";
+  }
 
   // i18n helper
   const tr = (k, fallback) =>

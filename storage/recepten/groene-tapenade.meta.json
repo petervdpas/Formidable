@@ -4,7 +4,7 @@
     "author_email": "regular@example.com",
     "template": "recepten.yaml",
     "created": "2025-08-08T11:06:20.080Z",
-    "updated": "2025-09-06T00:11:40.937Z",
+    "updated": "2025-09-10T17:37:37.674Z",
     "flagged": false,
     "tags": [
       "groen",
@@ -56,7 +56,10 @@
     "bereiding": "Hak de olijven fijn. Doe de kappertjes in een zeef en spoel kort af om overtollig zout te verwijderen.  \nWrijf alle ingrediënten fijn in een vijzel en voeg de olijfolie geleidelijk toe.  \nBreng op smaak met citroensap, witte peper en zout.",
     "verwante_links": [
       {
-        "verwant_recept": "formidable://recepten.yaml:groentenschotel.meta.json"
+        "verwant_recept": {
+          "href": "formidable://recepten.yaml:groentenschotel.meta.json",
+          "text": "Spaanse Groentenschotel"
+        }
       }
     ]
   }

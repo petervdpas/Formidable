@@ -156,7 +156,11 @@ export async function fieldGroupRenderer(
   }
 }
 
-function getLoopSummaryField(loopStartField, groupFields, dataEntry = {}) {
+export function getLoopSummaryField(
+  loopStartField,
+  groupFields,
+  dataEntry = {}
+) {
   const summaryKey = loopStartField?.summary_field;
   const summaryField = summaryKey
     ? groupFields.find((f) => f.key === summaryKey)
@@ -164,11 +168,47 @@ function getLoopSummaryField(loopStartField, groupFields, dataEntry = {}) {
         (f) => f.key && f.type !== "loopstart" && f.type !== "loopstop"
       );
 
-  const key = summaryField?.key || "(unknown)";
-  const label = summaryField?.label || key;
-  const value = dataEntry?.[key] || "(empty)";
+  const key = summaryField?.key ?? "(unknown)";
+  const label = summaryField?.label ?? key;
+  const raw = dataEntry?.[key];
 
-  return { key, label, value };
+  if (summaryField?.type === "link") {
+    let o = raw;
+    if (typeof o === "string") {
+      try {
+        o = JSON.parse(o);
+      } catch {
+        o = { href: o, text: "" };
+      }
+    }
+    if (o && typeof o === "object") {
+      const txt = (o.text ?? "").trim();
+      if (txt) return { key, label, value: txt, _type: "link" };
+      const href = (o.href ?? "").trim();
+      if (!href) return { key, label, value: "(empty)" };
+      if (href.startsWith("formidable://")) {
+        const entry = href.slice("formidable://".length).split(":").pop() || "";
+        return {
+          key,
+          label,
+          value: entry.replace(/\.meta\.json$/i, "") || href,
+          _type: "link",
+        };
+      }
+      const last = href.split("/").filter(Boolean).pop() || href;
+      return { key, label, value: last, _type: "link" };
+    }
+    return { key, label, value: "(empty)", _type: "link" };
+  }
+
+  if (raw == null || raw === "")
+    return { key, label, value: "(empty)", _type: summaryField?.type };
+  return {
+    key,
+    label,
+    value: Array.isArray(raw) ? raw[0] ?? "(empty)" : String(raw),
+    _type: summaryField?.type,
+  };
 }
 
 async function createLoopItem(
@@ -210,6 +250,7 @@ async function createLoopItem(
     key: previewKey,
     label: previewLabel,
     value: previewValue,
+    _type: previewType,
   } = getLoopSummaryField(loopStartField, groupFields, dataEntry);
 
   // Remove button
@@ -243,16 +284,49 @@ async function createLoopItem(
     setTimeout(() => {
       const fieldSelector = `[name="${previewKey}"]`;
       const inputEl = itemWrapper.querySelector(fieldSelector);
-      if (inputEl) {
-        const updateSummary = () => {
-          const raw = inputEl.value || "";
-          const firstLine = raw.split("\n")[0].trim() || "(empty)";
-          summaryEl.textContent = firstLine;
-        };
-        inputEl.addEventListener("input", updateSummary);
-        updateSummary();
-      }
-    }, 50);
+      if (!inputEl) return;
+
+      const isLink = previewType === "link";
+
+      const updateSummary = () => {
+        const raw = (inputEl.value || "").trim();
+        let display = "(empty)";
+
+        if (isLink) {
+          let obj = null;
+          if (raw) {
+            try {
+              obj = JSON.parse(raw);
+            } catch {
+              obj = { href: raw, text: "" };
+            }
+          }
+          if (obj) {
+            const txt = (obj.text ?? "").trim();
+            const href = (obj.href ?? "").trim();
+            if (txt) {
+              display = txt;
+            } else if (href) {
+              if (href.startsWith("formidable://")) {
+                const rest = href.slice("formidable://".length);
+                const entry = rest.split(":").pop() ?? "";
+                display = entry.replace(/\.meta\.json$/i, "") || href;
+              } else {
+                display = href.split("/").filter(Boolean).pop() || href;
+              }
+            }
+          }
+        } else {
+          display = raw.split("\n")[0].trim() || "(empty)";
+        }
+
+        summaryEl.textContent = display;
+      };
+
+      inputEl.addEventListener("input", updateSummary);
+      inputEl.addEventListener("change", updateSummary);
+      updateSummary();
+    }, 0);
   }
 
   itemWrapper.appendChild(header);
@@ -393,7 +467,7 @@ async function createLoopItem(
 
   itemWrapper.appendChild(fieldsContainer);
   // wrap
-  // itemWrapper.classList.add("collapsed");
+  // itemWrapper.classList.add("collapsed");   // Needs to be conditional from user pref?
 
   return itemWrapper;
 }

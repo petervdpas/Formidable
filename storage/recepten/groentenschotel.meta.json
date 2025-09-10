@@ -4,7 +4,7 @@
     "author_email": "regular@example.com",
     "template": "recepten.yaml",
     "created": "2025-08-08T08:30:20.912Z",
-    "updated": "2025-09-05T23:38:17.666Z",
+    "updated": "2025-09-10T17:46:52.299Z",
     "flagged": false,
     "tags": [
       "groentenschotel",
@@ -66,10 +66,16 @@
     "bereiding": "Was de aardappelen, maar schil ze niet. Snijd ze doormidden. Halveer de sjalotten. Verwijder het zaad en de zaadlijsten van de paprika’s en snijd het vruchtvlees in stukken. Was de aubergine(s) en de courgette(s), verwijder de steel van elk, snijd ze doormidden en vervolgens in plakken van ongeveer anderhalve centimeter dik. Verwijder de steeltjes van de Spaanse pepers en laat ze verder heel.\n\nVerhit 4 eetlepels olie in een zware braadslee. Schik de aardappelen naast elkaar op de bodem met het snijvlak naar beneden en rooster ze circa 10 minuten in een op 180 °C voorverwarmde oven. Verdeel de sjalotten en knoflook eroverheen. Rooster het geheel nog zo’n 20 minuten.\n\nHaal de braadslee uit de oven, voeg de groenten en de Spaanse pepers toe. Rits de blaadjes van de takjes tijm en voeg deze toe. Rooster het geheel nog 10 minuten.\n\nWas de tomaten, snijd ze doormidden en verwijder het zaad. Voeg de tomaten toe aan de groenten en schep alles door. Rooster de groenten in totaal **45 minuten**.\n\nHaal de braadslee uit de oven en besprenkel met vinaigrette.",
     "verwante_links": [
       {
-        "verwant_recept": "formidable://recepten.yaml:vinaigrette.meta.json"
+        "verwant_recept": {
+          "href": "formidable://recepten.yaml:vinaigrette.meta.json",
+          "text": "Basis Vinaigrette"
+        }
       },
       {
-        "verwant_recept": "formidable://recepten.yaml:groene-tapenade.meta.json"
+        "verwant_recept": {
+          "href": "formidable://recepten.yaml:groene-tapenade.meta.json",
+          "text": "Groene Tapenade"
+        }
       }
     ]
   }

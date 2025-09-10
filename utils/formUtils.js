@@ -4,6 +4,55 @@ import { EventBus } from "../modules/eventBus.js";
 import { fieldTypes, getFieldTypeDef } from "./fieldTypes.js";
 import { t } from "./i18n.js";
 
+// ─────────────────────────────────────────────
+// Default value normalizer (type-aware)
+// ─────────────────────────────────────────────
+export function normalizeDefaultValue(field, rawDefault) {
+  const type = field.type;
+
+  if (rawDefault == null) {
+    const defFn = fieldTypes[type]?.defaultValue;
+    return typeof defFn === "function" ? defFn() : null;
+  }
+
+  try {
+    switch (type) {
+      case "boolean":
+        return String(rawDefault).toLowerCase() === "true";
+
+      case "number":
+        return isNaN(Number(rawDefault)) ? null : Number(rawDefault);
+
+      case "link":
+        if (typeof rawDefault === "string") {
+          try {
+            return JSON.parse(rawDefault);
+          } catch {
+            return { href: rawDefault, text: rawDefault };
+          }
+        }
+        if (typeof rawDefault === "object" && rawDefault !== null) {
+          return {
+            href: rawDefault.href ?? "",
+            text: rawDefault.text ?? "",
+          };
+        }
+        return { href: "", text: "" };
+
+      default:
+        return typeof rawDefault === "string" ? rawDefault.trim() : rawDefault;
+    }
+  } catch (err) {
+    EventBus.emit("logging:warning", [
+      `[normalizeDefaultValue] Failed for type=${type}, value=${rawDefault}: ${err.message}`,
+    ]);
+    return null;
+  }
+}
+
+// ─────────────────────────────────────────────
+// Extract field definition from edit modal
+// ─────────────────────────────────────────────
 export function extractFieldDefinition({
   keyId = "edit-key",
   summaryDropdown,
@@ -22,7 +71,7 @@ export function extractFieldDefinition({
   const twoColumn = document.getElementById(twoColumnId)?.checked || false;
   const label = document.getElementById(labelId)?.value.trim();
   const description = document.getElementById(descriptionId)?.value.trim();
-  const def = document.getElementById(defaultId)?.value.trim();
+  const rawDef = document.getElementById(defaultId)?.value;
   const type = typeDropdown?.getSelected() || "text";
 
   let optionsRaw = document.getElementById(optionsId)?.value.trim();
@@ -43,14 +92,12 @@ export function extractFieldDefinition({
     }
   }
 
-  // Enforce exactly two boolean options: true and false
+  // Enforce exactly two boolean options
   if (type === "boolean") {
     const normalized = { true: null, false: null };
-
     for (const opt of options) {
       const val = typeof opt === "object" && opt !== null ? opt.value : opt;
       const strVal = String(val).toLowerCase();
-
       if (strVal === "true") {
         normalized.true = {
           value: true,
@@ -63,20 +110,15 @@ export function extractFieldDefinition({
         };
       }
     }
-
-    // Fill in missing options
-    if (!normalized.true) {
-      normalized.true = { value: true, label: "True" };
-    }
-    if (!normalized.false) {
-      normalized.false = { value: false, label: "False" };
-    }
-
+    if (!normalized.true) normalized.true = { value: true, label: "True" };
+    if (!normalized.false) normalized.false = { value: false, label: "False" };
     options = [normalized.true, normalized.false];
   }
 
   const field = { key, label, type };
-  if (def) field.default = def;
+  if (rawDef !== undefined && rawDef !== "") {
+    field.default = normalizeDefaultValue(field, rawDef);
+  }
   if (summaryField) field.summary_field = summaryField;
   if (expressionItem) field.expression_item = true;
   if (twoColumn) field.two_column = true;
@@ -86,6 +128,9 @@ export function extractFieldDefinition({
   return field;
 }
 
+// ─────────────────────────────────────────────
+// Build shadow data
+// ─────────────────────────────────────────────
 export function buildShadowData(fields, rawData = {}) {
   const data = rawData.data || rawData;
   const structuredData = {};
@@ -94,33 +139,28 @@ export function buildShadowData(fields, rawData = {}) {
   while (i < fields.length) {
     const field = fields[i];
 
-    // ───────────────────────────────
-    // Loop handling
-    // ───────────────────────────────
     if (field.type === "loopstart") {
       const loopKey = field.key;
       const { group, stopIdx } = collectLoopGroup(fields, i + 1, loopKey);
-
       const rawItems = Array.isArray(data[loopKey]) ? data[loopKey] : [];
-
       structuredData[loopKey] = rawItems.map((itemData) =>
         buildShadowData(group, itemData)
       );
-
       i = stopIdx + 1;
       continue;
     }
 
-    // ───────────────────────────────
-    // Regular field
-    // ───────────────────────────────
-    structuredData[field.key] = data[field.key] ?? field.default ?? null;
+    // regular field
+    structuredData[field.key] =
+      data[field.key] ?? normalizeDefaultValue(field, field.default);
     i++;
   }
-
   return structuredData;
 }
 
+// ─────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────
 export function collectLoopGroup(fields, startIdx, loopKey) {
   const group = [];
   let i = startIdx;
@@ -146,17 +186,14 @@ export function resolveFieldElement(container, field) {
   }
 
   const selectorParts = [`[data-field-key="${key}"]`];
-
   if (type) selectorParts.push(`[data-field-type="${type}"]`);
   if (loopKey) selectorParts.push(`[data-field-loop="${loopKey}"]`);
-
-  const selector = selectorParts.join("");
-
-  const el = container.querySelector(selector);
-
-  return el;
+  return container.querySelector(selectorParts.join(""));
 }
 
+// ─────────────────────────────────────────────
+// Form data collection
+// ─────────────────────────────────────────────
 async function parseFieldValue(container, field, template) {
   const def = fieldTypes[field.type];
   if (!def || typeof def.parseValue !== "function") {
@@ -174,7 +211,7 @@ async function parseFieldValue(container, field, template) {
 
   if (!el) {
     EventBus.emit("logging:warning", [
-      `[parseFieldValue] Element not found for field "${field.key}" of type "${field.type}" with loopKey "${field.loopKey}"`,
+      `[parseFieldValue] Element not found for field "${field.key}"`,
     ]);
     return undefined;
   }
@@ -196,54 +233,41 @@ export async function getFormData(container, template) {
   async function collectData(fields, container, parentLoopKeyChain = []) {
     const result = {};
     let i = 0;
-
     while (i < fields.length) {
       const field = fields[i];
-
       if (field.type === "loopstart") {
         const loopKey = field.key;
         const { group, stopIdx } = collectLoopGroup(fields, i + 1, loopKey);
         i = stopIdx + 1;
-
         const selector = `.loop-container[data-loop-key="${loopKey}"] .loop-item`;
         const loopItems = container.querySelectorAll(selector);
         const loopValues = [];
-
         for (const item of loopItems) {
           const entry = await collectData(group, item, [
             ...parentLoopKeyChain,
             loopKey,
           ]);
-
           const hasValues = Object.values(entry).some((v) => {
             if (Array.isArray(v)) return v.length > 0;
             if (v && typeof v === "object") return Object.keys(v).length > 0;
             return v !== undefined && v !== null && v !== "";
           });
-
           if (hasValues) loopValues.push(entry);
         }
-
         result[loopKey] = loopValues;
       } else {
         const scopedField = { ...field, loopKey: parentLoopKeyChain };
         const value = await parseFieldValue(container, scopedField, template);
-        if (value !== undefined) {
-          result[field.key] = value;
-        }
+        if (value !== undefined) result[field.key] = value;
         i++;
       }
     }
-
     return result;
   }
 
   const data = await collectData(fields, container);
-
-  // Metadata extraction
   const filenameInput = container.querySelector("#meta-json-filename");
   if (filenameInput) meta._filename = filenameInput.value.trim();
-
   const flaggedInput = container.querySelector("#meta-flagged");
   if (flaggedInput) meta.flagged = flaggedInput.value === "true";
 
@@ -255,83 +279,65 @@ export async function getFormData(container, template) {
   return { data, meta };
 }
 
+// ─────────────────────────────────────────────
+// Default injection
+// ─────────────────────────────────────────────
 export function createLoopDefaults(group) {
   const entry = {};
   for (const f of group) {
-    const defFn = fieldTypes[f.type]?.defaultValue;
-    entry[f.key] = f.hasOwnProperty("default")
-      ? f.default
-      : typeof defFn === "function"
-      ? defFn()
-      : undefined;
+    entry[f.key] = normalizeDefaultValue(f, f.default);
   }
   return entry;
 }
 
 export function injectFieldDefaults(fields, metaData) {
   let i = 0;
-
   while (i < fields.length) {
     const field = fields[i];
-
     if (field.type === "loopstart") {
       const loopKey = field.key;
       const { group, stopIdx } = collectLoopGroup(fields, i + 1, loopKey);
       i = stopIdx + 1;
-
       if (!Array.isArray(metaData[loopKey])) {
         metaData[loopKey] = [createLoopDefaults(group)];
       }
-
       metaData[loopKey].forEach((entry) => {
         group.forEach((f) => {
           const key = f.key;
-          const defFn = fieldTypes[f.type]?.defaultValue;
           if (!(key in entry)) {
-            entry[key] = f.hasOwnProperty("default")
-              ? f.default
-              : typeof defFn === "function"
-              ? defFn()
-              : undefined;
+            entry[key] = normalizeDefaultValue(f, f.default);
           }
         });
       });
-
       group.forEach((f) => delete metaData[f.key]);
     } else {
       const key = field.key;
-      const defFn = fieldTypes[field.type]?.defaultValue;
-
       if (!(key in metaData)) {
-        metaData[key] = field.hasOwnProperty("default")
-          ? field.default
-          : typeof defFn === "function"
-          ? defFn()
-          : undefined;
+        metaData[key] = normalizeDefaultValue(field, field.default);
       }
-
       i++;
     }
   }
 }
 
+// ─────────────────────────────────────────────
+// Misc
+// ─────────────────────────────────────────────
 export function applyFieldAttributeDisabling(dom, fieldTypeKey) {
   const typeDef = getFieldTypeDef(fieldTypeKey);
   const disabled = new Set(typeDef.disabledAttributes || []);
-
   Object.entries(dom).forEach(([key, el]) => {
-    // skip nulls, non-elements, and stuff without classList/closest
     if (!el || !(el instanceof Element)) return;
-
-    // find the “row” container
     let container;
-    if (el.classList?.contains("modal-form-row") || el.classList?.contains("switch-row")) {
+    if (
+      el.classList?.contains("modal-form-row") ||
+      el.classList?.contains("switch-row")
+    ) {
       container = el;
     } else {
       container = el.closest?.(".modal-form-row, .switch-row");
     }
     if (!container) return;
-
     container.style.display = disabled.has(key) ? "none" : "";
   });
 }
