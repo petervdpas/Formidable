@@ -419,6 +419,19 @@ export default {
   "field.format.markdown": "Markdown",
   "field.format.plain": "Gewone tekst",
 
+  "field.link.protocol": "Link Protocol",
+  "field.link.protocol.hint":
+    "Choose the protocol (http/https or formidable://)",
+  "field.link.url": "Link URL",
+  "field.link.url.hint": "The actual address of the link",
+  "field.link.template": "Link Template",
+  "field.link.template.hint": "The template used in formidable:// links",
+  "field.link.entry": "Link Entry",
+  "field.link.entry.hint": "The entry to open in the template",
+  "field.link.text": "Link Text",
+  "field.link.text.hint": "The text to display for the link",
+  "field.link.bare": "Bare Link",
+
   "field.code.label": "Code",
   "field.code.runmode": "Uitvoeringsmodus",
   "field.code.runmode.manual": "Handmatig",

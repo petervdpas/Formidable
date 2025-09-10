@@ -240,7 +240,7 @@ export const fieldTypes = {
     cssClass: { main: "modal-link" },
     selectorAttr: "data-link-field",
     disabledAttributes: ["summaryField", "formatTextareaRow", ...codeSpecific],
-    defaultValue: () => "",
+    defaultValue: () => ({ href: "", text: "" }), 
     renderInput: renderers.renderLinkField,
     parseValue: parsers.parseLinkField,
     applyValue: appliers.applyLinkField,
@@ -254,7 +254,7 @@ export const fieldTypes = {
     defaultValue: () => [],
     renderInput: renderers.renderTagsField,
     parseValue: parsers.parseTagsField,
-    applyValue: appliers.applyGenericField,
+    applyValue: appliers.applyTagsField,
   },
 
   code: {

@@ -14,7 +14,12 @@
   --filter-bg: #2a2a2a;
   --filter-border: #555;
   --filter-text: #ddd;
-  --filter-shadow: 0 1px 2px rgba(0,0,0,.25);
+  --filter-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+
+  --form-border: #444;
+  --link-row-bg: #1c1f24;
+  --link-color: #66b0ff;
+  --link-hover: #99caff;
 
   /* ───── Range Slider ───── */
   --range-track-bg: #bdbdbd;

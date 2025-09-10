@@ -7,6 +7,7 @@ import {
   addContainerElement,
   createFilePicker,
   createDirectoryPicker,
+  buildCompositeElementStacked,
 } from "./elementBuilders.js";
 import {
   applyDatasetMapping,
@@ -1041,133 +1042,304 @@ export async function renderLinkField(
   currentTemplate,
   { fetchTemplates, fetchMetaFiles }
 ) {
-  const v = resolveValue(field, value);
+  // ── helpers
+  const normalize = (v) => {
+    if (!v) return { href: "", text: "" };
+    if (typeof v === "string") return { href: v, text: "" }; // legacy
+    const href = typeof v?.href === "string" ? v.href : "";
+    const text = typeof v?.text === "string" ? v.text : "";
+    return { href, text };
+  };
+  const compact = (v) => {
+    const n = normalize(v);
+    if (!n.href && !n.text) return "";
+    return n;
+  };
+  const toJSON = (v) => {
+    const c = compact(v);
+    return typeof c === "string" ? "" : JSON.stringify(c);
+  };
+  const parseFormidableHref = (href) => {
+    // formidable://<template>:<entry>
+    if (!href?.startsWith?.("formidable://")) return null;
+    const rest = href.slice("formidable://".length);
+    const idx = rest.lastIndexOf(":");
+    if (idx <= 0) return null;
+    return { template: rest.slice(0, idx), entry: rest.slice(idx + 1) };
+  };
 
+  // ── initial value
+  const initial = normalize(value || field.default);
+  const parsedFormid = parseFormidableHref(initial.href);
+
+  // ── root wrapper (column layout so “text” sits under the link controls)
   const wrapper = addContainerElement({
     tag: "div",
-    attributes: {
-      style: "display: flex; flex-wrap: wrap; align-items: center; gap: 8px;",
-    },
     callback: (el) => {
       el.dataset.linkField = field.key;
     },
   });
 
-  const input = addContainerElement({
+  // hidden persisted control (JSON or "")
+  const hidden = addContainerElement({
     parent: wrapper,
     tag: "input",
-    attributes: {
-      type: "hidden",
-      name: field.key,
-    },
+    attributes: { type: "hidden", name: field.key },
     callback: (el) => {
-      el.value = v;
+      el.value = toJSON(initial);
     },
   });
 
-  const formatSelect = addContainerElement({ parent: wrapper, tag: "select" });
-  ["regular", "formidable"].forEach((opt) => {
+  // Row 1 (format + url | template + entry)
+  const rowTop = addContainerElement({
+    parent: wrapper,
+    tag: "div",
+    attributes: {
+      style:
+        "display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px;row-gap:10px;",
+    },
+  });
+
+  // small helper to create a stacked label+control block
+  const makeStack = ({ parent, forId, labelKey, subKey }) => {
+    const block = document.createElement("div");
+    block.style.display = "flex";
+    block.style.flexDirection = "column";
+    block.style.minWidth = "220px";
+
+    const labObj = buildCompositeElementStacked({
+      forId,
+      labelKey,
+      subKey,
+      i18nEnabled: true,
+      className: "stacked-label",
+      smallClass: "label-subtext",
+    });
+    const labEl = labObj?.root ?? labObj; // ← unwrap to element
+    block.appendChild(labEl);
+    parent.appendChild(block);
+    return { block };
+  };
+
+  // Format
+  const { block: fmtBlock } = makeStack({
+    parent: rowTop,
+    forId: `${field.key}-format`,
+    labelKey: "field.link.protocol",
+    subKey: "field.link.protocol.hint",
+  });
+  const formatSelect = addContainerElement({
+    parent: fmtBlock,
+    tag: "select",
+    attributes: { id: `${field.key}-format`, style: "min-width:180px;" },
+  });
+  for (const opt of ["regular", "formidable"]) {
     const o = document.createElement("option");
     o.value = opt;
-    o.textContent = opt;
+    o.textContent = opt; // translator can hook via <select> options in DOM
     formatSelect.appendChild(o);
-  });
+  }
 
-  const templateSelect = addContainerElement({
-    parent: wrapper,
-    tag: "select",
-    attributes: { style: "display: none;" },
+  // URL (shown when format=regular)
+  const { block: urlBlock } = makeStack({
+    parent: rowTop,
+    forId: `${field.key}-url`,
+    labelKey: "field.link.url",
+    subKey: "field.link.url.hint",
   });
-
-  const entrySelect = addContainerElement({
-    parent: wrapper,
-    tag: "select",
-    attributes: { style: "display: none;" },
-  });
-
   const urlInput = addContainerElement({
-    parent: wrapper,
+    parent: urlBlock,
     tag: "input",
     attributes: {
+      id: `${field.key}-url`,
       type: "text",
-      placeholder: "Enter URL",
-      style: "flex: 1; display: none;",
+      placeholder: "https://… or formidable://…",
+      style: "min-width:320px;",
     },
   });
 
-  function updateValue() {
-    const format = formatSelect.value;
+  // Template + Entry (shown when format=formidable)
+  const { block: tplBlock } = makeStack({
+    parent: rowTop,
+    forId: `${field.key}-tpl`,
+    labelKey: "field.link.template",
+    subKey: "field.link.template.hint",
+  });
+  const templateSelect = addContainerElement({
+    parent: tplBlock,
+    tag: "select",
+    attributes: {
+      id: `${field.key}-tpl`,
+      style: "min-width:240px;display:none;",
+    },
+  });
 
-    if (format === "regular") {
-      input.value = urlInput.value.trim();
-    } else if (format === "formidable") {
-      const tpl = templateSelect.value;
-      const entry = entrySelect.value;
-      input.value = tpl && entry ? `formidable://${tpl}:${entry}` : "";
-    } else {
-      input.value = "";
-    }
+  const { block: entryBlock } = makeStack({
+    parent: rowTop,
+    forId: `${field.key}-entry`,
+    labelKey: "field.link.entry",
+    subKey: "field.link.entry.hint",
+  });
+  const entrySelect = addContainerElement({
+    parent: entryBlock,
+    tag: "select",
+    attributes: {
+      id: `${field.key}-entry`,
+      style: "min-width:260px;display:none;",
+    },
+  });
+
+  // Row 2 (link text under link controls)
+  const rowBottom = addContainerElement({
+    parent: wrapper,
+    tag: "div",
+    attributes: { style: "display:block;" },
+  });
+  {
+    const lblObj = buildCompositeElementStacked({
+      forId: `${field.key}-text`,
+      labelKey: "field.link.text",
+      subKey: "field.link.text.hint",
+      i18nEnabled: true,
+    });
+    rowBottom.appendChild(lblObj?.root ?? lblObj); // ← unwrap
   }
 
-  formatSelect.addEventListener("change", async () => {
+  const textInput = addContainerElement({
+    parent: rowBottom,
+    tag: "input",
+    attributes: {
+      id: `${field.key}-text`,
+      type: "text",
+      placeholder: "", // translator fills via <label small>; keep input clean
+      style: "display:block;width:100%;max-width:none;box-sizing:border-box;",
+    },
+    callback: (el) => {
+      el.value = initial.text || "";
+    },
+  });
+
+  // auto-fill text until user types
+  let userTouchedText = !!initial.text;
+  textInput.addEventListener("input", () => (userTouchedText = true));
+
+  // ── value dispatcher
+  function updateHidden() {
     const fmt = formatSelect.value;
+    let href = "";
+
     if (fmt === "regular") {
-      templateSelect.style.display = "none";
-      entrySelect.style.display = "none";
-      urlInput.style.display = "block";
+      href = urlInput.value.trim();
     } else {
-      templateSelect.style.display = "inline-block";
-      entrySelect.style.display = "inline-block";
-      urlInput.style.display = "none";
-
-      await fillTemplateDropdown();
-      await fillEntryDropdownForSelectedTemplate();
+      const tpl = templateSelect.value || "";
+      const ent = entrySelect.value || "";
+      href = tpl && ent ? `formidable://${tpl}:${ent}` : "";
     }
-    updateValue();
-  });
 
-  templateSelect.addEventListener("change", async () => {
-    await fillEntryDropdownForSelectedTemplate();
-    updateValue();
-  });
+    hidden.value = toJSON({ href, text: textInput.value.trim() });
+  }
 
-  entrySelect.addEventListener("change", updateValue);
-  urlInput.addEventListener("input", updateValue);
-
+  // ── formidable support
   async function fillTemplateDropdown() {
-    const templates = await fetchTemplates();
     templateSelect.innerHTML = "";
-    templates.forEach((tpl) => {
+    const templates = (await fetchTemplates?.()) || [];
+    for (const tpl of templates) {
       const o = document.createElement("option");
       o.value = tpl.filename;
       o.textContent = tpl.filename;
       templateSelect.appendChild(o);
-    });
-    templateSelect.value = currentTemplate;
+    }
+    templateSelect.value = currentTemplate || templates?.[0]?.filename || "";
+  }
+
+  function fillEntryDropdown(files = []) {
+    entrySelect.innerHTML = "";
+    for (const f of files) {
+      const o = document.createElement("option");
+      o.value = f;
+      o.textContent = f;
+      entrySelect.appendChild(o);
+    }
   }
 
   async function fillEntryDropdownForSelectedTemplate() {
     const tpl = templateSelect.value;
-    if (!tpl) return;
-    const metaFiles = await fetchMetaFiles(tpl);
+    if (!tpl) {
+      entrySelect.innerHTML = "";
+      return;
+    }
+    const metaFiles = (await fetchMetaFiles?.(tpl)) || [];
     fillEntryDropdown(metaFiles);
   }
 
-  function fillEntryDropdown(metaFiles) {
-    entrySelect.innerHTML = "";
-    metaFiles.forEach((file) => {
-      const o = document.createElement("option");
-      o.value = file;
-      o.textContent = file;
-      entrySelect.appendChild(o);
-    });
+  // ── wire events
+  formatSelect.addEventListener("change", async () => {
+    const fmt = formatSelect.value;
+    const showFormidable = fmt === "formidable";
+
+    // toggle visibility
+    urlBlock.style.display = showFormidable ? "none" : "flex";
+    templateSelect.style.display = showFormidable ? "block" : "none";
+    entrySelect.style.display = showFormidable ? "block" : "none";
+    tplBlock.style.display = showFormidable ? "flex" : "none";
+    entryBlock.style.display = showFormidable ? "flex" : "none";
+
+    if (showFormidable) {
+      await fillTemplateDropdown();
+      await fillEntryDropdownForSelectedTemplate();
+    }
+    updateHidden();
+  });
+
+  templateSelect.addEventListener("change", async () => {
+    await fillEntryDropdownForSelectedTemplate();
+    if (!userTouchedText) {
+      const val = entrySelect.value || "";
+      textInput.value = val.replace(/\.meta\.json$/i, "");
+    }
+    updateHidden();
+  });
+
+  entrySelect.addEventListener("change", () => {
+    if (!userTouchedText) {
+      const val = entrySelect.value || "";
+      textInput.value = val.replace(/\.meta\.json$/i, "");
+    }
+    updateHidden();
+  });
+
+  urlInput.addEventListener("input", () => {
+    if (!userTouchedText) textInput.value = urlInput.value.trim();
+    updateHidden();
+  });
+
+  textInput.addEventListener("input", updateHidden);
+
+  // ── initialize UI from initial value
+  if (parsedFormid) {
+    formatSelect.value = "formidable";
+    urlBlock.style.display = "none";
+    tplBlock.style.display = "flex";
+    entryBlock.style.display = "flex";
+    templateSelect.style.display = "block";
+    entrySelect.style.display = "block";
+    await fillTemplateDropdown();
+    templateSelect.value = parsedFormid.template;
+    await fillEntryDropdownForSelectedTemplate();
+    entrySelect.value = parsedFormid.entry;
+  } else {
+    formatSelect.value = "regular";
+    urlBlock.style.display = "flex";
+    tplBlock.style.display = "none";
+    entryBlock.style.display = "none";
+    templateSelect.style.display = "none";
+    entrySelect.style.display = "none";
+    urlInput.value = initial.href;
   }
 
-  // Init state
-  formatSelect.value = "regular";
-  urlInput.value = v;
-  updateValue();
+  updateHidden();
 
+  // Keep the usual field context + wrapper
   applyFieldContextAttributes(wrapper, {
     key: field.key,
     type: field.type,

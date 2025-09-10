@@ -74,6 +74,19 @@ module.exports = {
       delete field.format;
     }
 
+    // link-specific: normalize default to {href,text}, ignore options
+    if (field.type === "link") {
+      const norm = (v) => {
+        if (!v) return { href: "", text: "" };
+        if (typeof v === "string") return { href: v, text: "" }; // back-compat
+        const href = typeof v.href === "string" ? v.href : "";
+        const text = typeof v.text === "string" ? v.text : "";
+        return { href, text };
+      };
+      field.default = norm(field.default);
+      field.options = []; // not used for link
+    }
+
     // code-specific
     if (field.type === "code") {
       // merge defaults first

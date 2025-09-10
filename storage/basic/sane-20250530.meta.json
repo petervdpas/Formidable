@@ -5,11 +5,11 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-09-09T22:49:17.382Z",
+    "updated": "2025-09-10T13:23:36.272Z",
     "flagged": true,
     "tags": [
       "bye",
-      "hi",
+      "great",
       "now what"
     ]
   },
@@ -49,17 +49,15 @@
       ]
     ],
     "design": "formidable.png",
-    "linktest": "formidable://basic.yaml:test-20250629.meta.json",
+    "linktest": {
+      "href": "formidable://basic.yaml:test-20250629.meta.json",
+      "text": "Decline this one"
+    },
     "ttags": [
-      "Hi",
       "Bye",
-      "now what"
+      "now what",
+      "Great"
     ],
-    "myScript": {
-      "seenTest": "Approve This one",
-      "cleanKey": "some-value-here!",
-      "capName": "Approve This one",
-      "shortFile": "sane-20250530.meta.…"
-    }
+    "myScript": "[object Object]"
   }
 }

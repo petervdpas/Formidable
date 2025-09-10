@@ -5,9 +5,9 @@
   "show_meta_section": true,
   "font_size": 14,
   "development_enable": true,
-  "logging_enabled": false,
+  "logging_enabled": true,
   "enable_plugins": true,
-  "context_mode": "template",
+  "context_mode": "storage",
   "context_folder": "./",
   "selected_template": "basic.yaml",
   "selected_data_file": "sane-20250530.meta.json",
@@ -21,10 +21,10 @@
   "internal_server_port": 8383,
   "window_bounds": {
     "width": 1300,
-    "height": 976,
-    "x": 273,
-    "y": 56
+    "height": 986,
+    "x": 295,
+    "y": 32
   },
   "template_sidebar_width": 364,
-  "storage_sidebar_width": 366
+  "storage_sidebar_width": 291
 }

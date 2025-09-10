@@ -134,6 +134,66 @@ label small {
   border-color: #ccc;
 }
 
+/* Card around the link field */
+.form-row.link-row {
+  border: 1px solid var(--form-border, #dfe3ea);
+  border-radius: 6px;
+  padding: 10px 12px;
+  background: var(--link-row-bg, #f9fbff);
+}
+
+.form-row.link-bare-row {
+  margin-top: 6px;
+}
+
+.link-bare-row .bare-link-content {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  max-width: 100%;
+}
+
+/* ---------- CASE A: button + label ---------- */
+
+.link-bare-row .bare-link-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+  opacity: .95;
+}
+
+.link-bare-row #btn-link-open {
+  flex: 0 0 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link-bare-row #btn-link-open .label {
+  display: inline-block;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ---------- CASE B: single anchor only ---------- */
+.link-bare-row .bare-link-content>a,
+.form-row.link-row a.bare-link,
+.form-row.link-bare-row a.bare-link {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
 @media (max-width: 600px) {
   .form-row.two-column {
     flex-direction: column;

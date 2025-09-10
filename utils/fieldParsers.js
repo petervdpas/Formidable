@@ -169,7 +169,20 @@ export const parseLinkField = async function (wrapper, template, field) {
     return "";
   }
 
-  return hidden.value?.trim() || "";
+  const raw = hidden.value?.trim() ?? "";
+  if (!raw) return ""; // empty link stays empty
+
+  // Prefer the new JSON shape; fall back to legacy string
+  try {
+    const obj = JSON.parse(raw);
+    const href = typeof obj?.href === "string" ? obj.href.trim() : "";
+    const text = typeof obj?.text === "string" ? obj.text.trim() : "";
+    return href || text ? { href, text } : "";
+  } catch {
+    // Legacy: hidden contained a plain string (href only)
+    const href = raw;
+    return href ? { href, text: "" } : "";
+  }
 };
 
 export const parseTagsField = async function (wrapper) {

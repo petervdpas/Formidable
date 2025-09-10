@@ -137,6 +137,11 @@ export async function fieldGroupRenderer(
         eventFunctions
       );
       if (row) {
+        if (field.type === "link" && row.classList) {
+          row.classList.add("link-row");
+          row.dataset.linkRowFor = field.key;
+        }
+
         container.appendChild(row);
         await applyValueToField(
           container,
@@ -369,6 +374,10 @@ async function createLoopItem(
         eventFunctions
       );
       if (row) {
+        if (fieldCopy.type === "link" && row.classList) {
+          row.classList.add("link-row");
+          row.dataset.linkRowFor = fieldCopy.key;
+        }
         fieldsContainer.appendChild(row);
         await applyValueToField(
           fieldsContainer,

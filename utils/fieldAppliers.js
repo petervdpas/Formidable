@@ -5,6 +5,7 @@ import { createLinkOpenButton } from "../modules/uiButtons.js";
 import { ensureVirtualLocation } from "./vfsUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 import { createSortable } from "./domUtils.js";
+import { wrapInputWithLabel } from "./elementBuilders.js";
 
 export function applyGuidField(container, field, value) {
   const key = field.key;
@@ -82,7 +83,10 @@ export function applyListField(
 
   const sortableList = listWrapper.querySelector(".sortable-list");
   const addButton = listWrapper.querySelector("button.add-list-button");
-  const scope = sortableList?.dataset?.dndScope || listWrapper?.dataset?.dndScope || `list:${key}:global`;
+  const scope =
+    sortableList?.dataset?.dndScope ||
+    listWrapper?.dataset?.dndScope ||
+    `list:${key}:global`;
 
   if (!sortableList || !addButton) {
     EventBus.emit("logging:error", [
@@ -163,7 +167,10 @@ export function applyTableField(
   if (!tableWrapper || !Array.isArray(value)) return;
 
   const tbody = tableWrapper.querySelector("tbody");
-  const scope = tbody?.dataset?.dndScope || tableWrapper?.dataset?.dndScope || `table:${key}:global`;
+  const scope =
+    tbody?.dataset?.dndScope ||
+    tableWrapper?.dataset?.dndScope ||
+    `table:${key}:global`;
   tbody.innerHTML = "";
 
   value.forEach((row) => {
@@ -288,114 +295,176 @@ export async function applyLinkField(
   const wrapper = container.querySelector(`[data-link-field="${key}"]`);
   if (!wrapper) return;
 
-  const formatSelect = wrapper.querySelector("select");
-  const templateSelect = wrapper.querySelector("select:nth-of-type(2)");
-  const entrySelect = wrapper.querySelector("select:nth-of-type(3)");
-  const urlInput = wrapper.querySelector('input[type="text"]');
+  // Select by ID (renderLinkField sets these ids)
+  const formatSelect =
+    wrapper.querySelector(`#${key}-format`) || wrapper.querySelector("select");
+  const templateSelect = wrapper.querySelector(`#${key}-tpl`);
+  const entrySelect = wrapper.querySelector(`#${key}-entry`);
+  const urlInput =
+    wrapper.querySelector(`#${key}-url`) ||
+    wrapper.querySelector('input[type="text"]');
 
   const fetchTemplates =
     eventFunctions.fetchTemplates || (() => Promise.resolve([]));
   const fetchMetaFiles =
     eventFunctions.fetchMetaFiles || (() => Promise.resolve([]));
 
-  // Ensure only 1 button container instance
-  let buttonContainer = wrapper.nextElementSibling;
+  // normalize new/legacy value
+  const { href } =
+    typeof value === "string"
+      ? { href: value.trim(), text: "" }
+      : {
+          href: value?.href?.trim?.() || "",
+          text: value?.text?.trim?.() || "",
+        };
+
+  // i18n helper
+  const tr = (k, fallback) =>
+    (window.i18n?.t && window.i18n.t(k)) ||
+    (typeof t === "function" && t(k)) ||
+    fallback;
+
+  // Parse formidable://<tpl>:<entry>
+  const parseFormidable = (link) => {
+    if (!link?.startsWith?.("formidable://")) return null;
+    const rest = link.slice("formidable://".length);
+    const idx = rest.lastIndexOf(":");
+    if (idx <= 0) return null;
+    return { tpl: rest.slice(0, idx), entry: rest.slice(idx + 1) };
+  };
+
+  // Ensure a SINGLE, labeled row for the bare link preview/open
+  // We build a form-row using wrapInputWithLabel so it matches your UX.
+  let bareRow = wrapper.parentElement.querySelector(
+    `.link-bare-row[data-for="${key}"]`
+  );
   let actionButton = null;
 
-  if (
-    !buttonContainer ||
-    !buttonContainer.classList.contains("link-action-container")
-  ) {
-    buttonContainer = document.createElement("div");
-    buttonContainer.className = "link-action-container";
-    buttonContainer.style.marginTop = "0.4em";
+  if (!bareRow) {
+    // content: a simple container that will hold the open button
+    const content = document.createElement("div");
+    content.className = "bare-link-content";
+    content.style.display = "inline-flex";
+    content.style.alignItems = "center";
 
     function onLinkClick() {
-      const href = actionButton?.dataset.href || "";
-      if (href.startsWith("formidable://")) {
-        const tpl = templateSelect.value;
-        const entry = entrySelect.value;
+      const link = actionButton?.dataset.href || "";
+      if (link.startsWith("formidable://")) {
+        const parsed = parseFormidable(link) || {};
         EventBus.emit("link:formidable:navigate", {
-          link: href,
-          template: tpl,
-          entry,
+          link,
+          template: parsed.tpl || templateSelect?.value || "",
+          entry: parsed.entry || entrySelect?.value || "",
         });
-      } else if (href.startsWith("http://") || href.startsWith("https://")) {
-        EventBus.emit("link:external:open", href);
+      } else if (/^https?:\/\//i.test(link)) {
+        EventBus.emit("link:external:open", link);
       } else {
         EventBus.emit("logging:warning", [
           "[applyLinkField] Unknown link format:",
-          href,
+          link,
         ]);
       }
     }
 
-    actionButton = createLinkOpenButton(value || "(no link)", onLinkClick);
-    buttonContainer.appendChild(actionButton);
-
-    // INSERT AFTER wrapper (outside flex row)
-    wrapper.parentElement.insertBefore(buttonContainer, wrapper.nextSibling);
-  } else {
-    actionButton = buttonContainer.querySelector("#btn-link-open");
-  }
-
-  function updateHref(href) {
+    actionButton = createLinkOpenButton(href || "(no link)", onLinkClick);
     actionButton.dataset.href = href;
-    actionButton.textContent = href || "(no link)";
-    actionButton.disabled = !href || href.trim() === "";
+    content.appendChild(actionButton);
+
+    // Build a labeled row using your helper
+    bareRow = wrapInputWithLabel(
+      content,
+      tr("field.link.bare", "Bare Link"),
+      "",
+      "single",
+      "form-row link-bare-row",
+      null,
+      "field.link.bare"
+    );
+    bareRow.dataset.for = key;
+
+    // Insert AFTER the main field wrapper
+    wrapper.parentElement.insertBefore(bareRow, wrapper.nextSibling);
+  } else {
+    // Reuse existing button
+    actionButton = bareRow.querySelector("#btn-link-open");
+    if (!actionButton) {
+      const content = bareRow.querySelector(".bare-link-content") || bareRow;
+      function onLinkClick() {}
+      actionButton = createLinkOpenButton(href || "(no link)", onLinkClick);
+      content.appendChild(actionButton);
+    }
   }
 
-  if (typeof value !== "string" || value.trim() === "") {
-    formatSelect.value = "regular";
-    urlInput.value = "";
-    urlInput.style.display = "block";
-    templateSelect.style.display = "none";
-    entrySelect.style.display = "none";
+  function updateHref(h) {
+    if (!actionButton) return;
+    actionButton.dataset.href = h;
+    actionButton.textContent = h || "(no link)";
+    actionButton.disabled = !h || !h.trim();
+    // Hide the whole row if empty for cleanliness
+    bareRow.style.display = actionButton.disabled ? "none" : "";
+  }
+
+  // Empty value → show regular URL UI
+  if (!href) {
+    if (formatSelect) formatSelect.value = "regular";
+    if (urlInput) {
+      urlInput.value = "";
+      urlInput.style.display = "block";
+    }
+    if (templateSelect) templateSelect.style.display = "none";
+    if (entrySelect) entrySelect.style.display = "none";
     updateHref("");
     return;
   }
 
-  if (value.startsWith("formidable://")) {
-    formatSelect.value = "formidable";
+  // Formidable link
+  if (href.startsWith("formidable://")) {
+    if (formatSelect) formatSelect.value = "formidable";
 
-    const parts = value.replace("formidable://", "").split(":");
-    const tpl = parts[0];
-    const entry = parts[1] || "";
+    const parsed = parseFormidable(href);
+    const tpl = parsed?.tpl || "";
+    const entry = parsed?.entry || "";
 
-    const templates = await fetchTemplates();
-    templateSelect.innerHTML = "";
-    templates.forEach((t) => {
-      const o = document.createElement("option");
-      o.value = t.filename;
-      o.textContent = t.filename;
-      templateSelect.appendChild(o);
-    });
-    templateSelect.value = tpl;
+    if (templateSelect) {
+      const templates = await fetchTemplates();
+      templateSelect.innerHTML = "";
+      templates.forEach((t) => {
+        const o = document.createElement("option");
+        o.value = t.filename;
+        o.textContent = t.filename;
+        templateSelect.appendChild(o);
+      });
+      templateSelect.value = tpl;
+      templateSelect.style.display = "inline-block";
+    }
 
-    const metaFiles = await fetchMetaFiles(tpl);
-    entrySelect.innerHTML = "";
-    metaFiles.forEach((file) => {
-      const o = document.createElement("option");
-      o.value = file;
-      o.textContent = file;
-      entrySelect.appendChild(o);
-    });
-    entrySelect.value = entry;
+    if (entrySelect) {
+      const metaFiles = await fetchMetaFiles(tpl);
+      entrySelect.innerHTML = "";
+      metaFiles.forEach((file) => {
+        const o = document.createElement("option");
+        o.value = file;
+        o.textContent = file;
+        entrySelect.appendChild(o);
+      });
+      entrySelect.value = entry;
+      entrySelect.style.display = "inline-block";
+    }
 
-    templateSelect.style.display = "inline-block";
-    entrySelect.style.display = "inline-block";
-    urlInput.style.display = "none";
-
-    updateHref(`formidable://${tpl}:${entry}`);
-  } else {
-    formatSelect.value = "regular";
-    urlInput.value = value;
-    urlInput.style.display = "block";
-    templateSelect.style.display = "none";
-    entrySelect.style.display = "none";
-
-    updateHref(value);
+    if (urlInput) urlInput.style.display = "none";
+    updateHref(href);
+    return;
   }
+
+  // Regular http(s)
+  if (formatSelect) formatSelect.value = "regular";
+  if (urlInput) {
+    urlInput.value = href;
+    urlInput.style.display = "block";
+  }
+  if (templateSelect) templateSelect.style.display = "none";
+  if (entrySelect) entrySelect.style.display = "none";
+  updateHref(href);
 }
 
 export function applyTagsField(container, field, value) {
@@ -403,38 +472,38 @@ export function applyTagsField(container, field, value) {
   const wrapper = container.querySelector(`[data-tags-field="${key}"]`);
   if (!wrapper || !Array.isArray(value)) return;
 
-  const inputGroup = wrapper.querySelector(".tags-input-group");
-  if (!inputGroup) {
+  const tagContainer = wrapper.querySelector(".tags-container");
+  if (!tagContainer) {
     EventBus.emit("logging:warning", [
-      `[applyTagsField] Missing input group for key "${key}".`,
+      `[applyTagsField] Missing .tags-container for key "${key}".`,
     ]);
     return;
   }
 
-  // Remove existing tag inputs
-  inputGroup.innerHTML = "";
+  // Clear existing chips
+  tagContainer.innerHTML = "";
 
-  // Recreate each tag input
-  value.forEach((tag) => {
-    const div = document.createElement("div");
-    div.className = "tag-input-wrapper";
+  // Recreate chips like renderTagsField()
+  function createTagElement(tagText) {
+    const tag = document.createElement("span");
+    tag.className = "tag-item";
+    tag.textContent = tagText;
 
-    const input = document.createElement("input");
-    input.type = "text";
-    input.name = field.key;
-    input.className = "tag-input";
-    input.value = tag;
+    const remove = document.createElement("button");
+    remove.className = "tag-remove";
+    remove.textContent = "×";
+    remove.onclick = () => tagContainer.removeChild(tag);
 
-    const removeBtn = document.createElement("button");
-    removeBtn.type = "button";
-    removeBtn.textContent = "-";
-    removeBtn.className = "remove-tag-btn";
-    removeBtn.onclick = () => div.remove();
+    tag.appendChild(remove);
+    return tag;
+  }
 
-    div.appendChild(input);
-    div.appendChild(removeBtn);
-    inputGroup.appendChild(div);
+  value.forEach((t) => {
+    const txt = String(t || "").trim();
+    if (txt) tagContainer.appendChild(createTagElement(txt));
   });
+
+  // Leave the input alone (user can keep typing)
 }
 
 export function applyGenericField(container, field, value) {

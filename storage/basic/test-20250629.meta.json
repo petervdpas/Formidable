@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-29T09:32:36.440Z",
-    "updated": "2025-09-05T22:29:52.152Z",
+    "updated": "2025-09-10T13:23:23.001Z",
     "flagged": false,
     "tags": [
       "ch.01",
@@ -43,10 +43,14 @@
       ]
     ],
     "design": "GreenSignWhiteArrowPersonRunning.png",
-    "linktest": "formidable://basic.yaml:sane-20250530.meta.json",
+    "linktest": {
+      "href": "formidable://basic.yaml:sane-20250530.meta.json",
+      "text": "Approve this one"
+    },
     "ttags": [
       "ch.01",
       "you lucky guy"
-    ]
+    ],
+    "myScript": "return (async (input, api) => {\n  const snap = await api.form.snapshot();  // { meta, data, template, filename }\n  const currentTest = snap?.data?.test ?? \"\";\n\n  const cleanKey  = api.string.sanitize(\"Some Value Here!\");\n  const capName   = api.string.capitalize(currentTest || \"unnamed\");\n  const shortFile = api.string.truncate(snap?.filename || \"\", 20);\n\n  return { seenTest: currentTest, cleanKey, capName, shortFile };\n})(input, api);\n"
   }
 }
