@@ -48,7 +48,6 @@ export function initEventRouter() {
   EventBus.off("file:copy-folder", systemHandler.handleCopyFolder);
   EventBus.off("file:copy-file", systemHandler.handleCopyFile);
   EventBus.off("file:exists", systemHandler.handleFileExists);
-  EventBus.off("file:openExternal", systemHandler.handleOpenExternal);
 
   EventBus.on("file:resolve", systemHandler.handleResolvePath);
   EventBus.on("file:ensure-directory", systemHandler.handleEnsureDirectory);
@@ -59,7 +58,6 @@ export function initEventRouter() {
   EventBus.on("file:copy-folder", systemHandler.handleCopyFolder);
   EventBus.on("file:copy-file", systemHandler.handleCopyFile);
   EventBus.on("file:exists", systemHandler.handleFileExists);
-  EventBus.on("file:openExternal", systemHandler.handleOpenExternal);
 
   EventBus.off("system:execute", systemHandler.handleExecuteCommand);
   EventBus.on("system:execute", systemHandler.handleExecuteCommand);
@@ -310,12 +308,12 @@ export function initEventRouter() {
   );
 
   // Link events
-  EventBus.off("link:external:open", linkHandler.handleExternalLinkOpen);
+  EventBus.off("link:external:open", linkHandler.handleOpenExternal);
   EventBus.off(
     "link:formidable:navigate",
     linkHandler.handleFormidableNavigate
   );
-  EventBus.on("link:external:open", linkHandler.handleExternalLinkOpen);
+  EventBus.on("link:external:open", linkHandler.handleOpenExternal);
   EventBus.on("link:formidable:navigate", linkHandler.handleFormidableNavigate);
 
   // Transform events

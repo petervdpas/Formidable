@@ -121,7 +121,6 @@ export function exposeGlobalAPI() {
       clearHighlighted: domUtils.clearHighlighted,
       highlightSelected: domUtils.highlightSelected,
       highlightAndClickForm: domUtils.highlightAndClickForm,
-      applyExternalLinkBehavior: domUtils.applyExternalLinkBehavior,
       createFieldManager: domUtils.createFieldManager,
       resolveScopedElement: domUtils.resolveScopedElement,
       applyFieldContextAttributes: domUtils.applyFieldContextAttributes,

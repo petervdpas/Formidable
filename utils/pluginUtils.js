@@ -215,7 +215,7 @@ export async function fileExists(path) {
 
 export async function openExternal(url) {
   // This one does not need a response
-  EventBus.emit("file:openExternal", { url });
+  EventBus.emit("link:external:open", { url });
 }
 
 export async function proxyFetch(url, options = {}) {

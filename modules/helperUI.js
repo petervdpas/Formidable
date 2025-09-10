@@ -1,6 +1,6 @@
 // modules/helperUI.js
 import { EventBus } from "./eventBus.js";
-import { applyExternalLinkBehavior } from "../utils/domUtils.js";
+import { wireLinkBehavior } from "../utils/linkBehavior.js";
 
 export async function renderHelp() {
   const container = document.getElementById("help-body");
@@ -42,7 +42,7 @@ export async function renderHelp() {
 
       contentEl.innerHTML = html;
 
-      applyExternalLinkBehavior(contentEl);
+      wireLinkBehavior(contentEl);
 
       contentEl.querySelectorAll("a[href^='#']").forEach((a) => {
         const targetId = a.getAttribute("href").slice(1);

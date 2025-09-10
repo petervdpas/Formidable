@@ -362,7 +362,10 @@ export async function applyLinkField(
           entry: parsed.entry || entrySelect?.value || "",
         });
       } else if (/^https?:\/\//i.test(link)) {
-        EventBus.emit("link:external:open", link);
+        EventBus.emit("link:external:open", {
+          url: link,
+          variant: "external",
+        });
       } else {
         EventBus.emit("logging:warning", [
           "[applyLinkField] Unknown link format:",

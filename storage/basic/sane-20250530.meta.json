@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-09-10T17:37:24.114Z",
+    "updated": "2025-09-10T18:13:03.333Z",
     "flagged": true,
     "tags": [
       "bye",
@@ -58,6 +58,11 @@
       "now what",
       "Great"
     ],
-    "myScript": "[object Object]"
+    "myScript": {
+      "seenTest": "Approve This one",
+      "cleanKey": "some-value-here!",
+      "capName": "Approve This one",
+      "shortFile": "sane-20250530.meta.…"
+    }
   }
 }

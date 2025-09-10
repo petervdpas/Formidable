@@ -129,18 +129,6 @@ export async function handleFileExists({ path }) {
   }
 }
 
-export async function handleOpenExternal({ url, variant = "external" }) {
-  try {
-    // Always delegate to main; main decides how to open.
-    await window.api.system.openExternal(url, { variant });
-  } catch (err) {
-    EventBus.emit("logging:error", [
-      `[SystemHandler] openExternal failed for "${url}" (variant="${variant}"):` ,
-      err,
-    ]);
-  }
-}
-
 export async function handleExecuteCommand({ cmd }) {
   try {
     const result = await window.api.system.executeCommand(cmd);

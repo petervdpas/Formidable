@@ -12,21 +12,16 @@ export function bindLinkDependencies(deps) {
 }
 
 // ─── External Link ────────────────────────────────────────────
-export function handleExternalLinkOpen(url) {
-  if (typeof url !== "string" || url.trim() === "") {
-    EventBus.emit("logging:warning", [
-      "[LinkHandler] Invalid external link:",
-      url,
+export async function handleOpenExternal({ url, variant = "external" }) {
+  try {
+    // Always delegate to main; main decides how to open.
+    await window.api.system.openExternal(url, { variant });
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      `[SystemHandler] openExternal failed for "${url}" (variant="${variant}"):` ,
+      err,
     ]);
-    return;
   }
-
-  EventBus.emit("logging:default", [
-    "[LinkHandler] Opening external link:",
-    url,
-  ]);
-
-  window.api.system.openExternal(url);
 }
 
 // ─── Formidable Navigate Link ─────────────────────────────────

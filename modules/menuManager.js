@@ -437,7 +437,7 @@ export async function handleMenuAction(action) {
           if (server.running) {
             const port = server.port || 8383;
             const url = `http://localhost:${port}/`;
-            EventBus.emit("file:openExternal", { url, variant: "tab" });
+            EventBus.emit("link:external:open", { url, variant: "tab" });
           } else {
             EventBus.emit("ui:toast", {
               languageKey: "toast.server.NotRunning",
@@ -454,7 +454,7 @@ export async function handleMenuAction(action) {
           if (server.running) {
             const port = server.port || 8383;
             const url = `http://localhost:${port}/`;
-            EventBus.emit("file:openExternal", { url, variant: "external" });
+            EventBus.emit("link:external:open", { url, variant: "external" });
           } else {
             EventBus.emit("ui:toast", {
               languageKey: "toast.server.NotRunning",
@@ -474,7 +474,7 @@ export async function handleMenuAction(action) {
       break;
 
     case "open-formidable-tools":
-      EventBus.emit("file:openExternal", {
+      EventBus.emit("link:external:open", {
         url: "https://formidable.tools",
         variant: "external",
       });
