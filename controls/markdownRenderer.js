@@ -9,6 +9,17 @@ const yaml = require("js-yaml");
 
 const vars = Object.create(null);
 
+function isAbsoluteUrl(u) {
+  return /^([a-z][a-z0-9+\-.]*:)?\/\//i.test(u) || /^(mailto|tel):/i.test(u);
+}
+
+function resolveTemplatePath(template, subdir, name) {
+  const basePath =
+    configManager.getTemplateStoragePath(template?.filename) || "";
+  const absPath = resolvePath(basePath, subdir, name);
+  return absPath.replace(/\\/g, "/");
+}
+
 const defaultRenderers = {
   list: (value) => (value || []).map((v) => `- ${v}`).join("\n"),
   table: (value = []) =>
@@ -64,6 +75,33 @@ const defaultRenderers = {
     return value
       .map((tag) => `#${tag.toLowerCase().replace(/\s+/g, "-")}`)
       .join(", ");
+  },
+  link: (value, field, template, filePrefix = true) => {
+    // value can be string or { href, text }
+    let href = "";
+    let text = "";
+
+    if (value && typeof value === "object") {
+      href = String(value.href || "");
+      text = String(value.text || "");
+    } else if (typeof value === "string") {
+      href = value;
+      text = "";
+    } else {
+      return "";
+    }
+
+    // resolve relative local paths through template storage
+    if (href && !isAbsoluteUrl(href) && !href.startsWith("file:")) {
+      const normalized = resolveTemplatePath(template, "", href);
+      href = filePrefix ? `file://${normalized}` : normalized;
+    }
+
+    const label = text || href || "";
+    if (!label) return "";
+
+    // Return Markdown link by default
+    return `[${label}](${href})`;
   },
   textarea: (v) => v,
   image: (filename, field, template, filePrefix = true) => {
@@ -197,6 +235,31 @@ function registerHelpers(filePrefix = true) {
       return value
         .map((val) => (mode === "value" ? val : optMap.get(val) || val))
         .join(", ");
+    }
+
+    // Link field with special handling
+    if (field.type === "link") {
+      let href = "";
+      let text = "";
+
+      if (value && typeof value === "object") {
+        href = String(value.href || "");
+        text = String(value.text || "");
+      } else if (typeof value === "string") {
+        href = value;
+      }
+
+      if (href && !isAbsoluteUrl(href) && !href.startsWith("file:")) {
+        const normalized = resolveTemplatePath(template, "", href);
+        href = filePrefix ? `file://${normalized}` : normalized;
+      }
+
+      if (mode === "href" || mode === "value") return href || "";
+      if (mode === "text" || mode === "label") return text || href || "";
+
+      // default → markdown link
+      const out = href ? `[${text || href}](${href})` : text || "";
+      return new Handlebars.SafeString(out);
     }
 
     // Dropdown, radio, table with simple value/label mapping

@@ -6,7 +6,7 @@ const MarkdownIt = require("markdown-it");
 const sanitizeHtml = require("sanitize-html");
 const hljs = require("highlight.js");
 
-// Aliases for fenced code blocks
+// ── Code block language aliases ───────────────────────────
 const LANG_ALIASES = {
   "c#": "csharp",
   cs: "csharp",
@@ -19,7 +19,18 @@ const LANG_ALIASES = {
   yml: "yaml",
 };
 
-// MarkdownIt with highlight.js
+// ── Small helpers ─────────────────────────────────────────
+function toFileUrl(absPath) {
+  return `file://${String(absPath).replace(/\\/g, "/")}`;
+}
+function isWinAbs(p) {
+  return /^[a-z]:[\\/]/i.test(p);
+}
+function isUnixAbs(p) {
+  return p?.startsWith("/") || p?.startsWith("\\");
+}
+
+// ── MarkdownIt with highlight.js ──────────────────────────
 const md = new MarkdownIt({
   html: true,
   linkify: true,
@@ -34,17 +45,15 @@ const md = new MarkdownIt({
           language: mapped,
           ignoreIllegals: true,
         }).value;
-        // Returning <pre><code> directly, so markdown-it does not wrap again
         return `<pre class="hljs"><code class="language-${mapped}">${html}</code></pre>`;
       } catch {}
     }
-    // Fallback without known language
     const esc = md.utils.escapeHtml(str);
     return `<pre class="hljs"><code>${esc}</code></pre>`;
   },
 });
 
-// Force links to open in a new tab with safe attributes
+// ── <a> normalization + hardening ─────────────────────────
 const defaultLinkOpen =
   md.renderer.rules.link_open ||
   function (tokens, idx, opts, env, self) {
@@ -53,12 +62,30 @@ const defaultLinkOpen =
 
 md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
   const t = tokens[idx];
+  const href = t.attrGet("href");
+
+  if (href) {
+    if (/^images\//i.test(href)) {
+      // Relative help asset
+      const abs = joinPath("help", href);
+      t.attrSet("href", toFileUrl(abs));
+    } else if (href.startsWith("file://")) {
+      // Keep as-is
+      t.attrSet("href", href);
+    } else if (isWinAbs(href) || isUnixAbs(href)) {
+      // Absolute filesystem path -> file://
+      t.attrSet("href", toFileUrl(href));
+    }
+  }
+
+  // Always open in new tab/window and harden
   t.attrSet("target", "_blank");
   t.attrSet("rel", "noopener noreferrer");
+
   return defaultLinkOpen(tokens, idx, options, env, self);
 };
 
-// Patch image rule to support file:// URLs
+// ── <img> normalization ───────────────────────────────────
 const defaultImageRenderer =
   md.renderer.rules.image ||
   function (tokens, idx, options, env, self) {
@@ -68,19 +95,29 @@ const defaultImageRenderer =
 md.renderer.rules.image = function (tokens, idx, options, env, self) {
   const token = tokens[idx];
   const src = token.attrGet("src");
-  if (src && src.startsWith("file://")) {
-    token.attrSet("src", src);
+
+  if (src) {
+    if (src.startsWith("file://")) {
+      token.attrSet("src", src);
+    } else if (/^images\//i.test(src)) {
+      const abs = joinPath("help", src);
+      token.attrSet("src", toFileUrl(abs));
+    } else if (isWinAbs(src) || isUnixAbs(src)) {
+      token.attrSet("src", toFileUrl(src));
+    }
   }
   return defaultImageRenderer(tokens, idx, options, env, self);
 };
 
-// Helpers
+// ── Helpers ───────────────────────────────────────────────
 const frontmatterRegex = /^---\n[\s\S]+?\n---\n*/;
 
 function stripFrontmatter(markdown) {
   return markdown.replace(frontmatterRegex, "");
 }
 
+// Convert image markdown that already uses file:// or images/...,
+// so it renders even if markdown-it or sanitizer would rewrite.
 function convertFileImages(markdown) {
   // ![alt](file://...)
   markdown = markdown.replace(
@@ -92,9 +129,8 @@ function convertFileImages(markdown) {
   markdown = markdown.replace(
     /!\[([^\]]*)\]\((images\/[^\)]+)\)/g,
     (_, alt, relPath) => {
-      const absPath = joinPath("help", relPath);
-      const fileUrl = `file://${absPath.replace(/\\/g, "/")}`;
-      return `<img src="${fileUrl}" alt="${alt}">`;
+      const abs = joinPath("help", relPath);
+      return `<img src="${toFileUrl(abs)}" alt="${alt}">`;
     }
   );
 
@@ -115,13 +151,12 @@ function decorateTagsOutsideCode(html) {
     .join("");
 }
 
-// Render pipeline
+// ── Render pipeline ───────────────────────────────────────
 function renderHtml(markdown) {
   try {
     const cleaned = stripFrontmatter(markdown);
     const preprocessed = convertFileImages(cleaned);
     const dirty = md.render(preprocessed);
-
     const tagDecorated = decorateTagsOutsideCode(dirty);
 
     const clean = sanitizeHtml(tagDecorated, {
@@ -143,7 +178,8 @@ function renderHtml(markdown) {
         pre: ["hljs"],
         code: ["hljs", "language-*"],
       },
-      allowedSchemes: ["http", "https", "data", "file"],
+      // Keep local files/images and common link schemes
+      allowedSchemes: ["http", "https", "data", "file", "mailto", "tel"],
     });
 
     log("[HtmlRenderer] Rendered and sanitized HTML.");

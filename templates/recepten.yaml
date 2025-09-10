@@ -28,7 +28,7 @@ markdown_template: >-
   ## {{field "naam"}}
 
 
-  **Door: {{field "auteur"}}**
+  **Door:** {{field "auteur"}}
 
 
   {{field "omschrijving"}}

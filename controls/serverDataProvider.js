@@ -76,8 +76,19 @@ async function loadAndRenderForm(templateName, dataFile) {
   let md = renderMarkdown(formData.data, templateYaml);
 
   // formidable://template.yaml:form.json → internal link
+  // 1) Markdown links: [Label](formidable://template.yaml:data.json)
   md = md.replace(
-    /(^|[^!])\bformidable:\/\/([^\s:]+):([^\s)]+)/g,
+    /\[([^\]]+)\]\(formidable:\/\/([^():\s]+):([^)]+)\)/g,
+    (m, label, templateFile, dataFile) => {
+      const tName = templateFile.replace(/\.yaml$/i, "");
+      const href  = `/template/${encodeURIComponent(tName)}/form/${encodeURIComponent(dataFile)}`;
+      return `[${label}](${href})`;
+    }
+  );
+
+  // 2) Bare occurrences (but not images): formidable://template.yaml:data.json
+  md = md.replace(
+    /(^|[^!])\bformidable:\/\/([^():\s]+):([^\s)]+)/g,
     (match, prefix, templateFile, dataFile) => {
       const tName = templateFile.replace(/\.yaml$/i, "");
       const href  = `/template/${encodeURIComponent(tName)}/form/${encodeURIComponent(dataFile)}`;

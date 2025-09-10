@@ -1042,7 +1042,6 @@ export async function renderLinkField(
   currentTemplate,
   { fetchTemplates, fetchMetaFiles }
 ) {
-
   console.log("Rendering LINK FIELD VALUE:", value);
 
   // ── helpers
@@ -1069,6 +1068,13 @@ export async function renderLinkField(
     const idx = rest.lastIndexOf(":");
     if (idx <= 0) return null;
     return { template: rest.slice(0, idx), entry: rest.slice(idx + 1) };
+  };
+
+  const show = (el, disp = "block") => {
+    if (el) el.style.display = disp;
+  };
+  const hide = (el) => {
+    if (el) el.style.display = "none";
   };
 
   // ── initial value
@@ -1280,17 +1286,35 @@ export async function renderLinkField(
     const fmt = formatSelect.value;
     const showFormidable = fmt === "formidable";
 
-    // toggle visibility
-    urlBlock.style.display = showFormidable ? "none" : "flex";
-    templateSelect.style.display = showFormidable ? "block" : "none";
-    entrySelect.style.display = showFormidable ? "block" : "none";
-    tplBlock.style.display = showFormidable ? "flex" : "none";
-    entryBlock.style.display = showFormidable ? "flex" : "none";
-
     if (showFormidable) {
+      hide(urlBlock);
+      hide(urlInput);
+
+      show(tplBlock, "flex");
+      show(templateSelect, "block");
+      show(entryBlock, "flex");
+      show(entrySelect, "block");
+
       await fillTemplateDropdown();
       await fillEntryDropdownForSelectedTemplate();
+    } else {
+      show(urlBlock, "flex");
+      show(urlInput, "block");
+
+      hide(tplBlock);
+      hide(templateSelect);
+      hide(entryBlock);
+      hide(entrySelect);
+
+      if (
+        !urlInput.value &&
+        initial?.href &&
+        !initial.href.startsWith("formidable://")
+      ) {
+        urlInput.value = initial.href;
+      }
     }
+
     updateHidden();
   });
 
@@ -1321,22 +1345,28 @@ export async function renderLinkField(
   // ── initialize UI from initial value
   if (parsedFormid) {
     formatSelect.value = "formidable";
-    urlBlock.style.display = "none";
-    tplBlock.style.display = "flex";
-    entryBlock.style.display = "flex";
-    templateSelect.style.display = "block";
-    entrySelect.style.display = "block";
+    hide(urlBlock);
+    hide(urlInput);
+
+    show(tplBlock, "flex");
+    show(templateSelect, "block");
+    show(entryBlock, "flex");
+    show(entrySelect, "block");
+
     await fillTemplateDropdown();
     templateSelect.value = parsedFormid.template;
     await fillEntryDropdownForSelectedTemplate();
     entrySelect.value = parsedFormid.entry;
   } else {
     formatSelect.value = "regular";
-    urlBlock.style.display = "flex";
-    tplBlock.style.display = "none";
-    entryBlock.style.display = "none";
-    templateSelect.style.display = "none";
-    entrySelect.style.display = "none";
+    show(urlBlock, "flex");
+    show(urlInput, "block");
+
+    hide(tplBlock);
+    hide(templateSelect);
+    hide(entryBlock);
+    hide(entrySelect);
+
     urlInput.value = initial.href;
   }
 

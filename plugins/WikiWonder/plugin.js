@@ -66,27 +66,38 @@ async function performMarkdownExport({
       updated = updated.replaceAll(`](${rawPath})`, `](${newPath})`);
     }
 
-    // ─── Replace formidable:// links with Azure Wiki links ───────────────
-    const linkPattern = /formidable:\/\/([^:\s]+):([^\s)]+)/g;
-    for (const match of markdown.matchAll(linkPattern)) {
-      const [, templateFile, dataFileName] = match;
-
-      const templateSlug = path.stripYamlExtension(templateFile);
-      const dataSlug = path.stripMetaExtension(dataFileName);
-
-      // Extract something like "CH.02" from "aanpak-ch02"
-      let label = dataSlug;
-      const chMatch = dataSlug.match(/ch(\d+)/i);
-      if (chMatch) {
-        const chNum = chMatch[1];
-        label = `CH.${chNum.padStart(2, "0")}`;
+    // ─── Replace formidable:// links with Azure Wiki links ───────────────────
+    // 1) Markdown links with explicit label: [label](formidable://template.yaml:data.meta.json#frag)
+    updated = updated.replace(
+      /\[([^\]]+)\]\(formidable:\/\/([^():\s]+):([^\s\)#]+)(#[^\s\)]*)?\)/g,
+      (m, label, templateFile, dataFileName, hash = "") => {
+        const templateSlug = path.stripYamlExtension(templateFile);
+        const dataSlug = path.stripMetaExtension(dataFileName);
+        const wikiPath = `/${encodeURIComponent(
+          templateSlug
+        )}/${encodeURIComponent(dataSlug)}${hash || ""}`;
+        return `[${label}](${wikiPath})`;
       }
+    );
 
-      const wikiPath = `/${templateSlug}/${dataSlug}`;
-      const linkText = `${templateSlug}/${dataSlug}`;
+    // 2) Bare occurrences (not images): formidable://template.yaml:data.meta.json#frag
+    updated = updated.replace(
+      /(^|[^!\[\(])\bformidable:\/\/([^():\s]+):([^\s\)#]+)(#[^\s\)]*)?/g,
+      (m, prefix, templateFile, dataFileName, hash = "") => {
+        const templateSlug = path.stripYamlExtension(templateFile);
+        const dataSlug = path.stripMetaExtension(dataFileName);
 
-      updated = updated.replaceAll(match[0], `[${linkText}](${wikiPath})`);
-    }
+        // Build label (keep your CH.## smart label)
+        let label = `${templateSlug}/${dataSlug}`;
+        const ch = dataSlug.match(/ch(\d+)/i);
+        if (ch) label = `CH.${String(ch[1]).padStart(2, "0")}`;
+
+        const wikiPath = `/${encodeURIComponent(
+          templateSlug
+        )}/${encodeURIComponent(dataSlug)}${hash || ""}`;
+        return `${prefix}[${label}](${wikiPath})`;
+      }
+    );
 
     // ─── Save modified markdown ──────────────────────────────────────────
     if (updated !== markdown) {

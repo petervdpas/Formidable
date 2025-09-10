@@ -5,7 +5,7 @@ markdown_template: |-
   ---
   title: Auto-generated Report
   author: Formidable Generator
-  date: 2025-07-30
+  date: 2025-09-10
   toc: true
   toc-title: Contents
   toc-own-page: true
@@ -238,6 +238,17 @@ markdown_template: |-
   {{else}}
   _No tags specified_
   {{/if}}
+  ---
+
+  ## MyScript
+
+  _{{fieldDescription "myScript"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "myScript")}}
+  ```
+  {{field "myScript"}}
 sidebar_expression: >-
   [ test | check ? { text: "You approved this!", classes: ["expr-text-green",
   "expr-bold"] } : { text: "You declined this!", classes: ["expr-text-red",

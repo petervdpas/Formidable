@@ -1,5 +1,4 @@
 // utils/linkBehavior.js
-
 import { EventBus } from "../modules/eventBus.js";
 
 function hasBridge() {
