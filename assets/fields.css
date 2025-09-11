@@ -171,6 +171,33 @@
   color: #000;
 }
 
+/* Only for rows where we replaced the Default label with a stacked label
+   (Code / LaTeX). Forces a two-column grid and top alignment. */
+#field-edit-modal .modal-form-row.has-stacked {
+  display: grid !important;
+  grid-template-columns: var(--label-col, 220px) 1fr; /* match your form layout */
+  column-gap: var(--form-gap, 12px);
+  align-items: start !important;          /* grid: top-align both cells */
+}
+
+/* Also pin both items individually (wins over any per-item styles) */
+#field-edit-modal .modal-form-row.has-stacked > label,
+#field-edit-modal .modal-form-row.has-stacked > * {
+  align-self: start !important;
+}
+
+/* Make the hint wrap tightly and not inflate the label cell */
+#field-edit-modal .modal-form-row.has-stacked .label-subtext {
+  display: block;
+  margin-top: 2px;
+  opacity: .75;
+  font-size: 0.7em;
+  line-height: 1.2;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 /* ───── Dynamic Table ───── */
 .dynamic-table {
   width: 100%;

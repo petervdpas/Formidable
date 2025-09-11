@@ -387,6 +387,37 @@
           ></textarea>
         </div>
 
+        <!-- LaTeX-specific settings (minimal) -->
+        <div
+          class="modal-form-row switch-row latex-only"
+          id="edit-latex-usefenced-row"
+          style="display: none"
+        >
+          <label for="edit-latex-usefenced" data-i18n="field.latex.usefenced"
+            >Use fenced raw block</label
+          >
+          <label class="switch">
+            <input type="checkbox" id="edit-latex-usefenced" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div
+          class="modal-form-row latex-only"
+          id="edit-latex-rows-row"
+          style="display: none"
+        >
+          <label for="edit-latex-rows" data-i18n="field.latex.rows">Rows</label>
+          <input
+            type="number"
+            id="edit-latex-rows"
+            min="2"
+            max="60"
+            value="10"
+            style="width: 72px"
+          />
+        </div>
+
         <div class="modal-form-row">
           <label for="edit-default" data-i18n="standard.default">Default</label>
           <textarea

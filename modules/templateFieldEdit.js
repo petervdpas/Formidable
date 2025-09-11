@@ -53,6 +53,9 @@ function setupFieldEditor(container, onChange, allFields = []) {
     inputMode: container.querySelector("#edit-inputmode"),
     apiMode: container.querySelector("#edit-apimode"),
     apiPick: container.querySelector("#edit-apipick"),
+
+    latexUseFenced: container.querySelector("#edit-latex-usefenced"),
+    latexRows: container.querySelector("#edit-latex-rows"),
   };
 
   let labelLocked = false;
@@ -150,7 +153,8 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
         initializeOptionsEditor(currentType, []);
         applyFieldAttributeDisabling(dom, currentType);
-        maybeSwapDefaultForCode(dom, currentType);
+
+        maybeSwapDefaultForCode(dom, currentType, getField());
 
         // seed code controls when switching to code
         if (currentType === "code") {
@@ -183,6 +187,12 @@ function setupFieldEditor(container, onChange, allFields = []) {
     applyFieldAttributeDisabling(dom, field.type);
     initializeOptionsEditor(field.type, field.options);
 
+    // LaTeX UI
+    if (field.type === "latex") {
+      if (dom.latexUseFenced) dom.latexUseFenced.checked = !!field.use_fenced;
+      if (dom.latexRows) dom.latexRows.value = Number(field.rows || 10);
+    }
+
     // Populate code-specific controls when editing an existing "code" field
     if (field.type === "code") {
       dom.runmode &&
@@ -190,7 +200,9 @@ function setupFieldEditor(container, onChange, allFields = []) {
       dom.allowRun && (dom.allowRun.checked = !!field.allow_run);
       dom.inputMode &&
         (dom.inputMode.value =
-          (field.input_mode || "safe").toLowerCase() === "raw" ? "raw" : "safe");
+          (field.input_mode || "safe").toLowerCase() === "raw"
+            ? "raw"
+            : "safe");
       dom.apiMode &&
         (dom.apiMode.value =
           (field.api_mode || "frozen").toLowerCase() === "raw"
@@ -203,7 +215,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
     }
 
     // create CM if needed
-    maybeSwapDefaultForCode(dom, field.type);
+    maybeSwapDefaultForCode(dom, field.type, field);
 
     // style the modal for type (no fullscreen hooks!)
     const modal = container.closest(".modal");
@@ -247,6 +259,13 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
     if (type === "textarea") {
       field.format = dom.formatTextarea?.value || "markdown"; // "markdown" or "plain"
+    }
+    if (type === "latex") {
+      field.use_fenced = !!dom.latexUseFenced?.checked;
+      field.rows = Math.max(
+        2,
+        Math.min(60, parseInt(dom.latexRows?.value || "10", 10))
+      );
     }
     if (isGuid) {
       field.primary_key = true;
@@ -517,91 +536,150 @@ export function renderFieldList(
   });
 }
 
-// — code editor wiring (always JS now)
-function maybeSwapDefaultForCode(dom, fieldType) {
+// — code editor wiring (JS for code via CM, plain textarea for LaTeX; "Default" stays the value editor)
+function maybeSwapDefaultForCode(dom, fieldType, field = {}) {
   const row = dom.default?.closest(".modal-form-row");
   if (!row || !dom.default) return;
 
-  let labelEl = row.querySelector("label[for='edit-default']");
+  const setStackedRow = (on) => row.classList.toggle("has-stacked", !!on);
   const isCode = fieldType === "code";
-  const isTextarea = dom.default.tagName === "TEXTAREA";
+  const isLatex = fieldType === "latex";
+  const isTextArea = dom.default.nodeName === "TEXTAREA";
+  let labelEl = row.querySelector("label[for='edit-default']");
 
-  if (isCode) {
-    row.querySelectorAll(".CodeMirror")?.forEach((n) => n.remove());
+  // --- helpers
+  const removeCodeMirror = () => {
     if (dom.__codeEditor) {
       destroyInlineCodeMirror(dom.__codeEditor);
       dom.__codeEditor = null;
     }
+    row.querySelectorAll(".CodeMirror")?.forEach((n) => n.remove());
+  };
 
-    if (!isTextarea) {
-      const ta = document.createElement("textarea");
-      ta.id = "edit-default";
-      ta.rows = 8;
-      ta.spellcheck = false;
-      ta.autocapitalize = "off";
-      ta.autocorrect = "off";
-      ta.className = "code-textarea";
-      ta.value = dom.default.value ?? "";
-      dom.default.replaceWith(ta);
-      dom.default = ta;
+  const ensureDefaultLabel = () => {
+    // If we switched from a stacked label, restore plain "Default"
+    if (!labelEl || labelEl.querySelector?.(".label-subtext")) {
+      const restored = document.createElement("label");
+      restored.htmlFor = "edit-default";
+      restored.className = labelEl?.className || "";
+      restored.setAttribute("data-i18n", "standard.default");
+      restored.textContent =
+        (typeof t === "function" && t("standard.default")) || "Default";
+      if (labelEl) labelEl.replaceWith(restored);
+      else row.insertBefore(restored, row.firstChild);
+      labelEl = restored;
     }
+  };
 
+  const stackLabel = (labelKey, subKey, fallbackMain, fallbackSub) => {
     const stacked = buildCompositeElementStacked({
       forId: "edit-default",
-      labelKey: "field.code.label",
-      subKey: "field.code.fullscreen",
+      labelKey,
+      subKey,
       i18nEnabled: true,
       className: labelEl?.className || "",
     });
 
     const mainSpan = stacked.querySelector("span");
-    if (mainSpan && (!mainSpan.textContent || mainSpan.textContent === "field.code.label")) {
-      mainSpan.setAttribute("data-i18n", "field.code.label");
-      mainSpan.textContent = (typeof t === "function" && t("field.code.label")) || "Code";
+    if (
+      mainSpan &&
+      (!mainSpan.textContent || mainSpan.textContent === labelKey)
+    ) {
+      mainSpan.setAttribute("data-i18n", labelKey);
+      mainSpan.textContent =
+        (typeof t === "function" && t(labelKey)) || fallbackMain;
     }
+
     const subSmall = stacked.querySelector(".label-subtext");
-    if (subSmall && (!subSmall.textContent || subSmall.textContent === "field.code.fullscreen")) {
-      subSmall.setAttribute("data-i18n", "field.code.fullscreen");
+    if (
+      subSmall &&
+      (!subSmall.textContent || subSmall.textContent === subKey)
+    ) {
+      subSmall.setAttribute("data-i18n", subKey);
       subSmall.textContent =
-        (typeof t === "function" && t("field.code.fullscreen")) || "Use F11 for fullscreen";
+        (typeof t === "function" && t(subKey)) || fallbackSub;
     }
 
     if (labelEl) labelEl.replaceWith(stacked);
     else row.insertBefore(stacked, row.firstChild);
+  };
+
+  const swapToTextArea = (clsList = [], rows = 2, placeholder = "") => {
+    if (!isTextArea) {
+      const ta = document.createElement("textarea");
+      ta.id = "edit-default";
+      ta.rows = rows;
+      ta.spellcheck = false;
+      ta.autocapitalize = "off";
+      ta.autocorrect = "off";
+      ta.value = dom.default.value ?? "";
+      clsList.forEach((c) => ta.classList.add(c));
+      if (placeholder) ta.placeholder = placeholder;
+      dom.default.replaceWith(ta);
+      dom.default = ta;
+    } else {
+      dom.default.classList.remove("code-textarea", "latex-textarea");
+      clsList.forEach((c) => dom.default.classList.add(c));
+      dom.default.rows = rows;
+      if (placeholder && !dom.default.placeholder)
+        dom.default.placeholder = placeholder;
+    }
+  };
+
+  // --- leave Code unless staying in Code
+  if (!isCode) removeCodeMirror();
+
+  // CODE → stacked label + CodeMirror over the Default textarea
+  if (isCode) {
+    swapToTextArea(["code-textarea"], 8);
+    stackLabel(
+      "field.code.label",
+      "field.code.fullscreen",
+      "Code",
+      "Use F11 for fullscreen"
+    );
+
+    setStackedRow(true);
 
     const modal = document.getElementById("field-edit-modal");
     const modalBodyEl = modal?.querySelector(".modal-body") || null;
-
-    // always JS
     dom.__codeEditor = createInlineCodeMirror(dom.default, {
       mode: "javascript",
       height: 560,
       modalBodyEl,
     });
+    return;
+  }
+
+  // LATEX → stacked label (LaTeX + hint), plain textarea; placeholder is UI-only
+  if (isLatex) {
+    const rows = Math.max(2, Math.min(60, Number(field?.rows ?? 12)));
+    const placeholder = "\\begin{center} ... \\end{center}";
+    swapToTextArea(["latex-textarea"], rows, placeholder);
+
+    stackLabel(
+      "field.latex.label",
+      "field.latex.hint",
+      "LaTeX",
+      "Raw \\LaTeX block (exported as fenced)"
+    );
+
+    setStackedRow(true);
+    return;
+  }
+
+  // OTHER TYPES → simple <input type="text"> with normal "Default" label
+  ensureDefaultLabel();
+  if (isTextArea) {
+    const inp = document.createElement("input");
+    inp.type = "text";
+    inp.id = "edit-default";
+    inp.value = dom.default.value ?? "";
+    dom.default.replaceWith(inp);
+    dom.default = inp;
+
+    setStackedRow(false);
   } else {
-    if (dom.__codeEditor) {
-      destroyInlineCodeMirror(dom.__codeEditor);
-      dom.__codeEditor = null;
-    }
-    row.querySelectorAll(".CodeMirror")?.forEach((n) => n.remove());
-
-    if (isTextarea) {
-      const inp = document.createElement("input");
-      inp.type = "text";
-      inp.id = "edit-default";
-      inp.value = dom.default.value ?? "";
-      dom.default.replaceWith(inp);
-      dom.default = inp;
-    }
-
-    const restored = document.createElement("label");
-    restored.htmlFor = "edit-default";
-    restored.className = labelEl?.className || "";
-    restored.setAttribute("data-i18n", "standard.default");
-    restored.textContent = (typeof t === "function" && t("standard.default")) || "Default";
-
-    if (labelEl) labelEl.replaceWith(restored);
-    else row.insertBefore(restored, row.firstChild);
+    dom.default.classList.remove("code-textarea", "latex-textarea");
   }
 }
-

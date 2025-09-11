@@ -129,7 +129,7 @@
 }
 
 .modal-form-row label {
-    min-width: 220px;
+    min-width: var(--label-col, 220px);
     font-weight: bold;
     text-align: right;
     padding-top: 2px;

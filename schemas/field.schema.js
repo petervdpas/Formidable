@@ -8,6 +8,7 @@ const knownTypes = [
   "multioption",
   "radio",
   "textarea",
+  "latex",
   "number",
   "range",
   "date",
@@ -29,6 +30,12 @@ const codeDefaults = {
   input_mode: "safe", // "safe" | "raw"
   api_mode: "frozen", // "frozen" | "raw"
   api_pick: [], // string[]
+};
+
+const latexDefaults = {
+  rows: 12,
+  use_fenced: true,
+  placeholder: "",
 };
 
 module.exports = {
@@ -72,6 +79,32 @@ module.exports = {
       field.format = textareaFormats.has(f) ? f : "markdown";
     } else {
       delete field.format;
+    }
+
+    // latex-specific
+    if (field.type === "latex") {
+      Object.assign(field, { ...latexDefaults, ...raw });
+
+      // normalize rows
+      const rowsNum = Number(field.rows);
+      field.rows = Number.isFinite(rowsNum)
+        ? Math.max(2, Math.min(60, Math.trunc(rowsNum)))
+        : latexDefaults.rows;
+
+      // normalize flags/strings
+      field.use_fenced = !!field.use_fenced;
+      field.placeholder =
+        typeof field.placeholder === "string" ? field.placeholder : "";
+
+      // value must be string (multiline is fine)
+      field.default = typeof field.default === "string" ? field.default : "";
+      // encourage block-scalar in YAML if short single-line provided
+      if (field.default && !field.default.includes("\n")) field.default += "\n";
+    } else {
+      // scrub latex-only props
+      delete field.rows;
+      delete field.use_fenced;
+      delete field.placeholder;
     }
 
     // code-specific

@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-09-10T18:13:03.333Z",
+    "updated": "2025-09-11T23:55:56.188Z",
     "flagged": true,
     "tags": [
       "bye",
@@ -63,6 +63,7 @@
       "cleanKey": "some-value-here!",
       "capName": "Approve This one",
       "shortFile": "sane-20250530.meta.…"
-    }
+    },
+    "latext": "\\begin{center}\n  \\fbox{%\n    \\begin{minipage}{0.6\\linewidth}\n      \\centering\n      \\vspace{1em}\n      \\includegraphics[width=0.5\\linewidth]{../.media/Images/signature-transparent.png}\\\\[0.5em]\n      \\textbf{Roadwarrior}\\\\\n      Software Engineer\\\\\n      09-09-2025\n      \\vspace{1em}\n    \\end{minipage}%\n  }\n\\end{center}\n"
   }
 }

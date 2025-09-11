@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-29T09:32:36.440Z",
-    "updated": "2025-09-10T17:37:27.081Z",
+    "updated": "2025-09-11T23:55:48.982Z",
     "flagged": false,
     "tags": [
       "ch.01",
@@ -51,6 +51,12 @@
       "ch.01",
       "you lucky guy"
     ],
-    "myScript": "return (async (input, api) => {\n  const snap = await api.form.snapshot();  // { meta, data, template, filename }\n  const currentTest = snap?.data?.test ?? \"\";\n\n  const cleanKey  = api.string.sanitize(\"Some Value Here!\");\n  const capName   = api.string.capitalize(currentTest || \"unnamed\");\n  const shortFile = api.string.truncate(snap?.filename || \"\", 20);\n\n  return { seenTest: currentTest, cleanKey, capName, shortFile };\n})(input, api);\n"
+    "myScript": {
+      "seenTest": "Decline This One",
+      "cleanKey": "some-value-here!",
+      "capName": "Decline This One",
+      "shortFile": "test-20250629.meta.…"
+    },
+    "latext": "\\begin{center}\n  \\fbox{%\n    \\begin{minipage}{0.6\\linewidth}\n      \\centering\n      \\vspace{1em}\n      \\includegraphics[width=0.5\\linewidth]{../.media/Images/signature-transparent.png}\\\\[0.5em]\n      \\textbf{Roadwarrior}\\\\\n      Software Engineer\\\\\n      09-09-2025\n      \\vspace{1em}\n    \\end{minipage}%\n  }\n\\end{center}\n"
   }
 }

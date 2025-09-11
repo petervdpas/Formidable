@@ -514,6 +514,21 @@ export function applyTagsField(container, field, value) {
   // Leave the input alone (user can keep typing)
 }
 
+// latex
+export function applyLatexField(container, field, value) {
+  const key = field.key;
+  const wrap = container.querySelector(`[data-latex-field="${key}"]`);
+  if (!wrap) return;
+
+  const v = (value ?? "").toString();
+
+  const hidden = wrap.querySelector(`input[type="hidden"][name="${key}"]`);
+  if (hidden) hidden.value = v;
+
+  const pre = wrap.querySelector(".latex-preview");
+  if (pre) pre.textContent = v;
+}
+
 export function applyGenericField(container, field, value) {
   const key = field.key;
   const input = container.querySelector(`[name="${key}"]`);

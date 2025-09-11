@@ -1042,8 +1042,6 @@ export async function renderLinkField(
   currentTemplate,
   { fetchTemplates, fetchMetaFiles }
 ) {
-  console.log("Rendering LINK FIELD VALUE:", value);
-
   // ── helpers
   const normalize = (v) => {
     if (!v) return { href: "", text: "" };
@@ -1760,4 +1758,44 @@ export async function renderCodeField(field, value = "") {
     if (typeof opts === "object") return { ...opts };
     return {};
   }
+}
+
+// ─────────────────────────────────────────────
+// Type: latex (stored value only; hidden in forms)
+export async function renderLatexField(field, value = "") {
+
+  console.log("Rendering LaTeX field:", field, value);
+
+  const v = (value ?? field.default ?? "").toString();
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "latex-field";
+  wrapper.setAttribute("data-latex-field", field.key);
+
+  const hidden = document.createElement("input");
+  hidden.type = "hidden";
+  hidden.name = field.key;
+  hidden.value = String(field.default ?? ""); // v;
+
+  applyFieldContextAttributes(hidden, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
+
+  // Optional: in-place preview (hidden unless field.preview === true)
+  const pre = document.createElement("pre");
+  pre.className = "latex-preview";
+  pre.style.display = field.preview === true ? "" : "none";
+  pre.textContent = v;
+
+  wrapper.append(hidden, pre);
+
+  return wrapInputWithLabel(
+    wrapper,
+    field.label || "LaTeX",
+    field.description || "",
+    field.two_column,
+    field.wrapper || "form-row"
+  );
 }

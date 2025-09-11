@@ -453,6 +453,13 @@ export default {
   "field.code.apipick.hint": "Welke API-sleutels bloot te stellen?",
   "field.code.fullscreen": "Gebruik F11 voor volledig scherm",
 
+  "field.latex.label": "LaTeX",
+  "field.latex.rows": "Regels",
+  "field.latex.usefenced": "Fenced raw-block gebruiken",
+  "field.latex.hint": "Voegt ruwe \\LaTeX in; export als fenced {=latex}-blok.",
+  "field.latex.placeholder": "\\begin{center} ... \\end{center}",
+  "latex.required": "LaTeX-inhoud is verplicht.",
+
   // ── Modals ───────────────────
 
   // "modal.settings.title": "Instellingen",

@@ -312,6 +312,24 @@
     color: var(--field-type-code-text);
 }
 
+/* LaTeX */
+.field-list-item[data-type="latex"] {
+    background-color: var(--field-type-latex-bg);
+    border-left: 4px solid var(--field-type-latex-border);
+    color: var(--field-type-latex-text);
+}
+
+.field-type.type-latex {
+    background-color: var(--field-type-latex-badge);
+    color: var(--field-type-latex-text);
+}
+
+#field-edit-modal.modal-latex {
+    background-color: var(--field-type-latex-modal);
+    border-left: 6px solid var(--field-type-latex-border);
+    color: var(--field-type-latex-text);
+}
+
 /* ───────────────────────────────
    Inline CodeMirror in Edit Field
    ─────────────────────────────── */

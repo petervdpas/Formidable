@@ -185,6 +185,7 @@ export const parseLinkField = async function (wrapper, template, field) {
   }
 };
 
+// Tags
 export const parseTagsField = async function (wrapper) {
   const tags = Array.from(wrapper.querySelectorAll(".tag-item"))
     .map((el) => el.firstChild?.textContent?.trim())
@@ -192,6 +193,7 @@ export const parseTagsField = async function (wrapper) {
   return tags;
 };
 
+// Code (Programmable)
 export const parseCodeField = async function (wrapper) {
   // wrapper has data-field-key/type; the persisted control is the hidden input
   const key = wrapper?.dataset?.fieldKey;
@@ -210,4 +212,11 @@ export const parseCodeField = async function (wrapper) {
   } catch {
     return raw;
   }
+};
+
+// latex (hidden) — always persist the template default
+export const parseLatexField = async function (_wrapper, _template, field) {
+  // Normalize to a plain string, keep whitespace, normalize newlines if you like
+  const v = String(field?.default ?? "");
+  return v.replace(/\r\n?/g, "\n");
 };
