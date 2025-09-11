@@ -43,6 +43,12 @@ export async function fieldGroupRenderer(
   eventFunctions = {},
   loopKeyChain = []
 ) {
+  const cfg = await new Promise((resolve) => {
+    EventBus.emit("config:load", (c) => resolve(c || {}));
+  });
+  const defaultCollapsed =
+    (cfg.loop_collapse_state ?? cfg.loop_state_collapsed) === true;
+
   const loopGroupKeys = new Set();
   let i = 0;
 
@@ -92,7 +98,8 @@ export async function fieldGroupRenderer(
           eventFunctions,
           [...loopKeyChain, loopKey],
           field,
-          metaData
+          metaData,
+          { defaultCollapsed }
         );
         loopList.appendChild(itemWrapper);
       }
@@ -105,7 +112,8 @@ export async function fieldGroupRenderer(
           eventFunctions,
           [...loopKeyChain, loopKey],
           field,
-          metaData
+          metaData,
+          { defaultCollapsed }
         );
         loopList.appendChild(newItem);
       });
@@ -218,8 +226,11 @@ async function createLoopItem(
   eventFunctions = {},
   loopKeyChain = [],
   loopStartField = null,
-  metaData = {}
+  metaData = {},
+  opts = {}
 ) {
+  const { defaultCollapsed = false } = opts;
+
   const itemWrapper = document.createElement("div");
   itemWrapper.className = "loop-item";
 
@@ -229,23 +240,32 @@ async function createLoopItem(
 
   // Drag handle
   const nestingDepth = loopKeyChain.length || 0;
-  const dragClass = `drag-handle loop-handle depth-${nestingDepth}`;
-
   const dragHandle = document.createElement("div");
-  dragHandle.className = dragClass;
+  dragHandle.className = `drag-handle loop-handle depth-${nestingDepth}`;
   dragHandle.textContent = "⠿";
   header.appendChild(dragHandle);
 
   // Collapse toggle
   const collapseBtn = document.createElement("button");
+  collapseBtn.type = "button";
   collapseBtn.className = "collapse-toggle";
   collapseBtn.innerHTML = "▼";
+  collapseBtn.setAttribute("aria-expanded", "true");
+  collapseBtn.setAttribute("title", t("standard.collapse") || "Collapse");
   collapseBtn.addEventListener("click", () => {
     const isCollapsed = itemWrapper.classList.toggle("collapsed");
     collapseBtn.innerHTML = isCollapsed ? "▶" : "▼";
+    collapseBtn.setAttribute("aria-expanded", String(!isCollapsed));
+    collapseBtn.setAttribute(
+      "title",
+      isCollapsed
+        ? t("standard.expand") || "Expand"
+        : t("standard.collapse") || "Collapse"
+    );
   });
   header.appendChild(collapseBtn);
 
+  // Preview/summary source
   const {
     key: previewKey,
     label: previewLabel,
@@ -265,69 +285,9 @@ async function createLoopItem(
         height: "auto",
       }
     );
-    if (confirmed) {
-      itemWrapper.remove();
-    }
+    if (confirmed) itemWrapper.remove();
   });
-
   header.appendChild(removeBtn);
-
-  // ─── Summary Line (Shown When Collapsed) ───
-  if (loopStartField?.summary_field) {
-    const summaryEl = document.createElement("div");
-    summaryEl.className = "loop-item-summary";
-
-    const firstLine = (previewValue || "").split("\n")[0].trim() || "(empty)";
-    summaryEl.textContent = firstLine;
-    header.appendChild(summaryEl);
-
-    setTimeout(() => {
-      const fieldSelector = `[name="${previewKey}"]`;
-      const inputEl = itemWrapper.querySelector(fieldSelector);
-      if (!inputEl) return;
-
-      const isLink = previewType === "link";
-
-      const updateSummary = () => {
-        const raw = (inputEl.value || "").trim();
-        let display = "(empty)";
-
-        if (isLink) {
-          let obj = null;
-          if (raw) {
-            try {
-              obj = JSON.parse(raw);
-            } catch {
-              obj = { href: raw, text: "" };
-            }
-          }
-          if (obj) {
-            const txt = (obj.text ?? "").trim();
-            const href = (obj.href ?? "").trim();
-            if (txt) {
-              display = txt;
-            } else if (href) {
-              if (href.startsWith("formidable://")) {
-                const rest = href.slice("formidable://".length);
-                const entry = rest.split(":").pop() ?? "";
-                display = entry.replace(/\.meta\.json$/i, "") || href;
-              } else {
-                display = href.split("/").filter(Boolean).pop() || href;
-              }
-            }
-          }
-        } else {
-          display = raw.split("\n")[0].trim() || "(empty)";
-        }
-
-        summaryEl.textContent = display;
-      };
-
-      inputEl.addEventListener("input", updateSummary);
-      inputEl.addEventListener("change", updateSummary);
-      updateSummary();
-    }, 0);
-  }
 
   itemWrapper.appendChild(header);
 
@@ -392,7 +352,8 @@ async function createLoopItem(
           eventFunctions,
           nestedLoopKeyChain,
           field,
-          metaData
+          metaData,
+          { defaultCollapsed }
         );
         nestedList.appendChild(nestedItem);
       }
@@ -411,7 +372,8 @@ async function createLoopItem(
           eventFunctions,
           nestedLoopKeyChain,
           field,
-          metaData
+          metaData,
+          { defaultCollapsed }
         );
         nestedList.appendChild(newItem);
       });
@@ -427,10 +389,7 @@ async function createLoopItem(
     } else {
       // ───── Regular Field ─────
       const fieldKey = field.key;
-      const fieldCopy = {
-        ...field,
-        loopKey: loopKeyChain,
-      };
+      const fieldCopy = { ...field, loopKey: loopKeyChain };
 
       if (!Object.prototype.hasOwnProperty.call(dataEntry, fieldKey)) {
         const defFn = fieldTypes[fieldCopy.type]?.defaultValue;
@@ -466,8 +425,68 @@ async function createLoopItem(
   }
 
   itemWrapper.appendChild(fieldsContainer);
-  // wrap
-  // itemWrapper.classList.add("collapsed");   // Needs to be conditional from user pref?
+
+  // ─── Summary Line (Shown When Collapsed) ───
+  if (loopStartField?.summary_field) {
+    const summaryEl = document.createElement("div");
+    summaryEl.className = "loop-item-summary";
+    const firstLine = (previewValue || "").split("\n")[0].trim() || "(empty)";
+    summaryEl.textContent = firstLine;
+    header.appendChild(summaryEl);
+
+    // Inputs are now in DOM; wire live updates
+    const fieldSelector = `[name="${previewKey}"]`;
+    const inputEl = itemWrapper.querySelector(fieldSelector);
+    if (inputEl) {
+      const isLink = previewType === "link";
+      const updateSummary = () => {
+        const raw = (inputEl.value || "").trim();
+        let display = "(empty)";
+
+        if (isLink) {
+          let obj = null;
+          if (raw) {
+            try {
+              obj = JSON.parse(raw);
+            } catch {
+              obj = { href: raw, text: "" };
+            }
+          }
+          if (obj) {
+            const txt = (obj.text ?? "").trim();
+            const href = (obj.href ?? "").trim();
+            if (txt) display = txt;
+            else if (href) {
+              if (href.startsWith("formidable://")) {
+                const rest = href.slice("formidable://".length);
+                const entry = rest.split(":").pop() ?? "";
+                display = entry.replace(/\.meta\.json$/i, "") || href;
+              } else {
+                display = href.split("/").filter(Boolean).pop() || href;
+              }
+            }
+          }
+        } else {
+          display = raw.split("\n")[0].trim() || "(empty)";
+        }
+
+        summaryEl.textContent = display;
+      };
+      inputEl.addEventListener("input", updateSummary);
+      inputEl.addEventListener("change", updateSummary);
+      updateSummary();
+    }
+  }
+
+  // ─── Initial collapsed state (per-loop override > global) ───
+  const initCollapsed =
+    loopStartField?.collapsed === true ? true : defaultCollapsed;
+  if (initCollapsed) {
+    itemWrapper.classList.add("collapsed");
+    collapseBtn.innerHTML = "▶";
+    collapseBtn.setAttribute("aria-expanded", "false");
+    collapseBtn.setAttribute("title", t("standard.expand") || "Expand");
+  }
 
   return itemWrapper;
 }

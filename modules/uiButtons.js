@@ -488,13 +488,34 @@ export function createLoopToolbar(loopList, { asIcons = true } = {}) {
   const toolbar = document.createElement("div");
   toolbar.className = "loop-toolbar";
 
+  // Keep button UI in sync with the wrapper state
+  function setItemCollapsed(item, collapsed) {
+    const btn = item.querySelector(".collapse-toggle");
+    if (collapsed) {
+      item.classList.add("collapsed");
+      if (btn) {
+        btn.innerHTML = "▶";
+        btn.setAttribute("aria-expanded", "false");
+        btn.setAttribute("title", t("standard.expand") || "Expand");
+      }
+    } else {
+      item.classList.remove("collapsed");
+      if (btn) {
+        btn.innerHTML = "▼";
+        btn.setAttribute("aria-expanded", "true");
+        btn.setAttribute("title", t("standard.collapse") || "Collapse");
+      }
+    }
+  }
+
   const collapseHandler = () => {
     loopList.querySelectorAll(":scope > .loop-item")
-      .forEach(it => it.classList.add("collapsed"));
+      .forEach((it) => setItemCollapsed(it, true));
   };
+
   const expandHandler = () => {
     loopList.querySelectorAll(":scope > .loop-item")
-      .forEach(it => it.classList.remove("collapsed"));
+      .forEach((it) => setItemCollapsed(it, false));
   };
 
   const collapseBtn = asIcons
@@ -503,8 +524,8 @@ export function createLoopToolbar(loopList, { asIcons = true } = {}) {
         className: "btn icon-button btn-icon-default btn-icon-small",
         identifier: "loop-collapse-all",
         onClick: collapseHandler,
-        i18nTitle: "standard.collapse_all",  // tooltip
-        i18nAria:  "standard.collapse_all",  // screen readers
+        i18nTitle: "standard.collapse_all",
+        i18nAria:  "standard.collapse_all",
       })
     : createButton({
         text: t("standard.collapse_all"),

@@ -119,6 +119,18 @@ export async function renderSettings() {
 
   tabDisplay.appendChild(
     createSwitch(
+      "loop-collapse-toggle",
+      "modal.settings.display.loop.collapsed",
+      config.loop_state_collapsed ?? false,
+      null,
+      "block",
+      ["standard.on", "standard.off"],
+      true
+    )
+  );
+
+  tabDisplay.appendChild(
+    createSwitch(
       "show-meta-toggle",
       "modal.settings.display.meta",
       config.show_meta_section ?? true,
@@ -314,6 +326,7 @@ function setupBindings(config, gitRootPicker) {
   bindToggleSwitch("show-meta-toggle", "show_meta_section", (enabled) => {
     EventBus.emit("screen:meta:visibility", enabled);
   });
+  bindToggleSwitch("loop-collapse-toggle", "loop_state_collapsed");
   bindToggleSwitch("plugin-toggle", "enable_plugins");
   bindToggleSwitch("settings-development-toggle", "development_enable");
   bindToggleSwitch("logging-toggle", "logging_enabled", (enabled) =>
@@ -481,7 +494,7 @@ function emitConfigStatus(configKey, value, success = true) {
 
 function mirrorMetaSwitchState(enabled) {
   const el = document.getElementById("show-meta-toggle");
-  if (!el) return; 
+  if (!el) return;
   el.checked = !!enabled;
   const label = el.closest(".switch")?.querySelector(".switch-state");
   if (label) {
