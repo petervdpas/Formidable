@@ -658,6 +658,7 @@ function maybeSwapDefaultForCode(dom, fieldType, field = {}) {
     dom.__codeEditor = createInlineCodeMirror(dom.default, {
       mode: "javascript",
       modalBodyEl,
+      height: 140,
     });
     return;
   }
@@ -682,6 +683,7 @@ function maybeSwapDefaultForCode(dom, fieldType, field = {}) {
     dom.__codeEditor = createInlineCodeMirror(dom.default, {
       mode: "stex",
       modalBodyEl,
+      height: 140,
     });
     return;
   }
