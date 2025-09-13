@@ -550,21 +550,21 @@ function maybeSwapDefaultForCode(dom, fieldType, field = {}) {
 
   // --- helpers
   const removeCodeMirror = () => {
+    // capture stale wrappers before we destroy/recreate
+    const stale = row ? Array.from(row.querySelectorAll(".CodeMirror")) : [];
+
     if (dom.__codeEditor) {
       destroyInlineCodeMirror(dom.__codeEditor);
       dom.__codeEditor = null;
     }
 
     if (dom.default && dom.default.nodeName === "TEXTAREA") {
-      dom.default.style.removeProperty("display"); // removes display:none
-      dom.default.hidden = false; // extra safety
+      dom.default.style.removeProperty("display");
+      dom.default.hidden = false;
     }
 
-    requestAnimationFrame(() => {
-      row.querySelectorAll(".CodeMirror").forEach((n) => {
-        if (!n.contains(dom.default)) n.remove();
-      });
-    });
+    // remove only the stale wrappers we captured (won't touch the new one)
+    stale.forEach((w) => w.isConnected && w.remove());
   };
 
   const ensureDefaultLabel = () => {
@@ -575,7 +575,8 @@ function maybeSwapDefaultForCode(dom, fieldType, field = {}) {
       restored.className = labelEl?.className || "";
       restored.setAttribute("data-i18n", "standard.default.value");
       restored.textContent =
-        (typeof t === "function" && t("standard.default.value")) || "Default value";
+        (typeof t === "function" && t("standard.default.value")) ||
+        "Default value";
       if (labelEl) labelEl.replaceWith(restored);
       else row.insertBefore(restored, row.firstChild);
       labelEl = restored;
@@ -675,6 +676,13 @@ function maybeSwapDefaultForCode(dom, fieldType, field = {}) {
     );
 
     setStackedRow(true);
+
+    const modal = document.getElementById("field-edit-modal");
+    const modalBodyEl = modal?.querySelector(".modal-body") || null;
+    dom.__codeEditor = createInlineCodeMirror(dom.default, {
+      mode: "stex",
+      modalBodyEl,
+    });
     return;
   }
 
