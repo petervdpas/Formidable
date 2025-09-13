@@ -106,6 +106,126 @@ export async function handleExtendedListForms({ templateFilename, callback }) {
   }
 }
 
+// --- ON-LOAD HOOK: run code fields with run_mode === 'load' -------------------
+export async function handleOnLoadRun(
+  { templateFilename, datafile, data, fields },
+  respond
+) {
+  try {
+    if (!Array.isArray(fields) || !fields.length || !data || typeof data !== "object") {
+      respond?.(data);
+      return;
+    }
+
+    const updated = { ...data };
+
+    // small helpers
+    const pick = (obj, ...keys) => {
+      for (const k of keys) if (obj && obj[k] !== undefined) return obj[k];
+      return undefined;
+    };
+    const optsToObject = (opts) => {
+      if (!opts) return {};
+      const out = {};
+      if (Array.isArray(opts)) {
+        for (const it of opts) {
+          if (it && typeof it === "object") {
+            if ("value" in it) {
+              const k = String(it.value).trim();
+              const v = "label" in it ? String(it.label) : "";
+              out[k] = v;
+              continue;
+            }
+            if ("key" in it) {
+              out[String(it.key)] = String(it.value ?? "");
+              continue;
+            }
+          }
+          if (Array.isArray(it) && it.length >= 2) {
+            out[String(it[0])] = String(it[1]);
+            continue;
+          }
+          if (typeof it === "string" && it.includes("=")) {
+            const [k, ...rest] = it.split("=");
+            out[k.trim()] = rest.join("=").trim();
+          }
+        }
+        return out;
+      }
+      if (typeof opts === "object") return { ...opts };
+      return {};
+    };
+
+    // Live snapshot from the just-loaded data
+    const formSnap = {
+      meta: updated?._meta || null,
+      data: { ...updated },
+      template: templateFilename || null,
+      filename: datafile || null,
+    };
+
+    // Run sequentially so later fields can see prior results
+    for (const f of fields) {
+      if (!f || f.type !== "code") continue;
+      const runMode = String(f.run_mode || "").toLowerCase();
+      if (runMode !== "load" || !f.allow_run) continue;
+
+      const src = typeof f.default === "string" ? f.default : "";
+      if (!src.trim()) continue;
+
+      const inputMode  = pick(f, "input_mode", "inputMode") || "safe";
+      const apiMode    = pick(f, "api_mode", "apiMode")   || "frozen";
+      const apiPickRaw = pick(f, "api_pick", "apiPick");
+      const apiPick = Array.isArray(apiPickRaw)
+        ? apiPickRaw
+        : typeof apiPickRaw === "string"
+          ? apiPickRaw.split(/[,\s]+/).map(s => s.trim()).filter(Boolean)
+          : null;
+
+      const opts = optsToObject(f.options);
+
+      const payload = {
+        code: String(src),
+        input: { ...(pick(f, "input") ?? {}), form: formSnap },
+        timeout: Number(pick(f, "timeout")) || 3000,
+        inputMode,
+        apiPick,
+        apiMode,
+        opts,
+        optsAsVars: Array.isArray(f.options) && f.options.length > 0,
+
+        // use your executor's new override so api.form.snapshot() sees live data
+        formSnapshot: formSnap,
+      };
+
+      let res;
+      try {
+        res = await EventBus.emitWithResponse("code:execute", payload);
+      } catch (e) {
+        res = { ok: false, error: String(e), logs: [] };
+      }
+
+      if (res?.ok) {
+        updated[f.key] = res.result;
+        formSnap.data = { ...updated }; // keep snapshot fresh for subsequent fields
+      } else {
+        EventBus.emit("logging:warning", [
+          `[formHandlers] Code field "${f.key}" (run_mode:load) failed:`,
+          res?.error || "Unknown error",
+        ]);
+      }
+    }
+
+    respond?.(updated);
+  } catch (e) {
+    EventBus.emit("logging:error", [
+      "[formHandlers] handleOnLoadRun failed:",
+      e,
+    ]);
+    respond?.(data);
+  }
+}
+
 // LOAD
 export async function handleLoadForm(
   { templateFilename, datafile, fields = [] },
@@ -117,17 +237,40 @@ export async function handleLoadForm(
       datafile,
       fields
     );
-    if (data) {
+
+    // If we got data, allow on-load code fields to compute/augment it
+    let processed = data;
+    if (data && data.data && Array.isArray(fields) && fields.length) {
+      try {
+        const runResult = await EventBus.emitWithResponse("form:load:run:onload", {
+          templateFilename,
+          datafile,
+          data: data.data,   // pass only the data block (not meta)
+          fields,
+        });
+        if (runResult && typeof runResult === "object") {
+          processed = { ...data, data: runResult };
+        }
+      } catch (e) {
+        EventBus.emit("logging:warning", [
+          "[handleLoadForm] on-load run failed; continuing with raw data:",
+          String(e),
+        ]);
+      }
+    }
+
+    if (processed) {
       EventBus.emit("form:context:update", {
-        meta: data.meta || null,
-        data: data.data || {},
+        meta: processed.meta || null,
+        data: processed.data || {},
         template: templateFilename || null,
         filename: datafile || null,
       });
     } else {
       EventBus.emit("form:context:update", null);
     }
-    callback?.(data);
+
+    callback?.(processed);
   } catch (err) {
     EventBus.emit("logging:error", [
       "[formHandlers] Failed to load form:",
