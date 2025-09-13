@@ -21,6 +21,7 @@ import {
 } from "../utils/elementBuilders.js";
 import {
   getEditor,
+  disposeMainEditor,
   handleEditorKey,
   initCodeMirror,
 } from "./templateCodemirror.js";
@@ -115,6 +116,9 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     currentEditIndex = null;
 
   async function renderEditor(data) {
+
+    disposeMainEditor();
+    
     if (!data) {
       EventBus.emit("logging:warning", [
         "[YamlEditor] renderEditor() called with null data",

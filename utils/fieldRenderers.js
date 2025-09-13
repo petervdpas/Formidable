@@ -1844,7 +1844,7 @@ export async function renderCodeField(field, value = "") {
 // ─────────────────────────────────────────────
 // Type: latex (stored value only; hidden in forms)
 export async function renderLatexField(field, value = "") {
-  console.log("Rendering LaTeX field:", field, value);
+  //console.log("Rendering LaTeX field:", field, value);
 
   const v = (value ?? field.default ?? "").toString();
 

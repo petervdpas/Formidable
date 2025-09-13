@@ -346,6 +346,7 @@ export default {
   "standard.label": "Label",
   "standard.description": "Beschrijving",
   "standard.default": "Standaard",
+  "standard.default.value": "Standaardwaarde",
   "standard.options": "Opties",
   "standard.expression": "Expressie",
   "standard.expressions": "Expressies",

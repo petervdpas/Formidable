@@ -23,12 +23,12 @@
   overflow: hidden;
 }
 
-.CodeMirror {
-  flex: 1;
-  width: auto;
-  height: var(--editor-compact-h); /* fixed compact height */
-  font-size: 14px;
-  overflow: hidden;
+.editor-wrapper > .CodeMirror {
+   flex: 1;
+   width: auto;
+   height: var(--editor-compact-h);
+   font-size: 14px;
+   overflow: hidden;
 }
 
 .editor-wrapper .CodeMirror-scroll {
@@ -74,3 +74,4 @@
   border-radius: 4px;
   pointer-events: none;
 }
+

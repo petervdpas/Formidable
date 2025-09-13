@@ -422,8 +422,8 @@ fields:
         const snap = await api.form.snapshot();
         const currentTest = snap?.data?.test ?? "";
 
-        const cleanKey  = api.string.sanitize("Some Value Here!");
-        const capName   = api.string.capitalize(currentTest || "unnamed");
+        const cleanKey = api.string.sanitize("Some Value Here!");
+        const capName = api.string.capitalize(currentTest || "unnamed");
         const shortFile = api.string.truncate(snap?.filename || "", 20);
 
         return { seenTest: currentTest, cleanKey, capName, shortFile };

@@ -326,6 +326,7 @@ export default {
   "standard.label": "Label",
   "standard.description": "Description",
   "standard.default": "Default",
+  "standard.default.value": "Default value",
   "standard.options": "Options",
   "standard.expression": "Expression",
   "standard.expressions": "Expressions",

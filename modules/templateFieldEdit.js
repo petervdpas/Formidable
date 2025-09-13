@@ -24,6 +24,7 @@ import {
   createInlineCodeMirror,
   destroyInlineCodeMirror,
 } from "./templateCodemirror.js";
+import { t } from "../utils/i18n.js";
 
 function setupFieldEditor(container, onChange, allFields = []) {
   const dom = {
@@ -553,7 +554,17 @@ function maybeSwapDefaultForCode(dom, fieldType, field = {}) {
       destroyInlineCodeMirror(dom.__codeEditor);
       dom.__codeEditor = null;
     }
-    row.querySelectorAll(".CodeMirror")?.forEach((n) => n.remove());
+
+    if (dom.default && dom.default.nodeName === "TEXTAREA") {
+      dom.default.style.removeProperty("display"); // removes display:none
+      dom.default.hidden = false; // extra safety
+    }
+
+    requestAnimationFrame(() => {
+      row.querySelectorAll(".CodeMirror").forEach((n) => {
+        if (!n.contains(dom.default)) n.remove();
+      });
+    });
   };
 
   const ensureDefaultLabel = () => {
@@ -562,9 +573,9 @@ function maybeSwapDefaultForCode(dom, fieldType, field = {}) {
       const restored = document.createElement("label");
       restored.htmlFor = "edit-default";
       restored.className = labelEl?.className || "";
-      restored.setAttribute("data-i18n", "standard.default");
+      restored.setAttribute("data-i18n", "standard.default.value");
       restored.textContent =
-        (typeof t === "function" && t("standard.default")) || "Default";
+        (typeof t === "function" && t("standard.default.value")) || "Default value";
       if (labelEl) labelEl.replaceWith(restored);
       else row.insertBefore(restored, row.firstChild);
       labelEl = restored;
@@ -645,7 +656,6 @@ function maybeSwapDefaultForCode(dom, fieldType, field = {}) {
     const modalBodyEl = modal?.querySelector(".modal-body") || null;
     dom.__codeEditor = createInlineCodeMirror(dom.default, {
       mode: "javascript",
-      height: 560,
       modalBodyEl,
     });
     return;

@@ -418,7 +418,7 @@ export function setupRenderModal() {
 export function setupFieldEditModal(field, allFields, onConfirm) {
   const modal = setupModal("field-edit-modal", {
     closeBtn: "field-edit-close",
-    escToClose: true,
+    escToClose: false,
     backdropClick: true,
     width: "44em",
     height: "auto",

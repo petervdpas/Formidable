@@ -312,104 +312,6 @@
     color: var(--field-type-code-text);
 }
 
-/* LaTeX */
-.field-list-item[data-type="latex"] {
-    background-color: var(--field-type-latex-bg);
-    border-left: 4px solid var(--field-type-latex-border);
-    color: var(--field-type-latex-text);
-}
-
-.field-type.type-latex {
-    background-color: var(--field-type-latex-badge);
-    color: var(--field-type-latex-text);
-}
-
-#field-edit-modal.modal-latex {
-    background-color: var(--field-type-latex-modal);
-    border-left: 6px solid var(--field-type-latex-border);
-    color: var(--field-type-latex-text);
-}
-
-/* ───────────────────────────────
-   Inline CodeMirror in Edit Field
-   ─────────────────────────────── */
-#field-edit-modal .CodeMirror {
-    width: 100% !important;
-    height: 100px !important;
-    border: 1px solid rgba(0, 0, 0, .15);
-    border-radius: 4px;
-    color: var(--text-color, #111);
-}
-
-/* Fallback textarea before CodeMirror loads */
-#field-edit-modal textarea.code-textarea {
-    width: 100%;
-    min-height: 100px;
-}
-
-/* Keep the "Code" label aligned */
-#field-edit-modal label[for="edit-default"] {
-    align-self: flex-start;
-    padding-top: 6px;
-}
-
-/* field-edit modal: small hint under label */
-#field-edit-modal label .cm-f11-hint {
-    display: block;
-    margin-top: 4px;
-    font-size: 0.85em;
-    line-height: 1.2;
-    opacity: .75;
-    /* subtle */
-    color: var(--text-subtle, currentColor);
-}
-
-/* Inline fullscreen toggle button */
-.cm-inline-controls {
-    display: inline-flex;
-    gap: 6px;
-    margin-left: 8px;
-}
-
-.cm-inline-controls .cm-fs-btn {
-    font-size: 12px;
-    line-height: 1;
-    padding: 4px 8px;
-    cursor: pointer;
-}
-
-/* ───────────────────────────────
-   Fullscreen (inside modal)
-   ─────────────────────────────── */
-#field-edit-modal .cm-modal-fullscreen {
-    position: absolute !important;
-    top: 60px;
-    left: 20px;
-    right: 20px;
-    bottom: 20px;
-    width: auto !important;
-    height: auto !important;
-    z-index: 50;
-    border-radius: 0;
-}
-
-/* Global fullscreen (page takeover) */
-.cm-fullscreen {
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100vw !important;
-    height: 100vh !important;
-    z-index: 10000;
-    border-radius: 0 !important;
-}
-
-body.cm-no-scroll {
-    overflow: hidden !important;
-}
-
 .code-field .code-toolbar {
     display: flex;
     gap: 8px;
@@ -434,4 +336,59 @@ body.cm-no-scroll {
 
 .code-field .spinner {
     opacity: .8;
+}
+
+/* LaTeX */
+.field-list-item[data-type="latex"] {
+    background-color: var(--field-type-latex-bg);
+    border-left: 4px solid var(--field-type-latex-border);
+    color: var(--field-type-latex-text);
+}
+
+.field-type.type-latex {
+    background-color: var(--field-type-latex-badge);
+    color: var(--field-type-latex-text);
+}
+
+#field-edit-modal.modal-latex {
+    background-color: var(--field-type-latex-modal);
+    border-left: 6px solid var(--field-type-latex-border);
+    color: var(--field-type-latex-text);
+}
+
+/* Fallback textarea before CodeMirror loads */
+#field-edit-modal textarea.code-textarea {
+    width: 100%;
+    min-height: 100px;
+}
+
+/* Keep the "Code" label aligned */
+#field-edit-modal label[for="edit-default"] {
+    align-self: flex-start;
+    padding-top: 6px;
+}
+
+
+/* zero the body padding only while CM is fullscreen */
+#field-edit-modal .modal-body.cm-fs-active {
+    padding: 0 !important;
+}
+
+/* CM wrapper fills the entire modal body */
+#field-edit-modal .cm-inline.cm-modal-fullscreen {
+    position: absolute !important;
+    inset: 0 !important;
+    /* no margins */
+    z-index: 1000;
+    width: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: hidden;
+}
+
+/* scroller should fill the wrapper */
+#field-edit-modal .cm-inline.cm-modal-fullscreen .CodeMirror-scroll {
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow-y: auto !important;
 }

@@ -165,6 +165,10 @@
   color: #eee;
 }
 
+#field-edit-modal .modal-body {
+  position: relative;
+}
+
 /* Optional hover enhancement for all: */
 #field-edit-modal[class*="modal-"] .btn-close:hover {
   background-color: rgba(0, 0, 0, 0.08);
@@ -175,14 +179,16 @@
    (Code / LaTeX). Forces a two-column grid and top alignment. */
 #field-edit-modal .modal-form-row.has-stacked {
   display: grid !important;
-  grid-template-columns: var(--label-col, 220px) 1fr; /* match your form layout */
+  grid-template-columns: var(--label-col, 220px) 1fr;
+  /* match your form layout */
   column-gap: var(--form-gap, 12px);
-  align-items: start !important;          /* grid: top-align both cells */
+  align-items: start !important;
+  /* grid: top-align both cells */
 }
 
 /* Also pin both items individually (wins over any per-item styles) */
-#field-edit-modal .modal-form-row.has-stacked > label,
-#field-edit-modal .modal-form-row.has-stacked > * {
+#field-edit-modal .modal-form-row.has-stacked>label,
+#field-edit-modal .modal-form-row.has-stacked>* {
   align-self: start !important;
 }
 
@@ -218,7 +224,7 @@
   width: 16px;
 }
 
-.dynamic-table tr > td:first-child {
+.dynamic-table tr>td:first-child {
   text-align: center;
   vertical-align: middle;
 }
