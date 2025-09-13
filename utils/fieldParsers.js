@@ -194,25 +194,25 @@ export const parseTagsField = async function (wrapper) {
 };
 
 // Code (Programmable)
-export const parseCodeField = async function (wrapper) {
-  // wrapper has data-field-key/type; the persisted control is the hidden input
-  const key = wrapper?.dataset?.fieldKey;
-  const hidden = wrapper?.querySelector?.(
-    `input[type="hidden"][name="${key}"]`
-  );
+export function parseCodeField(wrapper) {
+  if (!wrapper) return null;
+  const key = wrapper.dataset?.codeField || wrapper.dataset?.fieldKey || "";
+  const hidden =
+    wrapper.querySelector(`input[type="hidden"][name="${key}"]`) ||
+    wrapper.querySelector(`input[type="hidden"]`);
+  if (!hidden) return null;
 
-  if (!hidden) return ""; // nothing to store
-
-  const raw = hidden.value ?? "";
-  // If the runner stored JSON for non-strings, try to decode; otherwise return as-is
-  try {
-    // Treat plain strings like "a-b-c" safely: JSON.parse would throw, we catch below
-    const parsed = JSON.parse(raw);
-    return parsed;
-  } catch {
-    return raw;
+  const raw = String(hidden.value ?? "");
+  if (raw === "") return ""; // keep empty as empty
+  if (hidden.dataset?.valueEncoding === "json") {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      /* fall through */
+    }
   }
-};
+  return raw;
+}
 
 // latex (hidden) — always persist the template default
 export const parseLatexField = async function (_wrapper, _template, field) {

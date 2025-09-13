@@ -431,7 +431,7 @@ fields:
         label: Peter
       - value: myAge
         label: '57'
-    run_mode: manual
+    run_mode: save
     allow_run: true
     input_mode: safe
     api_mode: frozen

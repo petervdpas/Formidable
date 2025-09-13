@@ -251,6 +251,9 @@ export function initEventRouter() {
     listHandlers.handleListHighlighted({ listId: "template-list", name })
   );
 
+  EventBus.off("code:execute", codeExecHandler.handleCodeExecute);
+  EventBus.on("code:execute", codeExecHandler.handleCodeExecute);
+
   // Form Context events
   EventBus.off("form:context:get", formCtxHandlers.handleFormContextGet);
   EventBus.off("form:context:update", formCtxHandlers.handleFormContextUpdate);
@@ -263,6 +266,7 @@ export function initEventRouter() {
   EventBus.off("form:list", formHandlers.handleListForms);
   EventBus.off("form:extendedList", formHandlers.handleExtendedListForms);
   EventBus.off("form:load", formHandlers.handleLoadForm);
+  EventBus.off("form:save:run:before", formHandlers.handleBeforeSaveRun);
   EventBus.off("form:save", formHandlers.handleSaveForm);
   EventBus.off("form:delete", formHandlers.handleDeleteForm);
   EventBus.off("form:ensureDir", formHandlers.handleEnsureFormDir);
@@ -272,6 +276,7 @@ export function initEventRouter() {
   EventBus.on("form:list", formHandlers.handleListForms);
   EventBus.on("form:extendedList", formHandlers.handleExtendedListForms);
   EventBus.on("form:load", formHandlers.handleLoadForm);
+  EventBus.on("form:save:run:before", formHandlers.handleBeforeSaveRun);
   EventBus.on("form:save", formHandlers.handleSaveForm);
   EventBus.on("form:delete", formHandlers.handleDeleteForm);
   EventBus.on("form:ensureDir", formHandlers.handleEnsureFormDir);
@@ -417,9 +422,6 @@ export function initEventRouter() {
     "vfs:getTemplateMetaFiles",
     vfsHandler.handleGetTemplateMetaFiles
   );
-
-  EventBus.off("code:execute", codeExecHandler.handleCodeExecute);
-  EventBus.on("code:execute", codeExecHandler.handleCodeExecute);
 
   EventBus.off("boot:initialize", bootHandlers.initializeFromConfig);
   EventBus.on("boot:initialize", async (config) => {

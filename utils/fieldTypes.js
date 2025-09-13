@@ -345,7 +345,7 @@ export const fieldTypes = {
     defaultValue: () => "",
     renderInput: renderers.renderCodeField,
     parseValue: parsers.parseCodeField,
-    applyValue: appliers.applyGenericField,
+    applyValue: appliers.applyCodeField,
   },
 
   latex: {

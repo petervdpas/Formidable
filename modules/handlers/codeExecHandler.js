@@ -217,6 +217,7 @@ async function executeValidatedModule({ mod, url, input, api, timeout }) {
  *   apiMode?: 'frozen'|'raw' = 'frozen',
  *   opts?: Record<string,any>,       // template options
  *   optsAsVars?: boolean = false     // expose opts as const locals
+ *   formSnapshot?: object | null    // if provided, overrides CFA.form.snapshot() for this run
  * })
  */
 export async function handleCodeExecute({
@@ -228,6 +229,7 @@ export async function handleCodeExecute({
   apiMode = "frozen",
   opts = null,
   optsAsVars = false,
+  formSnapshot = null,        // <--- NEW
 } = {}) {
   try {
     if (typeof code !== "string" || code.trim() === "") {
@@ -236,30 +238,33 @@ export async function handleCodeExecute({
 
     const preparedInput = inputMode === "raw" ? input : toSerializable(input);
 
-    // CFA → pick → (optionally) freeze
-    let preparedApi = window.CFA || {};
-    if (Array.isArray(apiPick) && apiPick.length) {
-      preparedApi = pickKeys(preparedApi, apiPick);
+    // 1) start from CFA and pick keys
+    const cfa = window.CFA || {};
+    const picked = Array.isArray(apiPick) && apiPick.length ? pickKeys(cfa, apiPick) : cfa;
+
+    // 2) make a shallow copy so we never mutate global CFA
+    let preparedApi = { ...picked };
+    if (picked.form) preparedApi.form = { ...picked.form };
+
+    // 3) if caller provided a live snapshot, override api.form.snapshot() for this run
+    if (formSnapshot) {
+      if (!preparedApi.form) preparedApi.form = {};
+      preparedApi.form.snapshot = async () => formSnapshot;
     }
+
+    // 4) (optionally) freeze the prepared API copy
     if (apiMode === "frozen") {
-      try {
-        preparedApi = deepFreeze(preparedApi);
-      } catch {}
+      try { preparedApi = deepFreeze(preparedApi); } catch {}
     }
 
-    // normalize options once
     const normalizedOpts = normalizeOpts(opts);
-
-    // prelude gives: const myVar = input?.opts?.["myVar"];
     const prelude = optsAsVars ? buildPreludeFromOpts(normalizedOpts) : "";
 
-    // compile with prelude
     const compiled = await compileForValidation(code, prelude);
     if (!compiled.ok) {
       return { ok: false, error: compiled.error || "Invalid code", logs: [] };
     }
 
-    // ensure input.opts exists and matches the locals’ values
     const finalInput = {
       ...preparedInput,
       opts: { ...(preparedInput?.opts || {}), ...normalizedOpts },

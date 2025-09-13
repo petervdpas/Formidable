@@ -6,12 +6,12 @@
   "loop_state_collapsed": true,
   "font_size": 14,
   "development_enable": true,
-  "logging_enabled": true,
+  "logging_enabled": false,
   "enable_plugins": true,
   "context_mode": "storage",
   "context_folder": "./",
   "selected_template": "basic.yaml",
-  "selected_data_file": "sane-20250530.meta.json",
+  "selected_data_file": "test-20250629.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -23,8 +23,8 @@
   "window_bounds": {
     "width": 1280,
     "height": 976,
-    "x": -1280,
-    "y": -137
+    "x": 585,
+    "y": 31
   },
   "template_sidebar_width": 364,
   "storage_sidebar_width": 431

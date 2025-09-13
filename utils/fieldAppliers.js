@@ -514,6 +514,37 @@ export function applyTagsField(container, field, value) {
   // Leave the input alone (user can keep typing)
 }
 
+// Code (Programmable)
+export function applyCodeField(container, field, value) {
+  const key = field.key;
+  const input = container.querySelector(`[name="${key}"]`);
+  if (!input) {
+    EventBus.emit("logging:warning", [
+      `[applyCodeField] Missing input for key "${key}".`,
+    ]);
+    return;
+  }
+
+  input.dataset.valueEncoding = "json";
+
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      input.value = JSON.stringify(parsed);
+    } catch {
+      input.value = value;
+    }
+  } else if (value == null) {
+    input.value = "";
+  } else {
+    try {
+      input.value = JSON.stringify(value);
+    } catch {
+      input.value = String(value);
+    }
+  }
+}
+
 // latex
 export function applyLatexField(container, field, value) {
   const key = field.key;
