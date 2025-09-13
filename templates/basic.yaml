@@ -412,7 +412,9 @@ fields:
   - key: myScript
     type: code
     label: MyScript
-    description: Path + string test
+    description: >-
+      Builds a summary from form-data: test value, sanitized key, capitalized
+      name, and truncated filename (runs on save).
     expression_item: false
     two_column: false
     default: |

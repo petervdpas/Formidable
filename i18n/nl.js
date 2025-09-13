@@ -215,6 +215,9 @@ export default {
     "`Inschakelen Verzameling` vereist minimaal één GUID-veld in het sjabloon.",
   "toast.template.save.success": "Sjabloon {0} is succesvol opgeslagen.",
 
+  "toast.code.run.ok": "Code is succesvol uitgevoerd.",
+  "toast.code.run.failed": "Uitvoeren van code is mislukt: {0}",
+
   // ── Special ─────────────────────────
   "special.html.span.small":
     "<span {key[0]}>{0}</span> <small {key[1]}>{1}</small>",
@@ -410,6 +413,8 @@ export default {
   "aria.deletePlugin": "Plugin {0} verwijderen",
   "aria.togglePlugin": "{0} plugin {1}",
   "aria.restartApp": "Herstart de applicatie",
+  "aria.code.run": "Voer code-veld uit",
+  "aria.code.output": "Code-veld uitvoer",
 
   // Fields
   "field.type": "Veldtype",
@@ -452,6 +457,22 @@ export default {
   "field.code.apipick.placeholder": "bijv. pad,string,plugin",
   "field.code.apipick.hint": "Welke API-sleutels bloot te stellen?",
   "field.code.fullscreen": "Gebruik F11 voor volledig scherm",
+
+  "field.code.badge.manual": "Handmatige uitvoering",
+  "field.code.badge.load": "Automatische uitvoering bij laden",
+  "field.code.badge.save": "Uitvoering bij opslaan",
+  "field.code.hint.readonly": "Code bevindt zich in het sjabloon (alleen-lezen).",
+  "field.code.btn.run": "Uitvoeren",
+  "field.code.status.nocode": "Geen code in sjabloon",
+  "field.code.status.running": "Bezig met uitvoeren…",
+  "field.code.status.ok": "OK",
+  "field.code.status.error": "Fout",
+  "field.code.output.current": "huidige waarde",
+  "field.code.output.result": "resultaat",
+  "field.code.output.error": "fout",
+  "field.code.desc.manual": "Klik op Uitvoeren om uit te voeren.",
+  "field.code.desc.load": "Dit script wordt uitgevoerd wanneer het formulier wordt geladen.",
+  "field.code.desc.save": "Dit script wordt uitgevoerd bij opslaan.",
 
   "field.latex.label": "LaTeX",
   "field.latex.rows": "Regels",

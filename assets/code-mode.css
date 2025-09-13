@@ -1,0 +1,120 @@
+/* ── Code Field: structure + theming via CSS vars only ───────── */
+
+/* mode badge */
+.code-mode-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.6;
+    margin-right: 8px;
+}
+
+/* badge colors per mode */
+.code-mode-badge.mode-manual {
+    background: var(--code-manual-badge-bg);
+    color: var(--code-manual-badge-fg);
+}
+
+.code-mode-badge.mode-load {
+    background: var(--code-load-badge-bg);
+    color: var(--code-load-badge-fg);
+}
+
+.code-mode-badge.mode-save {
+    background: var(--code-save-badge-bg);
+    color: var(--code-save-badge-fg);
+}
+
+/* run button tint per mode (button only visible for manual in JS) */
+.btn.run-btn.btn-mode-manual {
+    background: var(--code-manual-btn-bg);
+    color: var(--code-manual-btn-fg);
+}
+
+.btn.run-btn.btn-mode-load {
+    background: var(--code-load-btn-bg);
+    color: var(--code-load-btn-fg);
+}
+
+.btn.run-btn.btn-mode-save {
+    background: var(--code-save-btn-bg);
+    color: var(--code-save-btn-fg);
+}
+
+.btn.run-btn {
+    padding: 4px 10px;
+}
+
+/* header + hint */
+.code-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.code-hint {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+/* toolbar */
+.code-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.code-toolbar .status {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.code-toolbar .spinner {
+    font-size: 14px;
+}
+
+/* output block with per-mode background */
+.code-output {
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    white-space: pre-wrap;
+    border: 1px solid var(--code-output-border);
+    max-height: 280px;
+    overflow: auto;
+}
+
+.code-output.mode-manual {
+    background: var(--code-manual-output-bg);
+}
+
+.code-output.mode-load {
+    background: var(--code-load-output-bg);
+}
+
+.code-output.mode-save {
+    background: var(--code-save-output-bg);
+}
+
+/* wrapper accent line per mode */
+.code-field.code-mode-manual {
+    border-left: 4px solid var(--code-manual-accent);
+    padding-left: 8px;
+    border-radius: 6px;
+}
+
+.code-field.code-mode-load {
+    border-left: 4px solid var(--code-load-accent);
+    padding-left: 8px;
+    border-radius: 6px;
+}
+
+.code-field.code-mode-save {
+    border-left: 4px solid var(--code-save-accent);
+    padding-left: 8px;
+    border-radius: 6px;
+}

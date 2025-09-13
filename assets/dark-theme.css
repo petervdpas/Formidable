@@ -153,6 +153,33 @@
   --git-bg-renamed: #42351e;
   --git-bg-untracked: #2c2c2c;
   --git-bg-unknown: #1c1c1c;
+
+  /* ── Code Field (Dark) ── */
+  --code-output-border: #444;
+
+  /* Manual (muted indigo) */
+  --code-manual-badge-bg: #252a43;
+  --code-manual-badge-fg: #c7d2fe;
+  --code-manual-btn-bg: #2f365f;
+  --code-manual-btn-fg: #e0e7ff;
+  --code-manual-output-bg: #0f172a;
+  --code-manual-accent: #818cf8;
+
+  /* Load (muted cyan/sky) */
+  --code-load-badge-bg: #073642;
+  --code-load-badge-fg: #a7f3d0;
+  --code-load-btn-bg: #0b3a46;
+  --code-load-btn-fg: #cffafe;
+  --code-load-output-bg: #0b2530;
+  --code-load-accent: #38bdf8;
+
+  /* Save (muted amber) */
+  --code-save-badge-bg: #3a2a12;
+  --code-save-badge-fg: #fde68a;
+  --code-save-btn-bg: #4a3514;
+  --code-save-btn-fg: #fffbeb;
+  --code-save-output-bg: #2b1f0c;
+  --code-save-accent: #f59e0b;
 }
 
 .dark-mode body,

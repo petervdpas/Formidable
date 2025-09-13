@@ -200,6 +200,9 @@ export default {
     "`Enable Collection` requires at least one GUID field in the template.",
   "toast.template.save.success": "Template {0} was saved successfully.",
 
+  "toast.code.run.ok": "Code ran successfully.",
+  "toast.code.run.failed": "Failed to run code: {0}",
+
   // ── Special ─────────────────────────
   "special.html.span.small":
     "<span {key[0]}>{0}</span> <small {key[1]}>{1}</small>",
@@ -391,6 +394,9 @@ export default {
   "aria.togglePlugin": "{0} plugin {1}",
   "aria.restartApp": "Restart the application",
 
+  "aria.code.run": "Run code-field",
+  "aria.code.output": "Code-field output",
+
   // Fields
   "field.type": "Field Type",
   "field.format": "Field Format",
@@ -433,10 +439,27 @@ export default {
   "field.code.apipick.hint": "Which API keys to expose?",
   "field.code.fullscreen": "Use F11 for fullscreen",
 
+  "field.code.badge.manual": "Manual run",
+  "field.code.badge.load": "Auto-run on load",
+  "field.code.badge.save": "Runs on save",
+  "field.code.hint.readonly": "Code lives in the template (read-only).",
+  "field.code.btn.run": "Run",
+  "field.code.status.nocode": "No code in template",
+  "field.code.status.running": "Running…",
+  "field.code.status.ok": "OK",
+  "field.code.status.error": "Error",
+  "field.code.output.current": "current value",
+  "field.code.output.result": "result",
+  "field.code.output.error": "error",
+  "field.code.desc.manual": "Click Run to execute.",
+  "field.code.desc.load": "This script runs when the form loads.",
+  "field.code.desc.save": "This script runs on save.",
+
   "field.latex.label": "LaTeX",
   "field.latex.rows": "Rows",
   "field.latex.usefenced": "Use fenced raw block",
-  "field.latex.hint": "Inserts raw \\LaTeX; exported as a fenced {=latex} block.",
+  "field.latex.hint":
+    "Inserts raw \\LaTeX; exported as a fenced {=latex} block.",
   "field.latex.placeholder": "\\begin{center} ... \\end{center}",
   "latex.required": "LaTeX content is required.",
 

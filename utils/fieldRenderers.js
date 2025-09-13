@@ -18,6 +18,7 @@ import { showOptionPopup } from "./popupUtils.js";
 import { getCurrentTheme } from "../modules/themeToggle.js";
 import { createRemoveImageButton } from "../modules/uiButtons.js";
 import { createIconButton } from "./buttonUtils.js";
+import { t } from "../utils/i18n.js";
 
 function resolveOption(opt) {
   return typeof opt === "string"
@@ -1584,14 +1585,20 @@ export async function renderPasswordField(field, value = "") {
 }
 
 // ─────────────────────────────────────────────
-// Type: code (programmable) — plain <textarea>, no CM init
+// Type: code (programmable) — UI reflects run_mode + i18n
 export async function renderCodeField(field, value = "") {
+
   const src = field.default || null;
+  const runMode = String(
+    field.run_mode || field.runMode || "manual"
+  ).toLowerCase();
+  const allowRun = field.allow_run !== false; // default true unless explicitly false
 
   const wrapper = document.createElement("div");
-  wrapper.className = "code-field";
+  wrapper.className = `code-field code-mode-${runMode}`;
   wrapper.dataset.codeField = field.key;
 
+  // hidden value that participates in form data
   const hidden = document.createElement("input");
   hidden.type = "hidden";
   hidden.name = field.key;
@@ -1603,18 +1610,41 @@ export async function renderCodeField(field, value = "") {
     loopKey: field.loopKey || null,
   });
 
+  // header: badge (i18n) + hint (i18n)
+  const header = document.createElement("div");
+  header.className = "code-header";
+
+  const badge = document.createElement("span");
+  badge.className = `code-mode-badge mode-${runMode}`;
+  badge.textContent =
+    runMode === "load"
+      ? t("field.code.badge.load", "Auto-run on load")
+      : runMode === "save"
+      ? t("field.code.badge.save", "Runs on save")
+      : t("field.code.badge.manual", "Manual run");
+
   const hint = document.createElement("div");
   hint.className = "code-hint";
-  hint.textContent = "Code lives in the template (read-only).";
+  hint.textContent = t(
+    "field.code.hint.readonly",
+    "Code lives in the template (read-only)."
+  );
 
+  header.appendChild(badge);
+  header.appendChild(hint);
+
+  // toolbar
   const bar = document.createElement("div");
   bar.className = "code-toolbar";
 
   const runBtn = document.createElement("button");
   runBtn.type = "button";
-  runBtn.className = "btn run-btn";
-  runBtn.textContent = "Run";
-  runBtn.style.display = field.allow_run ? "" : "none";
+  runBtn.className = `btn run-btn btn-mode-${runMode}`;
+  runBtn.textContent = t("field.code.btn.run", "Run");
+  runBtn.setAttribute("aria-label", t("aria.code.run", "Run code field"));
+
+  // Only manual gets a Run button
+  runBtn.style.display = allowRun && runMode === "manual" ? "" : "none";
 
   const spinner = document.createElement("span");
   spinner.className = "spinner";
@@ -1623,31 +1653,40 @@ export async function renderCodeField(field, value = "") {
 
   const status = document.createElement("span");
   status.className = "status";
+  status.textContent = ""; // keep quiet until we have a result
 
   bar.appendChild(runBtn);
   bar.appendChild(spinner);
   bar.appendChild(status);
 
+  // output area (colored per mode)
   const out = document.createElement("pre");
-  out.className = "code-output";
+  out.className = `code-output mode-${runMode}`;
   out.setAttribute("aria-live", "polite");
+  out.setAttribute("aria-label", t("aria.code.output", "Code field output"));
 
-  // small helper to support snake_case + camelCase
+  if (value !== "" && value != null) {
+    out.textContent = `// ${t(
+      "field.code.output.current",
+      "current value"
+    )}\n${fmt(value)}`;
+  }
+
+  // helper: snake_case + camelCase
   const pick = (obj, ...keys) => {
-    for (const k of keys) if (obj[k] !== undefined) return obj[k];
+    for (const k of keys) if (obj && obj[k] !== undefined) return obj[k];
     return undefined;
   };
 
   async function doRun() {
-    if (!src) {
-      status.textContent = "No code in template";
+    if (!src || !String(src).trim()) {
+      status.textContent = t("field.code.status.nocode", "No code in template");
       out.textContent = "";
       return;
     }
 
     spinner.style.display = "inline-block";
-    status.textContent = "Running…";
-    out.textContent = "";
+    status.textContent = t("field.code.status.running", "Running…");
 
     const emitWithResponse =
       (typeof window !== "undefined" && window.emitWithResponse) ||
@@ -1676,40 +1715,64 @@ export async function renderCodeField(field, value = "") {
       api: window.CFA || {},
       apiPick,
       apiMode,
-      opts: opts,
+      opts,
       optsAsVars: Array.isArray(field.options) && field.options.length > 0,
     };
 
     const res = await emitWithResponse("code:execute", payload);
 
     spinner.style.display = "none";
-    status.textContent = res?.ok ? "OK" : "Error";
+    const ok = !!res?.ok;
+    status.textContent = ok
+      ? t("field.code.status.ok", "OK")
+      : t("field.code.status.error", "Error");
 
     const lines = [];
     if (res?.logs?.length) lines.push(`// console\n${res.logs.join("\n")}`);
     lines.push(
-      res?.ok
-        ? `// result\n${fmt(res.result)}`
-        : `// error\n${String(res?.error ?? "Unknown error")}`
+      ok
+        ? `// ${t("field.code.output.result", "result")}\n${fmt(res.result)}`
+        : `// ${t("field.code.output.error", "error")}\n${String(
+            res?.error ?? "Unknown error"
+          )}`
     );
     out.textContent = lines.join("\n\n");
 
-    if (res?.ok) {
+    if (ok) {
       hidden.value = encode(res.result);
       hidden.dispatchEvent(new Event("input", { bubbles: true }));
       hidden.dispatchEvent(new Event("change", { bubbles: true }));
     }
+
+    // Toasts only for manual runs
+    if (runMode === "manual") {
+      EventBus.emit(
+        "ui:toast",
+        ok
+          ? {
+              languageKey: "toast.code.run.ok",
+              variant: "success",
+              duration: 2500,
+            }
+          : {
+              languageKey: "toast.code.run.failed",
+              args: [String(res?.error ?? "Unknown error")],
+              variant: "error",
+              duration: 4000,
+            }
+      );
+    }
   }
 
-  if (
-    String(field.run_mode || "manual").toLowerCase() === "load" &&
-    field.allow_run
-  ) {
+  // Auto-run for load
+  if (runMode === "load" && allowRun) {
     queueMicrotask(doRun);
   }
+
   runBtn.addEventListener("click", doRun);
 
-  wrapper.appendChild(hint);
+  // assemble
+  wrapper.appendChild(header);
   wrapper.appendChild(bar);
   wrapper.appendChild(out);
   wrapper.appendChild(hidden);
@@ -1723,11 +1786,17 @@ export async function renderCodeField(field, value = "") {
   return wrapInputWithLabel(
     wrapper,
     field.label || "Code",
-    field.description || "Runs the template’s script",
+    field.description ||
+      (runMode === "save"
+        ? t("field.code.desc.save", "This script runs on save.")
+        : runMode === "load"
+        ? t("field.code.desc.load", "This script runs when the form loads.")
+        : t("field.code.desc.manual", "Click Run to execute.")),
     field.two_column,
     field.wrapper || "form-row"
   );
 
+  // helpers
   function fmt(v) {
     try {
       return typeof v === "string" ? v : JSON.stringify(v, null, 2);
@@ -1739,13 +1808,11 @@ export async function renderCodeField(field, value = "") {
     if (v == null) return "";
     return typeof v === "string" ? v : JSON.stringify(v);
   }
-
   function optsToObject(opts) {
     if (!opts) return {};
     const out = {};
     if (Array.isArray(opts)) {
       for (const it of opts) {
-        // Support {value,label}
         if (it && typeof it === "object") {
           if ("value" in it) {
             const k = String(it.value).trim();

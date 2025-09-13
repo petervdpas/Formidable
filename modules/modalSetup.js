@@ -78,8 +78,8 @@ export function setupSettingsModal() {
     escToClose: true,
     backdropClick: true,
     resizable: false,
-    width: "36em",
-    height: "340px",
+    width: "40em",
+    height: "22em",
 
     onOpen: async (_el, api) => {
       // disable while initializing
