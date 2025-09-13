@@ -332,7 +332,8 @@ export async function renderTextareaField(field, value = "") {
   });
 
   // Prevent HTML interpretation
-  textarea.textContent = v;
+  // textarea.textContent = v;
+  textarea.value = v;
 
   applyFieldContextAttributes(textarea, {
     key: field.key,
@@ -442,6 +443,9 @@ export async function renderTextareaField(field, value = "") {
       autoDownloadFontAwesome: false,
     });
 
+    // Make the instance discoverable for the applier
+    textarea.__mde = editorInstance;
+
     const cm = editorInstance.codemirror;
     cm.on("keydown", () => {
       keystrokeCount++;
@@ -450,6 +454,16 @@ export async function renderTextareaField(field, value = "") {
       textarea.value = editorInstance.value();
       editorInstance.updateStatusBar();
     });
+
+    // Initial value already in textarea.value; ensure CM sees correct layout
+    setTimeout(() => cm.refresh(), 0);
+
+    // Optional: refresh when wrapper becomes visible (tabs/accordions)
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries)
+        if (e.isIntersecting) setTimeout(() => cm.refresh(), 0);
+    });
+    io.observe(wrapper);
   });
 
   return wrapInputWithLabel(
@@ -1763,7 +1777,6 @@ export async function renderCodeField(field, value = "") {
 // ─────────────────────────────────────────────
 // Type: latex (stored value only; hidden in forms)
 export async function renderLatexField(field, value = "") {
-
   console.log("Rendering LaTeX field:", field, value);
 
   const v = (value ?? field.default ?? "").toString();

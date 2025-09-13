@@ -200,7 +200,7 @@ export const fieldTypes = {
     defaultValue: () => "",
     renderInput: renderers.renderTextareaField,
     parseValue: parsers.parseTextareaField,
-    applyValue: appliers.applyGenericField,
+    applyValue: appliers.applyTextareaField,
   },
 
   number: {

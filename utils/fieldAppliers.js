@@ -21,6 +21,31 @@ export function applyGuidField(container, field, value) {
   input.value = value != null ? String(value) : "";
 }
 
+// textarea (with or without EasyMDE)
+export function applyTextareaField(container, field, value) {
+  const key = field.key;
+  const ta = container.querySelector(`textarea[name="${key}"]`);
+  if (!ta) return;
+
+  const next = value != null ? String(value) : "";
+
+  // Update the underlying textarea
+  ta.value = next;
+
+  // If EasyMDE is attached, update the visible editor too
+  const mde = ta.__mde;
+  if (mde && typeof mde.value === "function") {
+    // Avoid useless change events when same
+    if (mde.value() !== next) {
+      mde.value(next);
+      // Keep status bar accurate and layout correct
+      mde.updateStatusBar();
+      mde.codemirror && mde.codemirror.refresh();
+    }
+  }
+}
+
+// range field
 export function applyRangeField(
   container,
   field,
