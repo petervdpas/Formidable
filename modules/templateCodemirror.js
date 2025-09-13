@@ -45,8 +45,15 @@ export function initCodeMirror(textarea, initialValue = "") {
 
   if (main.cm) main.cm.toTextArea();
 
+  const wrapper = textarea.closest(".editor-wrapper");
+  const COMPACT_H = parseInt(
+    getComputedStyle(document.documentElement)
+      .getPropertyValue("--editor-compact-h")
+      .trim() || "220",
+    10
+  );
+
   main.cm = CodeMirror.fromTextArea(textarea, {
-    initialValue,
     mode: "yaml",
     theme: THEME(),
     lineNumbers: true,
@@ -56,16 +63,25 @@ export function initCodeMirror(textarea, initialValue = "") {
     autofocus: true,
   });
 
+  // Defer listener attach until the instance is definitely alive
   requestAnimationFrame(() => {
-    main.cm.refresh();
-    main.cm.setValue(initialValue || textarea.value || "");
-    main.cm.setSize("100%", "100%");
+    if (main.cm && typeof main.cm.on === "function") {
+      main.cm.on("blur", () => main.cm.save());
+    }
   });
 
-  main.wrapper = textarea.closest(".editor-wrapper");
+  requestAnimationFrame(() => {
+    main.cm.setValue(initialValue || textarea.value || "");
+    main.cm.setSize("100%", COMPACT_H);
+    main.cm.refresh();
+  });
 
-  // ── NEW: track main editor for retheming
+  main.wrapper = wrapper;
   registry.main = main.cm;
+
+  textarea.addEventListener("blur", () => {
+    if (main.cm && typeof main.cm.save === "function") main.cm.save();
+  });
 
   return main.cm;
 }

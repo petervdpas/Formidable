@@ -16,34 +16,31 @@
 
 .editor-wrapper {
   width: auto;
-  min-height: 60px;
-  max-height: 100px;
-  overflow: auto;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--input-border-color);
+  max-height: var(--editor-compact-h);
+  overflow: hidden;
 }
 
 .CodeMirror {
   flex: 1;
   width: auto;
-  height: 100% !important;
-  max-height: inherit;
-  overflow: auto; /* ✅ native scrollbars */
+  height: var(--editor-compact-h); /* fixed compact height */
   font-size: 14px;
+  overflow: hidden;
 }
 
 .editor-wrapper .CodeMirror-scroll {
-  max-height: 100px;
+  height: calc(var(--editor-compact-h) - 2px);
+  max-height: calc(var(--editor-compact-h) - 2px);
   overflow-y: auto;
 }
 
+/* Fullscreen overrides — keep these */
 .editor-wrapper.fullscreen {
   position: fixed;
-  top: 20px;
-  bottom: 20px;
-  left: 20px;
-  right: 20px;
+  inset: 20px;
   z-index: 9999;
   display: flex;
   flex-direction: column;
@@ -57,7 +54,6 @@
 }
 
 .editor-wrapper.fullscreen .CodeMirror {
-  flex: 1;
   height: 100% !important;
 }
 
@@ -78,4 +74,3 @@
   border-radius: 4px;
   pointer-events: none;
 }
-

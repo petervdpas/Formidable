@@ -1,5 +1,7 @@
 /* ───── Light Theme (default) ───── */
 :root {
+  --editor-compact-h: 140px;
+
   --text-color: #111;
   --text-description: #666;
   --input-border-color: #ccc;
