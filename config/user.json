@@ -8,10 +8,10 @@
   "development_enable": true,
   "logging_enabled": false,
   "enable_plugins": true,
-  "context_mode": "template",
+  "context_mode": "storage",
   "context_folder": "./",
-  "selected_template": "basic.yaml",
-  "selected_data_file": "sane-20250530.meta.json",
+  "selected_template": "loopie.yaml",
+  "selected_data_file": "test-20250711.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -23,9 +23,9 @@
   "window_bounds": {
     "width": 1280,
     "height": 976,
-    "x": 423,
-    "y": 38
+    "x": 411,
+    "y": 0
   },
   "template_sidebar_width": 374,
-  "storage_sidebar_width": 417
+  "storage_sidebar_width": 395
 }

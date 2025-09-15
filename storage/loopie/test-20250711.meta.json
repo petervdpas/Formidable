@@ -4,12 +4,12 @@
     "author_email": "regular@example.com",
     "template": "loopie.yaml",
     "created": "2025-07-11T06:10:16.683Z",
-    "updated": "2025-09-13T02:11:24.086Z",
+    "updated": "2025-09-14T23:45:19.117Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "title": "This is the main title....",
+    "title": "This is the main title.",
     "looper": [
       {
         "inloop_title": "Once upon a time...",

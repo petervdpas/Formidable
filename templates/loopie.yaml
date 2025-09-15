@@ -90,8 +90,8 @@ markdown_template: |-
 
   {{/loop}}
 sidebar_expression: >-
-  [ title | { text: title, classes: ["expr-text-white", "expr-bold",
-  "expr-ticker"] } ]
+  [ title | { text: "expression: " + title, classes: ["expr-text-purple",
+  "expr-bold", "expr-ticker"] } ]
 enable_collection: false
 fields:
   - key: title

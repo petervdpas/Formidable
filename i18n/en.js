@@ -460,7 +460,7 @@ export default {
   "field.latex.rows": "Rows",
   "field.latex.usefenced": "Use fenced raw block",
   "field.latex.hint":
-    "Inserts raw \\LaTeX; exported as a fenced {=latex} block.",
+    "Inserts raw LaTeX; exported as a fenced {=latex} block.",
   "field.latex.placeholder": "\\begin{center} ... \\end{center}",
   "latex.required": "LaTeX content is required.",
 

@@ -1,0 +1,61 @@
+/* Base layout & utilities */
+:root{
+  --bar-h:64px; --bar-bg:#0f172a; --bar-fg:#e2e8f0; --bar-muted:#94a3b8;
+  --input-bg:#fff; --input-bd:#cfd4da; --input-fg:#0f172a;
+}
+
+body{
+  font-family:system-ui, sans-serif; background:#f9f9f9; color:#333;
+  padding:2rem; max-width:960px; margin:2rem auto; line-height:1.6;
+}
+
+h1{ color:#4a90e2; margin-top:0; }
+h2,h3,h4{ color:#333; margin:1.5em 0 .5em; }
+p{ margin-bottom:1em; }
+a{ color:#4a90e2; text-decoration:none; }
+a:hover{ text-decoration:underline; }
+
+footer{ margin-top:3rem; font-size:.85rem; color:#aaa; text-align:center; }
+
+/* keep content images scoped so header assets aren’t affected */
+.page-wrap img{ max-width:100%; height:auto; display:block; margin:1.5em auto; }
+
+/* code & tables */
+code{ background:#eee; padding:.2em .4em; border-radius:3px; font-family:Consolas,ui-monospace,Menlo,monospace; font-size:.95em; }
+pre{ background:#eee; padding:1em; border-radius:4px; overflow-x:auto; }
+.hljs{ background:transparent; }
+pre.hljs{ background:#f6f8fa; border-radius:6px; padding:1em; overflow-x:auto; }
+pre.hljs code{ background:transparent; padding:0; }
+
+table{ border-collapse:collapse; width:100%; margin:1em 0; }
+th, td{ border:1px solid #ccc; padding:8px 12px; text-align:left; }
+th{ background:#f0f0f0; }
+
+/* lists + tiles */
+ul{ list-style:disc; margin:1em 0; padding-left:2em; }
+ul ul{ list-style:circle; }
+ul li, ol li{ margin-bottom:.5em; }
+ol{ list-style:decimal; margin:1em 0; padding-left:2em; }
+ol ol{ list-style:lower-alpha; margin-top:.5em; }
+
+ul.template-list, ul.form-picker-list{ list-style:none; padding-left:0; margin:1em 0; }
+ul.template-list li.template-item, ul.form-picker-list li.form-picker-item{ margin-bottom:.3em; }
+ul.template-list a, ul.form-picker-list a{
+  display:block; padding:.6em .8em; border-radius:6px; text-decoration:none; color:#333;
+  background:#eceff3; border:1px solid #cfd4da; transition:background-color .2s, border-color .2s, box-shadow .2s;
+}
+ul.template-list a:hover, ul.form-picker-list a:hover{
+  background:#e3ebff; border-color:#4a90e2; color:#2a5fbf; box-shadow:0 1px 0 rgba(0,0,0,.02);
+}
+ul.template-list a.selected, ul.form-picker-list a.selected{ background:#d7e2f7; border-color:#4a90e2; font-weight:600; }
+
+.form-link-title{ font-weight:500; }
+.expr-wrapper{ width:100%; font-size:.9em; }
+
+/* Make room for fixed header */
+.page-wrap{ padding-top: calc(var(--bar-h) + 16px); }
+
+/* hide inline tag badges everywhere (you said no visible tags) */
+.tag-badges{ display:none !important; }
+.inline-tag{ display:none !important; } /* if markdown rendered #tags */
+.hidden{ display:none !important; }

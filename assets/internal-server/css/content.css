@@ -1,0 +1,108 @@
+/* layout inside each tile */
+.form-link-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+ul.form-picker-list a.form-link {
+    display: flex;
+    flex-direction: column;
+    gap: .2em;
+}
+
+
+/* wiki links */
+a.wiki-link {
+    color: #6a2fb8;
+    font-weight: 600;
+    border-bottom: 1px dashed #aaa;
+}
+
+a.wiki-link:hover {
+    color: #4a90e2;
+    background: #f2f2ff;
+}
+
+/* ─────────────────────────────────────────────
+   Semantic Colors
+───────────────────────────────────────────── */
+.expr-text-green   { color: green; }
+.expr-text-blue    { color: blue; }
+.expr-text-red     { color: red; }
+.expr-text-orange  { color: orange; }
+.expr-text-yellow  { color: goldenrod; }
+
+/* ─────────────────────────────────────────────
+   Neutral & Grayscale
+───────────────────────────────────────────── */
+.expr-text-black      { color: black; }
+.expr-text-white      { color: white; }
+.expr-text-gray       { color: gray; }
+.expr-text-darkgray   { color: #444; }
+.expr-text-lightgray  { color: #ccc; }
+
+/* ─────────────────────────────────────────────
+   Accent / UI Colors
+───────────────────────────────────────────── */
+.expr-text-purple  { color: purple; }
+.expr-text-pink    { color: hotpink; }
+.expr-text-cyan    { color: cyan; }
+.expr-text-teal    { color: teal; }
+.expr-text-brown   { color: brown; }
+.expr-text-gold    { color: gold; }
+.expr-text-silver  { color: silver; }
+
+.expr-bold {
+    font-weight: bold;
+}
+
+.expr-italic {
+    font-style: italic;
+}
+
+.expr-underline {
+    text-decoration: underline;
+}
+
+@keyframes blinkingText {
+    0% {
+        opacity: 1
+    }
+
+    49% {
+        opacity: 0
+    }
+
+    100% {
+        opacity: 1
+    }
+}
+
+.expr-blinking {
+    animation: blinkingText 1.2s infinite;
+}
+
+.expr-ticker-container {
+    overflow: hidden;
+    position: relative;
+    max-width: 100%;
+}
+
+.expr-ticker {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 1.5em auto;
+}
+
+pre:not(.hljs) {
+    background: #eee;
+    padding: 1em;
+    border-radius: 4px;
+    overflow-x: auto;
+}

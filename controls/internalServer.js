@@ -36,25 +36,48 @@ function startInternalServer(port = 8383) {
   const app = express(); // <-- this is the Express app (no clash now)
 
   // storage (as before)
-  app.use("/storage",
+  app.use(
+    "/storage",
     express.static(path.resolve(configManager.getContextStoragePath()))
   );
 
   // ----- Assets dir: packaged vs dev
-  const assetsDir = electronApp && electronApp.isPackaged
-    ? path.join(process.resourcesPath, "assets")
-    : path.join(__dirname, "../assets");
+  const assetsDir =
+    electronApp && electronApp.isPackaged
+      ? path.join(process.resourcesPath, "assets")
+      : path.join(__dirname, "../assets");
 
-  log(`[InternalServer] assetsDir = ${assetsDir}`);
+  const isDev = !(electronApp && electronApp.isPackaged);
+  log(`[InternalServer] assetsDir = ${assetsDir} | dev=${isDev}`);
 
-  // static mount
-  app.use("/assets", express.static(assetsDir, { maxAge: "7d", etag: true }));
+  if (isDev) {
+    // DEV: never cache
+    app.use(
+      "/assets",
+      express.static(assetsDir, {
+        etag: false,
+        lastModified: false,
+        cacheControl: false,
+        maxAge: 0,
+        setHeaders: (res) => res.setHeader("Cache-Control", "no-store"),
+      })
+    );
+  } else {
+    // PROD: cache for a while (safe because we’ll bust with a version query)
+    app.use(
+      "/assets",
+      express.static(assetsDir, {
+        etag: true,
+        maxAge: "30d",
+      })
+    );
+  }
 
   // favicon at root (browsers auto-hit /favicon.ico)
   app.get("/favicon.ico", (req, res) =>
     res.sendFile(path.join(assetsDir, "formidable.ico"))
   );
-  
+
   // Index Page (HTML)
   app.get("/", async (req, res) => {
     const vfs = await getVirtualStructure();
@@ -105,26 +128,36 @@ function startInternalServer(port = 8383) {
       res.status(404).send(
         renderPage({
           title: "Template Not Found",
-          body: `<p>Template "${tmpl}" not found.</p><p><a href="/">Back to Home</a></p>`,
+          body: `<p>Template "${escapeHtml(
+            tmpl
+          )}" not found.</p>`,
           footerNote: `Running on port ${currentPort}`,
         })
       );
       return;
     }
 
-    // Use extended list to get titles
+    // Source data
     const forms = await extendedListForms(templateInfo.filename);
     const yaml = await loadTemplateYaml(templateInfo.filename);
     const sidebarExpr = yaml?.sidebar_expression || null;
+    const templateDisplayName = (yaml?.name || tmpl).toString().trim();
 
     const formLinks = forms
       .map((form) => {
         const href = `/template/${encodeURIComponent(
           tmpl
         )}/form/${encodeURIComponent(form.filename)}`;
-        const title = form.title || form.filename;
 
-        // Try to compute the sidebar expression text, if configured
+        const title = (form.title || form.filename || "").toString();
+        const tagsArr =
+          (Array.isArray(form.tags) && form.tags) ||
+          (Array.isArray(form.meta?.tags) && form.meta.tags) ||
+          (Array.isArray(form.data?.meta?.tags) && form.data.meta.tags) ||
+          [];
+
+        const tagAttr = tagsArr.map((t) => String(t).toLowerCase()).join(" ");
+
         let exprHtml = "";
         if (sidebarExpr && form.expressionItems) {
           try {
@@ -149,25 +182,30 @@ function startInternalServer(port = 8383) {
           }
         }
 
-        return `<li class="form-picker-item">
-          <a href="${href}" class="form-link">
-            <span class="form-link-title">${escapeHtml(title)}</span>
-            ${exprHtml ? `<span class="expr-wrapper">${exprHtml}</span>` : ""}
-          </a>
-        </li>`;
+        return `<li class="form-picker-item" data-tags="${escapeHtml(tagAttr)}">
+      <a href="${href}" class="form-link">
+        <span class="form-link-title">${escapeHtml(title)}</span>
+        ${exprHtml ? `<span class="expr-wrapper">${exprHtml}</span>` : ""}
+      </a>
+    </li>`;
       })
       .join("");
 
+    // Expose friendly names for crumbs.js
+    const pageMeta = {
+      templateId: tmpl,
+      templateName: templateDisplayName,
+    };
+
     const body = `
-      <p><a href="/">⬅ Back to Home</a></p>
-      <p>Template: <strong>${tmpl}</strong></p>
-      <h2>Forms</h2>
-      <ul class="form-picker-list">${formLinks}</ul>
-    `;
+    <script>window.__FORMIDABLE__ = ${JSON.stringify(pageMeta)};</script>
+    <h2>Available Forms</h2>
+    <ul class="form-picker-list">${formLinks}</ul>
+  `;
 
     res.send(
       renderPage({
-        title: `Template: ${tmpl}`,
+        title: `Template: ${templateDisplayName}`,
         body,
         footerNote: `Running on port ${currentPort}`,
       })
@@ -205,14 +243,16 @@ function startInternalServer(port = 8383) {
       res.status(404).send(
         renderPage({
           title: "Template Not Found",
-          body: `<p>Template "${tmpl}" not found or invalid.</p><p><a href="/">Back to Home</a></p>`,
+          body: `<p>Template "${escapeHtml(
+            tmpl
+          )}" not found or invalid.</p>`,
           footerNote: `Running on port ${currentPort}`,
         })
       );
       return;
     }
 
-    const { form, md, html } = await loadAndRenderForm(
+    const { form, html } = await loadAndRenderForm(
       templateInfo.filename,
       formFile
     );
@@ -221,24 +261,45 @@ function startInternalServer(port = 8383) {
       res.status(404).send(
         renderPage({
           title: "Form Not Found",
-          body: `<p>Form "${formFile}" not found in template "${tmpl}".</p><p><a href="/">Back to Home</a></p>`,
+          body: `<p>Form "${escapeHtml(
+            formFile
+          )}" not found in template "${escapeHtml(
+            tmpl
+          )}".</p>`,
           footerNote: `Running on port ${currentPort}`,
         })
       );
       return;
     }
 
+    // Read template YAML to determine item field + friendly template name
+    const yaml = await loadTemplateYaml(templateInfo.filename);
+    const templateDisplayName = (yaml?.name || tmpl).toString().trim();
+    const itemFieldKey =
+      (yaml?.item_field || yaml?.itemField || "").toString().trim() || null;
+
+    // Friendly form title: precomputed -> item field value -> filename
+    const formTitle =
+      form?.title ||
+      (itemFieldKey && form?.data && form.data[itemFieldKey]) ||
+      formFile;
+
+    // Expose meta for crumbs.js
+    const pageMeta = {
+      templateId: tmpl,
+      templateName: templateDisplayName,
+      formFile,
+      formTitle: String(formTitle),
+    };
+
     const body = `
-      <p><a href="/template/${encodeURIComponent(
-        tmpl
-      )}">⬅ Back to Template</a></p>
-      <h2>Form: ${formFile}</h2>
-      <article>${html}</article>
-    `;
+    <script>window.__FORMIDABLE__ = ${JSON.stringify(pageMeta)};</script>
+    <article>${html}</article>
+  `;
 
     res.send(
       renderPage({
-        title: `Form: ${formFile}`,
+        title: `Form: ${String(formTitle)}`,
         body,
         footerNote: `Running on port ${currentPort}`,
       })
