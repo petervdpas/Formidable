@@ -28,6 +28,8 @@ export default {
   "config.show_meta_section": "Show Meta Section",
 
   // ── Status Bar Buttons ─────────────────────
+  "status.buttonBar.tooltip.reload": "Reload",
+  "status.buttonBar.aria.reload": "Reload the page",
   "status.buttonBar.tooltip.gitQuick": "Quick Git",
   "status.buttonBar.aria.gitQuick": "Open Quick Git actions",
   "status.buttonBar.tooltip.characterPicker": "Character Picker",

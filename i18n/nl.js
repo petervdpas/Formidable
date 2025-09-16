@@ -28,8 +28,10 @@ export default {
   "config.show_meta_section": "Toon Meta Sectie",
 
   // ── Status Bar Buttons ─────────────────────
-  "status.buttonBar.tooltip.gitQuick": "Quick Git Acties",
-  "status.buttonBar.aria.gitQuick": "Open Quick Git acties",
+  "status.buttonBar.tooltip.reload": "Herlaad",
+  "status.buttonBar.aria.reload": "Herlaad de pagina",
+  "status.buttonBar.tooltip.gitQuick": "Snelle Git Acties",
+  "status.buttonBar.aria.gitQuick": "Open Snelle Git acties",
   "status.buttonBar.tooltip.characterPicker": "Karakterkiezer",
   "status.buttonBar.aria.characterPicker": "Open Karakterkiezer",
 

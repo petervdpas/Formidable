@@ -34,11 +34,39 @@ function createStatusGitQuickButtonConfig(onClick) {
   });
 }
 
+// Helpers
 function getFlag(cfg, path, fallback = true) {
   const val = path
     .split(".")
     .reduce((o, k) => (o && o[k] !== undefined ? o[k] : undefined), cfg);
   return typeof val === "boolean" ? val : fallback;
+}
+
+function installActionButton(
+  { addStatusButton, config },
+  {
+    flagKey,
+    id,
+    labelKey,
+    fallbackLabel,
+    iconClass,
+    titleKey,
+    ariaKey,
+    className,
+    action,
+  }
+) {
+  if (!getFlag(config, flagKey, true)) return null;
+  const cfg = createStatusButtonConfig({
+    id,
+    label: t(labelKey) || fallbackLabel,
+    iconClass,
+    titleKey,
+    ariaKey,
+    className,
+    onClick: action,
+  });
+  return addStatusButton(cfg);
 }
 
 // --- shared: reuse the same popup host and avoid duplicates ---
@@ -57,7 +85,33 @@ function openSharedPopup(triggerBtn, node, { onClose } = {}) {
   return popup;
 }
 
+function createStatusReloadButtonConfig(onClick) {
+  return createStatusButtonConfig({
+    id: "status-reload-btn",
+    label: t("status.buttonBar.aria.reload") || "Reload",
+    iconClass: "fa fa-refresh", // classic FA
+    titleKey: "status.buttonBar.tooltip.reload",
+    ariaKey: "status.buttonBar.aria.reload",
+    className: "btn-reload",
+    onClick,
+  });
+}
+
 // ===================== installers =====================
+function installReloadButton(deps) {
+  return installActionButton(deps, {
+    flagKey: "status_buttons.reload",
+    id: "status-reload-btn",
+    labelKey: "status.buttonBar.aria.reload",
+    fallbackLabel: "Reload",
+    iconClass: "fa fa-refresh",
+    titleKey: "status.buttonBar.tooltip.reload",
+    ariaKey: "status.buttonBar.aria.reload",
+    className: "btn-reload",
+    action: () => window.location.reload(),
+  });
+}
+
 function installCharPickerButton({ addStatusButton, EventBus, config }) {
   if (!getFlag(config, "status_buttons.charpicker", true)) return null;
 
@@ -186,5 +240,6 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
 export function installStatusButtons(deps) {
   const charBtn = installCharPickerButton(deps);
   const gitBtn = installGitQuickButton(deps);
-  return { charBtn, gitBtn };
+  const reloadBtn = installReloadButton(deps);
+  return { charBtn, gitBtn, reloadBtn };
 }
