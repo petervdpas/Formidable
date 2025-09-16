@@ -12,6 +12,7 @@ const cssEscape = (s) =>
 export function createStatusButtonConfig({
   id,
   label,
+  iconClass = "",
   titleKey = "",
   title = "",
   className = "",
@@ -23,6 +24,7 @@ export function createStatusButtonConfig({
   return {
     id,
     label,
+    iconClass,
     title: titleKey ? t(titleKey) : title,
     className,
     onClick,
@@ -42,6 +44,7 @@ export function createStatusButton(container, cfg = {}) {
   const {
     id,
     label = "•",
+    iconClass = "",
     title = "",
     className = "",
     onClick,
@@ -68,13 +71,28 @@ export function createStatusButton(container, cfg = {}) {
   btn.id = id;
   btn.className = `statusbar-button ${className}`.trim();
   btn.title = title;
-  btn.textContent = label;
 
   if (ariaLabel) btn.setAttribute("aria-label", ariaLabel);
 
   // apply extra attrs (e.g., data-* hooks)
   for (const [k, v] of Object.entries(attributes)) {
     btn.setAttribute(k, v);
+  }
+
+  // Content: FA icon + SR-only label (fallback to text if no icon)
+  if (iconClass) {
+    const i = document.createElement("i");
+    i.className = iconClass;
+    i.setAttribute("aria-hidden", "true");
+    btn.appendChild(i);
+    if (label) {
+      const sr = document.createElement("span");
+      sr.className = "sr-only";
+      sr.textContent = label;
+      btn.appendChild(sr);
+    }
+  } else {
+    btn.textContent = label;
   }
 
   if (typeof onClick === "function") {

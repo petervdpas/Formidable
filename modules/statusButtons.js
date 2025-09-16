@@ -14,7 +14,8 @@ import { createStatusButtonConfig } from "../utils/buttonUtils.js";
 function createStatusCharPickerButtonConfig(onClick) {
   return createStatusButtonConfig({
     id: "status-charpicker-btn",
-    label: "Ω",
+    label: t("status.buttonBar.aria.characterPicker") || "Character picker",
+    iconClass: "fa fa-i-cursor",
     titleKey: "status.buttonBar.tooltip.characterPicker",
     ariaKey: "status.buttonBar.aria.characterPicker",
     className: "btn-charpicker",
@@ -24,7 +25,8 @@ function createStatusCharPickerButtonConfig(onClick) {
 function createStatusGitQuickButtonConfig(onClick) {
   return createStatusButtonConfig({
     id: "status-gitquick-btn",
-    label: "⎇",
+    label: t("status.buttonBar.aria.gitQuick") || "Git quick actions",
+    iconClass: "fa fa-code-fork",
     titleKey: "status.buttonBar.tooltip.gitQuick",
     ariaKey: "status.buttonBar.aria.gitQuick",
     className: "btn-gitquick",
