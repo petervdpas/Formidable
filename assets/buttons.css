@@ -77,7 +77,6 @@ button:disabled,
   border-color: var(--generic-border-default);
   color: var(--generic-fg-default);
 }
-
 .btn-default:hover {
   background-color: var(--generic-bg-default-hover);
   border-color: var(--generic-border-default-hover);
@@ -89,7 +88,6 @@ button:disabled,
   border-color: var(--generic-border-success);
   color: var(--generic-fg-success);
 }
-
 .btn-okay:hover {
   background-color: var(--generic-bg-success-hover);
   border-color: var(--generic-border-success-hover);
@@ -101,7 +99,6 @@ button:disabled,
   border-color: var(--generic-border-info);
   color: var(--generic-fg-info);
 }
-
 .btn-info:hover {
   background-color: var(--generic-bg-info-hover);
   border-color: var(--generic-border-info-hover);
@@ -113,7 +110,6 @@ button:disabled,
   border-color: var(--generic-border-warn);
   color: var(--generic-fg-warn);
 }
-
 .btn-warn:hover {
   background-color: var(--generic-bg-warn-hover);
   border-color: var(--generic-border-warn-hover);
@@ -125,11 +121,33 @@ button:disabled,
   border-color: var(--generic-border-error);
   color: var(--generic-fg-error);
 }
-
 .btn-danger:hover {
   background-color: var(--generic-bg-error-hover);
   border-color: var(--generic-border-error-hover);
   color: var(--generic-fg-error-hover);
+}
+
+.btn-primary {
+  background-color: var(--generic-bg-info);
+  border-color: var(--generic-border-info);
+  color: var(--generic-fg-info);
+}
+.btn-primary:hover {
+  background-color: var(--generic-bg-info-hover);
+  border-color: var(--generic-border-info-hover);
+  color: var(--generic-fg-info-hover);
+}
+
+/* quiet = subtle/ghost-like button */
+.btn-quiet {
+  background: transparent !important;
+  border: 1px solid transparent;
+  color: var(--generic-fg-default);
+}
+.btn-quiet:hover {
+  background-color: var(--generic-bg-default-hover);
+  border-color: var(--generic-border-default-hover);
+  color: var(--generic-fg-default-hover);
 }
 
 /* ───── Icon Buttons ───── */

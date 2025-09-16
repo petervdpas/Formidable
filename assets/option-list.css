@@ -1,29 +1,26 @@
 /* option-list.css */
-:root {
-  --opt-bg: var(--popup-bg, var(--input-bg, #fff));
-  --opt-fg: var(--popup-fg, var(--input-fg, #222));
-  --opt-hover: var(--popup-hover, #f2f2f2);
-  --opt-border: var(--popup-border, var(--input-border-color, #ccc));
-  --opt-gap: 6px;
-  --opt-radius: 6px;
-}
 
 .option-list {
   box-sizing: border-box;
   font-family: inherit;
   font-size: 0.9em;
-  color: var(--opt-fg);
-  background: var(--opt-bg);
-  border: 1px solid var(--opt-border);
-  border-radius: var(--opt-radius);
-  padding: var(--opt-gap);
+  color: var(--popup-fg);
+  background: var(--popup-bg);
+  border: 1px solid var(--popup-border);
+  border-radius: 6px;
+  padding: 6px;
 
   display: flex;
   flex-direction: column;
-  gap: calc(var(--opt-gap) - 2px);
+  gap: 4px;
 }
 
-.option-list.compact { --opt-gap: 4px; --opt-radius: 4px; font-size: 0.85em; }
+.option-list.compact {
+  font-size: 0.85em;
+  border-radius: 4px;
+  padding: 4px;
+  gap: 2px;
+}
 
 .option-list .popup-option {
   display: flex;
@@ -34,6 +31,7 @@
   min-height: 28px;
   padding: 6px 8px;
   margin: 0;
+
   background: transparent;
   color: inherit;
   border: 0;
@@ -44,5 +42,11 @@
 }
 
 .option-list .popup-option:hover,
-.option-list .popup-option:focus { background: var(--opt-hover); outline: none; }
-.option-list .popup-option:focus-visible { box-shadow: 0 0 0 2px color-mix(in srgb, var(--opt-border), transparent 50%); }
+.option-list .popup-option:focus {
+  background: var(--popup-option-hover);
+  outline: none;
+}
+
+.option-list .popup-option:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--popup-border), transparent 50%);
+}

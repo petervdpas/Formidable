@@ -97,7 +97,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   initStatusHandler("status-bar");
 
   initStatusButtonsHandler("status-bar-buttons");
-  installStatusButtons({ addStatusButton, EventBus });
+  installStatusButtons({ addStatusButton, EventBus, config });
 
   // ── Grab DOM Elements ──
   const templateContainer = document.getElementById("template-container");

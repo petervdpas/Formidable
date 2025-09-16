@@ -1,0 +1,84 @@
+/* option-panel.css */
+
+/* Base panel box */
+.option-panel {
+  box-sizing: border-box;
+  color: var(--popup-fg);
+  background: var(--popup-bg);
+  border: 1px solid var(--popup-border);
+  border-radius: 6px;
+  padding: 8px;
+
+  min-width: 420px;
+  max-width: 640px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Win over popup.css defaults if needed */
+#status-button-popup .option-panel {
+  background: var(--popup-bg) !important;
+  color: var(--popup-fg) !important;
+  border: 1px solid var(--popup-border) !important;
+  border-radius: 6px !important;
+  padding: 8px !important;
+}
+
+/* Inner bits */
+.panel-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.panel-title {
+  font-weight: 700;
+}
+
+.panel-subtitle {
+  opacity: .8;
+  font-size: 12px;
+}
+
+.panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.panel-row label {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 4px;
+  opacity: .9;
+}
+
+.panel-row textarea,
+.panel-row input {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--input-bg);     /* keep inputs consistent with forms */
+  color: var(--input-fg);
+  border: 1px solid var(--input-border-color);
+}
+
+/* Footer */
+.panel-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--popup-border);
+  position: sticky;
+  bottom: -6px;
+  background: var(--popup-bg);
+}
+
+/* Button variant */
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+}

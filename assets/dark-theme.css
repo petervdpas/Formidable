@@ -34,6 +34,15 @@
   --color-switch-off: #555;
   --switch-knob-color: #f5f5f5;
 
+  --statusbar-btn-bg: #2a2a2a;
+  --statusbar-btn-bg-hover: #3a3a3a;
+  --statusbar-btn-border: #555;
+  --statusbar-btn-border-hover: #666;
+  --statusbar-btn-fg: #eee;
+
+  --statusbar-bg: #1e1e1e;
+  --statusbar-border: #444;
+
   --status-info-divider: #444;
   --status-message-color: #ccc;
   --status-success-color: #5ed598;

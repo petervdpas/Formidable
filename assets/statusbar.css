@@ -15,6 +15,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  background: var(--statusbar-bg);
+  border-top: 1px solid var(--statusbar-border);
+  color: var(--status-message-color);
 }
 
 #status-bar-message {
@@ -32,7 +36,8 @@
 
 /* Status message variants */
 #status-bar-message span.status-info {
-  color: var(--status-message-color); /* default */
+  color: var(--status-message-color);
+  /* default */
 }
 
 #status-bar-message span.status-success {
@@ -72,41 +77,37 @@
   padding-left: 8px;
 }
 
-.statusbar-button {
+/* Status bar buttons (themeable via vars) */
+#status-bar .statusbar-button {
   height: 20px;
   line-height: 18px;
   padding: 0 6px;
   font-size: 12px;
   border-radius: 3px;
-  border: 1px solid var(--statusbar-btn-border, #c7c7c7);
-  background: var(--statusbar-btn-bg, #fff);
-  color: var(--statusbar-btn-fg, inherit);
+  border: 1px solid var(--statusbar-btn-border);
+  background: var(--statusbar-btn-bg);
+  color: var(--statusbar-btn-fg);
   cursor: pointer;
-  transition: background-color .15s ease, border-color .15s ease, transform .05s ease;
+  transition: background-color .15s, border-color .15s, transform .05s;
 }
 
-.statusbar-button:hover {
-  background: var(--statusbar-btn-bg-hover, #f3f3f3);
-  border-color: var(--statusbar-btn-border-hover, #b7b7b7);
+#status-bar .statusbar-button:hover {
+  background: var(--statusbar-btn-bg-hover);
+  border-color: var(--statusbar-btn-border-hover);
 }
 
-.statusbar-button:active {
-  transform: translateY(0.5px);
+#status-bar .statusbar-button:active {
+  transform: translateY(.5px);
 }
 
-.statusbar-button:disabled {
+#status-bar .statusbar-button:disabled {
   opacity: .55;
   cursor: not-allowed;
 }
 
-/* Compact char-picker button */
+/* compact char picker */
 #status-charpicker-btn {
   min-width: 26px;
   font-weight: 600;
   padding: 0 5px;
-}
-
-#main-wrapper {
-  height: calc(100vh - 28px);
-  /* minus status bar + 4 */
 }

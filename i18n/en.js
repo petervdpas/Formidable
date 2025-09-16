@@ -37,6 +37,14 @@ export default {
   "git.quick.commit": "Commit…",
   "git.quick.open_full": "Open Git…",
 
+  "git.quick.title": "Quick Commit",
+  "git.quick.subtitle": "Write a commit message and choose an action.",
+  "git.quick.placeholder": "Commit message…",
+  "git.quick.stage_all": "Stage all",
+  "git.quick.commit": "Commit",
+  "git.quick.commit_push": "Commit & Push",
+  "git.quick.need_message": "Please enter a commit message.",
+
   // Errors (template-level)
   "error.template.duplicate_keys": "Duplicate keys: {0}",
   "error.template.unmatched_loopstart": "Unmatched loop start at: {0}",

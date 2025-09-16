@@ -1,36 +1,25 @@
-/* ===========================
-   Option Grid (standalone)
-   =========================== */
-
-:root {
-  --opt-bg: var(--popup-bg, var(--input-bg, #fff));
-  --opt-fg: var(--popup-fg, var(--input-fg, #222));
-  --opt-hover: var(--popup-hover, #f2f2f2);
-  --opt-border: var(--popup-border, var(--input-border-color, #ccc));
-  --opt-padding: 3px;
-  --opt-gap: 6px;
-  --opt-radius: 6px;
-}
+/* option-grid.css */
 
 /* Grid container */
 .option-grid {
   box-sizing: border-box;
   font-family: inherit;
   font-size: 0.9em;
-  color: var(--opt-fg);
-  background: var(--opt-bg);
-  border: 1px solid var(--opt-border);
-  border-radius: var(--opt-radius);
-  padding: var(--opt-padding);
+  color: var(--popup-fg);
+  background: var(--popup-bg);
+  border: 1px solid var(--popup-border);
+  border-radius: 6px;
+  padding: 3px;
 
   display: grid; /* column/row templates are set inline from JS */
-  gap: var(--opt-gap);
+  gap: 6px;
 }
 
 .option-grid.compact {
-  --opt-gap: 4px;
-  --opt-radius: 4px;
   font-size: 0.85em;
+  border-radius: 4px;
+  padding: 2px;
+  gap: 4px;
 }
 
 /* Individual cells (buttons) */
@@ -45,8 +34,7 @@
   padding: 0;
   margin: 0;
 
-  /* Visual cell frame */
-  border: 1px solid color-mix(in srgb, var(--opt-border), transparent 60%);
+  border: 1px solid color-mix(in srgb, var(--popup-border), transparent 60%);
   background: transparent;
   color: inherit;
   border-radius: 4px;
@@ -59,12 +47,12 @@
 
 .option-grid .popup-option:hover,
 .option-grid .popup-option:focus {
-  background: var(--opt-hover);
+  background: var(--popup-option-hover);
   outline: none;
 }
 
 .option-grid .popup-option:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--opt-border), transparent 50%);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--popup-border), transparent 50%);
 }
 
 /* Placeholder (empty) cells */
@@ -78,24 +66,19 @@
 
 /* =============================================
    Local overrides to win against popup.css
-   (do NOT touch popup.css—just scope here)
    ============================================= */
-
-/* Ensure dropdown styles (.popup-option in popup.css)
-   don't wipe our grid borders/backgrounds inside #my-popup */
 #my-popup .option-grid .popup-option {
-  border: 1px solid color-mix(in srgb, var(--opt-border), transparent 60%) !important;
+  border: 1px solid color-mix(in srgb, var(--popup-border), transparent 60%) !important;
   background: transparent !important;
 }
 
 #my-popup .option-grid .popup-option.is-placeholder {
-  border: 1px dashed var(--opt-border) !important;
+  border: 1px dashed var(--popup-border) !important;
   background: transparent !important;
 }
 
 /* =============================================
    Make the popup panel wrap to content nicely
-   (only this popup; won’t affect other panels)
    ============================================= */
 #my-popup.popup-panel {
   display: inline-block;
@@ -104,10 +87,8 @@
   max-width: none;
   padding: 6px;
   overflow: visible; /* avoid clipping the grid shadow/focus ring */
-  /* position is handled by JS; keep as-is */
 }
 
-/* Optional: slightly smaller padding inside the grid when used in #my-popup */
 #my-popup .option-grid {
   padding: 4px;
 }

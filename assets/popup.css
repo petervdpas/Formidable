@@ -15,8 +15,8 @@
   padding: 0;
   border: 0;
   box-shadow: none;
-  background: var(--input-bg, #fff);
-  color: var(--input-fg, #111);
+  background: var(--popup-bg);
+  color: var(--popup-fg);
   border-radius: 6px;
 
   /* just in case some global style leaks */
@@ -26,7 +26,7 @@
 /* Only show chrome when visible */
 .popup-panel.popup-visible {
   padding: 8px; /* or 4px if you prefer */
-  border: 1px solid var(--input-border-color, #ccc);
+  border: 1px solid var(--popup-border);
   box-shadow: var(--generic-box-shadow);
 }
 

@@ -131,6 +131,7 @@ h3::before {
 #main-wrapper {
   display: flex;
   flex-direction: column;
+  height: calc(100vh - 28px);
 }
 
 #template-container,

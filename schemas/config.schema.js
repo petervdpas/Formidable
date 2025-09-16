@@ -29,10 +29,27 @@ module.exports = {
     },
     template_sidebar_width: 300,
     storage_sidebar_width: 300,
+    status_buttons: {
+      charpicker: true,
+      gitquick: true,
+    },
   },
 
   sanitize(raw) {
-    const config = { ...this.defaults, ...raw };
+    const deepMerge = (defaults, rawVal) => {
+      if (typeof defaults !== "object" || defaults === null) {
+        return rawVal !== undefined ? rawVal : defaults;
+      }
+      const result = Array.isArray(defaults) ? [...defaults] : { ...defaults };
+      for (const key in defaults) {
+        result[key] =
+          rawVal && rawVal[key] !== undefined
+            ? deepMerge(defaults[key], rawVal[key])
+            : defaults[key];
+      }
+      return result;
+    };
+
     const repaired = {};
     let changed = false;
 
@@ -41,7 +58,9 @@ module.exports = {
         repaired[key] = this.defaults[key];
         changed = true;
       } else {
-        repaired[key] = raw[key];
+        const merged = deepMerge(this.defaults[key], raw[key]);
+        if (merged !== raw[key]) changed = true;
+        repaired[key] = merged;
       }
     }
 

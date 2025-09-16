@@ -1,6 +1,7 @@
 // utils/elementBuilders.js
 
 import { createDropdown } from "./dropdownUtils.js";
+import { createPanelButton } from "./buttonUtils.js"; 
 import { t } from "./i18n.js";
 
 export function createStyledLabel(
@@ -885,6 +886,114 @@ export function createOptionList(
   }
 
   return list;
+}
+
+/**
+ * A lightweight "mini-modal" style panel for popups.
+ * Usage:
+ *   const { element, inputs } = createOptionPanel({
+ *     title: t("git.quick.title") || "Quick Commit",
+ *     message: t("git.quick.subtitle") || "Write a commit message",
+ *     inputs: [{ id: "commitMsg", kind: "textarea", placeholder: "Commit message…" }],
+ *     actions: [
+ *       { value: "stage_all", label: t("git.quick.stage_all") || "Stage all" },
+ *       { value: "commit",    label: t("git.quick.commit")    || "Commit",    variant: "primary" },
+ *       { value: "commit_push", label: t("git.quick.commit_push") || "Commit & Push", variant: "primary" },
+ *       { value: "cancel",    label: t("standard.cancel") || "Cancel", variant: "default" },
+ *     ],
+ *   }, (val, ctx) => { ... });
+ */
+export function createOptionPanel(
+  { title = "", message = "", inputs = [], actions = [], className = "" } = {},
+  onAction = null
+) {
+  const wrap = document.createElement("div");
+  wrap.className = `option-panel ${className}`.trim();
+
+  // header
+  if (title || message) {
+    const header = document.createElement("div");
+    header.className = "panel-header";
+    if (title) {
+      const h = document.createElement("div");
+      h.className = "panel-title";
+      h.textContent = title;
+      header.appendChild(h);
+    }
+    if (message) {
+      const m = document.createElement("div");
+      m.className = "panel-subtitle";
+      m.textContent = message;
+      header.appendChild(m);
+    }
+    wrap.appendChild(header);
+  }
+
+  // body (inputs)
+  const body = document.createElement("div");
+  body.className = "panel-body";
+  const inputRefs = {};
+
+  for (const def of inputs) {
+    const row = document.createElement("div");
+    row.className = "panel-row";
+
+    if (def.label) {
+      const lab = document.createElement("label");
+      if (def.id) lab.htmlFor = def.id;
+      lab.textContent = def.label;
+      row.appendChild(lab);
+    }
+
+    let field;
+    if (def.kind === "textarea") {
+      field = document.createElement("textarea");
+      field.rows = def.rows || 3;
+    } else {
+      field = document.createElement("input");
+      field.type = def.type || "text";
+    }
+    if (def.id) field.id = def.id;
+    if (def.placeholder) field.placeholder = def.placeholder;
+    if (def.value != null) field.value = def.value;
+    if (def.className) field.className = def.className;
+
+    row.appendChild(field);
+    body.appendChild(row);
+
+    if (def.id) inputRefs[def.id] = field;
+  }
+  wrap.appendChild(body);
+
+  // footer (actions)
+  const footer = document.createElement("div");
+  footer.className = "panel-actions";
+
+  const call = (val) => onAction?.(val, { inputs: inputRefs });
+
+  for (const a of actions) {
+    const btn = createPanelButton({
+      text: a.label ?? a.value,
+      i18nKey: a.i18nKey || "",
+      value: a.value,
+      variant: a.variant || (a.value === "cancel" ? "quiet" : "default"),
+      size: a.size || "sm",
+      onAction: call,
+      attributes: a.attributes || {},
+      ariaLabel: a.ariaLabel || a.label || a.value,
+    });
+    footer.appendChild(btn);
+  }
+
+  wrap.appendChild(footer);
+  
+  // quality-of-life helpers
+  wrap.focusFirstInput = () => {
+    const el = Object.values(inputRefs)[0];
+    el?.focus?.();
+  };
+
+  return { element: wrap, inputs: inputRefs };
 }
 
 function fillGrid(options, makeBtn, settings) {

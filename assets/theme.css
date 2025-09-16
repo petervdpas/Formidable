@@ -46,6 +46,15 @@
   --color-switch-off: #ccc;
   --switch-knob-color: #fefefe;
 
+  --statusbar-btn-bg: #ffffff;
+  --statusbar-btn-bg-hover: #f3f3f3;
+  --statusbar-btn-border: #c7c7c7;
+  --statusbar-btn-border-hover: #b7b7b7;
+  --statusbar-btn-fg: #333;
+
+  --statusbar-bg: #f4f4f4;
+  --statusbar-border: #ccc;
+
   --status-info-divider: #ccc;
   --status-message-color: #333;
   --status-success-color: #28a745;
@@ -143,8 +152,6 @@
   --unflagged-color: #ccc;
 
   --profile-list-bg: #f0f0f0;
-
-  --popup-option-height: 40px;
 
   /* ───── Field Type Colors ───── */
 
@@ -257,6 +264,8 @@
   --field-type-latex-text: #fff;
 
   /* ───── Popup Panel ───── */
+  --popup-option-height: 40px;
+
   --popup-bg: #fff;
   --popup-fg: #000;
   --popup-border: #ccc;

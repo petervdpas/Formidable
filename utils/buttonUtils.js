@@ -5,7 +5,9 @@ import { t } from "./i18n.js";
 
 // Poly-ish: CSS.escape fallback
 const cssEscape = (s) =>
-  (window.CSS && typeof CSS.escape === "function") ? CSS.escape(s) : String(s).replace(/[^a-zA-Z0-9_\-]/g, "\\$&");
+  window.CSS && typeof CSS.escape === "function"
+    ? CSS.escape(s)
+    : String(s).replace(/[^a-zA-Z0-9_\-]/g, "\\$&");
 
 export function createStatusButtonConfig({
   id,
@@ -169,6 +171,40 @@ export function createIconButton({
   // Apply extra attributes last
   for (const [key, value] of Object.entries(attributes)) {
     btn.setAttribute(key, value);
+  }
+
+  return btn;
+}
+
+export function createPanelButton({
+  text,
+  i18nKey = "",
+  value = "", // action value you want back
+  variant = "default", // "default" | "primary" | "danger" | "quiet"
+  size = "sm", // "sm" | "md"
+  onAction = () => {},
+  attributes = {},
+  ariaLabel = "",
+}) {
+  const cls = [`btn-${variant}`, size === "sm" ? "btn-sm" : "", "btn-panel"]
+    .filter(Boolean)
+    .join(" ");
+
+  const btn = createButton({
+    text,
+    i18nKey,
+    className: cls,
+    identifier: `panel-${(value || text || "action")
+      .toLowerCase()
+      .replace(/\s+/g, "-")}`,
+    onClick: () => onAction(value),
+    attributes,
+    ariaLabel: ariaLabel || text,
+  });
+
+  // small affordance for keyboard hints if you ever pass attributes.title
+  if (!btn.getAttribute("title") && attributes?.title) {
+    btn.setAttribute("title", attributes.title);
   }
 
   return btn;

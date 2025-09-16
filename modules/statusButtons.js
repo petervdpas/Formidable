@@ -3,8 +3,9 @@ import { t } from "../utils/i18n.js";
 import { setupPopup } from "../utils/modalUtils.js";
 import { SelectionStore } from "../utils/selectionStore.js";
 import {
+  // createOptionList,
   createOptionGrid,
-  createOptionList,
+  createOptionPanel,
 } from "../utils/elementBuilders.js";
 import { allCharacters, toGridOptions } from "../utils/characterUtils.js";
 import { createStatusButtonConfig } from "../utils/buttonUtils.js";
@@ -31,6 +32,13 @@ function createStatusGitQuickButtonConfig(onClick) {
   });
 }
 
+function getFlag(cfg, path, fallback = true) {
+  const val = path
+    .split(".")
+    .reduce((o, k) => (o && o[k] !== undefined ? o[k] : undefined), cfg);
+  return typeof val === "boolean" ? val : fallback;
+}
+
 // --- shared: reuse the same popup host and avoid duplicates ---
 let activePopup = null;
 function openSharedPopup(triggerBtn, node, { onClose } = {}) {
@@ -48,11 +56,11 @@ function openSharedPopup(triggerBtn, node, { onClose } = {}) {
 }
 
 // ===================== installers =====================
+function installCharPickerButton({ addStatusButton, EventBus, config }) {
+  if (!getFlag(config, "status_buttons.charpicker", true)) return null;
 
-function installCharPickerButton({ addStatusButton, EventBus }) {
-  addStatusButton(
+  return addStatusButton(
     createStatusCharPickerButtonConfig((e, btnEl) => {
-      // keep editor focus
       SelectionStore.attachTriggerKeepingFocus(btnEl, () => {});
       const grid = createOptionGrid(
         toGridOptions(allCharacters),
@@ -79,49 +87,102 @@ function installCharPickerButton({ addStatusButton, EventBus }) {
   );
 }
 
-function installGitQuickButton({ addStatusButton, EventBus }) {
-  addStatusButton(
+function installGitQuickButton({ addStatusButton, EventBus, config }) {
+  if (!getFlag(config, "status_buttons.gitquick", true)) return null;
+
+  return addStatusButton(
     createStatusGitQuickButtonConfig((e, btnEl) => {
-      const options = [
+      const panel = createOptionPanel(
         {
-          value: "stage_all",
-          label: t("git.quick.stage_all") || "Stage all",
-          iconHTML: `<i class="fa fa-plus-square"></i>`,
+          title: t("git.quick.title") || "Quick Commit",
+          message:
+            t("git.quick.subtitle") ||
+            "Write a commit message and choose an action.",
+          inputs: [
+            {
+              id: "commitMsg",
+              kind: "textarea",
+              placeholder: t("git.quick.placeholder") || "Commit message…",
+              rows: 4,
+            },
+          ],
+          actions: [
+            {
+              value: "stage_all",
+              label: t("git.quick.stage_all") || "Stage all",
+            },
+            {
+              value: "commit",
+              label: t("git.quick.commit") || "Commit",
+              variant: "primary",
+            },
+            {
+              value: "commit_push",
+              label: t("git.quick.commit_push") || "Commit & Push",
+              variant: "primary",
+            },
+            {
+              value: "cancel",
+              label: t("standard.cancel") || "Cancel",
+              variant: "quiet",
+            },
+          ],
         },
-        {
-          value: "commit",
-          label: t("git.quick.commit") || "Commit…",
-          iconHTML: `<i class="fa fa-check"></i>`,
-        },
-        {
-          value: "open_full",
-          label: t("git.quick.open_full") || "Open Git…",
-          iconHTML: `<i class="fa fa-external-link-alt"></i>`,
-        },
-      ];
-      const list = createOptionList(
-        options,
-        (val) => {
+        async (val, ctx) => {
+          const msg = ctx.inputs.commitMsg?.value?.trim() || "";
           switch (val) {
             case "stage_all":
-              EventBus.emit("git:stage:all", { callback: () => {} });
+              await new Promise((r) =>
+                EventBus.emit("git:stage:all", { callback: r })
+              );
               break;
             case "commit":
-            case "open_full":
-              window.openGitModal?.();
+              if (!msg) {
+                EventBus.emit("ui:toast", {
+                  languageKey: "git.quick.need_message",
+                  variant: "warning",
+                  i18nEnabled: true,
+                });
+                return;
+              }
+              await new Promise((r) =>
+                EventBus.emit("git:commit", { message: msg, callback: r })
+              );
+              activePopup?.hide?.();
               break;
+            case "commit_push":
+              if (!msg) {
+                EventBus.emit("ui:toast", {
+                  languageKey: "git.quick.need_message",
+                  variant: "warning",
+                  i18nEnabled: true,
+                });
+                return;
+              }
+              await new Promise((r) =>
+                EventBus.emit("git:commit", { message: msg, callback: r })
+              );
+              await new Promise((r) =>
+                EventBus.emit("git:push", { callback: r })
+              );
+              activePopup?.hide?.();
+              break;
+            case "cancel":
+              activePopup?.hide?.();
+              return;
           }
-          activePopup?.hide?.();
-        },
-        { className: "gitq-actions", ariaLabel: "Git quick actions" }
+        }
       );
-      openSharedPopup(btnEl, list);
+
+      const p = openSharedPopup(btnEl, panel.element);
+      panel.focusFirstInput?.();
     })
   );
 }
 
 // optional aggregator
 export function installStatusButtons(deps) {
-  installCharPickerButton(deps);
-  installGitQuickButton(deps);
+  const charBtn = installCharPickerButton(deps);
+  const gitBtn = installGitQuickButton(deps);
+  return { charBtn, gitBtn };
 }
