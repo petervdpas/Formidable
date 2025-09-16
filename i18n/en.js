@@ -27,6 +27,16 @@ export default {
   "config.internal_server_port": "Server Port",
   "config.show_meta_section": "Show Meta Section",
 
+  // ── Status Bar Buttons ─────────────────────
+  "status.buttonBar.tooltip.gitQuick": "Quick Git",
+  "status.buttonBar.aria.gitQuick": "Open Quick Git actions",
+  "status.buttonBar.tooltip.characterPicker": "Character Picker",
+  "status.buttonBar.aria.characterPicker": "Open Character Picker",
+
+  "git.quick.stage_all": "Stage all",
+  "git.quick.commit": "Commit…",
+  "git.quick.open_full": "Open Git…",
+
   // Errors (template-level)
   "error.template.duplicate_keys": "Duplicate keys: {0}",
   "error.template.unmatched_loopstart": "Unmatched loop start at: {0}",
@@ -459,8 +469,7 @@ export default {
   "field.latex.label": "LaTeX",
   "field.latex.rows": "Rows",
   "field.latex.usefenced": "Use fenced raw block",
-  "field.latex.hint":
-    "Inserts raw LaTeX; exported as a fenced {=latex} block.",
+  "field.latex.hint": "Inserts raw LaTeX; exported as a fenced {=latex} block.",
   "field.latex.placeholder": "\\begin{center} ... \\end{center}",
   "latex.required": "LaTeX content is required.",
 

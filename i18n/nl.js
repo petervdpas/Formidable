@@ -27,6 +27,16 @@ export default {
   "config.internal_server_port": "Serverpoort",
   "config.show_meta_section": "Toon Meta Sectie",
 
+  // ── Status Bar Buttons ─────────────────────
+  "status.buttonBar.tooltip.gitQuick": "Quick Git Acties",
+  "status.buttonBar.aria.gitQuick": "Open Quick Git acties",
+  "status.buttonBar.tooltip.characterPicker": "Karakterkiezer",
+  "status.buttonBar.aria.characterPicker": "Open Karakterkiezer",
+
+  "git.quick.stage_all": "Stage all",
+  "git.quick.commit": "Commit…",
+  "git.quick.open_full": "Open Git…",
+
   // Errors (template-level)
   "error.template.duplicate_keys": "Duplicaat sleutels: {0}",
   "error.template.unmatched_loopstart": "Niet-overeenkomende lusstart op: {0}",
@@ -462,7 +472,8 @@ export default {
   "field.code.badge.manual": "Handmatige uitvoering",
   "field.code.badge.load": "Automatische uitvoering bij laden",
   "field.code.badge.save": "Uitvoering bij opslaan",
-  "field.code.hint.readonly": "Code bevindt zich in het sjabloon (alleen-lezen).",
+  "field.code.hint.readonly":
+    "Code bevindt zich in het sjabloon (alleen-lezen).",
   "field.code.btn.run": "Uitvoeren",
   "field.code.status.nocode": "Geen code in sjabloon",
   "field.code.status.running": "Bezig met uitvoeren…",
@@ -472,7 +483,8 @@ export default {
   "field.code.output.result": "resultaat",
   "field.code.output.error": "fout",
   "field.code.desc.manual": "Klik op Uitvoeren om uit te voeren.",
-  "field.code.desc.load": "Dit script wordt uitgevoerd wanneer het formulier wordt geladen.",
+  "field.code.desc.load":
+    "Dit script wordt uitgevoerd wanneer het formulier wordt geladen.",
   "field.code.desc.save": "Dit script wordt uitgevoerd bij opslaan.",
 
   "field.latex.label": "LaTeX",
