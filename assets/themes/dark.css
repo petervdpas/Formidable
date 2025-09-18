@@ -1,0 +1,255 @@
+/* dark.css */
+:root[data-theme="dark"] {
+    /* Base page + surfaces */
+    --page-bg: #121212;
+    --page-fg: #eee;
+
+    --sidebar-bg: #1c1c1c;
+    --sidebar-border: #444;
+
+    --workspace-bg: #121212;
+    --workspace-fg: #eee;
+
+    --statusbar-bg: #1e1e1e;
+    --statusbar-fg: #ccc;
+    --statusbar-border: #444;
+
+    --list-item-bg: #2a2a2a;
+    --list-item-hover-bg: #3a3a3a;
+    --list-item-selected-bg: #2196f3;
+    --list-item-selected-fg: #fff;
+    --list-item-selected-border: #0d47a1;
+
+    --modal-bg: #2a2a2a;
+    --modal-border: #555;
+    --modal-fg: #eee;
+    --modal-hover-bg: #444;
+    --modal-backdrop: rgba(0, 0, 0, 0.6);
+    --modal-highlight-bg: #3b3b3b;
+    --modal-highlight-border: #aaa;
+    --modal-highlight-text: #eee;
+
+    --slider-knob-bg: #ccc;
+
+    --scrollbar-thumb: #555;
+    --scrollbar-track: #222;
+
+    --resize-handle-bg: #666;
+    --resize-handle-border: #444;
+
+    --menu-bg: #1e1e1e;
+    --menu-fg: #eee;
+    --menu-border: #444;
+    --menu-hover-bg: #2a2a2a;
+    --submenu-bg: #2a2a2a;
+    --submenu-fg: #eee;
+    --submenu-hover-bg: #3a3a3a;
+    --submenu-separator: #444;
+
+    /* ───── Global UI Elements ───── */
+    --text-color: #eee;
+    --text-description: #ccc;
+    --input-border-color: #555;
+    --input-bg: #1c1c1c;
+    --input-fg: #eee;
+    --input-focus-border: #888;
+    --input-icon-bg: #3f3f3f;
+    --accent-color: #4dabf7;
+    --hover-bg: #2a2a2a;
+    --badge-bg: #2a2a2a;
+    --muted-fg: #bbb;
+
+    --filter-bg: #2a2a2a;
+    --filter-border: #555;
+    --filter-text: #ddd;
+    --filter-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+
+    --form-border: #444;
+    --link-row-bg: #1c1f24;
+    --link-color: #66b0ff;
+    --link-hover: #99caff;
+
+    /* ───── Range Slider ───── */
+    --range-track-bg: #bdbdbd;
+    --range-thumb-bg: #90caf9;
+    --range-thumb-border: #42a5f5;
+    --range-thumb-hover-shadow: rgba(144, 202, 249, 0.35);
+
+    --readonly-bg: #888;
+    --readonly-fg: #ffffe0;
+
+    --switch-track-bg: #555;
+    --switch-track-bg-checked: #2196f3;
+    --switch-knob-bg: #f5f5f5;
+    --switch-focus-ring: 0 0 0 3px rgba(33, 150, 243, .35);
+
+    --statusbar-btn-bg: #2a2a2a;
+    --statusbar-btn-bg-hover: #3a3a3a;
+    --statusbar-btn-border: #555;
+    --statusbar-btn-border-hover: #666;
+    --statusbar-btn-fg: #eee;
+
+    --statusbar-bg: #1e1e1e;
+    --statusbar-border: #444;
+
+    --status-info-divider: #444;
+    --status-message-color: #ccc;
+    --status-success-color: #5ed598;
+    --status-warning-color: #ffb84d;
+    --status-error-color: #ff6b6b;
+
+    /* ───── Editor Toolbar ───── */
+    --editor-toolbar-bg: #2a2a2a;
+    --editor-toolbar-fg: #ddd;
+    --editor-toolbar-border: #444;
+
+    --editor-toolbar-button-fg: #eee;
+    --editor-toolbar-button-fg-hover: #fff;
+    --editor-toolbar-button-fg-active: #000;
+    --editor-toolbar-button-fg-disabled: #777;
+
+    --editor-toolbar-button-bg-hover: #444;
+    --editor-toolbar-button-bg-active: #2196f3;
+    --editor-toolbar-button-bg-disabled: #333;
+
+    /* ───── Generic Shadows ───── */
+    --generic-box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+    --generic-shadow: 0 1px 2px rgba(255, 255, 255, 0.15);
+    --generic-shadow-hover: 0 2px 4px rgba(255, 255, 255, 0.25);
+    --generic-shadow-active: inset 0 1px 2px rgba(255, 255, 255, 0.3);
+
+    /* ───── Default ───── */
+    --generic-bg-default: #3c3c3c;
+    --generic-bg-default-hover: #555;
+    --generic-border-default: #666;
+    --generic-border-default-hover: #888;
+    --generic-fg-default: #eee;
+    --generic-fg-default-hover: #fff;
+
+    /* ───── Info ───── */
+    --generic-border-info: #559ce6;
+    --generic-border-info-hover: #4487c6;
+    --generic-bg-info: #2b3f55;
+    --generic-bg-info-hover: #36516d;
+    --generic-fg-info: #cce5ff;
+    --generic-fg-info-hover: #ffffff;
+
+    /* ───── Success ───── */
+    --generic-border-success: #218838;
+    --generic-border-success-hover: #1e7e34;
+    --generic-bg-success: #2e7d32;
+    --generic-bg-success-hover: #388e3c;
+    --generic-fg-success: #fff;
+    --generic-fg-success-hover: #fff;
+
+    /* ───── Error / Danger ───── */
+    --generic-border-error: #c82333;
+    --generic-border-error-hover: #a71d2a;
+    --generic-bg-error: #c62828;
+    --generic-bg-error-hover: #e53935;
+    --generic-fg-error: #fff;
+    --generic-fg-error-hover: #fff;
+
+    /* ───── Warning ───── */
+    --generic-border-warn: #e0a800;
+    --generic-border-warn-hover: #c69500;
+    --generic-bg-warn: #ef6c00;
+    --generic-bg-warn-hover: #ff9800;
+    --generic-fg-warn: #000;
+    --generic-fg-warn-hover: #000;
+
+    --close-button-color: #ccc;
+    --close-button-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    --close-hover-color: #fff;
+    --close-hover-bg: rgba(255, 255, 255, 0.1);
+
+    --modal-highlight-bg: #3b3b3b;
+    --modal-highlight-border: #aaa;
+    --modal-highlight-text: #eee;
+
+    --sortable-bg: #2a2a2a;
+    --sortable-drag-bg: #888;
+    --sortable-border-color: #666;
+    --sortable-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+    --sortable-hover-shadow: 0 0 12px rgba(0, 0, 0, 0.7);
+
+    --loop-border-color: #444;
+    --loop-description-color: var(--text-description);
+    --loop-bg: #1c1c1c;
+    --loop-bg-secondary: #2a2a2a;
+    --loop-add-bg: #28a745;
+    --loop-add-bg-hover: #1e7e34;
+    --loop-add-fg: #fff;
+
+    --subloop-bg-secondary: #1a2332;
+    --subloop-description-color: var(--text-description);
+    --subloop-border-color: #35557a;
+    --subloop-bg: #202b3b;
+    --subloop-add-bg: #3390ff;
+    --subloop-add-bg-hover: #1e78d5;
+    --subloop-add-fg: #fff;
+
+    --meta-section-bg: #2a2a2a;
+    --meta-section-border: #555;
+    --meta-section-text-color: #ccc;
+    --meta-section-font-size: 0.75rem;
+
+    --tag-bg: #3d5a3d;
+    --tag-border: #81c784;
+    --tag-text: #f0fff0;
+
+    --flagged-circle-bg: #2a2a2a;
+    --flagged-color: #4caf50;
+    --unflagged-color: #555;
+
+    --profile-list-bg: #1c1c1c;
+
+    /* ───── Popup Panel ───── */
+    --popup-bg: #1e1e1e;
+    --popup-fg: #eee;
+    --popup-border: #444;
+
+    --popup-option-bg: #333;
+    --popup-option-hover: #444;
+
+    --btn-primary-bg: #2e7d32;
+    --btn-primary-fg: #fff;
+    --btn-secondary-bg: #444;
+    --btn-secondary-fg: #ccc;
+
+    --git-fg-default: #eee;
+    --git-bg-default: #1c1c1c;
+    --git-bg-added: #1f3921;
+    --git-bg-modified: #3f3a1f;
+    --git-bg-deleted: #3f1f1f;
+    --git-bg-renamed: #42351e;
+    --git-bg-untracked: #2c2c2c;
+    --git-bg-unknown: #1c1c1c;
+
+    /* ── Code Field (Dark) ── */
+    --code-output-border: #444;
+
+    /* Manual (muted indigo) */
+    --code-manual-badge-bg: #252a43;
+    --code-manual-badge-fg: #c7d2fe;
+    --code-manual-btn-bg: #2f365f;
+    --code-manual-btn-fg: #e0e7ff;
+    --code-manual-output-bg: #0f172a;
+    --code-manual-accent: #818cf8;
+
+    /* Load (muted cyan/sky) */
+    --code-load-badge-bg: #073642;
+    --code-load-badge-fg: #a7f3d0;
+    --code-load-btn-bg: #0b3a46;
+    --code-load-btn-fg: #cffafe;
+    --code-load-output-bg: #0b2530;
+    --code-load-accent: #38bdf8;
+
+    /* Save (muted amber) */
+    --code-save-badge-bg: #3a2a12;
+    --code-save-badge-fg: #fde68a;
+    --code-save-btn-bg: #4a3514;
+    --code-save-btn-fg: #fffbeb;
+    --code-save-output-bg: #2b1f0c;
+    --code-save-accent: #f59e0b;
+}

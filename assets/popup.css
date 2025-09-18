@@ -25,14 +25,20 @@
 
 /* Only show chrome when visible */
 .popup-panel.popup-visible {
-  padding: 8px; /* or 4px if you prefer */
+  padding: 8px;
+  /* or 4px if you prefer */
   border: 1px solid var(--popup-border);
   box-shadow: var(--generic-box-shadow);
 }
 
 /* Hidden state + safety */
-.popup-hidden { display: none !important; }
-.popup-panel:empty { display: none !important; }
+.popup-hidden {
+  display: none !important;
+}
+
+.popup-panel:empty {
+  display: none !important;
+}
 
 /* Status button popup: natural autosizing */
 #status-button-popup.popup-panel.popup-visible {
@@ -48,7 +54,8 @@
   z-index: 1000;
   padding: 8px;
   min-width: 150px;
-  max-height: 180px;              /* must pair with overflow-y */
+  max-height: 180px;
+  /* must pair with overflow-y */
   overflow-y: auto;
 
   background-color: var(--input-bg);
@@ -65,7 +72,9 @@
 }
 
 /* Hide empty selectors too */
-.popup-selector:empty { display: none !important; }
+.popup-selector:empty {
+  display: none !important;
+}
 
 /* Options */
 .popup-option {
@@ -82,12 +91,24 @@
   font-size: inherit;
   transition: background-color 0.2s ease;
 }
-.popup-option:last-child { margin-bottom: 0; }
-.popup-option:hover { background-color: var(--popup-option-hover, #e0e0e0); }
+
+.popup-option:last-child {
+  margin-bottom: 0;
+}
+
+.popup-option:hover {
+  background-color: var(--popup-option-hover, #e0e0e0);
+}
 
 /* WebKit scrollbars */
-.popup-selector::-webkit-scrollbar { width: 6px; }
-.popup-selector::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+.popup-selector::-webkit-scrollbar {
+  width: 6px;
+}
+
+.popup-selector::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, #888);
+  border-radius: 4px;
+}
 
 /* ───── Header / Buttons / Resizer (unchanged) ───── */
 .popup-header {
@@ -99,7 +120,13 @@
   padding-bottom: 4px;
   min-height: 32px;
 }
-.popup-header h3 { margin: 0; font-size: 1.1em; flex: 1; color: inherit; }
+
+.popup-header h3 {
+  margin: 0;
+  font-size: 1.1em;
+  flex: 1;
+  color: inherit;
+}
 
 .popup-close-btn {
   background: transparent;
@@ -111,27 +138,69 @@
   line-height: 1;
 }
 
-.popup-form-row { margin-bottom: 10px; }
-.popup-form-row label {
-  display: block; font-weight: bold; font-size: 0.9em; margin-bottom: 4px; color: inherit;
+.popup-form-row {
+  margin-bottom: 10px;
 }
+
+.popup-form-row label {
+  display: block;
+  font-weight: bold;
+  font-size: 0.9em;
+  margin-bottom: 4px;
+  color: inherit;
+}
+
 .popup-form-row input,
 .popup-form-row select,
 .popup-form-row textarea {
-  display: block; width: 100%; padding: 6px 8px;
-  border: 1px solid var(--input-border-color); border-radius: 4px;
-  background-color: var(--input-bg); color: var(--input-fg);
-  box-sizing: border-box; font-family: inherit; font-size: 0.95em;
+  display: block;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--input-border-color);
+  border-radius: 4px;
+  background-color: var(--input-bg);
+  color: var(--input-fg);
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 0.95em;
 }
 
-.popup-buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
-.popup-buttons button { font-size: 0.95em; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-family: inherit; }
-.popup-buttons .btn-primary { background-color: var(--btn-primary-bg); color: var(--btn-primary-fg); border: none; }
-.popup-buttons .btn-secondary { background-color: var(--btn-secondary-bg); color: var(--btn-secondary-fg); border: 1px solid var(--input-border-color); }
+.popup-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.popup-buttons button {
+  font-size: 0.95em;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.popup-buttons .btn-primary {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-fg);
+  border: none;
+}
+
+.popup-buttons .btn-secondary {
+  background-color: var(--btn-secondary-bg);
+  color: var(--btn-secondary-fg);
+  border: 1px solid var(--input-border-color);
+}
 
 .popup-resizer {
-  width: 10px; height: 10px; background: var(--input-border-color);
-  position: absolute; right: 0; bottom: 0; cursor: se-resize; border-bottom-right-radius: 6px;
+  width: 10px;
+  height: 10px;
+  background: var(--input-border-color);
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  cursor: se-resize;
+  border-bottom-right-radius: 6px;
 }
 
 /* Mobile */

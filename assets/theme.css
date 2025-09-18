@@ -1,5 +1,50 @@
 /* ───── Light Theme (default) ───── */
 :root {
+  /* Base page + surfaces */
+  --page-bg: #ffffff;
+  --page-fg: #222222;
+
+  --sidebar-bg: #f0f0f0;
+  --sidebar-border: #ccc;
+
+  --workspace-bg: #ffffff;
+  --workspace-fg: #222;
+
+  --statusbar-bg: #f4f4f4;
+  --statusbar-fg: #333;
+  --statusbar-border: #ccc;
+
+  --list-item-bg: #e0e0e0;
+  --list-item-hover-bg: #d0d0d0;
+  --list-item-selected-bg: #2196f3;
+  --list-item-selected-fg: #fff;
+  --list-item-selected-border: #1976d2;
+
+  --modal-bg: #fff;
+  --modal-border: #ccc;
+  --modal-fg: #222;
+  --modal-hover-bg: #f3f3f3;
+  --modal-backdrop: rgba(0, 0, 0, 0.25);
+  --modal-highlight-bg: #f1f3f5;
+  --modal-highlight-border: #ccc;
+  --modal-highlight-text: #333;
+
+  --scrollbar-thumb: #ccc;
+  --scrollbar-track: #f0f0f0;
+
+  --resize-handle-bg: #888;
+  --resize-handle-border: #555;
+
+  --menu-bg: #f9f9f9;
+  --menu-fg: #222;
+  --menu-border: #ccc;
+  --menu-hover-bg: #f0f0f0;
+  --submenu-bg: #fff;
+  --submenu-fg: #222;
+  --submenu-hover-bg: #f5f5f5;
+  --submenu-separator: #ccc;
+
+  /* ───── Global UI Elements ───── */
   --editor-compact-h: 140px;
 
   --text-color: #111;
@@ -7,7 +52,10 @@
   --input-border-color: #ccc;
   --input-bg: #fdfdfd;
   --input-fg: #111;
+  --input-focus-border: #888;
   --input-icon-bg: #1d1d1d;
+  --input-icon-bg-hover: #7c7c7c;
+  --input-accent-color: #666;
   --accent-color: #007bff;
   --hover-bg: #f0f0f0;
   --badge-bg: #f6f6f6;
@@ -42,9 +90,10 @@
   --readonly-bg: #ffffe0;
   --readonly-fg: #888;
 
-  --color-switch-on: #4caf50;
-  --color-switch-off: #ccc;
-  --switch-knob-color: #fefefe;
+  --switch-track-bg: #ccc;
+  --switch-track-bg-checked: #4caf50;
+  --switch-knob-bg: #ffffff;
+  --switch-focus-ring: 0 0 0 3px rgba(76, 175, 80, .35);
 
   --statusbar-btn-bg: #ffffff;
   --statusbar-btn-bg-hover: #f3f3f3;
@@ -60,6 +109,19 @@
   --status-success-color: #28a745;
   --status-warning-color: #ff9800;
   --status-error-color: #e53935;
+
+  --editor-toolbar-bg: #f7f7f7;
+  --editor-toolbar-fg: #333;
+  --editor-toolbar-border: #ccc;
+
+  --editor-toolbar-button-fg: #444; 
+  --editor-toolbar-button-fg-hover: #000;  
+  --editor-toolbar-button-fg-active: #fff;  
+  --editor-toolbar-button-fg-disabled: #999;
+
+  --editor-toolbar-button-bg-hover: #e0e0e0;  
+  --editor-toolbar-button-bg-active: #2196f3;
+  --editor-toolbar-button-bg-disabled: #f5f5f5;
 
   /* ───── Generic Shadows ───── */
   --generic-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -111,10 +173,6 @@
   --close-button-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   --close-hover-color: #000;
   --close-hover-bg: rgba(0, 0, 0, 0.05);
-
-  --modal-highlight-bg: #f1f3f5;
-  --modal-highlight-border: #ccc;
-  --modal-highlight-text: #333;
 
   --sortable-bg: #fff;
   --sortable-drag-bg: #ffffe0;
@@ -313,140 +371,4 @@
   --code-save-btn-fg: #92400e;
   --code-save-output-bg: #fffbeb;
   --code-save-accent: #f59e0b;
-}
-
-.editor-wrapper.fullscreen {
-  background-color: var(--input-bg);
-  border: 2px solid var(--input-border-color);
-}
-
-/* General Light Theme Styling */
-body {
-  background-color: #ffffff;
-  color: #222;
-}
-
-#template-sidebar,
-#storage-sidebar {
-  background-color: #f0f0f0;
-  border-right: 1px solid #ccc;
-}
-
-#template-workspace,
-#storage-workspace,
-#template-content,
-#storage-content {
-  background-color: #ffffff;
-  color: #222;
-}
-
-#status-bar {
-  background-color: #f4f4f4;
-  border-top: 1px solid #ccc;
-  color: #333;
-}
-
-.template-item,
-.storage-item,
-.profile-item {
-  background-color: #e0e0e0;
-}
-
-.template-item:hover,
-.storage-item:hover,
-.profile-item:hover {
-  background-color: #d0d0d0;
-}
-
-.template-item.selected,
-.storage-item.selected,
-.profile-item.selected {
-  background-color: #2196f3 !important;
-  color: white;
-  font-weight: bold;
-  border-left: 4px solid #1976d2;
-}
-
-.slider {
-  background-color: #ccc;
-}
-
-.slider:before {
-  background-color: #ffffff;
-}
-
-input:checked+.slider {
-  background-color: #4caf50;
-}
-
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f0f0f0;
-}
-
-#resizeHandle,
-#storage-resizeHandle {
-  background-color: #888;
-  border: 1px solid #555;
-}
-
-/* ───── forms.css ───── */
-.dark-mode form,
-.dark-mode fieldset {
-  border-color: var(--input-border-color);
-}
-
-.dark-mode label small,
-.dark-mode .form-row .field-description {
-  color: var(--readonly-fg);
-}
-
-.dark-mode .form-row input[type="text"],
-.dark-mode .form-row input[type="url"],
-.dark-mode .form-row select,
-.dark-mode .form-row textarea {
-  border-color: var(--input-border-color);
-}
-
-/* Inputs (light) */
-input,
-textarea,
-select {
-  background-color: var(--input-bg);
-  color: var(--input-fg);
-  border-color: var(--input-border-color);
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-  border-color: #888;
-}
-
-input[readonly] {
-  background-color: var(--readonly-bg);
-  color: var(--readonly-fg);
-  border-color: var(--input-border-color);
-}
-
-input[type="checkbox"],
-input[type="radio"] {
-  accent-color: #666;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator {
-  background-color: var(--input-icon-bg);
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator:hover {
-  background-color: #7c7c7c;
 }

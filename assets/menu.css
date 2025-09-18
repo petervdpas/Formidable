@@ -1,13 +1,9 @@
 #app-menu {
-    background: #f4f4f4;
-    border-bottom: 1px solid #ccc;
     font-size: 14px;
     z-index: 9800;
-}
-
-.dark-mode #app-menu {
-    background: #1e1e1e;
-    border-bottom: 1px solid #444;
+    background-color: var(--menu-bg);
+    border-bottom: 1px solid var(--menu-border);
+    color: var(--menu-fg);
 }
 
 .menu-bar-container {
@@ -23,6 +19,7 @@
     list-style: none;
     padding: 0 4px;
     margin: 0;
+    color: var(--menu-fg);
 }
 
 .menu-item {
@@ -32,17 +29,12 @@
 }
 
 .menu-item:hover {
-    background-color: #eaeaea;
+    background-color: var(--menu-hover-bg);
 }
 
 .menu-item label {
     font-weight: normal;
     margin: -2px 0;
-}
-
-
-.dark-mode .menu-item:hover {
-    background-color: #2a2a2a;
 }
 
 .menu-item:hover .submenu {
@@ -54,25 +46,27 @@
     position: absolute;
     top: 100%;
     left: 0;
-    background: #ffffff;
-    border: 1px solid #ccc;
     padding: 4px 0;
     list-style: none;
     min-width: 180px;
     z-index: 100;
+    background-color: var(--submenu-bg);
+    border: 1px solid var(--menu-border);
 }
 
 .submenu li {
     padding: 6px 16px;
     cursor: pointer;
+    color: var(--submenu-fg);
 }
 
 .submenu li:hover {
     background: #eee;
+    background-color: var(--submenu-hover-bg);
 }
 
 .submenu .separator {
-    border-top: 1px solid #ccc;
+    border-top: 1px solid var(--submenu-separator);
     margin: 4px 0;
     padding: 0;
     height: 0;

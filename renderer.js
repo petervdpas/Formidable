@@ -88,6 +88,26 @@ window.addEventListener("DOMContentLoaded", async () => {
     EventBus.emit("config:load", (cfg) => resolve(cfg));
   });
 
+  const theme = (config.theme || "light").toLowerCase(); // "light" | "dark" | "system"
+  const resolvedNow =
+    theme !== "system"
+      ? theme
+      : window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+
+  // Update only if different to avoid layout thrash
+  if (document.documentElement.dataset.theme !== resolvedNow) {
+    document.documentElement.dataset.theme = resolvedNow;
+    document.documentElement.classList.remove("theme-light", "theme-dark");
+    document.documentElement.classList.add(`theme-${resolvedNow}`);
+  }
+
+  // Persist for next cold start (preload reads this instantly)
+  try {
+    localStorage.setItem("theme", theme);
+  } catch {}
+
   await loadLocale(config.language || "en");
   document.documentElement.setAttribute("lang", config.language || "en");
   translateDOM();

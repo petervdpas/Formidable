@@ -35,7 +35,6 @@
     <link rel="stylesheet" href="assets/option-panel.css" />
     <link rel="stylesheet" href="assets/options-edit.css" />
     <link rel="stylesheet" href="assets/popup.css" />
-    <link rel="stylesheet" href="assets/cm-editor.css" />
     <link rel="stylesheet" href="assets/buttons.css" />
     <link rel="stylesheet" href="assets/plugins.css" />
     <link rel="stylesheet" href="assets/links.css" />
@@ -59,6 +58,8 @@
     <!-- EasyMDE Styles -->
     <link rel="stylesheet" href="assets/easymde/easymde.min.css" />
     <link rel="stylesheet" href="assets/hljs/github.min.css" />
+
+    <link rel="stylesheet" href="assets/cm-editor.css" />
   </head>
   <body>
     <div id="main-wrapper">
@@ -418,10 +419,12 @@
             style="width: 72px"
           />
         </div>
-        
+
         <!-- Default value -->
         <div class="modal-form-row">
-          <label for="edit-default" data-i18n="standard.default.value">Default value</label>
+          <label for="edit-default" data-i18n="standard.default.value"
+            >Default value</label
+          >
           <textarea
             id="edit-default"
             rows="2"

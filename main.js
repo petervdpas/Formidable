@@ -3,7 +3,7 @@
 const DEBOUNCE_MS = 150;
 
 const packageJson = require("./package.json");
-const { app, BrowserWindow, Menu, session, screen } = require("electron");
+const { app, BrowserWindow, Menu, session, screen, nativeTheme } = require("electron");
 const path = require("path");
 const nodeLogger = require("./controls/nodeLogger");
 const fileManager = require("./controls/fileManager");
@@ -69,10 +69,15 @@ function createWindow() {
   // Always re-read config so we use the freshest saved bounds
   const userConfig = configManager.loadUserConfig();
   const bounds = getSafeBounds(userConfig.window_bounds);
+  const themePref = (userConfig.theme || "light").toLowerCase(); // "light" | "dark" | "system"
+  nativeTheme.themeSource = ["light","dark","system"].includes(themePref) ? themePref : "light";
 
+    // Use this same color for the BrowserWindow to remove white flash
+  const bg = nativeTheme.shouldUseDarkColors ? "#1e1e1e" : "#ffffff";
+  
   const win = new BrowserWindow({
     ...bounds,
-    backgroundColor: "#808080",
+    backgroundColor: bg,
     show: false,
     icon: currentIconPath(),
     // If you want content-size semantics, set useContentSize: true and adjust save/restore accordingly.

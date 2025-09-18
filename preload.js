@@ -2,6 +2,24 @@
 
 const { contextBridge, ipcRenderer } = require("electron");
 
+// Apply theme ASAP to avoid flash
+(function applyEarlyTheme() {
+  try {
+    // Persisted preference from previous runs (renderer will keep this in sync)
+    const stored = window.localStorage.getItem("theme"); // "light" | "dark" | "system"
+    const resolved =
+      stored && stored !== "system"
+        ? stored
+        : (nativeTheme.shouldUseDarkColors ? "dark" : "light");
+
+    // Use either a data-attr or class; pick one and keep it consistent with your CSS
+    document.documentElement.dataset.theme = resolved;         // e.g. [data-theme="dark"]
+    document.documentElement.classList.add(`theme-${resolved}`); // if you prefer class selectors
+  } catch (_) {
+    // best-effort; ignore
+  }
+})();
+
 // ---------- Helpers ----------
 function buildGroup(methods) {
   const group = {};

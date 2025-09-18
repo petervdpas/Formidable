@@ -20,6 +20,9 @@
     border: 1px solid var(--border-color, #999);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
     border-radius: 6px;
+    border-color: var(--modal-border, #999);
+    background-color: var(--modal-bg, #fff);
+    color: var(--modal-fg, #222);
 }
 
 .modal.show {
@@ -186,7 +189,7 @@
     width: 100%;
     height: 100%;
     z-index: 900;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--modal-backdrop, rgba(0, 0, 0, 0.5)) !important;
     opacity: 0;
     transition: opacity 0.2s ease;
 }

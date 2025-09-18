@@ -4,6 +4,7 @@ fieldset {
   border-radius: 6px;
   padding: 10px 14px;
   margin-bottom: 8px;
+  border-color: var(--input-border-color);
 }
 
 legend {
@@ -21,6 +22,7 @@ label small {
   font-weight: normal;
   font-size: 0.65em;
   margin-left: 6px;
+  color: var(--readonly-fg);
 }
 
 .label-subtext {
@@ -42,6 +44,7 @@ label small {
 }
 
 /* ───── Inputs and Selects ───── */
+
 .form-row input[type="text"],
 .form-row input[type="url"],
 .form-row select {
@@ -50,6 +53,7 @@ label small {
   padding: 6px 10px;
   border-radius: 4px;
   box-sizing: border-box;
+  border-color: var(--input-border-color);
 }
 
 .form-row textarea {
@@ -59,6 +63,7 @@ label small {
   box-sizing: border-box;
   min-height: 4rem;
   resize: vertical;
+  border-color: var(--input-border-color);
 }
 
 /* ───── Checkbox Alignment ───── */
@@ -111,6 +116,10 @@ label small {
   color: var(--generic-fg-info, #333);
   border-radius: 4px;
   font-style: italic;
+}
+
+.form-row .field-description {
+  color: var(--readonly-fg);
 }
 
 /* ───── Directory Picker ───── */

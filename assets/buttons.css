@@ -393,7 +393,7 @@ button.btn-remove-image:active,
 
 /* ───── Button Hover ───── */
 .modal-actions button:hover {
-  background-color: #f0f0f0;
+  background-color: var(--modal-hover-bg, #e4e4e4);
 }
 
 .toggle-buttons-inline button {

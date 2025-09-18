@@ -53,6 +53,11 @@
   overflow: hidden;
 }
 
+.editor-wrapper.fullscreen {
+  background-color: var(--input-bg);
+  border: 2px solid var(--input-border-color);
+}
+
 .editor-wrapper.fullscreen .CodeMirror {
   height: 100% !important;
 }
@@ -75,3 +80,42 @@
   pointer-events: none;
 }
 
+.EasyMDEContainer .editor-toolbar {
+  background-color: var(--editor-toolbar-bg);
+  color: var(--editor-toolbar-fg);
+  border: 1px solid var(--editor-toolbar-border);
+  border-bottom: none;
+}
+
+.EasyMDEContainer .editor-toolbar button {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--editor-toolbar-button-fg);
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.EasyMDEContainer .editor-toolbar button:hover {
+  color: var(--editor-toolbar-button-fg-hover);
+  background: var(--editor-toolbar-button-bg-hover);
+  border-color: var(--editor-toolbar-button-fg-hover);
+}
+
+.EasyMDEContainer .editor-toolbar button:active,
+.EasyMDEContainer .editor-toolbar button.active {
+  color: var(--editor-toolbar-button-fg-active);
+  background: var(--editor-toolbar-button-bg-active);
+  border-color: var(--editor-toolbar-button-fg-active);
+}
+
+.EasyMDEContainer .editor-toolbar button:disabled {
+  color: var(--editor-toolbar-button-fg-disabled);
+  background: var(--editor-toolbar-button-bg-disabled);
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.EasyMDEContainer .CodeMirror {
+  border: 1px solid var(--editor-toolbar-border);
+}

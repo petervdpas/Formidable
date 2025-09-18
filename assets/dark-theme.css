@@ -1,11 +1,59 @@
 /* ───── Dark Theme ───── */
 .dark-mode {
+  /* Base page + surfaces */
+  --page-bg: #121212;
+  --page-fg: #eee;
+
+  --sidebar-bg: #1c1c1c;
+  --sidebar-border: #444;
+
+  --workspace-bg: #121212;
+  --workspace-fg: #eee;
+
+  --statusbar-bg: #1e1e1e;
+  --statusbar-fg: #ccc;
+  --statusbar-border: #444;
+
+  --list-item-bg: #2a2a2a;
+  --list-item-hover-bg: #3a3a3a;
+  --list-item-selected-bg: #2196f3;
+  --list-item-selected-fg: #fff;
+  --list-item-selected-border: #0d47a1;
+
+  --modal-bg: #2a2a2a;
+  --modal-border: #555;
+  --modal-fg: #eee;
+  --modal-hover-bg: #444;
+  --modal-backdrop: rgba(0, 0, 0, 0.6);
+  --modal-highlight-bg: #3b3b3b;
+  --modal-highlight-border: #aaa;
+  --modal-highlight-text: #eee;
+
+  --scrollbar-thumb: #555;
+  --scrollbar-track: #222;
+
+  --resize-handle-bg: #666;
+  --resize-handle-border: #444;
+
+  --menu-bg: #1e1e1e;
+  --menu-fg: #eee;
+  --menu-border: #444;
+  --menu-hover-bg: #2a2a2a;
+  --submenu-bg: #2a2a2a;
+  --submenu-fg: #eee;
+  --submenu-hover-bg: #3a3a3a;
+  --submenu-separator: #444;
+
+  /* ───── Global UI Elements ───── */
   --text-color: #eee;
   --text-description: #ccc;
   --input-border-color: #555;
   --input-bg: #1c1c1c;
   --input-fg: #eee;
+  --input-focus-border: #888;
   --input-icon-bg: #3f3f3f;
+  --input-icon-bg-hover: #000;
+  --input-accent-color: #88d88c;
   --accent-color: #4dabf7;
   --hover-bg: #2a2a2a;
   --badge-bg: #2a2a2a;
@@ -30,9 +78,10 @@
   --readonly-bg: #888;
   --readonly-fg: #ffffe0;
 
-  --color-switch-on: #2196f3;
-  --color-switch-off: #555;
-  --switch-knob-color: #f5f5f5;
+  --switch-track-bg: #555;
+  --switch-track-bg-checked: #2196f3;
+  --switch-knob-bg: #f5f5f5;
+  --switch-focus-ring: 0 0 0 3px rgba(33, 150, 243, .35);
 
   --statusbar-btn-bg: #2a2a2a;
   --statusbar-btn-bg-hover: #3a3a3a;
@@ -48,6 +97,19 @@
   --status-success-color: #5ed598;
   --status-warning-color: #ffb84d;
   --status-error-color: #ff6b6b;
+
+  --editor-toolbar-bg:#2a2a2a;
+  --editor-toolbar-fg:#ddd;
+  --editor-toolbar-border:#444;
+
+  --editor-toolbar-button-fg:#eee;
+  --editor-toolbar-button-fg-hover:#fff;
+  --editor-toolbar-button-fg-active:#000;
+  --editor-toolbar-button-fg-disabled:#777;
+
+  --editor-toolbar-button-bg-hover:#444;
+  --editor-toolbar-button-bg-active:#2196f3;
+  --editor-toolbar-button-bg-disabled:#333;
 
   /* ───── Generic Shadows ───── */
   --generic-box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
@@ -99,10 +161,6 @@
   --close-button-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
   --close-hover-color: #fff;
   --close-hover-bg: rgba(255, 255, 255, 0.1);
-
-  --modal-highlight-bg: #3b3b3b;
-  --modal-highlight-border: #aaa;
-  --modal-highlight-text: #eee;
 
   --sortable-bg: #2a2a2a;
   --sortable-drag-bg: #888;
@@ -189,205 +247,4 @@
   --code-save-btn-fg: #fffbeb;
   --code-save-output-bg: #2b1f0c;
   --code-save-accent: #f59e0b;
-}
-
-.dark-mode body,
-.dark-mode #template-container,
-.dark-mode #storage-container,
-.dark-mode #template-sidebar,
-.dark-mode #storage-sidebar,
-.dark-mode #template-workspace,
-.dark-mode #template-content,
-.dark-mode #storage-workspace,
-.dark-mode #storage-content {
-  background-color: #121212;
-  color: #eee;
-}
-
-.dark-mode #status-bar {
-  background-color: #1e1e1e;
-  border-top: 1px solid #444;
-  color: #ccc;
-}
-
-.dark-mode #template-sidebar,
-.dark-mode #storage-sidebar {
-  border-right: 1px solid #444;
-}
-
-.dark-mode .template-item,
-.dark-mode .storage-item,
-.dark-mode .profile-item {
-  background-color: #2a2a2a;
-}
-
-.dark-mode .template-item:hover,
-.dark-mode .storage-item:hover,
-.dark-mode .profile-item:hover {
-  background-color: #3a3a3a;
-}
-
-.dark-mode .template-item.selected,
-.dark-mode .storage-item.selected,
-.dark-mode .profile-item.selected {
-  background-color: #2196f3;
-  color: white;
-  font-weight: bold;
-  border-left: 4px solid #0d47a1;
-}
-
-.dark-mode .modal {
-  background-color: #2a2a2a;
-  border-color: #555;
-  color: #eee;
-}
-
-.dark-mode .modal-actions button:hover {
-  background-color: #444;
-}
-
-.dark-mode .modal-backdrop {
-  background-color: rgba(0, 0, 0, 0.6) !important;
-}
-
-.dark-mode .slider:before {
-  background-color: #ccc;
-}
-
-.dark-mode ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-.dark-mode ::-webkit-scrollbar-thumb {
-  background-color: #555;
-  border-radius: 5px;
-}
-
-.dark-mode ::-webkit-scrollbar-track {
-  background: #222;
-}
-
-.dark-mode #template-resizeHandle,
-.dark-mode #storage-resizeHandle {
-  background-color: #666;
-  border-color: #444;
-}
-
-.dark-mode #app-menu {
-  background-color: #1e1e1e;
-  border-bottom: 1px solid #444;
-  color: #eee;
-}
-
-.dark-mode .menu-bar {
-  color: #eee;
-}
-
-.dark-mode .menu-item:hover {
-  background-color: #2a2a2a;
-}
-
-.dark-mode .submenu {
-  background-color: #2a2a2a;
-  border: 1px solid #555;
-}
-
-.dark-mode .submenu li {
-  color: #eee;
-}
-
-.dark-mode .submenu li:hover {
-  background-color: #3a3a3a;
-}
-
-.dark-mode .submenu .separator {
-  border-top: 1px solid #444;
-}
-
-/* ───── forms.css ───── */
-form,
-fieldset {
-  border-color: var(--input-border-color);
-}
-
-label small,
-.form-row .field-description {
-  color: var(--readonly-fg);
-}
-
-.form-row input[type="text"],
-.form-row input[type="url"],
-.form-row select,
-.form-row textarea {
-  border-color: var(--input-border-color);
-}
-
-/* Inputs (dark) */
-.dark-mode input,
-.dark-mode textarea,
-.dark-mode select {
-  background-color: var(--input-bg);
-  color: var(--input-fg);
-  border-color: var(--input-border-color);
-}
-
-.dark-mode input:focus,
-.dark-mode textarea:focus,
-.dark-mode select:focus {
-  border-color: #888;
-}
-
-.dark-mode input[readonly] {
-  background-color: var(--readonly-bg);
-  color: var(--readonly-fg);
-  border-color: var(--input-border-color);
-}
-
-.dark-mode input[type="checkbox"],
-.dark-mode input[type="radio"] {
-  accent-color: #88d88c;
-}
-
-.dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
-  background-color: var(--input-icon-bg);
-}
-
-.dark-mode input[type="date"]::-webkit-calendar-picker-indicator:hover {
-  background-color: #000;
-}
-
-.dark-mode .popup-selector {
-  background-color: var(--input-bg);
-  color: var(--input-fg);
-  border-color: var(--input-border-color);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
-
-.dark-mode .popup-option {
-  background-color: #2a2a2a;
-}
-
-.dark-mode .popup-option:hover {
-  background-color: #3a3a3a;
-}
-
-
-/* EasyMDE toolbar + statusbar dark mode support */
-.dark-mode .editor-toolbar {
-  background-color: #2a2a2a;
-  color: #ddd;
-  border-color: #444;
-}
-
-.dark-mode .editor-toolbar button {
-  color: #eee;
-}
-
-.dark-mode .editor-toolbar button:hover {
-  background-color: #444;
-}
-
-.dark-mode .EasyMDEContainer .CodeMirror {
-  border: 1px solid #444;
 }

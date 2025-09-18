@@ -1,9 +1,11 @@
-/* ───── Toggle Switch (Boolean / Theme-Neutral) ───── */
+/* ───── Toggle Switch (theme-neutral) ───── */
 :root {
-  --color-switch-off: #888;       /* Neutral OFF */
-  --color-switch-on: #4caf50;     /* Green ON or custom via var */
-  --switch-knob-color: white;
-  --switch-transition: 0.3s;
+  /* fallbacks if a theme forgets to define them */
+  --switch-track-bg: #888;
+  --switch-track-bg-checked: #4caf50;
+  --switch-knob-bg: #fff;
+  --switch-focus-ring: 0 0 0 3px rgba(76, 175, 80, .35);
+  --switch-transition: .25s;
 }
 
 .switch {
@@ -22,16 +24,12 @@
 
 .switch .slider {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: var(--color-switch-off);
-  transition: background-color var(--switch-transition);
-  border-radius: 11px;
+  inset: 0;
+  background-color: var(--switch-track-bg);
+  transition: background-color var(--switch-transition), box-shadow var(--switch-transition);
+  border-radius: 999px;
   display: flex;
   align-items: center;
-  padding: 0 3px;
   box-sizing: border-box;
 }
 
@@ -42,19 +40,34 @@
   width: 16px;
   left: 3px;
   top: 3px;
-  background-color: var(--switch-knob-color);
+  background-color: var(--switch-knob-bg);
   border-radius: 50%;
   transition: transform var(--switch-transition);
 }
 
-.switch input:checked + .slider {
-  background-color: var(--color-switch-on);
+.switch input:checked+.slider {
+  background-color: var(--switch-track-bg-checked);
 }
 
-.switch input:checked + .slider::before {
+.switch input:checked+.slider::before {
   transform: translateX(20px);
 }
 
+/* Focus ring (keyboard) */
+.switch input:focus-visible+.slider {
+  box-shadow: var(--switch-focus-ring);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  .switch .slider,
+  .switch .slider::before {
+    transition: none;
+  }
+}
+
+/* Layout helpers you already had */
 .switch-wrapper {
   display: inline-flex;
   align-items: center;
@@ -64,29 +77,27 @@
 .trailing-label {
   display: inline-flex;
   align-items: center;
-  font-size: 0.85em;
+  font-size: .85em;
   white-space: nowrap;
   line-height: 1;
 }
 
-/* Specifically for switch alignment rows */
 .modal-form-row .switch {
-    min-width: 10px;
+  min-width: 10px;
 }
 
 .modal-form-row.switch-row .switch {
-    height: 20px;
+  height: 20px;
 }
 
 .modal-form-row.switch-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
 }
 
 .modal-form-row.switch-row label:not(.switch) {
-    min-width: var(--label-col, 220px);
-    /* same as regular label */
-    font-weight: bold;
-    text-align: right;
+  min-width: var(--label-col, 220px);
+  font-weight: bold;
+  text-align: right;
 }
