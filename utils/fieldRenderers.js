@@ -15,10 +15,10 @@ import {
   generateGuid,
 } from "./domUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
-import { getCurrentTheme } from "../modules/themeToggle.js";
 import { createRemoveImageButton } from "../modules/uiButtons.js";
 import { createIconButton } from "./buttonUtils.js";
-import { t } from "../utils/i18n.js";
+import { getCurrentTheme } from "./themeUtils.js";
+import { t } from "./i18n.js";
 
 function resolveOption(opt) {
   return typeof opt === "string"

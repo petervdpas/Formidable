@@ -1,23 +1,37 @@
 // preload.js
 
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge, ipcRenderer, nativeTheme } = require("electron");
 
-// Apply theme ASAP to avoid flash
+// Wait until the <link> tags exist, then run fn
+function runWhenReady(fn) {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", fn, { once: true });
+  } else {
+    fn();
+  }
+}
+
 (function applyEarlyTheme() {
   try {
-    // Persisted preference from previous runs (renderer will keep this in sync)
-    const stored = window.localStorage.getItem("theme"); // "light" | "dark" | "system"
-    const resolved =
-      stored && stored !== "system"
-        ? stored
-        : (nativeTheme.shouldUseDarkColors ? "dark" : "light");
+    const stored = localStorage.getItem("theme");
+    const resolved = stored === "dark" ? "dark" : "light";
 
-    // Use either a data-attr or class; pick one and keep it consistent with your CSS
-    document.documentElement.dataset.theme = resolved;         // e.g. [data-theme="dark"]
-    document.documentElement.classList.add(`theme-${resolved}`); // if you prefer class selectors
-  } catch (_) {
-    // best-effort; ignore
-  }
+    document.documentElement.dataset.theme = resolved;
+    document.documentElement.classList.remove("theme-light","theme-dark");
+    document.documentElement.classList.add(`theme-${resolved}`);
+
+    const enableLinks = () => {
+      const light = document.getElementById("formidable-theme-light");
+      const dark  = document.getElementById("formidable-theme-dark");
+      if (light) light.disabled = resolved !== "light";
+      if (dark)  dark.disabled  = resolved !== "dark";
+    };
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", enableLinks, { once: true });
+    } else {
+      enableLinks();
+    }
+  } catch {}
 })();
 
 // ---------- Helpers ----------

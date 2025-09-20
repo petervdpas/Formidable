@@ -3,7 +3,6 @@
 import { EventBus } from "./eventBus.js";
 import { initTabs } from "../utils/tabUtils.js";
 import { formatAsRelativePath } from "../utils/pathUtils.js";
-import { initThemeToggle } from "./themeToggle.js";
 import {
   createDirectoryPicker,
   createSwitch,
@@ -352,7 +351,6 @@ function bindThemeSwitch(switchId, configKey) {
   const el = document.getElementById(switchId);
   if (!el) return;
 
-  initThemeToggle(el); // keep your logic
   EventBus.emit("theme:toggle", el.checked ? "dark" : "light");
 
   el.onchange = async () => {

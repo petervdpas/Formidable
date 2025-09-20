@@ -1,6 +1,6 @@
 // modules/templateCodemirror.js
 import { EventBus } from "./eventBus.js";
-import { getCurrentTheme } from "./themeToggle.js";
+import { getCurrentTheme } from "../utils/themeUtils.js";
 
 // Compute theme *at call*, not at import
 const THEME = () => (getCurrentTheme() === "dark" ? "monokai" : "eclipse");
