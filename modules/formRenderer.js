@@ -37,6 +37,36 @@ function getEventFunctions() {
   };
 }
 
+function attachFormSavedListener({ container, section, metaData }) {
+  const onSaved = (e) => {
+    if (!e || !e.filename) return;
+    const thisFile = metaData?._filename;
+    if (!thisFile || e.filename !== thisFile) return;
+
+    // Update “updated” label text if present
+    const updatedNode = section.querySelector('[data-i18n-key="standard.updated"], .meta-updated, [data-meta="updated"]');
+    if (updatedNode && e.updated) {
+      updatedNode.textContent = e.updated;
+    }
+
+    // Update tags display if you show it
+    const tagsNode = section.querySelector('[data-i18n-key="standard.tags"], .meta-tags, [data-meta="tags"]');
+    if (tagsNode && Array.isArray(e.tags)) {
+      tagsNode.textContent = e.tags.join(", ");
+    }
+
+    // Hidden mirror if you keep one
+    const updatedHidden = container.querySelector('input[name="meta-updated"]');
+    if (updatedHidden && e.updated) updatedHidden.value = e.updated;
+  };
+
+  EventBus.on("form:saved", onSaved);
+
+  // Clean up when the UI is replaced
+  const cleanup = () => EventBus.off("form:saved", onSaved);
+  container.__formSavedCleanup = cleanup;
+}
+
 async function buildMetaSection(
   meta,
   filename,
@@ -186,6 +216,8 @@ export async function renderFormUI(
     onRender
   );
   container.appendChild(metaSection);
+
+  attachFormSavedListener({ container, section: metaSection, metaData });
 
   // ─── Apply display setting + live updates ─────────────────────
   const applyMetaVisibility = (show) => {

@@ -26,6 +26,13 @@ export async function saveForm(container, template) {
   }
   savingInProgress = true;
 
+  // Preserve focus + selection
+  const active = document.activeElement;
+  const hasSel = active && "selectionStart" in active && "selectionEnd" in active;
+  const sel = hasSel
+    ? { start: active.selectionStart, end: active.selectionEnd }
+    : null;
+
   try {
     template = await ensureVirtualLocation(template);
     if (!template?.virtualLocation) {
@@ -87,26 +94,19 @@ export async function saveForm(container, template) {
       },
     };
 
-    // Inject tags from the single `tags` field into _meta.tags
-    const tagFieldKey = (template.fields || []).find(
-      (f) => f.type === "tags"
-    )?.key;
+    // tags → _meta.tags
+    const tagFieldKey = (template.fields || []).find((f) => f.type === "tags")?.key;
     if (tagFieldKey) {
       const raw = data[tagFieldKey];
       let tags = [];
       if (Array.isArray(raw)) {
-        tags = raw
-          .map((t) => (typeof t === "string" ? t : t?.value))
-          .filter(Boolean);
+        tags = raw.map((t) => (typeof t === "string" ? t : t?.value)).filter(Boolean);
       } else if (typeof raw === "string") {
-        tags = raw
-          .split(/[,;]/)
-          .map((s) => s.trim())
-          .filter(Boolean);
+        tags = raw.split(/[,;]/).map((s) => s.trim()).filter(Boolean);
       }
-      const norm = [
-        ...new Set(tags.map((t) => t.trim().toLowerCase()).filter(Boolean)),
-      ].sort((a, b) => a.localeCompare(b));
+      const norm = [...new Set(tags.map((t) => t.trim().toLowerCase()).filter(Boolean))].sort(
+        (a, b) => a.localeCompare(b)
+      );
       payload._meta.tags = norm;
     }
 
@@ -115,8 +115,18 @@ export async function saveForm(container, template) {
       datafile: datafile,
       payload: payload,
       fields: template.fields || [],
+      refreshMode: "silent", // keep UI steady
     });
   } finally {
+    // Restore focus + caret if element still in DOM
+    if (active && document.body.contains(active)) {
+      active.focus();
+      if (sel && typeof active.setSelectionRange === "function") {
+        try {
+          active.setSelectionRange(sel.start, sel.end);
+        } catch {}
+      }
+    }
     savingInProgress = false;
   }
 }

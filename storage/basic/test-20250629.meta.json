@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-29T09:32:36.440Z",
-    "updated": "2025-09-13T15:08:57.815Z",
+    "updated": "2025-09-20T23:29:11.758Z",
     "flagged": false,
     "tags": [
       "ch.01",
@@ -24,7 +24,7 @@
     "radio": "DOG",
     "mline": "Okay, and 2 bit?? A small change to test stuff! Test can be done by hand... like in the old days.... but people think that isn't that good!",
     "numpy": 17,
-    "rangie": 85,
+    "rangie": 25,
     "bday": "1968-12-23",
     "listy": [
       "A test",
@@ -40,6 +40,11 @@
         "Da",
         "Da",
         "Da"
+      ],
+      [
+        "Me",
+        "Mi",
+        "Mo"
       ]
     ],
     "design": "GreenSignWhiteArrowPersonRunning.png",

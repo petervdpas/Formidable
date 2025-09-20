@@ -2,6 +2,7 @@
 
 import { EventBus } from "../eventBus.js";
 import { clearContainerUI } from "../../utils/formUtils.js";
+import { normalizeOptions } from "../../utils/opts.js";
 
 let formManager = null;
 let storageListManager = null;
@@ -112,7 +113,12 @@ export async function handleOnLoadRun(
   respond
 ) {
   try {
-    if (!Array.isArray(fields) || !fields.length || !data || typeof data !== "object") {
+    if (
+      !Array.isArray(fields) ||
+      !fields.length ||
+      !data ||
+      typeof data !== "object"
+    ) {
       respond?.(data);
       return;
     }
@@ -123,37 +129,6 @@ export async function handleOnLoadRun(
     const pick = (obj, ...keys) => {
       for (const k of keys) if (obj && obj[k] !== undefined) return obj[k];
       return undefined;
-    };
-    const optsToObject = (opts) => {
-      if (!opts) return {};
-      const out = {};
-      if (Array.isArray(opts)) {
-        for (const it of opts) {
-          if (it && typeof it === "object") {
-            if ("value" in it) {
-              const k = String(it.value).trim();
-              const v = "label" in it ? String(it.label) : "";
-              out[k] = v;
-              continue;
-            }
-            if ("key" in it) {
-              out[String(it.key)] = String(it.value ?? "");
-              continue;
-            }
-          }
-          if (Array.isArray(it) && it.length >= 2) {
-            out[String(it[0])] = String(it[1]);
-            continue;
-          }
-          if (typeof it === "string" && it.includes("=")) {
-            const [k, ...rest] = it.split("=");
-            out[k.trim()] = rest.join("=").trim();
-          }
-        }
-        return out;
-      }
-      if (typeof opts === "object") return { ...opts };
-      return {};
     };
 
     // Live snapshot from the just-loaded data
@@ -173,16 +148,19 @@ export async function handleOnLoadRun(
       const src = typeof f.default === "string" ? f.default : "";
       if (!src.trim()) continue;
 
-      const inputMode  = pick(f, "input_mode", "inputMode") || "safe";
-      const apiMode    = pick(f, "api_mode", "apiMode")   || "frozen";
+      const inputMode = pick(f, "input_mode", "inputMode") || "safe";
+      const apiMode = pick(f, "api_mode", "apiMode") || "frozen";
       const apiPickRaw = pick(f, "api_pick", "apiPick");
       const apiPick = Array.isArray(apiPickRaw)
         ? apiPickRaw
         : typeof apiPickRaw === "string"
-          ? apiPickRaw.split(/[,\s]+/).map(s => s.trim()).filter(Boolean)
-          : null;
+        ? apiPickRaw
+            .split(/[,\s]+/)
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : null;
 
-      const opts = optsToObject(f.options);
+      const opts = normalizeOptions(f.options);
 
       const payload = {
         code: String(src),
@@ -193,8 +171,6 @@ export async function handleOnLoadRun(
         apiMode,
         opts,
         optsAsVars: Array.isArray(f.options) && f.options.length > 0,
-
-        // use your executor's new override so api.form.snapshot() sees live data
         formSnapshot: formSnap,
       };
 
@@ -242,12 +218,15 @@ export async function handleLoadForm(
     let processed = data;
     if (data && data.data && Array.isArray(fields) && fields.length) {
       try {
-        const runResult = await EventBus.emitWithResponse("form:load:run:onload", {
-          templateFilename,
-          datafile,
-          data: data.data,   // pass only the data block (not meta)
-          fields,
-        });
+        const runResult = await EventBus.emitWithResponse(
+          "form:load:run:onload",
+          {
+            templateFilename,
+            datafile,
+            data: data.data, // pass only the data block (not meta)
+            fields,
+          }
+        );
         if (runResult && typeof runResult === "object") {
           processed = { ...data, data: runResult };
         }
@@ -286,7 +265,12 @@ export async function handleBeforeSaveRun(
   respond
 ) {
   try {
-    if (!Array.isArray(fields) || !fields.length || !data || typeof data !== "object") {
+    if (
+      !Array.isArray(fields) ||
+      !fields.length ||
+      !data ||
+      typeof data !== "object"
+    ) {
       respond?.(data);
       return;
     }
@@ -298,43 +282,11 @@ export async function handleBeforeSaveRun(
       for (const k of keys) if (obj && obj[k] !== undefined) return obj[k];
       return undefined;
     };
-    const optsToObject = (opts) => {
-      if (!opts) return {};
-      const out = {};
-      if (Array.isArray(opts)) {
-        for (const it of opts) {
-          if (it && typeof it === "object") {
-            if ("value" in it) {
-              const k = String(it.value).trim();
-              const v = "label" in it ? String(it.label) : "";
-              out[k] = v;
-              continue;
-            }
-            if ("key" in it) {
-              out[String(it.key)] = String(it.value ?? "");
-              continue;
-            }
-          }
-          if (Array.isArray(it) && it.length >= 2) {
-            out[String(it[0])] = String(it[1]);
-            continue;
-          }
-          if (typeof it === "string" && it.includes("=")) {
-            const [k, ...rest] = it.split("=");
-            out[k].trim() = rest.join("=").trim();
-          }
-        }
-        return out;
-      }
-      if (typeof opts === "object") return { ...opts };
-      return {};
-    };
 
     // Build a minimal, live snapshot (fresh data you're about to save)
-    // Note: keep _meta out of .data if you prefer; it won’t break callers either way.
     const formSnap = {
       meta: updated?._meta || null,
-      data: { ...updated },             // live data view
+      data: { ...updated },
       template: templateFilename || null,
       filename: datafile || null,
     };
@@ -348,28 +300,29 @@ export async function handleBeforeSaveRun(
       const src = typeof f.default === "string" ? f.default : "";
       if (!src.trim()) continue;
 
-      const inputMode  = pick(f, "input_mode", "inputMode") || "safe";
-      const apiMode    = pick(f, "api_mode", "apiMode")   || "frozen";
+      const inputMode = pick(f, "input_mode", "inputMode") || "safe";
+      const apiMode = pick(f, "api_mode", "apiMode") || "frozen";
       const apiPickRaw = pick(f, "api_pick", "apiPick");
       const apiPick = Array.isArray(apiPickRaw)
         ? apiPickRaw
         : typeof apiPickRaw === "string"
-          ? apiPickRaw.split(/[,\s]+/).map(s => s.trim()).filter(Boolean)
-          : null;
+        ? apiPickRaw
+            .split(/[,\s]+/)
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : null;
 
-      const opts = optsToObject(f.options);
+      const opts = normalizeOptions(f.options);
 
       const payload = {
         code: String(src),
-        input: { ...(pick(f, "input") ?? {}), form: formSnap }, // scripts can also read input.form
+        input: { ...(pick(f, "input") ?? {}), form: formSnap },
         timeout: Number(pick(f, "timeout")) || 3000,
         inputMode,
         apiPick,
         apiMode,
         opts,
         optsAsVars: Array.isArray(f.options) && f.options.length > 0,
-
-        // NEW: override api.form.snapshot() for this run with the live snapshot
         formSnapshot: formSnap,
       };
 
@@ -381,11 +334,8 @@ export async function handleBeforeSaveRun(
       }
 
       if (res?.ok) {
-        // Write the computed value back into the data payload
         updated[f.key] = res.result;
-
-        // NEW: refresh the live snapshot so subsequent code fields see latest data
-        formSnap.data = { ...updated };
+        formSnap.data = { ...updated }; // refresh snapshot for subsequent fields
       } else {
         EventBus.emit("logging:warning", [
           `[formHandlers] Code field "${f.key}" (run_mode:save) failed:`,
@@ -396,14 +346,24 @@ export async function handleBeforeSaveRun(
 
     respond?.(updated);
   } catch (e) {
-    EventBus.emit("logging:error", ["[formHandlers] handleBeforeSaveRun failed:", e]);
+    EventBus.emit("logging:error", [
+      "[formHandlers] handleBeforeSaveRun failed:",
+      e,
+    ]);
     respond?.(data); // fall back to original data
   }
 }
 
 // SAVE
 export async function handleSaveForm(payload, respond) {
-  const { templateFilename, datafile, payload: data, fields = [] } = payload;
+  const {
+    templateFilename,
+    datafile,
+    payload: data,
+    fields = [],
+    // "silent" keeps UI intact; "list" updates list; "full" does heavy refresh
+    refreshMode = "silent",
+  } = payload;
 
   try {
     // let others preprocess (e.g., run code fields) before persisting
@@ -412,7 +372,8 @@ export async function handleSaveForm(payload, respond) {
       { templateFilename, datafile, data, fields }
     );
 
-    const dataToSave = preprocessed && typeof preprocessed === "object" ? preprocessed : data;
+    const dataToSave =
+      preprocessed && typeof preprocessed === "object" ? preprocessed : data;
 
     const result = await window.api.forms.saveForm(
       templateFilename,
@@ -425,11 +386,14 @@ export async function handleSaveForm(payload, respond) {
       datafile || result.path?.split(/[/\\]/).pop() || "unknown.json";
 
     if (result.success) {
-      EventBus.emit("form:context:update", {
-        meta: (data && data.meta) || null,
-        data: (data && data.data) || {},
+      // Soft signal for the active screen; do NOT re-render the whole form
+      EventBus.emit("form:saved", {
         template: templateFilename || null,
-        filename: datafile || result.path?.split(/[/\\]/).pop() || null,
+        filename: datafile || null,
+        updated: new Date().toISOString(),
+        tags: Array.isArray(dataToSave?._meta?.tags)
+          ? dataToSave._meta.tags
+          : undefined,
       });
 
       EventBus.emit("status:update", {
@@ -446,11 +410,18 @@ export async function handleSaveForm(payload, respond) {
         duration: 4000,
       });
 
-      EventBus.emit("form:list:reload");
-      setTimeout(() => EventBus.emit("form:list:highlighted", datafile), 500);
-
-      const templateName = (templateFilename || "").replace(/\.yaml$/, "");
-      EventBus.emit("vfs:refreshTemplate", { templateName: templateName });
+      // Optional light/heavy refresh knobs
+      if (refreshMode === "list") {
+        EventBus.emit("form:list:updateItem", {
+          name: datafile,
+          updatedAt: Date.now(),
+        });
+      } else if (refreshMode === "full") {
+        const templateName = (templateFilename || "").replace(/\.yaml$/, "");
+        EventBus.emit("vfs:refreshTemplate", { templateName });
+        EventBus.emit("form:list:reload");
+        setTimeout(() => EventBus.emit("form:list:highlighted", datafile), 500);
+      }
     } else {
       EventBus.emit("status:update", {
         message: "status.save.failed",
