@@ -453,6 +453,7 @@ export default {
   "field.link.text": "Linktekst",
   "field.link.text.hint": "De tekst die wordt weergegeven voor de link",
   "field.link.bare": "Kale link",
+  "field.link.none": "(geen link)",
 
   "field.code.label": "Code",
   "field.code.runmode": "Uitvoeringsmodus",

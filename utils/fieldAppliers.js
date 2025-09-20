@@ -5,7 +5,10 @@ import { createLinkOpenButton } from "../modules/uiButtons.js";
 import { ensureVirtualLocation } from "./vfsUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 import { createSortable } from "./domUtils.js";
-import { wrapInputWithLabel } from "./elementBuilders.js";
+import {
+  addContainerElement,
+  createStyledLabel,
+} from "./elementBuilders.js";
 
 export function applyGuidField(container, field, value) {
   const key = field.key;
@@ -344,15 +347,11 @@ export async function applyLinkField(
         };
 
   const textInput = wrapper.querySelector(`#${key}-link-text`);
-  if (textInput) {
-    textInput.value = text || "";
-  }
+  if (textInput) textInput.value = text || "";
 
-  // i18n helper
-  const tr = (k, fallback) =>
-    (window.i18n?.t && window.i18n.t(k)) ||
-    (typeof t === "function" && t(k)) ||
-    fallback;
+  // i18n helpers
+  const NO_LINK =
+    (typeof t === "function" && t("field.link.none")) || "(no link)";
 
   // Parse formidable://<tpl>:<entry>
   const parseFormidable = (link) => {
@@ -364,76 +363,80 @@ export async function applyLinkField(
   };
 
   // Ensure a SINGLE, labeled row for the bare link preview/open
-  // We build a form-row using wrapInputWithLabel so it matches your UX.
   let bareRow = wrapper.parentElement.querySelector(
     `.link-bare-row[data-for="${key}"]`
   );
   let actionButton = null;
 
+  // Single click handler factory (no duplication)
+  const makeOnLinkClick = (btn) => () => {
+    const link = btn?.dataset.href || "";
+    if (link.startsWith("formidable://")) {
+      const parsed = parseFormidable(link) || {};
+      EventBus.emit("link:formidable:navigate", {
+        link,
+        template: parsed.tpl || templateSelect?.value || "",
+        entry: parsed.entry || entrySelect?.value || "",
+      });
+    } else if (/^https?:\/\//i.test(link)) {
+      EventBus.emit("link:external:open", { url: link, variant: "external" });
+    } else {
+      EventBus.emit("logging:warning", [
+        "[applyLinkField] Unknown link format:",
+        link,
+      ]);
+    }
+  };
+
   if (!bareRow) {
-    // content: a simple container that will hold the open button
+    // Build row (no wrapInputWithLabel → no i18n double set)
+    const row = addContainerElement({
+      parent: wrapper.parentElement,
+      tag: "div",
+      className: "form-row link-bare-row",
+      attributes: { "data-for": key },
+    });
+
+    // Label from key as single source of truth; rendered immediately
+    row.appendChild(createStyledLabel("", { i18nKey: "field.link.bare" }));
+
+    // Content holder + button
     const content = document.createElement("div");
     content.className = "bare-link-content";
     content.style.display = "inline-flex";
     content.style.alignItems = "center";
+    row.appendChild(content);
 
-    function onLinkClick() {
-      const link = actionButton?.dataset.href || "";
-      if (link.startsWith("formidable://")) {
-        const parsed = parseFormidable(link) || {};
-        EventBus.emit("link:formidable:navigate", {
-          link,
-          template: parsed.tpl || templateSelect?.value || "",
-          entry: parsed.entry || entrySelect?.value || "",
-        });
-      } else if (/^https?:\/\//i.test(link)) {
-        EventBus.emit("link:external:open", {
-          url: link,
-          variant: "external",
-        });
-      } else {
-        EventBus.emit("logging:warning", [
-          "[applyLinkField] Unknown link format:",
-          link,
-        ]);
-      }
-    }
-
-    actionButton = createLinkOpenButton(href || "(no link)", onLinkClick);
-    actionButton.dataset.href = href;
-    content.appendChild(actionButton);
-
-    // Build a labeled row using your helper
-    bareRow = wrapInputWithLabel(
-      content,
-      tr("field.link.bare", "Bare Link"),
-      "",
-      "single",
-      "form-row link-bare-row",
-      null,
-      "field.link.bare"
-    );
-    bareRow.dataset.for = key;
+    const btn = createLinkOpenButton(href || NO_LINK, () => {});
+    btn.dataset.href = href;
+    btn.onclick = makeOnLinkClick(btn);
+    content.appendChild(btn);
 
     // Insert AFTER the main field wrapper
-    wrapper.parentElement.insertBefore(bareRow, wrapper.nextSibling);
+    wrapper.parentElement.insertBefore(row, wrapper.nextSibling);
+
+    bareRow = row;
+    actionButton = btn;
   } else {
-    // Reuse existing button
-    actionButton = bareRow.querySelector("#btn-link-open");
-    if (!actionButton) {
-      const content = bareRow.querySelector(".bare-link-content") || bareRow;
-      function onLinkClick() {}
-      actionButton = createLinkOpenButton(href || "(no link)", onLinkClick);
-      content.appendChild(actionButton);
+    // Reuse existing button (or create if missing)
+    const content = bareRow.querySelector(".bare-link-content") || bareRow;
+    let btn = bareRow.querySelector("#btn-link-open");
+    if (!btn) {
+      btn = createLinkOpenButton(href || NO_LINK, () => {});
+      content.appendChild(btn);
     }
+    btn.dataset.href = href;
+    btn.textContent = href || NO_LINK;
+    btn.onclick = makeOnLinkClick(btn);
+    actionButton = btn;
   }
 
   function updateHref(h) {
     if (!actionButton) return;
     actionButton.dataset.href = h;
-    actionButton.textContent = h || "(no link)";
+    actionButton.textContent = h || NO_LINK;
     actionButton.disabled = !h || !h.trim();
-    // Hide the whole row if empty for cleanliness
+    // If you want the row visible even when empty, comment out the next line
     bareRow.style.display = actionButton.disabled ? "none" : "";
   }
 
@@ -461,10 +464,10 @@ export async function applyLinkField(
     if (templateSelect) {
       const templates = await fetchTemplates();
       templateSelect.innerHTML = "";
-      templates.forEach((t) => {
+      templates.forEach((tfile) => {
         const o = document.createElement("option");
-        o.value = t.filename;
-        o.textContent = t.filename;
+        o.value = tfile.filename;
+        o.textContent = tfile.filename;
         templateSelect.appendChild(o);
       });
       templateSelect.value = tpl;

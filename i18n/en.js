@@ -442,6 +442,7 @@ export default {
   "field.link.text": "Link Text",
   "field.link.text.hint": "The text to display for the link",
   "field.link.bare": "Bare Link",
+  "field.link.none": "(no link)",
 
   "field.code.label": "Code",
   "field.code.runmode": "Run Mode",
