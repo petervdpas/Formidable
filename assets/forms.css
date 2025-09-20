@@ -1,30 +1,25 @@
-/* ───── Form Containers ───── */
-form,
-fieldset {
+/* forms.css — containers, rows, and component wrappers (no input styling) */
+
+/* Containers */
+form, fieldset {
   border-radius: 6px;
   padding: 10px 14px;
   margin-bottom: 8px;
   border-color: var(--input-border-color);
 }
-
-legend {
-  font-weight: bold;
-  padding: 0 6px;
-}
+legend { font-weight: bold; padding: 0 6px; }
 
 label {
   font-weight: bold;
   margin: 6px 0;
   display: block;
 }
-
 label small {
   font-weight: normal;
   font-size: 0.65em;
   margin-left: 6px;
   color: var(--readonly-fg);
 }
-
 .label-subtext {
   display: block;
   margin-top: 4px;
@@ -33,7 +28,7 @@ label small {
   color: inherit;
 }
 
-/* ───── General Row Layout ───── */
+/* Row layout */
 .form-row {
   display: flex;
   align-items: flex-start;
@@ -43,62 +38,75 @@ label small {
   box-sizing: border-box;
 }
 
-/* ───── Inputs and Selects ───── */
-
-.form-row input[type="text"],
-.form-row input[type="url"],
-.form-row select {
-  flex: 1;
+/* Let inputs expand without restyling them */
+.form-row :where(input, select, textarea) {
   width: 100%;
-  padding: 6px 10px;
-  border-radius: 4px;
-  box-sizing: border-box;
-  border-color: var(--input-border-color);
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
-.form-row textarea {
-  width: 100%;
-  padding: 6px 10px;
-  border-radius: 4px;
-  box-sizing: border-box;
-  min-height: 4rem;
-  resize: vertical;
-  border-color: var(--input-border-color);
-}
-
-/* ───── Checkbox Alignment ───── */
+/* Checkbox alignment */
 .form-row input[type="checkbox"] {
   align-self: flex-start;
   margin-top: 4px;
 }
 
-/* ───── Two Column Support ───── */
+/* Prevent stretch from generic input flex rule */
+.form-row input[type="checkbox"],
+.form-row input[type="radio"] {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0;
+}
+
+/* Standalone checkbox alignment (keep old look) */
+.form-row input[type="checkbox"] {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+/* Radio/checkbox groups */
+.form-row [data-radio-group],
+.form-row [data-checkbox-group] {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+/* Option labels inside groups shouldn’t be bold/block */
+.form-row [data-radio-group] label,
+.form-row [data-checkbox-group] label {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  margin: 0;
+  font-weight: normal;
+}
+
+/* Two-column */
 .form-row.two-column {
   justify-content: space-between;
   gap: 12px;
 }
-
-.form-row.two-column>div {
+.form-row.two-column > div {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
-
-.form-row.two-column>div:first-child {
+.form-row.two-column > div:first-child {
   flex: 0 0 40%;
   max-width: 40%;
 }
-
-.form-row.two-column>div:last-child {
+.form-row.two-column > div:last-child {
   flex: 1 1 60%;
 }
 
-/* ───── Single Column Fallback ───── */
-.form-row:not(.two-column) {
-  flex-direction: column;
-}
+/* Single-column fallback */
+.form-row:not(.two-column) { flex-direction: column; }
 
-/* ───── Radio Group Layout ───── */
+/* Radio groups */
 .form-row [data-radio-group] {
   display: flex;
   flex-direction: row;
@@ -106,6 +114,7 @@ label small {
   align-items: center;
 }
 
+/* Info helper */
 .form-info-text {
   font-size: 0.95em;
   line-height: 1.6;
@@ -118,42 +127,23 @@ label small {
   font-style: italic;
 }
 
-.form-row .field-description {
-  color: var(--readonly-fg);
-}
+.form-row .field-description { color: var(--readonly-fg); }
 
-/* ───── Directory Picker ───── */
-.directory-picker.disabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
+/* Directory picker (disabled state) */
+.directory-picker.disabled { opacity: 0.5; pointer-events: none; }
 .directory-picker.disabled input,
-.directory-picker.disabled button {
-  cursor: not-allowed;
-}
+.directory-picker.disabled button { cursor: not-allowed; }
+.directory-picker.disabled input { background-color: #f2f2f2; color: #aaa; }
+.directory-picker.disabled button { background-color: #ddd; border-color: #ccc; }
 
-.directory-picker.disabled input {
-  background-color: #f2f2f2;
-  color: #aaa;
-}
-
-.directory-picker.disabled button {
-  background-color: #ddd;
-  border-color: #ccc;
-}
-
-/* Card around the link field */
+/* Link field card + bare row */
 .form-row.link-row {
   border: 1px solid var(--form-border, #dfe3ea);
   border-radius: 6px;
   padding: 10px 12px;
   background: var(--link-row-bg, #f9fbff);
 }
-
-.form-row.link-bare-row {
-  margin-top: 6px;
-}
+.form-row.link-bare-row { margin-top: 6px; }
 
 .link-bare-row .bare-link-content {
   display: flex;
@@ -162,8 +152,7 @@ label small {
   max-width: 100%;
 }
 
-/* ---------- CASE A: button + label ---------- */
-
+/* CASE A: button + label */
 .link-bare-row .bare-link-label {
   flex: 1 1 auto;
   min-width: 0;
@@ -173,14 +162,12 @@ label small {
   font-weight: 500;
   opacity: .95;
 }
-
 .link-bare-row #btn-link-open {
   flex: 0 0 auto;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 .link-bare-row #btn-link-open .label {
   display: inline-block;
   max-width: 100%;
@@ -190,8 +177,8 @@ label small {
   text-overflow: ellipsis;
 }
 
-/* ---------- CASE B: single anchor only ---------- */
-.link-bare-row .bare-link-content>a,
+/* CASE B: single anchor */
+.link-bare-row .bare-link-content > a,
 .form-row.link-row a.bare-link,
 .form-row.link-bare-row a.bare-link {
   display: block;
@@ -203,12 +190,10 @@ label small {
   font-weight: 500;
 }
 
+/* Responsive */
 @media (max-width: 600px) {
-  .form-row.two-column {
-    flex-direction: column;
-  }
-
-  .form-row.two-column>div {
+  .form-row.two-column { flex-direction: column; }
+  .form-row.two-column > div {
     max-width: 100% !important;
     flex: 1 1 100% !important;
   }

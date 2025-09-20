@@ -49,12 +49,19 @@
     /* ───── Global UI Elements ───── */
     --text-color: #111;
     --text-description: #666;
-    --input-border-color: #ccc;
+
     --input-bg: #fdfdfd;
     --input-fg: #111;
-    --input-focus-border: #888;
-    --input-icon-bg: #1d1d1d;
-    --accent-color: #007bff;
+    --input-border-color: #ccc;
+
+    /* Focus: same blue, lighter ring */
+    --input-focus-border: #3b82f6;
+    --accent-color: rgba(0, 123, 255, .22);
+
+    --input-icon-bg: #e6e6e6;
+    --input-icon-bg-hover: #dcdcdc;
+
+    --input-accent-color: #0d6efd;
     --hover-bg: #f0f0f0;
     --badge-bg: #f6f6f6;
     --muted-fg: #666;

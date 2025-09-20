@@ -1,21 +1,24 @@
-/* ───── Input Field Structure ───── */
+/* inputs.css — all controls + states live here */
 
-input[type="text"],
-input[type="password"],
-input[type="email"],
-input[type="number"],
-input[type="date"],
-input[type="url"],
-select {
+/* -------- Text-like controls -------- */
+:where(input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="number"],
+  input[type="date"],
+  input[type="url"],
+  select) {
   padding: 6px 10px;
-  border-radius: 4px;
-  font-size: 14px;
   height: 36px;
+  border-radius: 4px;
   box-sizing: border-box;
-  border: 1px solid;
-  /* actual color comes from theme */
+  font-size: 14px;
+  border: 1px solid var(--input-border-color);
+  background-color: var(--input-bg);
+  color: var(--input-fg);
 }
 
+/* Textareas */
 textarea {
   padding: 6px 10px;
   border-radius: 4px;
@@ -23,18 +26,21 @@ textarea {
   min-height: 4rem;
   resize: vertical;
   box-sizing: border-box;
-  border: 1px solid;
-  /* actual color comes from theme */
+  border: 1px solid var(--input-border-color);
+  background-color: var(--input-bg);
+  color: var(--input-fg);
 }
 
-input:focus,
-textarea:focus,
-select:focus {
-  outline: none;
-  border-color: var(--input-focus-border);
-  box-shadow: 0 0 0 3px var(--accent-color);
+/* Unified focus style */
+:where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  textarea,
+  select):focus {
+  outline: none !important;
+  border-color: var(--input-focus-border) !important;
+  box-shadow: 0 0 0 2px var(--accent-color) !important;
 }
 
+/* Readonly */
 input[readonly] {
   background-color: var(--readonly-bg);
   color: var(--readonly-fg);
@@ -42,34 +48,25 @@ input[readonly] {
   font-style: italic;
 }
 
-input,
-textarea,
-select {
-  background-color: var(--input-bg);
-  color: var(--input-fg);
-  border-color: var(--input-border-color);
-}
-
+/* Checkboxes / radios */
 input[type="checkbox"],
 input[type="radio"] {
   accent-color: var(--input-accent-color);
 }
 
+/* Date icon */
 input[type="date"]::-webkit-calendar-picker-indicator {
   background-color: var(--input-icon-bg);
+  border-radius: 4px;
+  padding: 5px;
+  cursor: pointer;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
   background-color: var(--input-icon-bg-hover);
 }
 
-/* Calendar icon adjustments */
-input[type="date"]::-webkit-calendar-picker-indicator {
-  border-radius: 4px;
-  padding: 5px;
-  cursor: pointer;
-}
-
+/* Range slider */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -104,10 +101,12 @@ input[type="range"]:hover::-webkit-slider-thumb {
   box-shadow: 0 0 0 4px var(--range-thumb-hover-shadow);
 }
 
+/* Error */
 .input-error {
   border: 2px solid #c00 !important;
 }
 
+/* Input + button wrapper */
 .input-with-button {
   display: flex;
   align-items: center;
@@ -119,6 +118,7 @@ input[type="range"]:hover::-webkit-slider-thumb {
   flex: 1;
 }
 
+/* Password toggle combo */
 .password-field-wrapper input[type="password"],
 .password-field-wrapper input[type="text"] {
   flex: 1;
@@ -137,6 +137,7 @@ input[type="range"]:hover::-webkit-slider-thumb {
   justify-content: center;
 }
 
+/* Textarea status */
 .textarea-statusbar {
   font-size: 0.8em;
   color: #777;
@@ -144,7 +145,6 @@ input[type="range"]:hover::-webkit-slider-thumb {
   display: flex;
   gap: 1em;
   justify-content: flex-end;
-  /* push to right */
 }
 
 .textarea-statusbar span {

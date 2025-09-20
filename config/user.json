@@ -11,23 +11,23 @@
   "context_mode": "storage",
   "context_folder": "./",
   "selected_template": "basic.yaml",
-  "selected_data_file": "test-20250629.meta.json",
+  "selected_data_file": "sane-20250530.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
-  "language": "nl",
+  "language": "en",
   "encryption_key": "",
   "use_git": true,
   "git_root": "./",
   "enable_internal_server": true,
   "internal_server_port": 8383,
   "window_bounds": {
-    "width": 1359,
-    "height": 952,
-    "x": 280,
-    "y": 40
+    "width": 1361,
+    "height": 1000,
+    "x": 279,
+    "y": 16
   },
   "template_sidebar_width": 374,
-  "storage_sidebar_width": 395,
+  "storage_sidebar_width": 337,
   "status_buttons": {
     "charpicker": true,
     "gitquick": true
