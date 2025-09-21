@@ -37,15 +37,13 @@ export default {
 
   "git.quick.stage_all": "Stage all",
   "git.quick.commit": "Commit…",
+  "git.quick.commit_push": "Commit & Push",
+  "git.quick.need_message": "Please enter a commit message.",
   "git.quick.open_full": "Open Git…",
-
   "git.quick.title": "Quick Commit",
   "git.quick.subtitle": "Write a commit message and choose an action.",
   "git.quick.placeholder": "Commit message…",
   "git.quick.stage_all": "Stage all",
-  "git.quick.commit": "Commit",
-  "git.quick.commit_push": "Commit & Push",
-  "git.quick.need_message": "Please enter a commit message.",
 
   // Errors (template-level)
   "error.template.duplicate_keys": "Duplicate keys: {0}",
@@ -522,11 +520,14 @@ export default {
   "modal.settings.advanced.logging.enabled": "Enable Logging",
 
   "modal.settings.tab.statusButtons": "Status Buttons",
-  "modal.settings.tab.statusButtons.description": "Enable or disable individual status buttons.",
-  "modal.settings.tab.statusButtons.empty": "No status buttons defined in your configuration.",
+  "modal.settings.tab.statusButtons.description":
+    "Enable or disable individual status buttons.",
+  "modal.settings.tab.statusButtons.empty":
+    "No status buttons defined in your configuration.",
   "modal.settings.statusButtons.charpicker": "Character Picker",
   "modal.settings.statusButtons.gitquick": "Git Quick Actions",
-  "modal.settings.statusButtons.gitquick.dependsOnGit": "Requires Git to be enabled.",
+  "modal.settings.statusButtons.gitquick.dependsOnGit":
+    "Requires Git to be enabled.",
   "modal.settings.statusButtons.reloader": "Reload Button",
 
   "modal.profile.title": "Switch User Profile",

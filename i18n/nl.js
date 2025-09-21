@@ -35,9 +35,15 @@ export default {
   "status.buttonBar.tooltip.characterPicker": "Karakterkiezer",
   "status.buttonBar.aria.characterPicker": "Open Karakterkiezer",
 
-  "git.quick.stage_all": "Stage all",
+  "git.quick.stage_all": "Stage alles",
   "git.quick.commit": "Commit…",
+  "git.quick.commit_push": "Commit & Push",
+  "git.quick.need_message": "Voer een commitbericht in.",
   "git.quick.open_full": "Open Git…",
+  "git.quick.title": "Snelle Commit",
+  "git.quick.subtitle": "Schrijf een commitbericht en kies een actie.",
+  "git.quick.placeholder": "Commitbericht…",
+  "git.quick.stage_all": "Stage alles",
 
   // Errors (template-level)
   "error.template.duplicate_keys": "Duplicaat sleutels: {0}",
