@@ -32,7 +32,7 @@
     "gitquick": true
   },
   "history": {
-    "enabled": true,
+    "enabled": false,
     "persist": false,
     "max_size": 20,
     "stack": [],

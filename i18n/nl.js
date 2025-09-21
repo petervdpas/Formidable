@@ -26,6 +26,9 @@ export default {
   "config.enable_internal_server": "Interne server",
   "config.internal_server_port": "Serverpoort",
   "config.show_meta_section": "Toon Meta Sectie",
+  "config.history.enabled": "Geschiedenis",
+  "config.history.persist": "Bewaar Geschiedenis",
+  "config.history.max_size": "Max. Geschiedenis Grootte",
 
   // ── Status Bar Buttons ─────────────────────
   "status.buttonBar.tooltip.reload": "Herlaad",

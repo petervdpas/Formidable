@@ -26,6 +26,9 @@ export default {
   "config.enable_internal_server": "Internal Server",
   "config.internal_server_port": "Server Port",
   "config.show_meta_section": "Show Meta Section",
+  "config.history.enabled": "History",
+  "config.history.persist": "Persist History",
+  "config.history.max_size": "History Max Size",
 
   // ── Status Bar Buttons ─────────────────────
   "status.buttonBar.tooltip.reload": "Reload",

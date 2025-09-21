@@ -79,6 +79,53 @@ export async function renderSettings() {
     bindFormInput("author-email", "author_email", "modal.settings.author.email")
   );
 
+  // History — flat elements (no grouping)
+  tabGeneral.appendChild(
+    createSwitch(
+      "history-enabled",
+      "config.history.enabled",
+      config.history?.enabled ?? true,
+      null,
+      "block",
+      ["standard.on", "standard.off"],
+      true
+    )
+  );
+
+  tabGeneral.appendChild(
+    createSwitch(
+      "history-persist",
+      "config.history.persist",
+      config.history?.persist ?? false,
+      null,
+      "block",
+      ["standard.on", "standard.off"],
+      true
+    )
+  );
+
+  tabGeneral.appendChild(
+    createFormRowInput({
+      id: "history-max-size",
+      labelOrKey: "config.history.max_size",
+      type: "number",
+      value: config.history?.max_size ?? 20,
+      attributes: { min: 1, max: 500, step: 1 },
+      // nested -> save manually
+      configKey: "__history.max_size__",
+      onSave: async (val) => {
+        const n = Math.max(1, Math.min(500, parseInt(val, 10) || 20));
+        const h = cachedConfig.history ?? {};
+        await EventBus.emit("config:update", {
+          history: { ...h, max_size: n },
+        });
+        cachedConfig = await reloadUserConfig();
+        emitConfigStatus("history.max_size", String(n));
+      },
+      i18nEnabled: true,
+    })
+  );
+
   // ─── Display Settings ─────────────────
   const tabDisplay = document.createElement("div");
   tabDisplay.className = "tab-panel tab-display";
@@ -397,13 +444,17 @@ async function enforceGitQuickConstraint(useGitEnabled) {
         gitquick: false,
       };
 
-      await EventBus.emit("config:update", { status_buttons: nextStatusButtons });
+      await EventBus.emit("config:update", {
+        status_buttons: nextStatusButtons,
+      });
       cachedConfig = await reloadUserConfig();
 
       EventBus.emit("status:update", {
         languageKey: "status.config.disabled",
         i18nEnabled: true,
-        args: [t("modal.settings.statusButtons.gitquick") || "Git Quick Actions"],
+        args: [
+          t("modal.settings.statusButtons.gitquick") || "Git Quick Actions",
+        ],
         variant: "warning",
       });
     }
@@ -442,6 +493,55 @@ function setupBindings(config, gitRootPicker) {
   bindToggleSwitch("internal-server-toggle", "enable_internal_server");
 
   bindStatusButtons(config);
+
+  // ─── History (nested) ───
+  bindNestedSwitch("history-enabled", ["history", "enabled"]);
+  bindNestedSwitch("history-persist", ["history", "persist"]);
+  bindNestedNumber(
+    "#history-max-size input",
+    ["history", "max_size"],
+    (raw) => {
+      const n = parseInt(raw, 10);
+      if (Number.isNaN(n)) return 20;
+      return Math.min(500, Math.max(1, n));
+    }
+  );
+
+  // ─── Disable dependents when history is off ───
+  (() => {
+    const persistEl = document.getElementById("history-persist");
+    const maxEl = document.querySelector("#history-max-size input");
+    const setDisabled = (off) => {
+      const cb = persistEl?.matches('input[type="checkbox"]')
+        ? persistEl
+        : persistEl?.querySelector('input[type="checkbox"]');
+      if (cb) cb.disabled = !!off;
+      if (maxEl) maxEl.disabled = !!off;
+    };
+    setDisabled(cachedConfig.history?.enabled === false);
+
+    // hook the enabled toggle to keep this in sync
+    const enabledEl = document.getElementById("history-enabled");
+    const enabledCb = enabledEl?.matches('input[type="checkbox"]')
+      ? enabledEl
+      : enabledEl?.querySelector('input[type="checkbox"]');
+    if (enabledCb) {
+      const orig = enabledCb.onchange;
+      enabledCb.onchange = async (e) => {
+        if (typeof orig === "function") await orig(e);
+        setDisabled(!enabledCb.checked);
+      };
+    }
+  })();
+}
+
+async function updateNestedConfig(pathArr, value) {
+  // pathArr like ["history", "enabled"]
+  const [rootKey, leafKey] = pathArr;
+  const root = { ...(cachedConfig[rootKey] ?? {}), [leafKey]: value };
+  await EventBus.emit("config:update", { [rootKey]: root });
+  cachedConfig = await reloadUserConfig();
+  emitConfigStatus(`${rootKey}.${leafKey}`, value);
 }
 
 function bindThemeSwitch(switchId, configKey) {
@@ -474,6 +574,18 @@ function bindToggleSwitch(switchId, configKey, onExtra = null) {
   };
 }
 
+function bindNestedSwitch(switchId, pathArr) {
+  const el = document.getElementById(switchId);
+  if (!el) return;
+  const input = el.matches('input[type="checkbox"]')
+    ? el
+    : el.querySelector('input[type="checkbox"]');
+  if (!input) return;
+  input.onchange = async () => {
+    await updateNestedConfig(pathArr, !!input.checked);
+  };
+}
+
 function bindFormInput(id, configKey, key) {
   return createFormRowInput({
     id,
@@ -487,6 +599,18 @@ function bindFormInput(id, configKey, key) {
     },
     i18nEnabled: true,
   });
+}
+
+function bindNestedNumber(inputSelector, pathArr, coerce) {
+  const input =
+    document.querySelector(inputSelector) ||
+    document.getElementById(inputSelector.replace("#", ""));
+  if (!input) return;
+  input.onchange = async () => {
+    const v = coerce ? coerce(input.value) : Number(input.value);
+    input.value = String(v);
+    await updateNestedConfig(pathArr, v);
+  };
 }
 
 function bindDirButton(fieldId, configKey) {
@@ -529,12 +653,16 @@ function bindStatusButtons(config) {
         [key]: enabled,
       };
 
-      await EventBus.emit("config:update", { status_buttons: nextStatusButtons });
+      await EventBus.emit("config:update", {
+        status_buttons: nextStatusButtons,
+      });
       cachedConfig = await reloadUserConfig();
 
       const label = t(`modal.settings.statusButtons.${key}`) || key;
       EventBus.emit("status:update", {
-        languageKey: enabled ? "status.config.enabled" : "status.config.disabled",
+        languageKey: enabled
+          ? "status.config.enabled"
+          : "status.config.disabled",
         i18nEnabled: true,
         args: [label],
         variant: enabled ? "default" : "warning",
@@ -628,5 +756,7 @@ function emitConfigStatus(configKey, value, success = true) {
 function getSwitchInputById(id) {
   const el = document.getElementById(id);
   if (!el) return null;
-  return el.matches('input[type="checkbox"]') ? el : el.querySelector('input[type="checkbox"]');
+  return el.matches('input[type="checkbox"]')
+    ? el
+    : el.querySelector('input[type="checkbox"]');
 }
