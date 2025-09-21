@@ -99,6 +99,7 @@ function createStatusReloadButtonConfig(onClick) {
 
 // ===================== installers =====================
 function installReloadButton(deps) {
+  if (!getFlag(deps.config, "status_buttons.reloader", true)) return null;
   return installActionButton(deps, {
     flagKey: "status_buttons.reload",
     id: "status-reload-btn",

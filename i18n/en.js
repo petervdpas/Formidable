@@ -521,6 +521,14 @@ export default {
   "modal.settings.advanced.developmentMode": "Development Mode",
   "modal.settings.advanced.logging.enabled": "Enable Logging",
 
+  "modal.settings.tab.statusButtons": "Status Buttons",
+  "modal.settings.tab.statusButtons.description": "Enable or disable individual status buttons.",
+  "modal.settings.tab.statusButtons.empty": "No status buttons defined in your configuration.",
+  "modal.settings.statusButtons.charpicker": "Character Picker",
+  "modal.settings.statusButtons.gitquick": "Git Quick Actions",
+  "modal.settings.statusButtons.gitquick.dependsOnGit": "Requires Git to be enabled.",
+  "modal.settings.statusButtons.reloader": "Reload Button",
+
   "modal.profile.title": "Switch User Profile",
   "modal.profile.label.newProfile": "New Profile",
   "modal.profile.placeholder.newProfile": "e.g., jack.json",

@@ -40,6 +40,7 @@ export async function renderSettings() {
   const tabDirectoriesLabel = t("modal.settings.tab.directories");
   const tabInternalLabel = t("modal.settings.tab.internal");
   const tabAdvancedLabel = t("modal.settings.tab.advanced");
+  const tabStatusButtonsLabel = t("modal.settings.tab.statusButtons");
 
   const tabButtons = document.createElement("div");
   tabButtons.className = "tab-buttons";
@@ -49,6 +50,7 @@ export async function renderSettings() {
     <button class="tab-btn" data-i18n="modal.settings.tab.directories">${tabDirectoriesLabel}</button>
     <button class="tab-btn" data-i18n="modal.settings.tab.internal">${tabInternalLabel}</button>
     <button class="tab-btn" data-i18n="modal.settings.tab.advanced">${tabAdvancedLabel}</button>
+    <button class="tab-btn" data-i18n="modal.settings.tab.statusButtons">${tabStatusButtonsLabel}</button>
   `;
 
   // ─── General Settings ─────────────────
@@ -294,6 +296,21 @@ export async function renderSettings() {
     )
   );
 
+  // ─── Status Buttons ─────────────────
+  const tabStatusButtons = document.createElement("div");
+  tabStatusButtons.className = "tab-panel tab-status-buttons";
+
+  addContainerElement({
+    parent: tabStatusButtons,
+    tag: "p",
+    className: "form-info-text",
+    textContent: t("modal.settings.tab.statusButtons.description"),
+    i18nKey: "modal.settings.tab.statusButtons.description",
+  });
+
+  // Render a switch per status_buttons key
+  renderStatusButtonsTab(tabStatusButtons, config);
+
   // Inject tabs and setup bindings
   container.appendChild(tabButtons);
   container.appendChild(tabGeneral);
@@ -301,6 +318,7 @@ export async function renderSettings() {
   container.appendChild(tabDirs);
   container.appendChild(tabServer);
   container.appendChild(tabAdvanced);
+  container.appendChild(tabStatusButtons);
 
   initTabs("#settings-body", ".tab-btn", ".tab-panel", {
     activeClass: "active",
@@ -318,6 +336,85 @@ export async function renderSettings() {
   return true;
 }
 
+function renderStatusButtonsTab(parentEl, config) {
+  const sb = config.status_buttons ?? {};
+  const keys = Object.keys(sb);
+
+  if (keys.length === 0) {
+    addContainerElement({
+      parent: parentEl,
+      tag: "p",
+      className: "form-info-text",
+      textContent: t("modal.settings.tab.statusButtons.empty"),
+      i18nKey: "modal.settings.tab.statusButtons.empty",
+    });
+    return;
+  }
+
+  for (const key of keys) {
+    const switchId = `status-btn-${key}`;
+    const labelKey = `modal.settings.statusButtons.${key}`;
+
+    const sw = createSwitch(
+      switchId,
+      labelKey,
+      !!sb[key],
+      null,
+      "block",
+      ["standard.on", "standard.off"],
+      true
+    );
+
+    // Special rule: gitquick depends on use_git
+    if (key === "gitquick" && config.use_git !== true) {
+      const input = sw.querySelector('input[type="checkbox"]');
+      if (input) input.disabled = true;
+
+      // Optional helper text
+      addContainerElement({
+        parent: sw,
+        tag: "small",
+        className: "label-subtext",
+        textContent:
+          t("modal.settings.statusButtons.gitquick.dependsOnGit") ||
+          "Requires Git to be enabled.",
+      });
+    }
+
+    parentEl.appendChild(sw);
+  }
+}
+
+async function enforceGitQuickConstraint(useGitEnabled) {
+  const input = getSwitchInputById("status-btn-gitquick");
+  if (!input) return;
+
+  if (!useGitEnabled) {
+    input.disabled = true;
+
+    if (input.checked || cachedConfig.status_buttons?.gitquick === true) {
+      input.checked = false;
+
+      const nextStatusButtons = {
+        ...(cachedConfig.status_buttons ?? {}),
+        gitquick: false,
+      };
+
+      await EventBus.emit("config:update", { status_buttons: nextStatusButtons });
+      cachedConfig = await reloadUserConfig();
+
+      EventBus.emit("status:update", {
+        languageKey: "status.config.disabled",
+        i18nEnabled: true,
+        args: [t("modal.settings.statusButtons.gitquick") || "Git Quick Actions"],
+        variant: "warning",
+      });
+    }
+  } else {
+    input.disabled = false;
+  }
+}
+
 function setupBindings(config, gitRootPicker) {
   bindThemeSwitch("theme-toggle", "theme");
   bindToggleSwitch("show-icons-toggle", "show_icon_buttons");
@@ -333,7 +430,7 @@ function setupBindings(config, gitRootPicker) {
   );
 
   bindDirButton("settings-context-folder", "context_folder");
-  bindToggleSwitch("settings-use-git", "use_git", (enabled) => {
+  bindToggleSwitch("settings-use-git", "use_git", async (enabled) => {
     gitRootPicker.input.disabled = !enabled;
     gitRootPicker.button.disabled = !enabled;
     gitRootPicker.element.classList.toggle("disabled", !enabled);
@@ -341,10 +438,13 @@ function setupBindings(config, gitRootPicker) {
       gitRootPicker.input.value = "";
       EventBus.emit("config:update", { git_root: "" });
     }
+    await enforceGitQuickConstraint(enabled);
   });
   bindDirButton("settings-git-root", "git_root");
 
   bindToggleSwitch("internal-server-toggle", "enable_internal_server");
+
+  bindStatusButtons(config);
 }
 
 function bindThemeSwitch(switchId, configKey) {
@@ -410,6 +510,44 @@ function bindDirButton(fieldId, configKey) {
 
     emitConfigStatus(configKey, relative);
   };
+}
+
+function bindStatusButtons(config) {
+  const sb = config.status_buttons ?? {};
+  for (const key of Object.keys(sb)) {
+    const switchId = `status-btn-${key}`;
+    const input = getSwitchInputById(switchId);
+    if (!input) continue;
+
+    input.onchange = async () => {
+      if (key === "gitquick" && cachedConfig?.use_git !== true) {
+        input.checked = false;
+        await enforceGitQuickConstraint(false);
+        return;
+      }
+
+      const enabled = !!input.checked;
+      const nextStatusButtons = {
+        ...(cachedConfig.status_buttons ?? {}),
+        [key]: enabled,
+      };
+
+      await EventBus.emit("config:update", { status_buttons: nextStatusButtons });
+      cachedConfig = await reloadUserConfig();
+
+      const label = t(`modal.settings.statusButtons.${key}`) || key;
+      EventBus.emit("status:update", {
+        languageKey: enabled ? "status.config.enabled" : "status.config.disabled",
+        i18nEnabled: true,
+        args: [label],
+        variant: enabled ? "default" : "warning",
+      });
+
+      EventBus.emit?.("statusButtons:toggle", { id: key, enabled });
+    };
+  }
+
+  enforceGitQuickConstraint(cachedConfig?.use_git === true);
 }
 
 function setupLanguageDropdown(config) {
@@ -498,4 +636,10 @@ function mirrorMetaSwitchState(enabled) {
   if (label) {
     label.textContent = enabled ? t("standard.show") : t("standard.hide");
   }
+}
+
+function getSwitchInputById(id) {
+  const el = document.getElementById(id);
+  if (!el) return null;
+  return el.matches('input[type="checkbox"]') ? el : el.querySelector('input[type="checkbox"]');
 }

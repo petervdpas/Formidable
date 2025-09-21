@@ -78,7 +78,7 @@ export function setupSettingsModal() {
     escToClose: true,
     backdropClick: true,
     resizable: false,
-    width: "40em",
+    width: "42em",
     height: "22em",
 
     onOpen: async (_el, api) => {

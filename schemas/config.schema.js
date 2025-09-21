@@ -30,6 +30,7 @@ module.exports = {
     template_sidebar_width: 300,
     storage_sidebar_width: 300,
     status_buttons: {
+      reloader: true,
       charpicker: true,
       gitquick: true,
     },

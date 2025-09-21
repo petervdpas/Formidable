@@ -534,6 +534,14 @@ export default {
   "modal.settings.advanced.developmentMode": "Ontwikkelingsmodus",
   "modal.settings.advanced.logging.enabled": "Logging inschakelen",
 
+  "modal.settings.tab.statusButtons": "Statusknoppen",
+  "modal.settings.tab.statusButtons.description": "Schakel individuele statusknoppen in of uit.",
+  "modal.settings.tab.statusButtons.empty": "Geen statusknoppen gedefinieerd in uw configuratie.",
+  "modal.settings.statusButtons.charpicker": "Karakterkiezer",
+  "modal.settings.statusButtons.gitquick": "Git Snelle Acties",
+  "modal.settings.statusButtons.gitquick.dependsOnGit": "Vereist dat Git is ingeschakeld.",
+  "modal.settings.statusButtons.reloader": "Herlaad Knop",
+
   "modal.profile.title": "Wissel gebruikersprofiel",
   "modal.profile.label.newProfile": "Nieuw profiel",
   "modal.profile.placeholder.newProfile": "bijv. jack.json",

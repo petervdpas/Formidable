@@ -10,8 +10,8 @@
   "enable_plugins": true,
   "context_mode": "storage",
   "context_folder": "./",
-  "selected_template": "basic.yaml",
-  "selected_data_file": "sane-20250530.meta.json",
+  "selected_template": "recepten.yaml",
+  "selected_data_file": "groentenschotel.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -22,13 +22,12 @@
   "internal_server_port": 8383,
   "window_bounds": {
     "width": 1361,
-    "height": 1000,
-    "x": 279,
-    "y": 16
+    "height": 1000
   },
-  "template_sidebar_width": 374,
-  "storage_sidebar_width": 337,
+  "template_sidebar_width": 339,
+  "storage_sidebar_width": 383,
   "status_buttons": {
+    "reloader": true,
     "charpicker": true,
     "gitquick": true
   }
