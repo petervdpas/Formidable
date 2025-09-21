@@ -17,6 +17,10 @@
     --label-align: right;
     --label-weight: 600;
 
+    /* ───── Menu ───── */
+    --menu-icon-size: 20px;
+    --menu-icon-font-size: 1.8em;
+
     /* ───── Field Type Colors ───── */
     --field-type-looper-bg: #b9e2c0;
     --field-type-looper-border: #999;

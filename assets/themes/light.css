@@ -46,6 +46,15 @@
     --submenu-hover-bg: #f5f5f5;
     --submenu-separator: #ccc;
 
+    --menu-icon-bg: #e8f0ff;
+    --menu-icon-bg-hover: #d0e2ff;
+    --menu-icon-bg-active: #1d4ed8;
+    --menu-icon-color: #1e293b;
+    --menu-icon-color-hover: #0f172a;
+    --menu-icon-color-active: #ffffff;
+    --menu-icon-bg-disabled: #e5e7eb;
+    --menu-icon-color-disabled: #9ca3af;
+
     /* ───── Global UI Elements ───── */
     --text-color: #111;
     --text-description: #666;

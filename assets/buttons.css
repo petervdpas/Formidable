@@ -44,6 +44,7 @@ button:disabled,
   color: var(--generic-fg-default);
   box-shadow: none !important;
 }
+
 .btn-ghost:hover {
   background-color: var(--generic-bg-default-hover);
   border-color: var(--generic-border-default-hover);
@@ -77,6 +78,7 @@ button:disabled,
   border-color: var(--generic-border-default);
   color: var(--generic-fg-default);
 }
+
 .btn-default:hover {
   background-color: var(--generic-bg-default-hover);
   border-color: var(--generic-border-default-hover);
@@ -88,6 +90,7 @@ button:disabled,
   border-color: var(--generic-border-success);
   color: var(--generic-fg-success);
 }
+
 .btn-okay:hover {
   background-color: var(--generic-bg-success-hover);
   border-color: var(--generic-border-success-hover);
@@ -99,6 +102,7 @@ button:disabled,
   border-color: var(--generic-border-info);
   color: var(--generic-fg-info);
 }
+
 .btn-info:hover {
   background-color: var(--generic-bg-info-hover);
   border-color: var(--generic-border-info-hover);
@@ -110,6 +114,7 @@ button:disabled,
   border-color: var(--generic-border-warn);
   color: var(--generic-fg-warn);
 }
+
 .btn-warn:hover {
   background-color: var(--generic-bg-warn-hover);
   border-color: var(--generic-border-warn-hover);
@@ -121,6 +126,7 @@ button:disabled,
   border-color: var(--generic-border-error);
   color: var(--generic-fg-error);
 }
+
 .btn-danger:hover {
   background-color: var(--generic-bg-error-hover);
   border-color: var(--generic-border-error-hover);
@@ -132,6 +138,7 @@ button:disabled,
   border-color: var(--generic-border-info);
   color: var(--generic-fg-info);
 }
+
 .btn-primary:hover {
   background-color: var(--generic-bg-info-hover);
   border-color: var(--generic-border-info-hover);
@@ -144,6 +151,7 @@ button:disabled,
   border: 1px solid transparent;
   color: var(--generic-fg-default);
 }
+
 .btn-quiet:hover {
   background-color: var(--generic-bg-default-hover);
   border-color: var(--generic-border-default-hover);
@@ -181,7 +189,7 @@ button:disabled,
 }
 
 /* ───── Remove default visuals if no color class is present ───── */
-.btn.icon-button:not(.btn-warn):not(.btn-danger):not(.btn-info):not(.btn-okay):not(.btn-default):not(.btn-icon-warn):not(.btn-icon-danger):not(.btn-icon-info):not(.btn-icon-okay):not(.btn-icon-default):not(.btn-flagged):not(.btn-unflagged) {
+.btn.icon-button:not(.btn-warn):not(.btn-danger):not(.btn-info):not(.btn-okay):not(.btn-default):not(.btn-icon-warn):not(.btn-icon-danger):not(.btn-icon-info):not(.btn-icon-okay):not(.btn-icon-default):not(.btn-flagged):not(.btn-unflagged):not(.menu-icon) {
   background-color: transparent !important;
   border: none !important;
   box-shadow: none !important;
@@ -244,13 +252,68 @@ button:disabled,
   color: var(--unflagged-color, #5bc0de) !important;
 }
 
-.btn.icon-button.btn-icon-tiny {
-  width: 20px !important;
-  height: 20px !important;
-  min-width: 20px !important;   /* beat the 32px min-width */
+
+/* base tiny icon style */
+.btn.icon-button.btn-icon-tiny.menu-icon {
+  width: var(--menu-icon-size) !important;
+  height: var(--menu-icon-size) !important;
+  min-width: var(--menu-icon-size) !important;
   padding: 0 !important;
-  font-size: 1.8em !important;     /* stop 2.2em scaling */
-  border-radius: 3px;
+  font-size: var(--menu-icon-font-size) !important;
+  border-radius: 4px;
+  box-shadow: none !important;
+
+  background-color: var(--menu-icon-bg);
+  color: var(--menu-icon-color);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.1s ease;
+}
+
+.btn.icon-button.btn-icon-tiny.menu-icon:hover {
+  background-color: var(--menu-icon-bg-hover);
+  color: var(--menu-icon-color-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .12);
+}
+
+.btn.icon-button.btn-icon-tiny.menu-icon:active {
+  background-color: var(--menu-icon-bg-active);
+  color: var(--menu-icon-color-active);
+  transform: translateY(0);
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, .25);
+}
+
+.btn.icon-button.btn-icon-tiny.menu-icon:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--page-bg),
+    0 0 0 4px var(--menu-icon-bg-active);
+}
+
+/* Menu icon: real disabled state (no hover/active, no transform) */
+.btn.icon-button.btn-icon-tiny.menu-icon:disabled,
+.btn.icon-button.btn-icon-tiny.menu-icon[aria-disabled="true"] {
+  background-color: var(--menu-icon-bg-disabled) !important;
+  color: var(--menu-icon-color-disabled) !important;
+  border: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+  filter: none !important;
+  cursor: not-allowed !important;
+  pointer-events: none; /* prevents hover/active from ever triggering */
+}
+
+/* Also neutralize any generic icon-button hover/active on disabled */
+.btn.icon-button:disabled,
+.btn.icon-button[aria-disabled="true"],
+.btn.icon-button:disabled:hover,
+.btn.icon-button[aria-disabled="true"]:hover,
+.btn.icon-button:disabled:active,
+.btn.icon-button[aria-disabled="true"]:active {
+  transform: none !important;
+  filter: none !important;
   box-shadow: none !important;
 }
 
@@ -378,7 +441,8 @@ button.btn-remove-image:active,
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  margin-top: 4px;;
+  margin-top: 4px;
+  ;
   gap: 0.3em;
 
   flex-wrap: wrap;
@@ -388,7 +452,8 @@ button.btn-remove-image:active,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 2.5em; /* Keeps icon buttons from collapsing */
+  min-width: 2.5em;
+  /* Keeps icon buttons from collapsing */
   height: 2.2em;
   padding: 0.4em 0.8em;
   line-height: 1;
