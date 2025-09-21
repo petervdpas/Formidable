@@ -40,7 +40,16 @@ export function handleFullscreenToggle(targetId) {
 }
 
 export function handleStorageMetaVisibility(enabled) {
-  const el = document.getElementById("storage-meta");
-  if (!el) return;
-  el.style.display = enabled ? "" : "none";
+  const show = !!enabled;
+
+  const metaEl = document.getElementById("storage-meta");
+  if (metaEl) metaEl.style.display = show ? "" : "none";
+
+  const toggle = document.getElementById("show-meta-toggle");
+  if (toggle) {
+    toggle.checked = show;
+    const label = toggle.closest(".switch")?.querySelector(".switch-state");
+    if (label) label.textContent = show ? (window.i18n?.t?.("standard.show") || "Show")
+                                        : (window.i18n?.t?.("standard.hide") || "Hide");
+  }
 }

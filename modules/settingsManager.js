@@ -330,9 +330,6 @@ export async function renderSettings() {
   setupLanguageDropdown(config);
   setupBindings(config, gitRootPicker);
 
-  EventBus.off?.("screen:meta:visibility", mirrorMetaSwitchState);
-  EventBus.on?.("screen:meta:visibility", mirrorMetaSwitchState);
-
   return true;
 }
 
@@ -625,16 +622,6 @@ function emitConfigStatus(configKey, value, success = true) {
       i18nEnabled: true,
       args: [label, value],
     });
-  }
-}
-
-function mirrorMetaSwitchState(enabled) {
-  const el = document.getElementById("show-meta-toggle");
-  if (!el) return;
-  el.checked = !!enabled;
-  const label = el.closest(".switch")?.querySelector(".switch-state");
-  if (label) {
-    label.textContent = enabled ? t("standard.show") : t("standard.hide");
   }
 }
 

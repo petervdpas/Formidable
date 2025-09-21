@@ -73,6 +73,8 @@ export default {
     'Loop {0} for key "{1}" has no matching partner.',
 
   // ── Status Messages ─────────────────────
+  "standard.forward": "Forward",
+  "standard.back": "Back",
   "status.cache.init": "Cache initialized with DB: {0} version {1}.",
   "status.basic.setTo": "{0} set to {1}",
   "status.error.loading.list": "Error loading list: {0}",

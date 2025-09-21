@@ -282,6 +282,8 @@ export default {
   "lang.nl": "Nederlands",
 
   // ── Standard Translation ─────────────────────
+  "standard.forward": "Vooruit",
+  "standard.back": "Achteruit",
   "standard.storage": "Opslag",
   "standard.template": "Sjabloon",
   "standard.templates": "Sjablonen",

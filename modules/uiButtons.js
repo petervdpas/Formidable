@@ -6,6 +6,33 @@ import {
 } from "../utils/buttonUtils.js";
 import { t } from "../utils/i18n.js";
 
+// --- History (global) ---
+export function createHistoryBackIconButton(onClick, disabled = false) {
+  return createIconButton({
+    iconClass: "fa fa-chevron-left",
+    className: "btn-icon btn-icon-default btn-icon-tiny menu-icon", // <- tiny
+    identifier: "history-back",
+    onClick,
+    disabled,
+    i18nTitle: "standard.back",
+    i18nAria:  "standard.back",
+    attributes: { "data-action": "history:back" },
+  });
+}
+
+export function createHistoryForwardIconButton(onClick, disabled = false) {
+  return createIconButton({
+    iconClass: "fa fa-chevron-right",
+    className: "btn-icon btn-icon-default btn-icon-tiny menu-icon",
+    identifier: "history-forward",
+    onClick,
+    disabled,
+    i18nTitle: "standard.forward",
+    i18nAria:  "standard.forward",
+    attributes: { "data-action": "history:forward" },
+  });
+}
+
 export function createSettingsRestartIconButton(
   handleClick,
   isDisabled = false

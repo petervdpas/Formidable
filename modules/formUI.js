@@ -6,6 +6,8 @@ import { renderFormUI } from "./formRenderer.js";
 import { saveForm, deleteForm, renderFormPreview } from "./formActions.js";
 import { clearContainerUI } from "../utils/formUtils.js";
 
+const BOUND_FLAG = "__boundFormSaved";
+
 export function createFormManager(containerId) {
   const container = document.getElementById(containerId);
 
@@ -18,6 +20,42 @@ export function createFormManager(containerId) {
       containerId,
     ]);
     return;
+  }
+
+  // Bind once per container: live “updated/tags” UI refresh after save.
+  if (!container[BOUND_FLAG]) {
+    EventBus.on("form:saved", (e) => {
+      if (!e || e.filename !== currentDatafile) return;
+      if (
+        e.template &&
+        currentTemplate?.filename &&
+        e.template !== currentTemplate.filename
+      )
+        return;
+
+      queueMicrotask(() => {
+        const section = container.querySelector("#storage-meta");
+        if (!section) return;
+
+        const updatedNode = section.querySelector(
+          '[data-i18n-key="standard.updated"], .meta-updated, [data-meta="updated"]'
+        );
+        if (updatedNode && e.updated) updatedNode.textContent = e.updated;
+
+        const tagsNode = section.querySelector(
+          '[data-i18n-key="standard.tags"], .meta-tags, [data-meta="tags"]'
+        );
+        if (tagsNode && Array.isArray(e.tags) && e.tags.length) {
+          tagsNode.textContent = e.tags.join(", ");
+        }
+
+        const updatedHidden = container.querySelector(
+          'input[name="meta-updated"]'
+        );
+        if (updatedHidden && e.updated) updatedHidden.value = e.updated;
+      });
+    });
+    container[BOUND_FLAG] = true;
   }
 
   async function loadTemplate(templateYaml) {

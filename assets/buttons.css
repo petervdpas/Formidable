@@ -244,6 +244,16 @@ button:disabled,
   color: var(--unflagged-color, #5bc0de) !important;
 }
 
+.btn.icon-button.btn-icon-tiny {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;   /* beat the 32px min-width */
+  padding: 0 !important;
+  font-size: 1.8em !important;     /* stop 2.2em scaling */
+  border-radius: 3px;
+  box-shadow: none !important;
+}
+
 /* ───── Close Button ───── */
 .btn-close {
   background: none;

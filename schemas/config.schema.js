@@ -34,6 +34,13 @@ module.exports = {
       charpicker: true,
       gitquick: true,
     },
+    history: {
+      enabled: true,
+      persist: false,
+      max_size: 20,
+      stack: [],
+      index: -1,
+    },
   },
 
   sanitize(raw) {

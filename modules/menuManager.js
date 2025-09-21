@@ -5,6 +5,11 @@ import { reloadUserConfig } from "../utils/configUtil.js";
 import { bindActionHandlers } from "../utils/domUtils.js";
 import { createSwitch } from "../utils/elementBuilders.js";
 import { t } from "../utils/i18n.js";
+import { History } from "./historyManager.js";
+import {
+  createHistoryBackIconButton,
+  createHistoryForwardIconButton,
+} from "./uiButtons.js";
 
 let cachedConfig = null;
 let pluginMap = new Map(); // name → pluginMeta
@@ -21,12 +26,46 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   }
 
   cachedConfig = cachedConfig || (await reloadUserConfig());
+  History.init(cachedConfig);
 
   // Reset plugin map
   pluginMap.clear();
 
   const menuBar = document.createElement("ul");
   menuBar.className = "menu-bar";
+
+  const showHistory = !!(
+    cachedConfig.history?.enabled && (cachedConfig.history?.max_size ?? 0) > 1
+  );
+
+  if (showHistory) {
+    const li = document.createElement("li");
+    li.className = "menu-chevrons"; // NOT "menu-item" → won't affect submenus
+
+    const backBtn = createHistoryBackIconButton(() => {
+      const prev = History.back();
+      if (prev)
+        EventBus.emit("form:selected", { value: prev, __navFromHistory: true });
+    }, !History.canBack());
+
+    const fwdBtn = createHistoryForwardIconButton(() => {
+      const next = History.forward();
+      if (next)
+        EventBus.emit("form:selected", { value: next, __navFromHistory: true });
+    }, !History.canForward());
+
+    li.append(backBtn, fwdBtn);
+    menuBar.appendChild(li);
+
+    const sep = document.createElement("li");
+    sep.className = "menu-chevrons-separator ml-4 mr-2";
+    menuBar.appendChild(sep);
+
+    EventBus.on("history:state", ({ canBack, canForward }) => {
+      backBtn.disabled = !canBack;
+      fwdBtn.disabled = !canForward;
+    });
+  }
 
   // ─── File & Config Menu ─────────────────────
   menuBar.append(
