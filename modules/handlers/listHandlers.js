@@ -61,10 +61,9 @@ export function handleListHighlighted({ listId, name }) {
 }
 
 export async function handleListItemClicked({ listId, name }) {
-
   try {
     if (!listId || !name) return;
-  
+
     if (listId === "template-list") {
       const currentContext = await window.api.config
         .loadUserConfig()
@@ -134,8 +133,14 @@ export async function handleListItemClicked({ listId, name }) {
       }
 
       await formManager.loadFormData(data, name);
-  
+
       EventBus.emit("form:selected", name);
+
+      EventBus.emit("history:push", {
+        template: template.filename,
+        datafile: name,
+      });
+
       EventBus.emit("status:update", {
         message: "status.datafile.ready",
         languageKey: "status.datafile.ready",

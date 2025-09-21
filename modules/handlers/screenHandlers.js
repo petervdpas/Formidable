@@ -1,9 +1,9 @@
 // modules/handlers/screenHandlers.js
 
-function toggleFullscreen(wrapper, {
-  hintText = "ESC to exit fullscreen",
-  refresh = null,
-} = {}) {
+function toggleFullscreen(
+  wrapper,
+  { hintText = "ESC to exit fullscreen", refresh = null } = {}
+) {
   if (!wrapper) return;
 
   const entering = !wrapper.classList.contains("fullscreen");
@@ -49,7 +49,9 @@ export function handleStorageMetaVisibility(enabled) {
   if (toggle) {
     toggle.checked = show;
     const label = toggle.closest(".switch")?.querySelector(".switch-state");
-    if (label) label.textContent = show ? (window.i18n?.t?.("standard.show") || "Show")
-                                        : (window.i18n?.t?.("standard.hide") || "Hide");
+    if (label)
+      label.textContent = show
+        ? window.i18n?.t?.("standard.show") || "Show"
+        : window.i18n?.t?.("standard.hide") || "Hide";
   }
 }

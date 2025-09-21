@@ -3,6 +3,7 @@
 import { EventBus } from "./eventBus.js";
 
 import * as systemHandler from "./handlers/systemHandler.js";
+import * as historyHandler from "./handlers/historyHandler.js";
 import * as encryptionHandler from "./handlers/encryptionHandler.js";
 import * as serverHandler from "./handlers/serverHandler.js";
 import * as pluginHandler from "./handlers/pluginHandler.js";
@@ -85,6 +86,21 @@ export function initEventRouter() {
   EventBus.on("server:start", serverHandler.handleStartServer);
   EventBus.on("server:stop", serverHandler.handleStopServer);
   EventBus.on("server:status", serverHandler.handleGetServerStatus);
+
+  // History events
+  EventBus.off("history:init", historyHandler.handleHistoryInit);
+  EventBus.off("history:push", historyHandler.handleHistoryPush);
+  EventBus.off("history:back", historyHandler.handleHistoryBack);
+  EventBus.off("history:forward", historyHandler.handleHistoryForward);
+  EventBus.off("history:restore", historyHandler.handleHistoryRestore);
+  EventBus.off("history:navigate", historyHandler.handleHistoryNavigate);
+
+  EventBus.on("history:init", historyHandler.handleHistoryInit);
+  EventBus.on("history:push", historyHandler.handleHistoryPush);
+  EventBus.on("history:back", historyHandler.handleHistoryBack);
+  EventBus.on("history:forward", historyHandler.handleHistoryForward);
+  EventBus.on("history:restore", historyHandler.handleHistoryRestore);
+  EventBus.on("history:navigate", historyHandler.handleHistoryNavigate);
 
   // Plugin events
   EventBus.off("plugin:get-plugins-path", pluginHandler.handleGetPluginPath);
@@ -265,7 +281,7 @@ export function initEventRouter() {
   EventBus.off("form:selected", formHandlers.handleFormSelected);
   EventBus.off("form:list", formHandlers.handleListForms);
   EventBus.off("form:extendedList", formHandlers.handleExtendedListForms);
-  EventBus.off("form:load:run:onload", formHandlers.handleOnLoadRun); 
+  EventBus.off("form:load:run:onload", formHandlers.handleOnLoadRun);
   EventBus.off("form:load", formHandlers.handleLoadForm);
   EventBus.off("form:save:run:before", formHandlers.handleBeforeSaveRun);
   EventBus.off("form:save", formHandlers.handleSaveForm);
@@ -276,7 +292,7 @@ export function initEventRouter() {
   EventBus.on("form:selected", formHandlers.handleFormSelected);
   EventBus.on("form:list", formHandlers.handleListForms);
   EventBus.on("form:extendedList", formHandlers.handleExtendedListForms);
-  EventBus.on("form:load:run:onload", formHandlers.handleOnLoadRun); 
+  EventBus.on("form:load:run:onload", formHandlers.handleOnLoadRun);
   EventBus.on("form:load", formHandlers.handleLoadForm);
   EventBus.on("form:save:run:before", formHandlers.handleBeforeSaveRun);
   EventBus.on("form:save", formHandlers.handleSaveForm);

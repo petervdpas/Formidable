@@ -5,7 +5,6 @@ import { reloadUserConfig } from "../utils/configUtil.js";
 import { bindActionHandlers } from "../utils/domUtils.js";
 import { createSwitch } from "../utils/elementBuilders.js";
 import { t } from "../utils/i18n.js";
-import { History } from "./historyManager.js";
 import {
   createHistoryBackIconButton,
   createHistoryForwardIconButton,
@@ -26,7 +25,8 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   }
 
   cachedConfig = cachedConfig || (await reloadUserConfig());
-  History.init(cachedConfig);
+  // initialize history with config
+  EventBus.emit("history:init", cachedConfig);
 
   // Reset plugin map
   pluginMap.clear();
@@ -40,19 +40,15 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
 
   if (showHistory) {
     const li = document.createElement("li");
-    li.className = "menu-chevrons"; // NOT "menu-item" → won't affect submenus
+    li.className = "menu-chevrons";
 
-    const backBtn = createHistoryBackIconButton(() => {
-      const prev = History.back();
-      if (prev)
-        EventBus.emit("form:selected", { value: prev, __navFromHistory: true });
-    }, !History.canBack());
+    const backBtn = createHistoryBackIconButton(async () => {
+      await EventBus.emitWithResponse("history:back");
+    }, true);
 
-    const fwdBtn = createHistoryForwardIconButton(() => {
-      const next = History.forward();
-      if (next)
-        EventBus.emit("form:selected", { value: next, __navFromHistory: true });
-    }, !History.canForward());
+    const fwdBtn = createHistoryForwardIconButton(async () => {
+      await EventBus.emitWithResponse("history:forward");
+    }, true);
 
     li.append(backBtn, fwdBtn);
     menuBar.appendChild(li);
