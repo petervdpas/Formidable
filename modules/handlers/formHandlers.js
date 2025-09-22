@@ -394,6 +394,8 @@ export async function handleSaveForm(payload, respond) {
         tags: Array.isArray(dataToSave?._meta?.tags)
           ? dataToSave._meta.tags
           : undefined,
+        flagged: !!dataToSave?._meta?.flagged,
+        id: dataToSave?._meta?.id || dataToSave?._meta?.guid || undefined,
       });
 
       EventBus.emit("status:update", {

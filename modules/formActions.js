@@ -28,7 +28,8 @@ export async function saveForm(container, template) {
 
   // Preserve focus + selection
   const active = document.activeElement;
-  const hasSel = active && "selectionStart" in active && "selectionEnd" in active;
+  const hasSel =
+    active && "selectionStart" in active && "selectionEnd" in active;
   const sel = hasSel
     ? { start: active.selectionStart, end: active.selectionEnd }
     : null;
@@ -95,18 +96,25 @@ export async function saveForm(container, template) {
     };
 
     // tags → _meta.tags
-    const tagFieldKey = (template.fields || []).find((f) => f.type === "tags")?.key;
+    const tagFieldKey = (template.fields || []).find(
+      (f) => f.type === "tags"
+    )?.key;
     if (tagFieldKey) {
       const raw = data[tagFieldKey];
       let tags = [];
       if (Array.isArray(raw)) {
-        tags = raw.map((t) => (typeof t === "string" ? t : t?.value)).filter(Boolean);
+        tags = raw
+          .map((t) => (typeof t === "string" ? t : t?.value))
+          .filter(Boolean);
       } else if (typeof raw === "string") {
-        tags = raw.split(/[,;]/).map((s) => s.trim()).filter(Boolean);
+        tags = raw
+          .split(/[,;]/)
+          .map((s) => s.trim())
+          .filter(Boolean);
       }
-      const norm = [...new Set(tags.map((t) => t.trim().toLowerCase()).filter(Boolean))].sort(
-        (a, b) => a.localeCompare(b)
-      );
+      const norm = [
+        ...new Set(tags.map((t) => t.trim().toLowerCase()).filter(Boolean)),
+      ].sort((a, b) => a.localeCompare(b));
       payload._meta.tags = norm;
     }
 
@@ -115,8 +123,10 @@ export async function saveForm(container, template) {
       datafile: datafile,
       payload: payload,
       fields: template.fields || [],
-      refreshMode: "silent", // keep UI steady
+      refreshMode: "list", // keep UI steady
     });
+
+    EventBus.emit("form:list:refreshAfterSave", { name: datafile });
   } finally {
     // Restore focus + caret if element still in DOM
     if (active && document.body.contains(active)) {

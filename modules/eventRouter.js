@@ -300,19 +300,36 @@ export function initEventRouter() {
   EventBus.on("form:ensureDir", formHandlers.handleEnsureFormDir);
   EventBus.on("form:saveImage", formHandlers.handleSaveImageFile);
 
-  EventBus.off("form:list:reload", formHandlers.handleListReload);
+  EventBus.off("form:list:reload", listHandlers.handleListReload);
+  EventBus.off(
+    "form:list:refreshAfterSave",
+    listHandlers.handleListRefreshAfterSave
+  );
+  EventBus.off("form:list:updateItem", listHandlers.handleListUpdateItem);
   EventBus.off("form:list:itemClicked", listHandlers.handleListItemClicked);
   EventBus.off("form:list:highlighted", listHandlers.handleListHighlighted);
 
   EventBus.on("form:list:reload", () =>
     listHandlers.handleListReload({ listId: "storage-list" })
   );
+  EventBus.on(
+    "form:list:refreshAfterSave",
+    listHandlers.handleListRefreshAfterSave
+  );
+  EventBus.on("form:list:updateItem", (e) =>
+    listHandlers.handleListUpdateItem({ listId: "storage-list", ...e })
+  );
   EventBus.on("form:list:itemClicked", (name) =>
     listHandlers.handleListItemClicked({ listId: "storage-list", name })
   );
-  EventBus.on("form:list:highlighted", (name) =>
-    listHandlers.handleListHighlighted({ listId: "storage-list", name })
-  );
+  EventBus.on("form:list:highlighted", (payload) => {
+    const name = typeof payload === "string" ? payload : payload?.name;
+    const click =
+      typeof payload === "object" && payload?.click !== undefined
+        ? payload.click
+        : true;
+    listHandlers.handleListHighlighted({ listId: "storage-list", name, click });
+  });
 
   // Modal events
   EventBus.off("modal:template:confirm", modalHandler.handleTemplateConfirm);

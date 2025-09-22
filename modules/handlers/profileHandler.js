@@ -1,6 +1,5 @@
 // modules/handlers/profileHandler.js
 
-import { EventBus } from "../eventBus.js";
 import { clearHighlighted, highlightSelected } from "../../utils/domUtils.js";
 
 export async function handleProfileHighlighted({ listId, name }) {

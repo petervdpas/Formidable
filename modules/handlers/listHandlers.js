@@ -12,6 +12,25 @@ export function bindListDependencies(deps) {
   storageList = deps.storageListManager;
 }
 
+let refreshTimer = null;
+const REFRESH_DELAY_MS = 120;
+
+export function handleListRefreshAfterSave({ name }) {
+  if (!storageList || typeof storageList.reloadList !== "function") return;
+
+  if (refreshTimer) clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(async () => {
+    try {
+      await storageList.reloadList();
+      if (name) {
+        EventBus.emit("form:list:highlighted", { name, click: false });
+      }
+    } finally {
+      refreshTimer = null;
+    }
+  }, REFRESH_DELAY_MS);
+}
+
 export async function handleListReload({ listId }) {
   const manager =
     listId === "template-list"
@@ -27,7 +46,7 @@ export async function handleListReload({ listId }) {
   await manager.reloadList();
 }
 
-export function handleListHighlighted({ listId, name }) {
+export function handleListHighlighted({ listId, name, click = true }) {
   const container = document.getElementById(listId);
   if (!container || !name) return;
 
@@ -39,19 +58,21 @@ export function handleListHighlighted({ listId, name }) {
       listId === "storage-list"
         ? Array.from(container.querySelectorAll(".storage-item"))
         : Array.from(container.querySelectorAll(".template-item"));
+
     const normalized = name
       .toLowerCase()
       .replace(/\.meta\.json$|\.yaml$|\.md$/i, "");
 
     const match =
-      items.find((el) => el.textContent.trim().toLowerCase() === normalized) ||
       items.find(
         (el) => el.dataset?.value?.toLowerCase() === name.toLowerCase()
-      );
+      ) ||
+      items.find((el) => el.textContent.trim().toLowerCase() === normalized);
 
     if (match) {
-      clearHighlighted(container); // first clear anything with matching data-list-id
-      highlightSelected(container, name, { click: true });
+      clearHighlighted(container);
+      // ← no forced click unless explicitly asked
+      highlightSelected(container, name, { click });
     } else if (attempt++ < maxAttempts) {
       setTimeout(tryHighlight, 100);
     }
@@ -160,4 +181,54 @@ export async function handleListItemClicked({ listId, name }) {
       logOrigin: "ListHandlers:handleListItemClicked",
     });
   }
+}
+
+// Update an existing item in the list (e.g., after save)
+export function handleListUpdateItem({
+  listId,
+  name,
+  updatedAt,
+  tags,
+  flagged,
+}) {
+  const listEl = document.getElementById(listId);
+  if (!listEl) return;
+
+  const cssEscape = (s) =>
+    window.CSS && typeof CSS.escape === "function"
+      ? CSS.escape(s)
+      : String(s).replace(/[^a-zA-Z0-9_\-]/g, "\\$&");
+
+  // Prefer exact match via data-value
+  let item = listEl.querySelector(`[data-value="${cssEscape(name)}"]`);
+
+  // If not in DOM (filtered/not loaded), do the debounced full refresh
+  if (!item) {
+    handleListRefreshAfterSave({ name });
+    return;
+  }
+
+  // Update flag UI
+  if (typeof flagged === "boolean") {
+    item.classList.toggle("is-flagged", flagged);
+    const flagNode = item.querySelector(".flag-slot");
+    if (flagNode)
+      flagNode.innerHTML = flagged ? `<i class="fa fa-flag"></i>` : "";
+  }
+
+  // Update tags UI
+  if (Array.isArray(tags)) {
+    const sub = item.querySelector(".sublabel-slot");
+    if (sub) sub.textContent = tags.join(", ");
+  }
+
+  // Update timestamp UI
+  if (updatedAt) {
+    item.dataset.updatedAt = String(updatedAt);
+    const up = item.querySelector(".updated-slot");
+    if (up) up.textContent = new Date(updatedAt).toISOString();
+  }
+
+  // keep it focused
+  EventBus.emit("form:list:highlighted", { name, click: false });
 }
