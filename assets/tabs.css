@@ -47,3 +47,39 @@
   opacity: 1;
   pointer-events: auto;
 }
+
+/* Base */
+.tabview { display: block; }
+.tab-panel { display: none; padding: 6px 0; opacity: 0; pointer-events: none; transition: opacity .2s ease; }
+.tab-panel.active { display: block; opacity: 1; pointer-events: auto; }
+
+/* Horizontal (default look = your current one) */
+.tabview.htabs .tab-buttons {
+  display: flex; border-bottom: 1px solid var(--border-color);
+  margin-bottom: 2px; padding-bottom: 2px;
+}
+.tabview .tab-btn {
+  padding: 8px 12px; background: none; border: none; cursor: pointer;
+  font-weight: 600; color: var(--text-color);
+  border-bottom: 3px solid transparent;
+}
+.tabview .tab-btn:hover { background: var(--hover-bg); }
+.tabview.htabs .tab-btn.active { border-bottom-color: var(--accent-color); color: var(--accent-color); }
+
+/* Vertical */
+.tabview.vtabs { display: flex; gap: 12px; min-height: 420px; }
+.tabview.vtabs .tab-buttons {
+  flex: 0 0 220px; display: flex; flex-direction: column;
+  border-right: 1px solid var(--border-color); padding: 6px 8px 6px 0; margin: 0;
+}
+.tabview.vtabs .tab-btn { text-align: left; border-bottom: 0; border-left: 3px solid transparent; border-radius: 4px; }
+.tabview.vtabs .tab-btn.active { border-left-color: var(--accent-color); color: var(--accent-color); background: var(--hover-bg); }
+.tabview .tab-content { flex: 1 1 auto; min-width: 0; overflow: auto; padding-left: 4px; }
+
+/* Responsive fallback */
+@media (max-width: 700px) {
+  .tabview.vtabs { flex-direction: column; }
+  .tabview.vtabs .tab-buttons { flex-direction: row; border-right: 0; border-bottom: 1px solid var(--border-color); padding: 0 0 2px 0; gap: 4px; }
+  .tabview.vtabs .tab-btn { border-left: 0; border-bottom: 3px solid transparent; text-align: center; }
+  .tabview.vtabs .tab-btn.active { border-bottom-color: var(--accent-color); background: none; }
+}

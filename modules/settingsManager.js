@@ -1,7 +1,7 @@
 // modules/settingsManager.js
 
 import { EventBus } from "./eventBus.js";
-import { initTabs } from "../utils/tabUtils.js";
+import { makeTab, initTabs, createTabView } from "../utils/tabUtils.js";
 import { formatAsRelativePath } from "../utils/pathUtils.js";
 import {
   createDirectoryPicker,
@@ -31,6 +31,7 @@ export async function renderSettings() {
   // Reload config to ensure we have the latest values
   cachedConfig = await reloadUserConfig();
   const config = cachedConfig;
+  let gitRootPicker;
 
   container.innerHTML = "";
 
@@ -53,319 +54,402 @@ export async function renderSettings() {
     <button class="tab-btn" data-i18n="modal.settings.tab.statusButtons">${tabStatusButtonsLabel}</button>
   `;
 
-  // ─── General Settings ─────────────────
-  const tabGeneral = document.createElement("div");
-  tabGeneral.className = "tab-panel tab-general";
+  // ─── General Settings (factory) ─────────────────
+  const generalTab = makeTab(
+    "general",
+    t("modal.settings.tab.general"),
+    (panel) => {
+      // Intro text
+      addContainerElement({
+        parent: panel,
+        tag: "p",
+        className: "form-info-text",
+        textContent: t("modal.settings.tab.general.description"),
+        i18nKey: "modal.settings.tab.general.description",
+      });
 
-  const languageRow = document.createElement("div");
-  languageRow.id = "settings-language";
-  languageRow.className = "modal-form-row";
+      // Language dropdown host (setupLanguageDropdown binds to this id)
+      const languageRow = document.createElement("div");
+      languageRow.id = "settings-language";
+      languageRow.className = "modal-form-row";
+      panel.appendChild(languageRow);
 
-  addContainerElement({
-    parent: tabGeneral,
-    tag: "p",
-    className: "form-info-text",
-    textContent: t("modal.settings.tab.general.description"),
-    i18nKey: "modal.settings.tab.general.description",
-  });
+      // Author
+      panel.appendChild(
+        bindFormInput(
+          "author-name",
+          "author_name",
+          "modal.settings.author.name"
+        )
+      );
+      panel.appendChild(
+        bindFormInput(
+          "author-email",
+          "author_email",
+          "modal.settings.author.email"
+        )
+      );
 
-  tabGeneral.appendChild(languageRow);
+      // History
+      panel.appendChild(
+        createSwitch(
+          "history-enabled",
+          "config.history.enabled",
+          cachedConfig.history?.enabled ?? true,
+          null,
+          "block",
+          ["standard.on", "standard.off"],
+          true
+        )
+      );
 
-  tabGeneral.appendChild(
-    bindFormInput("author-name", "author_name", "modal.settings.author.name")
+      panel.appendChild(
+        createSwitch(
+          "history-persist",
+          "config.history.persist",
+          cachedConfig.history?.persist ?? false,
+          null,
+          "block",
+          ["standard.on", "standard.off"],
+          true
+        )
+      );
+
+      panel.appendChild(
+        createFormRowInput({
+          id: "history-max-size",
+          labelOrKey: "config.history.max_size",
+          type: "number",
+          value: cachedConfig.history?.max_size ?? 20,
+          attributes: { min: 1, max: 500, step: 1 },
+          // nested -> save manually (keep old behavior)
+          configKey: "__history.max_size__",
+          onSave: async (val) => {
+            const n = Math.max(1, Math.min(500, parseInt(val, 10) || 20));
+            const h = cachedConfig.history ?? {};
+            await EventBus.emit("config:update", {
+              history: { ...h, max_size: n },
+            });
+            cachedConfig = await reloadUserConfig();
+            emitConfigStatus("history.max_size", String(n));
+          },
+          i18nEnabled: true,
+        })
+      );
+    }
   );
 
-  tabGeneral.appendChild(
-    bindFormInput("author-email", "author_email", "modal.settings.author.email")
+  // ─── Display Settings (factory) ─────────────────
+  const displayTab = makeTab(
+    "display",
+    t("modal.settings.tab.display"),
+    (panel) => {
+      addContainerElement({
+        parent: panel,
+        tag: "p",
+        className: "form-info-text",
+        textContent: t("modal.settings.tab.display.description"),
+        i18nKey: "modal.settings.tab.display.description",
+      });
+
+      panel.appendChild(
+        createSwitch(
+          "theme-toggle",
+          "modal.settings.display.theme",
+          cachedConfig.theme === "dark", // checked => dark
+          null,
+          "block",
+          [
+            "modal.settings.display.theme.dark",
+            "modal.settings.display.theme.light",
+          ],
+          true
+        )
+      );
+
+      panel.appendChild(
+        createSwitch(
+          "show-expressions-toggle",
+          "standard.expressions",
+          cachedConfig.use_expressions ?? true,
+          null,
+          "block",
+          ["standard.show", "standard.hide"],
+          true
+        )
+      );
+
+      panel.appendChild(
+        createSwitch(
+          "loop-collapse-toggle",
+          "modal.settings.display.loop.collapsed",
+          cachedConfig.loop_state_collapsed ?? false,
+          null,
+          "block",
+          ["standard.on", "standard.off"],
+          true
+        )
+      );
+
+      panel.appendChild(
+        createSwitch(
+          "show-meta-toggle",
+          "modal.settings.display.meta",
+          cachedConfig.show_meta_section ?? true,
+          null,
+          "block",
+          ["standard.show", "standard.hide"],
+          true
+        )
+      );
+
+      panel.appendChild(
+        createSwitch(
+          "show-icons-toggle",
+          "modal.settings.icon.buttons",
+          cachedConfig.show_icon_buttons ?? true,
+          null,
+          "block",
+          ["standard.on.experimental", "standard.off"],
+          true
+        )
+      );
+    }
   );
 
-  // History — flat elements (no grouping)
-  tabGeneral.appendChild(
-    createSwitch(
-      "history-enabled",
-      "config.history.enabled",
-      config.history?.enabled ?? true,
-      null,
-      "block",
-      ["standard.on", "standard.off"],
-      true
-    )
+  // ─── Directories & Git (factory) ─────────────────
+  const directoriesTab = makeTab(
+    "directories",
+    t("modal.settings.tab.directories"),
+    (panel) => {
+      addContainerElement({
+        parent: panel,
+        tag: "p",
+        className: "form-info-text",
+        textContent: t("modal.settings.tab.directories.description"),
+        i18nKey: "modal.settings.tab.directories.description",
+      });
+
+      // Context folder picker
+      const contextFolderPicker = createDirectoryPicker({
+        id: "settings-context-folder",
+        label: t("modal.settings.context.folder"),
+        value: cachedConfig.context_folder || "./",
+        outerClass: "modal-form-row tight-gap",
+      });
+      panel.appendChild(contextFolderPicker.element);
+
+      // Use Git switch
+      panel.appendChild(
+        createSwitch(
+          "settings-use-git",
+          "modal.settings.git.enabled",
+          cachedConfig.use_git ?? false,
+          null,
+          "block",
+          ["standard.enabled", "standard.disabled"],
+          true
+        )
+      );
+
+      // Git root picker (assign to outer-scoped variable for setupBindings)
+      gitRootPicker = createDirectoryPicker({
+        id: "settings-git-root",
+        label: t("modal.settings.git.root"),
+        value: cachedConfig.git_root || "",
+        outerClass: "modal-form-row tight-gap",
+      });
+      panel.appendChild(gitRootPicker.element);
+
+      // Initial enable/disable state driven by use_git
+      const isGitEnabled = cachedConfig.use_git === true;
+      gitRootPicker.input.disabled = !isGitEnabled;
+      gitRootPicker.button.disabled = !isGitEnabled;
+      gitRootPicker.element.classList.toggle("disabled", !isGitEnabled);
+    }
   );
 
-  tabGeneral.appendChild(
-    createSwitch(
-      "history-persist",
-      "config.history.persist",
-      config.history?.persist ?? false,
-      null,
-      "block",
-      ["standard.on", "standard.off"],
-      true
-    )
+  // ─── Internal Server (factory) ─────────────────
+  const internalTab = makeTab(
+    "internal",
+    t("modal.settings.tab.internal"),
+    (panel) => {
+      addContainerElement({
+        parent: panel,
+        tag: "p",
+        className: "form-info-text",
+        textContent: t("modal.settings.tab.internal.description"),
+        i18nKey: "modal.settings.tab.internal.description",
+      });
+
+      panel.appendChild(
+        createSwitch(
+          "internal-server-toggle",
+          "modal.settings.internal.enabled",
+          cachedConfig.enable_internal_server ?? false,
+          null,
+          "block",
+          ["standard.on", "standard.off"],
+          true
+        )
+      );
+
+      panel.appendChild(
+        bindFormInput(
+          "internal-server-port",
+          "internal_server_port",
+          "modal.settings.internal.port"
+        )
+      );
+    }
   );
 
-  tabGeneral.appendChild(
-    createFormRowInput({
-      id: "history-max-size",
-      labelOrKey: "config.history.max_size",
-      type: "number",
-      value: config.history?.max_size ?? 20,
-      attributes: { min: 1, max: 500, step: 1 },
-      // nested -> save manually
-      configKey: "__history.max_size__",
-      onSave: async (val) => {
-        const n = Math.max(1, Math.min(500, parseInt(val, 10) || 20));
-        const h = cachedConfig.history ?? {};
-        await EventBus.emit("config:update", {
-          history: { ...h, max_size: n },
+  // ─── Advanced Settings (factory) ─────────────────
+  const advancedTab = makeTab(
+    "advanced",
+    t("modal.settings.tab.advanced"),
+    (panel) => {
+      addContainerElement({
+        parent: panel,
+        tag: "p",
+        className: "form-info-text",
+        textContent: t("modal.settings.tab.advanced.description"),
+        i18nKey: "modal.settings.tab.advanced.description",
+      });
+
+      panel.appendChild(
+        createSwitch(
+          "plugin-toggle",
+          "modal.settings.advanced.plugins.enabled",
+          cachedConfig.enable_plugins ?? false,
+          null,
+          "block",
+          ["standard.enabled", "standard.disabled"],
+          true
+        )
+      );
+
+      panel.appendChild(
+        createFormRowInput({
+          id: "encryption-key",
+          labelOrKey: "modal.settings.advanced.secretKey",
+          type: "password",
+          value: cachedConfig.encryption_key,
+          configKey: "encryption_key",
+          onSave: async (val) => {
+            await EventBus.emit("config:update", { encryption_key: val });
+            cachedConfig = await reloadUserConfig();
+            emitConfigStatus("encryption_key", "•••••");
+          },
+          i18nEnabled: true,
+        })
+      );
+
+      panel.appendChild(
+        createSwitch(
+          "settings-development-toggle",
+          "modal.settings.advanced.developmentMode",
+          cachedConfig.development_enable ?? false,
+          null,
+          "block",
+          ["standard.enabled", "standard.disabled"],
+          true
+        )
+      );
+
+      panel.appendChild(
+        createSwitch(
+          "logging-toggle",
+          "modal.settings.advanced.logging.enabled",
+          cachedConfig.logging_enabled,
+          null,
+          "block",
+          ["standard.enabled", "standard.disabled"],
+          true
+        )
+      );
+    }
+  );
+
+  // ─── Status Buttons (factory) ─────────────────
+  const statusButtonsTab = makeTab(
+    "status-buttons",
+    t("modal.settings.tab.statusButtons"),
+    (panel) => {
+      addContainerElement({
+        parent: panel,
+        tag: "p",
+        className: "form-info-text",
+        textContent: t("modal.settings.tab.statusButtons.description"),
+        i18nKey: "modal.settings.tab.statusButtons.description",
+      });
+
+      const sb = cachedConfig.status_buttons ?? {};
+      const keys = Object.keys(sb);
+
+      if (keys.length === 0) {
+        addContainerElement({
+          parent: panel,
+          tag: "p",
+          className: "form-info-text",
+          textContent: t("modal.settings.tab.statusButtons.empty"),
+          i18nKey: "modal.settings.tab.statusButtons.empty",
         });
-        cachedConfig = await reloadUserConfig();
-        emitConfigStatus("history.max_size", String(n));
-      },
-      i18nEnabled: true,
-    })
+        return;
+      }
+
+      for (const key of keys) {
+        const switchId = `status-btn-${key}`;
+        const labelKey = `modal.settings.statusButtons.${key}`;
+
+        const sw = createSwitch(
+          switchId,
+          labelKey,
+          !!sb[key],
+          null,
+          "block",
+          ["standard.on", "standard.off"],
+          true
+        );
+
+        // Special rule: gitquick depends on use_git
+        if (key === "gitquick" && cachedConfig.use_git !== true) {
+          const input = sw.querySelector('input[type="checkbox"]');
+          if (input) input.disabled = true;
+
+          addContainerElement({
+            parent: sw,
+            tag: "small",
+            className: "label-subtext",
+            textContent:
+              t("modal.settings.statusButtons.gitquick.dependsOnGit") ||
+              "Requires Git to be enabled.",
+          });
+        }
+
+        panel.appendChild(sw);
+      }
+    }
   );
-
-  // ─── Display Settings ─────────────────
-  const tabDisplay = document.createElement("div");
-  tabDisplay.className = "tab-panel tab-display";
-
-  addContainerElement({
-    parent: tabDisplay,
-    tag: "p",
-    className: "form-info-text",
-    textContent: t("modal.settings.tab.display.description"),
-    i18nKey: "modal.settings.tab.display.description",
-  });
-
-  tabDisplay.appendChild(
-    createSwitch(
-      "theme-toggle",
-      "modal.settings.display.theme",
-      config.theme === "dark",
-      null,
-      "block",
-      [
-        "modal.settings.display.theme.dark",
-        "modal.settings.display.theme.light",
-      ],
-      true
-    )
-  );
-
-  tabDisplay.appendChild(
-    createSwitch(
-      "show-expressions-toggle",
-      "standard.expressions",
-      config.use_expressions ?? true,
-      null,
-      "block",
-      ["standard.show", "standard.hide"],
-      true
-    )
-  );
-
-  tabDisplay.appendChild(
-    createSwitch(
-      "loop-collapse-toggle",
-      "modal.settings.display.loop.collapsed",
-      config.loop_state_collapsed ?? false,
-      null,
-      "block",
-      ["standard.on", "standard.off"],
-      true
-    )
-  );
-
-  tabDisplay.appendChild(
-    createSwitch(
-      "show-meta-toggle",
-      "modal.settings.display.meta",
-      config.show_meta_section ?? true,
-      null,
-      "block",
-      ["standard.show", "standard.hide"],
-      true
-    )
-  );
-
-  tabDisplay.appendChild(
-    createSwitch(
-      "show-icons-toggle",
-      "modal.settings.icon.buttons",
-      config.show_icon_buttons ?? true,
-      null,
-      "block",
-      ["standard.on.experimental", "standard.off"],
-      true
-    )
-  );
-
-  // ─── Directories & Git ───────────────
-  const tabDirs = document.createElement("div");
-  tabDirs.className = "tab-panel tab-dirs";
-
-  addContainerElement({
-    parent: tabDirs,
-    tag: "p",
-    className: "form-info-text",
-    textContent: t("modal.settings.tab.directories.description"),
-    i18nKey: "modal.settings.tab.directories.description",
-  });
-
-  const contextFolderPicker = createDirectoryPicker({
-    id: "settings-context-folder",
-    label: t("modal.settings.context.folder"),
-    value: config.context_folder || "./",
-    outerClass: "modal-form-row tight-gap",
-  });
-  tabDirs.appendChild(contextFolderPicker.element);
-
-  const useGitSwitch = createSwitch(
-    "settings-use-git",
-    "modal.settings.git.enabled",
-    config.use_git ?? false,
-    null,
-    "block",
-    ["standard.enabled", "standard.disabled"],
-    true
-  );
-  tabDirs.appendChild(useGitSwitch);
-
-  const gitRootPicker = createDirectoryPicker({
-    id: "settings-git-root",
-    label: t("modal.settings.git.root"),
-    value: config.git_root || "",
-    outerClass: "modal-form-row tight-gap",
-  });
-  tabDirs.appendChild(gitRootPicker.element);
-
-  // Disable Git picker initially if not enabled
-  const isGitEnabled = config.use_git === true;
-  gitRootPicker.input.disabled = !isGitEnabled;
-  gitRootPicker.button.disabled = !isGitEnabled;
-  gitRootPicker.element.classList.toggle("disabled", !isGitEnabled);
-
-  // ─── Internal Server ──────────────────────
-  const tabServer = document.createElement("div");
-  tabServer.className = "tab-panel tab-server";
-
-  addContainerElement({
-    parent: tabServer,
-    tag: "p",
-    className: "form-info-text",
-    textContent: t("modal.settings.tab.internal.description"),
-    i18nKey: "modal.settings.tab.internal.description",
-  });
-
-  tabServer.appendChild(
-    createSwitch(
-      "internal-server-toggle",
-      "modal.settings.internal.enabled",
-      config.enable_internal_server ?? false,
-      null,
-      "block",
-      ["standard.on", "standard.off"],
-      true
-    )
-  );
-
-  tabServer.appendChild(
-    bindFormInput(
-      "internal-server-port",
-      "internal_server_port",
-      "modal.settings.internal.port"
-    )
-  );
-
-  // ─── Advanced Settings ──────────────────────
-  const tabAdvanced = document.createElement("div");
-  tabAdvanced.className = "tab-panel tab-advanced";
-
-  addContainerElement({
-    parent: tabAdvanced,
-    tag: "p",
-    className: "form-info-text",
-    textContent: t("modal.settings.tab.advanced.description"),
-    i18nKey: "modal.settings.tab.advanced.description",
-  });
-
-  tabAdvanced.appendChild(
-    createSwitch(
-      "plugin-toggle",
-      "modal.settings.advanced.plugins.enabled",
-      config.enable_plugins ?? false,
-      null,
-      "block",
-      ["standard.enabled", "standard.disabled"],
-      true
-    )
-  );
-
-  tabAdvanced.appendChild(
-    createFormRowInput({
-      id: "encryption-key",
-      labelOrKey: "modal.settings.advanced.secretKey",
-      type: "password",
-      value: config.encryption_key,
-      configKey: "encryption_key",
-      onSave: async (val) => {
-        await EventBus.emit("config:update", { encryption_key: val });
-        cachedConfig = await reloadUserConfig();
-
-        emitConfigStatus("encryption_key", "•••••");
-      },
-      i18nEnabled: true,
-    })
-  );
-
-  tabAdvanced.appendChild(
-    createSwitch(
-      "settings-development-toggle",
-      "modal.settings.advanced.developmentMode",
-      config.development_enable ?? false,
-      null,
-      "block",
-      ["standard.enabled", "standard.disabled"],
-      true
-    )
-  );
-
-  tabAdvanced.appendChild(
-    createSwitch(
-      "logging-toggle",
-      "modal.settings.advanced.logging.enabled",
-      config.logging_enabled,
-      null,
-      "block",
-      ["standard.enabled", "standard.disabled"],
-      true
-    )
-  );
-
-  // ─── Status Buttons ─────────────────
-  const tabStatusButtons = document.createElement("div");
-  tabStatusButtons.className = "tab-panel tab-status-buttons";
-
-  addContainerElement({
-    parent: tabStatusButtons,
-    tag: "p",
-    className: "form-info-text",
-    textContent: t("modal.settings.tab.statusButtons.description"),
-    i18nKey: "modal.settings.tab.statusButtons.description",
-  });
-
-  // Render a switch per status_buttons key
-  renderStatusButtonsTab(tabStatusButtons, config);
 
   // Inject tabs and setup bindings
   container.appendChild(tabButtons);
-  container.appendChild(tabGeneral);
-  container.appendChild(tabDisplay);
-  container.appendChild(tabDirs);
-  container.appendChild(tabServer);
-  container.appendChild(tabAdvanced);
-  container.appendChild(tabStatusButtons);
+
+  // Build real panels from the factories
+  const generalPanel = generalTab.content();
+  const displayPanel = displayTab.content();
+  const directoriesPanel = directoriesTab.content();
+  const internalPanel = internalTab.content();
+  const advancedPanel = advancedTab.content();
+  const statusButtonsPanel = statusButtonsTab.content();
+
+  // Append panels (in the same order as the buttons)
+  container.appendChild(generalPanel);
+  container.appendChild(displayPanel);
+  container.appendChild(directoriesPanel);
+  container.appendChild(internalPanel);
+  container.appendChild(advancedPanel);
+  container.appendChild(statusButtonsPanel);
 
   initTabs("#settings-body", ".tab-btn", ".tab-panel", {
     activeClass: "active",
@@ -378,55 +462,6 @@ export async function renderSettings() {
   setupBindings(config, gitRootPicker);
 
   return true;
-}
-
-function renderStatusButtonsTab(parentEl, config) {
-  const sb = config.status_buttons ?? {};
-  const keys = Object.keys(sb);
-
-  if (keys.length === 0) {
-    addContainerElement({
-      parent: parentEl,
-      tag: "p",
-      className: "form-info-text",
-      textContent: t("modal.settings.tab.statusButtons.empty"),
-      i18nKey: "modal.settings.tab.statusButtons.empty",
-    });
-    return;
-  }
-
-  for (const key of keys) {
-    const switchId = `status-btn-${key}`;
-    const labelKey = `modal.settings.statusButtons.${key}`;
-
-    const sw = createSwitch(
-      switchId,
-      labelKey,
-      !!sb[key],
-      null,
-      "block",
-      ["standard.on", "standard.off"],
-      true
-    );
-
-    // Special rule: gitquick depends on use_git
-    if (key === "gitquick" && config.use_git !== true) {
-      const input = sw.querySelector('input[type="checkbox"]');
-      if (input) input.disabled = true;
-
-      // Optional helper text
-      addContainerElement({
-        parent: sw,
-        tag: "small",
-        className: "label-subtext",
-        textContent:
-          t("modal.settings.statusButtons.gitquick.dependsOnGit") ||
-          "Requires Git to be enabled.",
-      });
-    }
-
-    parentEl.appendChild(sw);
-  }
 }
 
 async function enforceGitQuickConstraint(useGitEnabled) {
