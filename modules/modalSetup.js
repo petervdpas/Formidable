@@ -5,6 +5,7 @@ import { reloadUserConfig } from "../utils/configUtil.js";
 import { buildButtonGroup, createButton } from "../utils/buttonUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
 import { renderSettings } from "./settingsManager.js";
+import { setTabviewOrientation } from "../utils/tabUtils.js";
 import { renderWorkspaceModal } from "./contextManager.js";
 import { applyModalCssClass, setupModal } from "../utils/modalUtils.js";
 import { extractFieldDefinition } from "../utils/formUtils.js";
@@ -78,7 +79,7 @@ export function setupSettingsModal() {
     escToClose: true,
     backdropClick: true,
     resizable: false,
-    width: "42em",
+    width: "48em",
     height: "26em",
 
     onOpen: async (_el, api) => {
@@ -115,9 +116,11 @@ export function setupSettingsModal() {
 
         refreshProfileBadge();
 
-        const ok = await renderSettings();
-        if (!ok) {
-          EventBus.emit("logging:warning", ["Settings container not found"]);
+        const tv = await renderSettings();
+        if (tv) {
+          setTabviewOrientation(tv, true);
+        } else {
+          EventBus.emit("logging:warning", ["Settings tabView not found"]);
         }
       } finally {
         api.setEnabled();

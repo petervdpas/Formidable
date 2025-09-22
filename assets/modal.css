@@ -25,6 +25,17 @@
     color: var(--modal-fg, #222);
 }
 
+.modal .modal-body {
+  position: relative;
+  overflow: clip;
+  border-radius: inherit;
+  min-height: 0;
+}
+
+@supports not (overflow: clip) {
+  .modal .modal-body { overflow: hidden; }
+}
+
 .modal.show {
     display: block;
     opacity: 1;
@@ -75,9 +86,7 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    /* Changed from center to bottom-align the content */
     padding: 10px 0;
-    /* Reduce vertical padding */
     margin-bottom: 8px;
     border-bottom: 1px solid;
 }
@@ -89,7 +98,6 @@
     flex-wrap: wrap;
     justify-content: space-between;
     padding-bottom: 4px;
-    /* Optional: if line spacing looks off */
 }
 
 .modal-title-row h2 {
@@ -102,7 +110,6 @@
     flex-shrink: 0;
     margin-left: auto;
     margin-right: -4px;
-    /* Pull tight to the edge */
     padding: 6px;
 }
 
@@ -115,7 +122,6 @@
     padding: 3px 4px;
 }
 
-/* Make sure the header and content align well */
 .modal-body.two-pane {
     flex: 1;
     display: flex;
@@ -137,7 +143,6 @@
     font-weight: bold;
     text-align: right;
     padding-top: 2px;
-    /* optional, if label seems too high */
 }
 
 .modal-form-row input,
@@ -292,7 +297,6 @@
     padding-right: 12px;
 }
 
-/* Optional: if you want to style the preview */
 #render-preview h1,
 #render-preview h2,
 #render-preview h3 {
@@ -339,7 +343,6 @@
     font-style: italic;
 }
 
-/* Code block styling for Markdown preview */
 #render-preview pre code {
     display: block;
     max-width: 100%;
@@ -368,7 +371,6 @@
     font-weight: 500;
 }
 
-/* Optional: if using a syntax highlighter later */
 #render-preview code.language-sh {
     color: #005cc5;
 }
@@ -412,7 +414,6 @@
     }
 
     .modal:not(.large) {
-        /* only apply adaptive rules if height would overflow */
         max-height: calc(100vh - 80px);
         overflow-y: auto;
     }

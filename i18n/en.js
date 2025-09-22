@@ -489,10 +489,13 @@ export default {
 
   // ── Modals ───────────────────
 
-  // "modal.settings.title": "Settings",
+  "modal.settings.title": "Settings",
   "modal.settings.tab.general": "General",
   "modal.settings.tab.general.description":
     "Configure author details like name, email and language.",
+  "modal.settings.tab.history": "History",
+  "modal.settings.tab.history.description":
+    "Configure history settings like enabled, persist and max size.", 
   "modal.settings.tab.display": "Display",
   "modal.settings.tab.display.description":
     "Configure the display theme and toggle icon-based buttons.",

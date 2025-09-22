@@ -21,6 +21,12 @@
     --menu-icon-size: 20px;
     --menu-icon-font-size: 1.8em;
 
+    /* ───── Divider ───── */
+    --divider-space: 12px;
+    --divider-inset: 10px;
+    --divider-grad-size: 6px;
+    --divider-grad-stop: 60%;
+
     /* ───── Field Type Colors ───── */
     --field-type-looper-bg: #b9e2c0;
     --field-type-looper-border: #999;

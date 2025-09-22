@@ -4,6 +4,8 @@
     --page-bg: #ffffff;
     --page-fg: #222222;
 
+    --border-color: #ccc;
+
     --sidebar-bg: #f0f0f0;
     --sidebar-border: #ccc;
 
@@ -13,6 +15,9 @@
     --statusbar-bg: #f4f4f4;
     --statusbar-fg: #333;
     --statusbar-border: #ccc;
+
+    --divider-color: #dfe3ea;
+    --divider-shadow: rgba(2, 6, 23, .08);
 
     --list-item-bg: #e0e0e0;
     --list-item-hover-bg: #d0d0d0;

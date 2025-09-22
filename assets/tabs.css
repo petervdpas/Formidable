@@ -1,85 +1,225 @@
-/* ───── Tabs ───── */
+/* tabs.css */
 
+.tabview {
+  display: block;
+}
+
+/* buttons strip */
 .tab-buttons {
   display: flex;
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 2px;
-  padding-bottom: 2px;
+  gap: 4px;
 }
 
 .tab-btn {
-  padding: 6px 16px;
+  padding: 8px 12px;
   background: none;
   border: none;
-  border-bottom: 3px solid transparent;
-  color: var(--text-color);
   cursor: pointer;
-  font-weight: bold;
-  transition: all 0.2s ease;
+  font-weight: 600;
+  color: var(--text-color);
+  border-bottom: 3px solid transparent;
+  /* htabs active marker */
+  transition: all .2s ease;
   box-shadow: none !important;
 }
 
 .tab-btn:hover {
-  background-color: var(--hover-bg); 
+  background: var(--hover-bg);
 }
 
-.tab-btn.active {
-  border-bottom-color: var(--accent-color);
-  color: var(--accent-color);
-}
-
+/* panels */
 .tab-panel {
   display: none;
   padding: 6px 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
 }
 
 .tab-panel.active {
   display: block;
-}
-
-.tab-panel {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-}
-
-.tab-panel.active {
   opacity: 1;
   pointer-events: auto;
 }
 
-/* Base */
-.tabview { display: block; }
-.tab-panel { display: none; padding: 6px 0; opacity: 0; pointer-events: none; transition: opacity .2s ease; }
-.tab-panel.active { display: block; opacity: 1; pointer-events: auto; }
+/* ───────── Horizontal ───────── */
 
-/* Horizontal (default look = your current one) */
 .tabview.htabs .tab-buttons {
-  display: flex; border-bottom: 1px solid var(--border-color);
-  margin-bottom: 2px; padding-bottom: 2px;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
-.tabview .tab-btn {
-  padding: 8px 12px; background: none; border: none; cursor: pointer;
-  font-weight: 600; color: var(--text-color);
-  border-bottom: 3px solid transparent;
-}
-.tabview .tab-btn:hover { background: var(--hover-bg); }
-.tabview.htabs .tab-btn.active { border-bottom-color: var(--accent-color); color: var(--accent-color); }
 
-/* Vertical */
-.tabview.vtabs { display: flex; gap: 12px; min-height: 420px; }
+.tabview.htabs .tab-btn.active {
+  border-bottom-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+/* draw the divider INSIDE the content so it never hits modal edges */
+.tabview.htabs .tab-content {
+  position: relative;
+  padding-top: var(--divider-space, 12px);
+}
+
+/* hairline */
+.tabview.htabs .tab-content::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: var(--divider-inset, 10px);
+  right: var(--divider-inset, 10px);
+  height: 1px;
+  background: var(--divider-color, var(--border-color));
+  pointer-events: none;
+}
+
+.tabview.htabs .tab-content::after {
+  height: var(--divider-grad-size);
+  background: linear-gradient(
+    to bottom,
+    var(--divider-shadow) 0,
+    transparent var(--divider-grad-stop)
+  );
+}
+
+/* ───────── Vertical ───────── */
+
+.tabview.vtabs {
+  display: flex;
+  gap: 0;
+  min-height: 420px;
+}
+
 .tabview.vtabs .tab-buttons {
-  flex: 0 0 220px; display: flex; flex-direction: column;
-  border-right: 1px solid var(--border-color); padding: 6px 8px 6px 0; margin: 0;
+  flex: 0 0 140px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 8px 6px 0;
+  margin: 0;
 }
-.tabview.vtabs .tab-btn { text-align: left; border-bottom: 0; border-left: 3px solid transparent; border-radius: 4px; }
-.tabview.vtabs .tab-btn.active { border-left-color: var(--accent-color); color: var(--accent-color); background: var(--hover-bg); }
-.tabview .tab-content { flex: 1 1 auto; min-width: 0; overflow: auto; padding-left: 4px; }
 
-/* Responsive fallback */
-@media (max-width: 700px) {
-  .tabview.vtabs { flex-direction: column; }
-  .tabview.vtabs .tab-buttons { flex-direction: row; border-right: 0; border-bottom: 1px solid var(--border-color); padding: 0 0 2px 0; gap: 4px; }
-  .tabview.vtabs .tab-btn { border-left: 0; border-bottom: 3px solid transparent; text-align: center; }
-  .tabview.vtabs .tab-btn.active { border-bottom-color: var(--accent-color); background: none; }
+.tabview.vtabs .tab-btn {
+  text-align: left;
+  border-bottom: 0;
+  border-left: 3px solid transparent;
+  border-radius: 4px;
+}
+
+.tabview.vtabs .tab-btn.active {
+  border-left-color: var(--accent-color);
+  color: var(--accent-color);
+  background: var(--hover-bg);
+}
+
+.tabview .tab-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: auto;
+}
+
+.tabview.vtabs .tab-content {
+  position: relative;
+  padding-left: var(--divider-space, 12px);
+}
+
+/* vertical hairline */
+.tabview.vtabs .tab-content::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  background: var(--divider-color, var(--border-color));
+  pointer-events: none;
+}
+
+.tabview.vtabs .tab-content::after {
+  width: var(--divider-grad-size);
+  background: linear-gradient(
+    to right,
+    var(--divider-shadow) 0,
+    transparent var(--divider-grad-stop)
+  );
+}
+
+/* ───────── Inside modal: keep everything clipped and scrollable ───────── */
+
+.modal .modal-body {
+  position: relative;
+  overflow: clip;
+  border-radius: inherit;
+  min-height: 0;
+}
+
+@supports not (overflow: clip) {
+  .modal .modal-body {
+    overflow: hidden;
+  }
+}
+
+.modal .modal-body>.tabview {
+  min-height: 0;
+}
+
+.modal .modal-body>.tabview.vtabs {
+  align-items: stretch;
+}
+
+.modal .modal-body>.tabview.vtabs .tab-buttons,
+.modal .modal-body>.tabview.vtabs .tab-content,
+.modal .modal-body>.tabview.htabs .tab-content {
+  max-height: 100%;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* ───────── Responsive ───────── */
+@media (max-width:700px) {
+  .tabview.vtabs {
+    flex-direction: column;
+  }
+
+  .tabview.vtabs .tab-buttons {
+    flex-direction: row;
+    padding: 0 0 2px 0;
+    gap: 4px;
+  }
+
+  .tabview.vtabs .tab-btn {
+    border-left: 0;
+    border-bottom: 3px solid transparent;
+    text-align: center;
+  }
+
+  .tabview.vtabs .tab-btn.active {
+    background: none;
+    border-bottom-color: var(--accent-color);
+  }
+
+  /* switch divider to the horizontal look */
+  .tabview.vtabs .tab-content {
+    padding-left: 0;
+    padding-top: var(--divider-space, 12px);
+  }
+
+  .tabview.vtabs .tab-content::before {
+    top: 0;
+    bottom: auto;
+    left: var(--divider-inset, 10px);
+    right: var(--divider-inset, 10px);
+    width: auto;
+    height: 1px;
+  }
+
+  .tabview.vtabs .tab-content::after {
+    top: 1px;
+    bottom: auto;
+    left: var(--divider-inset, 10px);
+    right: var(--divider-inset, 10px);
+    width: auto;
+    height: 14px;
+    background: linear-gradient(to bottom, var(--divider-shadow, rgba(0, 0, 0, .18)), transparent);
+  }
 }

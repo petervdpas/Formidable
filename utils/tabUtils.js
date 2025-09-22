@@ -1,54 +1,39 @@
 // utils/tabUtils.js
 
 /**
- * Simple class-toggling tabs (legacy).
- */
-export function initTabs(
-  containerSelector,
-  tabButtonSelector,
-  tabContentSelector,
-  options = {}
-) {
-  const container = document.querySelector(containerSelector);
-  if (!container) return false;
-
-  const buttons = container.querySelectorAll(tabButtonSelector);
-  const panels = container.querySelectorAll(tabContentSelector);
-  const activeClass = options.activeClass || "active";
-  const onTabChange = options.onTabChange || (() => {});
-
-  if (!buttons.length || !panels.length) return false;
-
-  const select = (i) => {
-    buttons.forEach((b, ix) => b.classList.toggle(activeClass, ix === i));
-    panels.forEach((p, ix) => p.classList.toggle(activeClass, ix === i));
-    onTabChange(i);
-  };
-
-  buttons.forEach((btn, i) => btn.addEventListener("click", () => select(i)));
-
-  select(0);
-  return true;
-}
-
-/**
- * Create a tab descriptor for createTabView
+ * Create a tab descriptor for createTabView.
+ * Accepts both (id, label, buildFn, i18nKey) and (id, label, i18nKey, buildFn).
  *
- * @param {string} id - internal id, also used for DOM ids
- * @param {string} label - text (already translated)
- * @param {function(HTMLElement):void} build - callback that fills the panel element
- * @returns {{id:string,label:string,content:()=>HTMLElement}}
+ * @param {string} id
+ * @param {string} label
+ * @param {(el:HTMLElement)=>void|string} buildOrKey
+ * @param {(el:HTMLElement)=>void|string|null} keyOrBuild
+ * @returns {{id:string,label:string,i18nKey:string|null,content:()=>HTMLElement}}
  */
-export function makeTab(id, label, build) {
+export function makeTab(id, label, buildOrKey, keyOrBuild = null) {
+  // Allow swapped arg order
+  let build = typeof buildOrKey === "function" ? buildOrKey : keyOrBuild;
+  let i18nKey =
+    typeof buildOrKey === "string" && typeof keyOrBuild !== "string"
+      ? buildOrKey
+      : (typeof keyOrBuild === "string" ? keyOrBuild : null);
+
+  if (typeof build !== "function") {
+    throw new TypeError(
+      `makeTab("${id}"): third or fourth argument must be a function (build(panel)).`
+    );
+  }
+
   return {
     id,
     label,
+    i18nKey,
     content: () => {
-      const panel = document.createElement("div");
-      panel.className = `tab-panel tab-${id}`;
-      build(panel);
-      return panel;
-    }
+      const el = document.createElement("div");
+      el.className = `tab-${id}`;
+      build(el);
+      return el;
+    },
   };
 }
 
@@ -61,7 +46,8 @@ export function makeTab(id, label, build) {
  * @param {number} [opts.activeIndex=0]
  * @param {(index:number)=>void} [opts.onChange]
  * @param {string} [opts.classes]
- * @returns {{root:HTMLElement, select:(i:number)=>void, buttons:HTMLElement[], panels:HTMLElement[]}}
+ * @param {{t:(key:string)=>string,eventName?:string}|null} [opts.i18n=null]  // if provided, enables live relabel
+ * @returns {{root:HTMLElement, select:(i:number)=>void, buttons:HTMLElement[], panels:HTMLElement[], retitle:()=>void}}
  */
 export function createTabView({
   items,
@@ -69,6 +55,7 @@ export function createTabView({
   activeIndex = 0,
   onChange = null,
   classes = "",
+  i18n = null,
 } = {}) {
   if (!Array.isArray(items) || !items.length)
     throw new Error("createTabView: items required");
@@ -90,15 +77,26 @@ export function createTabView({
   let current = -1;
   const buttons = [];
   const panels = [];
+  const i18nKeys = [];
 
   const makePanel = (i) => {
+    const child = items[i].content();
+
+    // Reuse if caller already provided a .tab-panel
+    if (child.classList?.contains("tab-panel")) {
+      child.setAttribute("role", "tabpanel");
+      child.setAttribute("tabindex", "0");
+      child.hidden = true;
+      return child;
+    }
+
+    // Otherwise, wrap into our own panel
     const p = document.createElement("div");
     p.className = "tab-panel";
     p.setAttribute("role", "tabpanel");
     p.setAttribute("tabindex", "0");
     p.hidden = true;
-    // let caller create/own the subtree:
-    p.appendChild(items[i].content());
+    p.appendChild(child);
     return p;
   };
 
@@ -111,6 +109,12 @@ export function createTabView({
     btn.className = "tab-btn";
     btn.id = `${id}-btn`;
     btn.textContent = it.label;
+    if (it.i18nKey) {
+      btn.dataset.i18n = it.i18nKey;
+      i18nKeys[i] = it.i18nKey;
+    } else {
+      i18nKeys[i] = null;
+    }
     btn.disabled = !!it.disabled;
 
     btn.setAttribute("role", "tab");
@@ -146,6 +150,31 @@ export function createTabView({
 
   root.append(tablist, contentHost);
 
+  // i18n relabel support
+  function retitle() {
+    if (!i18n?.t) return;
+    for (let i = 0; i < buttons.length; i++) {
+      const k = i18nKeys[i];
+      if (k) buttons[i].textContent = i18n.t(k);
+    }
+  }
+
+  let langHandler = null;
+  if (i18n?.t) {
+    const ev = i18n.eventName || "i18n:changed";
+    langHandler = () => retitle();
+    document.addEventListener(ev, langHandler);
+
+    // auto-unsubscribe when root is removed from DOM
+    const mo = new MutationObserver(() => {
+      if (!root.isConnected) {
+        document.removeEventListener(ev, langHandler);
+        mo.disconnect();
+      }
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+  }
+
   function select(i) {
     if (i === current || buttons[i]?.disabled) return;
     if (current >= 0) {
@@ -164,5 +193,19 @@ export function createTabView({
 
   select(Math.min(Math.max(0, activeIndex), items.length - 1));
 
-  return { root, select, buttons, panels };
+  return { root, select, buttons, panels, retitle };
+}
+
+// Toggle orientation after createTabView has been created
+export function setTabviewOrientation(tabviewOrRoot, vertical) {
+  const root = tabviewOrRoot?.root || tabviewOrRoot;
+  if (!root) return;
+
+  root.classList.toggle("vtabs", !!vertical);
+  root.classList.toggle("htabs", !vertical);
+
+  const list = root.querySelector('.tab-buttons[role="tablist"]');
+  if (list) {
+    list.setAttribute("aria-orientation", vertical ? "vertical" : "horizontal");
+  }
 }

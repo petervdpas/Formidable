@@ -1,7 +1,7 @@
 // modules/settingsManager.js
 
 import { EventBus } from "./eventBus.js";
-import { makeTab, initTabs, createTabView } from "../utils/tabUtils.js";
+import { makeTab, createTabView } from "../utils/tabUtils.js";
 import { formatAsRelativePath } from "../utils/pathUtils.js";
 import {
   createDirectoryPicker,
@@ -25,39 +25,19 @@ export async function renderSettings() {
   const container = document.getElementById("settings-body");
   if (!container) return false;
 
-  // Invalidate cache to ensure we get fresh config
+  // Reset cache + reload config
   invalidateUserConfig();
-
-  // Reload config to ensure we have the latest values
   cachedConfig = await reloadUserConfig();
   const config = cachedConfig;
   let gitRootPicker;
 
   container.innerHTML = "";
 
-  // ─── Tabs ─────────────────────────────
-  const tabGeneralLabel = t("modal.settings.tab.general");
-  const tabDisplayLabel = t("modal.settings.tab.display");
-  const tabDirectoriesLabel = t("modal.settings.tab.directories");
-  const tabInternalLabel = t("modal.settings.tab.internal");
-  const tabAdvancedLabel = t("modal.settings.tab.advanced");
-  const tabStatusButtonsLabel = t("modal.settings.tab.statusButtons");
-
-  const tabButtons = document.createElement("div");
-  tabButtons.className = "tab-buttons";
-  tabButtons.innerHTML = `
-    <button class="tab-btn" data-i18n="modal.settings.tab.general">${tabGeneralLabel}</button>
-    <button class="tab-btn" data-i18n="modal.settings.tab.display">${tabDisplayLabel}</button>
-    <button class="tab-btn" data-i18n="modal.settings.tab.directories">${tabDirectoriesLabel}</button>
-    <button class="tab-btn" data-i18n="modal.settings.tab.internal">${tabInternalLabel}</button>
-    <button class="tab-btn" data-i18n="modal.settings.tab.advanced">${tabAdvancedLabel}</button>
-    <button class="tab-btn" data-i18n="modal.settings.tab.statusButtons">${tabStatusButtonsLabel}</button>
-  `;
-
   // ─── General Settings (factory) ─────────────────
   const generalTab = makeTab(
     "general",
     t("modal.settings.tab.general"),
+    "modal.settings.tab.general",
     (panel) => {
       // Intro text
       addContainerElement({
@@ -89,8 +69,24 @@ export async function renderSettings() {
           "modal.settings.author.email"
         )
       );
+    }
+  );
 
-      // History
+    // ─── History Settings (factory) ─────────────────
+  const historyTab = makeTab(
+    "history",
+    t("modal.settings.tab.history"),
+    "modal.settings.tab.history",
+    (panel) => {
+      // Intro text
+      addContainerElement({
+        parent: panel,
+        tag: "p",
+        className: "form-info-text",
+        textContent: t("modal.settings.tab.history.description"),
+        i18nKey: "modal.settings.tab.history.description",
+      });
+
       panel.appendChild(
         createSwitch(
           "history-enabled",
@@ -143,6 +139,7 @@ export async function renderSettings() {
   const displayTab = makeTab(
     "display",
     t("modal.settings.tab.display"),
+    "modal.settings.tab.display",
     (panel) => {
       addContainerElement({
         parent: panel,
@@ -221,6 +218,7 @@ export async function renderSettings() {
   const directoriesTab = makeTab(
     "directories",
     t("modal.settings.tab.directories"),
+    "modal.settings.tab.directories",
     (panel) => {
       addContainerElement({
         parent: panel,
@@ -273,6 +271,7 @@ export async function renderSettings() {
   const internalTab = makeTab(
     "internal",
     t("modal.settings.tab.internal"),
+    "modal.settings.tab.internal",
     (panel) => {
       addContainerElement({
         parent: panel,
@@ -308,6 +307,7 @@ export async function renderSettings() {
   const advancedTab = makeTab(
     "advanced",
     t("modal.settings.tab.advanced"),
+    "modal.settings.tab.advanced",
     (panel) => {
       addContainerElement({
         parent: panel,
@@ -375,6 +375,7 @@ export async function renderSettings() {
   const statusButtonsTab = makeTab(
     "status-buttons",
     t("modal.settings.tab.statusButtons"),
+    "modal.settings.tab.statusButtons",
     (panel) => {
       addContainerElement({
         parent: panel,
@@ -432,71 +433,34 @@ export async function renderSettings() {
     }
   );
 
-  // Inject tabs and setup bindings
-  container.appendChild(tabButtons);
-
-  // Build real panels from the factories
-  const generalPanel = generalTab.content();
-  const displayPanel = displayTab.content();
-  const directoriesPanel = directoriesTab.content();
-  const internalPanel = internalTab.content();
-  const advancedPanel = advancedTab.content();
-  const statusButtonsPanel = statusButtonsTab.content();
-
-  // Append panels (in the same order as the buttons)
-  container.appendChild(generalPanel);
-  container.appendChild(displayPanel);
-  container.appendChild(directoriesPanel);
-  container.appendChild(internalPanel);
-  container.appendChild(advancedPanel);
-  container.appendChild(statusButtonsPanel);
-
-  initTabs("#settings-body", ".tab-btn", ".tab-panel", {
-    activeClass: "active",
-    onTabChange: (index) => {
-      EventBus.emit("logging:default", [`[Settings] Switched to tab ${index}`]);
+  // ─── Create vertical tabview from factories ─────
+  const tv = createTabView({
+    items: [
+      generalTab,
+      historyTab,
+      displayTab,
+      directoriesTab,
+      internalTab,
+      advancedTab,
+      statusButtonsTab,
+    ],
+    vertical: false,
+    activeIndex: 0,
+    onChange: (i) => {
+      EventBus.emit("logging:default", [`[Settings] Switched to tab ${i}`]);
     },
   });
 
+  // Inject into container
+  container.appendChild(tv.root);
+
+  // Bind everything after DOM is in place
   setupLanguageDropdown(config);
   setupBindings(config, gitRootPicker);
 
-  return true;
+  return tv;
 }
 
-async function enforceGitQuickConstraint(useGitEnabled) {
-  const input = getSwitchInputById("status-btn-gitquick");
-  if (!input) return;
-
-  if (!useGitEnabled) {
-    input.disabled = true;
-
-    if (input.checked || cachedConfig.status_buttons?.gitquick === true) {
-      input.checked = false;
-
-      const nextStatusButtons = {
-        ...(cachedConfig.status_buttons ?? {}),
-        gitquick: false,
-      };
-
-      await EventBus.emit("config:update", {
-        status_buttons: nextStatusButtons,
-      });
-      cachedConfig = await reloadUserConfig();
-
-      EventBus.emit("status:update", {
-        languageKey: "status.config.disabled",
-        i18nEnabled: true,
-        args: [
-          t("modal.settings.statusButtons.gitquick") || "Git Quick Actions",
-        ],
-        variant: "warning",
-      });
-    }
-  } else {
-    input.disabled = false;
-  }
-}
 
 function setupBindings(config, gitRootPicker) {
   bindThemeSwitch("theme-toggle", "theme");
@@ -568,6 +532,40 @@ function setupBindings(config, gitRootPicker) {
       };
     }
   })();
+}
+
+async function enforceGitQuickConstraint(useGitEnabled) {
+  const input = getSwitchInputById("status-btn-gitquick");
+  if (!input) return;
+
+  if (!useGitEnabled) {
+    input.disabled = true;
+
+    if (input.checked || cachedConfig.status_buttons?.gitquick === true) {
+      input.checked = false;
+
+      const nextStatusButtons = {
+        ...(cachedConfig.status_buttons ?? {}),
+        gitquick: false,
+      };
+
+      await EventBus.emit("config:update", {
+        status_buttons: nextStatusButtons,
+      });
+      cachedConfig = await reloadUserConfig();
+
+      EventBus.emit("status:update", {
+        languageKey: "status.config.disabled",
+        i18nEnabled: true,
+        args: [
+          t("modal.settings.statusButtons.gitquick") || "Git Quick Actions",
+        ],
+        variant: "warning",
+      });
+    }
+  } else {
+    input.disabled = false;
+  }
 }
 
 async function updateNestedConfig(pathArr, value) {

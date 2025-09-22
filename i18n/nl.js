@@ -510,10 +510,13 @@ export default {
 
   // ── Modals ───────────────────
 
-  // "modal.settings.title": "Instellingen",
+  "modal.settings.title": "Instellingen",
   "modal.settings.tab.general": "Algemeen",
   "modal.settings.tab.general.description":
     "Configureer auteurgegevens zoals naam, e-mail en taal.",
+  "modal.settings.tab.history": "Geschiedenis",
+  "modal.settings.tab.history.description":
+    "Configureer geschiedenisinstellingen zoals inschakelen, behouden en maximale grootte.",
   "modal.settings.tab.display": "Weergave",
   "modal.settings.tab.display.description":
     "Configureer het weergavethema en schakel op pictogrammen gebaseerde knoppen in.",
@@ -546,11 +549,14 @@ export default {
   "modal.settings.advanced.logging.enabled": "Logging inschakelen",
 
   "modal.settings.tab.statusButtons": "Statusknoppen",
-  "modal.settings.tab.statusButtons.description": "Schakel individuele statusknoppen in of uit.",
-  "modal.settings.tab.statusButtons.empty": "Geen statusknoppen gedefinieerd in uw configuratie.",
+  "modal.settings.tab.statusButtons.description":
+    "Schakel individuele statusknoppen in of uit.",
+  "modal.settings.tab.statusButtons.empty":
+    "Geen statusknoppen gedefinieerd in uw configuratie.",
   "modal.settings.statusButtons.charpicker": "Karakterkiezer",
   "modal.settings.statusButtons.gitquick": "Git Snelle Acties",
-  "modal.settings.statusButtons.gitquick.dependsOnGit": "Vereist dat Git is ingeschakeld.",
+  "modal.settings.statusButtons.gitquick.dependsOnGit":
+    "Vereist dat Git is ingeschakeld.",
   "modal.settings.statusButtons.reloader": "Herlaad Knop",
 
   "modal.profile.title": "Wissel gebruikersprofiel",
