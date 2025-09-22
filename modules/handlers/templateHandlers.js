@@ -127,6 +127,8 @@ export async function handleSaveTemplate({ name, data, callback }) {
 
       const templateName = name.replace(/\.yaml$/, "");
       EventBus.emit("vfs:refreshTemplate", { templateName });
+
+      EventBus.emit("template:list:refreshAfterSave", { name });
     } else {
       EventBus.emit("status:update", {
         message: "status.template.save.error",
@@ -155,6 +157,7 @@ export async function handleDeleteTemplate({ name, callback }) {
         storeName: "vfs",
         key: `template:${templateName}`,
       });
+      EventBus.emit("template:list:reload");
     }
     callback?.(result);
   } catch (err) {

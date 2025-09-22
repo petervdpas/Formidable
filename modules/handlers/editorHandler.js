@@ -94,7 +94,6 @@ export async function handleDeleteTemplate(container) {
 
     window.currentSelectedTemplate = null;
     window.currentSelectedTemplateName = null;
-    window.templateListManager?.loadList?.();
   } else {
     EventBus.emit("status:update", {
       message: "status.template.delete.failed",

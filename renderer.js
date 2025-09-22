@@ -222,7 +222,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   );
 
   // ── Sidebars ──
-  window.templateListManager = createTemplateListManager(
+  const templateListManager = createTemplateListManager(
     templateModal,
     templateDropdown
   );
@@ -255,7 +255,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
 
   bindListDependencies({
-    templateListManager: window.templateListManager,
+    templateListManager,
     storageListManager,
   });
 
@@ -267,7 +267,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   // ── Initial Data Load ──
   await Promise.all([
     loadTemplateOptions(),
-    window.templateListManager.loadList(),
+    templateListManager.loadList(),
     templateDropdown.refresh?.() ?? Promise.resolve(),
   ]);
 

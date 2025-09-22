@@ -46,7 +46,7 @@ export function createTemplateListManager(modal, dropdown = null) {
     },
 
     onItemClick: (templateItem) =>
-      EventBus.emit("template:list:itemClicked", templateItem),
+      EventBus.emit("template:list:itemClicked", templateItem?.value ?? templateItem),
 
     emptyMessage: t("special.noTemplatesFound"),
 
@@ -70,9 +70,9 @@ export function createTemplateListManager(modal, dropdown = null) {
                 throw new Error("Save failed");
               }
 
-              await listManager.loadList();
-
               if (dropdown?.refresh) await dropdown.refresh();
+
+              EventBus.emit("template:list:refreshAfterSave", { name: template });
 
               EventBus.emit("template:selected", {
                 name: template,
@@ -257,7 +257,7 @@ export function createStorageListManager(formManager, modal) {
     },
 
     onItemClick: (storageItem) =>
-      EventBus.emit("form:list:itemClicked", storageItem),
+      EventBus.emit("form:list:itemClicked", storageItem?.value ?? storageItem),
 
     emptyMessage: t("special.noMetadataFilesFound"),
 

@@ -255,6 +255,10 @@ export function initEventRouter() {
 
   EventBus.off("template:list:reload", listHandlers.handleListReload);
   EventBus.off("template:list:itemClicked", listHandlers.handleListItemClicked);
+  EventBus.off(
+    "template:list:refreshAfterSave",
+    listHandlers.handleListRefreshAfterSave
+  );
   EventBus.off("template:list:highlighted", listHandlers.handleListHighlighted);
 
   EventBus.on("template:list:reload", () =>
@@ -263,9 +267,21 @@ export function initEventRouter() {
   EventBus.on("template:list:itemClicked", (name) =>
     listHandlers.handleListItemClicked({ listId: "template-list", name })
   );
-  EventBus.on("template:list:highlighted", (name) =>
-    listHandlers.handleListHighlighted({ listId: "template-list", name })
+  EventBus.on("template:list:refreshAfterSave", (e) =>
+    listHandlers.handleListRefreshAfterSave({ listId: "template-list", ...e })
   );
+  EventBus.on("template:list:highlighted", (payload) => {
+    const name = typeof payload === "string" ? payload : payload?.name;
+    const click =
+      typeof payload === "object" && payload?.click !== undefined
+        ? payload.click
+        : true;
+    listHandlers.handleListHighlighted({
+      listId: "template-list",
+      name,
+      click,
+    });
+  });
 
   EventBus.off("code:execute", codeExecHandler.handleCodeExecute);
   EventBus.on("code:execute", codeExecHandler.handleCodeExecute);
@@ -312,9 +328,8 @@ export function initEventRouter() {
   EventBus.on("form:list:reload", () =>
     listHandlers.handleListReload({ listId: "storage-list" })
   );
-  EventBus.on(
-    "form:list:refreshAfterSave",
-    listHandlers.handleListRefreshAfterSave
+  EventBus.on("form:list:refreshAfterSave", (e) =>
+    listHandlers.handleListRefreshAfterSave({ listId: "storage-list", ...e })
   );
   EventBus.on("form:list:updateItem", (e) =>
     listHandlers.handleListUpdateItem({ listId: "storage-list", ...e })

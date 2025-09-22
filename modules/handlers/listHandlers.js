@@ -12,23 +12,36 @@ export function bindListDependencies(deps) {
   storageList = deps.storageListManager;
 }
 
-let refreshTimer = null;
+const refreshTimers = new Map();
 const REFRESH_DELAY_MS = 120;
 
-export function handleListRefreshAfterSave({ name }) {
-  if (!storageList || typeof storageList.reloadList !== "function") return;
+export function handleListRefreshAfterSave({ listId, name }) {
+  const manager =
+    listId === "template-list"
+      ? templateList
+      : listId === "storage-list"
+      ? storageList
+      : null;
 
-  if (refreshTimer) clearTimeout(refreshTimer);
-  refreshTimer = setTimeout(async () => {
+  if (!manager || typeof manager.reloadList !== "function") return;
+
+  const existing = refreshTimers.get(listId);
+  if (existing) clearTimeout(existing);
+  const t = setTimeout(async () => {
     try {
-      await storageList.reloadList();
+      await manager.reloadList();
       if (name) {
-        EventBus.emit("form:list:highlighted", { name, click: false });
+        const event =
+          listId === "template-list"
+            ? "template:list:highlighted"
+            : "form:list:highlighted";
+        EventBus.emit(event, { name, click: false });
       }
     } finally {
-      refreshTimer = null;
+      refreshTimers.delete(listId);
     }
   }, REFRESH_DELAY_MS);
+  refreshTimers.set(listId, t);
 }
 
 export async function handleListReload({ listId }) {
@@ -204,7 +217,7 @@ export function handleListUpdateItem({
 
   // If not in DOM (filtered/not loaded), do the debounced full refresh
   if (!item) {
-    handleListRefreshAfterSave({ name });
+    handleListRefreshAfterSave({ listId, name });
     return;
   }
 
