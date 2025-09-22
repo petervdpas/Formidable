@@ -408,6 +408,9 @@ export default {
   "standard.collapse_all": "Alles inklappen",
   "standard.expand_all": "Alles uitklappen",
 
+  "standard.nbr.of.items.total": "Aantal in lijst: {0}",
+  "standard.nbr.of.items.filtered": "Aantal in lijst: {0} van {1}",
+
   // ── Tooltips ─────────────────────────────
   "tooltip.restart.formidable": "Herstart Formidable",
 

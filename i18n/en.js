@@ -388,6 +388,9 @@ export default {
   "standard.collapse_all": "Collapse All",
   "standard.expand_all": "Expand All",
 
+  "standard.nbr.of.items.total": "Nbr. of Items: {0}",
+  "standard.nbr.of.items.filtered": "Nbr. of Items: {0} of {1}",
+
   // ── Tooltips ─────────────────────────────
   "tooltip.restart.formidable": "Restart Formidable",
 
@@ -495,7 +498,7 @@ export default {
     "Configure author details like name, email and language.",
   "modal.settings.tab.history": "History",
   "modal.settings.tab.history.description":
-    "Configure history settings like enabled, persist and max size.", 
+    "Configure history settings like enabled, persist and max size.",
   "modal.settings.tab.display": "Display",
   "modal.settings.tab.display.description":
     "Configure the display theme and toggle icon-based buttons.",

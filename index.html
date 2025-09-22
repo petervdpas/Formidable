@@ -62,8 +62,16 @@
 
     <!-- THEME — load AFTER EasyMDE so our values/rules win -->
     <link rel="stylesheet" href="assets/common.css" />
-    <link id="formidable-theme-light" rel="stylesheet" href="assets/themes/light.css" />
-    <link id="formidable-theme-dark" rel="stylesheet" href="assets/themes/dark.css" />
+    <link
+      id="formidable-theme-light"
+      rel="stylesheet"
+      href="assets/themes/light.css"
+    />
+    <link
+      id="formidable-theme-dark"
+      rel="stylesheet"
+      href="assets/themes/dark.css"
+    />
   </head>
   <body>
     <div id="main-wrapper">
@@ -78,7 +86,16 @@
       <!-- Template Form Editor Context -->
       <div id="template-container">
         <div id="template-sidebar">
-          <h3 data-i18n="standard.templates">Templates</h3>
+          <h3>
+            <span data-i18n="standard.templates">Templates</span>
+            <span
+              class="list-count templates-list-count"
+              aria-live="polite"
+              data-i18n="standard.nbr.of.items.filtered"
+            >
+              Nbr. of Items: 0
+            </span>
+          </h3>
           <div id="template-list"></div>
         </div>
         <div id="template-splitter">
@@ -101,7 +118,16 @@
       <div id="storage-container" style="display: none">
         <div id="storage-sidebar">
           <div id="template-selector"></div>
-          <h3 data-i18n="standard.forms">Forms</h3>
+          <h3>
+            <span data-i18n="standard.forms">Forms</span>
+            <span
+              class="list-count storage-list-count"
+              aria-live="polite"
+              data-i18n="standard.nbr.of.items"
+            >
+              Nbr. of Items: 0
+            </span>
+          </h3>
           <div id="storage-list"></div>
         </div>
         <div id="storage-splitter">
@@ -119,6 +145,7 @@
           </section>
         </div>
       </div>
+      
       <!-- Shared Status Bar -->
       <div id="status-bar">
         <div id="status-bar-message">

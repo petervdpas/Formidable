@@ -11,7 +11,10 @@ import {
   addContainerElement,
   createFilterField,
 } from "../utils/elementBuilders.js";
-import { createListManager } from "../utils/listUtils.js";
+import {
+  createListManager,
+  wrapRenderWithCounter,
+} from "../utils/listUtils.js";
 import { createAddButton } from "./uiButtons.js";
 import { t } from "../utils/i18n.js";
 
@@ -46,7 +49,10 @@ export function createTemplateListManager(modal, dropdown = null) {
     },
 
     onItemClick: (templateItem) =>
-      EventBus.emit("template:list:itemClicked", templateItem?.value ?? templateItem),
+      EventBus.emit(
+        "template:list:itemClicked",
+        templateItem?.value ?? templateItem
+      ),
 
     emptyMessage: t("special.noTemplatesFound"),
 
@@ -72,7 +78,9 @@ export function createTemplateListManager(modal, dropdown = null) {
 
               if (dropdown?.refresh) await dropdown.refresh();
 
-              EventBus.emit("template:list:refreshAfterSave", { name: template });
+              EventBus.emit("template:list:refreshAfterSave", {
+                name: template,
+              });
 
               EventBus.emit("template:selected", {
                 name: template,
@@ -101,6 +109,17 @@ export function createTemplateListManager(modal, dropdown = null) {
       },
     }),
   });
+
+  wrapRenderWithCounter(
+    listManager,
+    document.querySelector(".templates-list-count"),
+    {
+      containerId: "template-list",
+      itemClass: "template-item",
+      mode: "total",
+      i18nKeyTotal: "standard.nbr.of.items.total",
+    }
+  );
 
   return {
     ...listManager,
@@ -334,6 +353,17 @@ export function createStorageListManager(formManager, modal) {
       },
     }),
   });
+
+  wrapRenderWithCounter(
+    listManager,
+    document.querySelector(".storage-list-count"),
+    {
+      containerId: "storage-list",
+      itemClass: "storage-item",
+      mode: "filteredTotal",
+      i18nKeyFiltered: "standard.nbr.of.items.filtered",
+    }
+  );
 
   return { ...listManager, reloadList: () => listManager.loadList() };
 }

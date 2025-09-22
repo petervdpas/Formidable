@@ -446,6 +446,19 @@ h3::before {
   font-size: inherit;
 }
 
+.list-count {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 6px;
+  font-size: 0.6em;
+  line-height: 1.6;
+  border-radius: 10px;
+  background: var(--badge-bg, rgba(0,0,0,.08));
+  color: var(--badge-fg, inherit);
+  vertical-align: middle;
+  opacity: .9;
+}
+
 .list-item {
   display: flex;
   justify-content: space-between;

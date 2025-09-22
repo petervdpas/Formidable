@@ -1,6 +1,10 @@
 // utils/listUtils.js
 
 import { EventBus } from "../modules/eventBus.js";
+import { t } from "./i18n.js";
+
+let fullList = [];
+let lastFilteredCount = 0;
 
 export function makeSelectableList(
   items,
@@ -73,8 +77,6 @@ export function createListManager({
     host.appendChild(filterUI); // fragment contents or element
   }
 
-  let fullList = [];
-
   async function loadList() {
     EventBus.emit("logging:default", [
       `[createListManager] Loading list into #${elementId}...`,
@@ -106,6 +108,8 @@ export function createListManager({
     if (typeof customFilter === "function") {
       filteredItems = fullList.filter(customFilter);
     }
+
+    lastFilteredCount = filteredItems.length;
 
     if (!filteredItems || filteredItems.length === 0) {
       listWrapper.innerHTML = `<div class="empty-message">${emptyMessage}</div>`;
@@ -191,7 +195,102 @@ export function createListManager({
       }
     },
     getItemCount: () => fullList.length,
-    getFilteredCount: () =>
+    getFilteredCount: () => lastFilteredCount,
+    getDomVisibleCount: () =>
       listWrapper.querySelectorAll(`.${itemClass}`).length,
   };
+}
+
+export function setBadgeText(el, i18nKey, args = []) {
+  if (!el) return;
+  el.setAttribute("data-i18n", i18nKey);
+  el.setAttribute("data-i18n-args", JSON.stringify(args));
+  const label = t(i18nKey, args);
+  el.textContent = label;
+  el.setAttribute("aria-label", label);
+}
+
+export function getVisibleCount(selector) {
+  const nodes = document.querySelectorAll(selector);
+  let n = 0;
+  nodes.forEach((el) => {
+    const cs = window.getComputedStyle(el);
+    if (
+      cs.display !== "none" &&
+      cs.visibility !== "hidden" &&
+      (el.offsetParent !== null || cs.position === "fixed")
+    )
+      n++;
+  });
+  return n;
+}
+
+/**
+ * Attach a dynamic, i18n-safe counter to any listManager.
+ * mode: "total" (templates) or "filteredTotal" (forms)
+ */
+export function wrapRenderWithCounter(
+  listManager,
+  badgeEl,
+  {
+    containerId,
+    itemClass,
+    mode = "filteredTotal",
+    i18nKeyTotal = "standard.nbr.of.items.total",
+    i18nKeyFiltered = "standard.nbr.of.items.filtered",
+  } = {}
+) {
+  if (!listManager || typeof listManager.renderList !== "function") return;
+
+  const measure = () => {
+    const total =
+      typeof listManager.getItemCount === "function"
+        ? listManager.getItemCount()
+        : getVisibleCount(`#${containerId} .${itemClass}`);
+
+    if (mode === "total") {
+      setBadgeText(badgeEl, i18nKeyTotal, [total]);
+      return;
+    }
+
+    const mgrFiltered =
+      typeof listManager.getFilteredCount === "function"
+        ? listManager.getFilteredCount()
+        : null;
+
+    const visible =
+      typeof listManager.getDomVisibleCount === "function"
+        ? listManager.getDomVisibleCount()
+        : getVisibleCount(`#${containerId} .${itemClass}`);
+
+    const filtered = Number.isFinite(mgrFiltered)
+      ? Math.max(mgrFiltered, visible)
+      : visible;
+
+    setBadgeText(badgeEl, i18nKeyFiltered, [filtered, total]);
+  };
+
+  const afterPaint = () => requestAnimationFrame(measure);
+
+  const origRender = listManager.renderList.bind(listManager);
+  listManager.renderList = (dir, cb) =>
+    origRender(dir, () => {
+      afterPaint();
+      if (typeof cb === "function") cb();
+    });
+
+  if (typeof listManager.loadList === "function") {
+    const origLoad = listManager.loadList.bind(listManager);
+    listManager.loadList = async (...args) => {
+      const r = await origLoad(...args);
+      afterPaint();
+      return r;
+    };
+  }
+
+  // refresh when i18n changes (EventBus) or browser lang change
+  EventBus?.on?.("i18n:changed", afterPaint);
+  window.addEventListener?.("languagechange", afterPaint);
+
+  afterPaint();
 }

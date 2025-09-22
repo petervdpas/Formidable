@@ -24,9 +24,23 @@ export async function loadLocale(locale = "en") {
 /**
  * Translate a given key with fallback
  */
-export function t(key, fallback = "") {
-  let translation = translations[key] || fallback || key;
-  return translation;
+export function t(key, argsOrFallback = "", fallback = "") {
+  let args = [];
+  let fb = "";
+  if (Array.isArray(argsOrFallback)) {
+    args = argsOrFallback;
+    fb = fallback;
+  } else {
+    fb = argsOrFallback;
+  }
+
+  let out = translations[key] ?? fb ?? key;
+  if (args.length) {
+    out = out.replace(/{(\d+)}/g, (m, i) =>
+      args[i] !== undefined ? String(args[i]) : m
+    );
+  }
+  return out;
 }
 
 /**
@@ -69,7 +83,10 @@ export function translateDOM(root = document.body) {
           args[index] !== undefined ? String(args[index]) : match
         );
       } catch (e) {
-        console.warn("[translateDOM] Invalid JSON in data-i18n-args:", argsAttr);
+        console.warn(
+          "[translateDOM] Invalid JSON in data-i18n-args:",
+          argsAttr
+        );
       }
     }
 
