@@ -167,7 +167,7 @@ export default {
   "menu.view.devtools": "Ontwikkelaarstools",
   "menu.help.pages": "Helppagina's",
   "menu.help.about": "Over Formidable",
-  "menu.help.formidable.tools": "Bezoek Formidable Tools",
+  "menu.help.formidable.website": "Bezoek Website",
   "menu.context.label": "Context Modus:",
   "menu.context.option.storage": "Opslag",
   "menu.context.option.template": "Sjabloon",

@@ -183,7 +183,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
       { label: "menu.help.pages", i18n: true, action: "open-help" },
       { label: "menu.help.about", i18n: true, action: "open-about" },
       {
-        label: "menu.help.formidable.tools",
+        label: "menu.help.formidable.website",
         i18n: true,
         action: "open-formidable-tools",
       },

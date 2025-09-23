@@ -16,6 +16,9 @@ export async function loadLocale(locale = "en") {
   try {
     translations = (await import(`../i18n/${locale}.js`)).default;
     currentLocale = locale;
+    translateDOM();
+    window.dispatchEvent(new Event("languagechange"));
+    EventBus?.emit?.("i18n:changed", locale);
   } catch (err) {
     console.error(`[i18n] Failed to load locale '${locale}'`, err);
   }

@@ -156,7 +156,7 @@ export default {
   "menu.view.devtools": "Toggle DevTools",
   "menu.help.pages": "Help Pages",
   "menu.help.about": "About Formidable",
-  "menu.help.formidable.tools": "Visit Formidable Tools",
+  "menu.help.formidable.website": "Visit Website",
   "menu.context.label": "Context Mode:",
   "menu.context.option.storage": "Storage",
   "menu.context.option.template": "Template",

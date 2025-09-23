@@ -3,9 +3,6 @@
 import { EventBus } from "../modules/eventBus.js";
 import { t } from "./i18n.js";
 
-let fullList = [];
-let lastFilteredCount = 0;
-
 export function makeSelectableList(
   items,
   onSelect,
@@ -51,6 +48,10 @@ export function createListManager({
     ]);
     throw new Error(`List container #${elementId} not found.`);
   }
+
+  // per-instance state
+  let fullList = [];
+  let lastFilteredCount = 0;
 
   // ── Idempotent wrappers: find or create once ─────────────────────
   let listWrapper = container.querySelector(":scope > .list-items-wrapper");
