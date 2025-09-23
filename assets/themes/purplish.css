@@ -1,0 +1,271 @@
+/* fontys.css */
+:root[data-theme="purplish"] {
+  /* Base page + surfaces */
+  --page-bg: #fdfdfd;
+  --page-fg: #1a1a1a;
+
+  --border-color: #d0c5e0;
+
+  --sidebar-bg: #f5f2fa;
+  --sidebar-border: #d0c5e0;
+
+  --workspace-bg: #ffffff;
+  --workspace-fg: #1a1a1a;
+
+  --statusbar-bg: #ede7f6;
+  --statusbar-fg: #2b2b2b;
+  --statusbar-border: #d0c5e0;
+
+  --divider-color: #e2d9f3;
+  --divider-shadow: rgba(92, 45, 145, .15);
+
+  /* Lists */
+  --list-item-bg: #f2ecfa;
+  --list-item-hover-bg: #e3d7f5;
+  --list-item-selected-bg: #5c2d91;   /* Fontys purple */
+  --list-item-selected-fg: #fff;
+  --list-item-selected-border: #421f6b;
+
+  /* Modals */
+  --modal-bg: #ffffff;
+  --modal-border: #d0c5e0;
+  --modal-fg: #1a1a1a;
+  --modal-hover-bg: #f8f5fc;
+  --modal-backdrop: rgba(92, 45, 145, 0.3);
+  --modal-highlight-bg: #ede7f6;
+  --modal-highlight-border: #b39ddb;
+  --modal-highlight-text: #2b2b2b;
+
+  --slider-knob-bg: #5c2d91;
+
+  /* Scrollbars */
+  --scrollbar-thumb: #b39ddb;
+  --scrollbar-track: #f5f2fa;
+
+  /* Resize handle */
+  --resize-handle-bg: #7e57c2;
+  --resize-handle-border: #5c2d91;
+
+  /* Menus */
+  --menu-bg: #ffffff;
+  --menu-fg: #1a1a1a;
+  --menu-border: #d0c5e0;
+  --menu-hover-bg: #f8f5fc;
+  --submenu-bg: #f2ecfa;
+  --submenu-fg: #1a1a1a;
+  --submenu-hover-bg: #e3d7f5;
+  --submenu-separator: #d0c5e0;
+
+  --menu-icon-bg: #ede7f6;
+  --menu-icon-bg-hover: #d1c4e9;
+  --menu-icon-bg-active: #5c2d91;
+  --menu-icon-color: #2b2b2b;
+  --menu-icon-color-hover: #1a1a1a;
+  --menu-icon-color-active: #ffffff;
+  --menu-icon-bg-disabled: #f2ecfa;
+  --menu-icon-color-disabled: #9e8ec9;
+
+  /* ───── Global UI Elements ───── */
+  --text-color: #1a1a1a;
+  --text-description: #666;
+
+  --input-bg: #ffffff;
+  --input-fg: #1a1a1a;
+  --input-border-color: #c0b0d6;
+
+  /* Focus ring + accents */
+  --input-focus-border: #5c2d91;
+  --accent-color: rgba(92, 45, 145, .25);
+
+  --input-icon-bg: #ede7f6;
+  --input-icon-bg-hover: #d1c4e9;
+
+  --input-accent-color: #5c2d91;
+  --hover-bg: #f8f5fc;
+  --badge-bg: #ede7f6;
+  --muted-fg: #777;
+
+  --filter-bg: #f8f5fc;
+  --filter-border: #d0c5e0;
+  --filter-text: #1a1a1a;
+  --filter-shadow: 0 1px 2px rgba(92,45,145,.15);
+
+  --form-border: #d0c5e0;
+  --link-row-bg: #f2ecfa;
+  --link-color: #5c2d91;
+  --link-hover: #421f6b;
+
+  /* ───── Range Slider ───── */
+  --range-track-bg: #d1c4e9;
+  --range-thumb-bg: #5c2d91;
+  --range-thumb-border: #421f6b;
+  --range-thumb-hover-shadow: rgba(92,45,145,.25);
+
+  --readonly-bg: #f2ecfa;
+  --readonly-fg: #5c2d91;
+
+  /* Switch */
+  --switch-track-bg: #d1c4e9;
+  --switch-track-bg-checked: #5c2d91;
+  --switch-knob-bg: #ffffff;
+  --switch-focus-ring: 0 0 0 3px rgba(92, 45, 145, .35);
+
+  /* Status bar buttons */
+  --statusbar-btn-bg: #ffffff;
+  --statusbar-btn-bg-hover: #f8f5fc;
+  --statusbar-btn-border: #d0c5e0;
+  --statusbar-btn-border-hover: #b39ddb;
+  --statusbar-btn-fg: #1a1a1a;
+
+  /* Status colors */
+  --status-info-divider: #d0c5e0;
+  --status-message-color: #2b2b2b;
+  --status-success-color: #2e7d32;
+  --status-warning-color: #ff9800;
+  --status-error-color: #c62828;
+
+  /* Editor toolbar */
+  --editor-toolbar-bg: #f8f5fc;
+  --editor-toolbar-fg: #2b2b2b;
+  --editor-toolbar-border: #d0c5e0;
+  --editor-toolbar-button-fg: #2b2b2b;
+  --editor-toolbar-button-fg-hover: #1a1a1a;
+  --editor-toolbar-button-fg-active: #fff;
+  --editor-toolbar-button-fg-disabled: #9e7dbf;
+  --editor-toolbar-button-bg-hover: #e3d7f5;
+  --editor-toolbar-button-bg-active: #5c2d91;
+  --editor-toolbar-button-bg-disabled: #f2ecfa;
+
+  /* Shadows */
+  --generic-box-shadow: 0 2px 4px rgba(92, 45, 145, 0.08);
+  --generic-shadow: 0 1px 2px rgba(92, 45, 145, 0.18);
+  --generic-shadow-hover: 0 2px 4px rgba(92, 45, 145, 0.28);
+  --generic-shadow-active: inset 0 1px 2px rgba(92, 45, 145, 0.35);
+
+  /* Buttons (semantic) */
+  --generic-bg-default: #ede7f6;
+  --generic-bg-default-hover: #e3d7f5;
+  --generic-border-default: #c0b0d6;
+  --generic-border-default-hover: #b39ddb;
+  --generic-fg-default: #1a1a1a;
+  --generic-fg-default-hover: #000000;
+
+  --generic-border-info: #b39ddb;
+  --generic-border-info-hover: #a58ad6;
+  --generic-bg-info: #ede7f6;
+  --generic-bg-info-hover: #e3d7f5;
+  --generic-fg-info: #2b2b2b;
+  --generic-fg-info-hover: #1a1a1a;
+
+  --generic-border-success: #2e7d32;
+  --generic-border-success-hover: #1e6b23;
+  --generic-bg-success: #4caf50;
+  --generic-bg-success-hover: #2e7d32;
+  --generic-fg-success: #ffffff;
+  --generic-fg-success-hover: #ffffff;
+
+  --generic-border-error: #c62828;
+  --generic-border-error-hover: #a71d2a;
+  --generic-bg-error: #e53935;
+  --generic-bg-error-hover: #c62828;
+  --generic-fg-error: #fff;
+  --generic-fg-error-hover: #fff;
+
+  --generic-border-warn: #e0a800;
+  --generic-border-warn-hover: #c69500;
+  --generic-bg-warn: #ffb74d;
+  --generic-bg-warn-hover: #fb8c00;
+  --generic-fg-warn: #000;
+  --generic-fg-warn-hover: #000;
+
+  --close-button-color: #7e57c2;
+  --close-button-shadow: 0 1px 3px rgba(0,0,0,.15);
+  --close-hover-color: #5c2d91;
+  --close-hover-bg: rgba(92,45,145,.10);
+
+  /* Sortables / loops */
+  --sortable-bg: #ffffff;
+  --sortable-drag-bg: #f2ecfa;
+  --sortable-border-color: #c0b0d6;
+  --sortable-box-shadow: 0 2px 6px rgba(0,0,0,.10);
+  --sortable-hover-shadow: 0 0 12px rgba(92,45,145,.20);
+
+  --loop-border-color: #d0c5e0;
+  --loop-description-color: var(--text-description);
+  --loop-bg: #ffffff;
+  --loop-bg-secondary: #f8f5fc;
+  --loop-add-bg: #5c2d91;
+  --loop-add-bg-hover: #421f6b;
+  --loop-add-fg: #fff;
+
+  --subloop-bg-secondary: #f5f2fa;
+  --subloop-description-color: var(--text-description);
+  --subloop-border-color: #c0b0d6;
+  --subloop-bg: #ffffff;
+  --subloop-add-bg: #7e57c2;
+  --subloop-add-bg-hover: #5c2d91;
+  --subloop-add-fg: #ffffff;
+
+  --meta-section-bg: #f8f5fc;
+  --meta-section-border: #d0c5e0;
+  --meta-section-text-color: #2b2b2b;
+  --meta-section-font-size: 0.78rem;
+
+  --tag-bg: #ede7f6;
+  --tag-border: #b39ddb;
+  --tag-text: #2b2b2b;
+
+  --flagged-circle-bg: #f2ecfa;
+  --flagged-color: #4caf50;
+  --unflagged-color: #c0b0d6;
+
+  --profile-list-bg: #f5f2fa;
+
+  /* Popup panel */
+  --popup-bg: #ffffff;
+  --popup-fg: #1a1a1a;
+  --popup-border: #d0c5e0;
+  --popup-option-bg: #f8f5fc;
+  --popup-option-hover: #e3d7f5;
+
+  /* Buttons (primary/secondary) */
+  --btn-primary-bg: #5c2d91;
+  --btn-primary-fg: #ffffff;
+  --btn-secondary-bg: #ede7f6;
+  --btn-secondary-fg: #2b2b2b;
+
+  /* Git table */
+  --git-fg-default: #1a1a1a;
+  --git-bg-default: #ffffff;
+  --git-bg-added: #e0f7e9;
+  --git-bg-modified: #fff6db;
+  --git-bg-deleted: #fce0e0;
+  --git-bg-renamed: #f5e5c0;
+  --git-bg-untracked: #f2ecfa;
+  --git-bg-unknown: #ffffff;
+
+  /* Code field */
+  --code-output-border: #d0c5e0;
+
+  /* Code badges */
+  --code-manual-badge-bg: #ede7f6;
+  --code-manual-badge-fg: #4a3a6b;
+  --code-manual-btn-bg: #ede7f6;
+  --code-manual-btn-fg: #2b2b2b;
+  --code-manual-output-bg: #f8f5fc;
+  --code-manual-accent: #5c2d91;
+
+  --code-load-badge-bg: #e3f2fd;
+  --code-load-badge-fg: #0d47a1;
+  --code-load-btn-bg: #e3f2fd;
+  --code-load-btn-fg: #0d47a1;
+  --code-load-output-bg: #f1f8ff;
+  --code-load-accent: #2196f3;
+
+  --code-save-badge-bg: #fff3e0;
+  --code-save-badge-fg: #8a4b00;
+  --code-save-btn-bg: #fff3e0;
+  --code-save-btn-fg: #8a4b00;
+  --code-save-output-bg: #fff8e6;
+  --code-save-accent: #f59e0b;
+}

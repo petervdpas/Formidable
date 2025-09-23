@@ -540,7 +540,7 @@ export default {
   "modal.settings.display.theme": "Weergave Thema",
   "modal.settings.display.theme.light": "Licht",
   "modal.settings.display.theme.dark": "Donker",
-  "modal.settings.display.theme.lilac": "Lila (experimenteel)",
+  "modal.settings.display.theme.purplish": "Purperachtig (experimenteel)",
   "modal.settings.display.meta": "Toon Meta Sectie",
   "modal.settings.display.loop.collapsed": "Ingeklapte Lus-items",
   "modal.settings.icon.buttons": "Pictogram knoppen",

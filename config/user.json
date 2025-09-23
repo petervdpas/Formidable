@@ -1,5 +1,5 @@
 {
-  "theme": "light",
+  "theme": "purplish",
   "show_icon_buttons": false,
   "use_expressions": true,
   "show_meta_section": true,
@@ -10,8 +10,8 @@
   "enable_plugins": true,
   "context_mode": "storage",
   "context_folder": "./",
-  "selected_template": "recepten.yaml",
-  "selected_data_file": "vinaigrette.meta.json",
+  "selected_template": "basic.yaml",
+  "selected_data_file": "sane-20250530.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",

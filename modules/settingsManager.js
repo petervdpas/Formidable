@@ -743,7 +743,7 @@ function setupThemeDropdown(config) {
     options: [
       { value: "light", label: t("modal.settings.display.theme.light") || "Light" },
       { value: "dark",  label: t("modal.settings.display.theme.dark")  || "Dark"  },
-      { value: "lilac", label: t("modal.settings.display.theme.lilac") || "Lilac" },
+      { value: "purplish", label: t("modal.settings.display.theme.purplish") || "Purplish" }
     ],
     onChange: async (theme) => {
       // persist

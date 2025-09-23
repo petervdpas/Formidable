@@ -90,7 +90,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
 
   const theme = (config.theme || "light").toLowerCase(); // see set below
-  const allowed = new Set(["light", "dark", "lilac"]);
+  const allowed = new Set(["light", "dark", "purplish"]);
   const resolvedNow = allowed.has(theme) ? theme : "light";
 
   document.documentElement.dataset.theme = resolvedNow;
