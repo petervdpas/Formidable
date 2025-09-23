@@ -239,6 +239,8 @@ export default {
   "toast.code.run.ok": "Code is succesvol uitgevoerd.",
   "toast.code.run.failed": "Uitvoeren van code is mislukt: {0}",
 
+  "toast.dom.ready.check": "DOM is gereed: {0}",
+
   // ── Special ─────────────────────────
   "special.html.span.small":
     "<span {key[0]}>{0}</span> <small {key[1]}>{1}</small>",

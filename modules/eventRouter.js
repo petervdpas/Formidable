@@ -3,6 +3,7 @@
 import { EventBus } from "./eventBus.js";
 
 import * as systemHandler from "./handlers/systemHandler.js";
+import * as tasksHandler from "./handlers/tasksHandler.js";
 import * as historyHandler from "./handlers/historyHandler.js";
 import * as encryptionHandler from "./handlers/encryptionHandler.js";
 import * as serverHandler from "./handlers/serverHandler.js";
@@ -62,6 +63,27 @@ export function initEventRouter() {
 
   EventBus.off("system:execute", systemHandler.handleExecuteCommand);
   EventBus.on("system:execute", systemHandler.handleExecuteCommand);
+
+  // Task scheduler events
+  EventBus.off("tasks:register", tasksHandler.handleTasksRegister);
+  EventBus.off("tasks:unregister", tasksHandler.handleTasksUnregister);
+  EventBus.off("tasks:update", tasksHandler.handleTasksUpdate);
+  EventBus.off("tasks:pause", tasksHandler.handleTasksPause);
+  EventBus.off("tasks:resume", tasksHandler.handleTasksResume);
+  EventBus.off("tasks:runNow", tasksHandler.handleTasksRunNow);
+  EventBus.off("tasks:list", tasksHandler.handleTasksList);
+  EventBus.off("tasks:exists", tasksHandler.handleTasksExists);
+  EventBus.off("tasks:clearAll", tasksHandler.handleTasksClearAll);
+
+  EventBus.on("tasks:register", tasksHandler.handleTasksRegister);
+  EventBus.on("tasks:unregister", tasksHandler.handleTasksUnregister);
+  EventBus.on("tasks:update", tasksHandler.handleTasksUpdate);
+  EventBus.on("tasks:pause", tasksHandler.handleTasksPause);
+  EventBus.on("tasks:resume", tasksHandler.handleTasksResume);
+  EventBus.on("tasks:runNow", tasksHandler.handleTasksRunNow);
+  EventBus.on("tasks:list", tasksHandler.handleTasksList);
+  EventBus.on("tasks:exists", tasksHandler.handleTasksExists);
+  EventBus.on("tasks:clearAll", tasksHandler.handleTasksClearAll);
 
   // Encryption events
   EventBus.off("encryption:encrypt", encryptionHandler.handleEncrypt);
