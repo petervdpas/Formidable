@@ -89,11 +89,14 @@ window.addEventListener("DOMContentLoaded", async () => {
     EventBus.emit("config:load", (cfg) => resolve(cfg));
   });
 
-  const theme = (config.theme || "light").toLowerCase(); // "light" | "dark"
-  const resolvedNow = theme === "dark" ? "dark" : "light";
+  const theme = (config.theme || "light").toLowerCase(); // see set below
+  const allowed = new Set(["light", "dark", "lilac"]);
+  const resolvedNow = allowed.has(theme) ? theme : "light";
 
   document.documentElement.dataset.theme = resolvedNow;
-  document.documentElement.classList.remove("theme-light", "theme-dark");
+  for (const themeName of allowed) {
+    document.documentElement.classList.remove(`theme-${themeName}`);
+  }
   document.documentElement.classList.add(`theme-${resolvedNow}`);
 
   // enable only the correct stylesheet

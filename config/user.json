@@ -1,5 +1,5 @@
 {
-  "theme": "dark",
+  "theme": "light",
   "show_icon_buttons": false,
   "use_expressions": true,
   "show_meta_section": true,
@@ -22,12 +22,10 @@
   "internal_server_port": 8383,
   "window_bounds": {
     "width": 1340,
-    "height": 923,
-    "x": 290,
-    "y": 54
+    "height": 923
   },
   "template_sidebar_width": 352,
-  "storage_sidebar_width": 356,
+  "storage_sidebar_width": 369,
   "status_buttons": {
     "reloader": true,
     "charpicker": true,

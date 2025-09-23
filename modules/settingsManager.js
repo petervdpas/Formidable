@@ -72,7 +72,7 @@ export async function renderSettings() {
     }
   );
 
-    // ─── History Settings (factory) ─────────────────
+  // ─── History Settings (factory) ─────────────────
   const historyTab = makeTab(
     "history",
     t("modal.settings.tab.history"),
@@ -149,20 +149,11 @@ export async function renderSettings() {
         i18nKey: "modal.settings.tab.display.description",
       });
 
-      panel.appendChild(
-        createSwitch(
-          "theme-toggle",
-          "modal.settings.display.theme",
-          cachedConfig.theme === "dark", // checked => dark
-          null,
-          "block",
-          [
-            "modal.settings.display.theme.dark",
-            "modal.settings.display.theme.light",
-          ],
-          true
-        )
-      );
+      // Theme dropdown host (bound by setupThemeDropdown)
+      const themeRow = document.createElement("div");
+      themeRow.id = "settings-theme";
+      themeRow.className = "modal-form-row";
+      panel.appendChild(themeRow);
 
       panel.appendChild(
         createSwitch(
@@ -456,14 +447,13 @@ export async function renderSettings() {
 
   // Bind everything after DOM is in place
   setupLanguageDropdown(config);
+  setupThemeDropdown(config);
   setupBindings(config, gitRootPicker);
 
   return tv;
 }
 
-
 function setupBindings(config, gitRootPicker) {
-  bindThemeSwitch("theme-toggle", "theme");
   bindToggleSwitch("show-icons-toggle", "show_icon_buttons");
   bindToggleSwitch("show-expressions-toggle", "use_expressions");
   bindToggleSwitch("show-meta-toggle", "show_meta_section", (enabled) => {
@@ -744,6 +734,31 @@ function setupLanguageDropdown(config) {
   });
 }
 
+function setupThemeDropdown(config) {
+  // keep whatever loader you use in renderer: applyThemeLinks(theme)
+  createDropdown({
+    containerId: "settings-theme",
+    labelTextOrKey: "modal.settings.display.theme",
+    selectedValue: (config.theme || "light").toLowerCase(),
+    options: [
+      { value: "light", label: t("modal.settings.display.theme.light") || "Light" },
+      { value: "dark",  label: t("modal.settings.display.theme.dark")  || "Dark"  },
+      { value: "lilac", label: t("modal.settings.display.theme.lilac") || "Lilac" },
+    ],
+    onChange: async (theme) => {
+      // persist
+      await EventBus.emit("config:update", { theme });
+      cachedConfig = await reloadUserConfig();
+
+      // apply immediately
+      EventBus.emit("theme:toggle", theme);
+
+      // status toast
+      emitConfigStatus("theme", theme);
+    },
+    i18nEnabled: true,
+  });
+}
 function emitConfigStatus(configKey, value, success = true) {
   const labelKey = `config.${configKey}`;
   const label = t(labelKey);

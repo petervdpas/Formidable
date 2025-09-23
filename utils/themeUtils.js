@@ -2,13 +2,14 @@
 
 /**
  * Enable the correct theme stylesheet link element.
- * Expects <link id="formidable-theme-light"> and <link id="formidable-theme-dark">
  */
 export function applyThemeLinks(mode) {
-  const light = document.getElementById("formidable-theme-light");
-  const dark  = document.getElementById("formidable-theme-dark");
-  if (light) light.disabled = mode !== "light";
-  if (dark)  dark.disabled  = mode !== "dark";
+  const prefix = "formidable-theme-";
+  const links = Array.from(document.querySelectorAll(`link[id^="${prefix}"]`));
+  for (const l of links) {
+    const idMode = l.id.slice(prefix.length);
+    l.disabled = idMode !== mode;
+  }
 }
 
 /**
@@ -18,9 +19,8 @@ export function setCodeMirrorTheme(mode) {
   const filename = mode === "dark" ? "monokai.css" : "eclipse.css";
   const link = document.getElementById("cm-theme");
   if (link) link.href = `assets/codemirror/${filename}`;
-
-  document.querySelectorAll(".CodeMirror").forEach((cmEl) => {
-    const cm = cmEl.CodeMirror;
+  document.querySelectorAll(".CodeMirror").forEach((el) => {
+    const cm = el.CodeMirror;
     if (cm) {
       cm.setOption("theme", mode === "dark" ? "monokai" : "eclipse");
       cm.refresh();
@@ -31,7 +31,7 @@ export function setCodeMirrorTheme(mode) {
 /**
  * Track the current theme globally
  */
-let currentTheme = "dark";
+let currentTheme = "light";
 
 export function setCurrentTheme(mode) {
   currentTheme = mode;

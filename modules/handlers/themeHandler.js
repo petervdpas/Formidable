@@ -7,26 +7,27 @@ import {
 } from "../../utils/themeUtils.js";
 
 export async function handleThemeToggle(theme) {
-  const isDark = theme === "dark";
   const root = document.documentElement;
+  const next = String(theme || "").trim().toLowerCase() || "light";
 
-  root.dataset.theme = theme;
-  root.classList.toggle("theme-dark", isDark);
-  root.classList.toggle("theme-light", !isDark);
+  root.dataset.theme = next;
+  for (const cls of Array.from(root.classList)) {
+    if (cls.startsWith("theme-")) root.classList.remove(cls);
+  }
+  root.classList.add(`theme-${next}`);
 
-  applyThemeLinks(theme);
-  setCodeMirrorTheme(theme);
-  setCurrentTheme(theme);
+  applyThemeLinks(next);
+  setCodeMirrorTheme(next);
+  setCurrentTheme(next);
 
-  try {
-    localStorage.setItem("theme", theme);
-  } catch {}
+  // persist
+  try { localStorage.setItem("theme", next); } catch {}
+  await window.api.config.updateUserConfig({ theme: next });
 
-  await window.api.config.updateUserConfig({ theme });
   EventBus.emit("status:update", {
-    message: `status.theme.set.${isDark ? "dark" : "light"}`,
-    languageKey: `status.theme.set.${isDark ? "dark" : "light"}`,
+    languageKey: "status.basic.setTo",
     i18nEnabled: true,
-    variant: isDark ? "warning" : "default",
+    args: ["config.theme", next],
+    variant: /\bdark\b/i.test(next) ? "warning" : "default",
   });
 }

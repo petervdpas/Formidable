@@ -519,6 +519,7 @@ export default {
   "modal.settings.display.theme": "Display Theme",
   "modal.settings.display.theme.light": "Light",
   "modal.settings.display.theme.dark": "Dark",
+  "modal.settings.display.theme.lilac": "Lilac (experimental)",
   "modal.settings.display.meta": "Show Meta Section",
   "modal.settings.display.loop.collapsed": "Collapse Loop Items",
   "modal.settings.icon.buttons": "Icon-based Buttons",
