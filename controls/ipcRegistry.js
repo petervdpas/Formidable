@@ -271,8 +271,8 @@ function registerIpcHandlers() {
   registerIpc("get-template-descriptor", (e, name) =>
     templateManager.getTemplateDescriptor(name)
   );
-  registerIpc("create-basic-template", () =>
-    templateManager.createBasicTemplateIfMissing()
+  registerIpc("seed-basic-template-if-empty", () =>
+    templateManager.seedBasicTemplateIfEmpty()
   );
   registerIpc("get-item-fields", (e, name) =>
     templateManager.getPossibleItemFields(name)

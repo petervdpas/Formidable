@@ -303,8 +303,17 @@ function validateTemplate(template) {
   return errors;
 }
 
-function createBasicTemplateIfMissing() {
+function seedBasicTemplateIfEmpty() {
+  ensureTemplateDirectory();
+
+  const existing = listTemplates();
+  if ((existing?.length || 0) > 0) {
+    // Nothing to seed; do NOT require or create basic.yaml
+    return;
+  }
+
   const path = getTemplatePath(basicYamlName);
+
   if (!fileManager.fileExists(path)) {
     const content = {
       name: "Basic Form",
@@ -440,7 +449,7 @@ module.exports = {
   deleteTemplate,
   validateTemplate,
   getTemplateDescriptor,
-  createBasicTemplateIfMissing,
+  seedBasicTemplateIfEmpty,
   getPossibleItemFields,
   getTagsFieldKey,
 };

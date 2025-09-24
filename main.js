@@ -144,7 +144,7 @@ app.whenReady().then(() => {
   log("[Main] App is ready. Checking environment...");
 
   templateManager.ensureTemplateDirectory();
-  templateManager.createBasicTemplateIfMissing();
+  templateManager.seedBasicTemplateIfEmpty();
 
   nodeLogger.setLoggingEnabled(!!userConfig.logging_enabled);
   nodeLogger.setWriteEnabled(!!userConfig.logging_enabled);
