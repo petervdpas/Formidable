@@ -129,7 +129,7 @@ export async function renderGitStatus(container, modalApi) {
               "special.git.discard.sure",
               `<div class="modal-message-highlight"><code>${rawData.value}</code></div>`,
               {
-                okKey: "standard.discard",
+                okKey: "standard.git.discard",
                 cancelKey: "standard.cancel",
                 width: "auto",
                 height: "auto",

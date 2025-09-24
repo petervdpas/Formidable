@@ -2,8 +2,21 @@
 
 import { EventBus } from "./eventBus.js";
 import { buildButtonGroup } from "../utils/buttonUtils.js";
-import { createGitCommitButton, createGitDiscardButton } from "./uiButtons.js";
-import { createFormRowInput } from "../utils/elementBuilders.js";
+import {
+  createGitCommitButton,
+  createGitDiscardButton,
+  createGitFetchButton,
+  createGitCheckoutButton,
+  createGitTrackUpstreamButton,
+  createGitCreateCheckoutButton,
+  createGitCreateCheckoutTrackButton,
+  createGitPullButton,
+  createGitPushButton,
+} from "./uiButtons.js";
+import {
+  addContainerElement,
+  createFormRowInput,
+} from "../utils/elementBuilders.js";
 import { createListManager } from "../utils/listUtils.js";
 import { showConfirmModal } from "../utils/modalUtils.js";
 import { createDropdown } from "../utils/dropdownUtils.js";
@@ -34,7 +47,7 @@ export async function getGitContext() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// LEFT PANE
+// LEFT PANE (buttons-first + addContainerElement everywhere)
 // ─────────────────────────────────────────────────────────────
 export async function buildGitControlLeftPane({
   gitPath,
@@ -44,234 +57,358 @@ export async function buildGitControlLeftPane({
 }) {
   const node = document.createElement("div");
 
-  const ids = {
-    remoteDD: uid("remote-dd"),
-    remoteBranchDD: uid("remote-branch-dd"),
-    branchRow: uid("branch-actions"),
-    syncRow: uid("sync-row"),
-    trackingRow: uid("tracking-row"),
-    fetchBtn: uid("fetch"),
-    checkoutBtn: uid("checkout"),
-    trackBtn: uid("track"),
-  };
+  // Containers
+  const section = addContainerElement({
+    parent: node,
+    className: "git-section",
+  });
 
-  node.innerHTML = `
-    <div class="git-section">
-      <h3 style="margin-top:0">${
-        t("modal.git.branches") || "Branches & Remote"
-      }</h3>
-      <div class="git-row">
-        <div>Remote:</div>
-        <div id="${ids.remoteDD}" style="flex:1"></div>
-        <button class="btn" id="${ids.fetchBtn}">Fetch</button>
-      </div>
-      <div class="git-row">
-        <div>Remote branch:</div>
-        <div id="${ids.remoteBranchDD}" style="flex:1"></div>
-        <button class="btn" id="${ids.checkoutBtn}">Checkout</button>
-        <button class="btn" id="${ids.trackBtn}">Track (set upstream)</button>
-      </div>
-      <div class="git-row" id="${ids.branchRow}"></div>
-      <hr/>
-      <div class="git-row" id="${ids.syncRow}"></div>
-      <div id="${ids.trackingRow}" style="font-size:12px;opacity:.9"></div>
-    </div>
-  `;
+  addContainerElement({
+    parent: section,
+    tag: "h3",
+    textContent: t("modal.git.branches") || "Branches & Remote",
+    attributes: { style: "margin-top:0" },
+  });
 
-  const init = async () => {
-    // remote dropdown
-    const remotes = remoteInfo?.remotes?.map((r) => r.name) || [];
-    let selectedRemote = remotes.includes("origin")
-      ? "origin"
-      : remotes[0] || "";
+  // Row: Remote
+  const rowRemote = addContainerElement({
+    parent: section,
+    className: "git-row",
+  });
+  addContainerElement({
+    parent: rowRemote,
+    tag: "div",
+    textContent: "Remote:",
+  });
+  const remoteDDWrap = addContainerElement({
+    parent: rowRemote,
+    tag: "div",
+    attributes: { style: "flex:1" },
+  });
+
+  // Row: Remote branch
+  const rowRemoteBranch = addContainerElement({
+    parent: section,
+    className: "git-row",
+  });
+  addContainerElement({
+    parent: rowRemoteBranch,
+    tag: "div",
+    textContent: "Remote branch:",
+  });
+  const remoteBranchDDWrap = addContainerElement({
+    parent: rowRemoteBranch,
+    tag: "div",
+    attributes: { style: "flex:1" },
+  });
+
+  // Row: Create local / track
+  const branchRow = addContainerElement({
+    parent: section,
+    className: "git-row",
+  });
+
+  // Divider
+  addContainerElement({ parent: section, tag: "hr" });
+
+  // Row: Sync (pull/push)
+  const syncRow = addContainerElement({
+    parent: section,
+    className: "git-row",
+  });
+
+  // Tracking summary
+  const trackingRow = addContainerElement({
+    parent: section,
+    attributes: { style: "font-size:12px;opacity:.9" },
+  });
+
+  // ── State for dropdowns
+  const remotes = remoteInfo?.remotes?.map((r) => r.name) || [];
+  let selectedRemote = remotes.includes("origin") ? "origin" : remotes[0] || "";
+  let selectedRemoteBranch = "";
+
+  // ── BUTTONS FIRST (all consts from uiButtons)
+  const fetchBtn = createGitFetchButton(async () => {
+    fetchBtn.disabled = true;
+    await EventBus.emitWithResponse("git:fetch", {
+      folderPath: gitPath,
+      remote: selectedRemote,
+      opts: ["--prune"],
+    });
+    fetchBtn.disabled = false;
+    EventBus.emit("ui:toast", {
+      languageKey: "toast.git.fetch.complete",
+      variant: "success",
+    });
+  });
+
+  const checkoutBtn = createGitCheckoutButton(async () => {
+    if (!selectedRemote || !selectedRemoteBranch) return;
+    await EventBus.emitWithResponse("git:branch-create", {
+      folderPath: gitPath,
+      name: selectedRemoteBranch,
+      opts: { checkout: true },
+    });
+    await EventBus.emitWithResponse("git:set-upstream", {
+      folderPath: gitPath,
+      remote: selectedRemote,
+      branch: selectedRemoteBranch,
+    });
+    EventBus.emit("ui:toast", {
+      languageKey: "toast.git.checkout.complete",
+      variant: "success",
+    });
+  });
+
+  const trackBtn = createGitTrackUpstreamButton(async () => {
+    if (!selectedRemote || !selectedRemoteBranch) return;
+    await EventBus.emitWithResponse("git:set-upstream", {
+      folderPath: gitPath,
+      remote: selectedRemote,
+      branch: selectedRemoteBranch,
+    });
+    EventBus.emit("ui:toast", {
+      languageKey: "toast.git.track.set",
+      variant: "success",
+    });
+  });
+
+  const nameInput = document.createElement("input");
+  nameInput.type = "text";
+  nameInput.placeholder = "new-branch-name";
+
+  const createBtn = createGitCreateCheckoutButton(async () => {
+    const name = nameInput.value.trim();
+    if (!name) return;
+    await EventBus.emitWithResponse("git:branch-create", {
+      folderPath: gitPath,
+      name,
+      opts: { checkout: true },
+    });
+    EventBus.emit("ui:toast", {
+      languageKey: "toast.git.branch.created",
+      variant: "success",
+    });
+  });
+
+  const createTrackBtn = createGitCreateCheckoutTrackButton(async () => {
+    const name = nameInput.value.trim();
+    if (!name || !selectedRemote) return;
+    await EventBus.emitWithResponse("git:branch-create", {
+      folderPath: gitPath,
+      name,
+      opts: { checkout: true },
+    });
+    await EventBus.emitWithResponse("git:set-upstream", {
+      folderPath: gitPath,
+      remote: selectedRemote,
+      branch: name,
+    });
+    EventBus.emit("ui:toast", {
+      languageKey: "toast.git.branch.created",
+      variant: "success",
+    });
+  });
+
+  const pullBtn = createGitPullButton(async () => {
+    pullBtn.disabled = true;
+    await EventBus.emitWithResponse("git:pull", { folderPath: gitPath });
+    pullBtn.disabled = false;
+    EventBus.emit("ui:toast", {
+      languageKey: "toast.git.pull.complete",
+      variant: "success",
+    });
+  });
+
+  const pushBtn = createGitPushButton(async () => {
+    pushBtn.disabled = true;
+    await EventBus.emitWithResponse("git:push", { folderPath: gitPath });
+    pushBtn.disabled = false;
+    EventBus.emit("ui:toast", {
+      languageKey: "toast.git.push.complete",
+      variant: "success",
+    });
+  });
+
+  // ── Mount buttons (then dropdowns)
+  rowRemote.appendChild(fetchBtn);
+  rowRemoteBranch.appendChild(checkoutBtn);
+  rowRemoteBranch.appendChild(trackBtn);
+
+  branchRow.appendChild(nameInput);
+  branchRow.appendChild(createBtn);
+  branchRow.appendChild(createTrackBtn);
+
+  syncRow.append(buildButtonGroup(pullBtn, pushBtn));
+
+  // ── Dropdowns (into the wrappers created above)
+  const rebuildRemoteBranches = () => {
+    // clear wrapper first to avoid stacking multiple selects
+    remoteBranchDDWrap.innerHTML = "";
+    const branches = (remoteInfo?.remoteBranches || [])
+      .filter((b) => selectedRemote && b.startsWith(`${selectedRemote}/`))
+      .map((b) => b.replace(`${selectedRemote}/`, ""));
+    selectedRemoteBranch = branches[0] || "";
     createDropdown({
-      containerId: ids.remoteDD,
+      containerEl: remoteBranchDDWrap,
       labelTextOrKey: "",
-      options: remotes.map((n) => ({ value: n, label: n })),
-      selectedValue: selectedRemote,
+      options: branches.map((n) => ({ value: n, label: n })),
+      selectedValue: selectedRemoteBranch,
       onChange: (v) => {
-        selectedRemote = v;
-        rebuildRemoteBranches();
+        selectedRemoteBranch = v;
       },
     });
-
-    // remote branches dropdown
-    let selectedRemoteBranch = "";
-    const rebuildRemoteBranches = () => {
-      const branches = (remoteInfo?.remoteBranches || [])
-        .filter((b) => selectedRemote && b.startsWith(`${selectedRemote}/`))
-        .map((b) => b.replace(`${selectedRemote}/`, ""));
-      selectedRemoteBranch = branches[0] || "";
-      createDropdown({
-        containerId: ids.remoteBranchDD,
-        labelTextOrKey: "",
-        options: branches.map((n) => ({ value: n, label: n })),
-        selectedValue: selectedRemoteBranch,
-        onChange: (v) => {
-          selectedRemoteBranch = v;
-        },
-      });
-    };
-    rebuildRemoteBranches();
-
-    // buttons (safe to bind via `node`, not document)
-    const fetchBtn = node.querySelector(`#${ids.fetchBtn}`);
-    const checkoutBtn = node.querySelector(`#${ids.checkoutBtn}`);
-    const trackBtn = node.querySelector(`#${ids.trackBtn}`);
-
-    fetchBtn.onclick = async () => {
-      fetchBtn.disabled = true;
-      await EventBus.emitWithResponse("git:fetch", {
-        folderPath: gitPath,
-        remote: selectedRemote,
-        opts: ["--prune"],
-      });
-      fetchBtn.disabled = false;
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.fetch.complete",
-        variant: "success",
-      });
-    };
-
-    checkoutBtn.onclick = async () => {
-      if (!selectedRemote || !selectedRemoteBranch) return;
-      await EventBus.emitWithResponse("git:branch-create", {
-        folderPath: gitPath,
-        name: selectedRemoteBranch,
-        opts: { checkout: true },
-      });
-      await EventBus.emitWithResponse("git:set-upstream", {
-        folderPath: gitPath,
-        remote: selectedRemote,
-        branch: selectedRemoteBranch,
-      });
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.checkout.complete",
-        variant: "success",
-      });
-    };
-
-    trackBtn.onclick = async () => {
-      if (!selectedRemote || !selectedRemoteBranch) return;
-      await EventBus.emitWithResponse("git:set-upstream", {
-        folderPath: gitPath,
-        remote: selectedRemote,
-        branch: selectedRemoteBranch,
-      });
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.track.set",
-        variant: "success",
-      });
-    };
-
-    // create local/track
-    const branchRow = node.querySelector(`#${ids.branchRow}`);
-    const nameInput = document.createElement("input");
-    nameInput.type = "text";
-    nameInput.placeholder = "new-branch-name";
-    const createBtn = document.createElement("button");
-    createBtn.className = "btn";
-    createBtn.textContent = "Create & Checkout";
-    const createTrackBtn = document.createElement("button");
-    createTrackBtn.className = "btn";
-    createTrackBtn.textContent = "Create, Checkout & Track";
-    branchRow.append(nameInput, createBtn, createTrackBtn);
-
-    createBtn.onclick = async () => {
-      const name = nameInput.value.trim();
-      if (!name) return;
-      await EventBus.emitWithResponse("git:branch-create", {
-        folderPath: gitPath,
-        name,
-        opts: { checkout: true },
-      });
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.branch.created",
-        variant: "success",
-      });
-    };
-    createTrackBtn.onclick = async () => {
-      const name = nameInput.value.trim();
-      if (!name || !selectedRemote) return;
-      await EventBus.emitWithResponse("git:branch-create", {
-        folderPath: gitPath,
-        name,
-        opts: { checkout: true },
-      });
-      await EventBus.emitWithResponse("git:set-upstream", {
-        folderPath: gitPath,
-        remote: selectedRemote,
-        branch: name,
-      });
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.branch.created",
-        variant: "success",
-      });
-    };
-
-    // pull/push + tracking
-    const syncRow = node.querySelector(`#${ids.syncRow}`);
-    const pullBtn = document.createElement("button");
-    pullBtn.className = "btn";
-    pullBtn.textContent = "Pull";
-    const pushBtn = document.createElement("button");
-    pushBtn.className = "btn";
-    pushBtn.textContent = "Push";
-    syncRow.append(buildButtonGroup(pullBtn, pushBtn));
-
-    pullBtn.onclick = async () => {
-      pullBtn.disabled = true;
-      await EventBus.emitWithResponse("git:pull", { folderPath: gitPath });
-      pullBtn.disabled = false;
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.pull.complete",
-        variant: "success",
-      });
-    };
-    pushBtn.onclick = async () => {
-      pushBtn.disabled = true;
-      await EventBus.emitWithResponse("git:push", { folderPath: gitPath });
-      pushBtn.disabled = false;
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.push.complete",
-        variant: "success",
-      });
-    };
-
-    const trackingRow = node.querySelector(`#${ids.trackingRow}`);
-    trackingRow.innerHTML = `
-      ${t("standard.branch") || "Branch"}: <b>${status.current}</b>
-      <span class="git-badge">ahead: ${status.ahead || 0}</span>
-      <span class="git-badge">behind: ${status.behind || 0}</span><br/>
-      ${t("standard.tracked") || "Tracked"}: ${
-      status.tracking || t("standard.none")
-    }
-    `;
   };
 
-  return { node, init };
+  // Remote DD
+  createDropdown({
+    containerEl: remoteDDWrap,
+    labelTextOrKey: "",
+    options: remotes.map((n) => ({ value: n, label: n })),
+    selectedValue: selectedRemote,
+    onChange: (v) => {
+      selectedRemote = v;
+      rebuildRemoteBranches();
+    },
+  });
+
+  rebuildRemoteBranches();
+
+  // ── Tracking info (structured; no innerHTML)
+  const renderTrackingRow = () => {
+    trackingRow.innerHTML = "";
+    const line1 = addContainerElement({ parent: trackingRow });
+    addContainerElement({
+      parent: line1,
+      tag: "span",
+      textContent: `${t("standard.branch") || "Branch"}: `,
+    });
+    const b = addContainerElement({
+      parent: line1,
+      tag: "b",
+      textContent: status.current,
+    });
+
+    const badges = addContainerElement({ parent: trackingRow });
+    addContainerElement({
+      parent: badges,
+      tag: "span",
+      className: "git-badge",
+      textContent: `ahead: ${status.ahead || 0}`,
+    });
+    addContainerElement({
+      parent: badges,
+      tag: "span",
+      className: "git-badge",
+      textContent: `behind: ${status.behind || 0}`,
+      attributes: { style: "margin-left:6px" },
+    });
+
+    const line2 = addContainerElement({ parent: trackingRow });
+    addContainerElement({
+      parent: line2,
+      tag: "span",
+      textContent: `${t("standard.tracked") || "Tracked"}: ${
+        status.tracking || t("standard.none")
+      }`,
+    });
+  };
+  renderTrackingRow();
+
+  // Everything wired now; no deferred work needed
+  return { node, init: async () => {} };
 }
 
 // ─────────────────────────────────────────────────────────────
-// RIGHT PANE
+// RIGHT PANE (buttons-first; addContainerElement; no innerHTML)
 // ─────────────────────────────────────────────────────────────
 export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
   const node = document.createElement("div");
-  const fileListId = uid("git-file-list");
-  const commitRowId = uid("commit-row");
 
-  node.innerHTML = `
-    <div class="git-section">
-      <h3 style="margin-top:0">${
-        t("modal.git.status") || "Status & Commit"
-      }</h3>
-      <div id="${fileListId}" class="git-file-list"></div>
-      <div id="${commitRowId}" class="git-commit-row"></div>
-    </div>
-  `;
+  // Containers
+  const section = addContainerElement({
+    parent: node,
+    className: "git-section",
+  });
+  addContainerElement({
+    parent: section,
+    tag: "h3",
+    textContent: t("modal.git.status") || "Status & Commit",
+    attributes: { style: "margin-top:0" },
+  });
+
+  const fileListId = uid("git-file-list");
+  const fileListWrap = addContainerElement({
+    parent: section,
+    className: "git-file-list",
+    attributes: { id: fileListId },
+  });
+
+  const commitRowWrap = addContainerElement({
+    parent: section,
+    className: "git-commit-row",
+  });
+
+  // BUTTON FIRST: commit button with behavior
+  let commitMessage = "";
+  const hasChanges = (status.files || []).length > 0;
+
+  const commitBtn = createGitCommitButton(async () => {
+    if (!commitMessage) {
+      EventBus.emit("ui:toast", {
+        languageKey: "toast.git.commit.noMessage",
+        variant: "warning",
+      });
+      return;
+    }
+    const res = await EventBus.emitWithResponse("git:commit", {
+      folderPath: gitPath,
+      message: commitMessage,
+    });
+    if (typeof res === "string") {
+      EventBus.emit("ui:toast", {
+        languageKey: "toast.git.commit.complete",
+        variant: "success",
+      });
+    } else if (res?.summary?.changes != null) {
+      EventBus.emit("ui:toast", {
+        languageKey: "toast.git.commit.success",
+        args: [res.summary.changes],
+        variant: "success",
+      });
+    }
+    await gitListManager.loadList();
+  }, !(hasChanges && commitMessage));
+
+  // Input row (DOM-built; attach input listener to toggle commit button)
+  const inputRow = createFormRowInput({
+    id: "git-commit-message",
+    labelOrKey: "modal.git.commit.message",
+    value: "",
+    type: "textarea",
+    multiline: true,
+    placeholder: t("modal.git.commit.placeholder"),
+    onSave: undefined,
+    i18nEnabled: true,
+  });
+
+  const msgField = inputRow.querySelector("textarea, input");
+  msgField.addEventListener("input", () => {
+    commitMessage = msgField.value.trim();
+    commitBtn.disabled = !(
+      (gitListManager?.currentList?.length ?? (status.files || []).length) >
+        0 && commitMessage
+    );
+  });
+
+  commitRowWrap.append(inputRow, buildButtonGroup(commitBtn));
+
+  // List manager (wired in init to ensure it exists before listeners)
+  let gitListManager = null;
 
   const init = async () => {
-    const gitListManager = createListManager({
+    gitListManager = createListManager({
       elementId: fileListId,
       itemClass: "git-list-item",
       emptyMessage: t("modal.git.no.changes.detected"),
@@ -336,7 +473,7 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
             "special.git.discard.sure",
             `<div class="modal-message-highlight"><code>${rawData.value}</code></div>`,
             {
-              okKey: "standard.discard",
+              okKey: "standard.git.discard",
               cancelKey: "standard.cancel",
               width: "auto",
               height: "auto",
@@ -368,57 +505,13 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
         flagNode.appendChild(discardBtn);
       },
     });
+
     await gitListManager.loadList();
 
-    // commit UI
-    const commitRow = node.querySelector(`#${commitRowId}`);
-    const inputRow = createFormRowInput({
-      id: "git-commit-message",
-      labelOrKey: "modal.git.commit.message",
-      value: "",
-      type: "textarea",
-      multiline: true,
-      placeholder: t("modal.git.commit.placeholder"),
-      onSave: undefined,
-      i18nEnabled: true,
-    });
-
-    let commitMessage = "";
-    const hasChanges = (status.files || []).length > 0;
-    const commitBtn = createGitCommitButton(async () => {
-      if (!commitMessage) {
-        EventBus.emit("ui:toast", {
-          languageKey: "toast.git.commit.noMessage",
-          variant: "warning",
-        });
-        return;
-      }
-      const res = await EventBus.emitWithResponse("git:commit", {
-        folderPath: gitPath,
-        message: commitMessage,
-      });
-      if (typeof res === "string") {
-        EventBus.emit("ui:toast", {
-          languageKey: "toast.git.commit.complete",
-          variant: "success",
-        });
-      } else if (res?.summary?.changes != null) {
-        EventBus.emit("ui:toast", {
-          languageKey: "toast.git.commit.success",
-          args: [res.summary.changes],
-          variant: "success",
-        });
-      }
-      await gitListManager.loadList();
-    }, !(hasChanges && commitMessage));
-
-    const msgField = inputRow.querySelector("textarea, input");
-    msgField.addEventListener("input", () => {
-      commitMessage = msgField.value.trim();
-      commitBtn.disabled = !(hasChanges && commitMessage);
-    });
-
-    commitRow.append(inputRow, buildButtonGroup(commitBtn));
+    // Enable/disable commit button based on fresh list + message
+    commitBtn.disabled = !(
+      (gitListManager.currentList?.length || 0) > 0 && commitMessage
+    );
   };
 
   return { node, init };

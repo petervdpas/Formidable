@@ -343,11 +343,6 @@ export default {
   "standard.view": "Weergave",
   "standard.help": "Hulp",
   "standard.render": "Weergeven",
-  "standard.push": "Pushen",
-  "standard.pull": "Pullen",
-  "standard.commit": "Committen",
-  "standard.discard": "Negeren",
-  "standard.sync": "Synchroniseren",
   "standard.copy": "Kopiëren",
   "standard.copy.sign": "⧉",
   "standard.paste": "Plakken",
@@ -413,6 +408,17 @@ export default {
   "standard.nbr.of.items.total": "Aantal in lijst: {0}",
   "standard.nbr.of.items.filtered": "Aantal in lijst: {0} van {1}",
 
+  "standard.git.push": "Pushen",
+  "standard.git.pull": "Pullen",
+  "standard.git.commit": "Committen",
+  "standard.git.discard": "Negeren",
+  "standard.git.sync": "Synchroniseren",
+  "standard.git.fetch": "Fetch",
+  "standard.git.checkout": "Checkout",
+  "standard.git.trackUpstream": "Track (set upstream)",
+  "standard.git.createAndCheckout": "Create & Checkout",
+  "standard.git.createCheckoutTrack": "Create, Checkout & Track",
+
   // ── Tooltips ─────────────────────────────
   "tooltip.restart.formidable": "Herstart Formidable",
 
@@ -431,9 +437,17 @@ export default {
   "button.uploadPlugin": "Plugin Uploaden",
 
   // ── ARIA Labels ───────────────────────────
-  "aria.push": "Pushen naar remote",
-  "aria.pull": "Pullen van remote",
+  "aria.push": "Push naar remote",
+  "aria.pull": "Pull van remote",
   "aria.commit": "Wijzigingen committen",
+  "aria.discard": "Wijzigingen negeren",
+  "aria.sync": "Synchroniseren met remote",
+  "aria.fetch": "Fetch van remote",
+  "aria.checkout": "Uitchecken van branch",
+  "aria.trackUpstream": "Track upstream branch",
+  "aria.createAndCheckout": "Maak en uitchecken van branch",
+  "aria.createCheckoutTrack": "Maak, check uit en track branch",
+  
   "aria.moveUp": "Veld omhoog verplaatsen",
   "aria.moveDown": "Veld omlaag verplaatsen",
   "aria.copyMarkdown": "Markdown kopiëren",

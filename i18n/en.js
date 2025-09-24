@@ -227,7 +227,7 @@ export default {
   "toast.code.run.failed": "Failed to run code: {0}",
 
   "toast.dom.ready.check": "DOM is ready: {0}",
-  
+
   // ── Special ─────────────────────────
   "special.html.span.small":
     "<span {key[0]}>{0}</span> <small {key[1]}>{1}</small>",
@@ -323,11 +323,6 @@ export default {
   "standard.view": "View",
   "standard.help": "Help",
   "standard.render": "Render",
-  "standard.push": "Push",
-  "standard.pull": "Pull",
-  "standard.commit": "Commit",
-  "standard.discard": "Discard",
-  "standard.sync": "Sync",
   "standard.copy": "Copy",
   "standard.copy.sign": "⧉",
   "standard.paste": "Paste",
@@ -393,6 +388,17 @@ export default {
   "standard.nbr.of.items.total": "Nbr. of Items: {0}",
   "standard.nbr.of.items.filtered": "Nbr. of Items: {0} of {1}",
 
+  "standard.git.push": "Push",
+  "standard.git.pull": "Pull",
+  "standard.git.commit": "Commit",
+  "standard.git.discard": "Discard",
+  "standard.git.sync": "Sync",
+  "standard.git.fetch": "Fetch",
+  "standard.git.checkout": "Checkout",
+  "standard.git.trackUpstream": "Track (set upstream)",
+  "standard.git.createAndCheckout": "Create & Checkout",
+  "standard.git.createCheckoutTrack": "Create, Checkout & Track",
+
   // ── Tooltips ─────────────────────────────
   "tooltip.restart.formidable": "Restart Formidable",
 
@@ -414,6 +420,14 @@ export default {
   "aria.push": "Push to remote",
   "aria.pull": "Pull from remote",
   "aria.commit": "Commit changes",
+  "aria.discard": "Discard changes",
+  "aria.sync": "Sync with remote",
+  "aria.fetch": "Fetch from remote",
+  "aria.checkout": "Checkout branch",
+  "aria.trackUpstream": "Track upstream branch",
+  "aria.createAndCheckout": "Create and checkout branch",
+  "aria.createCheckoutTrack": "Create, checkout and track branch",
+
   "aria.moveUp": "Move field up",
   "aria.moveDown": "Move field down",
   "aria.copyMarkdown": "Copy Markdown",

@@ -247,10 +247,11 @@ export function createFormRenderIconButton(onClick) {
   });
 }
 
+// --- Git buttons ---
 export function createGitCommitButton(onClick, disabled = false) {
   return createButton({
-    text: t("standard.commit"),
-    i18nKey: "standard.commit",
+    text: t("standard.git.commit"),
+    i18nKey: "standard.git.commit",
     className: "btn-info",
     identifier: "git-commit",
     onClick,
@@ -261,8 +262,8 @@ export function createGitCommitButton(onClick, disabled = false) {
 
 export function createGitPushButton(onClick, disabled = false) {
   return createButton({
-    text: t("standard.push"),
-    i18nKey: "standard.push",
+    text: t("standard.git.push"),
+    i18nKey: "standard.git.push",
     className: "btn-info",
     identifier: "git-push",
     onClick,
@@ -273,8 +274,8 @@ export function createGitPushButton(onClick, disabled = false) {
 
 export function createGitPullButton(onClick, disabled = false) {
   return createButton({
-    text: t("standard.pull"),
-    i18nKey: "standard.pull",
+    text: t("standard.git.pull"),
+    i18nKey: "standard.git.pull",
     className: "btn-info",
     identifier: "git-pull",
     onClick,
@@ -285,13 +286,73 @@ export function createGitPullButton(onClick, disabled = false) {
 
 export function createGitDiscardButton(filePath, onClick) {
   return createButton({
-    text: t("standard.discard"),
-    i18nKey: "standard.discard",
+    text: t("standard.git.discard"),
+    i18nKey: "standard.git.discard",
     className: "btn-warn btn-discard",
     onClick,
     attributes: {
       title: `Discard changes in ${filePath}`,
     },
+  });
+}
+
+export function createGitFetchButton(onClick, disabled = false) {
+  return createButton({
+    text: t("standard.git.fetch"),
+    i18nKey: "standard.git.fetch",
+    className: "btn-default",
+    identifier: "git-fetch",
+    onClick,
+    disabled,
+    ariaLabel: t("aria.fetch"),
+  });
+}
+
+export function createGitCheckoutButton(onClick, disabled = false) {
+  return createButton({
+    text: t("standard.git.checkout"),
+    i18nKey: "standard.git.checkout",
+    className: "btn-default",
+    identifier: "git-checkout",
+    onClick,
+    disabled,
+    ariaLabel: t("aria.checkout"),
+  });
+}
+
+export function createGitTrackUpstreamButton(onClick, disabled = false) {
+  return createButton({
+    text: t("standard.git.trackUpstream"),
+    i18nKey: "standard.git.trackUpstream",
+    className: "btn-default",
+    identifier: "git-track-upstream",
+    onClick,
+    disabled,
+    ariaLabel: t("aria.trackUpstream"),
+  });
+}
+
+export function createGitCreateCheckoutButton(onClick, disabled = false) {
+  return createButton({
+    text: t("standard.git.createAndCheckout"),
+    i18nKey: "standard.git.createAndCheckout",
+    className: "btn-default",
+    identifier: "git-create-checkout",
+    onClick,
+    disabled,
+    ariaLabel: t("aria.createAndCheckout"),
+  });
+}
+
+export function createGitCreateCheckoutTrackButton(onClick, disabled = false) {
+  return createButton({
+    text: t("standard.git.createCheckoutTrack"),
+    i18nKey: "standard.git.createCheckoutTrack",
+    className: "btn-default",
+    identifier: "git-create-checkout-track",
+    onClick,
+    disabled,
+    ariaLabel: t("aria.createCheckoutTrack"),
   });
 }
 
