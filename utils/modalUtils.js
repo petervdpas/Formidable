@@ -639,3 +639,81 @@ export function showConfirmModal(i18nKey, extraHtml = null, options = {}) {
     modal.show();
   });
 }
+
+export function createSplitModalLayout({
+  modalEl,
+  leftContent = null,
+  rightContent = null,
+  leftWidth = "40%",
+  rightWidth = "60%",
+  gap = "12px",
+  className = "",
+} = {}) {
+  if (!modalEl) {
+    EventBus.emit("logging:warning", [
+      "[SplitModal] Missing modal element in createSplitModalLayout",
+    ]);
+    return null;
+  }
+
+  const body = modalEl.querySelector(".modal-body");
+  if (!body) {
+    EventBus.emit("logging:warning", [
+      "[SplitModal] Modal element has no .modal-body",
+      modalEl,
+    ]);
+    return null;
+  }
+
+  // clear old body content
+  body.innerHTML = "";
+
+  // shell
+  const wrap = document.createElement("div");
+  wrap.className = `modal-split ${className}`.trim();
+  Object.assign(wrap.style, {
+    display: "grid",
+    gridTemplateColumns: `${leftWidth} ${rightWidth}`,
+    gap,
+    width: "100%",
+    height: "100%",
+    boxSizing: "border-box",
+  });
+
+  const left = document.createElement("div");
+  left.className = "modal-split-left";
+  if (leftContent != null) {
+    if (leftContent instanceof HTMLElement) {
+      left.appendChild(leftContent);
+    } else {
+      EventBus.emit("logging:warning", [
+        "[SplitModal] leftContent is not an HTMLElement",
+        { type: typeof leftContent },
+      ]);
+    }
+  }
+
+  const right = document.createElement("div");
+  right.className = "modal-split-right";
+  if (rightContent != null) {
+    if (rightContent instanceof HTMLElement) {
+      right.appendChild(rightContent);
+    } else {
+      EventBus.emit("logging:warning", [
+        "[SplitModal] rightContent is not an HTMLElement",
+        { type: typeof rightContent },
+      ]);
+    }
+  }
+
+  wrap.appendChild(left);
+  wrap.appendChild(right);
+  body.appendChild(wrap);
+
+  EventBus.emit("logging:default", [
+    "[SplitModal] Initialized split layout",
+    { leftWidth, rightWidth, gap, className: wrap.className },
+  ]);
+
+  return { wrap, left, right };
+}

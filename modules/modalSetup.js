@@ -7,7 +7,11 @@ import { fieldTypes } from "../utils/fieldTypes.js";
 import { renderSettings } from "./settingsManager.js";
 import { setTabviewOrientation } from "../utils/tabUtils.js";
 import { renderWorkspaceModal } from "./contextManager.js";
-import { applyModalCssClass, setupModal } from "../utils/modalUtils.js";
+import {
+  applyModalCssClass,
+  setupModal,
+  createSplitModalLayout,
+} from "../utils/modalUtils.js";
 import { extractFieldDefinition } from "../utils/formUtils.js";
 import { createDropdown } from "../utils/dropdownUtils.js";
 import { syncScroll } from "../utils/domUtils.js";
@@ -15,6 +19,12 @@ import { createProfileListManager } from "./profileManager.js";
 import { renderPluginManager } from "./pluginManagerUI.js";
 import { renderHelp } from "./helperUI.js";
 import { renderGitStatus } from "./gitActions.js";
+import {
+  getGitContext,
+  buildGitControlLeftPane,
+  buildGitControlRightPane,
+} from "./gitControlModal.js";
+
 import {
   createSettingsRestartIconButton,
   createShowMarkdownButton,
@@ -177,6 +187,42 @@ export function setupGitModal() {
     },
   });
 
+  return modal;
+}
+
+export function setupGitModalNew() {
+  const modal = setupModal("git-actions-modal", {
+    closeBtn: "git-actions-close",
+    escToClose: true,
+    backdropClick: true,
+    width: "60em",
+    height: "auto",
+    onOpen: async () => {
+      const container = document.getElementById("git-modal-body");
+      if (!container) return;
+
+      const modalEl = container.closest(".modal");
+      const ctx = await getGitContext();
+
+      const left = await buildGitControlLeftPane({ ...ctx, modalApi: modal });
+      const right = await buildGitControlRightPane({ ...ctx, modalApi: modal });
+
+      const split = createSplitModalLayout({
+        modalEl,
+        leftContent: left.node,
+        rightContent: right.node,
+        leftWidth: "1fr",
+        rightWidth: "1fr",
+        gap: "12px",
+        className: "git-split",
+      });
+      if (!split) return;
+
+      // now that nodes are mounted, run DOM-dependent wiring
+      await left.init();
+      await right.init();
+    },
+  });
   return modal;
 }
 

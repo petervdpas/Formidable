@@ -388,6 +388,19 @@
     z-index: 3000 !important;
 }
 
+.modal-split {
+  height: 100%;
+  overflow: hidden;
+}
+
+.modal-split-left,
+.modal-split-right {
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 6px;
+  padding: 10px;
+  overflow-y: auto;
+}
+
 @media screen and (max-width: 768px) {
 
     .modal.large {

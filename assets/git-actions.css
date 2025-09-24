@@ -1,8 +1,8 @@
 /* Git File List Container */
-#git-file-list {
+.git-file-list {
   max-height: 24vh;
   overflow-y: auto;
-  padding-right: 0.5em;
+  padding-right: .5em;
   padding: .5em;
   border-top: 1px solid var(--border-color, #ccc);
   border-bottom: 1px solid var(--border-color, #ccc);
@@ -27,7 +27,6 @@
   filter: brightness(0.97);
 }
 
-/* Left: Path + Git Symbol */
 .git-list-item .list-item-main {
   display: flex;
   flex-direction: column;
@@ -38,36 +37,38 @@
 .git-list-item .list-item-label {
   font-weight: 600;
   font-size: 1rem;
-  color: var(--git-fg-default, var(--text-primary, #222));
-  margin-bottom: 0.2em;
+  margin-bottom: .2em;
   word-break: break-word;
 }
 
-/* Right: Discard Button Area */
 .git-list-item .list-item-flag {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 0.4em;
-  margin-left: 0.5em;
+  gap: .4em;
+  margin-left: .5em;
 }
 
-/* Git status coloring: full background by class */
 .git-list-item.added {
   background-color: var(--git-bg-added);
 }
+
 .git-list-item.modified {
   background-color: var(--git-bg-modified);
 }
+
 .git-list-item.deleted {
   background-color: var(--git-bg-deleted);
 }
+
 .git-list-item.renamed {
   background-color: var(--git-bg-renamed);
 }
+
 .git-list-item.untracked {
   background-color: var(--git-bg-untracked);
 }
+
 .git-list-item.unknown {
   background-color: var(--git-bg-unknown);
 }
