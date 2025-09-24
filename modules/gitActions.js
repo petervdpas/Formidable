@@ -21,7 +21,7 @@ export async function renderGitStatus(container, modalApi) {
   });
 
   const gitPath = config.git_root || ".";
-  const refresh = () => renderGitStatus(container);
+  const refresh = () => renderGitStatus(container, modalApi);
   const gitFileListId = "git-file-list";
 
   EventBus.emit("git:status", {

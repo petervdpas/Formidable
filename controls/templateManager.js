@@ -321,7 +321,7 @@ function seedBasicTemplateIfEmpty() {
       markdown_template: ``,
       fields: [
         {
-          key: "test",
+          key: "basic_form_test",
           label: "Test",
           type: "text",
           default: "Default value",
@@ -329,7 +329,7 @@ function seedBasicTemplateIfEmpty() {
         },
         { key: "check", label: "Check", type: "boolean", two_column: true },
         {
-          key: "dropdown",
+          key: "basic_form_dropdown",
           label: "Dropdown",
           type: "dropdown",
           default: "R",
@@ -340,7 +340,7 @@ function seedBasicTemplateIfEmpty() {
           ],
         },
         {
-          key: "multichoice",
+          key: "basic_form_multichoice",
           label: "Multiple Choice",
           type: "multioption",
           two_column: true,
@@ -351,7 +351,7 @@ function seedBasicTemplateIfEmpty() {
           ],
         },
         {
-          key: "radio",
+          key: "basic_form_radio",
           label: "Radio",
           type: "radio",
           default: "DOG",
@@ -363,30 +363,30 @@ function seedBasicTemplateIfEmpty() {
           ],
         },
         {
-          key: "mline",
+          key: "basic_form_mline",
           label: "Mline",
           type: "textarea",
           default: "A whole lot of prefab text...",
         },
         {
-          key: "numpy",
+          key: "basic_form_numpy",
           label: "Numpy",
           type: "number",
           default: "17",
         },
         {
-          key: "bday",
+          key: "basic_form_bday",
           label: "Birthday",
           type: "date",
           default: "1968-12-23",
         },
         {
-          key: "listy",
+          key: "basic_form_listy",
           label: "Listy",
           type: "list",
         },
         {
-          key: "datable",
+          key: "basic_form_datable",
           label: "Table",
           type: "table",
           options: [

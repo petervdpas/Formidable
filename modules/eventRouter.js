@@ -445,6 +445,55 @@ export function initEventRouter() {
   EventBus.on("git:commit", gitHandler.handleGitCommit);
   EventBus.on("git:discard", gitHandler.handleGitDiscard);
 
+  // Advanced Git events
+  EventBus.off("git-fetch", gitHandler.handleGitFetch);
+  EventBus.off("git-set-upstream", gitHandler.handleGitSetUpstream);
+  EventBus.off("git-add-all", gitHandler.handleGitAddAll);
+  EventBus.off("git-add-paths", gitHandler.handleGitAddPaths);
+  EventBus.off("git-reset-paths", gitHandler.handleGitResetPaths);
+  EventBus.off("git-commit-paths", gitHandler.handleGitCommitPaths);
+  EventBus.off("git-branches", gitHandler.handleGitBranches);
+  EventBus.off("git-branch-create", gitHandler.handleGitBranchCreate);
+  EventBus.off("git-checkout", gitHandler.handleGitCheckout);
+  EventBus.off("git-branch-delete", gitHandler.handleGitBranchDelete);
+  EventBus.off("git-diff-name-only", gitHandler.handleGitDiffNameOnly);
+  EventBus.off("git-diff-file", gitHandler.handleGitDiffFile);
+  EventBus.off("git-log", gitHandler.handleGitLog);
+  EventBus.off("git-reset-hard", gitHandler.handleGitResetHard);
+  EventBus.off("git-revert", gitHandler.handleGitRevert);
+  EventBus.off("git-merge", gitHandler.handleGitMerge);
+  EventBus.off("git-merge-abort", gitHandler.handleGitMergeAbort);
+  EventBus.off("git-rebase-start", gitHandler.handleGitRebaseStart);
+  EventBus.off("git-rebase-continue", gitHandler.handleGitRebaseContinue);
+  EventBus.off("git-rebase-abort", gitHandler.handleGitRebaseAbort);
+  EventBus.off("git-conflicts", gitHandler.handleGitConflicts);
+  EventBus.off("git-mergetool", gitHandler.handleGitMergetool);
+  EventBus.off("git-open-in-vscode", gitHandler.handleGitOpenInVSCode);
+
+  EventBus.on("git-fetch", gitHandler.handleGitFetch);
+  EventBus.on("git-set-upstream", gitHandler.handleGitSetUpstream);
+  EventBus.on("git-add-all", gitHandler.handleGitAddAll);
+  EventBus.on("git-add-paths", gitHandler.handleGitAddPaths);
+  EventBus.on("git-reset-paths", gitHandler.handleGitResetPaths);
+  EventBus.on("git-commit-paths", gitHandler.handleGitCommitPaths);
+  EventBus.on("git-branches", gitHandler.handleGitBranches);
+  EventBus.on("git-branch-create", gitHandler.handleGitBranchCreate);
+  EventBus.on("git-checkout", gitHandler.handleGitCheckout);
+  EventBus.on("git-branch-delete", gitHandler.handleGitBranchDelete);
+  EventBus.on("git-diff-name-only", gitHandler.handleGitDiffNameOnly);
+  EventBus.on("git-diff-file", gitHandler.handleGitDiffFile);
+  EventBus.on("git-log", gitHandler.handleGitLog);
+  EventBus.on("git-reset-hard", gitHandler.handleGitResetHard);
+  EventBus.on("git-revert", gitHandler.handleGitRevert);
+  EventBus.on("git-merge", gitHandler.handleGitMerge);
+  EventBus.on("git-merge-abort", gitHandler.handleGitMergeAbort);
+  EventBus.on("git-rebase-start", gitHandler.handleGitRebaseStart);
+  EventBus.on("git-rebase-continue", gitHandler.handleGitRebaseContinue);
+  EventBus.on("git-rebase-abort", gitHandler.handleGitRebaseAbort);
+  EventBus.on("git-conflicts", gitHandler.handleGitConflicts);
+  EventBus.on("git-mergetool", gitHandler.handleGitMergetool);
+  EventBus.on("git-open-in-vscode", gitHandler.handleGitOpenInVSCode);
+
   // Cache events
   EventBus.off("cache:init", cacheHandler.initCache);
   EventBus.off("cache:loadFromDisk", cacheHandler.handleCacheLoadFromDisk);

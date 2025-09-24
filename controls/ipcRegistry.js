@@ -243,17 +243,79 @@ function registerIpcHandlers() {
   // Git
   registerIpc("is-git-repo", (e, folder) => gitManager.isGitRepo(folder));
   registerIpc("get-git-root", (e, folder) => gitManager.getGitRoot(folder));
-  registerIpc("git-status", (e, folder) => gitManager.gitStatus(folder));
-  registerIpc("git-remote-info", (e, folder) =>
-    gitManager.getRemoteInfo(folder)
-  );
-  registerIpc("git-pull", (e, folder) => gitManager.gitPull(folder));
-  registerIpc("git-push", (e, folder) => gitManager.gitPush(folder));
-  registerIpc("git-commit", (e, folder, msg) =>
-    gitManager.gitCommit(folder, msg)
+  registerIpc("git-status", (e, folder) => gitManager.status(folder));
+  registerIpc("git-remote-info", (e, folder) => gitManager.remoteInfo(folder));
+  registerIpc("git-pull", (e, folder) => gitManager.pull(folder));
+  registerIpc("git-push", (e, folder) => gitManager.push(folder));
+  registerIpc("git-commit", (e, folder, msg, opts) =>
+    gitManager.commit(folder, msg, {
+      addAllBeforeCommit: true,
+      ...(opts || {}),
+    })
   );
   registerIpc("git-discard", (e, { folderPath, filePath }) =>
-    gitManager.gitDiscardFile(folderPath, filePath)
+    gitManager.discardFile(folderPath, filePath)
+  );
+  registerIpc("git-fetch", (e, folder, remote, opts) =>
+    gitManager.fetch(folder, remote, opts)
+  );
+  registerIpc("git-set-upstream", (e, folder, remote, branch) =>
+    gitManager.setUpstream(folder, remote, branch)
+  );
+  registerIpc("git-add-all", (e, folder) => gitManager.addAll(folder));
+  registerIpc("git-add-paths", (e, folder, paths) =>
+    gitManager.addPaths(folder, paths)
+  );
+  registerIpc("git-reset-paths", (e, folder, paths) =>
+    gitManager.resetPaths(folder, paths)
+  );
+  registerIpc("git-commit-paths", (e, folder, message, paths) =>
+    gitManager.commitPaths(folder, message, paths)
+  );
+  registerIpc("git-branches", (e, folder) => gitManager.branches(folder));
+  registerIpc("git-branch-create", (e, folder, name, opts) =>
+    gitManager.createBranch(folder, name, opts)
+  );
+  registerIpc("git-checkout", (e, folder, ref) =>
+    gitManager.checkout(folder, ref)
+  );
+  registerIpc("git-branch-delete", (e, folder, name, force) =>
+    gitManager.deleteBranch(folder, name, { force })
+  );
+  registerIpc("git-diff-name-only", (e, folder, base) =>
+    gitManager.diffNameOnly(folder, base)
+  );
+  registerIpc("git-diff-file", (e, folder, file, base) =>
+    gitManager.diffFile(folder, file, base)
+  );
+  registerIpc("git-log", (e, folder, opts) =>
+    gitManager.logCommits(folder, opts)
+  );
+  registerIpc("git-reset-hard", (e, folder, ref) =>
+    gitManager.resetHard(folder, ref)
+  );
+  registerIpc("git-revert", (e, folder, hash, opts) =>
+    gitManager.revertCommit(folder, hash, opts)
+  );
+  registerIpc("git-merge", (e, folder, ref) => gitManager.merge(folder, ref));
+  registerIpc("git-merge-abort", (e, folder) => gitManager.mergeAbort(folder));
+  registerIpc("git-rebase-start", (e, folder, upstream) =>
+    gitManager.rebaseStart(folder, upstream)
+  );
+  registerIpc("git-rebase-continue", (e, folder) =>
+    gitManager.rebaseContinue(folder)
+  );
+  registerIpc("git-rebase-abort", (e, folder) =>
+    gitManager.rebaseAbort(folder)
+  );
+  registerIpc("git-conflicts", (e, folder) =>
+    gitManager.getConflictedFiles(folder)
+  );
+  registerIpc("git-mergetool", (e, folder, file) =>
+    gitManager.openMergetool(folder, file)
+  );
+  registerIpc("git-open-in-vscode", (e, folder, file) =>
+    gitManager.openInVSCode(folder, file)
   );
 
   // Templates

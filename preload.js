@@ -17,17 +17,19 @@ function runWhenReady(fn) {
     const resolved = stored === "dark" ? "dark" : "light";
 
     document.documentElement.dataset.theme = resolved;
-    document.documentElement.classList.remove("theme-light","theme-dark");
+    document.documentElement.classList.remove("theme-light", "theme-dark");
     document.documentElement.classList.add(`theme-${resolved}`);
 
     const enableLinks = () => {
       const light = document.getElementById("formidable-theme-light");
-      const dark  = document.getElementById("formidable-theme-dark");
+      const dark = document.getElementById("formidable-theme-dark");
       if (light) light.disabled = resolved !== "light";
-      if (dark)  dark.disabled  = resolved !== "dark";
+      if (dark) dark.disabled = resolved !== "dark";
     };
     if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", enableLinks, { once: true });
+      document.addEventListener("DOMContentLoaded", enableLinks, {
+        once: true,
+      });
     } else {
       enableLinks();
     }
@@ -89,6 +91,32 @@ const api = {
   ]),
   help: buildGroup(["list-help-topics", "get-help-topic"]),
   git: buildGroup([
+    // new advanced routes
+    "git-fetch",
+    "git-set-upstream",
+    "git-add-all",
+    "git-add-paths",
+    "git-reset-paths",
+    "git-commit-paths",
+    "git-branches",
+    "git-branch-create",
+    "git-checkout",
+    "git-branch-delete",
+    "git-diff-name-only",
+    "git-diff-file",
+    "git-log",
+    "git-reset-hard",
+    "git-revert",
+    "git-merge",
+    "git-merge-abort",
+    "git-rebase-start",
+    "git-rebase-continue",
+    "git-rebase-abort",
+    "git-conflicts",
+    "git-mergetool",
+    "git-open-in-vscode",
+
+    // keep your existing ones for backward compatibility
     "is-git-repo",
     "get-git-root",
     "git-status",
