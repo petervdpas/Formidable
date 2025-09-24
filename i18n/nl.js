@@ -224,6 +224,10 @@ export default {
     "Your branch is ahead by {0} commit(s) — auto-sync skipped.",
   "toast.git.autosync.upToDate": "Repository is up to date.",
   "toast.git.autosync.error": "Auto-sync failed: {0}",
+  "toast.git.fetch.complete": "Fetch voltooid.",
+  "toast.git.checkout.complete": "Checkout voltooid.",
+  "toast.git.track.set": "Upstream branch gevolgd.",
+  "toast.git.branch.created": "Branch aangemaakt.",
 
   "toast.profile.invalidName":
     "Gebruik kleine letters, koppeltekens en eindig met .json",
@@ -378,7 +382,6 @@ export default {
   "standard.ready": "Klaar",
   "standard.settings": "Instellingen",
   "standard.status": "Status",
-  "standard.branch": "Tak",
   "standard.tracked": "Bijgehouden",
   "standard.un.tracked": "Niet bijgehouden",
   "standard.change": "Wijziging",
@@ -414,10 +417,23 @@ export default {
   "standard.git.discard": "Negeren",
   "standard.git.sync": "Synchroniseren",
   "standard.git.fetch": "Fetch",
+  "standard.git.branch": "Tak",
   "standard.git.checkout": "Checkout",
   "standard.git.trackUpstream": "Track (set upstream)",
   "standard.git.createAndCheckout": "Create & Checkout",
   "standard.git.createCheckoutTrack": "Create, Checkout & Track",
+  "standard.git.upstream": "Upstream",
+  "standard.git.local": "Lokaal",
+  "standard.git.remote": "Remote",
+  "standard.git.noUpstream": "Geen upstream",
+  "standard.git.noRemote": "Geen remote",
+  "standard.git.fetching": "Fetching...",
+  "standard.git.cloning": "Cloning...",
+  "standard.git.loading": "Loading...",
+  "standard.git.status": "Status",
+  "standard.git.badge.ahead": "↑{0}",
+  "standard.git.badge.behind": "↓{0}",
+  "standard.git.badge.diverged": "⇕{0}",
 
   // ── Tooltips ─────────────────────────────
   "tooltip.restart.formidable": "Herstart Formidable",
@@ -447,7 +463,7 @@ export default {
   "aria.trackUpstream": "Track upstream branch",
   "aria.createAndCheckout": "Maak en uitchecken van branch",
   "aria.createCheckoutTrack": "Maak, check uit en track branch",
-  
+
   "aria.moveUp": "Veld omhoog verplaatsen",
   "aria.moveDown": "Veld omlaag verplaatsen",
   "aria.copyMarkdown": "Markdown kopiëren",
@@ -592,6 +608,12 @@ export default {
   "modal.git.commit.message": "Commitbericht",
   "modal.git.commit.placeholder":
     "bijv. README bijgewerkt en typefouten gecorrigeerd",
+
+  "modal.git.branches": "Branches",
+  "modal.git.branches.current": "Huidige Branch",
+  "modal.git.branches.switch": "Wissel Branch",
+  "modal.git.branches.create": "Maak Branch",
+  "modal.git.status": "Status & Commit",
 
   "modal.workspace.title": "Werkruimte-instellingen",
 

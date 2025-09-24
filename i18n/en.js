@@ -199,6 +199,10 @@ export default {
   "toast.git.discard.failed": "Failed to discard changes in {0}",
   "toast.git.discarded.changes.in": "Discarded changes in {0}",
   "toast.git.commit.noMessage": "Cannot commit: no message.",
+  "toast.git.fetch.complete": "Fetch complete.",
+  "toast.git.checkout.complete": "Checkout complete.",
+  "toast.git.track.set": "Upstream branch tracked.",
+  "toast.git.branch.created": "Branch created.",
 
   "toast.git.autosync.disabled": "Git auto-sync is disabled in this profile.",
   "toast.git.autosync.notRepo":
@@ -358,7 +362,7 @@ export default {
   "standard.ready": "Ready",
   "standard.settings": "Settings",
   "standard.status": "Status",
-  "standard.branch": "Branch",
+
   "standard.tracked": "Tracked",
   "standard.un.tracked": "Untracked",
   "standard.change": "Change",
@@ -394,10 +398,23 @@ export default {
   "standard.git.discard": "Discard",
   "standard.git.sync": "Sync",
   "standard.git.fetch": "Fetch",
+  "standard.git.branch": "Branch",
   "standard.git.checkout": "Checkout",
   "standard.git.trackUpstream": "Track (set upstream)",
   "standard.git.createAndCheckout": "Create & Checkout",
   "standard.git.createCheckoutTrack": "Create, Checkout & Track",
+  "standard.git.upstream": "Upstream",
+  "standard.git.local": "Local",
+  "standard.git.remote": "Remote",
+  "standard.git.noUpstream": "No upstream",
+  "standard.git.noRemote": "No remote",
+  "standard.git.fetching": "Fetching...",
+  "standard.git.cloning": "Cloning...",
+  "standard.git.loading": "Loading...",
+  "standard.git.status": "Status",
+  "standard.git.badge.ahead": "↑{0}",
+  "standard.git.badge.behind": "↓{0}",
+  "standard.git.badge.diverged": "⇕{0}",
 
   // ── Tooltips ─────────────────────────────
   "tooltip.restart.formidable": "Restart Formidable",
@@ -570,6 +587,12 @@ export default {
   "modal.git.none.found": "None found.",
   "modal.git.commit.message": "Commit Message",
   "modal.git.commit.placeholder": "e.g. Update README and fix typos",
+
+  "modal.git.branches": "Branches",
+  "modal.git.branches.current": "Current Branch",
+  "modal.git.branches.switch": "Switch Branch",
+  "modal.git.branches.create": "Create Branch",
+  "modal.git.status": "Status & Commit",
 
   "modal.workspace.title": "Workspace Settings",
 

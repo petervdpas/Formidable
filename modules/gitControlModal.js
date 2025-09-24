@@ -20,7 +20,7 @@ import {
 import { createListManager } from "../utils/listUtils.js";
 import { showConfirmModal } from "../utils/modalUtils.js";
 import { createDropdown } from "../utils/dropdownUtils.js";
-import { t } from "../utils/i18n.js";
+import { translateDOM } from "../utils/i18n.js";
 
 const uid = (p) => `${p}-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -47,7 +47,7 @@ export async function getGitContext() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// LEFT PANE (buttons-first + addContainerElement everywhere)
+// LEFT PANE (buttons-first + addContainerElement + pure i18n)
 // ─────────────────────────────────────────────────────────────
 export async function buildGitControlLeftPane({
   gitPath,
@@ -57,16 +57,15 @@ export async function buildGitControlLeftPane({
 }) {
   const node = document.createElement("div");
 
-  // Containers
+  // Section
   const section = addContainerElement({
     parent: node,
     className: "git-section",
   });
-
   addContainerElement({
     parent: section,
     tag: "h3",
-    textContent: t("modal.git.branches") || "Branches & Remote",
+    i18nKey: "modal.git.branches",
     attributes: { style: "margin-top:0" },
   });
 
@@ -78,7 +77,7 @@ export async function buildGitControlLeftPane({
   addContainerElement({
     parent: rowRemote,
     tag: "div",
-    textContent: "Remote:",
+    i18nKey: "standard.remote",
   });
   const remoteDDWrap = addContainerElement({
     parent: rowRemote,
@@ -94,7 +93,7 @@ export async function buildGitControlLeftPane({
   addContainerElement({
     parent: rowRemoteBranch,
     tag: "div",
-    textContent: "Remote branch:",
+    i18nKey: "standard.remoteBranch",
   });
   const remoteBranchDDWrap = addContainerElement({
     parent: rowRemoteBranch,
@@ -102,7 +101,7 @@ export async function buildGitControlLeftPane({
     attributes: { style: "flex:1" },
   });
 
-  // Row: Create local / track
+  // Row: Create/Track
   const branchRow = addContainerElement({
     parent: section,
     className: "git-row",
@@ -111,7 +110,7 @@ export async function buildGitControlLeftPane({
   // Divider
   addContainerElement({ parent: section, tag: "hr" });
 
-  // Row: Sync (pull/push)
+  // Row: Sync
   const syncRow = addContainerElement({
     parent: section,
     className: "git-row",
@@ -123,12 +122,12 @@ export async function buildGitControlLeftPane({
     attributes: { style: "font-size:12px;opacity:.9" },
   });
 
-  // ── State for dropdowns
+  // State
   const remotes = remoteInfo?.remotes?.map((r) => r.name) || [];
   let selectedRemote = remotes.includes("origin") ? "origin" : remotes[0] || "";
   let selectedRemoteBranch = "";
 
-  // ── BUTTONS FIRST (all consts from uiButtons)
+  // Buttons (from uiButtons)
   const fetchBtn = createGitFetchButton(async () => {
     fetchBtn.disabled = true;
     await EventBus.emitWithResponse("git:fetch", {
@@ -176,7 +175,9 @@ export async function buildGitControlLeftPane({
 
   const nameInput = document.createElement("input");
   nameInput.type = "text";
-  nameInput.placeholder = "new-branch-name";
+  // mark placeholder for i18n (no fallback)
+  nameInput.setAttribute("data-i18n-placeholder", "git.branch.new.placeholder");
+  nameInput.placeholder = "";
 
   const createBtn = createGitCreateCheckoutButton(async () => {
     const name = nameInput.value.trim();
@@ -231,7 +232,7 @@ export async function buildGitControlLeftPane({
     });
   });
 
-  // ── Mount buttons (then dropdowns)
+  // Mount buttons
   rowRemote.appendChild(fetchBtn);
   rowRemoteBranch.appendChild(checkoutBtn);
   rowRemoteBranch.appendChild(trackBtn);
@@ -242,9 +243,8 @@ export async function buildGitControlLeftPane({
 
   syncRow.append(buildButtonGroup(pullBtn, pushBtn));
 
-  // ── Dropdowns (into the wrappers created above)
+  // Dropdowns
   const rebuildRemoteBranches = () => {
-    // clear wrapper first to avoid stacking multiple selects
     remoteBranchDDWrap.innerHTML = "";
     const branches = (remoteInfo?.remoteBranches || [])
       .filter((b) => selectedRemote && b.startsWith(`${selectedRemote}/`))
@@ -252,7 +252,7 @@ export async function buildGitControlLeftPane({
     selectedRemoteBranch = branches[0] || "";
     createDropdown({
       containerEl: remoteBranchDDWrap,
-      labelTextOrKey: "",
+      labelTextOrKey: "", // no visible label
       options: branches.map((n) => ({ value: n, label: n })),
       selectedValue: selectedRemoteBranch,
       onChange: (v) => {
@@ -261,10 +261,9 @@ export async function buildGitControlLeftPane({
     });
   };
 
-  // Remote DD
   createDropdown({
     containerEl: remoteDDWrap,
-    labelTextOrKey: "",
+    labelTextOrKey: "", // no visible label
     options: remotes.map((n) => ({ value: n, label: n })),
     selectedValue: selectedRemote,
     onChange: (v) => {
@@ -275,58 +274,100 @@ export async function buildGitControlLeftPane({
 
   rebuildRemoteBranches();
 
-  // ── Tracking info (structured; no innerHTML)
+  // Tracking info (pure i18n)
   const renderTrackingRow = () => {
     trackingRow.innerHTML = "";
+
+    // "Branch: <b>{name}</b>"
     const line1 = addContainerElement({ parent: trackingRow });
     addContainerElement({
       parent: line1,
       tag: "span",
-      textContent: `${t("standard.branch") || "Branch"}: `,
+      i18nKey: "standard.git.branch",
     });
-    const b = addContainerElement({
+    addContainerElement({ parent: line1, tag: "span", textContent: ": " });
+    addContainerElement({
       parent: line1,
       tag: "b",
-      textContent: status.current,
+      textContent: status.current || "",
     });
 
+    // badges
     const badges = addContainerElement({ parent: trackingRow });
-    addContainerElement({
+
+    const aheadWrap = addContainerElement({
       parent: badges,
       tag: "span",
       className: "git-badge",
-      textContent: `ahead: ${status.ahead || 0}`,
     });
     addContainerElement({
+      parent: aheadWrap,
+      tag: "span",
+      i18nKey: "standard.git.badge.ahead",
+    });
+    addContainerElement({
+      parent: aheadWrap,
+      tag: "span",
+      textContent: ` ${Number(status.ahead || 0)}`,
+    });
+
+    const behindWrap = addContainerElement({
       parent: badges,
       tag: "span",
       className: "git-badge",
-      textContent: `behind: ${status.behind || 0}`,
       attributes: { style: "margin-left:6px" },
     });
+    addContainerElement({
+      parent: behindWrap,
+      tag: "span",
+      i18nKey: "standard.git.badge.behind",
+    });
+    addContainerElement({
+      parent: behindWrap,
+      tag: "span",
+      textContent: ` ${Number(status.behind || 0)}`,
+    });
 
+    // "Tracked: <value|none>"
     const line2 = addContainerElement({ parent: trackingRow });
     addContainerElement({
       parent: line2,
       tag: "span",
-      textContent: `${t("standard.tracked") || "Tracked"}: ${
-        status.tracking || t("standard.none")
-      }`,
+      i18nKey: "standard.tracked",
     });
+    addContainerElement({ parent: line2, tag: "span", textContent: ": " });
+    if (status.tracking) {
+      addContainerElement({
+        parent: line2,
+        tag: "span",
+        textContent: status.tracking,
+      });
+    } else {
+      addContainerElement({
+        parent: line2,
+        tag: "span",
+        i18nKey: "standard.none",
+      });
+    }
   };
   renderTrackingRow();
 
-  // Everything wired now; no deferred work needed
-  return { node, init: async () => {} };
+  // IMPORTANT: translate after mount
+  return {
+    node,
+    init: async () => {
+      // translate only the subtree for this pane
+      requestAnimationFrame(() => translateDOM(node));
+    },
+  };
 }
 
 // ─────────────────────────────────────────────────────────────
-// RIGHT PANE (buttons-first; addContainerElement; no innerHTML)
+// RIGHT PANE (buttons-first; addContainerElement; pure i18n)
 // ─────────────────────────────────────────────────────────────
 export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
   const node = document.createElement("div");
 
-  // Containers
   const section = addContainerElement({
     parent: node,
     className: "git-section",
@@ -334,12 +375,12 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
   addContainerElement({
     parent: section,
     tag: "h3",
-    textContent: t("modal.git.status") || "Status & Commit",
+    i18nKey: "modal.git.status",
     attributes: { style: "margin-top:0" },
   });
 
   const fileListId = uid("git-file-list");
-  const fileListWrap = addContainerElement({
+  addContainerElement({
     parent: section,
     className: "git-file-list",
     attributes: { id: fileListId },
@@ -350,9 +391,10 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
     className: "git-commit-row",
   });
 
-  // BUTTON FIRST: commit button with behavior
+  // Commit button
   let commitMessage = "";
   const hasChanges = (status.files || []).length > 0;
+  let gitListManager = null;
 
   const commitBtn = createGitCommitButton(async () => {
     if (!commitMessage) {
@@ -381,37 +423,41 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
     await gitListManager.loadList();
   }, !(hasChanges && commitMessage));
 
-  // Input row (DOM-built; attach input listener to toggle commit button)
+  // Commit input row (no fallback placeholder)
   const inputRow = createFormRowInput({
     id: "git-commit-message",
     labelOrKey: "modal.git.commit.message",
     value: "",
     type: "textarea",
     multiline: true,
-    placeholder: t("modal.git.commit.placeholder"),
+    placeholder: "", // translator fills via data-i18n-placeholder
     onSave: undefined,
     i18nEnabled: true,
   });
 
   const msgField = inputRow.querySelector("textarea, input");
-  msgField.addEventListener("input", () => {
-    commitMessage = msgField.value.trim();
-    commitBtn.disabled = !(
-      (gitListManager?.currentList?.length ?? (status.files || []).length) >
-        0 && commitMessage
+  if (msgField) {
+    msgField.setAttribute(
+      "data-i18n-placeholder",
+      "modal.git.commit.placeholder"
     );
-  });
+    msgField.placeholder = "";
+    msgField.addEventListener("input", () => {
+      commitMessage = msgField.value.trim();
+      const changesCount =
+        gitListManager?.currentList?.length ??
+        (status.files ? status.files.length : 0);
+      commitBtn.disabled = !(changesCount > 0 && commitMessage);
+    });
+  }
 
   commitRowWrap.append(inputRow, buildButtonGroup(commitBtn));
 
-  // List manager (wired in init to ensure it exists before listeners)
-  let gitListManager = null;
-
   const init = async () => {
-    gitListManager = createListManager({
+    const listMgr = createListManager({
       elementId: fileListId,
       itemClass: "git-list-item",
-      emptyMessage: t("modal.git.no.changes.detected"),
+      emptyMessage: "", // keep empty so missing key is obvious if you localize it elsewhere
       fetchListFunction: async () => {
         const result = await new Promise((resolve) =>
           EventBus.emit("git:status", {
@@ -506,12 +552,16 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
       },
     });
 
+    gitListManager = listMgr;
     await gitListManager.loadList();
 
-    // Enable/disable commit button based on fresh list + message
+    // sync commit button state with loaded list
     commitBtn.disabled = !(
       (gitListManager.currentList?.length || 0) > 0 && commitMessage
     );
+
+    // translate only this subtree after it’s mounted & list rendered
+    requestAnimationFrame(() => translateDOM(node));
   };
 
   return { node, init };
