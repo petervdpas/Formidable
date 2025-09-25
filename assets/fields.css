@@ -179,7 +179,7 @@
    (Code / LaTeX). Forces a two-column grid and top alignment. */
 #field-edit-modal .modal-form-row.has-stacked {
   display: grid !important;
-  grid-template-columns: var(--label-col, 220px) 1fr;
+  grid-template-columns: var(--label-width, 220px) 1fr;
   /* match your form layout */
   column-gap: var(--form-gap, 12px);
   align-items: start !important;

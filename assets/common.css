@@ -12,7 +12,7 @@
     --range-thumb-size: 18px;
 
     /* ───── Form Layout ───── */
-    --label-col: clamp(160px, 26ch, 240px);
+    --label-width: clamp(160px, 26ch, 240px);
     --form-gap: 12px;
     --label-align: right;
     --label-weight: 600;

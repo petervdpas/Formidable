@@ -97,7 +97,7 @@
 }
 
 .modal-form-row.switch-row label:not(.switch) {
-  min-width: var(--label-col, 220px);
+  min-width: var(--label-width, 220px);
   font-weight: bold;
   text-align: right;
 }

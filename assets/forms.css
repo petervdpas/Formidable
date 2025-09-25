@@ -1,25 +1,63 @@
 /* forms.css — containers, rows, and component wrappers (no input styling) */
 
 /* Containers */
-form, fieldset {
+form,
+fieldset {
   border-radius: 6px;
   padding: 10px 14px;
   margin-bottom: 8px;
   border-color: var(--input-border-color);
 }
-legend { font-weight: bold; padding: 0 6px; }
+
+legend {
+  font-weight: bold;
+  padding: 0 6px;
+}
 
 label {
   font-weight: bold;
   margin: 6px 0;
   display: block;
 }
+
 label small {
   font-weight: normal;
   font-size: 0.65em;
   margin-left: 6px;
   color: var(--readonly-fg);
 }
+
+/* Two-column rows honor per-row --label-width */
+.labeled-control-row.two-column {
+  display: grid;
+  grid-template-columns: var(--label-width, 140px) 1fr;
+  column-gap: 12px;
+  align-items: center;
+}
+
+/* Right-align the label column so inputs line up */
+.labeled-control-row.two-column>div:first-child {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* Keep inline variant neat */
+.labeled-control-row>label {
+  white-space: nowrap;
+}
+
+/* If any inner labels remain, collapse their spacing */
+.labeled-control-row .control-wrap>label {
+  margin: 0 0 4px 0;
+  font-size: 12px;
+  opacity: .7;
+}
+
+.labeled-control-row .control-wrap>label:empty {
+  display: none;
+}
+
 .label-subtext {
   display: block;
   margin-top: 4px;
@@ -90,21 +128,26 @@ label small {
   justify-content: space-between;
   gap: 12px;
 }
-.form-row.two-column > div {
+
+.form-row.two-column>div {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
-.form-row.two-column > div:first-child {
+
+.form-row.two-column>div:first-child {
   flex: 0 0 40%;
   max-width: 40%;
 }
-.form-row.two-column > div:last-child {
+
+.form-row.two-column>div:last-child {
   flex: 1 1 60%;
 }
 
 /* Single-column fallback */
-.form-row:not(.two-column) { flex-direction: column; }
+.form-row:not(.two-column) {
+  flex-direction: column;
+}
 
 /* Radio groups */
 .form-row [data-radio-group] {
@@ -127,14 +170,30 @@ label small {
   font-style: italic;
 }
 
-.form-row .field-description { color: var(--readonly-fg); }
+.form-row .field-description {
+  color: var(--readonly-fg);
+}
 
 /* Directory picker (disabled state) */
-.directory-picker.disabled { opacity: 0.5; pointer-events: none; }
+.directory-picker.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .directory-picker.disabled input,
-.directory-picker.disabled button { cursor: not-allowed; }
-.directory-picker.disabled input { background-color: #f2f2f2; color: #aaa; }
-.directory-picker.disabled button { background-color: #ddd; border-color: #ccc; }
+.directory-picker.disabled button {
+  cursor: not-allowed;
+}
+
+.directory-picker.disabled input {
+  background-color: #f2f2f2;
+  color: #aaa;
+}
+
+.directory-picker.disabled button {
+  background-color: #ddd;
+  border-color: #ccc;
+}
 
 /* Link field card + bare row */
 .form-row.link-row {
@@ -143,7 +202,10 @@ label small {
   padding: 10px 12px;
   background: var(--link-row-bg, #f9fbff);
 }
-.form-row.link-bare-row { margin-top: 6px; }
+
+.form-row.link-bare-row {
+  margin-top: 6px;
+}
 
 .link-bare-row .bare-link-content {
   display: flex;
@@ -162,12 +224,14 @@ label small {
   font-weight: 500;
   opacity: .95;
 }
+
 .link-bare-row #btn-link-open {
   flex: 0 0 auto;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .link-bare-row #btn-link-open .label {
   display: inline-block;
   max-width: 100%;
@@ -178,7 +242,7 @@ label small {
 }
 
 /* CASE B: single anchor */
-.link-bare-row .bare-link-content > a,
+.link-bare-row .bare-link-content>a,
 .form-row.link-row a.bare-link,
 .form-row.link-bare-row a.bare-link {
   display: block;
@@ -192,8 +256,11 @@ label small {
 
 /* Responsive */
 @media (max-width: 600px) {
-  .form-row.two-column { flex-direction: column; }
-  .form-row.two-column > div {
+  .form-row.two-column {
+    flex-direction: column;
+  }
+
+  .form-row.two-column>div {
     max-width: 100% !important;
     flex: 1 1 100% !important;
   }

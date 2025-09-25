@@ -1,7 +1,7 @@
 // utils/elementBuilders.js
 
 import { createDropdown } from "./dropdownUtils.js";
-import { createPanelButton } from "./buttonUtils.js"; 
+import { createPanelButton } from "./buttonUtils.js";
 import { t } from "./i18n.js";
 
 export function createStyledLabel(
@@ -194,6 +194,7 @@ export function addContainerElement({
   textContent = "",
   attributes = {},
   i18nKey = "",
+  i18nArgs = null,
   callback = null,
 } = {}) {
   const el = document.createElement(tag);
@@ -206,9 +207,15 @@ export function addContainerElement({
     el.setAttribute(key, value);
   });
 
-  // If translation key is provided, add data-i18n
+  // If translation key is provided, add data-i18n (+ optional args)
   if (i18nKey) {
     el.setAttribute("data-i18n", i18nKey);
+    if (Array.isArray(i18nArgs)) {
+      el.setAttribute("data-i18n-args", JSON.stringify(i18nArgs));
+      if (!textContent) el.textContent = t(i18nKey, i18nArgs, "");
+    } else if (!textContent) {
+      el.textContent = t(i18nKey, "");
+    }
   }
 
   // Run optional callback to set properties
@@ -335,10 +342,9 @@ export function createFormRowDropdown({
 }) {
   const row = document.createElement("div");
   row.className = "modal-form-row";
-  // row.id = `${id}-row`; // optional; not required anymore
 
   const dd = createDropdown({
-    containerEl: row, // <— pass the element directly
+    containerEl: row,
     labelTextOrKey: labelOrKey,
     selectedValue,
     options,
@@ -348,10 +354,130 @@ export function createFormRowDropdown({
   });
 
   if (dd?.selectElement) {
-    dd.selectElement.id = id; // so saves can query by #yaml-item-field
+    dd.selectElement.id = id;
   }
 
   return { row, dropdown: dd };
+}
+
+export function buildLabeledControl({
+  labelTextOrKey = "",
+  i18nEnabled = false,
+  forId = null,
+  descriptionText = "",
+  control,
+  actions = [],
+  layout = "inline",
+  className = "modal-form-row",
+  gap = "8px",
+  labelWidth = null,
+  suppressInnerLabel = true,
+} = {}) {
+  const row = document.createElement("div");
+  row.className = `${className} labeled-control-row`.trim();
+  if (labelWidth) row.style.setProperty("--label-width", labelWidth);
+
+  const labelEl = createLabelElement({
+    text: i18nEnabled ? t(labelTextOrKey) : labelTextOrKey,
+    forId,
+    i18nKey: i18nEnabled ? labelTextOrKey : null,
+  });
+
+  const left = document.createElement("div");
+  const right = document.createElement("div");
+  const body = document.createElement("div");
+
+  const controlWrap = document.createElement("div");
+  controlWrap.className = "control-wrap";
+  controlWrap.style.flex = "1";
+  controlWrap.style.minWidth = "0";
+
+  let controlEl = null;
+  if (typeof control === "function") {
+    const maybe = control(controlWrap) || null;
+    controlEl =
+      maybe instanceof HTMLElement
+        ? maybe
+        : controlWrap.firstElementChild || controlWrap;
+  } else if (control instanceof HTMLElement) {
+    controlWrap.appendChild(control);
+    controlEl = control;
+  } else {
+    controlEl = controlWrap;
+  }
+
+  // NEW: kill blank/inner labels that dropdowns add
+  if (suppressInnerLabel) {
+    controlWrap.querySelectorAll(":scope > label").forEach((lab) => {
+      const txt = (lab.textContent || "").trim();
+      const hasI18n = lab.hasAttribute("data-i18n");
+      if (!txt && !hasI18n) lab.style.display = "none";
+    });
+  }
+
+  const actionsWrap = document.createElement("div");
+  actionsWrap.className = "control-actions";
+  actionsWrap.style.display = "flex";
+  actionsWrap.style.alignItems = "center";
+  actionsWrap.style.gap = gap;
+  for (const a of actions)
+    if (a instanceof HTMLElement) actionsWrap.appendChild(a);
+
+  if (layout === "two-column") {
+    row.classList.add("two-column");
+
+    left.appendChild(labelEl);
+    if (descriptionText) {
+      const desc = document.createElement("div");
+      desc.className = "field-description";
+      desc.textContent = descriptionText;
+      left.appendChild(desc);
+    }
+
+    const inline = document.createElement("div");
+    inline.className = "inline-control";
+    inline.style.display = "flex";
+    inline.style.alignItems = "center";
+    inline.style.gap = gap;
+
+    inline.appendChild(controlWrap);
+    if (actions.length) inline.appendChild(actionsWrap);
+
+    right.appendChild(inline);
+    row.appendChild(left);
+    row.appendChild(right);
+  } else if (layout === "stacked") {
+    row.appendChild(labelEl);
+    if (descriptionText) {
+      const desc = document.createElement("div");
+      desc.className = "field-description";
+      desc.textContent = descriptionText;
+      row.appendChild(desc);
+    }
+
+    body.style.display = "flex";
+    body.style.alignItems = "center";
+    body.style.gap = gap;
+    body.appendChild(controlWrap);
+    if (actions.length) body.appendChild(actionsWrap);
+    row.appendChild(body);
+  } else {
+    row.style.display = "grid";
+    row.style.alignItems = "center";
+    row.style.columnGap = gap;
+    const labelCol = `var(--label-width, auto)`;
+    row.style.gridTemplateColumns = actions.length
+      ? `${labelCol} 1fr auto`
+      : `${labelCol} 1fr`;
+    row.appendChild(labelEl);
+    row.appendChild(controlWrap);
+    if (actions.length) row.appendChild(actionsWrap);
+  }
+
+  row.labelElement = labelEl;
+  row.controlElement = controlEl;
+  row.actionsElement = actionsWrap;
+  return row;
 }
 
 export function buildCompositeElement({
@@ -986,7 +1112,7 @@ export function createOptionPanel(
   }
 
   wrap.appendChild(footer);
-  
+
   // quality-of-life helpers
   wrap.focusFirstInput = () => {
     const el = Object.values(inputRefs)[0];

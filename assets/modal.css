@@ -134,12 +134,12 @@
 .modal-form-row {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: 8px;
     margin: 2px 0;
 }
 
 .modal-form-row label {
-    min-width: var(--label-col, 220px);
+    min-width: var(--label-width, 220px);
     font-weight: bold;
     text-align: right;
     padding-top: 2px;

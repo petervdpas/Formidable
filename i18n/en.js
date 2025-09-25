@@ -362,9 +362,6 @@ export default {
   "standard.ready": "Ready",
   "standard.settings": "Settings",
   "standard.status": "Status",
-
-  "standard.tracked": "Tracked",
-  "standard.un.tracked": "Untracked",
   "standard.change": "Change",
   "standard.change.s": "Change(s)",
   "standard.changes": "Changes",
@@ -399,10 +396,11 @@ export default {
   "standard.git.sync": "Sync",
   "standard.git.fetch": "Fetch",
   "standard.git.branch": "Branch",
+  "standard.git.branches": "Branches",
   "standard.git.checkout": "Checkout",
-  "standard.git.trackUpstream": "Track (set upstream)",
-  "standard.git.createAndCheckout": "Create & Checkout",
-  "standard.git.createCheckoutTrack": "Create, Checkout & Track",
+  "standard.git.tracked": "Tracked",
+  "standard.git.untracked": "Untracked",
+  "standard.git.create": "Create",
   "standard.git.upstream": "Upstream",
   "standard.git.local": "Local",
   "standard.git.remote": "Remote",
@@ -415,6 +413,8 @@ export default {
   "standard.git.badge.ahead": "↑{0}",
   "standard.git.badge.behind": "↓{0}",
   "standard.git.badge.diverged": "⇕{0}",
+  "standard.git.branch.new": "New Branch",
+  "standard.git.branch.new.placeholder": "new-branch-name",
 
   // ── Tooltips ─────────────────────────────
   "tooltip.restart.formidable": "Restart Formidable",

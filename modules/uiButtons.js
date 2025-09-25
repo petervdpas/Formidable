@@ -320,39 +320,15 @@ export function createGitCheckoutButton(onClick, disabled = false) {
   });
 }
 
-export function createGitTrackUpstreamButton(onClick, disabled = false) {
-  return createButton({
-    text: t("standard.git.trackUpstream"),
-    i18nKey: "standard.git.trackUpstream",
-    className: "btn-default",
-    identifier: "git-track-upstream",
-    onClick,
-    disabled,
-    ariaLabel: t("aria.trackUpstream"),
-  });
-}
-
 export function createGitCreateCheckoutButton(onClick, disabled = false) {
   return createButton({
-    text: t("standard.git.createAndCheckout"),
-    i18nKey: "standard.git.createAndCheckout",
+    text: t("standard.git.create"),
+    i18nKey: "standard.git.create",
     className: "btn-default",
     identifier: "git-create-checkout",
     onClick,
     disabled,
     ariaLabel: t("aria.createAndCheckout"),
-  });
-}
-
-export function createGitCreateCheckoutTrackButton(onClick, disabled = false) {
-  return createButton({
-    text: t("standard.git.createCheckoutTrack"),
-    i18nKey: "standard.git.createCheckoutTrack",
-    className: "btn-default",
-    identifier: "git-create-checkout-track",
-    onClick,
-    disabled,
-    ariaLabel: t("aria.createCheckoutTrack"),
   });
 }
 
