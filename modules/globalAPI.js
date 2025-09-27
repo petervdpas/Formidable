@@ -12,6 +12,7 @@ import * as buttonUtils from "../utils/buttonUtils.js";
 import * as fieldRenderers from "../utils/fieldRenderers.js";
 import * as stringUtils from "../utils/stringUtils.js";
 import * as transform from "../utils/transformationUtils.js";
+import Toast from "../utils/toastUtils.js";
 
 export function exposeGlobalAPI() {
   const api = {
@@ -31,7 +32,7 @@ export function exposeGlobalAPI() {
       stripExtension: pathUtils.stripExtension,
       getExtension: pathUtils.getExtension,
       joinPaths: pathUtils.joinPaths,
-      isRelative: pathUtils.isRelative ,
+      isRelative: pathUtils.isRelative,
       ensureRelative: pathUtils.ensureRelative,
       ensureAbsolute: pathUtils.ensureAbsolute,
       makeRelativeTo: pathUtils.makeRelativeTo,
@@ -152,6 +153,8 @@ export function exposeGlobalAPI() {
       truncate: stringUtils.truncate,
       withDefault: stringUtils.withDefault,
     },
+
+    toast: Toast,
   };
 
   // Expose full API
@@ -163,6 +166,10 @@ export function exposeGlobalAPI() {
   window.emitWithResponse = EventBus.emitWithResponse;
   window.on = EventBus.on;
   window.once = EventBus.once;
+
+  window.Toast = Toast; // e.g., Toast.success("Saved!")
+  window.toast = (variant, keyOrText, args, opts) =>
+    Toast.show(variant, keyOrText, args, opts);
 
   EventBus.emit("logging:default", [
     "[GlobalAPI] FormidableGlobalAPI exposed.",

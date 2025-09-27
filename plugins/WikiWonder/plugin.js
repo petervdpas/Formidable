@@ -124,17 +124,14 @@ async function performMarkdownExport({
       try {
         await plugin.copyFile({ from, to, overwrite: true });
       } catch (err) {
-        emit("ui:toast", {
-          message: t("plugin.toast.image.copy.failed", [filename, err.message]),
-          variant: "error",
-        });
+        Toast.error(
+          t("plugin.toast.image.copy.failed", [filename, err.message])
+        );
       }
     }
   }
 
-  emit("ui:toast", {
-    message: t("plugin.toast.export.complete"),
-    variant: "success",
+  Toast.success(t("plugin.toast.export.complete"), undefined, {
     duration: 6000,
   });
 }
@@ -143,10 +140,7 @@ async function copyToTarget({ plugin, pluginName, targetDir }) {
   const t = plugin.getPluginTranslations(pluginName);
 
   if (!targetDir) {
-    emit("ui:toast", {
-      message: t("plugin.toast.no.target"),
-      variant: "error",
-    });
+    Toast.error(t("plugin.toast.no.target"));
     return;
   }
 
@@ -157,13 +151,13 @@ async function copyToTarget({ plugin, pluginName, targetDir }) {
     overwrite: true,
   });
 
-  emit("ui:toast", {
-    message: result.success
-      ? t("plugin.toast.copy.success")
-      : t("plugin.toast.copy.failed"),
-    variant: result.success ? "success" : "error",
-    duration: 7000,
-  });
+  Toast[result.success ? "success" : "error"](
+    t(
+      result.success ? "plugin.toast.copy.success" : "plugin.toast.copy.failed"
+    ),
+    undefined,
+    { duration: 7000 }
+  );
 }
 
 export async function run() {
@@ -178,15 +172,13 @@ export async function run() {
     const markdownRoot = `plugins/${pluginName}/markdown`;
     try {
       await plugin.emptyFolder(markdownRoot);
-      emit("ui:toast", {
-        message: t("plugin.toast.folder.cleared", [markdownRoot]),
-        variant: "success",
-        duration: 3000,
-      });
+      Toast.success(
+        t("plugin.toast.folder.cleared", [markdownRoot]),
+        undefined,
+        { duration: 3000 }
+      );
     } catch (err) {
-      emit("ui:toast", {
-        message: t("plugin.toast.folder.failed", [err.message]),
-        variant: "error",
+      Toast.error(t("plugin.toast.folder.failed", [err.message]), undefined, {
         duration: 5000,
       });
     }
@@ -302,12 +294,13 @@ export async function run() {
           settings.encodeFilenames = Boolean(values.encodeFilenames);
 
           const result = await plugin.saveSettings(pluginName, settings);
-          emit("ui:toast", {
-            message: result?.success
-              ? t("plugin.toast.settings.saved")
-              : t("plugin.toast.settings.failed"),
-            variant: result?.success ? "success" : "error",
-          });
+          Toast[result?.success ? "success" : "error"](
+            t(
+              result?.success
+                ? "plugin.toast.settings.saved"
+                : "plugin.toast.settings.failed"
+            )
+          );
         },
       });
 

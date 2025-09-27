@@ -1,24 +1,17 @@
 // plugins/PandocPrint/plugin.js
 
 async function getMarkdownPath(plugin, pluginName, t) {
-
   await plugin.invalidateConfig();
 
   const tmpl = await plugin.getConfig("selected_template");
   const dfile = await plugin.getConfig("selected_data_file");
 
   if (!tmpl || tmpl === "") {
-    emit("ui:toast", {
-      message: t("plugin.toast.missing.selected.template"),
-      variant: "error",
-    });
+    Toast.error(t("plugin.toast.missing.selected.template"));
     return;
   }
   if (!dfile || dfile === "") {
-    emit("ui:toast", {
-      message: t("plugin.toast.missing.selected.storage"),
-      variant: "error",
-    });
+    Toast.error(t("plugin.toast.missing.selected.storage"));
     return;
   }
 
@@ -46,15 +39,11 @@ export async function run() {
     const markdownRoot = `plugins/${pluginName}/markdown`;
     try {
       await plugin.emptyFolder(markdownRoot);
-      emit("ui:toast", {
-        message: t("plugin.toast.folder.cleared", [markdownRoot]),
-        variant: "success",
+      Toast.success(t("plugin.toast.folder.cleared", [markdownRoot]), null, {
         duration: 3000,
       });
     } catch (err) {
-      emit("ui:toast", {
-        message: t("plugin.toast.folder.failed", [err.message]),
-        variant: "error",
+      Toast.error(t("plugin.toast.folder.failed", [err.message]), null, {
         duration: 5000,
       });
     }
@@ -224,12 +213,13 @@ export async function run() {
           settings.updated = new Date().toISOString();
           const result = await plugin.saveSettings(pluginName, settings);
 
-          emit("ui:toast", {
-            message: result?.success
-              ? t("plugin.toast.settings.saved")
-              : t("plugin.toast.settings.failed"),
-            variant: result?.success ? "success" : "error",
-          });
+          Toast[result?.success ? "success" : "error"](
+            t(
+              result?.success
+                ? "plugin.toast.settings.saved"
+                : "plugin.toast.settings.failed"
+            )
+          );
         },
       });
 
@@ -266,16 +256,15 @@ export async function run() {
           console.log("[PandocPrint] Final command:", finalCommand);
           const result = await plugin.executeSystemCommand(finalCommand);
 
-          const toastMessage = result.success
-            ? t("plugin.toast.pdf.success")
-            : t("plugin.toast.pdf.failed");
-          const toastVariant = result.success ? "success" : "error";
-
-          emit("ui:toast", {
-            message: toastMessage,
-            variant: toastVariant,
-            duration: 8000,
-          });
+          Toast[result.success ? "success" : "error"](
+            t(
+              result.success
+                ? "plugin.toast.pdf.success"
+                : "plugin.toast.pdf.failed"
+            ),
+            null,
+            { duration: 8000 }
+          );
         },
       });
 

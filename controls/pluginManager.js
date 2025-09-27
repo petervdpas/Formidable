@@ -297,8 +297,7 @@ export async function run() {
       const btn = button.createButton({
         text: "Toast!",
         className: "btn-success",
-        onClick: () =>
-          emit("ui:toast", { message: "Plugin says hi!", variant: "success" }),
+        onClick: () => Toast.success("Plugin says hi!"),
         ariaLabel: "Send toast",
       });
       bodyEl.appendChild(btn);

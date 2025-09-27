@@ -1,6 +1,7 @@
 // modules/handlers/pluginHandler.js
 
 import { EventBus } from "../eventBus.js";
+import { Toast } from "../../utils/toastUtils.js";
 
 // ─────────────────────────────────────────────────────────────
 // Persistent plugin event registry (FIX: survives reloads)
@@ -194,11 +195,7 @@ export async function handleRunPlugin(
       logOrigin: "PluginHandler:handleRunPlugin",
     });
 
-    EventBus.emit("ui:toast", {
-      languageKey: "toast.plugin.crashed",
-      args: [name, target],
-      variant: "error",
-    });
+    Toast.error("toast.plugin.crashed", [name, target]);
 
     callback?.({ error: err.message });
   }
