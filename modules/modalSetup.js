@@ -175,7 +175,7 @@ export function setupWorkspaceModal() {
   });
 }
 
-export function setupGitModal() {
+export function setupGitModalOld() {
   const modal = setupModal("git-actions-modal", {
     closeBtn: "git-actions-close",
     escToClose: true,
@@ -191,7 +191,7 @@ export function setupGitModal() {
   return modal;
 }
 
-export function setupGitModalNew() {
+export function setupGitModal() {
   const modal = setupModal("git-actions-modal", {
     closeBtn: "git-actions-close",
     escToClose: true,
