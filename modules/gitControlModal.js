@@ -451,7 +451,7 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
     const listMgr = createListManager({
       elementId: fileListId,
       itemClass: "git-list-item",
-      emptyMessage: "",
+      emptyMessage: t("modal.git.no.changes.detected"),
       fetchListFunction: async () => {
         const s = await getStatus(gitPath);
         currentStatus = s || currentStatus;
