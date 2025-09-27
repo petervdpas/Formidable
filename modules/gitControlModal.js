@@ -18,6 +18,7 @@ import { createListManager } from "../utils/listUtils.js";
 import { showConfirmModal } from "../utils/modalUtils.js";
 import { createDropdown } from "../utils/dropdownUtils.js";
 import { t, translateDOM } from "../utils/i18n.js";
+import { Toast } from "../utils/toastUtils.js";
 
 const uid = (p) => `${p}-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -80,10 +81,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
       opts: ["--prune"],
     });
     fetchBtn.disabled = false;
-    EventBus.emit("ui:toast", {
-      languageKey: "toast.git.fetch.complete",
-      variant: "success",
-    });
+    Toast.success("toast.git.fetch.complete");
   });
 
   const checkoutBtn = createGitCheckoutButton(async () => {
@@ -98,30 +96,21 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
       remote: selectedRemote,
       branch: selectedRemoteBranch,
     });
-    EventBus.emit("ui:toast", {
-      languageKey: "toast.git.checkout.complete",
-      variant: "success",
-    });
+    Toast.success("toast.git.checkout.complete");
   });
 
   const pullBtn = createGitPullButton(async () => {
     pullBtn.disabled = true;
     await EventBus.emitWithResponse("git:pull", { folderPath: gitPath });
     pullBtn.disabled = false;
-    EventBus.emit("ui:toast", {
-      languageKey: "toast.git.pull.complete",
-      variant: "success",
-    });
+    Toast.success("toast.git.pull.complete");
   });
 
   const pushBtn = createGitPushButton(async () => {
     pushBtn.disabled = true;
     await EventBus.emitWithResponse("git:push", { folderPath: gitPath });
     pushBtn.disabled = false;
-    EventBus.emit("ui:toast", {
-      languageKey: "toast.git.push.complete",
-      variant: "success",
-    });
+    Toast.success("toast.git.push.complete");
   });
 
   // Keep references used by both rows
@@ -205,10 +194,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
         branch: name,
       });
     }
-    EventBus.emit("ui:toast", {
-      languageKey: "toast.git.branch.created",
-      variant: "success",
-    });
+    Toast.success("toast.git.branch.created");
   });
 
   section.appendChild(
@@ -332,10 +318,7 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
 
   const commitBtn = createGitCommitButton(async () => {
     if (!commitMessage) {
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.commit.noMessage",
-        variant: "warning",
-      });
+      Toast.warning("toast.git.commit.noMessage");
       return;
     }
     const res = await EventBus.emitWithResponse("git:commit", {
@@ -343,16 +326,9 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
       message: commitMessage,
     });
     if (typeof res === "string") {
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.commit.complete",
-        variant: "success",
-      });
+      Toast.success("toast.git.commit.complete");
     } else if (res?.summary?.changes != null) {
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.commit.success",
-        args: [res.summary.changes],
-        variant: "success",
-      });
+      Toast.success("toast.git.commit.success", [res.summary.changes]);
     }
     await gitListManager.loadList();
   }, !(hasChanges && commitMessage));
@@ -454,18 +430,10 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
           });
 
           if (result?.success) {
-            EventBus.emit("ui:toast", {
-              languageKey: "toast.git.discarded.changes.in",
-              args: [rawData.value],
-              variant: "info",
-            });
+            Toast.info("toast.git.discarded.changes.in", [rawData.value]);
             await gitListManager.loadList();
           } else {
-            EventBus.emit("ui:toast", {
-              languageKey: "toast.git.discard.failed",
-              args: [rawData.value],
-              variant: "error",
-            });
+            Toast.error("toast.git.discard.failed", [rawData.value]);
           }
           modalApi?.setEnabled?.();
         });

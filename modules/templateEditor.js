@@ -3,6 +3,7 @@
 import { EventBus } from "./eventBus.js";
 import { showConfirmModal } from "../utils/modalUtils.js";
 import { bindHotkeys, unbindHotkeys } from "../utils/hotkeyUtils.js";
+import { Toast } from "../utils/toastUtils.js";
 import {
   renderFieldList,
   showFieldEditorModal,
@@ -218,10 +219,7 @@ export function initTemplateEditor(containerId, onSaveCallback) {
 
         if (!hasGuid) {
           checkbox.checked = false;
-          EventBus.emit("ui:toast", {
-            languageKey: "toast.template.enable.collection",
-            variant: "warn",
-          });
+          Toast.warning("toast.template.enable.collection");
         }
       },
       "block",
@@ -314,13 +312,7 @@ export function initTemplateEditor(containerId, onSaveCallback) {
         });
         errors.forEach((err) => {
           const { key, args } = formatError(err);
-          EventBus.emit("ui:toast", {
-            message: key,
-            languageKey: key,
-            variant: "error",
-            i18nEnabled: true,
-            args: args || [],
-          });
+          Toast.error(key, args || []);
         });
         return;
       }
@@ -339,11 +331,7 @@ export function initTemplateEditor(containerId, onSaveCallback) {
         i18nEnabled: true,
         args: [filename],
       });
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.template.save.success",
-        args: [filename],
-        variant: "success",
-      });
+      Toast.success("toast.template.save.success", [filename]);
     };
     const onDelete = () => {
       EventBus.emit("editor:delete", container);

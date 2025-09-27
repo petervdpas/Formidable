@@ -12,6 +12,7 @@ import { createFormRowInput } from "../utils/elementBuilders.js";
 import { createListManager } from "../utils/listUtils.js";
 import { showConfirmModal } from "../utils/modalUtils.js";
 import { t } from "../utils/i18n.js";
+import { Toast } from "../utils/toastUtils.js";
 
 export async function renderGitStatus(container, modalApi) {
   container.innerHTML = t("modal.git.loading.status");
@@ -147,19 +148,10 @@ export async function renderGitStatus(container, modalApi) {
             });
 
             if (result?.success) {
-              EventBus.emit("ui:toast", {
-                languageKey: "toast.git.discarded.changes.in",
-                args: [rawData.value],
-                variant: "info",
-              });
-
+              Toast.info("toast.git.discarded.changes.in", [rawData.value]);
               await gitListManager.loadList();
             } else {
-              EventBus.emit("ui:toast", {
-                languageKey: "toast.git.discard.failed",
-                args: [rawData.value],
-                variant: "error",
-              });
+              Toast.error("toast.git.discard.failed", [rawData.value]);
             }
             modalApi.setEnabled(); // <- always re-enable modal at the end
           });
@@ -236,10 +228,7 @@ export async function renderGitStatus(container, modalApi) {
 
       const commitBtn = createGitCommitButton(() => {
         if (!commitMessage) {
-          EventBus.emit("ui:toast", {
-            languageKey: "toast.git.commit.noMessage",
-            variant: "warning",
-          });
+          Toast.warning("toast.git.commit.noMessage");
           return;
         }
 
@@ -248,16 +237,11 @@ export async function renderGitStatus(container, modalApi) {
           message: commitMessage,
           callback: (result) => {
             if (typeof result === "string") {
-              EventBus.emit("ui:toast", {
-                languageKey: "toast.git.commit.complete",
-                variant: "success",
-              });
+              Toast.success("toast.git.commit.complete");
             } else if (result?.summary?.changes != null) {
-              EventBus.emit("ui:toast", {
-                languageKey: "toast.git.commit.success",
-                args: [result.summary.changes],
-                variant: "success",
-              });
+              Toast.success("toast.git.commit.success", [
+                result.summary.changes,
+              ]);
             }
             refresh();
           },
@@ -277,16 +261,13 @@ export async function renderGitStatus(container, modalApi) {
               const fromShort = hash.from.substring(0, 7);
               const toShort = hash.to.substring(0, 7);
 
-              EventBus.emit("ui:toast", {
-                languageKey: "toast.git.push.range",
-                args: [branch, fromShort, toShort],
-                variant: "success",
-              });
+              Toast.success("toast.git.push.range", [
+                branch,
+                fromShort,
+                toShort,
+              ]);
             } else {
-              EventBus.emit("ui:toast", {
-                languageKey: "toast.git.push.complete",
-                variant: "success",
-              });
+              Toast.success("toast.git.push.complete");
             }
 
             refresh();
@@ -308,21 +289,15 @@ export async function renderGitStatus(container, modalApi) {
                 summary.insertions > 0);
 
             if (typeof result === "string") {
-              EventBus.emit("ui:toast", {
-                languageKey: "toast.git.pull.complete",
-                variant: "success",
-              });
+              Toast.success("toast.git.pull.complete");
             } else if (hasChanges) {
-              EventBus.emit("ui:toast", {
-                languageKey: "toast.git.pull.changes",
-                args: [summary.changes, summary.deletions, summary.insertions],
-                variant: "success",
-              });
+              Toast.success("toast.git.pull.changes", [
+                summary.changes,
+                summary.deletions,
+                summary.insertions,
+              ]);
             } else {
-              EventBus.emit("ui:toast", {
-                languageKey: "toast.git.pull.noChanges",
-                variant: "info",
-              });
+              Toast.info("toast.git.pull.noChanges");
             }
 
             refresh();

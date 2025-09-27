@@ -19,6 +19,7 @@ import { createRemoveImageButton } from "../modules/uiButtons.js";
 import { createIconButton } from "./buttonUtils.js";
 import { getCurrentTheme } from "./themeUtils.js";
 import { t } from "./i18n.js";
+import { Toast } from "./toastUtils.js";
 
 function resolveOption(opt) {
   return typeof opt === "string"
@@ -1587,7 +1588,6 @@ export async function renderPasswordField(field, value = "") {
 // ─────────────────────────────────────────────
 // Type: code (programmable) — UI reflects run_mode + i18n
 export async function renderCodeField(field, value = "") {
-
   const src = field.default || null;
   const runMode = String(
     field.run_mode || field.runMode || "manual"
@@ -1746,21 +1746,15 @@ export async function renderCodeField(field, value = "") {
 
     // Toasts only for manual runs
     if (runMode === "manual") {
-      EventBus.emit(
-        "ui:toast",
-        ok
-          ? {
-              languageKey: "toast.code.run.ok",
-              variant: "success",
-              duration: 2500,
-            }
-          : {
-              languageKey: "toast.code.run.failed",
-              args: [String(res?.error ?? "Unknown error")],
-              variant: "error",
-              duration: 4000,
-            }
-      );
+      if (ok) {
+        Toast.success("toast.code.run.ok", [], { duration: 2500 });
+      } else {
+        Toast.error(
+          "toast.code.run.failed",
+          [String(res?.error ?? "Unknown error")],
+          { duration: 4000 }
+        );
+      }
     }
   }
 

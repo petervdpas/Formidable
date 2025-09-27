@@ -4,9 +4,7 @@ import { EventBus } from "./eventBus.js";
 import { reloadUserConfig } from "../utils/configUtil.js";
 import { buildButtonGroup, createButton } from "../utils/buttonUtils.js";
 import { fieldTypes } from "../utils/fieldTypes.js";
-import { renderSettings } from "./settingsManager.js";
 import { setTabviewOrientation } from "../utils/tabUtils.js";
-import { renderWorkspaceModal } from "./contextManager.js";
 import {
   applyModalCssClass,
   setupModal,
@@ -15,6 +13,9 @@ import {
 import { extractFieldDefinition } from "../utils/formUtils.js";
 import { createDropdown } from "../utils/dropdownUtils.js";
 import { syncScroll } from "../utils/domUtils.js";
+import { Toast } from "../utils/toastUtils.js";
+import { renderSettings } from "./settingsManager.js";
+import { renderWorkspaceModal } from "./contextManager.js";
 import { createProfileListManager } from "./profileManager.js";
 import { renderPluginManager } from "./pluginManagerUI.js";
 import { renderHelp } from "./helperUI.js";
@@ -319,10 +320,7 @@ export function setupPluginModal() {
         const createBtn = createPluginCreateButton(async () => {
           const folder = folderInput.value.trim();
           if (!folder) {
-            EventBus.emit("ui:toast", {
-              languageKey: "toast.folder.required",
-              variant: "error",
-            });
+            Toast.error("toast.folder.required");
             return;
           }
 
@@ -333,11 +331,9 @@ export function setupPluginModal() {
               target: selectedTarget,
             });
 
-            EventBus.emit("ui:toast", {
-              message:
-                result.message || result.error || t("toast.plugin.created"),
-              variant: result.error ? "error" : "success",
-            });
+            (result.error ? Toast.error : Toast.success)(
+              result.message || result.error || t("toast.plugin.created")
+            );
 
             await listManager.loadList();
             folderInput.value = "";
@@ -528,10 +524,7 @@ export function setupFieldEditModal(field, allFields, onConfirm) {
       if (!rawKey) {
         keyInput.classList.add("input-error");
         confirmBtn.disabled = true;
-        EventBus.emit("ui:toast", {
-          languageKey: "toast.key.required",
-          variant: "error",
-        });
+        Toast.error("toast.key.required");
         return;
       }
 

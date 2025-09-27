@@ -174,9 +174,9 @@ export default {
 
   // ─ Toast Messages ─────────────────────
   "toast.server.Started": "Interne server is gestart.",
-  "toast.server.AlreadyRunning": "Interne server draait al.",
+  "toast.server.AlreadyRunning": "Interne server is al actief.",
   "toast.server.Stopped": "Interne server is gestopt.",
-  "toast.server.NotRunning": "Interne server draaide niet.",
+  "toast.server.NotRunning": "Interne server is niet actief.",
   "toast.server.status": "Server is {0} op poort: {1}",
   "toast.server.running": "actief",
   "toast.server.stopped": "gestopt",

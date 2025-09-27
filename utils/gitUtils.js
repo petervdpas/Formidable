@@ -1,5 +1,6 @@
 // utils/gitUtils.js
 import { EventBus } from "../modules/eventBus.js";
+import { Toast } from "./toastUtils.js";
 
 /** Backward/forward-compatible helper for request/response style events. */
 async function callWithResponse(channel, payload = {}) {
@@ -8,12 +9,19 @@ async function callWithResponse(channel, payload = {}) {
     "git:discard", // handleGitDiscard returns a result
   ]);
 
-  if (directReturnChannels.has(channel) && typeof EventBus.emitWithResponse === "function") {
+  if (
+    directReturnChannels.has(channel) &&
+    typeof EventBus.emitWithResponse === "function"
+  ) {
     // Use the direct-return path for channels that support it
     try {
       return await EventBus.emitWithResponse(channel, payload);
     } catch (e) {
-      EventBus.emit("logging:error", ["[EventBus] emitWithResponse failed:", channel, e]);
+      EventBus.emit("logging:error", [
+        "[EventBus] emitWithResponse failed:",
+        channel,
+        e,
+      ]);
       return null;
     }
   }
@@ -89,11 +97,7 @@ export async function safeAutoSyncOnReload(cfg) {
 
   try {
     if (!cfg?.use_git) {
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.autosync.disabled",
-        message: "Git auto-sync is disabled in this profile.",
-        variant: "info",
-      });
+      Toast.info("toast.git.autosync.disabled");
       return { skipped: "git_disabled" };
     }
 
@@ -101,11 +105,7 @@ export async function safeAutoSyncOnReload(cfg) {
     const rootPath = await getRoot(cfgPath);
     if (!rootPath) {
       console.log("[Git][AutoSync] skipped: not_a_repo", { cfgPath });
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.autosync.notRepo",
-        message: "No Git repository found at the configured path.",
-        variant: "info",
-      });
+      Toast.info("toast.git.autosync.notRepo");
       return { skipped: "not_a_repo" };
     }
 
@@ -113,48 +113,27 @@ export async function safeAutoSyncOnReload(cfg) {
 
     const status = await getStatus(rootPath);
     if (!status) {
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.autosync.noStatus",
-        message: "Could not read Git status.",
-        variant: "warning",
-      });
+      Toast.warning("toast.git.autosync.noStatus");
       return { skipped: "no_status" };
     }
 
     if (!hasTracking(status)) {
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.autosync.noTracking",
-        message: "No tracking branch set — auto-sync skipped.",
-        variant: "info",
-      });
+      Toast.info("toast.git.autosync.noTracking");
       return { skipped: "no_tracking" };
     }
 
     if (!isClean(status)) {
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.autosync.localChanges",
-        message: "Local changes detected — auto-sync skipped.",
-        variant: "info",
-      });
+      Toast.info("toast.git.autosync.localChanges");
       return { skipped: "local_changes" };
     }
 
     if (isAhead(status)) {
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.autosync.ahead",
-        message: `Your branch is ahead by ${status.ahead} commit(s) — auto-sync skipped.`,
-        args: [status.ahead],
-        variant: "info",
-      });
+      Toast.info("toast.git.autosync.ahead", [status.ahead]);
       return { skipped: "ahead" };
     }
 
     if (!isBehind(status)) {
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.autosync.upToDate",
-        message: "Repository is up to date.",
-        variant: "success",
-      });
+      Toast.success("toast.git.autosync.upToDate");
       return { skipped: "uptodate" };
     }
 
@@ -162,38 +141,25 @@ export async function safeAutoSyncOnReload(cfg) {
     const result = await pull(rootPath);
     const summary = result?.summary;
     const changed =
-      summary && (summary.changes > 0 || summary.deletions > 0 || summary.insertions > 0);
+      summary &&
+      (summary.changes > 0 || summary.deletions > 0 || summary.insertions > 0);
 
     if (typeof result === "string") {
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.pull.complete",
-        message: "Pull complete.",
-        variant: "success",
-      });
+      Toast.success("toast.git.pull.complete");
     } else if (changed) {
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.pull.changes",
-        message: `Pulled: ${summary.changes} changes, ${summary.deletions} deletions, ${summary.insertions} insertions.`,
-        args: [summary.changes, summary.deletions, summary.insertions],
-        variant: "success",
-      });
+      Toast.success("toast.git.pull.changes", [
+        summary.changes,
+        summary.deletions,
+        summary.insertions,
+      ]);
     } else {
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.git.pull.noChanges",
-        message: "Nothing new to pull.",
-        variant: "info",
-      });
+      Toast.info("toast.git.pull.noChanges");
     }
 
     EventBus.emit("status:update", { scope: "git", action: "pulled" });
     return { pulled: true, result };
   } catch (err) {
-    EventBus.emit("ui:toast", {
-      languageKey: "toast.git.autosync.error",
-      message: `Auto-sync failed: ${String(err?.message || err)}`,
-      args: [String(err?.message || err)],
-      variant: "error",
-    });
+    Toast.error("toast.git.autosync.error", [String(err?.message || err)]);
     return { error: true, message: String(err?.message || err) };
   }
 }

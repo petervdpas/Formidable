@@ -3,6 +3,7 @@
 import { EventBus } from "../eventBus.js";
 import { clearContainerUI } from "../../utils/formUtils.js";
 import { normalizeOptions } from "../../utils/opts.js";
+import { Toast } from "../../utils/toastUtils.js";
 
 let formManager = null;
 let storageListManager = null;
@@ -405,12 +406,7 @@ export async function handleSaveForm(payload, respond) {
         args: [shortName],
       });
 
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.save.success",
-        args: [shortName],
-        variant: "success",
-        duration: 4000,
-      });
+      Toast.success("toast.save.success", [shortName], { duration: 4000 });
 
       // Optional light/heavy refresh knobs
       if (refreshMode === "list") {
@@ -432,12 +428,7 @@ export async function handleSaveForm(payload, respond) {
         args: [shortName, result.error || "Unknown error"],
       });
 
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.save.failed",
-        args: [shortName],
-        variant: "error",
-        duration: 4000,
-      });
+      Toast.error("toast.save.failed", [shortName], { duration: 4000 });
     }
 
     respond?.(result);

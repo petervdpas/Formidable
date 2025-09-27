@@ -3,27 +3,22 @@
 import { EventBus } from "./eventBus.js";
 import { createListManager } from "../utils/listUtils.js";
 import { createFormRowInput } from "../utils/elementBuilders.js";
-import { createProfileAddButton } from "./uiButtons.js";
 import { makePill } from "../utils/domUtils.js";
 import { t } from "../utils/i18n.js";
+import { Toast } from "../utils/toastUtils.js";
+import { createProfileAddButton } from "./uiButtons.js";
 
 async function createOrSwitchProfileByName(name) {
   const valid = /^[a-z0-9-]+\.json$/.test(name);
   if (!valid) {
-    EventBus.emit("ui:toast", {
-      languageKey: "toast.profile.invalidName",
-      variant: "error",
-    });
+    Toast.error("toast.profile.invalidName");
     return false;
   }
 
   const fullPath = await window.api.system.resolvePath("config", name);
   const exists = await window.api.system.fileExists(fullPath);
   if (exists) {
-    EventBus.emit("ui:toast", {
-      languageKey: "toast.profile.exists",
-      variant: "warning",
-    });
+    Toast.warning("toast.profile.exists");
     return false;
   }
 
@@ -35,10 +30,7 @@ async function createOrSwitchProfileByName(name) {
   });
 
   if (!success) {
-    EventBus.emit("ui:toast", {
-      languageKey: "toast.profile.switchFailed",
-      variant: "error",
-    });
+    Toast.error("toast.profile.switchFailed");
     return false;
   }
 
@@ -50,10 +42,7 @@ export function createProfileListManager({ currentProfile } = {}) {
     const inputEl = document.getElementById("new-profile-name");
     const name = (inputEl?.value || "").trim();
     if (!name) {
-      EventBus.emit("ui:toast", {
-        languageKey: "toast.profile.invalidName",
-        variant: "error",
-      });
+      Toast.error("toast.profile.invalidName");
       return;
     }
 
@@ -92,10 +81,7 @@ export function createProfileListManager({ currentProfile } = {}) {
       if (success) {
         window.electron.window.reload();
       } else {
-        EventBus.emit("ui:toast", {
-          languageKey: "toast.profile.switchFailed",
-          variant: "error",
-        });
+        Toast.error("toast.profile.switchFailed");
       }
     },
 

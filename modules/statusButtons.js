@@ -9,6 +9,7 @@ import {
 } from "../utils/elementBuilders.js";
 import { allCharacters, toGridOptions } from "../utils/characterUtils.js";
 import { createStatusButtonConfig } from "../utils/buttonUtils.js";
+import { Toast } from "../utils/toastUtils.js";
 
 // --- button configs (text-label style) ---
 function createStatusCharPickerButtonConfig(onClick) {
@@ -125,11 +126,7 @@ function installCharPickerButton({ addStatusButton, EventBus, config }) {
           const ok = SelectionStore.insertText(val);
           if (!ok) {
             navigator.clipboard.writeText(val).catch(() => {});
-            EventBus.emit("ui:toast", {
-              languageKey: "toast.copy.clipboard",
-              args: [val],
-              variant: "success",
-            });
+            Toast.success("toast.copy.clipboard", [val]);
           }
           activePopup?.hide?.();
         },
@@ -195,11 +192,7 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
               break;
             case "commit":
               if (!msg) {
-                EventBus.emit("ui:toast", {
-                  languageKey: "git.quick.need_message",
-                  variant: "warning",
-                  i18nEnabled: true,
-                });
+                Toast.warning("git.quick.need_message");
                 return;
               }
               await new Promise((r) =>
@@ -209,11 +202,7 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
               break;
             case "commit_push":
               if (!msg) {
-                EventBus.emit("ui:toast", {
-                  languageKey: "git.quick.need_message",
-                  variant: "warning",
-                  i18nEnabled: true,
-                });
+                Toast.warning("git.quick.need_message");
                 return;
               }
               await new Promise((r) =>

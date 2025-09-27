@@ -9,6 +9,7 @@ import {
 } from "./uiButtons.js";
 import { showConfirmModal } from "../utils/modalUtils.js";
 import { t, tLow } from "../utils/i18n.js";
+import { Toast } from "../utils/toastUtils.js";
 
 export async function renderPluginManager(container, modalApi) {
   const listManager = createListManager({
@@ -47,17 +48,20 @@ export async function renderPluginManager(container, modalApi) {
             });
 
             if (result?.success) {
-              EventBus.emit("ui:toast", {
-                languageKey: "toast.plugin.status",
-                args: [rawData.name, newState ? tLow("standard.enabled") : tLow("standard.disabled")],
-                variant: newState ? "success" : "warn",
-              });
+              (newState ? Toast.success : Toast.warning)(
+                "toast.plugin.status",
+                [
+                  rawData.name,
+                  newState
+                    ? tLow("standard.enabled")
+                    : tLow("standard.disabled"),
+                ]
+              );
             } else {
-              EventBus.emit("ui:toast", {
-                languageKey: "toast.plugin.update.failed",
-                args: [rawData.name, result?.error],
-                variant: "error",
-              });
+              Toast.error("toast.plugin.update.failed", [
+                rawData.name,
+                result?.error,
+              ]);
             }
 
             await listManager.loadList();
@@ -92,17 +96,12 @@ export async function renderPluginManager(container, modalApi) {
           });
 
           if (result?.success) {
-            EventBus.emit("ui:toast", {
-              languageKey: "toast.plugin.delete",
-              args: [rawData.name],
-              variant: "success",
-            });
+            Toast.success("toast.plugin.delete", [rawData.name]);
           } else {
-            EventBus.emit("ui:toast", {
-              languageKey: "toast.plugin.delete.failed",
-              args: [rawData.name, result?.error],
-              variant: "error",
-            });
+            Toast.error("toast.plugin.delete.failed", [
+              rawData.name,
+              result?.error,
+            ]);
           }
 
           await listManager.loadList();

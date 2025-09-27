@@ -162,10 +162,10 @@ export default {
   "menu.context.option.template": "Template",
 
   // ── Toast Messages ─────────────────────
-  "toast.server.Started": "Internal server was started.",
+  "toast.server.Started": "Internal server has started.",
   "toast.server.AlreadyRunning": "Internal server is already running.",
-  "toast.server.Stopped": "Internal server was stopped.",
-  "toast.server.NotRunning": "Internal server wasn't running.",
+  "toast.server.Stopped": "Internal server has stopped.",
+  "toast.server.NotRunning": "Internal server is not running.",
   "toast.server.status": "Server is {0} on port: {1}",
   "toast.server.running": "running",
   "toast.server.stopped": "stopped",

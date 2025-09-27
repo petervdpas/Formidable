@@ -5,6 +5,7 @@ import { reloadUserConfig } from "../utils/configUtil.js";
 import { bindActionHandlers } from "../utils/domUtils.js";
 import { createSwitch } from "../utils/elementBuilders.js";
 import { t } from "../utils/i18n.js";
+import { Toast } from "../utils/toastUtils.js";
 import {
   createHistoryBackIconButton,
   createHistoryForwardIconButton,
@@ -312,10 +313,7 @@ export async function handleMenuAction(action) {
           EventBus.emit("logging:warning", [
             "[Menu] No selected_template entry found.",
           ]);
-          EventBus.emit("ui:toast", {
-            languageKey: "toast.template.not.selected",
-            variant: "warning",
-          });
+          Toast.warning("toast.template.not.selected");
           return;
         }
 
@@ -415,15 +413,9 @@ export async function handleMenuAction(action) {
               const port = cachedConfig?.internal_server_port || 8383;
               EventBus.emit("server:start", { port });
             }
-            EventBus.emit("ui:toast", {
-              languageKey: "toast.server.Started",
-              variant: "success",
-            });
+            Toast.success("toast.server.Started");
           } else {
-            EventBus.emit("ui:toast", {
-              languageKey: "toast.server.AlreadyRunning",
-              variant: "success",
-            });
+            Toast.success("toast.server.AlreadyRunning");
           }
         },
       });
@@ -434,15 +426,9 @@ export async function handleMenuAction(action) {
         callback: (server) => {
           if (server.running) {
             EventBus.emit("server:stop");
-            EventBus.emit("ui:toast", {
-              languageKey: "toast.server.Stopped",
-              variant: "warning",
-            });
+            Toast.warning("toast.server.Stopped");
           } else {
-            EventBus.emit("ui:toast", {
-              languageKey: "toast.server.NotRunning",
-              variant: "warning",
-            });
+            Toast.warning("toast.server.NotRunning");
           }
         },
       });
@@ -457,11 +443,10 @@ export async function handleMenuAction(action) {
             ? "toast.server.running"
             : "toast.server.stopped";
 
-          EventBus.emit("ui:toast", {
-            languageKey: "toast.server.status",
-            args: [t(statusKey), server.port || "-"],
-            variant: server.running ? "success" : "info",
-          });
+          (server.running ? Toast.success : Toast.info)("toast.server.status", [
+            t(statusKey),
+            server.port || "-",
+          ]);
         },
       });
       break;
@@ -474,10 +459,7 @@ export async function handleMenuAction(action) {
             const url = `http://localhost:${port}/`;
             EventBus.emit("link:external:open", { url, variant: "tab" });
           } else {
-            EventBus.emit("ui:toast", {
-              languageKey: "toast.server.NotRunning",
-              variant: "warning",
-            });
+            Toast.warning("toast.server.NotRunning");
           }
         },
       });
@@ -491,10 +473,7 @@ export async function handleMenuAction(action) {
             const url = `http://localhost:${port}/`;
             EventBus.emit("link:external:open", { url, variant: "external" });
           } else {
-            EventBus.emit("ui:toast", {
-              languageKey: "toast.server.NotRunning",
-              variant: "warning",
-            });
+            Toast.warning("toast.server.NotRunning");
           }
         },
       });

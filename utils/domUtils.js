@@ -3,6 +3,7 @@
 import { EventBus } from "../modules/eventBus.js";
 import { fieldTypes } from "./fieldTypes.js";
 import * as fieldRenderers from "./fieldRenderers.js";
+import { Toast } from "./toastUtils.js";
 
 export function waitForElement(selector, root = document.body, timeout = 5000) {
   return new Promise((resolve, reject) => {
@@ -500,19 +501,10 @@ export function copyToClipboard(
 
         if (!ok) throw new Error("execCommand copy failed");
       }
-
-      EventBus.emit("ui:toast", {
-        languageKey: successMessage,
-        args,
-        variant: "success",
-      });
+      Toast.success(successMessage, args);
     } catch (e) {
       EventBus.emit("logging:error", ["[Clipboard] Copy failed", e]);
-      EventBus.emit("ui:toast", {
-        languageKey: errorMessage,
-        args,
-        variant: "error",
-      });
+      Toast.error(errorMessage, args);
     } finally {
       // tiny debounce to avoid accidental double clicks
       setTimeout(() => {
@@ -590,11 +582,7 @@ export function createSortable(
         now - lastToastTime > 1500
       ) {
         lastToastTime = now;
-        EventBus.emit("ui:toast", {
-          languageKey: "toast.dragging.item.collapse",
-          variant: "info",
-          duration: 2500,
-        });
+        Toast.info("toast.dragging.item.collapse", [], { duration: 2500 });
       }
 
       return blocked;

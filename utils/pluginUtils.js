@@ -14,6 +14,7 @@ import {
   reloadUserConfig,
   invalidateUserConfig,
 } from "./configUtil.js";
+import { Toast } from "./toastUtils.js";
 
 // Plugin-specific allowed keys
 const pluginAllowedKeys = [
@@ -299,11 +300,7 @@ export async function saveMarkdownTo({
   await saveFile(markdownFilePath, markdown, { silent: true });
 
   if (showToast) {
-    EventBus.emit("ui:toast", {
-      languageKey: "toast.markdown.saved",
-      args: [markdownFilePath],
-      variant: "success",
-    });
+    Toast.success("toast.markdown.saved", [markdownFilePath]);
   }
 
   return markdownFilePath;
