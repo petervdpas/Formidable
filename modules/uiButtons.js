@@ -250,8 +250,8 @@ export function createFormRenderIconButton(onClick) {
 // --- Git buttons ---
 export function createGitCommitButton(onClick, disabled = false) {
   return createButton({
-    text: t("standard.git.commit"),
-    i18nKey: "standard.git.commit",
+    text: t("git.commit"),
+    i18nKey: "git.commit",
     className: "btn-info",
     identifier: "git-commit",
     onClick,
@@ -262,8 +262,8 @@ export function createGitCommitButton(onClick, disabled = false) {
 
 export function createGitPushButton(onClick, disabled = false) {
   return createButton({
-    text: t("standard.git.push"),
-    i18nKey: "standard.git.push",
+    text: t("git.push"),
+    i18nKey: "git.push",
     className: "btn-info",
     identifier: "git-push",
     onClick,
@@ -274,8 +274,8 @@ export function createGitPushButton(onClick, disabled = false) {
 
 export function createGitPullButton(onClick, disabled = false) {
   return createButton({
-    text: t("standard.git.pull"),
-    i18nKey: "standard.git.pull",
+    text: t("git.pull"),
+    i18nKey: "git.pull",
     className: "btn-info",
     identifier: "git-pull",
     onClick,
@@ -286,8 +286,8 @@ export function createGitPullButton(onClick, disabled = false) {
 
 export function createGitDiscardButton(filePath, onClick) {
   return createButton({
-    text: t("standard.git.discard"),
-    i18nKey: "standard.git.discard",
+    text: t("git.discard"),
+    i18nKey: "git.discard",
     className: "btn-warn btn-discard",
     onClick,
     attributes: {
@@ -298,8 +298,8 @@ export function createGitDiscardButton(filePath, onClick) {
 
 export function createGitFetchButton(onClick, disabled = false) {
   return createButton({
-    text: t("standard.git.fetch"),
-    i18nKey: "standard.git.fetch",
+    text: t("git.fetch"),
+    i18nKey: "git.fetch",
     className: "btn-default",
     identifier: "git-fetch",
     onClick,
@@ -310,8 +310,8 @@ export function createGitFetchButton(onClick, disabled = false) {
 
 export function createGitCheckoutButton(onClick, disabled = false) {
   return createButton({
-    text: t("standard.git.checkout"),
-    i18nKey: "standard.git.checkout",
+    text: t("git.checkout"),
+    i18nKey: "git.checkout",
     className: "btn-default",
     identifier: "git-checkout",
     onClick,
@@ -322,8 +322,8 @@ export function createGitCheckoutButton(onClick, disabled = false) {
 
 export function createGitCreateCheckoutButton(onClick, disabled = false) {
   return createButton({
-    text: t("standard.git.create"),
-    i18nKey: "standard.git.create",
+    text: t("git.create"),
+    i18nKey: "git.create",
     className: "btn-default",
     identifier: "git-create-checkout",
     onClick,

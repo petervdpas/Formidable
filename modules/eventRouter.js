@@ -435,17 +435,6 @@ export function initEventRouter() {
   EventBus.off("git:push", gitHandler.handleGitPush);
   EventBus.off("git:commit", gitHandler.handleGitCommit);
   EventBus.off("git:discard", gitHandler.handleGitDiscard);
-
-  EventBus.on("git:check", gitHandler.handleGitCheckRepo);
-  EventBus.on("git:root", gitHandler.handleGitGetRoot);
-  EventBus.on("git:status", gitHandler.handleGitStatus);
-  EventBus.on("git:remote-info", gitHandler.handleGitRemoteInfo);
-  EventBus.on("git:pull", gitHandler.handleGitPull);
-  EventBus.on("git:push", gitHandler.handleGitPush);
-  EventBus.on("git:commit", gitHandler.handleGitCommit);
-  EventBus.on("git:discard", gitHandler.handleGitDiscard);
-
-  // Advanced Git events
   EventBus.off("git:fetch", gitHandler.handleGitFetch);
   EventBus.off("git:set-upstream", gitHandler.handleGitSetUpstream);
   EventBus.off("git:add-all", gitHandler.handleGitAddAll);
@@ -462,6 +451,7 @@ export function initEventRouter() {
   EventBus.off("git:reset-hard", gitHandler.handleGitResetHard);
   EventBus.off("git:revert", gitHandler.handleGitRevert);
   EventBus.off("git:merge", gitHandler.handleGitMerge);
+  EventBus.off("git:merge-continue", gitHandler.handleGitMergeContinue);
   EventBus.off("git:merge-abort", gitHandler.handleGitMergeAbort);
   EventBus.off("git:rebase-start", gitHandler.handleGitRebaseStart);
   EventBus.off("git:rebase-continue", gitHandler.handleGitRebaseContinue);
@@ -469,7 +459,20 @@ export function initEventRouter() {
   EventBus.off("git:conflicts", gitHandler.handleGitConflicts);
   EventBus.off("git:mergetool", gitHandler.handleGitMergetool);
   EventBus.off("git:open-in-vscode", gitHandler.handleGitOpenInVSCode);
+  EventBus.off("git:progress-state", gitHandler.handleGitProgressState);
+  EventBus.off("git:choose-ours", gitHandler.handleGitChooseOurs);
+  EventBus.off("git:choose-theirs", gitHandler.handleGitChooseTheirs);
+  EventBus.off("git:mark-resolved", gitHandler.handleGitMarkResolved);
+  EventBus.off("git:revert-resolution", gitHandler.handleGitRevertResolution);
 
+  EventBus.on("git:check", gitHandler.handleGitCheckRepo);
+  EventBus.on("git:root", gitHandler.handleGitGetRoot);
+  EventBus.on("git:status", gitHandler.handleGitStatus);
+  EventBus.on("git:remote-info", gitHandler.handleGitRemoteInfo);
+  EventBus.on("git:pull", gitHandler.handleGitPull);
+  EventBus.on("git:push", gitHandler.handleGitPush);
+  EventBus.on("git:commit", gitHandler.handleGitCommit);
+  EventBus.on("git:discard", gitHandler.handleGitDiscard);
   EventBus.on("git:fetch", gitHandler.handleGitFetch);
   EventBus.on("git:set-upstream", gitHandler.handleGitSetUpstream);
   EventBus.on("git:add-all", gitHandler.handleGitAddAll);
@@ -486,6 +489,7 @@ export function initEventRouter() {
   EventBus.on("git:reset-hard", gitHandler.handleGitResetHard);
   EventBus.on("git:revert", gitHandler.handleGitRevert);
   EventBus.on("git:merge", gitHandler.handleGitMerge);
+  EventBus.on("git:merge-continue", gitHandler.handleGitMergeContinue);
   EventBus.on("git:merge-abort", gitHandler.handleGitMergeAbort);
   EventBus.on("git:rebase-start", gitHandler.handleGitRebaseStart);
   EventBus.on("git:rebase-continue", gitHandler.handleGitRebaseContinue);
@@ -493,6 +497,11 @@ export function initEventRouter() {
   EventBus.on("git:conflicts", gitHandler.handleGitConflicts);
   EventBus.on("git:mergetool", gitHandler.handleGitMergetool);
   EventBus.on("git:open-in-vscode", gitHandler.handleGitOpenInVSCode);
+  EventBus.on("git:progress-state", gitHandler.handleGitProgressState);
+  EventBus.on("git:choose-ours", gitHandler.handleGitChooseOurs);
+  EventBus.on("git:choose-theirs", gitHandler.handleGitChooseTheirs);
+  EventBus.on("git:mark-resolved", gitHandler.handleGitMarkResolved);
+  EventBus.on("git:revert-resolution", gitHandler.handleGitRevertResolution);
 
   // Cache events
   EventBus.off("cache:init", cacheHandler.initCache);

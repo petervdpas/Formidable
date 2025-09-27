@@ -91,7 +91,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   addContainerElement({
     parent: section,
     tag: "h3",
-    i18nKey: "modal.git.branches",
+    i18nKey: "git.branches",
     attributes: { style: "margin-top:0" },
   });
 
@@ -133,7 +133,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
 
   section.appendChild(
     buildLabeledControl({
-      labelTextOrKey: "standard.git.remote",
+      labelTextOrKey: "git.remote",
       i18nEnabled: true,
       layout: "two-column",
       labelWidth: "120px",
@@ -155,7 +155,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
 
   section.appendChild(
     buildLabeledControl({
-      labelTextOrKey: "standard.git.branches",
+      labelTextOrKey: "git.branches",
       i18nEnabled: true,
       layout: "two-column",
       labelWidth: "120px",
@@ -186,7 +186,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   nameInput.id = "git-new-branch";
   nameInput.setAttribute(
     "data-i18n-placeholder",
-    "standard.git.branch.new.placeholder"
+    "git.branch.new.placeholder"
   );
 
   const createBtn = createGitCreateCheckoutButton(async () => {
@@ -209,7 +209,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
 
   section.appendChild(
     buildLabeledControl({
-      labelTextOrKey: "standard.git.branch.new",
+      labelTextOrKey: "git.branch.new",
       i18nEnabled: true,
       forId: nameInput.id,
       layout: "two-column",
@@ -230,7 +230,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
     addContainerElement({
       parent: line1,
       tag: "span",
-      i18nKey: "standard.git.branch",
+      i18nKey: "git.branch",
     });
     addContainerElement({ parent: line1, tag: "span", textContent: ": " });
     addContainerElement({
@@ -242,12 +242,12 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
     const badges = addContainerElement({ parent: trackingRow });
     makeGitBadge({
       parent: badges,
-      key: "standard.git.badge.ahead",
+      key: "git.badge.ahead",
       count: status.ahead,
     });
     makeGitBadge({
       parent: badges,
-      key: "standard.git.badge.behind",
+      key: "git.badge.behind",
       count: status.behind,
       marginLeft: "6px",
     });
@@ -256,7 +256,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
     addContainerElement({
       parent: line2,
       tag: "span",
-      i18nKey: "standard.git.tracked",
+      i18nKey: "git.tracked",
     });
     addContainerElement({ parent: line2, tag: "span", textContent: ": " });
     if (status.tracking) {
@@ -292,7 +292,7 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
   addContainerElement({
     parent: section,
     tag: "h3",
-    i18nKey: "modal.git.status",
+    i18nKey: "git.status",
     attributes: { style: "margin-top:0" },
   });
 
@@ -411,7 +411,7 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
   );
 
   const commitInputRow = buildLabeledControl({
-    labelTextOrKey: "modal.git.commit.message",
+    labelTextOrKey: "git.commit.message",
     i18nEnabled: true,
     forId: msgInput.id,
     layout: "stacked",
@@ -487,7 +487,7 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
               "special.git.discard.sure",
               `<div class="modal-message-highlight"><code>${rawData.value}</code></div>`,
               {
-                okKey: "standard.git.discard",
+                okKey: "git.discard",
                 cancelKey: "standard.cancel",
                 width: "auto",
                 height: "auto",

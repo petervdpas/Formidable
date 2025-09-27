@@ -10,8 +10,8 @@
   "enable_plugins": true,
   "context_mode": "storage",
   "context_folder": "./",
-  "selected_template": "recepten.yaml",
-  "selected_data_file": "groene-tapenade.meta.json",
+  "selected_template": "basic.yaml",
+  "selected_data_file": "sane-20250530.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -23,8 +23,8 @@
   "window_bounds": {
     "width": 1369,
     "height": 913,
-    "x": 316,
-    "y": 37
+    "x": 275,
+    "y": 59
   },
   "template_sidebar_width": 352,
   "storage_sidebar_width": 418,

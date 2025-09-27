@@ -175,9 +175,9 @@ export function setupWorkspaceModal() {
 }
 
 export function setupGitModal() {
-  const GIT_MODAL_WIDTH = "40em"; // 60 for both panes
+  const GIT_MODAL_WIDTH = "60em"; // 60 for both panes
   const GIT_MODAL_HEIGHT = "30.5em";
-  const GIT_MODAL_SHOWCONTENT = "right";
+  const GIT_MODAL_SHOWCONTENT = "both";
 
   const modal = setupModal("git-actions-modal", {
     closeBtn: "git-actions-close",

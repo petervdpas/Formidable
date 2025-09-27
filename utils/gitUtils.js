@@ -1,5 +1,4 @@
 // utils/gitUtils.js
-
 import { EventBus } from "../modules/eventBus.js";
 import { Toast } from "./toastUtils.js";
 
@@ -121,6 +120,61 @@ export async function discardFile(folderPath, filePath) {
   return await callWithResponse("git:discard", { folderPath, filePath });
 }
 
+/* ───────────────────── Conflicts / Merge / Rebase ───────────────────── */
+export async function getConflicts(folderPath) {
+  // returns array of conflicted file paths
+  return await callWithResponse("git:conflicts", { folderPath });
+}
+
+export async function getProgressState(folderPath) {
+  // { inMerge:boolean, inRebase:boolean, conflicted:string[] }
+  return await callWithResponse("git:progress-state", { folderPath });
+}
+
+export async function chooseOurs(folderPath, file) {
+  return await callWithResponse("git:choose-ours", { folderPath, file });
+}
+
+export async function chooseTheirs(folderPath, file) {
+  return await callWithResponse("git:choose-theirs", { folderPath, file });
+}
+
+export async function markResolved(folderPath, file) {
+  return await callWithResponse("git:mark-resolved", { folderPath, file });
+}
+
+export async function revertResolution(folderPath, file) {
+  return await callWithResponse("git:revert-resolution", { folderPath, file });
+}
+
+export async function mergeAbort(folderPath) {
+  return await callWithResponse("git:merge-abort", { folderPath });
+}
+
+export async function mergeContinue(folderPath) {
+  return await callWithResponse("git:merge-continue", { folderPath });
+}
+
+export async function rebaseStart(folderPath, upstream) {
+  return await callWithResponse("git:rebase-start", { folderPath, upstream });
+}
+
+export async function rebaseContinue(folderPath) {
+  return await callWithResponse("git:rebase-continue", { folderPath });
+}
+
+export async function rebaseAbort(folderPath) {
+  return await callWithResponse("git:rebase-abort", { folderPath });
+}
+
+export async function openMergetool(folderPath, file) {
+  return await callWithResponse("git:mergetool", { folderPath, file });
+}
+
+export async function openInVSCode(folderPath, file) {
+  return await callWithResponse("git:open-in-vscode", { folderPath, file });
+}
+
 /* ───────────────────── Helpers ───────────────────── */
 export function isClean(status) {
   return Boolean(status?.clean) || (status?.files?.length ?? 0) === 0;
@@ -133,6 +187,33 @@ export function isAhead(status) {
 }
 export function isBehind(status) {
   return (status?.behind || 0) > 0;
+}
+
+/**
+ * Pull and detect conflicts. If conflicts are present, returns { ok:false, conflicts, state }.
+ * Otherwise returns { ok:true, result }.
+ */
+export async function pullWithRebase(folderPath, remote, branch) {
+  try {
+    const res = await callWithResponse("git:pull", {
+      folderPath,
+      remote,
+      branch,
+      // If you later expose options in main, pass ['--rebase'] there.
+    });
+
+    const state = await getProgressState(folderPath);
+    if (state?.conflicted?.length) {
+      return { ok: false, conflicts: state.conflicted, state };
+    }
+    return { ok: true, result: res };
+  } catch (err) {
+    const state = await getProgressState(folderPath);
+    if (state?.conflicted?.length) {
+      return { ok: false, conflicts: state.conflicted, state };
+    }
+    throw err;
+  }
 }
 
 /**

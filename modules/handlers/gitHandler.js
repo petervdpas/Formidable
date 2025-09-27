@@ -321,6 +321,19 @@ export async function handleGitMerge({ folderPath, ref, callback }) {
   }
 }
 
+export async function handleGitMergeContinue({ folderPath, callback }) {
+  try {
+    const res = await window.api.git.gitMergeContinue(folderPath);
+    callback?.(res?.ok ? res.data : null);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      "[GitHandler] merge-continue failed:",
+      err,
+    ]);
+    callback?.(null);
+  }
+}
+
 export async function handleGitMergeAbort({ folderPath, callback }) {
   try {
     const res = await window.api.git.gitMergeAbort(folderPath);
@@ -380,6 +393,66 @@ export async function handleGitConflicts({ folderPath, callback }) {
   } catch (err) {
     EventBus.emit("logging:error", [
       "[GitHandler] Failed to get conflicts:",
+      err,
+    ]);
+    callback?.(null);
+  }
+}
+
+export async function handleGitProgressState({ folderPath, callback }) {
+  try {
+    const res = await window.api.git.gitProgressState(folderPath);
+    callback?.(res?.ok ? res.data : null);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      "[GitHandler] progress-state failed:",
+      err,
+    ]);
+    callback?.(null);
+  }
+}
+
+export async function handleGitChooseOurs({ folderPath, file, callback }) {
+  try {
+    const res = await window.api.git.gitChooseOurs(folderPath, file);
+    callback?.(res?.ok ? res.data : null);
+  } catch (err) {
+    EventBus.emit("logging:error", ["[GitHandler] choose-ours failed:", err]);
+    callback?.(null);
+  }
+}
+
+export async function handleGitChooseTheirs({ folderPath, file, callback }) {
+  try {
+    const res = await window.api.git.gitChooseTheirs(folderPath, file);
+    callback?.(res?.ok ? res.data : null);
+  } catch (err) {
+    EventBus.emit("logging:error", ["[GitHandler] choose-theirs failed:", err]);
+    callback?.(null);
+  }
+}
+
+export async function handleGitMarkResolved({ folderPath, file, callback }) {
+  try {
+    const res = await window.api.git.gitMarkResolved(folderPath, file);
+    callback?.(res?.ok ? res.data : null);
+  } catch (err) {
+    EventBus.emit("logging:error", ["[GitHandler] mark-resolved failed:", err]);
+    callback?.(null);
+  }
+}
+
+export async function handleGitRevertResolution({
+  folderPath,
+  file,
+  callback,
+}) {
+  try {
+    const res = await window.api.git.gitRevertResolution(folderPath, file);
+    callback?.(res?.ok ? res.data : null);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      "[GitHandler] revert-resolution failed:",
       err,
     ]);
     callback?.(null);

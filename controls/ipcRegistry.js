@@ -299,6 +299,9 @@ function registerIpcHandlers() {
   );
   registerIpc("git-merge", (e, folder, ref) => gitManager.merge(folder, ref));
   registerIpc("git-merge-abort", (e, folder) => gitManager.mergeAbort(folder));
+  registerIpc("git-merge-continue", (e, folder) =>
+    gitManager.mergeContinue(folder)
+  );
   registerIpc("git-rebase-start", (e, folder, upstream) =>
     gitManager.rebaseStart(folder, upstream)
   );
@@ -310,6 +313,21 @@ function registerIpcHandlers() {
   );
   registerIpc("git-conflicts", (e, folder) =>
     gitManager.getConflictedFiles(folder)
+  );
+  registerIpc("git-progress-state", (e, folder) =>
+    gitManager.getProgressState(folder)
+  );
+  registerIpc("git-choose-ours", (e, folder, file) =>
+    gitManager.chooseOurs(folder, file)
+  );
+  registerIpc("git-choose-theirs", (e, folder, file) =>
+    gitManager.chooseTheirs(folder, file)
+  );
+  registerIpc("git-mark-resolved", (e, folder, file) =>
+    gitManager.markResolved(folder, file)
+  );
+  registerIpc("git-revert-resolution", (e, folder, file) =>
+    gitManager.revertResolution(folder, file)
   );
   registerIpc("git-mergetool", (e, folder, file) =>
     gitManager.openMergetool(folder, file)

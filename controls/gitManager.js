@@ -1,5 +1,6 @@
 // controls/gitManager.js
 const path = require("path");
+const fs = require("fs");
 const { exec } = require("child_process");
 const simpleGit = require("simple-git");
 const fileManager = require("./fileManager");
@@ -238,11 +239,7 @@ async function resetPaths(folderPath, paths = []) {
   }
 }
 
-async function commit(
-  folderPath,
-  message,
-  { addAllBeforeCommit = true } = {}
-) {
+async function commit(folderPath, message, { addAllBeforeCommit = true } = {}) {
   try {
     const root = await resolveRoot(folderPath);
     if (!root) return fail("Not a repo");
@@ -427,6 +424,17 @@ async function mergeAbort(folderPath) {
     return fail(err);
   }
 }
+async function mergeContinue(folderPath) {
+  try {
+    const root = await resolveRoot(folderPath);
+    if (!root) return fail("Not a repo");
+    const git = await getGitInstance(root);
+    const res = await git.raw(["merge", "--continue"]);
+    return ok(res);
+  } catch (err) {
+    return fail(err);
+  }
+}
 
 // ── Stash ──────────────────────────────────────────────────
 async function stashSave(folderPath, message = "") {
@@ -494,6 +502,87 @@ async function getConflictedFiles(folderPath) {
   const st = await status(folderPath);
   if (!st.ok || !st.data) return st;
   return ok(st.data.conflicted || []);
+}
+
+async function getProgressState(folderPath) {
+  try {
+    const root = await resolveRoot(folderPath);
+    if (!root) return ok({ inMerge: false, inRebase: false, conflicted: [] });
+
+    const gitDir = path.join(root, ".git");
+    const inMerge =
+      fs.existsSync(path.join(gitDir, "MERGE_HEAD")) ||
+      fs.existsSync(path.join(gitDir, "CHERRY_PICK_HEAD")); // cherry-pick behaves like merge
+    const inRebase =
+      fs.existsSync(path.join(gitDir, "rebase-merge")) ||
+      fs.existsSync(path.join(gitDir, "rebase-apply"));
+
+    const st = await status(root);
+    const conflicted = st.ok && st.data ? st.data.conflicted || [] : [];
+
+    return ok({ inMerge, inRebase, conflicted });
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+async function chooseOurs(folderPath, filePath) {
+  try {
+    const root = await resolveRoot(folderPath);
+    if (!root) return fail("Not a repo");
+    return await withRepoLock(root, async () => {
+      const git = await getGitInstance(root);
+      await git.raw(["checkout", "--ours", "--", filePath]);
+      await git.add([filePath]); // mark resolved
+      return ok(true);
+    });
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+async function chooseTheirs(folderPath, filePath) {
+  try {
+    const root = await resolveRoot(folderPath);
+    if (!root) return fail("Not a repo");
+    return await withRepoLock(root, async () => {
+      const git = await getGitInstance(root);
+      await git.raw(["checkout", "--theirs", "--", filePath]);
+      await git.add([filePath]); // mark resolved
+      return ok(true);
+    });
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+async function markResolved(folderPath, filePath) {
+  try {
+    const root = await resolveRoot(folderPath);
+    if (!root) return fail("Not a repo");
+    return await withRepoLock(root, async () => {
+      const git = await getGitInstance(root);
+      await git.add([filePath]); // stage as resolved
+      return ok(true);
+    });
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+async function revertResolution(folderPath, filePath) {
+  try {
+    const root = await resolveRoot(folderPath);
+    if (!root) return fail("Not a repo");
+    return await withRepoLock(root, async () => {
+      const git = await getGitInstance(root);
+      // restore both index & working tree for that path
+      await git.raw(["restore", "-SW", "--staged", "--", filePath]);
+      return ok(true);
+    });
+  } catch (err) {
+    return fail(err);
+  }
 }
 
 async function openMergetool(folderPath, filePath = undefined) {
@@ -574,10 +663,16 @@ module.exports = {
   // merge/rebase/conflicts
   merge,
   mergeAbort,
+  mergeContinue,
   rebaseStart,
   rebaseContinue,
   rebaseAbort,
   getConflictedFiles,
+  getProgressState,
+  chooseOurs,
+  chooseTheirs,
+  markResolved,
+  revertResolution,
   openMergetool,
   openInVSCode,
 };
