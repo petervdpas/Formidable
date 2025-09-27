@@ -21,8 +21,10 @@
   "enable_internal_server": true,
   "internal_server_port": 8383,
   "window_bounds": {
-    "width": 1920,
-    "height": 1032
+    "width": 1369,
+    "height": 913,
+    "x": 316,
+    "y": 37
   },
   "template_sidebar_width": 352,
   "storage_sidebar_width": 418,
