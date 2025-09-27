@@ -19,7 +19,6 @@ import { showConfirmModal } from "../utils/modalUtils.js";
 import { createDropdown } from "../utils/dropdownUtils.js";
 import { t, translateDOM } from "../utils/i18n.js";
 import { Toast } from "../utils/toastUtils.js";
-
 import {
   loadConfig,
   resolveGitPath,
@@ -35,20 +34,30 @@ import {
 
 const uid = (p) => `${p}-${Math.random().toString(36).slice(2, 9)}`;
 
-/* ----------------------------- boolean rules ----------------------------- */
+/* ------------ boolean rules (single-source-of-truth enablement) ----------- */
 const canCommit = ({ listLen, message }) =>
   listLen > 0 && Boolean(message && message.trim());
 
 const canPush = ({ status, listLen }) =>
   (status?.ahead || 0) > 0 && listLen === 0;
 
-const canPull = ({ status }) => (status?.behind || 0) > 0;
+const canPull = ({ status }) => {
+  const tracking = !!status?.tracking;
+  const ahead = typeof status?.ahead === "number" ? status.ahead : null;
+  const behind = typeof status?.behind === "number" ? status.behind : null;
+  const knowsSync = ahead !== null && behind !== null;
+  const inSync = knowsSync && ahead === 0 && behind === 0;
+  return tracking && !inSync;
+};
 
-/* ------------------------------- shared bits ------------------------------ */
+/* -------------------------------- shared --------------------------------- */
 export async function getGitContext() {
   const cfg = await loadConfig();
   const gitPath = resolveGitPath(cfg);
-  const [status, remoteInfo] = await Promise.all([getStatus(gitPath), getRemoteInfo(gitPath)]);
+  const [status, remoteInfo] = await Promise.all([
+    getStatus(gitPath),
+    getRemoteInfo(gitPath),
+  ]);
   return { gitPath, status, remoteInfo };
 }
 
@@ -67,7 +76,10 @@ function makeGitBadge({ parent, key, count, marginLeft = "" }) {
 export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   const node = document.createElement("div");
 
-  const section = addContainerElement({ parent: node, className: "git-section" });
+  const section = addContainerElement({
+    parent: node,
+    className: "git-section",
+  });
   addContainerElement({
     parent: section,
     tag: "h3",
@@ -164,7 +176,10 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   const nameInput = document.createElement("input");
   nameInput.type = "text";
   nameInput.id = "git-new-branch";
-  nameInput.setAttribute("data-i18n-placeholder", "standard.git.branch.new.placeholder");
+  nameInput.setAttribute(
+    "data-i18n-placeholder",
+    "standard.git.branch.new.placeholder"
+  );
 
   const createBtn = createGitCreateCheckoutButton(async () => {
     const name = nameInput.value.trim();
@@ -204,12 +219,24 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   const renderTrackingRow = () => {
     trackingRow.innerHTML = "";
     const line1 = addContainerElement({ parent: trackingRow });
-    addContainerElement({ parent: line1, tag: "span", i18nKey: "standard.git.branch" });
+    addContainerElement({
+      parent: line1,
+      tag: "span",
+      i18nKey: "standard.git.branch",
+    });
     addContainerElement({ parent: line1, tag: "span", textContent: ": " });
-    addContainerElement({ parent: line1, tag: "b", textContent: status.current || "" });
+    addContainerElement({
+      parent: line1,
+      tag: "b",
+      textContent: status.current || "",
+    });
 
     const badges = addContainerElement({ parent: trackingRow });
-    makeGitBadge({ parent: badges, key: "standard.git.badge.ahead", count: status.ahead });
+    makeGitBadge({
+      parent: badges,
+      key: "standard.git.badge.ahead",
+      count: status.ahead,
+    });
     makeGitBadge({
       parent: badges,
       key: "standard.git.badge.behind",
@@ -218,12 +245,24 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
     });
 
     const line2 = addContainerElement({ parent: trackingRow });
-    addContainerElement({ parent: line2, tag: "span", i18nKey: "standard.git.tracked" });
+    addContainerElement({
+      parent: line2,
+      tag: "span",
+      i18nKey: "standard.git.tracked",
+    });
     addContainerElement({ parent: line2, tag: "span", textContent: ": " });
     if (status.tracking) {
-      addContainerElement({ parent: line2, tag: "span", textContent: status.tracking });
+      addContainerElement({
+        parent: line2,
+        tag: "span",
+        textContent: status.tracking,
+      });
     } else {
-      addContainerElement({ parent: line2, tag: "span", i18nKey: "standard.none" });
+      addContainerElement({
+        parent: line2,
+        tag: "span",
+        i18nKey: "standard.none",
+      });
     }
   };
   renderTrackingRow();
@@ -238,7 +277,10 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
 export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
   const node = document.createElement("div");
 
-  const section = addContainerElement({ parent: node, className: "git-section" });
+  const section = addContainerElement({
+    parent: node,
+    className: "git-section",
+  });
   addContainerElement({
     parent: section,
     tag: "h3",
@@ -253,7 +295,6 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
     attributes: { id: fileListId },
   });
 
-  // --- STATE + RULE ENGINE (per your request) ---
   let currentStatus = status;
   const state = {
     status: currentStatus,
@@ -379,7 +420,8 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
     className: "git-row",
     attributes: { style: "margin-top:8px" },
   });
-  syncRow.append(buildButtonGroup(pullBtn, pushBtn));
+  const syncGroup = buildButtonGroup(pullBtn, pushBtn, "button-group--full");
+  syncRow.append(syncGroup);
 
   msgInput.addEventListener("input", () => {
     commitMessage = msgInput.value;
@@ -389,7 +431,7 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
   async function refreshStatusAndList() {
     currentStatus = await getStatus(gitPath);
     setState({ status: currentStatus });
-    await gitListManager.loadList(); // this updates listLen via fetchListFunction
+    await gitListManager.loadList();
   }
 
   const init = async () => {
@@ -408,7 +450,10 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
         const { symbol, className } = normalizeFileStatus(rawData);
 
         const labelEl = itemNode.querySelector(".list-item-label");
-        if (labelEl) labelEl.textContent = `${symbol || "??"}: ${rawData.display || rawData.value}`;
+        if (labelEl)
+          labelEl.textContent = `${symbol || "??"}: ${
+            rawData.display || rawData.value
+          }`;
 
         itemNode.classList.remove(
           "added",
@@ -453,7 +498,7 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
     });
 
     gitListManager = listMgr;
-    await gitListManager.loadList(); // sets listLen via setState in fetchListFunction
+    await gitListManager.loadList();
     requestAnimationFrame(() => translateDOM(node));
   };
 

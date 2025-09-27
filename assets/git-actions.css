@@ -107,3 +107,16 @@
   width: 100%;
   display: block;
 }
+
+/* full-width group with 50/50 buttons */
+.git-section .button-group--full {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+}
+.git-section .button-group--full > .btn,
+.git-section .button-group--full > button {
+  flex: 1 1 0;
+  min-width: 0;
+  display: block;
+}
