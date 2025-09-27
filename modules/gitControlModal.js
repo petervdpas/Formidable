@@ -20,23 +20,28 @@ import { createDropdown } from "../utils/dropdownUtils.js";
 import { t, translateDOM } from "../utils/i18n.js";
 import { Toast } from "../utils/toastUtils.js";
 
+import {
+  loadConfig,
+  resolveGitPath,
+  getStatus,
+  getRemoteInfo,
+  commit as gitCommit,
+  pull as gitPull,
+  push as gitPush,
+  discardFile as gitDiscard,
+  mapStatusFiles,
+  normalizeFileStatus,
+} from "../utils/gitUtils.js";
+
 const uid = (p) => `${p}-${Math.random().toString(36).slice(2, 9)}`;
 
+// Gather current git context via utils
 export async function getGitContext() {
-  const config = await new Promise((resolve) =>
-    EventBus.emit("config:load", (cfg) => resolve(cfg))
-  );
-  const gitPath = config.git_root || ".";
+  const cfg = await loadConfig();
+  const gitPath = resolveGitPath(cfg);
   const [status, remoteInfo] = await Promise.all([
-    new Promise((resolve) =>
-      EventBus.emit("git:status", { folderPath: gitPath, callback: resolve })
-    ),
-    new Promise((resolve) =>
-      EventBus.emit("git:remote-info", {
-        folderPath: gitPath,
-        callback: resolve,
-      })
-    ),
+    getStatus(gitPath),
+    getRemoteInfo(gitPath),
   ]);
   return { gitPath, status, remoteInfo };
 }
@@ -74,18 +79,22 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
 
   // Buttons
   const fetchBtn = createGitFetchButton(async () => {
-    fetchBtn.disabled = true;
-    await EventBus.emitWithResponse("git:fetch", {
-      folderPath: gitPath,
-      remote: selectedRemote,
-      opts: ["--prune"],
-    });
-    fetchBtn.disabled = false;
-    Toast.success("toast.git.fetch.complete");
+    try {
+      fetchBtn.disabled = true;
+      await EventBus.emitWithResponse("git:fetch", {
+        folderPath: gitPath,
+        remote: selectedRemote,
+        opts: ["--prune"],
+      });
+      Toast.success("toast.git.fetch.complete");
+    } finally {
+      fetchBtn.disabled = false;
+    }
   });
 
   const checkoutBtn = createGitCheckoutButton(async () => {
     if (!selectedRemote || !selectedRemoteBranch) return;
+    // Create local branch from remote branch & set upstream
     await EventBus.emitWithResponse("git:branch-create", {
       folderPath: gitPath,
       name: selectedRemoteBranch,
@@ -100,17 +109,45 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   });
 
   const pullBtn = createGitPullButton(async () => {
-    pullBtn.disabled = true;
-    await EventBus.emitWithResponse("git:pull", { folderPath: gitPath });
-    pullBtn.disabled = false;
-    Toast.success("toast.git.pull.complete");
+    try {
+      pullBtn.disabled = true;
+      const result = await gitPull(gitPath);
+      const sum = result?.summary;
+      const changed =
+        sum && (sum.changes > 0 || sum.deletions > 0 || sum.insertions > 0);
+      if (typeof result === "string") {
+        Toast.success("toast.git.pull.complete");
+      } else if (changed) {
+        Toast.success("toast.git.pull.changes", [
+          sum.changes,
+          sum.deletions,
+          sum.insertions,
+        ]);
+      } else {
+        Toast.info("toast.git.pull.noChanges");
+      }
+    } finally {
+      pullBtn.disabled = false;
+    }
   });
 
   const pushBtn = createGitPushButton(async () => {
-    pushBtn.disabled = true;
-    await EventBus.emitWithResponse("git:push", { folderPath: gitPath });
-    pushBtn.disabled = false;
-    Toast.success("toast.git.push.complete");
+    try {
+      pushBtn.disabled = true;
+      const result = await gitPush(gitPath);
+      const hash = result?.update?.hash;
+      const head = result?.update?.head;
+      if (hash?.from && hash?.to) {
+        const branch = head?.local?.replace("refs/heads/", "") || "unknown";
+        const fromShort = String(hash.from).slice(0, 7);
+        const toShort = String(hash.to).slice(0, 7);
+        Toast.success("toast.git.push.range", [branch, fromShort, toShort]);
+      } else {
+        Toast.success("toast.git.push.complete");
+      }
+    } finally {
+      pushBtn.disabled = false;
+    }
   });
 
   // Keep references used by both rows
@@ -120,14 +157,14 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   // Remote: label + dropdown + Fetch
   section.appendChild(
     buildLabeledControl({
-      labelTextOrKey: "standard.git.remote", // correct i18n key
+      labelTextOrKey: "standard.git.remote",
       i18nEnabled: true,
       layout: "two-column",
       labelWidth: "120px",
       control: (mount) => {
         createDropdown({
           containerEl: mount,
-          labelTextOrKey: "", // inner label suppressed by builder
+          labelTextOrKey: "",
           options: remotes.map((n) => ({ value: n, label: n })),
           selectedValue: selectedRemote,
           onChange: (v) => {
@@ -321,14 +358,13 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
       Toast.warning("toast.git.commit.noMessage");
       return;
     }
-    const res = await EventBus.emitWithResponse("git:commit", {
-      folderPath: gitPath,
-      message: commitMessage,
-    });
+    const res = await gitCommit(gitPath, commitMessage);
     if (typeof res === "string") {
       Toast.success("toast.git.commit.complete");
     } else if (res?.summary?.changes != null) {
       Toast.success("toast.git.commit.success", [res.summary.changes]);
+    } else {
+      Toast.success("toast.git.commit.complete");
     }
     await gitListManager.loadList();
   }, !(hasChanges && commitMessage));
@@ -362,29 +398,15 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
       itemClass: "git-list-item",
       emptyMessage: "",
       fetchListFunction: async () => {
-        const result = await new Promise((resolve) =>
-          EventBus.emit("git:status", {
-            folderPath: gitPath,
-            callback: resolve,
-          })
-        );
-        return (
-          result?.files?.map((file) => ({
-            display: file.path,
-            value: file.path,
-            index: file.index,
-            working_dir: file.working_dir,
-          })) || []
-        );
+        const s = await getStatus(gitPath);
+        return mapStatusFiles(s);
       },
       renderItemExtra: async ({ flagNode, itemNode, rawData }) => {
-        const index = (rawData.index || "").trim();
-        const work = (rawData.working_dir || "").trim();
-        const symbol = `${index}${work}`.trim() || "??";
+        const { symbol, className } = normalizeFileStatus(rawData);
 
         const labelEl = itemNode.querySelector(".list-item-label");
         if (labelEl)
-          labelEl.textContent = `${symbol}: ${
+          labelEl.textContent = `${symbol || "??"}: ${
             rawData.display || rawData.value
           }`;
 
@@ -394,48 +416,38 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
           "deleted",
           "renamed",
           "untracked",
+          "ignored",
+          "conflicted",
           "unknown"
         );
-        itemNode.classList.add(
-          symbol.includes("A")
-            ? "added"
-            : symbol.includes("D")
-            ? "deleted"
-            : symbol.includes("M")
-            ? "modified"
-            : symbol.includes("R")
-            ? "renamed"
-            : symbol === "??"
-            ? "untracked"
-            : "unknown"
-        );
+        itemNode.classList.add(className);
 
         const discardBtn = createGitDiscardButton(rawData.value, async () => {
-          modalApi?.setDisabled?.();
-          const confirmed = await showConfirmModal(
-            "special.git.discard.sure",
-            `<div class="modal-message-highlight"><code>${rawData.value}</code></div>`,
-            {
-              okKey: "standard.git.discard",
-              cancelKey: "standard.cancel",
-              width: "auto",
-              height: "auto",
+          try {
+            modalApi?.setDisabled?.();
+
+            const confirmed = await showConfirmModal(
+              "special.git.discard.sure",
+              `<div class="modal-message-highlight"><code>${rawData.value}</code></div>`,
+              {
+                okKey: "standard.git.discard",
+                cancelKey: "standard.cancel",
+                width: "auto",
+                height: "auto",
+              }
+            );
+            if (!confirmed) return;
+
+            const result = await gitDiscard(gitPath, rawData.value);
+            if (result?.success) {
+              Toast.info("toast.git.discarded.changes.in", [rawData.value]);
+              await gitListManager.loadList();
+            } else {
+              Toast.error("toast.git.discard.failed", [rawData.value]);
             }
-          );
-          if (!confirmed) return modalApi?.setEnabled?.();
-
-          const result = await EventBus.emitWithResponse("git:discard", {
-            folderPath: gitPath,
-            filePath: rawData.value,
-          });
-
-          if (result?.success) {
-            Toast.info("toast.git.discarded.changes.in", [rawData.value]);
-            await gitListManager.loadList();
-          } else {
-            Toast.error("toast.git.discard.failed", [rawData.value]);
+          } finally {
+            modalApi?.setEnabled?.();
           }
-          modalApi?.setEnabled?.();
         });
         flagNode.appendChild(discardBtn);
       },
