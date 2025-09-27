@@ -309,15 +309,19 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
     listLen: (currentStatus.files || []).length,
     message: "",
   };
+
   const rules = new Map();
   const bindEnableRule = (btn, predicate) => {
     rules.set(btn, predicate);
     btn.disabled = !predicate(state);
     return btn;
   };
+  const recomputeEnabled = () => {
+    rules.forEach((pred, btn) => (btn.disabled = !pred(state)));
+  };
   const setState = (patch) => {
     Object.assign(state, patch);
-    rules.forEach((pred, btn) => (btn.disabled = !pred(state)));
+    recomputeEnabled();
   };
 
   let gitListManager = null;
@@ -348,7 +352,8 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
         setState({ message: "" });
         await refreshStatusAndList();
       } finally {
-        commitBtn.disabled = false;
+        // Do NOT force-enable; always recompute from state
+        recomputeEnabled();
         msgInput.focus();
       }
     }, false),
@@ -376,7 +381,7 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
         }
         await refreshStatusAndList();
       } finally {
-        pullBtn.disabled = false;
+        recomputeEnabled();
       }
     }, false),
     canPull
@@ -399,7 +404,7 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
         }
         await refreshStatusAndList();
       } finally {
-        pushBtn.disabled = false;
+        recomputeEnabled();
       }
     }, false),
     canPush
