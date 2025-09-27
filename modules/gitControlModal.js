@@ -34,38 +34,28 @@ import {
 
 const uid = (p) => `${p}-${Math.random().toString(36).slice(2, 9)}`;
 
-// STRICT: commit allowed only with message + local changes (as you had)
-const canCommit = ({ listLen, message }) => {
-  return listLen > 0 && Boolean(message && message.trim());
+// --- boolean rules (single source of truth) ---
+const toNum = (v) => (typeof v === "number" ? v : null);
+
+const canCommit = ({ listLen, message }) =>
+  listLen > 0 && Boolean(message && message.trim());
+
+// PUSH: enabled iff we are ahead of upstream
+const canPush = ({ status }) => {
+  const a = toNum(status?.ahead);
+  return a !== null && a > 0;
 };
 
-// PUSH: ahead>0, not behind, clean tree, and tracking exists
-const canPush = ({ status, listLen }) => {
-  if (!status?.tracking) return false;
-  if (listLen > 0) return false;
-
-  const a = typeof status.ahead === "number" ? status.ahead : null;
-  const b = typeof status.behind === "number" ? status.behind : null;
-
-  if (a === null || b === null) return false;
-  if (a > 0 && b === 0) return true;
-
-  return false;
-};
-
-// PULL: behind or diverged; in-sync → false; only-ahead → false;
-// if counts unknown but tracking exists → allow
+// PULL:
+// - disabled when ahead (>0)
+// - enabled when behind (>0)
+// - enabled when sync is unknown (no ahead/behind info)
 const canPull = ({ status }) => {
-  if (!status?.tracking) return false;
-
-  const a = typeof status.ahead === "number" ? status.ahead : null;
-  const b = typeof status.behind === "number" ? status.behind : null;
-
-  if (a === null || b === null) return true; 
-  if (a === 0 && b === 0) return false;
-  if (a > 0 && b === 0) return false;
-
-  return b > 0 || (a > 0 && b > 0);
+  const a = toNum(status?.ahead);
+  const b = toNum(status?.behind);
+  if (a === null || b === null) return true;
+  if (a > 0) return false;
+  return b > 0;
 };
 
 /* -------------------------------- shared --------------------------------- */
