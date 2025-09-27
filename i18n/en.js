@@ -146,7 +146,7 @@ export default {
   "menu.config.switchProfile": "Switch Profile...",
   "menu.config.settings": "Settings...",
   "menu.config.workspace": "Workspace...",
-  "menu.git.actions": "Git Actions...",
+  "menu.git.control": "Git Control...",
   "menu.server.start": "Start Server",
   "menu.server.stop": "Stop Server",
   "menu.server.status": "Server Status",
@@ -579,7 +579,7 @@ export default {
   "modal.profile.label.newProfile": "New Profile",
   "modal.profile.placeholder.newProfile": "e.g., jack.json",
 
-  "modal.git.title": "Git Actions",
+  "modal.git.title": "Git Control",
   "modal.git.loading.status": "Loading Git Status...",
   "modal.git.error.status":
     "⚠️ Failed to fetch Git status. Please ensure Git is installed and the directory is a valid Git repository.",

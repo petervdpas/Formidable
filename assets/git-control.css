@@ -75,30 +75,39 @@
   background-color: var(--git-bg-unknown);
 }
 
+.git-file-list {
+  height: 16vh;
+  overflow-y: auto;
+  margin-bottom: 16px;
+}
+
 /* Make the commit message row stacked and stretchy */
 .git-commit-input-row {
-  display: block;              /* label above, control below */
+  display: block;
 }
-.git-commit-input-row > label {
+
+.git-commit-input-row>label {
   display: block;
   margin-bottom: 6px;
 }
-.git-commit-input-row > div,
+
+.git-commit-input-row>div,
 .git-commit-input-row .inline-control,
 .git-commit-input-row .control-wrap {
   display: block;
   width: 100%;
-  min-width: 0;                /* avoid grid/flex min-width trapping */
+  min-width: 0;
   box-sizing: border-box;
 }
+
 .git-commit-input-row textarea,
 #git-commit-message {
   display: block;
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  min-height: 72px;            /* optional */
-  resize: vertical;            /* optional */
+  min-height: 72px;
+  resize: vertical;
 }
 
 /* The button row is already full-width; keep it that way */
@@ -114,8 +123,9 @@
   width: 100%;
   gap: 8px;
 }
-.git-section .button-group--full > .btn,
-.git-section .button-group--full > button {
+
+.git-section .button-group--full>.btn,
+.git-section .button-group--full>button {
   flex: 1 1 0;
   min-width: 0;
   display: block;

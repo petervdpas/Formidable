@@ -19,7 +19,6 @@ import { renderWorkspaceModal } from "./contextManager.js";
 import { createProfileListManager } from "./profileManager.js";
 import { renderPluginManager } from "./pluginManagerUI.js";
 import { renderHelp } from "./helperUI.js";
-import { renderGitStatus } from "./gitActions.js";
 import {
   getGitContext,
   buildGitControlLeftPane,
@@ -175,29 +174,17 @@ export function setupWorkspaceModal() {
   });
 }
 
-export function setupGitModalOld() {
-  const modal = setupModal("git-actions-modal", {
-    closeBtn: "git-actions-close",
-    escToClose: true,
-    backdropClick: true,
-    width: "40em",
-    height: "auto",
-    onOpen: async () => {
-      const container = document.getElementById("git-modal-body");
-      if (container) await renderGitStatus(container, modal);
-    },
-  });
-
-  return modal;
-}
-
 export function setupGitModal() {
+  const GIT_MODAL_WIDTH = "40em"; // 60 for both panes
+  const GIT_MODAL_HEIGHT = "30.5em";
+  const GIT_MODAL_SHOWCONTENT = "right";
+
   const modal = setupModal("git-actions-modal", {
     closeBtn: "git-actions-close",
     escToClose: true,
     backdropClick: true,
-    width: "60em",
-    height: "auto",
+    width: GIT_MODAL_WIDTH,
+    height: GIT_MODAL_HEIGHT,
     onOpen: async () => {
       const container = document.getElementById("git-modal-body");
       if (!container) return;
@@ -216,10 +203,10 @@ export function setupGitModal() {
         rightWidth: "1fr",
         gap: "12px",
         className: "git-split",
+        showContent: GIT_MODAL_SHOWCONTENT,
       });
       if (!split) return;
 
-      // now that nodes are mounted, run DOM-dependent wiring
       await left.init();
       await right.init();
     },

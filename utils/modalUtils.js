@@ -648,6 +648,7 @@ export function createSplitModalLayout({
   rightWidth = "60%",
   gap = "12px",
   className = "",
+  showContent = "both",
 } = {}) {
   if (!modalEl) {
     EventBus.emit("logging:warning", [
@@ -665,15 +666,12 @@ export function createSplitModalLayout({
     return null;
   }
 
-  // clear old body content
   body.innerHTML = "";
 
-  // shell
   const wrap = document.createElement("div");
   wrap.className = `modal-split ${className}`.trim();
   Object.assign(wrap.style, {
     display: "grid",
-    gridTemplateColumns: `${leftWidth} ${rightWidth}`,
     gap,
     width: "100%",
     height: "100%",
@@ -682,37 +680,30 @@ export function createSplitModalLayout({
 
   const left = document.createElement("div");
   left.className = "modal-split-left";
-  if (leftContent != null) {
-    if (leftContent instanceof HTMLElement) {
-      left.appendChild(leftContent);
-    } else {
-      EventBus.emit("logging:warning", [
-        "[SplitModal] leftContent is not an HTMLElement",
-        { type: typeof leftContent },
-      ]);
-    }
-  }
+  if (leftContent instanceof HTMLElement) left.appendChild(leftContent);
 
   const right = document.createElement("div");
   right.className = "modal-split-right";
-  if (rightContent != null) {
-    if (rightContent instanceof HTMLElement) {
-      right.appendChild(rightContent);
-    } else {
-      EventBus.emit("logging:warning", [
-        "[SplitModal] rightContent is not an HTMLElement",
-        { type: typeof rightContent },
-      ]);
-    }
+  if (rightContent instanceof HTMLElement) right.appendChild(rightContent);
+
+  const addLeft = showContent !== "right";
+  const addRight = showContent !== "left";
+
+  if (addLeft && addRight) {
+    wrap.style.gridTemplateColumns = `${leftWidth} ${rightWidth}`;
+    wrap.appendChild(left);
+    wrap.appendChild(right);
+  } else {
+    wrap.style.gridTemplateColumns = "1fr";
+    if (addLeft) wrap.appendChild(left);
+    if (addRight) wrap.appendChild(right);
   }
 
-  wrap.appendChild(left);
-  wrap.appendChild(right);
   body.appendChild(wrap);
 
   EventBus.emit("logging:default", [
     "[SplitModal] Initialized split layout",
-    { leftWidth, rightWidth, gap, className: wrap.className },
+    { leftWidth, rightWidth, gap, className: wrap.className, showContent },
   ]);
 
   return { wrap, left, right };

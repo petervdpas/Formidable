@@ -104,7 +104,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
   if (cachedConfig.use_git) {
     menuBar.append(
       createMenuGroup("standard.git", [
-        { label: "menu.git.actions", i18n: true, action: "open-git-modal" },
+        { label: "menu.git.control", i18n: true, action: "open-git-modal" },
       ])
     );
   }

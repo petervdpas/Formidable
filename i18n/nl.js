@@ -156,7 +156,7 @@ export default {
   "menu.config.switchProfile": "Wissel profiel...",
   "menu.config.settings": "Instellingen...",
   "menu.config.workspace": "Werkruimte...",
-  "menu.git.actions": "Git-acties...",
+  "menu.git.control": "Git-besturing...",
   "menu.server.start": "Start server",
   "menu.server.stop": "Stop server",
   "menu.server.status": "Serverstatus",
@@ -600,7 +600,7 @@ export default {
   "modal.profile.label.newProfile": "Nieuw profiel",
   "modal.profile.placeholder.newProfile": "bijv. jack.json",
 
-  "modal.git.title": "Git-acties",
+  "modal.git.title": "Git Control",
   "modal.git.loading.status": "Git-status wordt geladen...",
   "modal.git.error.status":
     "⚠️ Kan Git-status niet ophalen. Zorg ervoor dat Git is geïnstalleerd en dat de map een geldige Git-repository is.",
