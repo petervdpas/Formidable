@@ -47,6 +47,11 @@ export default {
   "git.quick.subtitle": "Write a commit message and choose an action.",
   "git.quick.placeholder": "Commit message…",
   "git.quick.stage_all": "Stage all",
+  "git.quick.changes.to.commit": "changes to commit ({0})",
+  "git.quick.state.merge": "merge",
+  "git.quick.state.rebase": "rebase",
+  "git.quick.state.conflicts": "{0} conflicts",
+  "git.quick.state.conflict": "{0} conflict",
 
   // Errors (template-level)
   "error.template.duplicate_keys": "Duplicate keys: {0}",
@@ -420,6 +425,7 @@ export default {
   "git.branches.create": "Create Branch",
   "git.status": "Status & Commit",
   "git.commit.message": "Commit Message",
+  "git.commit.placeholder": "e.g. Update README and fix typos",
 
   // ── Tooltips ─────────────────────────────
   "tooltip.restart.formidable": "Restart Formidable",

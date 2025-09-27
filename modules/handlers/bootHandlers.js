@@ -2,6 +2,7 @@
 
 import { EventBus } from "../eventBus.js";
 import { safeAutoSyncOnReload } from "../../utils/gitUtils.js";
+import { startPollers } from "../pollers/index.js";
 
 export async function initializeFromConfig(config) {
   const {
@@ -74,23 +75,6 @@ export async function initializeFromConfig(config) {
   // ─── Stage 7: Safe Git auto-sync on reload ─────────────────────
   await safeAutoSyncOnReload(config);
 
-  // e.g. in bootHandlers.initializeFromConfig (Stage 8)
-  /*
-  EventBus.emit("tasks:register", {
-    id: "demo:theme-pulse",
-    interval: 10_000,
-    immediate: false,
-    // any stable element; html[data-theme] exists after boot
-    condition: { type: "dom-exists", selector: "html[data-theme]" },
-    fn: async () => {
-      const html = document.documentElement;
-      const current = (html.dataset.theme || "light").toLowerCase();
-      const next = current === "dark" ? "light" : "dark";
-
-      // Apply immediately (visual)
-      EventBus.emit("theme:toggle", next);
-    },
-  });
-  */
-
+  // ─── Stage 8: Start background pollers (generic) ───────────────
+  await startPollers();
 }

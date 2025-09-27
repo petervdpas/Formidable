@@ -37,7 +37,6 @@
 /* Status message variants */
 #status-bar-message span.status-info {
   color: var(--status-message-color);
-  /* default */
 }
 
 #status-bar-message span.status-success {
@@ -77,7 +76,6 @@
   padding-left: 8px;
 }
 
-/* Status bar buttons (themeable via vars) */
 #status-bar .statusbar-button {
   height: 20px;
   line-height: 18px;
@@ -105,7 +103,53 @@
   cursor: not-allowed;
 }
 
-/* compact char picker */
+/* ───── State classes (only colors, no size change) ───── */
+
+/* INFO (commit possible) */
+#status-bar .statusbar-button.is-info,
+#status-bar .statusbar-button.commit-possible {
+  color: var(--statusbar-state-info-fg);
+  border-color: var(--statusbar-state-info-border);
+  background: var(--statusbar-state-info-bg);
+}
+
+#status-bar .statusbar-button.is-info:hover,
+#status-bar .statusbar-button.commit-possible:hover {
+  background: var(--statusbar-state-info-bg-hover);
+  border-color: var(--statusbar-state-info-border);
+}
+
+/* WARN (merge/rebase) */
+#status-bar .statusbar-button.is-warning,
+#status-bar .statusbar-button.in-merge,
+#status-bar .statusbar-button.in-rebase {
+  color: var(--statusbar-state-warn-fg);
+  border-color: var(--statusbar-state-warn-border);
+  background: var(--statusbar-state-warn-bg);
+}
+
+#status-bar .statusbar-button.is-warning:hover,
+#status-bar .statusbar-button.in-merge:hover,
+#status-bar .statusbar-button.in-rebase:hover {
+  background: var(--statusbar-state-warn-bg-hover);
+  border-color: var(--statusbar-state-warn-border);
+}
+
+/* DANGER (conflicts) */
+#status-bar .statusbar-button.is-danger,
+#status-bar .statusbar-button.has-conflicts {
+  color: var(--statusbar-state-danger-fg);
+  border-color: var(--statusbar-state-danger-border);
+  background: var(--statusbar-state-danger-bg);
+}
+
+#status-bar .statusbar-button.is-danger:hover,
+#status-bar .statusbar-button.has-conflicts:hover {
+  background: var(--statusbar-state-danger-bg-hover);
+  border-color: var(--statusbar-state-danger-border);
+}
+
+/* compact char picker (unchanged) */
 #status-charpicker-btn {
   min-width: 26px;
   font-weight: 600;

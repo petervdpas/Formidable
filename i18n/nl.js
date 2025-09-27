@@ -47,6 +47,11 @@ export default {
   "git.quick.subtitle": "Schrijf een commitbericht en kies een actie.",
   "git.quick.placeholder": "Commitbericht…",
   "git.quick.stage_all": "Stage alles",
+  "git.quick.changes.to.commit": "wijzigingen om te committen ({0})",
+  "git.quick.state.merge": "samenvoegen",
+  "git.quick.state.rebase": "herbaseren",
+  "git.quick.state.conflicts": "{0} conflicten",
+  "git.quick.state.conflict": "{0} conflict",
 
   // Errors (template-level)
   "error.template.duplicate_keys": "Duplicaat sleutels: {0}",
@@ -439,6 +444,7 @@ export default {
   "git.branches.create": "Maak Branch",
   "git.status": "Status & Commit",
   "git.commit.message": "Commitbericht",
+  "git.commit.placeholder": "bijv. Update README en fix typos",
 
   // ── Tooltips ─────────────────────────────
   "tooltip.restart.formidable": "Herstart Formidable",

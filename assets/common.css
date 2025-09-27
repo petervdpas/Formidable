@@ -27,6 +27,31 @@
     --divider-grad-size: 6px;
     --divider-grad-stop: 60%;
 
+    /* ───── Status Bar (state colors) ───── */
+    /* INFO */
+    --statusbar-state-info-fg: var(--generic-fg-info);
+    --statusbar-state-info-border: var(--generic-border-info);
+    --statusbar-state-info-bg: var(--generic-bg-info);
+    --statusbar-state-info-bg-hover: var(--generic-bg-info-hover);
+
+    /* SUCCESS (commit possible) */
+    --statusbar-state-success-fg: var(--generic-fg-success);
+    --statusbar-state-success-border: var(--generic-border-success);
+    --statusbar-state-success-bg: var(--generic-bg-success);
+    --statusbar-state-success-bg-hover: var(--generic-bg-success-hover);
+
+    /* WARNING (merge/rebase) */
+    --statusbar-state-warn-fg: var(--generic-fg-warn);
+    --statusbar-state-warn-border: var(--generic-border-warn);
+    --statusbar-state-warn-bg: var(--generic-bg-warn);
+    --statusbar-state-warn-bg-hover: var(--generic-bg-warn-hover);
+
+    /* DANGER (conflicts) */
+    --statusbar-state-danger-fg: var(--generic-fg-error);
+    --statusbar-state-danger-border: var(--generic-border-error);
+    --statusbar-state-danger-bg: var(--generic-bg-error);
+    --statusbar-state-danger-bg-hover: var(--generic-bg-error-hover);
+
     /* ───── Field Type Colors ───── */
     --field-type-looper-bg: #b9e2c0;
     --field-type-looper-border: #999;

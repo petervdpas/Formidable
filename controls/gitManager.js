@@ -428,9 +428,11 @@ async function mergeContinue(folderPath) {
   try {
     const root = await resolveRoot(folderPath);
     if (!root) return fail("Not a repo");
-    const git = await getGitInstance(root);
-    const res = await git.raw(["merge", "--continue"]);
-    return ok(res);
+    return await withRepoLock(root, async () => {
+      const git = await getGitInstance(root);
+      const res = await git.raw(["merge", "--continue"]);
+      return ok(res);
+    });
   } catch (err) {
     return fail(err);
   }
