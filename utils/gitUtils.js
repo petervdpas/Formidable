@@ -1,19 +1,16 @@
 // utils/gitUtils.js
+
 import { EventBus } from "../modules/eventBus.js";
 import { Toast } from "./toastUtils.js";
 
-/** Backward/forward-compatible helper for request/response style events. */
 async function callWithResponse(channel, payload = {}) {
-  // Handlers that RETURN a value (not via callback)
-  const directReturnChannels = new Set([
-    "git:discard", // handleGitDiscard returns a result
-  ]);
+  const directReturnChannels = new Set(["git:discard"]);
+  const positionalCallbackChannels = new Set(["config:load"]);
 
   if (
     directReturnChannels.has(channel) &&
     typeof EventBus.emitWithResponse === "function"
   ) {
-    // Use the direct-return path for channels that support it
     try {
       return await EventBus.emitWithResponse(channel, payload);
     } catch (e) {
@@ -26,10 +23,65 @@ async function callWithResponse(channel, payload = {}) {
     }
   }
 
-  // Default path: handlers expect a callback in payload
+  if (positionalCallbackChannels.has(channel)) {
+    return await new Promise((resolve) => {
+      EventBus.emit(channel, resolve);
+    });
+  }
+
   return await new Promise((resolve) => {
     EventBus.emit(channel, { ...(payload || {}), callback: resolve });
   });
+}
+
+const CONFLICT_PAIRS = new Set(["DD", "AU", "UD", "UA", "DU", "AA", "UU"]);
+
+export function normalizeFileStatus(file) {
+  const index = String(file?.index || "").trim();
+  const work = String(file?.working_dir || "").trim();
+
+  const pair = `${index}${work}` || "??";
+  const symbol = pair === "  " ? "" : pair.replace(/\s+/g, "") || "??";
+
+  const state = classifyStatus(index, work);
+
+  return {
+    index,
+    work,
+    symbol,
+    state,
+    className: state,
+  };
+}
+
+export function classifyStatus(index, work) {
+  if (index === "!" || work === "!") return "ignored";
+  if (index === "?" || work === "?") return "untracked";
+  if (index === "U" || work === "U" || CONFLICT_PAIRS.has(`${index}${work}`)) {
+    return "conflicted";
+  }
+  if (index === "R" || work === "R") return "renamed";
+  if (index === "A" || work === "A") return "added";
+  if (index === "D" || work === "D") return "deleted";
+  if (index === "M" || work === "M") return "modified";
+  return "unknown";
+}
+
+export function mapStatusFiles(status) {
+  return (
+    status?.files?.map((f) => {
+      const norm = normalizeFileStatus(f);
+      return {
+        display: f.path,
+        value: f.path,
+        index: f.index,
+        working_dir: f.working_dir,
+        symbol: norm.symbol,
+        state: norm.state,
+        className: norm.className,
+      };
+    }) || []
+  );
 }
 
 /* ───────────────────── Config ───────────────────── */
@@ -37,6 +89,7 @@ export async function loadConfig() {
   const cfg = await callWithResponse("config:load");
   return cfg || {};
 }
+
 export function resolveGitPath(cfg) {
   return (cfg && (cfg.git_root || cfg.context_folder)) || ".";
 }
@@ -64,7 +117,7 @@ export async function commit(folderPath, message) {
   return await callWithResponse("git:commit", { folderPath, message });
 }
 export async function discardFile(folderPath, filePath) {
-  // handler returns value directly (no callback)
+  // returns directly
   return await callWithResponse("git:discard", { folderPath, filePath });
 }
 
