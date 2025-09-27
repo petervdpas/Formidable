@@ -74,3 +74,36 @@
 .git-list-item.unknown {
   background-color: var(--git-bg-unknown);
 }
+
+/* Make the commit message row stacked and stretchy */
+.git-commit-input-row {
+  display: block;              /* label above, control below */
+}
+.git-commit-input-row > label {
+  display: block;
+  margin-bottom: 6px;
+}
+.git-commit-input-row > div,
+.git-commit-input-row .inline-control,
+.git-commit-input-row .control-wrap {
+  display: block;
+  width: 100%;
+  min-width: 0;                /* avoid grid/flex min-width trapping */
+  box-sizing: border-box;
+}
+.git-commit-input-row textarea,
+#git-commit-message {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  min-height: 72px;            /* optional */
+  resize: vertical;            /* optional */
+}
+
+/* The button row is already full-width; keep it that way */
+.git-commit-row .btn,
+.git-commit-row button {
+  width: 100%;
+  display: block;
+}
