@@ -41,7 +41,7 @@ import {
   rebaseContinue,
   rebaseAbort,
   openMergetool,
-  GitRules,
+  GitRules, // <-- central rules
 } from "../utils/gitUtils.js";
 
 const uid = (p) => `${p}-${Math.random().toString(36).slice(2, 9)}`;

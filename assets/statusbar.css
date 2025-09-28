@@ -119,6 +119,20 @@
   border-color: var(--statusbar-state-info-border);
 }
 
+/* SUCCESS (ready to push) */
+#status-bar .statusbar-button.is-success,
+#status-bar .statusbar-button.push-possible {
+  color: var(--statusbar-state-success-fg);
+  border-color: var(--statusbar-state-success-border);
+  background: var(--statusbar-state-success-bg);
+}
+
+#status-bar .statusbar-button.is-success:hover,
+#status-bar .statusbar-button.push-possible:hover {
+  background: var(--statusbar-state-success-bg-hover);
+  border-color: var(--statusbar-state-success-border);
+}
+
 /* WARN (merge/rebase) */
 #status-bar .statusbar-button.is-warning,
 #status-bar .statusbar-button.in-merge,

@@ -52,6 +52,7 @@ export default {
   "git.quick.state.rebase": "rebase",
   "git.quick.state.conflicts": "{0} conflicts",
   "git.quick.state.conflict": "{0} conflict",
+  "git.quick.ready.to.push": "ready to push ({0})",
 
   // Errors (template-level)
   "error.template.duplicate_keys": "Duplicate keys: {0}",
