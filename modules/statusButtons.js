@@ -2,7 +2,10 @@
 import { t } from "../utils/i18n.js";
 import { setupPopup } from "../utils/modalUtils.js";
 import { SelectionStore } from "../utils/selectionStore.js";
-import { createOptionGrid, createOptionPanel } from "../utils/elementBuilders.js";
+import {
+  createOptionGrid,
+  createOptionPanel,
+} from "../utils/elementBuilders.js";
 import { allCharacters, toGridOptions } from "../utils/characterUtils.js";
 import { createStatusButtonConfig } from "../utils/buttonUtils.js";
 import { Toast } from "../utils/toastUtils.js";
@@ -149,22 +152,30 @@ function installCharPickerButton({ addStatusButton, EventBus, config }) {
 function installGitQuickButton({ addStatusButton, EventBus, config }) {
   if (!getFlag(config, "status_buttons.gitquick", true)) return null;
 
-  // lazy-resolve repo path once
   const gitPathPromise = (async () => {
     const cfg = await loadConfig();
     return resolveGitPath(cfg) || null;
   })();
 
+  const setDisabled = (btn, disabled) => {
+    if (!btn) return;
+    btn.disabled = !!disabled;
+    btn.setAttribute("aria-disabled", String(!!disabled));
+  };
+
+  const setPushVisual = (btn, canPush) => {
+    if (!btn) return;
+    btn.classList.toggle("is-success", !!canPush);
+  };
+
   return addStatusButton(
     createStatusGitQuickButtonConfig(async (e, btnEl) => {
       const gitPath = await gitPathPromise;
       if (!gitPath) {
-        // nothing configured; just open full modal if available
         window.openGitModal?.();
         return;
       }
 
-      // live repo snapshot
       let status = await getStatus(gitPath).catch(() => null);
       let progress = await getProgressState(gitPath).catch(() => null);
       let message = "";
@@ -175,16 +186,12 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
           status,
           progress,
           message,
-          strictPush: true, // enforce "no push before commit"
+          strictPush: true,
         });
-        if (commitBtn) {
-          commitBtn.disabled = !ev.canCommit;
-          commitBtn.setAttribute("aria-disabled", String(!ev.canCommit));
-        }
-        if (pushBtn) {
-          pushBtn.disabled = !ev.canPush;
-          pushBtn.setAttribute("aria-disabled", String(!ev.canPush));
-        }
+
+        setDisabled(commitBtn, !ev.canCommit);
+        setDisabled(pushBtn, !ev.canPush);
+        setPushVisual(pushBtn, ev.canPush);
       };
 
       const refreshFromRepo = async (commitBtn, pushBtn, msgEl) => {
@@ -222,7 +229,10 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
               value: "push",
               label: t("git.push") || "Push",
               variant: "default",
-              attributes: { "aria-disabled": "true" },
+              attributes: {
+                "aria-disabled": "true",
+                "data-variant": "success",
+              },
             },
             {
               value: "open_full",
@@ -241,8 +251,12 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
 
           switch (val) {
             case "commit": {
-              // guard via rules again
-              const ev = GitRules.evaluate({ status, progress, message: msg });
+              const ev = GitRules.evaluate({
+                status,
+                progress,
+                message: msg,
+                strictPush: true,
+              });
               if (!ev.canCommit) return;
               try {
                 await gitCommit(gitPath, msg);
@@ -250,7 +264,7 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
                 ctx.inputs.commitMsg.value = "";
                 await refreshFromRepo(commitBtn, pushBtn, ctx.inputs.commitMsg);
               } catch {
-                // swallow; toasts from backend likely already shown
+                // backend may toast errors already
               } finally {
                 EventBus.emit("status:update", { scope: "git" });
               }
@@ -271,7 +285,7 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
                 Toast.success("toast.git.push.complete");
                 await refreshFromRepo(commitBtn, pushBtn, ctx.inputs.commitMsg);
               } catch {
-                // swallow; backend may toast
+                // backend may toast errors already
               } finally {
                 EventBus.emit("status:update", { scope: "git" });
               }
@@ -279,11 +293,10 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
               break;
             }
 
-            case "open_full": {
+            case "open_full":
               window.openGitModal?.();
               activePopup?.hide?.();
               break;
-            }
 
             case "cancel":
               activePopup?.hide?.();
@@ -294,28 +307,25 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
 
       const msgEl = panel.inputs.commitMsg;
       const commitBtn =
-        panel.element.querySelector('button[value="commit"]') ||
-        panel.element.querySelector('[data-value="commit"]');
+        panel.element.querySelector('button[data-value="commit"]') ||
+        panel.element.querySelector('button[value="commit"]');
       const pushBtn =
-        panel.element.querySelector('button[value="push"]') ||
-        panel.element.querySelector('[data-value="push"]');
+        panel.element.querySelector('button[data-value="push"]') ||
+        panel.element.querySelector('button[value="push"]');
 
-      // initial compute from current repo state
       recompute(commitBtn, pushBtn, msgEl);
 
-      // react to typing
       msgEl?.addEventListener("input", () =>
         recompute(commitBtn, pushBtn, msgEl)
       );
 
-      // react to external git changes
       const off = EventBus.on("status:update", async (evt) => {
         if (evt?.scope === "git") {
           await refreshFromRepo(commitBtn, pushBtn, msgEl);
         }
       });
 
-      openSharedPopup(e.currentTarget || btnEl, panel.element, {
+      openSharedPopup(e?.currentTarget || btnEl, panel.element, {
         onClose: () => off?.(),
       });
       panel.focusFirstInput?.();
@@ -323,7 +333,6 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
   );
 }
 
-// optional aggregator
 export function installStatusButtons(deps) {
   const charBtn = installCharPickerButton(deps);
   const gitBtn = installGitQuickButton(deps);

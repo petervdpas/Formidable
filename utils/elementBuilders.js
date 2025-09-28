@@ -1022,10 +1022,10 @@ export function createOptionList(
  *     message: t("git.quick.subtitle") || "Write a commit message",
  *     inputs: [{ id: "commitMsg", kind: "textarea", placeholder: "Commit message…" }],
  *     actions: [
- *       { value: "stage_all", label: t("git.quick.stage_all") || "Stage all" },
- *       { value: "commit",    label: t("git.quick.commit")    || "Commit",    variant: "primary" },
- *       { value: "commit_push", label: t("git.quick.commit_push") || "Commit & Push", variant: "primary" },
- *       { value: "cancel",    label: t("standard.cancel") || "Cancel", variant: "default" },
+ *       { value: "stage_all",  label: t("git.quick.stage_all")  || "Stage all" },
+ *       { value: "commit",     label: t("git.quick.commit")     || "Commit",    variant: "primary" },
+ *       { value: "commit_push",label: t("git.quick.commit_push")|| "Commit & Push", variant: "primary" },
+ *       { value: "cancel",     label: t("standard.cancel")      || "Cancel",    variant: "default" },
  *     ],
  *   }, (val, ctx) => { ... });
  */
@@ -1036,10 +1036,11 @@ export function createOptionPanel(
   const wrap = document.createElement("div");
   wrap.className = `option-panel ${className}`.trim();
 
-  // header
+  // ── Header ────────────────────────────────────────────────────────────────
   if (title || message) {
     const header = document.createElement("div");
     header.className = "panel-header";
+
     if (title) {
       const h = document.createElement("div");
       h.className = "panel-title";
@@ -1055,7 +1056,7 @@ export function createOptionPanel(
     wrap.appendChild(header);
   }
 
-  // body (inputs)
+  // ── Body (inputs) ─────────────────────────────────────────────────────────
   const body = document.createElement("div");
   body.className = "panel-body";
   const inputRefs = {};
@@ -1079,10 +1080,12 @@ export function createOptionPanel(
       field = document.createElement("input");
       field.type = def.type || "text";
     }
+
     if (def.id) field.id = def.id;
     if (def.placeholder) field.placeholder = def.placeholder;
     if (def.value != null) field.value = def.value;
     if (def.className) field.className = def.className;
+    if (def.disabled === true) field.disabled = true;
 
     row.appendChild(field);
     body.appendChild(row);
@@ -1091,11 +1094,14 @@ export function createOptionPanel(
   }
   wrap.appendChild(body);
 
-  // footer (actions)
+  // ── Footer (actions) ──────────────────────────────────────────────────────
   const footer = document.createElement("div");
   footer.className = "panel-actions";
 
   const call = (val) => onAction?.(val, { inputs: inputRefs });
+
+  const truthy = (v) =>
+    v === true || v === "true" || v === 1 || v === "1" || v === "";
 
   for (const a of actions) {
     const btn = createPanelButton({
@@ -1108,12 +1114,27 @@ export function createOptionPanel(
       attributes: a.attributes || {},
       ariaLabel: a.ariaLabel || a.label || a.value,
     });
+
+    btn.setAttribute("data-value", a.value);
+
+    const attrs = a.attributes || {};
+    const initiallyDisabled =
+      truthy(attrs.disabled) || truthy(attrs["aria-disabled"]);
+    if (initiallyDisabled) {
+      btn.disabled = true;
+      btn.setAttribute("aria-disabled", "true");
+    }
+
+    if (attrs["data-variant"]) {
+      btn.setAttribute("data-variant", String(attrs["data-variant"]));
+    }
+
     footer.appendChild(btn);
   }
 
   wrap.appendChild(footer);
 
-  // quality-of-life helpers
+  // ── Helpers ───────────────────────────────────────────────────────────────
   wrap.focusFirstInput = () => {
     const el = Object.values(inputRefs)[0];
     el?.focus?.();
