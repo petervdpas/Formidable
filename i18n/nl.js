@@ -424,10 +424,22 @@ export default {
   "git.branches": "Takken",
   "git.branch.new": "Nieuwe tak",
   "git.branch.new.placeholder": "nieuwe-branch-naam",
-    "git.tracked": "Bijgehouden",
+  "git.tracked": "Bijgehouden",
   "git.status": "Status & Commit",
   "git.commit.message": "Commitbericht",
   "git.commit.placeholder": "bijv. Update README en fix typos",
+
+  "git.conflicts.header": "Merge / Rebase / Conflicten",
+  "git.conflicts.none": "Geen conflicten",
+  "git.merge.continue": "Merge doorgaan",
+  "git.merge.abort": "Merge afbreken",
+  "git.rebase.continue": "Rebase doorgaan",
+  "git.rebase.abort": "Rebase afbreken",
+  "git.pick.ours": "Lokale versie",
+  "git.pick.theirs": "Remote versie",
+  "git.pick.ours.all": "Alles oplossen als lokaal",
+  "git.pick.theirs.all": "Alles oplossen als remote",
+  "git.mergetool.open": "Mergetool",
 
   "git.error.nonFastForward":
     "Remote heeft nieuwe commits. Pull (of rebase) eerst.",
@@ -436,7 +448,7 @@ export default {
     "Commit of stash je wijzigingen, en pull dan.",
   "git.error.notRepo": "Geen Git-repository.",
   "git.error.unknown": "Onbekende Git-fout.",
-  
+
   "git.reason.busy": "Voltooi eerst de merge of rebase.",
   "git.reason.noChanges": "Geen wijzigingen om te committen.",
   "git.reason.noMsg": "Voer een commitbericht in.",

@@ -701,10 +701,5 @@ export function createSplitModalLayout({
 
   body.appendChild(wrap);
 
-  EventBus.emit("logging:default", [
-    "[SplitModal] Initialized split layout",
-    { leftWidth, rightWidth, gap, className: wrap.className, showContent },
-  ]);
-
   return { wrap, left, right };
 }

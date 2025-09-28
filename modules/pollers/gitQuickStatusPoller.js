@@ -33,11 +33,11 @@ function applyStateToButton(btnSelector, progress = {}, status = null) {
   el.classList.toggle("in-merge", false);
   el.classList.toggle("in-rebase", false);
   el.classList.toggle("commit-possible", false);
-  el.classList.toggle("push-possible", false); 
+  el.classList.toggle("push-possible", false);
 
   el.classList.toggle("is-danger", false);
   el.classList.toggle("is-warning", false);
-  el.classList.toggle("is-success", false); 
+  el.classList.toggle("is-success", false);
   el.classList.toggle("is-info", false);
 
   let title = defaultTitle;
@@ -48,7 +48,6 @@ function applyStateToButton(btnSelector, progress = {}, status = null) {
 
     const mergeTxt = t("git.quick.state.merge", "merge");
     const rebaseTxt = t("git.quick.state.rebase", "rebase");
-
 
     const n = (progress.conflicted || []).length;
     const conflictsTxt =
@@ -85,7 +84,7 @@ function applyStateToButton(btnSelector, progress = {}, status = null) {
     const tail = t(
       "git.quick.ready.to.push",
       [ahead],
-      `ready to push (${ahead})` 
+      `ready to push (${ahead})`
     );
     title = `${prefix}: ${tail}`;
   } else {
@@ -146,7 +145,7 @@ export async function startGitQuickStatusPoller(
         +inMerge,
         +inRebase,
         +commitPossible,
-        +pushPossible, 
+        +pushPossible,
         state.filesCount,
         ahead,
         (progress?.conflicted || []).join("|"),
@@ -160,8 +159,15 @@ export async function startGitQuickStatusPoller(
     },
   });
 
+  let runNowTimer = null;
+  const noisy = new Set(["progress", "status"]);
   const off = EventBus.on("status:update", (e) => {
-    if (e?.scope === "git") EventBus.emit("tasks:runNow", POLLER_ID);
+    if (e?.scope !== "git") return;
+    if (noisy.has(e?.action)) return;
+    clearTimeout(runNowTimer);
+    runNowTimer = setTimeout(() => {
+      EventBus.emit("tasks:runNow", POLLER_ID);
+    }, 250);
   });
 
   const mo = new MutationObserver(() => {

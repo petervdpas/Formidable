@@ -31,17 +31,14 @@ import {
   mapStatusFiles,
   normalizeFileStatus,
   getProgressState,
-  getConflicts,
   chooseOurs,
   chooseTheirs,
-  markResolved,
-  revertResolution,
   mergeContinue,
   mergeAbort,
   rebaseContinue,
   rebaseAbort,
   openMergetool,
-  GitRules, // <-- central rules
+  GitRules,
 } from "../utils/gitUtils.js";
 
 const uid = (p) => `${p}-${Math.random().toString(36).slice(2, 9)}`;
@@ -72,7 +69,7 @@ function makeGitBadge({ parent, key, count, marginLeft = "" }) {
 export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   const node = document.createElement("div");
 
-  /* ───── Branch / remote block (existing) ───── */
+  /* ───── Branch / remote block ───── */
   const section = addContainerElement({
     parent: node,
     className: "git-section",
@@ -97,7 +94,6 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
         opts: ["--prune"],
       });
       Toast.success("toast.git.fetch.complete");
-      // refresh remote branches list after fetch
       await refreshRemoteBranches();
     } finally {
       fetchBtn.disabled = false;
@@ -265,135 +261,154 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   };
   renderTrackingRow();
 
-  /* ───── NEW: Merge / Rebase / Conflicts block ───── */
+  /* ───── Conflicts ───── */
   const conflictSection = addContainerElement({
     parent: node,
     className: "git-section",
   });
+
   addContainerElement({
     parent: conflictSection,
     tag: "h3",
-    textContent: "Merge / Rebase / Conflicts",
-    // i18nKey: "git.conflicts.header"
+    i18nKey: "git.conflicts.header",
+    attributes: { style: "margin-top:0" },
   });
 
-  // State nodes
-  const stateRow = addContainerElement({
+  const topBar = addContainerElement({
     parent: conflictSection,
-    className: "git-state-row",
-    attributes: { style: "font-size:12px;opacity:.9;margin-bottom:6px" },
+    className: "git-actions-top",
+    attributes: {
+      style: "display:flex;gap:6px;align-items:center;margin-bottom:8px",
+    },
   });
-  const actionsRow = addContainerElement({
-    parent: conflictSection,
-    className: "git-actions-row",
-  });
+
   const listWrap = addContainerElement({
     parent: conflictSection,
     className: "git-conflict-list",
   });
 
-  // Helpers to render
   let currentProgress = { inMerge: false, inRebase: false, conflicted: [] };
 
-  function renderState() {
-    stateRow.innerHTML = "";
-    const s = currentProgress;
-    const line = addContainerElement({ parent: stateRow });
-    const bits = [];
-    bits.push(`merge: ${s.inMerge ? "yes" : "no"}`);
-    bits.push(`rebase: ${s.inRebase ? "yes" : "no"}`);
-    bits.push(`conflicts: ${s.conflicted?.length || 0}`);
-    addContainerElement({
-      parent: line,
-      tag: "span",
-      textContent: bits.join(" · "),
-    });
+  function setBusy(container, busy) {
+    container
+      .querySelectorAll("button")
+      .forEach((b) => (b.disabled = !!busy || b._disabledByRule === true));
   }
 
-  function makeSmallBtn(label, handler) {
-    const b = document.createElement("button");
-    b.className = "btn btn--small";
-    b.textContent = label;
-    b.addEventListener("click", handler);
-    return b;
-  }
-
-  function renderActions() {
-    actionsRow.innerHTML = "";
+  function primaryActions() {
+    topBar.innerHTML = "";
     const s = currentProgress;
 
     if (s.inMerge) {
-      actionsRow.appendChild(
-        makeSmallBtn("Merge Continue", async () => {
-          try {
-            actionsRow
-              .querySelectorAll("button")
-              .forEach((b) => (b.disabled = true));
-            const res = await mergeContinue(gitPath);
-            if (res?.ok === false) {
-              Toast.error(String(res?.error || "merge --continue failed"));
-            } else {
-              Toast.success("Merge continued");
-            }
-          } finally {
-            await refreshProgress();
-          }
-        })
-      );
-      actionsRow.appendChild(
-        makeSmallBtn("Merge Abort", async () => {
-          try {
-            actionsRow
-              .querySelectorAll("button")
-              .forEach((b) => (b.disabled = true));
-            const res = await mergeAbort(gitPath);
-            if (res?.ok === false) {
-              Toast.error(String(res?.error || "merge --abort failed"));
-            } else {
-              Toast.success("Merge aborted");
-            }
-          } finally {
-            await refreshProgress();
-          }
-        })
-      );
+      const cont = document.createElement("button");
+      cont.className = "btn btn--primary";
+      cont.textContent = t("git.merge.continue") || "Merge Continue";
+      cont.addEventListener("click", async () => {
+        try {
+          setBusy(conflictSection, true);
+          const res = await mergeContinue(gitPath);
+          if (res?.ok === false)
+            Toast.error(String(res?.error || "merge --continue failed"));
+          else Toast.success("Merge continued");
+        } finally {
+          await refreshProgress();
+          setBusy(conflictSection, false);
+        }
+      });
+
+      const abort = document.createElement("button");
+      abort.className = "btn btn--quiet";
+      abort.textContent = t("git.merge.abort") || "Merge Abort";
+      abort.addEventListener("click", async () => {
+        try {
+          setBusy(conflictSection, true);
+          const res = await mergeAbort(gitPath);
+          if (res?.ok === false)
+            Toast.error(String(res?.error || "merge --abort failed"));
+          else Toast.success("Merge aborted");
+        } finally {
+          await refreshProgress();
+          setBusy(conflictSection, false);
+        }
+      });
+
+      topBar.append(cont, abort);
+    } else if (s.inRebase) {
+      const cont = document.createElement("button");
+      cont.className = "btn btn--primary";
+      cont.textContent = t("git.rebase.continue") || "Rebase Continue";
+      cont.addEventListener("click", async () => {
+        try {
+          setBusy(conflictSection, true);
+          const res = await rebaseContinue(gitPath);
+          if (res?.ok === false)
+            Toast.error(String(res?.error || "rebase --continue failed"));
+          else Toast.success("Rebase continued");
+        } finally {
+          await refreshProgress();
+          setBusy(conflictSection, false);
+        }
+      });
+
+      const abort = document.createElement("button");
+      abort.className = "btn btn--quiet";
+      abort.textContent = t("git.rebase.abort") || "Rebase Abort";
+      abort.addEventListener("click", async () => {
+        try {
+          setBusy(conflictSection, true);
+          const res = await rebaseAbort(gitPath);
+          if (res?.ok === false)
+            Toast.error(String(res?.error || "rebase --abort failed"));
+          else Toast.success("Rebase aborted");
+        } finally {
+          await refreshProgress();
+          setBusy(conflictSection, false);
+        }
+      });
+
+      topBar.append(cont, abort);
     }
 
-    if (s.inRebase) {
-      actionsRow.appendChild(
-        makeSmallBtn("Rebase Continue", async () => {
-          try {
-            actionsRow
-              .querySelectorAll("button")
-              .forEach((b) => (b.disabled = true));
-            const res = await rebaseContinue(gitPath);
-            if (res?.ok === false) {
-              Toast.error(String(res?.error || "rebase --continue failed"));
-            } else {
-              Toast.success("Rebase continued");
-            }
-          } finally {
-            await refreshProgress();
+    // Bulk actions only if >1 conflicts
+    if ((s.conflicted?.length || 0) > 1) {
+      const spacer = document.createElement("div");
+      spacer.style.flex = "1";
+      topBar.appendChild(spacer);
+
+      const allOurs = document.createElement("button");
+      allOurs.className = "btn btn--small";
+      allOurs.textContent = t("git.pick.ours.all") || "Resolve all as Ours";
+      allOurs.addEventListener("click", async () => {
+        try {
+          setBusy(conflictSection, true);
+          for (const f of s.conflicted) {
+            await chooseOurs(gitPath, f);
           }
-        })
-      );
-      actionsRow.appendChild(
-        makeSmallBtn("Rebase Abort", async () => {
-          try {
-            actionsRow
-              .querySelectorAll("button")
-              .forEach((b) => (b.disabled = true));
-            const res = await rebaseAbort(gitPath);
-            if (res?.ok === false) {
-              Toast.error(String(res?.error || "rebase --abort failed"));
-            } else {
-              Toast.success("Rebase aborted");
-            }
-          } finally {
-            await refreshProgress();
+          Toast.success("Resolved all as ours");
+        } finally {
+          await refreshProgress();
+          setBusy(conflictSection, false);
+        }
+      });
+
+      const allTheirs = document.createElement("button");
+      allTheirs.className = "btn btn--small";
+      allTheirs.textContent =
+        t("git.pick.theirs.all") || "Resolve all as Theirs";
+      allTheirs.addEventListener("click", async () => {
+        try {
+          setBusy(conflictSection, true);
+          for (const f of s.conflicted) {
+            await chooseTheirs(gitPath, f);
           }
-        })
-      );
+          Toast.success("Resolved all as theirs");
+        } finally {
+          await refreshProgress();
+          setBusy(conflictSection, false);
+        }
+      });
+
+      topBar.append(allOurs, allTheirs);
     }
   }
 
@@ -405,7 +420,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
         parent: listWrap,
         tag: "div",
         className: "muted",
-        textContent: "No conflicts",
+        i18nKey: "git.conflicts.none",
       });
       return;
     }
@@ -414,85 +429,68 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
       const row = addContainerElement({
         parent: listWrap,
         className: "git-conflict-item",
+        attributes: {
+          style: "display:flex;gap:6px;align-items:center",
+        },
       });
 
-      // label
       addContainerElement({
         parent: row,
         tag: "code",
         textContent: file,
         attributes: {
           style:
-            "flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;",
+            "flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis",
         },
       });
 
-      // actions: ours, theirs, mergetool, mark, revert
-      row.appendChild(
-        makeSmallBtn("Ours", async () => {
-          try {
-            row.querySelectorAll("button").forEach((b) => (b.disabled = true));
-            const res = await chooseOurs(gitPath, file);
-            if (res?.ok === false)
-              Toast.error(String(res?.error || "choose ours failed"));
-            else Toast.success("Picked ours");
-          } finally {
-            await refreshProgress();
-          }
-        })
-      );
-      row.appendChild(
-        makeSmallBtn("Theirs", async () => {
-          try {
-            row.querySelectorAll("button").forEach((b) => (b.disabled = true));
-            const res = await chooseTheirs(gitPath, file);
-            if (res?.ok === false)
-              Toast.error(String(res?.error || "choose theirs failed"));
-            else Toast.success("Picked theirs");
-          } finally {
-            await refreshProgress();
-          }
-        })
-      );
-      row.appendChild(
-        makeSmallBtn("Mergetool", async () => {
-          try {
-            row.querySelectorAll("button").forEach((b) => (b.disabled = true));
-            const res = await openMergetool(gitPath, file);
-            if (res?.ok === false)
-              Toast.error(String(res?.error || "mergetool failed"));
-            else Toast.info("Mergetool launched");
-          } finally {
-            await refreshProgress();
-          }
-        })
-      );
-      row.appendChild(
-        makeSmallBtn("Mark", async () => {
-          try {
-            row.querySelectorAll("button").forEach((b) => (b.disabled = true));
-            const res = await markResolved(gitPath, file);
-            if (res?.ok === false)
-              Toast.error(String(res?.error || "mark resolved failed"));
-            else Toast.success("Marked resolved");
-          } finally {
-            await refreshProgress();
-          }
-        })
-      );
-      row.appendChild(
-        makeSmallBtn("Revert", async () => {
-          try {
-            row.querySelectorAll("button").forEach((b) => (b.disabled = true));
-            const res = await revertResolution(gitPath, file);
-            if (res?.ok === false)
-              Toast.error(String(res?.error || "revert resolution failed"));
-            else Toast.info("Reverted resolution");
-          } finally {
-            await refreshProgress();
-          }
-        })
-      );
+      const btnOurs = document.createElement("button");
+      btnOurs.className = "btn btn--small";
+      btnOurs.textContent = t("git.pick.ours") || "Ours";
+      btnOurs.addEventListener("click", async () => {
+        try {
+          setBusy(row, true);
+          const res = await chooseOurs(gitPath, file);
+          if (res?.ok === false)
+            Toast.error(String(res?.error || "choose ours failed"));
+          else Toast.success("Picked ours");
+        } finally {
+          await refreshProgress();
+          setBusy(row, false);
+        }
+      });
+
+      const btnTheirs = document.createElement("button");
+      btnTheirs.className = "btn btn--small";
+      btnTheirs.textContent = t("git.pick.theirs") || "Theirs";
+      btnTheirs.addEventListener("click", async () => {
+        try {
+          setBusy(row, true);
+          const res = await chooseTheirs(gitPath, file);
+          if (res?.ok === false)
+            Toast.error(String(res?.error || "choose theirs failed"));
+          else Toast.success("Picked theirs");
+        } finally {
+          await refreshProgress();
+          setBusy(row, false);
+        }
+      });
+
+      const btnTool = document.createElement("button");
+      btnTool.className = "btn btn--small";
+      btnTool.textContent = t("git.mergetool.open") || "Mergetool";
+      btnTool.addEventListener("click", async () => {
+        try {
+          setBusy(row, true);
+          const res = await openMergetool(gitPath, file);
+        } finally {
+          // We don't force-refresh here; mergetool is external.
+          setBusy(row, false);
+          Toast.info("Mergetool launched");
+        }
+      });
+
+      row.append(btnOurs, btnTheirs, btnTool);
     });
   }
 
@@ -503,16 +501,17 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
       inRebase: false,
       conflicted: [],
     };
-    renderState();
-    renderActions();
+    primaryActions();
     renderConflictList();
     translateDOM(node);
-    EventBus.emit("status:update", { scope: "git", action: "progress" });
+    EventBus.emit("status:update", { scope: "git-ui", action: "progress" });
   }
 
-  // keep in sync when others change git state
   const off = EventBus.on("status:update", (e) => {
-    if (e?.scope === "git") refreshProgress();
+    if (e?.scope !== "git") return;
+    // ignore UI-driven refresh pings
+    if (e?.action === "progress" || e?.action === "status") return;
+    refreshProgress();
   });
 
   // initial paint of progress
@@ -681,7 +680,7 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
     currentStatus = s || currentStatus;
     currentProgress = p || currentProgress;
     await gitListManager.loadList();
-    EventBus.emit("status:update", { scope: "git", action: "status" });
+    EventBus.emit("status:update", { scope: "git-ui", action: "status" });
   }
 
   let gitListManager = null;
