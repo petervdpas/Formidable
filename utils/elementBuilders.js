@@ -1029,6 +1029,7 @@ export function createOptionList(
  *     ],
  *   }, (val, ctx) => { ... });
  */
+// utils/elementBuilders.js
 export function createOptionPanel(
   { title = "", message = "", inputs = [], actions = [], className = "" } = {},
   onAction = null
@@ -1103,6 +1104,8 @@ export function createOptionPanel(
   const truthy = (v) =>
     v === true || v === "true" || v === 1 || v === "1" || v === "";
 
+  const actionRefs = new Map();
+
   for (const a of actions) {
     const btn = createPanelButton({
       text: a.label ?? a.value,
@@ -1130,6 +1133,7 @@ export function createOptionPanel(
     }
 
     footer.appendChild(btn);
+    actionRefs.set(a.value, btn);
   }
 
   wrap.appendChild(footer);
@@ -1140,7 +1144,35 @@ export function createOptionPanel(
     el?.focus?.();
   };
 
-  return { element: wrap, inputs: inputRefs };
+  // expose action controls
+  const actionsApi = {
+    get: (val) => actionRefs.get(val) || null,
+    setEnabled: (val, enabled) => {
+      const b = actionRefs.get(val);
+      if (!b) return;
+      b.disabled = !enabled;
+      b.setAttribute("aria-disabled", String(!enabled));
+    },
+    setVariant: (val, variant) => {
+      const b = actionRefs.get(val);
+      if (!b) return;
+      // remove any previous btn-* variant class we may have set
+      b.classList.forEach((c) => {
+        if (/^btn-(default|primary|danger|quiet|okay)$/i.test(c)) {
+          b.classList.remove(c);
+        }
+      });
+      b.classList.add(`btn-${variant}`);
+      b.setAttribute("data-variant", variant);
+    },
+    setLabel: (val, text) => {
+      const b = actionRefs.get(val);
+      if (!b) return;
+      b.textContent = text;
+    },
+  };
+
+  return { element: wrap, inputs: inputRefs, actions: actionsApi };
 }
 
 function fillGrid(options, makeBtn, settings) {

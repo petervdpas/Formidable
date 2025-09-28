@@ -157,17 +157,6 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
     return resolveGitPath(cfg) || null;
   })();
 
-  const setDisabled = (btn, disabled) => {
-    if (!btn) return;
-    btn.disabled = !!disabled;
-    btn.setAttribute("aria-disabled", String(!!disabled));
-  };
-
-  const setPushVisual = (btn, canPush) => {
-    if (!btn) return;
-    btn.classList.toggle("is-success", !!canPush);
-  };
-
   return addStatusButton(
     createStatusGitQuickButtonConfig(async (e, btnEl) => {
       const gitPath = await gitPathPromise;
@@ -178,31 +167,6 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
 
       let status = await getStatus(gitPath).catch(() => null);
       let progress = await getProgressState(gitPath).catch(() => null);
-      let message = "";
-
-      const recompute = (commitBtn, pushBtn, msgEl) => {
-        message = (msgEl?.value || "").trim();
-        const ev = GitRules.evaluate({
-          status,
-          progress,
-          message,
-          strictPush: true,
-        });
-
-        setDisabled(commitBtn, !ev.canCommit);
-        setDisabled(pushBtn, !ev.canPush);
-        setPushVisual(pushBtn, ev.canPush);
-      };
-
-      const refreshFromRepo = async (commitBtn, pushBtn, msgEl) => {
-        const [s, p] = await Promise.all([
-          getStatus(gitPath).catch(() => null),
-          getProgressState(gitPath).catch(() => null),
-        ]);
-        if (s) status = s;
-        if (p) progress = p;
-        recompute(commitBtn, pushBtn, msgEl);
-      };
 
       const panel = createOptionPanel(
         {
@@ -228,16 +192,13 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
             {
               value: "push",
               label: t("git.push") || "Push",
-              variant: "default",
-              attributes: {
-                "aria-disabled": "true",
-                "data-variant": "okay",
-              },
+              variant: "default", 
+              attributes: { "aria-disabled": "true" },
             },
             {
               value: "open_full",
               label: t("git.quick.open_full") || "Open Git…",
-              variant: "info",
+              variant: "default",
             },
             {
               value: "cancel",
@@ -258,13 +219,15 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
                 strictPush: true,
               });
               if (!ev.canCommit) return;
+
               try {
                 await gitCommit(gitPath, msg);
                 Toast.success("toast.git.commit.complete");
                 ctx.inputs.commitMsg.value = "";
-                await refreshFromRepo(commitBtn, pushBtn, ctx.inputs.commitMsg);
+                await refreshFromRepo();
+                applyRules();
               } catch {
-                // backend may toast errors already
+                // backend likely already toasted errors
               } finally {
                 EventBus.emit("status:update", { scope: "git" });
               }
@@ -280,12 +243,14 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
                 strictPush: true,
               });
               if (!ev.canPush) return;
+
               try {
                 await gitPush(gitPath);
                 Toast.success("toast.git.push.complete");
-                await refreshFromRepo(commitBtn, pushBtn, ctx.inputs.commitMsg);
+                await refreshFromRepo();
+                applyRules();
               } catch {
-                // backend may toast errors already
+                // backend likely already toasted errors
               } finally {
                 EventBus.emit("status:update", { scope: "git" });
               }
@@ -306,22 +271,38 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
       );
 
       const msgEl = panel.inputs.commitMsg;
-      const commitBtn =
-        panel.element.querySelector('button[data-value="commit"]') ||
-        panel.element.querySelector('button[value="commit"]');
-      const pushBtn =
-        panel.element.querySelector('button[data-value="push"]') ||
-        panel.element.querySelector('button[value="push"]');
 
-      recompute(commitBtn, pushBtn, msgEl);
+      const refreshFromRepo = async () => {
+        const [s, p] = await Promise.all([
+          getStatus(gitPath).catch(() => null),
+          getProgressState(gitPath).catch(() => null),
+        ]);
+        if (s) status = s;
+        if (p) progress = p;
+      };
 
-      msgEl?.addEventListener("input", () =>
-        recompute(commitBtn, pushBtn, msgEl)
-      );
+      const applyRules = () => {
+        const message = (msgEl?.value || "").trim();
+        const ev = GitRules.evaluate({
+          status,
+          progress,
+          message,
+          strictPush: true,
+        });
+
+        panel.actions.setEnabled("commit", ev.canCommit);
+        panel.actions.setEnabled("push", ev.canPush);
+        panel.actions.setVariant("push", ev.canPush ? "okay" : "default");
+      };
+
+      applyRules();
+
+      msgEl?.addEventListener("input", applyRules);
 
       const off = EventBus.on("status:update", async (evt) => {
         if (evt?.scope === "git") {
-          await refreshFromRepo(commitBtn, pushBtn, msgEl);
+          await refreshFromRepo();
+          applyRules();
         }
       });
 
