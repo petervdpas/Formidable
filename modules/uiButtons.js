@@ -250,44 +250,44 @@ export function createFormRenderIconButton(onClick) {
 // --- Git buttons ---
 export function createGitCommitButton(onClick, disabled = false) {
   return createButton({
-    text: t("git.commit"),
-    i18nKey: "git.commit",
+    text: t("button.git.commit"),
+    i18nKey: "button.git.commit",
     className: "btn-info",
     identifier: "git-commit",
     onClick,
     disabled,
-    ariaLabel: t("aria.commit"),
+    ariaLabel: t("aria.git.commit"),
   });
 }
 
 export function createGitPushButton(onClick, disabled = false) {
   return createButton({
-    text: t("git.push"),
-    i18nKey: "git.push",
+    text: t("button.git.push"),
+    i18nKey: "button.git.push",
     className: "btn-info",
     identifier: "git-push",
     onClick,
     disabled,
-    ariaLabel: t("aria.push"),
+    ariaLabel: t("aria.git.push"),
   });
 }
 
 export function createGitPullButton(onClick, disabled = false) {
   return createButton({
-    text: t("git.pull"),
-    i18nKey: "git.pull",
+    text: t("button.git.pull"),
+    i18nKey: "button.git.pull",
     className: "btn-info",
     identifier: "git-pull",
     onClick,
     disabled,
-    ariaLabel: t("aria.pull"),
+    ariaLabel: t("aria.git.pull"),
   });
 }
 
 export function createGitDiscardButton(filePath, onClick) {
   return createButton({
-    text: t("git.discard"),
-    i18nKey: "git.discard",
+    text: t("button.git.discard"),
+    i18nKey: "button.git.discard",
     className: "btn-warn btn-discard",
     onClick,
     attributes: {
@@ -298,37 +298,37 @@ export function createGitDiscardButton(filePath, onClick) {
 
 export function createGitFetchButton(onClick, disabled = false) {
   return createButton({
-    text: t("git.fetch"),
-    i18nKey: "git.fetch",
+    text: t("button.git.fetch"),
+    i18nKey: "button.git.fetch",
     className: "btn-default",
     identifier: "git-fetch",
     onClick,
     disabled,
-    ariaLabel: t("aria.fetch"),
+    ariaLabel: t("aria.git.fetch"),
   });
 }
 
 export function createGitCheckoutButton(onClick, disabled = false) {
   return createButton({
-    text: t("git.checkout"),
-    i18nKey: "git.checkout",
+    text: t("button.git.checkout"),
+    i18nKey: "button.git.checkout",
     className: "btn-default",
     identifier: "git-checkout",
     onClick,
     disabled,
-    ariaLabel: t("aria.checkout"),
+    ariaLabel: t("aria.git.checkout"),
   });
 }
 
 export function createGitCreateCheckoutButton(onClick, disabled = false) {
   return createButton({
-    text: t("git.create"),
-    i18nKey: "git.create",
+    text: t("button.git.create"),
+    i18nKey: "button.git.create",
     className: "btn-default",
     identifier: "git-create-checkout",
     onClick,
     disabled,
-    ariaLabel: t("aria.createAndCheckout"),
+    ariaLabel: t("aria.git.create"),
   });
 }
 

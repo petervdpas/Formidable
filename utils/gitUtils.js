@@ -1,6 +1,7 @@
 // utils/gitUtils.js
 import { EventBus } from "../modules/eventBus.js";
 import { Toast } from "./toastUtils.js";
+import { t } from "./i18n.js";
 
 async function callWithResponse(channel, payload = {}) {
   const directReturnChannels = new Set(["git:discard"]);
@@ -85,14 +86,21 @@ export function mapStatusFiles(status) {
 
 // ── One-stop rules object ───────────────────────────────────────────────────
 export const GitRules = Object.freeze({
-  toNum(v) { return (typeof v === "number" ? v : null); },
-
-  isBusy(p) {
-    return !!(p?.inMerge || p?.inRebase ||
-      (Array.isArray(p?.conflicted) && p.conflicted.length > 0));
+  toNum(v) {
+    return typeof v === "number" ? v : null;
   },
 
-  filesCount(status) { return Array.isArray(status?.files) ? status.files.length : 0; },
+  isBusy(p) {
+    return !!(
+      p?.inMerge ||
+      p?.inRebase ||
+      (Array.isArray(p?.conflicted) && p.conflicted.length > 0)
+    );
+  },
+
+  filesCount(status) {
+    return Array.isArray(status?.files) ? status.files.length : 0;
+  },
 
   deriveState(status, progress = null) {
     return {
@@ -103,49 +111,57 @@ export const GitRules = Object.freeze({
     };
   },
 
-  // legacy-style (list/message) – still available if you need it
-  canCommitLegacy({ listLen, message }) {
-    return listLen > 0 && Boolean(message && message.trim());
-  },
-  canPushLegacy({ status }) {
-    const a = this.toNum(status?.ahead);
-    return a !== null && a > 0;
-  },
-  canPullLegacy({ status }) {
-    const a = this.toNum(status?.ahead);
-    const b = this.toNum(status?.behind);
-    if (a === null || b === null) return true;
-    if (a > 0) return false;
-    return b > 0;
+  canCommit(state, message) {
+    return (
+      !state.busy && state.filesCount > 0 && Boolean(message && message.trim())
+    );
   },
 
-  // state-based (preferred)
-  canCommit(state, message) {
-    return !state.busy && state.filesCount > 0 && Boolean(message && message.trim());
-  },
   canPush(state, { strict = true } = {}) {
     if (state.busy) return false;
-    if (strict && state.filesCount > 0) return false; // “no push before commit”
+    if (strict && state.filesCount > 0) return false;
     return state.ahead !== null && state.ahead > 0;
   },
+
   canPull(state) {
     if (state.busy) return false;
+    if (state.filesCount > 0) return false; // ⟵ important change
     if (state.ahead === null || state.behind === null) return true;
     if (state.ahead > 0) return false;
     return state.behind > 0;
   },
 
-  /** Convenience: compute everything at once */
+  canAutoStashPull(state) {
+    return (
+      !state.busy &&
+      state.filesCount > 0 &&
+      (state.behind ?? 0) > 0 &&
+      (state.ahead ?? 0) === 0
+    );
+  },
+
   evaluate({ status, progress = null, message = "", strictPush = true } = {}) {
     const state = this.deriveState(status, progress);
     return {
       state,
       canCommit: this.canCommit(state, message),
-      canPush:   this.canPush(state, { strict: strictPush }),
-      canPull:   this.canPull(state),
+      canPush: this.canPush(state, { strict: strictPush }),
+      canPull: this.canPull(state),
+      canAutoStashPull: this.canAutoStashPull(state),
     };
   },
 });
+
+function prettyGitError(err) {
+  const msg = String(err?.message || err || "");
+  if (/non-fast-forward/i.test(msg)) return t("git.error.nonFastForward");
+  if (/no upstream|has no upstream/i.test(msg))
+    return t("git.error.noUpstream");
+  if (/would be overwritten by merge/i.test(msg))
+    return t("git.error.wouldOverwriteMerge");
+  if (/not a git repository/i.test(msg)) return t("git.error.notRepo");
+  return t("git.error.unknown");
+}
 
 /* ───────────────────── Config ───────────────────── */
 export async function loadConfig() {
@@ -170,28 +186,47 @@ export async function getStatus(folderPath) {
 export async function getRemoteInfo(folderPath) {
   return await callWithResponse("git:remote-info", { folderPath });
 }
-export async function pull(folderPath) {
-  return await callWithResponse("git:pull", { folderPath });
+export async function pull(folderPath, opts = {}) {
+  try {
+    return await callWithResponse("git:pull", { folderPath, ...opts });
+  } catch (err) {
+    const msg = String(err?.message || err);
+    if (/would be overwritten by merge/i.test(msg)) {
+      Toast.warning("toast.git.pull.localChangesBlocked", [
+        "Commit or stash your changes, then pull.",
+      ]);
+    } else {
+      Toast.error("toast.git.pull.failed", [msg]);
+    }
+    throw err;
+  }
 }
-export async function push(folderPath) {
-  return await callWithResponse("git:push", { folderPath });
+export async function push(folderPath, { notify = true } = {}) {
+  try {
+    return await callWithResponse("git:push", { folderPath });
+  } catch (err) {
+    if (notify) Toast.error("toast.git.push.failed", [prettyGitError(err)]);
+    throw err;
+  }
 }
-export async function commit(folderPath, message) {
-  return await callWithResponse("git:commit", { folderPath, message });
+export async function commit(folderPath, message, { notify = true } = {}) {
+  try {
+    return await callWithResponse("git:commit", { folderPath, message });
+  } catch (err) {
+    if (notify) Toast.error("toast.git.commit.failed", [prettyGitError(err)]);
+    throw err;
+  }
 }
 export async function discardFile(folderPath, filePath) {
-  // returns directly
   return await callWithResponse("git:discard", { folderPath, filePath });
 }
 
 /* ───────────────────── Conflicts / Merge / Rebase ───────────────────── */
 export async function getConflicts(folderPath) {
-  // returns array of conflicted file paths
   return await callWithResponse("git:conflicts", { folderPath });
 }
 
 export async function getProgressState(folderPath) {
-  // { inMerge:boolean, inRebase:boolean, conflicted:string[] }
   return await callWithResponse("git:progress-state", { folderPath });
 }
 

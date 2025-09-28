@@ -1014,21 +1014,6 @@ export function createOptionList(
   return list;
 }
 
-/**
- * A lightweight "mini-modal" style panel for popups.
- * Usage:
- *   const { element, inputs } = createOptionPanel({
- *     title: t("git.quick.title") || "Quick Commit",
- *     message: t("git.quick.subtitle") || "Write a commit message",
- *     inputs: [{ id: "commitMsg", kind: "textarea", placeholder: "Commit message…" }],
- *     actions: [
- *       { value: "stage_all",  label: t("git.quick.stage_all")  || "Stage all" },
- *       { value: "commit",     label: t("git.quick.commit")     || "Commit",    variant: "primary" },
- *       { value: "commit_push",label: t("git.quick.commit_push")|| "Commit & Push", variant: "primary" },
- *       { value: "cancel",     label: t("standard.cancel")      || "Cancel",    variant: "default" },
- *     ],
- *   }, (val, ctx) => { ... });
- */
 // utils/elementBuilders.js
 export function createOptionPanel(
   { title = "", message = "", inputs = [], actions = [], className = "" } = {},

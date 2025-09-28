@@ -38,15 +38,12 @@ export default {
   "status.buttonBar.tooltip.characterPicker": "Karakterkiezer",
   "status.buttonBar.aria.characterPicker": "Open Karakterkiezer",
 
-  "git.quick.stage_all": "Stage alles",
   "git.quick.commit": "Commit…",
-  "git.quick.commit_push": "Commit & Push",
-  "git.quick.need_message": "Voer een commitbericht in.",
+  "git.quick.push": "Push…",
   "git.quick.open_full": "Open Git…",
   "git.quick.title": "Snelle Commit",
   "git.quick.subtitle": "Schrijf een commitbericht en kies een actie.",
   "git.quick.placeholder": "Commitbericht…",
-  "git.quick.stage_all": "Stage alles",
   "git.quick.changes.to.commit": "wijzigingen om te committen ({0})",
   "git.quick.state.merge": "samenvoegen",
   "git.quick.state.rebase": "herbaseren",
@@ -207,10 +204,13 @@ export default {
 
   "toast.git.commit.success": "Gecommit: {0} wijziging(en)",
   "toast.git.commit.complete": "Commit voltooid.",
+  "toast.git.commit.failed": "Commit mislukt: {0}.",
   "toast.git.push.range": "Geüpload naar {0}: {1} → {2}",
   "toast.git.push.complete": "Push voltooid.",
+  "toast.git.push.failed": "Push mislukt: {0}.",
   "toast.git.pull.changes":
     "Opgehaald: {0} wijzigingen, {1} verwijderingen, {2} toevoegingen.",
+  "toast.git.pull.failed": "Kon wijzigingen niet ophalen: {0}.",
   "toast.git.pull.complete": "Pull voltooid.",
   "toast.git.pull.noChanges": "Geen wijzigingen opgehaald.",
   "toast.git.discard.failed": "Verwerpen van wijzigingen in {0} is mislukt.",
@@ -218,9 +218,9 @@ export default {
   "toast.git.commit.noMessage": "Kan niet committen zonder bericht.",
   "toast.git.fetch.complete": "Fetch voltooid.",
   "toast.git.checkout.complete": "Checkout voltooid.",
-  "toast.git.track.set": "Upstream branch gevolgd.",
   "toast.git.branch.created": "Branch aangemaakt.",
-  "toast.git.autosync.disabled": "Git auto-sync is uitgeschakeld in dit profiel.",
+  "toast.git.autosync.disabled":
+    "Git auto-sync is uitgeschakeld in dit profiel.",
   "toast.git.autosync.notRepo":
     "Er is geen Git-repository in de contextmap — auto-sync overgeslagen.",
   "toast.git.autosync.noStatus": "Kon Git-status niet lezen.",
@@ -232,6 +232,8 @@ export default {
     "Je branch is voor op {0} commit(s) — auto-sync overgeslagen.",
   "toast.git.autosync.upToDate": "Repository is up to date.",
   "toast.git.autosync.error": "Auto-sync is mislukt: {0}",
+  "toast.git.pull.localChangesBlocked":
+    "Lokale wijzigingen gedetecteerd — pull geblokkeerd.",
 
   "toast.profile.invalidName":
     "Gebruik kleine letters, koppeltekens en eindig met .json",
@@ -413,39 +415,33 @@ export default {
   "standard.nbr.of.items.total": "Aantal in lijst: {0}",
   "standard.nbr.of.items.filtered": "Aantal in lijst: {0} van {1}",
 
-  "git.push": "Pushen",
-  "git.pull": "Pullen",
-  "git.commit": "Committen",
-  "git.discard": "Negeren",
-  "git.sync": "Synchroniseren",
-  "git.fetch": "Fetch",
-  "git.branch": "Tak",
-  "git.branches": "Takken",
-  "git.checkout": "Checkout",
-  "git.tracked": "Bijgehouden",
-  "git.untracked": "Niet bijgehouden",
-  "git.create": "Aanmaken",
-  "git.upstream": "Upstream",
-  "git.local": "Lokaal",
   "git.remote": "Remote",
-  "git.noUpstream": "Geen upstream",
-  "git.noRemote": "Geen remote",
-  "git.fetching": "Fetching...",
-  "git.cloning": "Cloning...",
-  "git.loading": "Loading...",
   "git.status": "Status",
   "git.badge.ahead": "↑{0}",
   "git.badge.behind": "↓{0}",
   "git.badge.diverged": "⇕{0}",
+  "git.branch": "Tak",
+  "git.branches": "Takken",
   "git.branch.new": "Nieuwe tak",
   "git.branch.new.placeholder": "nieuwe-branch-naam",
-  "git.branches": "Branches",
-  "git.branches.current": "Huidige Branch",
-  "git.branches.switch": "Wissel Branch",
-  "git.branches.create": "Maak Branch",
+    "git.tracked": "Bijgehouden",
   "git.status": "Status & Commit",
   "git.commit.message": "Commitbericht",
   "git.commit.placeholder": "bijv. Update README en fix typos",
+
+  "git.error.nonFastForward":
+    "Remote heeft nieuwe commits. Pull (of rebase) eerst.",
+  "git.error.noUpstream": "Geen upstream ingesteld voor deze branch.",
+  "git.error.wouldOverwriteMerge":
+    "Commit of stash je wijzigingen, en pull dan.",
+  "git.error.notRepo": "Geen Git-repository.",
+  "git.error.unknown": "Onbekende Git-fout.",
+  
+  "git.reason.busy": "Voltooi eerst de merge of rebase.",
+  "git.reason.noChanges": "Geen wijzigingen om te committen.",
+  "git.reason.noMsg": "Voer een commitbericht in.",
+  "git.reason.uncommitted": "Commit of stash lokale wijzigingen eerst.",
+  "git.reason.nothingToPush": "Niets om te pushen.",
 
   // ── Tooltips ─────────────────────────────
   "tooltip.restart.formidable": "Herstart Formidable",
@@ -464,17 +460,23 @@ export default {
   "button.createPlugin": "Plugin Aanmaken",
   "button.uploadPlugin": "Plugin Uploaden",
 
+  "button.git.commit": "Commit",
+  "button.git.push": "Push",
+  "button.git.pull": "Pull",
+  "button.git.discard": "Negeren",
+  "button.git.fetch": "Fetch",
+  "button.git.checkout": "Uitchecken",
+  "button.git.create": "Aanmaken",
+
   // ── ARIA Labels ───────────────────────────
-  "aria.push": "Push naar remote",
-  "aria.pull": "Pull van remote",
-  "aria.commit": "Wijzigingen committen",
-  "aria.discard": "Wijzigingen negeren",
-  "aria.sync": "Synchroniseren met remote",
-  "aria.fetch": "Fetch van remote",
-  "aria.checkout": "Uitchecken van branch",
-  "aria.trackUpstream": "Track upstream branch",
-  "aria.createAndCheckout": "Maak en uitchecken van branch",
-  "aria.createCheckoutTrack": "Maak, check uit en track branch",
+  "aria.git.push": "Push naar remote",
+  "aria.git.pull": "Pull van remote",
+  "aria.git.commit": "Wijzigingen committen",
+  "aria.git.discard": "Wijzigingen negeren",
+  "aria.git.sync": "Synchroniseren met remote",
+  "aria.git.fetch": "Fetch van remote",
+  "aria.git.checkout": "Uitchecken van branch",
+  "aria.git.create": "Maak en uitchecken van branch",
 
   "aria.moveUp": "Veld omhoog verplaatsen",
   "aria.moveDown": "Veld omlaag verplaatsen",
@@ -612,13 +614,7 @@ export default {
   "modal.profile.placeholder.newProfile": "bijv. jack.json",
 
   "modal.git.title": "Git Besturing",
-  "modal.git.loading.status": "Git-status wordt geladen...",
-  "modal.git.error.status":
-    "⚠️ Kan Git-status niet ophalen. Zorg ervoor dat Git is geïnstalleerd en dat de map een geldige Git-repository is.",
   "modal.git.no.changes.detected": "Geen wijzigingen gevonden",
-  "modal.git.none.found": "Niets gevonden.",
-  "modal.git.commit.placeholder":
-    "bijv. README bijgewerkt en typefouten gecorrigeerd",
 
   "modal.workspace.title": "Werkruimte-instellingen",
 

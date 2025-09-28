@@ -243,7 +243,11 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
     });
 
     const line2 = addContainerElement({ parent: trackingRow });
-    addContainerElement({ parent: line2, tag: "span", i18nKey: "git.tracked" });
+    addContainerElement({
+      parent: line2,
+      tag: "span",
+      i18nKey: "git.tracked",
+    });
     addContainerElement({ parent: line2, tag: "span", textContent: ": " });
     if (status.tracking) {
       addContainerElement({
@@ -550,7 +554,7 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
 
   const msgInput = document.createElement("textarea");
   msgInput.id = "git-commit-message";
-  msgInput.placeholder = t("modal.git.commit.placeholder");
+  msgInput.placeholder = t("git.commit.placeholder");
 
   const commitBtn = createGitCommitButton(async () => {
     const { canCommit } = GitRules.evaluate({
@@ -721,7 +725,7 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
               "special.git.discard.sure",
               `<div class="modal-message-highlight"><code>${rawData.value}</code></div>`,
               {
-                okKey: "git.discard",
+                okKey: "button.git.discard",
                 cancelKey: "standard.cancel",
                 width: "auto",
                 height: "auto",
