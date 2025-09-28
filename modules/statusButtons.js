@@ -2,10 +2,7 @@
 import { t } from "../utils/i18n.js";
 import { setupPopup } from "../utils/modalUtils.js";
 import { SelectionStore } from "../utils/selectionStore.js";
-import {
-  createOptionGrid,
-  createOptionPanel,
-} from "../utils/elementBuilders.js";
+import { createOptionGrid, createOptionPanel } from "../utils/elementBuilders.js";
 import { allCharacters, toGridOptions } from "../utils/characterUtils.js";
 import { createStatusButtonConfig } from "../utils/buttonUtils.js";
 import { Toast } from "../utils/toastUtils.js";
@@ -162,10 +159,12 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
     createStatusGitQuickButtonConfig(async (e, btnEl) => {
       const gitPath = await gitPathPromise;
       if (!gitPath) {
+        // nothing configured; just open full modal if available
         window.openGitModal?.();
         return;
       }
 
+      // live repo snapshot
       let status = await getStatus(gitPath).catch(() => null);
       let progress = await getProgressState(gitPath).catch(() => null);
       let message = "";
@@ -176,7 +175,7 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
           status,
           progress,
           message,
-          strictPush: true,
+          strictPush: true, // enforce "no push before commit"
         });
         if (commitBtn) {
           commitBtn.disabled = !ev.canCommit;
@@ -242,6 +241,7 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
 
           switch (val) {
             case "commit": {
+              // guard via rules again
               const ev = GitRules.evaluate({ status, progress, message: msg });
               if (!ev.canCommit) return;
               try {
@@ -250,6 +250,7 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
                 ctx.inputs.commitMsg.value = "";
                 await refreshFromRepo(commitBtn, pushBtn, ctx.inputs.commitMsg);
               } catch {
+                // swallow; toasts from backend likely already shown
               } finally {
                 EventBus.emit("status:update", { scope: "git" });
               }
@@ -270,6 +271,7 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
                 Toast.success("toast.git.push.complete");
                 await refreshFromRepo(commitBtn, pushBtn, ctx.inputs.commitMsg);
               } catch {
+                // swallow; backend may toast
               } finally {
                 EventBus.emit("status:update", { scope: "git" });
               }
@@ -298,12 +300,15 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
         panel.element.querySelector('button[value="push"]') ||
         panel.element.querySelector('[data-value="push"]');
 
+      // initial compute from current repo state
       recompute(commitBtn, pushBtn, msgEl);
 
+      // react to typing
       msgEl?.addEventListener("input", () =>
         recompute(commitBtn, pushBtn, msgEl)
       );
 
+      // react to external git changes
       const off = EventBus.on("status:update", async (evt) => {
         if (evt?.scope === "git") {
           await refreshFromRepo(commitBtn, pushBtn, msgEl);

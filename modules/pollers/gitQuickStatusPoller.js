@@ -6,6 +6,7 @@ import {
   resolveGitPath,
   getProgressState,
   getStatus,
+  GitRules,
 } from "../../utils/gitUtils.js";
 
 const safe = (s) => String(s || "").replace(/[^a-z0-9:_-]/gi, "_");
@@ -14,32 +15,29 @@ function applyStateToButton(btnSelector, progress = {}, status = null) {
   const el = document.querySelector(btnSelector);
   if (!el) return;
 
-  // remember the default title ONCE
   if (!el.hasAttribute("data-default-title")) {
     el.setAttribute("data-default-title", el.title || "Git quick actions");
   }
   const defaultTitle =
     el.getAttribute("data-default-title") || "Git quick actions";
 
-  // progress bits
-  const hasConflicts = (progress.conflicted || []).length > 0;
-  const inMerge = !!progress.inMerge;
-  const inRebase = !!progress.inRebase;
+  const state = GitRules.deriveState(status || {}, progress || {});
+  const hasConflicts = (progress?.conflicted || []).length > 0;
+  const inMerge = !!progress?.inMerge;
+  const inRebase = !!progress?.inRebase;
+  const commitPossible = !state.busy && state.filesCount > 0;
+  const pushPossible = GitRules.canPush(state, { strict: true });
+  const ahead = state.ahead ?? 0;
 
-  // status bits (working tree changes)
-  const filesCount = Array.isArray(status?.files) ? status.files.length : 0;
-  const commitPossible =
-    !hasConflicts && !inMerge && !inRebase && filesCount > 0;
-
-  // clear & set only the winning state (priority)
   el.classList.toggle("has-conflicts", false);
   el.classList.toggle("in-merge", false);
   el.classList.toggle("in-rebase", false);
   el.classList.toggle("commit-possible", false);
+  el.classList.toggle("push-possible", false); 
 
   el.classList.toggle("is-danger", false);
   el.classList.toggle("is-warning", false);
-  el.classList.toggle("is-success", false);
+  el.classList.toggle("is-success", false); 
   el.classList.toggle("is-info", false);
 
   let title = defaultTitle;
@@ -48,11 +46,10 @@ function applyStateToButton(btnSelector, progress = {}, status = null) {
   if (hasConflicts) {
     el.classList.add("has-conflicts", "is-danger");
 
-    // localized labels
     const mergeTxt = t("git.quick.state.merge", "merge");
     const rebaseTxt = t("git.quick.state.rebase", "rebase");
 
-    // plural-aware conflicts (fallback still reads well)
+
     const n = (progress.conflicted || []).length;
     const conflictsTxt =
       n === 1
@@ -79,10 +76,20 @@ function applyStateToButton(btnSelector, progress = {}, status = null) {
     el.classList.add("commit-possible", "is-info");
     const tail = t(
       "git.quick.changes.to.commit",
-      [filesCount],
-      `changes to commit (${filesCount})`
+      [state.filesCount],
+      `changes to commit (${state.filesCount})`
     );
     title = `${prefix}: ${tail}`;
+  } else if (pushPossible) {
+    el.classList.add("push-possible", "is-success");
+    const tail = t(
+      "git.quick.ready.to.push",
+      [ahead],
+      `ready to push (${ahead})` 
+    );
+    title = `${prefix}: ${tail}`;
+  } else {
+    // nothing special — leave default title/styles
   }
 
   el.title = title;
@@ -99,7 +106,6 @@ export async function startGitQuickStatusPoller(
   const btnSelector = `#${buttonId}`;
   const POLLER_ID = `git:statusbtn:${safe(gitPath)}`;
 
-  // initial paint
   try {
     const [progress, status] = await Promise.all([
       getProgressState(gitPath),
@@ -110,7 +116,6 @@ export async function startGitQuickStatusPoller(
     applyStateToButton(btnSelector, {}, null);
   }
 
-  // idempotent register
   EventBus.emit("tasks:unregister", POLLER_ID);
   EventBus.emit("tasks:register", {
     id: POLLER_ID,
@@ -128,20 +133,22 @@ export async function startGitQuickStatusPoller(
         getStatus(args.gitPath).catch(() => null),
       ]);
 
+      const state = GitRules.deriveState(status || {}, progress || {});
       const hasConflicts = (progress?.conflicted || []).length > 0;
       const inMerge = !!progress?.inMerge;
       const inRebase = !!progress?.inRebase;
-      const filesCount = Array.isArray(status?.files) ? status.files.length : 0;
-      const commitPossible =
-        !hasConflicts && !inMerge && !inRebase && filesCount > 0;
+      const commitPossible = !state.busy && state.filesCount > 0;
+      const pushPossible = GitRules.canPush(state, { strict: true });
+      const ahead = state.ahead ?? -1;
 
-      // signature so we only repaint when something actually changed
       const sig = [
         +hasConflicts,
         +inMerge,
         +inRebase,
         +commitPossible,
-        filesCount,
+        +pushPossible, 
+        state.filesCount,
+        ahead,
         (progress?.conflicted || []).join("|"),
       ].join(":");
 
@@ -153,12 +160,10 @@ export async function startGitQuickStatusPoller(
     },
   });
 
-  // fast refresh on other git events
   const off = EventBus.on("status:update", (e) => {
     if (e?.scope === "git") EventBus.emit("tasks:runNow", POLLER_ID);
   });
 
-  // cleanup if button removed
   const mo = new MutationObserver(() => {
     if (!document.querySelector(btnSelector)) {
       EventBus.emit("tasks:unregister", POLLER_ID);
