@@ -222,6 +222,7 @@ export default {
   "toast.git.autosync.error": "Auto-sync failed: {0}",
   "toast.git.pull.localChangesBlocked":
     "Local changes detected — pull blocked.",
+  "toast.git.sync.failed": "Git sync failed: {0}.",
 
   "toast.profile.invalidName": "Use lowercase, hyphens, and end with .json",
   "toast.profile.exists": "Profile already exists.",

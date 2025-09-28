@@ -37,11 +37,11 @@ async function callWithResponse(channel, payload = {}) {
 const CONFLICT_PAIRS = new Set(["DD", "AU", "UD", "UA", "DU", "AA", "UU"]);
 
 export function normalizeFileStatus(file) {
-  const index = String(file?.index || "").trim();
-  const work = String(file?.working_dir || "").trim();
+  const index = String(file?.index ?? "").trim();
+  const work = String(file?.working_dir ?? "").trim();
 
-  const pair = `${index}${work}` || "??";
-  const symbol = pair === "  " ? "" : pair.replace(/\s+/g, "") || "??";
+  const compact = `${index}${work}`.replace(/\s+/g, "");
+  const symbol = compact || "??";
 
   const state = classifyStatus(index, work);
 
@@ -196,7 +196,7 @@ export async function pull(folderPath, opts = {}) {
         "Commit or stash your changes, then pull.",
       ]);
     } else {
-      Toast.error("toast.git.pull.failed", [msg]);
+      Toast.error("toast.git.pull.failed", [prettyGitError(err)]);
     }
     throw err;
   }
@@ -219,6 +219,19 @@ export async function commit(folderPath, message, { notify = true } = {}) {
 }
 export async function discardFile(folderPath, filePath) {
   return await callWithResponse("git:discard", { folderPath, filePath });
+}
+export async function sync(
+  folderPath,
+  remote = "origin",
+  branch,
+  { notify = true } = {}
+) {
+  try {
+    return await callWithResponse("git:sync", { folderPath, remote, branch });
+  } catch (err) {
+    if (notify) Toast.error("toast.git.sync.failed", [prettyGitError(err)]);
+    throw err;
+  }
 }
 
 /* ───────────────────── Conflicts / Merge / Rebase ───────────────────── */
@@ -392,7 +405,8 @@ export async function safeAutoSyncOnReload(cfg) {
     EventBus.emit("status:update", { scope: "git", action: "pulled" });
     return { pulled: true, result };
   } catch (err) {
-    Toast.error("toast.git.autosync.error", [String(err?.message || err)]);
+    const pretty = prettyGitError(err);
+    Toast.error("toast.git.autosync.error", [pretty]);
     return { error: true, message: String(err?.message || err) };
   }
 }

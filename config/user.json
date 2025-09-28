@@ -22,7 +22,9 @@
   "internal_server_port": 8383,
   "window_bounds": {
     "width": 1920,
-    "height": 1032
+    "height": 1032,
+    "x": 0,
+    "y": 0
   },
   "template_sidebar_width": 352,
   "storage_sidebar_width": 418,

@@ -427,7 +427,7 @@ export function initEventRouter() {
   );
 
   // Git events
-  EventBus.off("git:check", gitHandler.handleGitCheckRepo);
+  EventBus.off("git:check", gitHandler.handleGitIsRepo);
   EventBus.off("git:root", gitHandler.handleGitGetRoot);
   EventBus.off("git:status", gitHandler.handleGitStatus);
   EventBus.off("git:remote-info", gitHandler.handleGitRemoteInfo);
@@ -452,6 +452,7 @@ export function initEventRouter() {
   EventBus.off("git:revert", gitHandler.handleGitRevert);
   EventBus.off("git:merge", gitHandler.handleGitMerge);
   EventBus.off("git:merge-continue", gitHandler.handleGitMergeContinue);
+  EventBus.off("git:continue-anyway", gitHandler.handleGitContinueAny);
   EventBus.off("git:merge-abort", gitHandler.handleGitMergeAbort);
   EventBus.off("git:rebase-start", gitHandler.handleGitRebaseStart);
   EventBus.off("git:rebase-continue", gitHandler.handleGitRebaseContinue);
@@ -464,8 +465,9 @@ export function initEventRouter() {
   EventBus.off("git:choose-theirs", gitHandler.handleGitChooseTheirs);
   EventBus.off("git:mark-resolved", gitHandler.handleGitMarkResolved);
   EventBus.off("git:revert-resolution", gitHandler.handleGitRevertResolution);
+  EventBus.off("git:sync", gitHandler.handleGitSync);
 
-  EventBus.on("git:check", gitHandler.handleGitCheckRepo);
+  EventBus.on("git:check", gitHandler.handleGitIsRepo);
   EventBus.on("git:root", gitHandler.handleGitGetRoot);
   EventBus.on("git:status", gitHandler.handleGitStatus);
   EventBus.on("git:remote-info", gitHandler.handleGitRemoteInfo);
@@ -490,6 +492,7 @@ export function initEventRouter() {
   EventBus.on("git:revert", gitHandler.handleGitRevert);
   EventBus.on("git:merge", gitHandler.handleGitMerge);
   EventBus.on("git:merge-continue", gitHandler.handleGitMergeContinue);
+  EventBus.on("git:continue-anyway", gitHandler.handleGitContinueAny);
   EventBus.on("git:merge-abort", gitHandler.handleGitMergeAbort);
   EventBus.on("git:rebase-start", gitHandler.handleGitRebaseStart);
   EventBus.on("git:rebase-continue", gitHandler.handleGitRebaseContinue);
@@ -502,6 +505,7 @@ export function initEventRouter() {
   EventBus.on("git:choose-theirs", gitHandler.handleGitChooseTheirs);
   EventBus.on("git:mark-resolved", gitHandler.handleGitMarkResolved);
   EventBus.on("git:revert-resolution", gitHandler.handleGitRevertResolution);
+  EventBus.on("git:sync", gitHandler.handleGitSync);
 
   // Cache events
   EventBus.off("cache:init", cacheHandler.initCache);

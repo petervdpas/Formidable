@@ -1,15 +1,6 @@
 // preload.js
 
-const { contextBridge, ipcRenderer, nativeTheme } = require("electron");
-
-// Wait until the <link> tags exist, then run fn
-function runWhenReady(fn) {
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", fn, { once: true });
-  } else {
-    fn();
-  }
-}
+const { contextBridge, ipcRenderer } = require("electron");
 
 (function applyEarlyTheme() {
   try {
@@ -126,6 +117,8 @@ const api = {
     "git-choose-theirs",
     "git-mark-resolved",
     "git-revert-resolution",
+    "git-continue-any",
+    "git-sync", 
     "git-mergetool",
     "git-open-in-vscode",
   ]),

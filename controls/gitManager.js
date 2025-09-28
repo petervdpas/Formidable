@@ -26,6 +26,12 @@ async function withRepoLock(repoRoot, fn) {
   }
 }
 
+function toRepoRelPosix(root, anyPath) {
+  const abs = path.isAbsolute(anyPath) ? anyPath : path.join(root, anyPath);
+  const rel = fileManager.makeRelative(root, abs);
+  return fileManager.toPosixPath(rel);
+}
+
 function ok(data) {
   return { ok: true, data };
 }
@@ -243,9 +249,13 @@ async function commit(folderPath, message, { addAllBeforeCommit = true } = {}) {
   try {
     const root = await resolveRoot(folderPath);
     if (!root) return fail("Not a repo");
+    const { mode } = await getProgressMode(root);
+    if (mode)
+      return fail("Commit geblokkeerd: merge/rebase actief. Gebruik Continue.");
+
     return await withRepoLock(root, async () => {
       const git = await getGitInstance(root);
-      if (addAllBeforeCommit) await git.add("."); // <- auto-stage like before
+      if (addAllBeforeCommit) await git.add(".");
       const res = await git.commit(message);
       return ok(res);
     });
@@ -330,8 +340,10 @@ async function diffNameOnly(folderPath, base = "HEAD") {
 
 async function diffFile(folderPath, filePath, base = "HEAD") {
   try {
-    const git = await getGitInstance(folderPath);
-    const out = await git.diff([base, "--", filePath]);
+    const root = await resolveRoot(folderPath);
+    const git = await getGitInstance(root);
+    const rel = toRepoRelPosix(root, filePath);
+    const out = await git.diff([base, "--", rel]);
     return ok(out);
   } catch (err) {
     return fail(err);
@@ -379,42 +391,55 @@ async function merge(folderPath, ref) {
     return await withRepoLock(root, async () => {
       const git = await getGitInstance(root);
       const res = await git.merge([ref]);
-      // simple-git throws on conflicts; if we reach here, likely clean merge
       return ok(res);
     });
   } catch (err) {
-    // When conflicts occur, simple-git surfaces error text. We still return ok:false with message
     return fail(err);
   }
 }
 
 async function rebaseStart(folderPath, upstream) {
   try {
-    const git = await getGitInstance(folderPath);
-    const res = await git.raw(["rebase", upstream]);
-    return ok(res);
+    const root = await resolveRoot(folderPath);
+    if (!root) return fail("Not a repo");
+    return await withRepoLock(root, async () => {
+      const git = await getGitInstance(root);
+      const res = await git.raw(["rebase", upstream]);
+      return ok(res);
+    });
   } catch (err) {
     return fail(err);
   }
 }
+
 async function rebaseContinue(folderPath) {
   try {
-    const git = await getGitInstance(folderPath);
-    const res = await git.raw(["rebase", "--continue"]);
-    return ok(res);
+    const root = await resolveRoot(folderPath);
+    if (!root) return fail("Not a repo");
+    return await withRepoLock(root, async () => {
+      const git = await getGitInstance(root);
+      const res = await git.raw(["rebase", "--continue"]);
+      return ok(res);
+    });
   } catch (err) {
     return fail(err);
   }
 }
+
 async function rebaseAbort(folderPath) {
   try {
-    const git = await getGitInstance(folderPath);
-    const res = await git.raw(["rebase", "--abort"]);
-    return ok(res);
+    const root = await resolveRoot(folderPath);
+    if (!root) return fail("Not a repo");
+    return await withRepoLock(root, async () => {
+      const git = await getGitInstance(root);
+      const res = await git.raw(["rebase", "--abort"]);
+      return ok(res);
+    });
   } catch (err) {
     return fail(err);
   }
 }
+
 async function mergeAbort(folderPath) {
   try {
     const git = await getGitInstance(folderPath);
@@ -450,6 +475,7 @@ async function stashSave(folderPath, message = "") {
     return fail(err);
   }
 }
+
 async function stashList(folderPath) {
   try {
     const git = await getGitInstance(folderPath);
@@ -459,6 +485,7 @@ async function stashList(folderPath) {
     return fail(err);
   }
 }
+
 async function stashPop(folderPath, ref = "stash@{0}") {
   try {
     const git = await getGitInstance(folderPath);
@@ -532,10 +559,11 @@ async function chooseOurs(folderPath, filePath) {
   try {
     const root = await resolveRoot(folderPath);
     if (!root) return fail("Not a repo");
+    const rel = toRepoRelPosix(root, filePath);
     return await withRepoLock(root, async () => {
       const git = await getGitInstance(root);
-      await git.raw(["checkout", "--ours", "--", filePath]);
-      await git.add([filePath]); // mark resolved
+      await git.raw(["checkout", "--ours", "--", rel]);
+      await git.add([rel]);
       return ok(true);
     });
   } catch (err) {
@@ -547,10 +575,11 @@ async function chooseTheirs(folderPath, filePath) {
   try {
     const root = await resolveRoot(folderPath);
     if (!root) return fail("Not a repo");
+    const rel = toRepoRelPosix(root, filePath);
     return await withRepoLock(root, async () => {
       const git = await getGitInstance(root);
-      await git.raw(["checkout", "--theirs", "--", filePath]);
-      await git.add([filePath]); // mark resolved
+      await git.raw(["checkout", "--theirs", "--", rel]);
+      await git.add([rel]);
       return ok(true);
     });
   } catch (err) {
@@ -562,9 +591,10 @@ async function markResolved(folderPath, filePath) {
   try {
     const root = await resolveRoot(folderPath);
     if (!root) return fail("Not a repo");
+    const rel = toRepoRelPosix(root, filePath);
     return await withRepoLock(root, async () => {
       const git = await getGitInstance(root);
-      await git.add([filePath]); // stage as resolved
+      await git.add([rel]);
       return ok(true);
     });
   } catch (err) {
@@ -576,11 +606,94 @@ async function revertResolution(folderPath, filePath) {
   try {
     const root = await resolveRoot(folderPath);
     if (!root) return fail("Not a repo");
+    const rel = toRepoRelPosix(root, filePath);
     return await withRepoLock(root, async () => {
       const git = await getGitInstance(root);
-      // restore both index & working tree for that path
-      await git.raw(["restore", "-SW", "--staged", "--", filePath]);
+      await git.raw([
+        "restore",
+        "--staged",
+        "--worktree",
+        "--source=HEAD",
+        "--",
+        rel,
+      ]);
       return ok(true);
+    });
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+async function hasUnmerged(git) {
+  const s = await git.status();
+  const unmergedCodes = new Set(["UU", "AA", "DD", "AU", "UD", "UA", "DU"]);
+  const stillUnmerged =
+    (s.conflicted && s.conflicted.length > 0) ||
+    (s.files || []).some((f) =>
+      unmergedCodes.has((f.index || "") + (f.working_dir || ""))
+    );
+  return stillUnmerged;
+}
+
+async function getProgressMode(folderPath) {
+  const root = await resolveRoot(folderPath);
+  if (!root) return { mode: null, root: null };
+  const git = await getGitInstance(root);
+  const [mergeHead, rebaseHead] = await Promise.all([
+    git
+      .raw(["rev-parse", "-q", "--verify", "MERGE_HEAD"])
+      .then(() => true)
+      .catch(() => false),
+    git
+      .raw(["rev-parse", "-q", "--verify", "REBASE_HEAD"])
+      .then(() => true)
+      .catch(() => false),
+  ]);
+  return {
+    mode: mergeHead ? "merge" : rebaseHead ? "rebase" : null,
+    root,
+    git,
+  };
+}
+
+async function continueAny(folderPath) {
+  try {
+    const { mode, root, git } = await getProgressMode(folderPath);
+    if (!mode) return fail("Geen merge/rebase actief.");
+    if (await hasUnmerged(git))
+      return fail("Nog conflicten: eerst alles kiezen en stagen.");
+
+    const res = await git.raw([mode, "--continue"]);
+    return ok(res);
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+async function sync(folderPath, remote = "origin", branch = undefined) {
+  try {
+    const root = await resolveRoot(folderPath);
+    if (!root) return fail("Not a repo");
+    return await withRepoLock(root, async () => {
+      const git = await getGitInstance(root);
+
+      await git.fetch(remote, branch);
+      await git
+        .pull(remote, branch, ["--rebase", "--autostash"])
+        .catch(() => {});
+
+      if (await hasUnmerged(git)) {
+        const s = await git.status();
+        return ok({ needsResolution: true, status: s });
+      }
+
+      const st = await git.status();
+      if (!st.tracking && branch) {
+        await git.push(["-u", remote, branch]);
+      } else {
+        await git.push(remote, branch);
+      }
+      return ok({ needsResolution: false });
     });
   } catch (err) {
     return fail(err);
@@ -624,7 +737,6 @@ async function openInVSCode(folderPath, filePath) {
 }
 
 module.exports = {
-  // basics
   isGitRepo,
   getGitRoot,
   status,
@@ -633,36 +745,24 @@ module.exports = {
   pull,
   push,
   setUpstream,
-
-  // staging/commit
   addAll,
   addPaths,
   resetPaths,
   commit,
   commitPaths,
-
-  // branches
   branches,
   createBranch,
   checkout,
   deleteBranch,
-
-  // history/diff
   logCommits,
   diffNameOnly,
   diffFile,
   resetHard,
   revertCommit,
-
-  // stash
   stashSave,
   stashList,
   stashPop,
-
-  // file discard
   discardFile,
-
-  // merge/rebase/conflicts
   merge,
   mergeAbort,
   mergeContinue,
@@ -675,6 +775,8 @@ module.exports = {
   chooseTheirs,
   markResolved,
   revertResolution,
+  continueAny,
+  sync,
   openMergetool,
   openInVSCode,
 };

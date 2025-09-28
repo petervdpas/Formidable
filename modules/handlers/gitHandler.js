@@ -6,7 +6,7 @@ import { EventBus } from "../eventBus.js";
 const unwrap = (res, fallback = null) => (res?.ok ? res.data : fallback);
 const pass = (cb, res, fallback = null) => cb?.(unwrap(res, fallback));
 
-export async function handleGitCheckRepo({ folderPath, callback }) {
+export async function handleGitIsRepo({ folderPath, callback }) {
   try {
     const res = await window.api.git.isGitRepo(folderPath);
     callback?.(res?.ok ? !!res.data : false);
@@ -321,6 +321,16 @@ export async function handleGitMerge({ folderPath, ref, callback }) {
   }
 }
 
+export async function handleGitContinueAny({ folderPath, callback }) {
+  try {
+    const res = await window.api.git.gitContinueAny(folderPath);
+    callback?.(res?.ok ? res.data : null);
+  } catch (err) {
+    EventBus.emit("logging:error", ["[GitHandler] continue-any failed:", err]);
+    callback?.(null);
+  }
+}
+
 export async function handleGitMergeContinue({ folderPath, callback }) {
   try {
     const res = await window.api.git.gitMergeContinue(folderPath);
@@ -455,6 +465,16 @@ export async function handleGitRevertResolution({
       "[GitHandler] revert-resolution failed:",
       err,
     ]);
+    callback?.(null);
+  }
+}
+
+export async function handleGitSync({ folderPath, remote = "origin", branch, callback }) {
+  try {
+    const res = await window.api.git.gitSync(folderPath, remote, branch);
+    pass(callback, res, null);
+  } catch (err) {
+    EventBus.emit("logging:error", ["[GitHandler] Failed to sync:", err]);
     callback?.(null);
   }
 }

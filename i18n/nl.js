@@ -234,6 +234,7 @@ export default {
   "toast.git.autosync.error": "Auto-sync is mislukt: {0}",
   "toast.git.pull.localChangesBlocked":
     "Lokale wijzigingen gedetecteerd — pull geblokkeerd.",
+  "toast.git.sync.failed": "Git sync is mislukt: {0}.",
 
   "toast.profile.invalidName":
     "Gebruik kleine letters, koppeltekens en eindig met .json",
