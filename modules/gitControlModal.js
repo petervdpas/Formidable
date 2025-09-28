@@ -43,7 +43,29 @@ import {
 
 const uid = (p) => `${p}-${Math.random().toString(36).slice(2, 9)}`;
 
-/* -------------------------------- shared --------------------------------- */
+/* ───────────────── helpers: events ───────────────── */
+function pingGitUI(action) {
+  EventBus.emit("git:ui:update", { scope: "git", action });
+}
+
+function emitStatusBar(
+  languageKey,
+  variant = "info",
+  args = [],
+  logOrigin = "GitControlModal"
+) {
+  EventBus.emit("status:update", {
+    message: t(languageKey),
+    languageKey,
+    i18nEnabled: true,
+    args,
+    variant,
+    log: true,
+    logLevel: "default",
+    logOrigin,
+  });
+}
+
 export async function getGitContext() {
   const cfg = await loadConfig();
   const gitPath = resolveGitPath(cfg);
@@ -65,11 +87,9 @@ function makeGitBadge({ parent, key, count, marginLeft = "" }) {
   });
 }
 
-/* -------------------------------- left pane ------------------------------- */
 export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   const node = document.createElement("div");
 
-  /* ───── Branch / remote block ───── */
   const section = addContainerElement({
     parent: node,
     className: "git-section",
@@ -94,7 +114,9 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
         opts: ["--prune"],
       });
       Toast.success("toast.git.fetch.complete");
+      emitStatusBar("toast.git.fetch.complete", "success");
       await refreshRemoteBranches();
+      pingGitUI("fetch");
     } finally {
       fetchBtn.disabled = false;
     }
@@ -113,6 +135,8 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
       branch: selectedRemoteBranch,
     });
     Toast.success("toast.git.checkout.complete");
+    emitStatusBar("toast.git.checkout.complete", "success");
+    pingGitUI("checkout");
   });
 
   let remoteBranchDDWrap = null;
@@ -194,7 +218,9 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
       });
     }
     Toast.success("toast.git.branch.created");
+    emitStatusBar("toast.git.branch.created", "success");
     nameInput.value = "";
+    pingGitUI("branch-create");
   });
 
   section.appendChild(
@@ -261,7 +287,6 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   };
   renderTrackingRow();
 
-  /* ───── Conflicts ───── */
   const conflictSection = addContainerElement({
     parent: node,
     className: "git-section",
@@ -306,10 +331,12 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
       cont.addEventListener("click", async () => {
         try {
           setBusy(conflictSection, true);
-          const res = await mergeContinue(gitPath);
-          if (res?.ok === false)
-            Toast.error(String(res?.error || "merge --continue failed"));
-          else Toast.success("Merge continued");
+          await mergeContinue(gitPath);
+          Toast.success("toast.git.merge.continued");
+          emitStatusBar("toast.git.merge.continued", "success");
+        } catch (e) {
+          Toast.error(String(e?.message || t("git.error.unknown")));
+          emitStatusBar("git.error.unknown", "error");
         } finally {
           await refreshProgress();
           setBusy(conflictSection, false);
@@ -322,10 +349,12 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
       abort.addEventListener("click", async () => {
         try {
           setBusy(conflictSection, true);
-          const res = await mergeAbort(gitPath);
-          if (res?.ok === false)
-            Toast.error(String(res?.error || "merge --abort failed"));
-          else Toast.success("Merge aborted");
+          await mergeAbort(gitPath);
+          Toast.success("toast.git.merge.aborted");
+          emitStatusBar("toast.git.merge.aborted", "success");
+        } catch (e) {
+          Toast.error(String(e?.message || t("git.error.unknown")));
+          emitStatusBar("git.error.unknown", "error");
         } finally {
           await refreshProgress();
           setBusy(conflictSection, false);
@@ -340,10 +369,12 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
       cont.addEventListener("click", async () => {
         try {
           setBusy(conflictSection, true);
-          const res = await rebaseContinue(gitPath);
-          if (res?.ok === false)
-            Toast.error(String(res?.error || "rebase --continue failed"));
-          else Toast.success("Rebase continued");
+          await rebaseContinue(gitPath);
+          Toast.success("toast.git.rebase.continued");
+          emitStatusBar("toast.git.rebase.continued", "success");
+        } catch (e) {
+          Toast.error(String(e?.message || t("git.error.unknown")));
+          emitStatusBar("git.error.unknown", "error");
         } finally {
           await refreshProgress();
           setBusy(conflictSection, false);
@@ -356,10 +387,12 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
       abort.addEventListener("click", async () => {
         try {
           setBusy(conflictSection, true);
-          const res = await rebaseAbort(gitPath);
-          if (res?.ok === false)
-            Toast.error(String(res?.error || "rebase --abort failed"));
-          else Toast.success("Rebase aborted");
+          await rebaseAbort(gitPath);
+          Toast.success("toast.git.rebase.aborted");
+          emitStatusBar("toast.git.rebase.aborted", "success");
+        } catch (e) {
+          Toast.error(String(e?.message || t("git.error.unknown")));
+          emitStatusBar("git.error.unknown", "error");
         } finally {
           await refreshProgress();
           setBusy(conflictSection, false);
@@ -369,7 +402,6 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
       topBar.append(cont, abort);
     }
 
-    // Bulk actions only if >1 conflicts
     if ((s.conflicted?.length || 0) > 1) {
       const spacer = document.createElement("div");
       spacer.style.flex = "1";
@@ -377,14 +409,18 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
 
       const allOurs = document.createElement("button");
       allOurs.className = "btn btn--small";
-      allOurs.textContent = t("git.pick.ours.all") || "Resolve all as Ours";
+      allOurs.textContent = t("git.pick.ours.all") || "Resolve all as Local";
       allOurs.addEventListener("click", async () => {
         try {
           setBusy(conflictSection, true);
           for (const f of s.conflicted) {
             await chooseOurs(gitPath, f);
           }
-          Toast.success("Resolved all as ours");
+          Toast.success("toast.git.resolved.ours.all");
+          emitStatusBar("toast.git.resolved.ours.all", "success");
+        } catch (e) {
+          Toast.error(String(e?.message || t("git.error.unknown")));
+          emitStatusBar("git.error.unknown", "error");
         } finally {
           await refreshProgress();
           setBusy(conflictSection, false);
@@ -394,14 +430,18 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
       const allTheirs = document.createElement("button");
       allTheirs.className = "btn btn--small";
       allTheirs.textContent =
-        t("git.pick.theirs.all") || "Resolve all as Theirs";
+        t("git.pick.theirs.all") || "Resolve all as Remote";
       allTheirs.addEventListener("click", async () => {
         try {
           setBusy(conflictSection, true);
           for (const f of s.conflicted) {
             await chooseTheirs(gitPath, f);
           }
-          Toast.success("Resolved all as theirs");
+          Toast.success("toast.git.resolved.theirs.all");
+          emitStatusBar("toast.git.resolved.theirs.all", "success");
+        } catch (e) {
+          Toast.error(String(e?.message || t("git.error.unknown")));
+          emitStatusBar("git.error.unknown", "error");
         } finally {
           await refreshProgress();
           setBusy(conflictSection, false);
@@ -446,14 +486,16 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
 
       const btnOurs = document.createElement("button");
       btnOurs.className = "btn btn--small";
-      btnOurs.textContent = t("git.pick.ours") || "Ours";
+      btnOurs.textContent = t("git.pick.ours") || "Local Version";
       btnOurs.addEventListener("click", async () => {
         try {
           setBusy(row, true);
-          const res = await chooseOurs(gitPath, file);
-          if (res?.ok === false)
-            Toast.error(String(res?.error || "choose ours failed"));
-          else Toast.success("Picked ours");
+          await chooseOurs(gitPath, file);
+          Toast.success("toast.git.resolved.ours");
+          emitStatusBar("toast.git.resolved.ours", "success");
+        } catch (e) {
+          Toast.error(String(e?.message || t("git.error.unknown")));
+          emitStatusBar("git.error.unknown", "error");
         } finally {
           await refreshProgress();
           setBusy(row, false);
@@ -462,14 +504,16 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
 
       const btnTheirs = document.createElement("button");
       btnTheirs.className = "btn btn--small";
-      btnTheirs.textContent = t("git.pick.theirs") || "Theirs";
+      btnTheirs.textContent = t("git.pick.theirs") || "Remote Version";
       btnTheirs.addEventListener("click", async () => {
         try {
           setBusy(row, true);
-          const res = await chooseTheirs(gitPath, file);
-          if (res?.ok === false)
-            Toast.error(String(res?.error || "choose theirs failed"));
-          else Toast.success("Picked theirs");
+          await chooseTheirs(gitPath, file);
+          Toast.success("toast.git.resolved.theirs");
+          emitStatusBar("toast.git.resolved.theirs", "success");
+        } catch (e) {
+          Toast.error(String(e?.message || t("git.error.unknown")));
+          emitStatusBar("git.error.unknown", "error");
         } finally {
           await refreshProgress();
           setBusy(row, false);
@@ -482,11 +526,11 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
       btnTool.addEventListener("click", async () => {
         try {
           setBusy(row, true);
-          const res = await openMergetool(gitPath, file);
+          await openMergetool(gitPath, file);
         } finally {
-          // We don't force-refresh here; mergetool is external.
           setBusy(row, false);
           Toast.info("Mergetool launched");
+          emitStatusBar("git.mergetool.open", "info"); // optional
         }
       });
 
@@ -504,17 +548,16 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
     primaryActions();
     renderConflictList();
     translateDOM(node);
-    EventBus.emit("status:update", { scope: "git-ui", action: "progress" });
+    pingGitUI("progress");
   }
 
-  const off = EventBus.on("status:update", (e) => {
-    if (e?.scope !== "git") return;
-    // ignore UI-driven refresh pings
-    if (e?.action === "progress" || e?.action === "status") return;
+  const off = EventBus.on("git:ui:update", (e) => {
+    // if something changed elsewhere, refresh left pane progress UI
+    if (!e) return;
+    if (e.action === "progress" || e.action === "status") return;
     refreshProgress();
   });
 
-  // initial paint of progress
   await refreshProgress();
 
   return {
@@ -524,7 +567,6 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   };
 }
 
-/* -------------------------------- right pane ------------------------------ */
 export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
   const node = document.createElement("div");
 
@@ -546,7 +588,6 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
     attributes: { id: fileListId },
   });
 
-  // unified state for rules
   let currentStatus = status;
   let currentProgress = await getProgressState(gitPath);
   let commitMessage = "";
@@ -563,6 +604,7 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
     });
     if (!canCommit) {
       Toast.warning("toast.git.commit.noMessage");
+      emitStatusBar("toast.git.commit.noMessage", "warning");
       return;
     }
     commitBtn.disabled = true;
@@ -570,14 +612,20 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
       const res = await gitCommit(gitPath, commitMessage);
       if (typeof res === "string") {
         Toast.success("toast.git.commit.complete");
+        emitStatusBar("toast.git.commit.complete", "success");
       } else if (res?.summary?.changes != null) {
         Toast.success("toast.git.commit.success", [res.summary.changes]);
+        emitStatusBar("toast.git.commit.success", "success", [
+          res.summary.changes,
+        ]);
       } else {
         Toast.success("toast.git.commit.complete");
+        emitStatusBar("toast.git.commit.complete", "success");
       }
       msgInput.value = "";
       commitMessage = "";
       await refreshStatusProgressAndList();
+      pingGitUI("commit");
     } finally {
       recomputeButtons();
       msgInput.focus();
@@ -593,16 +641,24 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
         sum && (sum.changes > 0 || sum.deletions > 0 || sum.insertions > 0);
       if (typeof result === "string") {
         Toast.success("toast.git.pull.complete");
+        emitStatusBar("toast.git.pull.complete", "success");
       } else if (changed) {
         Toast.success("toast.git.pull.changes", [
           sum.changes,
           sum.deletions,
           sum.insertions,
         ]);
+        emitStatusBar("toast.git.pull.changes", "success", [
+          sum.changes,
+          sum.deletions,
+          sum.insertions,
+        ]);
       } else {
         Toast.info("toast.git.pull.noChanges");
+        emitStatusBar("toast.git.pull.noChanges", "info");
       }
       await refreshStatusProgressAndList();
+      pingGitUI("pull");
     } finally {
       recomputeButtons();
     }
@@ -619,10 +675,17 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
         const fromShort = String(hash.from).slice(0, 7);
         const toShort = String(hash.to).slice(0, 7);
         Toast.success("toast.git.push.range", [branch, fromShort, toShort]);
+        emitStatusBar("toast.git.push.range", "success", [
+          branch,
+          fromShort,
+          toShort,
+        ]);
       } else {
         Toast.success("toast.git.push.complete");
+        emitStatusBar("toast.git.push.complete", "success");
       }
       await refreshStatusProgressAndList();
+      pingGitUI("push");
     } finally {
       recomputeButtons();
     }
@@ -654,13 +717,12 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
   const syncGroup = buildButtonGroup(pullBtn, pushBtn, "button-group--full");
   syncRow.append(syncGroup);
 
-  // recompute from central rules
   const recomputeButtons = () => {
     const ev = GitRules.evaluate({
       status: currentStatus,
       progress: currentProgress,
       message: commitMessage,
-      strictPush: true, // “no push before commit”
+      strictPush: true,
     });
     commitBtn.disabled = !ev.canCommit;
     pullBtn.disabled = !ev.canPull;
@@ -680,7 +742,8 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
     currentStatus = s || currentStatus;
     currentProgress = p || currentProgress;
     await gitListManager.loadList();
-    EventBus.emit("status:update", { scope: "git-ui", action: "status" });
+    // internal ping; not a status-bar message
+    pingGitUI("status");
   }
 
   let gitListManager = null;
@@ -735,9 +798,16 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
             const result = await gitDiscard(gitPath, rawData.value);
             if (result?.success) {
               Toast.info("toast.git.discarded.changes.in", [rawData.value]);
+              emitStatusBar("toast.git.discarded.changes.in", "info", [
+                rawData.value,
+              ]);
               await refreshStatusProgressAndList();
+              pingGitUI("discard");
             } else {
               Toast.error("toast.git.discard.failed", [rawData.value]);
+              emitStatusBar("toast.git.discard.failed", "error", [
+                rawData.value,
+              ]);
             }
           } finally {
             modalApi?.setEnabled?.();
@@ -750,22 +820,19 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
     gitListManager = listMgr;
     await gitListManager.loadList();
 
-    // first compute
     recomputeButtons();
 
-    // keep right pane in sync with external changes too
-    const off = EventBus.on("status:update", async (e) => {
-      if (e?.scope === "git") {
-        const [s, p] = await Promise.all([
-          getStatus(gitPath).catch(() => null),
-          getProgressState(gitPath).catch(() => null),
-        ]);
-        if (s) currentStatus = s;
-        if (p) currentProgress = p;
-        recomputeButtons();
-      }
+    const off = EventBus.on("git:ui:update", async (e) => {
+      // When other git actions happen elsewhere, recompute button states
+      if (!e) return;
+      const [s, p] = await Promise.all([
+        getStatus(gitPath).catch(() => null),
+        getProgressState(gitPath).catch(() => null),
+      ]);
+      if (s) currentStatus = s;
+      if (p) currentProgress = p;
+      recomputeButtons();
     });
-    // let modal clean it if you support destroy
     node._offGitStatusUpdate = off;
 
     requestAnimationFrame(() => translateDOM(node));

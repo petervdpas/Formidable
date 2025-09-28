@@ -249,10 +249,6 @@ async function commit(folderPath, message, { addAllBeforeCommit = true } = {}) {
   try {
     const root = await resolveRoot(folderPath);
     if (!root) return fail("Not a repo");
-    const { mode } = await getProgressMode(root);
-    if (mode)
-      return fail("Commit geblokkeerd: merge/rebase actief. Gebruik Continue.");
-
     return await withRepoLock(root, async () => {
       const git = await getGitInstance(root);
       if (addAllBeforeCommit) await git.add(".");

@@ -235,6 +235,15 @@ export default {
   "toast.git.pull.localChangesBlocked":
     "Lokale wijzigingen gedetecteerd — pull geblokkeerd.",
   "toast.git.sync.failed": "Git sync is mislukt: {0}.",
+  "toast.git.merge.continued": "Merge voortgezet.",
+  "toast.git.merge.aborted": "Merge afgebroken.",
+  "toast.git.rebase.continued": "Rebase voortgezet.",
+  "toast.git.rebase.aborted": "Rebase afgebroken.",
+  "toast.git.resolved.ours": "Gemarkeerd als lokaal.",
+  "toast.git.resolved.theirs": "Gemarkeerd als remote.",
+  "toast.git.resolved.ours.all": "Resolved als lokaal.",
+  "toast.git.resolved.theirs.all": "Resolved als remote.",
+
 
   "toast.profile.invalidName":
     "Gebruik kleine letters, koppeltekens en eindig met .json",

@@ -223,6 +223,14 @@ export default {
   "toast.git.pull.localChangesBlocked":
     "Local changes detected — pull blocked.",
   "toast.git.sync.failed": "Git sync failed: {0}.",
+  "toast.git.merge.continued": "Merge continued.",
+  "toast.git.merge.aborted": "Merge aborted.",
+  "toast.git.rebase.continued": "Rebase continued.",
+  "toast.git.rebase.aborted": "Rebase aborted.",
+  "toast.git.resolved.ours": "Marked as local.",
+  "toast.git.resolved.theirs": "Marked as remote.",
+  "toast.git.resolved.ours.all": "Resolved all as local.",
+  "toast.git.resolved.theirs.all": "Resolved all as remote.",
 
   "toast.profile.invalidName": "Use lowercase, hyphens, and end with .json",
   "toast.profile.exists": "Profile already exists.",

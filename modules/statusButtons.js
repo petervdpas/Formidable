@@ -293,7 +293,10 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
               } catch {
                 /* backend likely toasts */
               } finally {
-                EventBus.emit("status:update", { scope: "git" });
+                EventBus.emit("git:ui:update", {
+                  scope: "git",
+                  action: "commit",
+                });
               }
               activePopup?.hide?.();
               break;
@@ -313,7 +316,10 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
                 await refreshFromRepo(commitBtn, pushBtn, ctx.inputs.commitMsg);
               } catch {
               } finally {
-                EventBus.emit("status:update", { scope: "git" });
+                EventBus.emit("git:ui:update", {
+                  scope: "git",
+                  action: "push",
+                });
               }
               activePopup?.hide?.();
               break;
@@ -358,7 +364,7 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
         recompute(commitBtn, pushBtn, msgEl)
       );
 
-      const off = EventBus.on("status:update", async (evt) => {
+      const off = EventBus.on("git:ui:update", async (evt) => {
         if (evt?.scope === "git")
           await refreshFromRepo(commitBtn, pushBtn, msgEl);
       });

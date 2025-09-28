@@ -507,6 +507,10 @@ export function initEventRouter() {
   EventBus.on("git:revert-resolution", gitHandler.handleGitRevertResolution);
   EventBus.on("git:sync", gitHandler.handleGitSync);
 
+  // Special case for UI update to ensure only one listener is active
+  EventBus.off("git:ui:update", gitHandler.handleGitUiUpdate);
+  EventBus.on("git:ui:update", gitHandler.handleGitUiUpdate);
+
   // Cache events
   EventBus.off("cache:init", cacheHandler.initCache);
   EventBus.off("cache:loadFromDisk", cacheHandler.handleCacheLoadFromDisk);

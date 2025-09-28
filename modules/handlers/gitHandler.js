@@ -469,7 +469,12 @@ export async function handleGitRevertResolution({
   }
 }
 
-export async function handleGitSync({ folderPath, remote = "origin", branch, callback }) {
+export async function handleGitSync({
+  folderPath,
+  remote = "origin",
+  branch,
+  callback,
+}) {
   try {
     const res = await window.api.git.gitSync(folderPath, remote, branch);
     pass(callback, res, null);
@@ -503,4 +508,25 @@ export async function handleGitOpenInVSCode({ folderPath, file, callback }) {
     ]);
     callback?.(null);
   }
+}
+
+/**
+ * Handle a UI update request from Git operations.
+ * Normalizes the payload and re-broadcasts to other parts of the app.
+ *
+ * Expected payload: { scope:"git", action:"commit"|"push"|"pull"|... }
+ */
+export function handleGitUiUpdate(payload) {
+  const action = payload?.action || "unknown";
+
+  // 1. Tell the statusbar to refresh
+  EventBus.emit("status:update", {
+    scope: "git",
+    action, // e.g. "commit", "push"
+  });
+
+  // 2. Kick the quick-status poller so the button updates immediately
+  EventBus.emit("tasks:runNow", `git:statusbtn:*`);
+
+  return { scope: "git", action };
 }

@@ -177,18 +177,24 @@ export function resolveGitPath(cfg) {
 export async function isGitRepo(folderPath) {
   return await callWithResponse("git:check", { folderPath });
 }
+
 export async function getRoot(folderPath) {
   return await callWithResponse("git:root", { folderPath });
 }
+
 export async function getStatus(folderPath) {
   return await callWithResponse("git:status", { folderPath });
 }
+
 export async function getRemoteInfo(folderPath) {
   return await callWithResponse("git:remote-info", { folderPath });
 }
+
 export async function pull(folderPath, opts = {}) {
   try {
-    return await callWithResponse("git:pull", { folderPath, ...opts });
+    const res = await callWithResponse("git:pull", { folderPath, ...opts });
+    EventBus.emit("git:ui:update", { scope: "git", action: "pull" });
+    return res;
   } catch (err) {
     const msg = String(err?.message || err);
     if (/would be overwritten by merge/i.test(msg)) {
@@ -201,25 +207,35 @@ export async function pull(folderPath, opts = {}) {
     throw err;
   }
 }
+
 export async function push(folderPath, { notify = true } = {}) {
   try {
-    return await callWithResponse("git:push", { folderPath });
+    const res = await callWithResponse("git:push", { folderPath });
+    EventBus.emit("git:ui:update", { scope: "git", action: "push" });
+    return res;
   } catch (err) {
     if (notify) Toast.error("toast.git.push.failed", [prettyGitError(err)]);
     throw err;
   }
 }
+
 export async function commit(folderPath, message, { notify = true } = {}) {
   try {
-    return await callWithResponse("git:commit", { folderPath, message });
+    const res = await callWithResponse("git:commit", { folderPath, message });
+    EventBus.emit("git:ui:update", { scope: "git", action: "commit" });
+    return res;
   } catch (err) {
     if (notify) Toast.error("toast.git.commit.failed", [prettyGitError(err)]);
     throw err;
   }
 }
+
 export async function discardFile(folderPath, filePath) {
-  return await callWithResponse("git:discard", { folderPath, filePath });
+  const res = await callWithResponse("git:discard", { folderPath, filePath });
+  EventBus.emit("git:ui:update", { scope: "git", action: "discard" });
+  return res;
 }
+
 export async function sync(
   folderPath,
   remote = "origin",
@@ -227,7 +243,13 @@ export async function sync(
   { notify = true } = {}
 ) {
   try {
-    return await callWithResponse("git:sync", { folderPath, remote, branch });
+    const res = await callWithResponse("git:sync", {
+      folderPath,
+      remote,
+      branch,
+    });
+    EventBus.emit("git:ui:update", { scope: "git", action: "sync" });
+    return res;
   } catch (err) {
     if (notify) Toast.error("toast.git.sync.failed", [prettyGitError(err)]);
     throw err;
@@ -402,7 +424,7 @@ export async function safeAutoSyncOnReload(cfg) {
       Toast.info("toast.git.pull.noChanges");
     }
 
-    EventBus.emit("status:update", { scope: "git", action: "pulled" });
+    EventBus.emit("git:ui:update", { scope: "git", action: "pulled" });
     return { pulled: true, result };
   } catch (err) {
     const pretty = prettyGitError(err);
