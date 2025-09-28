@@ -228,10 +228,10 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
             {
               value: "push",
               label: t("git.push") || "Push",
-              variant: "success",
+              variant: "default",
               attributes: {
                 "aria-disabled": "true",
-                "data-variant": "success",
+                "data-variant": "okay",
               },
             },
             {
