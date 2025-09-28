@@ -460,6 +460,7 @@ export default {
   "button.uploadPlugin": "Upload Plugin",
 
   "button.git.commit": "Commit",
+  "button.git.sync": "Synchronize",
   "button.git.push": "Push",
   "button.git.pull": "Pull",
   "button.git.discard": "Discard",
@@ -472,7 +473,7 @@ export default {
   "aria.git.pull": "Pull from remote",
   "aria.git.commit": "Commit changes",
   "aria.git.discard": "Discard changes",
-  "aria.git.sync": "Sync with remote",
+  "aria.git.sync": "Synchronize with remote",
   "aria.git.fetch": "Fetch from remote",
   "aria.git.checkout": "Checkout branch",
   "aria.git.create": "Create and checkout branch",

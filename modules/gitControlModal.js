@@ -4,6 +4,7 @@ import { buildButtonGroup } from "../utils/buttonUtils.js";
 import {
   createGitCommitButton,
   createGitDiscardButton,
+  createGitSyncButton,
   createGitFetchButton,
   createGitCheckoutButton,
   createGitCreateCheckoutButton,
@@ -33,12 +34,12 @@ import {
   getProgressState,
   chooseOurs,
   chooseTheirs,
-  mergeContinue,
   mergeAbort,
-  rebaseContinue,
   rebaseAbort,
+  continueAny,
   openMergetool,
   GitRules,
+  markResolved, // ⟵ BELANGRIJK: na pick ook stage/resolved
 } from "../utils/gitUtils.js";
 
 const uid = (p) => `${p}-${Math.random().toString(36).slice(2, 9)}`;
@@ -287,6 +288,74 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   };
   renderTrackingRow();
 
+  const syncRow = addContainerElement({
+    parent: section,
+    className: "git-sync-row",
+    attributes: { style: "margin-top:10px" },
+  });
+
+  const syncBtn = createGitSyncButton(async () => {
+    try {
+      syncBtn.disabled = true;
+
+      const resultPull = await gitPull(gitPath);
+      if (resultPull?.summary) {
+        const sum = resultPull.summary;
+        if (sum.changes > 0 || sum.deletions > 0 || sum.insertions > 0) {
+          Toast.success("toast.git.pull.changes", [
+            sum.changes,
+            sum.deletions,
+            sum.insertions,
+          ]);
+          emitStatusBar("toast.git.pull.changes", "success", [
+            sum.changes,
+            sum.deletions,
+            sum.insertions,
+          ]);
+        } else {
+          Toast.info("toast.git.pull.noChanges");
+          emitStatusBar("toast.git.pull.noChanges", "info");
+        }
+      } else {
+        Toast.success("toast.git.pull.complete");
+        emitStatusBar("toast.git.pull.complete", "success");
+      }
+
+      const resultPush = await gitPush(gitPath);
+      if (resultPush?.update?.hash) {
+        const hash = resultPush.update.hash;
+        const head = resultPush.update.head;
+        const branch = head?.local?.replace("refs/heads/", "") || "unknown";
+        Toast.success("toast.git.push.range", [
+          branch,
+          String(hash.from).slice(0, 7),
+          String(hash.to).slice(0, 7),
+        ]);
+        emitStatusBar("toast.git.push.range", "success", [
+          branch,
+          String(hash.from).slice(0, 7),
+          String(hash.to).slice(0, 7),
+        ]);
+      } else {
+        Toast.success("toast.git.push.complete");
+        emitStatusBar("toast.git.push.complete", "success");
+      }
+
+      await refreshProgress();
+      pingGitUI("sync");
+    } catch (e) {
+      Toast.error("toast.git.sync.failed", [String(e?.message || e)]);
+      emitStatusBar("toast.git.sync.failed", "error", [
+        String(e?.message || e),
+      ]);
+    } finally {
+      syncBtn.disabled = false;
+    }
+  }, false);
+
+  syncBtn.style.width = "100%";
+  syncRow.appendChild(syncBtn);
+
   const conflictSection = addContainerElement({
     parent: node,
     className: "git-section",
@@ -331,7 +400,8 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
       cont.addEventListener("click", async () => {
         try {
           setBusy(conflictSection, true);
-          await mergeContinue(gitPath);
+          const res = await continueAny(gitPath);
+          if (!res?.ok) throw new Error(res?.error || t("git.error.unknown"));
           Toast.success("toast.git.merge.continued");
           emitStatusBar("toast.git.merge.continued", "success");
         } catch (e) {
@@ -369,7 +439,8 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
       cont.addEventListener("click", async () => {
         try {
           setBusy(conflictSection, true);
-          await rebaseContinue(gitPath);
+          const res = await continueAny(gitPath);
+          if (!res?.ok) throw new Error(res?.error || t("git.error.unknown"));
           Toast.success("toast.git.rebase.continued");
           emitStatusBar("toast.git.rebase.continued", "success");
         } catch (e) {
@@ -415,6 +486,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
           setBusy(conflictSection, true);
           for (const f of s.conflicted) {
             await chooseOurs(gitPath, f);
+            await markResolved(gitPath, f); // ⟵ staged/resolved
           }
           Toast.success("toast.git.resolved.ours.all");
           emitStatusBar("toast.git.resolved.ours.all", "success");
@@ -436,6 +508,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
           setBusy(conflictSection, true);
           for (const f of s.conflicted) {
             await chooseTheirs(gitPath, f);
+            await markResolved(gitPath, f); // ⟵ staged/resolved
           }
           Toast.success("toast.git.resolved.theirs.all");
           emitStatusBar("toast.git.resolved.theirs.all", "success");
@@ -456,12 +529,23 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
     listWrap.innerHTML = "";
     const files = currentProgress.conflicted || [];
     if (!files.length) {
-      addContainerElement({
-        parent: listWrap,
-        tag: "div",
-        className: "muted",
-        i18nKey: "git.conflicts.none",
-      });
+      if (currentProgress.inMerge || currentProgress.inRebase) {
+        addContainerElement({
+          parent: listWrap,
+          tag: "div",
+          className: "muted",
+          textContent:
+            t("git.conflicts.resolvedPendingContinue") ||
+            "All conflicts resolved. Use Continue to finish.",
+        });
+      } else {
+        addContainerElement({
+          parent: listWrap,
+          tag: "div",
+          className: "muted",
+          i18nKey: "git.conflicts.none",
+        });
+      }
       return;
     }
 
@@ -491,6 +575,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
         try {
           setBusy(row, true);
           await chooseOurs(gitPath, file);
+          await markResolved(gitPath, file); // ⟵ staged/resolved
           Toast.success("toast.git.resolved.ours");
           emitStatusBar("toast.git.resolved.ours", "success");
         } catch (e) {
@@ -509,6 +594,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
         try {
           setBusy(row, true);
           await chooseTheirs(gitPath, file);
+          await markResolved(gitPath, file); // ⟵ staged/resolved
           Toast.success("toast.git.resolved.theirs");
           emitStatusBar("toast.git.resolved.theirs", "success");
         } catch (e) {
@@ -530,7 +616,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
         } finally {
           setBusy(row, false);
           Toast.info("Mergetool launched");
-          emitStatusBar("git.mergetool.open", "info"); // optional
+          emitStatusBar("git.mergetool.open", "info");
         }
       });
 
@@ -548,11 +634,11 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
     primaryActions();
     renderConflictList();
     translateDOM(node);
-    pingGitUI("progress");
+    pingGitUI("progress"); // ⟵ Rechter paneel kan nu mee verversen
   }
 
   const off = EventBus.on("git:ui:update", (e) => {
-    // if something changed elsewhere, refresh left pane progress UI
+    // als iets elders veranderde, refresh linkerpaneel progress UI
     if (!e) return;
     if (e.action === "progress" || e.action === "status") return;
     refreshProgress();
@@ -742,8 +828,7 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
     currentStatus = s || currentStatus;
     currentProgress = p || currentProgress;
     await gitListManager.loadList();
-    // internal ping; not a status-bar message
-    pingGitUI("status");
+    pingGitUI("status"); // interne ping
   }
 
   let gitListManager = null;
@@ -822,8 +907,8 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
 
     recomputeButtons();
 
+    // ⟵ Zorg dat rechterpaneel óók echt herlaadt bij progress-evt (merge/rebase)
     const off = EventBus.on("git:ui:update", async (e) => {
-      // When other git actions happen elsewhere, recompute button states
       if (!e) return;
       const [s, p] = await Promise.all([
         getStatus(gitPath).catch(() => null),
@@ -831,6 +916,23 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
       ]);
       if (s) currentStatus = s;
       if (p) currentProgress = p;
+
+      // Recompute + lijst herladen bij alle relevante acties
+      if (
+        [
+          "progress",
+          "pull",
+          "push",
+          "commit",
+          "discard",
+          "sync",
+          "checkout",
+        ].includes(e.action)
+      ) {
+        await gitListManager.loadList();
+        requestAnimationFrame(() => translateDOM(node));
+      }
+
       recomputeButtons();
     });
     node._offGitStatusUpdate = off;

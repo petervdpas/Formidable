@@ -483,6 +483,7 @@ export default {
   "button.uploadPlugin": "Plugin Uploaden",
 
   "button.git.commit": "Commit",
+  "button.git.sync": "Synchroniseren",
   "button.git.push": "Push",
   "button.git.pull": "Pull",
   "button.git.discard": "Negeren",

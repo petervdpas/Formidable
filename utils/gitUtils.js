@@ -125,7 +125,7 @@ export const GitRules = Object.freeze({
 
   canPull(state) {
     if (state.busy) return false;
-    if (state.filesCount > 0) return false; // ⟵ important change
+    if (state.filesCount > 0) return false; // ⟵ pull blokkeren met unstaged changes
     if (state.ahead === null || state.behind === null) return true;
     if (state.ahead > 0) return false;
     return state.behind > 0;
@@ -256,6 +256,12 @@ export async function sync(
   }
 }
 
+export async function continueAny(folderPath, message = null) {
+  const res = await callWithResponse("git:continue-any", { folderPath, message });
+  EventBus.emit("git:ui:update", { scope: "git", action: "progress" });
+  return res;
+}
+
 /* ───────────────────── Conflicts / Merge / Rebase ───────────────────── */
 export async function getConflicts(folderPath) {
   return await callWithResponse("git:conflicts", { folderPath });
@@ -274,7 +280,10 @@ export async function chooseTheirs(folderPath, file) {
 }
 
 export async function markResolved(folderPath, file) {
-  return await callWithResponse("git:mark-resolved", { folderPath, file });
+  // verwacht: backend doet `git add <file>` of `--theirs/--ours` staging
+  const res = await callWithResponse("git:mark-resolved", { folderPath, file });
+  EventBus.emit("git:ui:update", { scope: "git", action: "progress" });
+  return res;
 }
 
 export async function revertResolution(folderPath, file) {
@@ -282,23 +291,36 @@ export async function revertResolution(folderPath, file) {
 }
 
 export async function mergeAbort(folderPath) {
-  return await callWithResponse("git:merge-abort", { folderPath });
+  const res = await callWithResponse("git:merge-abort", { folderPath });
+  EventBus.emit("git:ui:update", { scope: "git", action: "progress" });
+  return res;
 }
 
 export async function mergeContinue(folderPath) {
-  return await callWithResponse("git:merge-continue", { folderPath });
+  const res = await callWithResponse("git:merge-continue", { folderPath });
+  EventBus.emit("git:ui:update", { scope: "git", action: "progress" });
+  return res;
 }
 
 export async function rebaseStart(folderPath, upstream) {
-  return await callWithResponse("git:rebase-start", { folderPath, upstream });
+  const res = await callWithResponse("git:rebase-start", {
+    folderPath,
+    upstream,
+  });
+  EventBus.emit("git:ui:update", { scope: "git", action: "progress" });
+  return res;
 }
 
 export async function rebaseContinue(folderPath) {
-  return await callWithResponse("git:rebase-continue", { folderPath });
+  const res = await callWithResponse("git:rebase-continue", { folderPath });
+  EventBus.emit("git:ui:update", { scope: "git", action: "progress" });
+  return res;
 }
 
 export async function rebaseAbort(folderPath) {
-  return await callWithResponse("git:rebase-abort", { folderPath });
+  const res = await callWithResponse("git:rebase-abort", { folderPath });
+  EventBus.emit("git:ui:update", { scope: "git", action: "progress" });
+  return res;
 }
 
 export async function openMergetool(folderPath, file) {
@@ -369,7 +391,6 @@ export async function safeAutoSyncOnReload(cfg) {
       return { skipped: "git_disabled" };
     }
 
-    // 🔧 Always resolve to the actual repo root first
     const rootPath = await getRoot(cfgPath);
     if (!rootPath) {
       console.log("[Git][AutoSync] skipped: not_a_repo", { cfgPath });
@@ -405,7 +426,6 @@ export async function safeAutoSyncOnReload(cfg) {
       return { skipped: "uptodate" };
     }
 
-    // Behind → pull from the root
     const result = await pull(rootPath);
     const summary = result?.summary;
     const changed =

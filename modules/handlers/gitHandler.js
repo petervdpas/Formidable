@@ -321,13 +321,13 @@ export async function handleGitMerge({ folderPath, ref, callback }) {
   }
 }
 
-export async function handleGitContinueAny({ folderPath, callback }) {
+export async function handleGitContinueAny({ folderPath, message, callback }) {
   try {
-    const res = await window.api.git.gitContinueAny(folderPath);
-    callback?.(res?.ok ? res.data : null);
+    const res = await window.api.git.gitContinueAny(folderPath, message);
+    callback?.(res);
   } catch (err) {
     EventBus.emit("logging:error", ["[GitHandler] continue-any failed:", err]);
-    callback?.(null);
+    callback?.({ ok: false, error: err?.message || String(err) });
   }
 }
 

@@ -284,6 +284,18 @@ export function createGitPullButton(onClick, disabled = false) {
   });
 }
 
+export function createGitSyncButton(onClick, disabled = false) {
+  return createButton({
+    text: t("button.git.sync"),
+    i18nKey: "button.git.sync",
+    className: "btn-info",
+    identifier: "git-sync",
+    onClick,
+    disabled,
+    ariaLabel: t("aria.git.sync"),
+  });
+}
+
 export function createGitDiscardButton(filePath, onClick) {
   return createButton({
     text: t("button.git.discard"),

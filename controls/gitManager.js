@@ -8,8 +8,15 @@ const { log, warn, error } = require("./nodeLogger");
 
 const gitConfigCache = new Set();
 
-// naive in-process queue to serialize git ops per repo
+function normPair(index, work) {
+  const i = String(index || "").trim();
+  const w = String(work || "").trim();
+  return (i + w).replace(/\s+/g, ""); // "U " -> "U", " U" -> "U", " U " -> "U"
+}
+
+const UNMERGED_CODES = new Set(["DD", "AU", "UD", "UA", "DU", "AA", "UU", "U"]);
 const repoLocks = new Map();
+
 async function withRepoLock(repoRoot, fn) {
   const q = repoLocks.get(repoRoot) || Promise.resolve();
   let resolveNext;
@@ -537,13 +544,20 @@ async function getProgressState(folderPath) {
     const gitDir = path.join(root, ".git");
     const inMerge =
       fs.existsSync(path.join(gitDir, "MERGE_HEAD")) ||
-      fs.existsSync(path.join(gitDir, "CHERRY_PICK_HEAD")); // cherry-pick behaves like merge
+      fs.existsSync(path.join(gitDir, "CHERRY_PICK_HEAD"));
     const inRebase =
       fs.existsSync(path.join(gitDir, "rebase-merge")) ||
       fs.existsSync(path.join(gitDir, "rebase-apply"));
 
     const st = await status(root);
-    const conflicted = st.ok && st.data ? st.data.conflicted || [] : [];
+    const s = st.ok && st.data ? st.data : { conflicted: [], files: [] };
+
+    const byList = Array.isArray(s.conflicted) ? s.conflicted : [];
+    const byCodes = (Array.isArray(s.files) ? s.files : [])
+      .filter((f) => UNMERGED_CODES.has(normPair(f.index, f.working_dir)))
+      .map((f) => f.path);
+
+    const conflicted = Array.from(new Set([...byList, ...byCodes]));
 
     return ok({ inMerge, inRebase, conflicted });
   } catch (err) {
@@ -622,13 +636,12 @@ async function revertResolution(folderPath, filePath) {
 
 async function hasUnmerged(git) {
   const s = await git.status();
-  const unmergedCodes = new Set(["UU", "AA", "DD", "AU", "UD", "UA", "DU"]);
-  const stillUnmerged =
-    (s.conflicted && s.conflicted.length > 0) ||
-    (s.files || []).some((f) =>
-      unmergedCodes.has((f.index || "") + (f.working_dir || ""))
-    );
-  return stillUnmerged;
+  if (s.conflicted && s.conflicted.length > 0) return true;
+
+  const files = Array.isArray(s.files) ? s.files : [];
+  return files.some((f) =>
+    UNMERGED_CODES.has(normPair(f.index, f.working_dir))
+  );
 }
 
 async function getProgressMode(folderPath) {
@@ -652,15 +665,25 @@ async function getProgressMode(folderPath) {
   };
 }
 
-async function continueAny(folderPath) {
+async function continueAny(folderPath, message = null) {
   try {
     const { mode, root, git } = await getProgressMode(folderPath);
-    if (!mode) return fail("Geen merge/rebase actief.");
+    if (!mode) return fail("No merge/rebase in progress.");
     if (await hasUnmerged(git))
-      return fail("Nog conflicten: eerst alles kiezen en stagen.");
+      return fail("Unmerged files remain: resolve and stage them first.");
 
-    const res = await git.raw([mode, "--continue"]);
-    return ok(res);
+    if (mode === "merge") {
+      const msg = message || "Merge commit";
+      const res = await git.commit(msg);
+      return ok(res);
+    }
+
+    if (mode === "rebase") {
+      const res = await git.raw(["rebase", "--continue"]);
+      return ok(res);
+    }
+
+    return fail("Unsupported mode.");
   } catch (err) {
     return fail(err);
   }

@@ -452,7 +452,7 @@ export function initEventRouter() {
   EventBus.off("git:revert", gitHandler.handleGitRevert);
   EventBus.off("git:merge", gitHandler.handleGitMerge);
   EventBus.off("git:merge-continue", gitHandler.handleGitMergeContinue);
-  EventBus.off("git:continue-anyway", gitHandler.handleGitContinueAny);
+  EventBus.off("git:continue-any", gitHandler.handleGitContinueAny);
   EventBus.off("git:merge-abort", gitHandler.handleGitMergeAbort);
   EventBus.off("git:rebase-start", gitHandler.handleGitRebaseStart);
   EventBus.off("git:rebase-continue", gitHandler.handleGitRebaseContinue);
@@ -492,7 +492,7 @@ export function initEventRouter() {
   EventBus.on("git:revert", gitHandler.handleGitRevert);
   EventBus.on("git:merge", gitHandler.handleGitMerge);
   EventBus.on("git:merge-continue", gitHandler.handleGitMergeContinue);
-  EventBus.on("git:continue-anyway", gitHandler.handleGitContinueAny);
+  EventBus.on("git:continue-any", gitHandler.handleGitContinueAny);
   EventBus.on("git:merge-abort", gitHandler.handleGitMergeAbort);
   EventBus.on("git:rebase-start", gitHandler.handleGitRebaseStart);
   EventBus.on("git:rebase-continue", gitHandler.handleGitRebaseContinue);

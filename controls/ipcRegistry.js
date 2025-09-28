@@ -329,8 +329,8 @@ function registerIpcHandlers() {
   registerIpc("git-revert-resolution", (e, folder, file) =>
     gitManager.revertResolution(folder, file)
   );
-  registerIpc("git-continue-any", (e, folder) =>
-    gitManager.continueAny(folder)
+  ipcMain.handle("git-continue-any", (e, folder, msg) =>
+    gitManager.continueAny(folder, msg)
   );
   registerIpc("git-sync", (e, folder, remote, branch) =>
     gitManager.sync(folder, remote, branch)

@@ -16,14 +16,10 @@ function applyStateToButton(btnSelector, progress = {}, status = null) {
   if (!el) return;
 
   if (!el.hasAttribute("data-default-title")) {
-    el.setAttribute(
-      "data-default-title",
-      el.title || t("git.quick.defaultTitle", "Git quick actions")
-    );
+    el.setAttribute("data-default-title", el.title || "Git quick actions");
   }
   const defaultTitle =
-    el.getAttribute("data-default-title") ||
-    t("git.quick.defaultTitle", "Git quick actions");
+    el.getAttribute("data-default-title") || "Git quick actions";
 
   const state = GitRules.deriveState(status || {}, progress || {});
   const hasConflicts = (progress?.conflicted || []).length > 0;
@@ -31,40 +27,37 @@ function applyStateToButton(btnSelector, progress = {}, status = null) {
   const inRebase = !!progress?.inRebase;
   const commitPossible = !state.busy && state.filesCount > 0;
   const pushPossible = GitRules.canPush(state, { strict: true });
+  const pullPossible = GitRules.canPull(state);
   const ahead = state.ahead ?? 0;
+  const behind = state.behind ?? 0;
 
-  // reset classes
-  el.classList.remove(
-    "has-conflicts",
-    "in-merge",
-    "in-rebase",
-    "commit-possible",
-    "push-possible",
-    "is-danger",
-    "is-warning",
-    "is-success",
-    "is-info"
-  );
+  // reset flags
+  el.classList.toggle("has-conflicts", false);
+  el.classList.toggle("in-merge", false);
+  el.classList.toggle("in-rebase", false);
+  el.classList.toggle("commit-possible", false);
+  el.classList.toggle("push-possible", false);
+  el.classList.toggle("pull-possible", false);
+
+  el.classList.toggle("is-danger", false);
+  el.classList.toggle("is-warning", false);
+  el.classList.toggle("is-success", false);
+  el.classList.toggle("is-info", false);
 
   let title = defaultTitle;
   const prefix = t("standard.git", "Git");
 
   if (hasConflicts) {
     el.classList.add("has-conflicts", "is-danger");
-
-    const mergeTxt = t("git.quick.state.merge", "merge");
-    const rebaseTxt = t("git.quick.state.rebase", "rebase");
-
-    const n = progress.conflicted.length;
+    const n = (progress.conflicted || []).length;
     const conflictsTxt =
       n === 1
         ? t("git.quick.state.conflict", ["1"], "1 conflict")
         : t("git.quick.state.conflicts", [n], `${n} conflicts`);
 
     const parts = [];
-    if (inMerge) parts.push(mergeTxt);
-    if (inRebase) parts.push(rebaseTxt);
-
+    if (inMerge) parts.push(t("git.quick.state.merge", "merge"));
+    if (inRebase) parts.push(t("git.quick.state.rebase", "rebase"));
     title = `${prefix}: ${conflictsTxt}${
       parts.length ? " · " + parts.join(" · ") : ""
     }`;
@@ -72,7 +65,6 @@ function applyStateToButton(btnSelector, progress = {}, status = null) {
     el.classList.add("is-warning");
     if (inMerge) el.classList.add("in-merge");
     if (inRebase) el.classList.add("in-rebase");
-
     const parts = [];
     if (inMerge) parts.push(t("git.quick.state.merge", "merge"));
     if (inRebase) parts.push(t("git.quick.state.rebase", "rebase"));
@@ -83,6 +75,14 @@ function applyStateToButton(btnSelector, progress = {}, status = null) {
       "git.quick.changes.to.commit",
       [state.filesCount],
       `changes to commit (${state.filesCount})`
+    );
+    title = `${prefix}: ${tail}`;
+  } else if (pullPossible) {
+    el.classList.add("pull-possible", "is-success");
+    const tail = t(
+      "git.quick.ready.to.pull",
+      [behind],
+      `ready to pull (${behind})`
     );
     title = `${prefix}: ${tail}`;
   } else if (pushPossible) {
@@ -109,7 +109,6 @@ export async function startGitQuickStatusPoller(
   const btnSelector = `#${buttonId}`;
   const POLLER_ID = `git:statusbtn:${safe(gitPath)}`;
 
-  // initial update
   try {
     const [progress, status] = await Promise.all([
       getProgressState(gitPath),
@@ -143,17 +142,20 @@ export async function startGitQuickStatusPoller(
       const inRebase = !!progress?.inRebase;
       const commitPossible = !state.busy && state.filesCount > 0;
       const pushPossible = GitRules.canPush(state, { strict: true });
-      const ahead = state.ahead ?? 0;
+      const pullPossible = GitRules.canPull(state);
+      const ahead = state.ahead ?? -1;
+      const behind = state.behind ?? -1;
 
       const sig = [
-        +hasConflicts,
-        +inMerge,
-        +inRebase,
-        +commitPossible,
-        +pushPossible,
+        hasConflicts,
+        inMerge,
+        inRebase,
+        commitPossible,
+        pushPossible,
+        pullPossible,
         state.filesCount,
         ahead,
-        (progress?.conflicted || []).join("|"),
+        behind,
       ].join(":");
 
       if (sig !== args.sig) {
@@ -164,16 +166,11 @@ export async function startGitQuickStatusPoller(
     },
   });
 
-  // trigger immediate refresh when git UI update happens
-  let runNowTimer = null;
-  const off = EventBus.on("git:ui:update", () => {
-    clearTimeout(runNowTimer);
-    runNowTimer = setTimeout(() => {
-      EventBus.emit("tasks:runNow", POLLER_ID);
-    }, 250);
+  // refresh on git scope status updates
+  const off = EventBus.on("status:update", (e) => {
+    if (e?.scope === "git") EventBus.emit("tasks:runNow", POLLER_ID);
   });
 
-  // clean up if element disappears
   const mo = new MutationObserver(() => {
     if (!document.querySelector(btnSelector)) {
       EventBus.emit("tasks:unregister", POLLER_ID);
