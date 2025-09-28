@@ -41,33 +41,10 @@ import {
   rebaseContinue,
   rebaseAbort,
   openMergetool,
+  GitRules,
 } from "../utils/gitUtils.js";
 
 const uid = (p) => `${p}-${Math.random().toString(36).slice(2, 9)}`;
-
-// --- boolean rules (single source of truth) ---
-const toNum = (v) => (typeof v === "number" ? v : null);
-
-const canCommit = ({ listLen, message }) =>
-  listLen > 0 && Boolean(message && message.trim());
-
-// PUSH: enabled iff we are ahead of upstream
-const canPush = ({ status }) => {
-  const a = toNum(status?.ahead);
-  return a !== null && a > 0;
-};
-
-// PULL:
-// - disabled when ahead (>0)
-// - enabled when behind (>0)
-// - enabled when sync is unknown (no ahead/behind info)
-const canPull = ({ status }) => {
-  const a = toNum(status?.ahead);
-  const b = toNum(status?.behind);
-  if (a === null || b === null) return true;
-  if (a > 0) return false;
-  return b > 0;
-};
 
 /* -------------------------------- shared --------------------------------- */
 export async function getGitContext() {
@@ -145,7 +122,6 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   let remoteBranchDDWrap = null;
   let rebuildRemoteBranches = () => {};
   async function refreshRemoteBranches() {
-    // simple re-pull remote info & rebuild (non-blocking)
     const latest = await getRemoteInfo(gitPath);
     remoteInfo = latest || remoteInfo;
     rebuildRemoteBranches();
@@ -294,7 +270,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
     parent: conflictSection,
     tag: "h3",
     textContent: "Merge / Rebase / Conflicts",
-    // i18nKey: "git.conflicts.header" // add key if you localize
+    // i18nKey: "git.conflicts.header"
   });
 
   // State nodes
@@ -527,6 +503,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
     renderActions();
     renderConflictList();
     translateDOM(node);
+    EventBus.emit("status:update", { scope: "git", action: "progress" });
   }
 
   // keep in sync when others change git state
@@ -540,7 +517,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   return {
     node,
     init: async () => requestAnimationFrame(() => translateDOM(node)),
-    destroy: () => off?.(), // if your modal supports cleanup
+    destroy: () => off?.(),
   };
 }
 
@@ -566,112 +543,87 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
     attributes: { id: fileListId },
   });
 
+  // unified state for rules
   let currentStatus = status;
-  const state = {
-    status: currentStatus,
-    listLen: (currentStatus.files || []).length,
-    message: "",
-  };
-
-  const rules = new Map();
-  const bindEnableRule = (btn, predicate) => {
-    rules.set(btn, predicate);
-    btn.disabled = !predicate(state);
-    return btn;
-  };
-  const recomputeEnabled = () => {
-    rules.forEach((pred, btn) => (btn.disabled = !pred(state)));
-  };
-  const setState = (patch) => {
-    Object.assign(state, patch);
-    recomputeEnabled();
-  };
-
-  let gitListManager = null;
+  let currentProgress = await getProgressState(gitPath);
   let commitMessage = "";
 
   const msgInput = document.createElement("textarea");
   msgInput.id = "git-commit-message";
   msgInput.placeholder = t("modal.git.commit.placeholder");
 
-  const commitBtn = bindEnableRule(
-    createGitCommitButton(async () => {
-      if (!canCommit(state)) {
-        Toast.warning("toast.git.commit.noMessage");
-        return;
+  const commitBtn = createGitCommitButton(async () => {
+    const { canCommit } = GitRules.evaluate({
+      status: currentStatus,
+      progress: currentProgress,
+      message: commitMessage,
+    });
+    if (!canCommit) {
+      Toast.warning("toast.git.commit.noMessage");
+      return;
+    }
+    commitBtn.disabled = true;
+    try {
+      const res = await gitCommit(gitPath, commitMessage);
+      if (typeof res === "string") {
+        Toast.success("toast.git.commit.complete");
+      } else if (res?.summary?.changes != null) {
+        Toast.success("toast.git.commit.success", [res.summary.changes]);
+      } else {
+        Toast.success("toast.git.commit.complete");
       }
-      commitBtn.disabled = true;
-      try {
-        const res = await gitCommit(gitPath, commitMessage);
-        if (typeof res === "string") {
-          Toast.success("toast.git.commit.complete");
-        } else if (res?.summary?.changes != null) {
-          Toast.success("toast.git.commit.success", [res.summary.changes]);
-        } else {
-          Toast.success("toast.git.commit.complete");
-        }
-        msgInput.value = "";
-        commitMessage = "";
-        setState({ message: "" });
-        await refreshStatusAndList();
-      } finally {
-        // Do NOT force-enable; always recompute from state
-        recomputeEnabled();
-        msgInput.focus();
-      }
-    }, false),
-    canCommit
-  );
+      msgInput.value = "";
+      commitMessage = "";
+      await refreshStatusProgressAndList();
+    } finally {
+      recomputeButtons();
+      msgInput.focus();
+    }
+  }, false);
 
-  const pullBtn = bindEnableRule(
-    createGitPullButton(async () => {
-      pullBtn.disabled = true;
-      try {
-        const result = await gitPull(gitPath);
-        const sum = result?.summary;
-        const changed =
-          sum && (sum.changes > 0 || sum.deletions > 0 || sum.insertions > 0);
-        if (typeof result === "string") {
-          Toast.success("toast.git.pull.complete");
-        } else if (changed) {
-          Toast.success("toast.git.pull.changes", [
-            sum.changes,
-            sum.deletions,
-            sum.insertions,
-          ]);
-        } else {
-          Toast.info("toast.git.pull.noChanges");
-        }
-        await refreshStatusAndList();
-      } finally {
-        recomputeEnabled();
+  const pullBtn = createGitPullButton(async () => {
+    pullBtn.disabled = true;
+    try {
+      const result = await gitPull(gitPath);
+      const sum = result?.summary;
+      const changed =
+        sum && (sum.changes > 0 || sum.deletions > 0 || sum.insertions > 0);
+      if (typeof result === "string") {
+        Toast.success("toast.git.pull.complete");
+      } else if (changed) {
+        Toast.success("toast.git.pull.changes", [
+          sum.changes,
+          sum.deletions,
+          sum.insertions,
+        ]);
+      } else {
+        Toast.info("toast.git.pull.noChanges");
       }
-    }, false),
-    canPull
-  );
+      await refreshStatusProgressAndList();
+    } finally {
+      recomputeButtons();
+    }
+  }, false);
 
-  const pushBtn = bindEnableRule(
-    createGitPushButton(async () => {
-      pushBtn.disabled = true;
-      try {
-        const result = await gitPush(gitPath);
-        const hash = result?.update?.hash;
-        const head = result?.update?.head;
-        if (hash?.from && hash?.to) {
-          const branch = head?.local?.replace("refs/heads/", "") || "unknown";
-          const fromShort = String(hash.from).slice(0, 7);
-          const toShort = String(hash.to).slice(0, 7);
-          Toast.success("toast.git.push.range", [branch, fromShort, toShort]);
-        } else {
-          Toast.success("toast.git.push.complete");
-        }
-        await refreshStatusAndList();
-      } finally {
-        recomputeEnabled();
+  const pushBtn = createGitPushButton(async () => {
+    pushBtn.disabled = true;
+    try {
+      const result = await gitPush(gitPath);
+      const hash = result?.update?.hash;
+      const head = result?.update?.head;
+      if (hash?.from && hash?.to) {
+        const branch = head?.local?.replace("refs/heads/", "") || "unknown";
+        const fromShort = String(hash.from).slice(0, 7);
+        const toShort = String(hash.to).slice(0, 7);
+        Toast.success("toast.git.push.range", [branch, fromShort, toShort]);
+      } else {
+        Toast.success("toast.git.push.complete");
       }
-    }, false),
-    canPush
-  );
+      await refreshStatusProgressAndList();
+    } finally {
+      recomputeButtons();
+    }
+  }, false);
 
   const commitInputRow = buildLabeledControl({
     labelTextOrKey: "git.commit.message",
@@ -699,16 +651,36 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
   const syncGroup = buildButtonGroup(pullBtn, pushBtn, "button-group--full");
   syncRow.append(syncGroup);
 
+  // recompute from central rules
+  const recomputeButtons = () => {
+    const ev = GitRules.evaluate({
+      status: currentStatus,
+      progress: currentProgress,
+      message: commitMessage,
+      strictPush: true, // “no push before commit”
+    });
+    commitBtn.disabled = !ev.canCommit;
+    pullBtn.disabled = !ev.canPull;
+    pushBtn.disabled = !ev.canPush;
+  };
+
   msgInput.addEventListener("input", () => {
     commitMessage = msgInput.value;
-    setState({ message: commitMessage });
+    recomputeButtons();
   });
 
-  async function refreshStatusAndList() {
-    currentStatus = await getStatus(gitPath);
-    setState({ status: currentStatus });
+  async function refreshStatusProgressAndList() {
+    const [s, p] = await Promise.all([
+      getStatus(gitPath),
+      getProgressState(gitPath),
+    ]);
+    currentStatus = s || currentStatus;
+    currentProgress = p || currentProgress;
     await gitListManager.loadList();
+    EventBus.emit("status:update", { scope: "git", action: "status" });
   }
+
+  let gitListManager = null;
 
   const init = async () => {
     const listMgr = createListManager({
@@ -719,7 +691,6 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
         const s = await getStatus(gitPath);
         currentStatus = s || currentStatus;
         const list = mapStatusFiles(currentStatus);
-        setState({ status: currentStatus, listLen: list.length });
         return list;
       },
       renderItemExtra: async ({ flagNode, itemNode, rawData }) => {
@@ -761,7 +732,7 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
             const result = await gitDiscard(gitPath, rawData.value);
             if (result?.success) {
               Toast.info("toast.git.discarded.changes.in", [rawData.value]);
-              await refreshStatusAndList();
+              await refreshStatusProgressAndList();
             } else {
               Toast.error("toast.git.discard.failed", [rawData.value]);
             }
@@ -775,6 +746,25 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
 
     gitListManager = listMgr;
     await gitListManager.loadList();
+
+    // first compute
+    recomputeButtons();
+
+    // keep right pane in sync with external changes too
+    const off = EventBus.on("status:update", async (e) => {
+      if (e?.scope === "git") {
+        const [s, p] = await Promise.all([
+          getStatus(gitPath).catch(() => null),
+          getProgressState(gitPath).catch(() => null),
+        ]);
+        if (s) currentStatus = s;
+        if (p) currentProgress = p;
+        recomputeButtons();
+      }
+    });
+    // let modal clean it if you support destroy
+    node._offGitStatusUpdate = off;
+
     requestAnimationFrame(() => translateDOM(node));
   };
 

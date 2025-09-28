@@ -83,6 +83,70 @@ export function mapStatusFiles(status) {
   );
 }
 
+// ── One-stop rules object ───────────────────────────────────────────────────
+export const GitRules = Object.freeze({
+  toNum(v) { return (typeof v === "number" ? v : null); },
+
+  isBusy(p) {
+    return !!(p?.inMerge || p?.inRebase ||
+      (Array.isArray(p?.conflicted) && p.conflicted.length > 0));
+  },
+
+  filesCount(status) { return Array.isArray(status?.files) ? status.files.length : 0; },
+
+  deriveState(status, progress = null) {
+    return {
+      filesCount: this.filesCount(status),
+      ahead: this.toNum(status?.ahead),
+      behind: this.toNum(status?.behind),
+      busy: this.isBusy(progress),
+    };
+  },
+
+  // legacy-style (list/message) – still available if you need it
+  canCommitLegacy({ listLen, message }) {
+    return listLen > 0 && Boolean(message && message.trim());
+  },
+  canPushLegacy({ status }) {
+    const a = this.toNum(status?.ahead);
+    return a !== null && a > 0;
+  },
+  canPullLegacy({ status }) {
+    const a = this.toNum(status?.ahead);
+    const b = this.toNum(status?.behind);
+    if (a === null || b === null) return true;
+    if (a > 0) return false;
+    return b > 0;
+  },
+
+  // state-based (preferred)
+  canCommit(state, message) {
+    return !state.busy && state.filesCount > 0 && Boolean(message && message.trim());
+  },
+  canPush(state, { strict = true } = {}) {
+    if (state.busy) return false;
+    if (strict && state.filesCount > 0) return false; // “no push before commit”
+    return state.ahead !== null && state.ahead > 0;
+  },
+  canPull(state) {
+    if (state.busy) return false;
+    if (state.ahead === null || state.behind === null) return true;
+    if (state.ahead > 0) return false;
+    return state.behind > 0;
+  },
+
+  /** Convenience: compute everything at once */
+  evaluate({ status, progress = null, message = "", strictPush = true } = {}) {
+    const state = this.deriveState(status, progress);
+    return {
+      state,
+      canCommit: this.canCommit(state, message),
+      canPush:   this.canPush(state, { strict: strictPush }),
+      canPull:   this.canPull(state),
+    };
+  },
+});
+
 /* ───────────────────── Config ───────────────────── */
 export async function loadConfig() {
   const cfg = await callWithResponse("config:load");
