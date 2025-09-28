@@ -39,7 +39,7 @@ import {
   continueAny,
   openMergetool,
   GitRules,
-  markResolved, // ⟵ BELANGRIJK: na pick ook stage/resolved
+  markResolved,
 } from "../utils/gitUtils.js";
 
 const uid = (p) => `${p}-${Math.random().toString(36).slice(2, 9)}`;
@@ -349,7 +349,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
         String(e?.message || e),
       ]);
     } finally {
-      syncBtn.disabled = false;
+      await refreshProgress();
     }
   }, false);
 
@@ -382,6 +382,17 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   });
 
   let currentProgress = { inMerge: false, inRebase: false, conflicted: [] };
+  let currentStatus = status;
+
+  function recomputeSyncButton() {
+    const ev = GitRules.evaluate({
+      status: currentStatus,
+      progress: currentProgress,
+      message: "",
+      strictPush: true,
+    });
+    syncBtn.disabled = !(ev.canPull || ev.canPush);
+  }
 
   function setBusy(container, busy) {
     container
@@ -624,24 +635,31 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
     });
   }
 
-  async function refreshProgress() {
-    const progress = await getProgressState(gitPath);
+  async function refreshProgress({ silent = false } = {}) {
+    const [progress, s] = await Promise.all([
+      getProgressState(gitPath),
+      getStatus(gitPath),
+    ]);
     currentProgress = progress || {
       inMerge: false,
       inRebase: false,
       conflicted: [],
     };
+    if (s) currentStatus = s;
+
     primaryActions();
     renderConflictList();
     translateDOM(node);
-    pingGitUI("progress"); // ⟵ Rechter paneel kan nu mee verversen
+    recomputeSyncButton();
+
+    if (!silent) {
+      pingGitUI("progress");
+    }
   }
 
   const off = EventBus.on("git:ui:update", (e) => {
-    // als iets elders veranderde, refresh linkerpaneel progress UI
     if (!e) return;
-    if (e.action === "progress" || e.action === "status") return;
-    refreshProgress();
+    refreshProgress({ silent: true });
   });
 
   await refreshProgress();
@@ -907,7 +925,6 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
 
     recomputeButtons();
 
-    // ⟵ Zorg dat rechterpaneel óók echt herlaadt bij progress-evt (merge/rebase)
     const off = EventBus.on("git:ui:update", async (e) => {
       if (!e) return;
       const [s, p] = await Promise.all([
@@ -917,7 +934,6 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
       if (s) currentStatus = s;
       if (p) currentProgress = p;
 
-      // Recompute + lijst herladen bij alle relevante acties
       if (
         [
           "progress",
