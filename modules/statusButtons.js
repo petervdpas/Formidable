@@ -228,7 +228,7 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
             {
               value: "push",
               label: t("git.push") || "Push",
-              variant: "default",
+              variant: "success",
               attributes: {
                 "aria-disabled": "true",
                 "data-variant": "success",
@@ -237,7 +237,7 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
             {
               value: "open_full",
               label: t("git.quick.open_full") || "Open Git…",
-              variant: "default",
+              variant: "info",
             },
             {
               value: "cancel",
