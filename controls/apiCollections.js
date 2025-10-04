@@ -17,6 +17,123 @@ const {
 const formManager = require("./formManager");
 const configManager = require("./configManager");
 
+function fieldToProperty(f = {}) {
+  const schema = {};
+  const optVals = (Array.isArray(f.options) ? f.options : []).map((o) =>
+    String(o.value)
+  );
+  const optLabels = (Array.isArray(f.options) ? f.options : []).map((o) =>
+    String(o.label ?? o.value)
+  );
+
+  switch ((f.type || "").toLowerCase()) {
+    case "guid":
+      Object.assign(schema, { type: "string", description: "GUID field" });
+      break;
+    case "text":
+    case "textarea":
+    case "latex":
+    case "code":
+      Object.assign(schema, { type: "string" });
+      break;
+    case "number":
+      Object.assign(schema, { type: "number" });
+      break;
+    case "boolean":
+      Object.assign(schema, { type: "boolean" });
+      break;
+    case "date":
+      Object.assign(schema, { type: "string", format: "date" });
+      break;
+    case "dropdown":
+    case "radio":
+      Object.assign(schema, {
+        type: "string",
+        enum: optVals,
+        "x-enum-labels": optLabels,
+      });
+      break;
+    case "multioption":
+      Object.assign(schema, {
+        type: "array",
+        items: { type: "string", enum: optVals },
+      });
+      break;
+    case "range": {
+      const byVal = Object.fromEntries(
+        (f.options || []).map((o) => [
+          String(o.value).toLowerCase(),
+          o.label ?? o.value,
+        ])
+      );
+      const min = Number(byVal.min);
+      const max = Number(byVal.max);
+      const step = Number(byVal.step);
+      Object.assign(schema, {
+        type: "number",
+        ...(Number.isFinite(min) ? { minimum: min } : {}),
+        ...(Number.isFinite(max) ? { maximum: max } : {}),
+        ...(Number.isFinite(step) ? { multipleOf: step } : {}),
+      });
+      break;
+    }
+    case "list":
+      Object.assign(schema, { type: "array", items: { type: "string" } });
+      break;
+    case "table": {
+      const cols = (f.options || []).map((o) => String(o.value));
+      Object.assign(schema, {
+        type: "array",
+        description: "Array of row objects keyed by column id",
+        items: {
+          type: "object",
+          additionalProperties: false,
+          properties: Object.fromEntries(
+            cols.map((c) => [c, { type: "string" }])
+          ),
+        },
+      });
+      break;
+    }
+    case "image":
+      Object.assign(schema, {
+        type: "string",
+        format: "uri",
+        description:
+          "Path/URL to image (e.g. /storage/<template>/images/<file>)",
+      });
+      break;
+    case "link":
+      Object.assign(schema, { type: "string", format: "uri" });
+      break;
+    case "tags":
+      Object.assign(schema, { type: "array", items: { type: "string" } });
+      break;
+    default:
+      Object.assign(schema, { type: "string" });
+  }
+
+  if (f.description) schema.description = f.description;
+  return [f.key, schema];
+}
+
+function makeDataSchema(yaml) {
+  const props = {};
+  const required = [];
+  for (const f of yaml?.fields || []) {
+    if (!f?.key) continue;
+    const [k, s] = fieldToProperty(f);
+    props[k] = s;
+    if (f.type === "guid") required.push(k);
+  }
+  return {
+    type: "object",
+    additionalProperties: false,
+    properties: props,
+    ...(required.length ? { required } : {}),
+  };
+}
+
 function guidKeyOfTemplate(yaml) {
   const f = (yaml?.fields || []).find((x) => x?.type === "guid");
   return f ? f.key : null;
@@ -396,20 +513,87 @@ function mountApiCollections(app) {
     const vfs = await getVirtualStructure();
     const templates = Object.entries(vfs.templateStorageFolders || {});
     const enabled = [];
+
+    // Build per-template schemas
+    const schemas = {
+      ItemBase: {
+        type: "object",
+        properties: {
+          template: { type: "string" },
+          id: { type: "string", description: "GUID" },
+          filename: { type: "string" },
+          title: { type: "string" },
+          meta: { type: "object", additionalProperties: true },
+          rev: {
+            type: "object",
+            properties: {
+              etag: { type: "string" },
+              lastModified: { type: "string" },
+            },
+          },
+          links: {
+            type: "object",
+            properties: {
+              self: { type: "string" },
+              html: { type: "string" },
+            },
+          },
+        },
+        required: ["template", "id", "filename"],
+      },
+    };
+
+    const itemRefs = [];
+    const payloadRefs = [];
+
     for (const [id, desc] of templates) {
       const y = await loadTemplateYaml(desc.filename);
-      if (y && y.enable_collection === true && guidKeyOfTemplate(y)) {
-        enabled.push({ id, name: y.name || id, guidKey: guidKeyOfTemplate(y) });
-      }
+      const guidField = (y?.fields || []).find((f) => f.type === "guid");
+      if (!y || y.enable_collection !== true || !guidField) continue;
+
+      enabled.push({ id, yaml: y, guidKey: guidField.key });
+
+      const dataSchemaName = `Data_${id}`;
+      const payloadName = `Upsert_${id}`;
+      const itemName = `Item_${id}`;
+
+      const dataSchema = makeDataSchema(y);
+
+      schemas[dataSchemaName] = dataSchema;
+
+      schemas[payloadName] = {
+        type: "object",
+        properties: {
+          meta: { type: "object", additionalProperties: true },
+          data: { $ref: `#/components/schemas/${dataSchemaName}` },
+        },
+        required: ["data"],
+      };
+
+      schemas[itemName] = {
+        allOf: [
+          { $ref: "#/components/schemas/ItemBase" },
+          {
+            type: "object",
+            properties: {
+              data: { $ref: `#/components/schemas/${dataSchemaName}` },
+            },
+            required: ["data"],
+          },
+        ],
+      };
+
+      itemRefs.push({ $ref: `#/components/schemas/${itemName}` });
+      payloadRefs.push({ $ref: `#/components/schemas/${payloadName}` });
     }
 
-    return {
+    const spec = {
       openapi: "3.0.3",
       info: {
         title: "Formidable Collections API",
-        version: "1.0.0",
+        version: "1.1.0",
         description:
-          "CRUD over collection-enabled templates. Identity is the GUID field defined in each template.",
+          "CRUD for collection-enabled templates. Request/response schemas are generated from each template's fields.",
       },
       servers: [{ url: baseUrl }],
       components: {
@@ -419,43 +603,18 @@ function mountApiCollections(app) {
             in: "path",
             required: true,
             schema: { type: "string", enum: enabled.map((t) => t.id) },
-            description: "Template id (collection-enabled).",
+            description: "Template id",
           },
           IdParam: {
             name: "id",
             in: "path",
             required: true,
             schema: { type: "string" },
-            description: "Item GUID.",
+            description: "Item GUID",
           },
         },
         schemas: {
-          Item: {
-            type: "object",
-            properties: {
-              template: { type: "string" },
-              id: { type: "string", description: "GUID" },
-              filename: { type: "string" },
-              title: { type: "string" },
-              meta: { type: "object", additionalProperties: true },
-              data: { type: "object", additionalProperties: true },
-              rev: {
-                type: "object",
-                properties: {
-                  etag: { type: "string" },
-                  lastModified: { type: "string" },
-                },
-              },
-              links: {
-                type: "object",
-                properties: {
-                  self: { type: "string" },
-                  html: { type: "string" },
-                },
-              },
-            },
-            required: ["template", "id", "filename", "data"],
-          },
+          ...schemas,
           ListResponse: {
             type: "object",
             properties: {
@@ -464,19 +623,16 @@ function mountApiCollections(app) {
               total: { type: "integer" },
               limit: { type: "integer" },
               offset: { type: "integer" },
-              items: {
-                type: "array",
-                items: { $ref: "#/components/schemas/Item" },
-              },
+              items: { type: "array", items: { oneOf: itemRefs } },
             },
-          },
-          UpsertPayload: {
-            type: "object",
-            properties: {
-              meta: { type: "object", additionalProperties: true },
-              data: { type: "object", additionalProperties: true },
-            },
-            required: ["data"],
+            required: [
+              "collectionEnabled",
+              "template",
+              "total",
+              "limit",
+              "offset",
+              "items",
+            ],
           },
         },
       },
@@ -518,13 +674,16 @@ function mountApiCollections(app) {
             },
           },
           post: {
-            summary: "Create new item (GUID required in data)",
+            summary: "Create new item",
             parameters: [{ $ref: "#/components/parameters/TemplateParam" }],
             requestBody: {
               required: true,
               content: {
                 "application/json": {
-                  schema: { $ref: "#/components/schemas/UpsertPayload" },
+                  schema: {
+                    oneOf: payloadRefs,
+                    description: "Pick the schema matching the template path.",
+                  },
                 },
               },
             },
@@ -532,9 +691,7 @@ function mountApiCollections(app) {
               201: {
                 description: "Created",
                 content: {
-                  "application/json": {
-                    schema: { $ref: "#/components/schemas/Item" },
-                  },
+                  "application/json": { schema: { oneOf: itemRefs } },
                 },
               },
               400: { description: "guid-missing" },
@@ -554,9 +711,7 @@ function mountApiCollections(app) {
               200: {
                 description: "OK",
                 content: {
-                  "application/json": {
-                    schema: { $ref: "#/components/schemas/Item" },
-                  },
+                  "application/json": { schema: { oneOf: itemRefs } },
                 },
               },
               404: { description: "not-found" },
@@ -571,18 +726,14 @@ function mountApiCollections(app) {
             requestBody: {
               required: true,
               content: {
-                "application/json": {
-                  schema: { $ref: "#/components/schemas/UpsertPayload" },
-                },
+                "application/json": { schema: { oneOf: payloadRefs } },
               },
             },
             responses: {
               200: {
                 description: "OK",
                 content: {
-                  "application/json": {
-                    schema: { $ref: "#/components/schemas/Item" },
-                  },
+                  "application/json": { schema: { oneOf: itemRefs } },
                 },
               },
               403: { description: "collection-disabled" },
@@ -615,6 +766,8 @@ function mountApiCollections(app) {
         },
       },
     };
+
+    return spec;
   }
 
   // serve raw OpenAPI JSON
