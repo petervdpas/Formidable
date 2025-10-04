@@ -1,15 +1,14 @@
 // controls/serverDataProvider.js
 
-const configManager   = require("./configManager");
-const formManager     = require("./formManager");
+const fs = require("fs");
+const path = require("path");
+const configManager = require("./configManager");
+const formManager = require("./formManager");
 const templateManager = require("./templateManager");
 const { renderMarkdown } = require("./markdownRenderer");
-
-// marked + highlight.js
 const { marked } = require("marked");
 const hljs = require("highlight.js");
 
-// map common fence names to hljs languages
 const LANG_ALIASES = {
   "c#": "csharp",
   cs: "csharp",
@@ -22,19 +21,24 @@ const LANG_ALIASES = {
   yml: "yaml",
 };
 
-// configure marked to emit hljs markup
 const renderer = new marked.Renderer();
 renderer.code = (code, infostring) => {
   const lang = (infostring || "").trim().split(/\s+/)[0].toLowerCase();
   const mapped = LANG_ALIASES[lang] || lang;
 
   if (mapped && hljs.getLanguage(mapped)) {
-    const html = hljs.highlight(code, { language: mapped, ignoreIllegals: true }).value;
+    const html = hljs.highlight(code, {
+      language: mapped,
+      ignoreIllegals: true,
+    }).value;
     return `<pre class="hljs"><code class="language-${mapped}">${html}</code></pre>\n`;
   }
 
   // fallback (escape only)
-  const esc = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const esc = code
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
   return `<pre class="hljs"><code>${esc}</code></pre>\n`;
 };
 
@@ -63,81 +67,231 @@ async function loadFormFile(templateName, dataFile) {
 }
 
 async function loadAndRenderForm(templateName, dataFile) {
-  const templateYaml   = await loadTemplateYaml(templateName);
-  const fields         = templateYaml?.fields || [];
+  const templateYaml = await loadTemplateYaml(templateName);
+  const fields = templateYaml?.fields || [];
   const templateFolder = templateName.replace(/\.yaml$/i, "");
 
   const formData = formManager.loadForm(templateName, dataFile, fields);
 
   if (!templateYaml || !formData) {
-    return { template: templateYaml || null, form: formData || null, md: null, html: null };
+    return {
+      template: templateYaml || null,
+      form: formData || null,
+      md: null,
+      html: null,
+    };
   }
 
   let md = renderMarkdown(formData.data, templateYaml);
 
-  // formidable://template.yaml:form.json → internal link
-  // 1) Markdown links: [Label](formidable://template.yaml:data.json)
   md = md.replace(
     /\[([^\]]+)\]\(formidable:\/\/([^():\s]+):([^)]+)\)/g,
-    (m, label, templateFile, dataFile) => {
+    (m, label, templateFile, dataFile2) => {
       const tName = templateFile.replace(/\.yaml$/i, "");
-      const href  = `/template/${encodeURIComponent(tName)}/form/${encodeURIComponent(dataFile)}`;
+      const href = `/template/${encodeURIComponent(
+        tName
+      )}/form/${encodeURIComponent(dataFile2)}`;
       return `[${label}](${href})`;
     }
   );
 
-  // 2) Bare occurrences (but not images): formidable://template.yaml:data.json
   md = md.replace(
     /(^|[^!])\bformidable:\/\/([^():\s]+):([^\s)]+)/g,
-    (match, prefix, templateFile, dataFile) => {
+    (match, prefix, templateFile, dataFile2) => {
       const tName = templateFile.replace(/\.yaml$/i, "");
-      const href  = `/template/${encodeURIComponent(tName)}/form/${encodeURIComponent(dataFile)}`;
-      const full  = `formidable://${templateFile}:${dataFile}`;
+      const href = `/template/${encodeURIComponent(
+        tName
+      )}/form/${encodeURIComponent(dataFile2)}`;
+      const full = `formidable://${templateFile}:${dataFile2}`;
       return `${prefix}[${full}](${href})`;
     }
   );
 
-  // strip frontmatter
   md = md.replace(/^---[\s\S]*?---\n+/, "");
 
-  // file://image → /storage/<template>/images/<file>
   md = md.replace(
     /!\[([^\]]*?)\]\(file:\/\/([^)]+?)\)/g,
     (full, alt, filePath) => {
-      const parts  = filePath.split(/[\\/]/);
+      const parts = filePath.split(/[\\/]/);
       const imgFile = parts[parts.length - 1];
-      return `![${alt}](/storage/${encodeURIComponent(templateFolder)}/images/${encodeURIComponent(imgFile)})`;
+      return `![${alt}](/storage/${encodeURIComponent(
+        templateFolder
+      )}/images/${encodeURIComponent(imgFile)})`;
     }
   );
 
-  // render with marked (now emits hljs markup)
   let html = marked.parse(md);
 
-  // inline #tags → span
   html = html.replace(/(^|[\s>])#([\w.\-]+)/g, (m, pre, tag) => {
     return `${pre}<span class="inline-tag">#${tag}</span>`;
   });
 
-  // wiki-link class on internal links
   html = html.replace(
     /<a\s+href="\/template\/[^"]+\/form\/[^"]+">([^<]+)<\/a>/gi,
     (full) => full.replace("<a ", '<a class="wiki-link" ')
   );
 
-  // patch residual file:// images in HTML
   html = html.replace(
     /<img\s+[^>]*src=["']file:\/\/([^"']+)["'][^>]*>/gi,
     (match, filePath) => {
-      const parts   = filePath.split(/[\\/]/);
+      const parts = filePath.split(/[\\/]/);
       const imgFile = parts[parts.length - 1];
       return match.replace(
         `file://${filePath}`,
-        `/storage/${encodeURIComponent(templateFolder)}/images/${encodeURIComponent(imgFile)}`
+        `/storage/${encodeURIComponent(
+          templateFolder
+        )}/images/${encodeURIComponent(imgFile)}`
       );
     }
   );
 
   return { template: templateYaml, form: formData, md, html };
+}
+
+function guidKeyOfTemplate(yaml) {
+  return (yaml?.fields || []).find((f) => f?.type === "guid")?.key || null;
+}
+
+function tagsKeyOfTemplate(yaml) {
+  try {
+    return templateManager.getTagsFieldKey(yaml?.fields || []);
+  } catch {
+    return null;
+  }
+}
+
+function normalizeTags(val) {
+  if (Array.isArray(val)) {
+    return val
+      .map((t) => String(t).replace(/^#/, "").trim().toLowerCase())
+      .filter(Boolean);
+  }
+  if (typeof val === "string") {
+    return val
+      .split(/[,\s]+/)
+      .map((t) => t.replace(/^#/, "").trim().toLowerCase())
+      .filter(Boolean);
+  }
+  return [];
+}
+
+function isCollectionEnabled(yaml) {
+  return !!(yaml && yaml.enable_collection === true && guidKeyOfTemplate(yaml));
+}
+
+function statRev(absPath) {
+  try {
+    const st = fs.statSync(absPath);
+    const etag = `W/"${st.size}-${Math.floor(st.mtimeMs)}"`;
+    const lastModified = new Date(st.mtimeMs).toUTCString();
+    return { etag, lastModified, mtimeMs: st.mtimeMs, size: st.size };
+  } catch {
+    return { etag: 'W/"0-0"', lastModified: new Date(0).toUTCString() };
+  }
+}
+
+async function collectionRev(templateName) {
+  const storagePath = configManager.getTemplateStoragePath(templateName);
+  const files = formManager.listForms(templateName) || [];
+  let maxMtime = 0;
+  for (const file of files) {
+    try {
+      const st = fs.statSync(path.join(storagePath, file));
+      maxMtime = Math.max(maxMtime, st.mtimeMs);
+    } catch {}
+  }
+  const etag = `W/"${files.length}-${Math.floor(maxMtime)}"`;
+  const lastModified = new Date(maxMtime || 0).toUTCString();
+  return { etag, lastModified };
+}
+
+async function listCollection(
+  templateName,
+  { limit = 100, offset = 0, q = "", tags = "" } = {}
+) {
+  const yaml = await loadTemplateYaml(templateName);
+  if (!isCollectionEnabled(yaml)) return { collectionEnabled: false };
+
+  const files = formManager.listForms(templateName) || [];
+  const fields = yaml.fields || [];
+  const itemFieldKey = (yaml.item_field || "").trim();
+  const guidKey = guidKeyOfTemplate(yaml);
+  const tagsKey = tagsKeyOfTemplate(yaml);
+
+  const ql = String(q || "").toLowerCase();
+  const tagFilter = normalizeTags(tags);
+  const itemsAll = [];
+
+  for (const filename of files) {
+    const form = formManager.loadForm(templateName, filename, fields);
+    if (!form) continue;
+
+    const guid = String(form?.data?.[guidKey] ?? "");
+    if (!guid) continue; // <-- require GUID
+
+    const title =
+      form?.title || (itemFieldKey && form?.data?.[itemFieldKey]) || filename;
+
+    const itemTags = normalizeTags(
+      (tagsKey && form?.data?.[tagsKey]) || form?.meta?.tags || []
+    );
+
+    if (ql) {
+      const hay = `${String(title).toLowerCase()} ${itemTags.join(" ")}`;
+      if (!hay.includes(ql)) continue;
+    }
+    if (tagFilter.length) {
+      const set = new Set(itemTags);
+      if (!tagFilter.every((t) => set.has(t))) continue;
+    }
+
+    itemsAll.push({
+      id: guid, // <-- GUID only
+      filename,
+      title: String(title),
+      tags: itemTags,
+      href: `/api/collections/${encodeURIComponent(
+        templateName.replace(/\.yaml$/i, "")
+      )}/${encodeURIComponent(guid)}`, // <-- GUID in href
+    });
+  }
+
+  const total = itemsAll.length;
+  const items = itemsAll.slice(offset, offset + limit);
+
+  return {
+    collectionEnabled: true,
+    template: templateName.replace(/\.yaml$/i, ""),
+    total,
+    limit,
+    offset,
+    items,
+  };
+}
+
+async function resolveFormById(templateName, guid) {
+  const yaml = await loadTemplateYaml(templateName);
+  const fields = yaml?.fields || [];
+  const storagePath = configManager.getTemplateStoragePath(templateName);
+  const files = formManager.listForms(templateName) || [];
+
+  const guidKey = (yaml?.fields || []).find((f) => f?.type === "guid")?.key;
+  if (!guidKey) return { ok: false, code: 400, reason: "guid-missing" };
+
+  for (const filename of files) {
+    const form = formManager.loadForm(templateName, filename, fields);
+    if (!form) continue;
+    if (String(form?.data?.[guidKey]) === String(guid)) {
+      return {
+        ok: true,
+        template: yaml,
+        form,
+        formFile: filename,
+        absPath: path.join(storagePath, filename),
+      };
+    }
+  }
+  return { ok: false, code: 404, reason: "not-found" };
 }
 
 module.exports = {
@@ -146,4 +300,10 @@ module.exports = {
   loadTemplateYaml,
   loadFormFile,
   loadAndRenderForm,
+
+  listCollection,
+  resolveFormById,
+  isCollectionEnabled,
+  statRev,
+  collectionRev,
 };

@@ -13,6 +13,7 @@ const {
 const configManager = require("./configManager");
 const { log } = require("./nodeLogger");
 const miniExprParser = require("./miniExprParser");
+const { mountApiCollections } = require("./apiCollections");
 
 let server = null;
 let currentPort = null;
@@ -73,6 +74,9 @@ function startInternalServer(port = 8383) {
     );
   }
 
+  // --- REST API: collections-only ---
+  mountApiCollections(app);
+
   // favicon at root (browsers auto-hit /favicon.ico)
   app.get("/favicon.ico", (req, res) =>
     res.sendFile(path.join(assetsDir, "formidable.ico"))
@@ -128,9 +132,7 @@ function startInternalServer(port = 8383) {
       res.status(404).send(
         renderPage({
           title: "Template Not Found",
-          body: `<p>Template "${escapeHtml(
-            tmpl
-          )}" not found.</p>`,
+          body: `<p>Template "${escapeHtml(tmpl)}" not found.</p>`,
           footerNote: `Running on port ${currentPort}`,
         })
       );
@@ -243,9 +245,7 @@ function startInternalServer(port = 8383) {
       res.status(404).send(
         renderPage({
           title: "Template Not Found",
-          body: `<p>Template "${escapeHtml(
-            tmpl
-          )}" not found or invalid.</p>`,
+          body: `<p>Template "${escapeHtml(tmpl)}" not found or invalid.</p>`,
           footerNote: `Running on port ${currentPort}`,
         })
       );
@@ -263,9 +263,7 @@ function startInternalServer(port = 8383) {
           title: "Form Not Found",
           body: `<p>Form "${escapeHtml(
             formFile
-          )}" not found in template "${escapeHtml(
-            tmpl
-          )}".</p>`,
+          )}" not found in template "${escapeHtml(tmpl)}".</p>`,
           footerNote: `Running on port ${currentPort}`,
         })
       );
