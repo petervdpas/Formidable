@@ -148,18 +148,6 @@ async function loadAndRenderForm(templateName, dataFile) {
   return { template: templateYaml, form: formData, md, html };
 }
 
-function guidKeyOfTemplate(yaml) {
-  return (yaml?.fields || []).find((f) => f?.type === "guid")?.key || null;
-}
-
-function tagsKeyOfTemplate(yaml) {
-  try {
-    return templateManager.getTagsFieldKey(yaml?.fields || []);
-  } catch {
-    return null;
-  }
-}
-
 function normalizeTags(val) {
   if (Array.isArray(val)) {
     return val
@@ -176,7 +164,11 @@ function normalizeTags(val) {
 }
 
 function isCollectionEnabled(yaml) {
-  return !!(yaml && yaml.enable_collection === true && guidKeyOfTemplate(yaml));
+  return !!(
+    yaml &&
+    yaml.enable_collection === true &&
+    templateManager.getGuidFieldKey(yaml?.fields || [])
+  );
 }
 
 function statRev(absPath) {
@@ -207,7 +199,7 @@ async function collectionRev(templateName) {
 
 async function listCollection(
   templateName,
-  { limit = 100, offset = 0, q = "", tags = "" } = {}
+  { limit = 100, offset = 0, q = "", tags = "", include = "summary" } = {}
 ) {
   const yaml = await loadTemplateYaml(templateName);
   if (!isCollectionEnabled(yaml)) return { collectionEnabled: false };
@@ -215,26 +207,29 @@ async function listCollection(
   const files = formManager.listForms(templateName) || [];
   const fields = yaml.fields || [];
   const itemFieldKey = (yaml.item_field || "").trim();
-  const guidKey = guidKeyOfTemplate(yaml);
-  const tagsKey = tagsKeyOfTemplate(yaml);
+  const guidKey = templateManager.getGuidFieldKey(yaml?.fields || []);
+  const tagsKey = templateManager.getTagsFieldKey(yaml.fields || []);
 
   const ql = String(q || "").toLowerCase();
   const tagFilter = normalizeTags(tags);
   const itemsAll = [];
+
+  const storagePath = configManager.getTemplateStoragePath(templateName);
+  const templateId = templateName.replace(/\.yaml$/i, "");
+  const wantData = include === "data" || include === "all";
+  const wantMeta = include === "meta" || include === "all";
 
   for (const filename of files) {
     const form = formManager.loadForm(templateName, filename, fields);
     if (!form) continue;
 
     const guid = String(form?.data?.[guidKey] ?? "");
-    if (!guid) continue; // <-- require GUID
+    if (!guid) continue;
 
     const title =
       form?.title || (itemFieldKey && form?.data?.[itemFieldKey]) || filename;
 
-    const itemTags = normalizeTags(
-      (tagsKey && form?.data?.[tagsKey]) || form?.meta?.tags || []
-    );
+    const itemTags = tagsKey ? normalizeTags(form?.data?.[tagsKey]) : [];
 
     if (ql) {
       const hay = `${String(title).toLowerCase()} ${itemTags.join(" ")}`;
@@ -245,15 +240,36 @@ async function listCollection(
       if (!tagFilter.every((t) => set.has(t))) continue;
     }
 
-    itemsAll.push({
-      id: guid, // <-- GUID only
-      filename,
-      title: String(title),
-      tags: itemTags,
-      href: `/api/collections/${encodeURIComponent(
-        templateName.replace(/\.yaml$/i, "")
-      )}/${encodeURIComponent(guid)}`, // <-- GUID in href
-    });
+    if (wantData || wantMeta) {
+      const rev = statRev(path.join(storagePath, filename));
+      itemsAll.push({
+        template: templateId,
+        id: guid,
+        filename,
+        title: String(title),
+        ...(wantMeta ? { meta: form.meta || {} } : {}),
+        ...(wantData ? { data: form.data || {} } : {}),
+        links: {
+          self: `/api/collections/${encodeURIComponent(
+            templateId
+          )}/${encodeURIComponent(guid)}`,
+          html: `/template/${encodeURIComponent(
+            templateId
+          )}/form/${encodeURIComponent(filename)}`,
+        },
+        rev: { etag: rev.etag, lastModified: rev.lastModified },
+      });
+    } else {
+      itemsAll.push({
+        id: guid,
+        filename,
+        title: String(title),
+        tags: itemTags,
+        href: `/api/collections/${encodeURIComponent(
+          templateId
+        )}/${encodeURIComponent(guid)}`,
+      });
+    }
   }
 
   const total = itemsAll.length;
@@ -275,7 +291,7 @@ async function resolveFormById(templateName, guid) {
   const storagePath = configManager.getTemplateStoragePath(templateName);
   const files = formManager.listForms(templateName) || [];
 
-  const guidKey = (yaml?.fields || []).find((f) => f?.type === "guid")?.key;
+  const guidKey = templateManager.getGuidFieldKey(yaml?.fields || []);
   if (!guidKey) return { ok: false, code: 400, reason: "guid-missing" };
 
   for (const filename of files) {

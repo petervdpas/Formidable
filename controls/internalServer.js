@@ -103,7 +103,12 @@ function startInternalServer(port = 8383) {
       <p>Welcome to the Formidable Internal Server.</p>
       <h2>Available Templates</h2>
       <ul class="template-list">${templateLinks.join("")}</ul>
-      <p><a href="/virtual">View Virtual Structure (JSON)</a></p>
+
+      <div class="after-list">
+        <a href="/api/docs" class="link-chip" aria-label="Open API docs (Swagger)">
+          Open API docs (Swagger)
+        </a>
+      </div>
     `;
 
     res.send(
@@ -115,12 +120,14 @@ function startInternalServer(port = 8383) {
     );
   });
 
-  // JSON - Virtual Structure (pretty printed)
-  app.get("/virtual", async (req, res) => {
-    const vfs = await getVirtualStructure();
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
-    res.send(JSON.stringify(vfs, null, 2));
-  });
+  // JSON - Virtual Structure (DEV only)
+  if (process.env.NODE_ENV !== "production") {
+    app.get("/virtual", async (req, res) => {
+      const vfs = await getVirtualStructure();
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+      res.send(JSON.stringify(vfs, null, 2));
+    });
+  }
 
   // HTML - Template List of Forms
   app.get("/template/:template", async (req, res) => {

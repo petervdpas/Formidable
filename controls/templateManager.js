@@ -52,6 +52,10 @@ function saveTemplate(name, data) {
         })
       : [];
 
+    sanitizedFields.forEach((f) => {
+      if (f.type === "tags" && !Array.isArray(f.default)) f.default = [];
+    });
+
     const ordered = {
       name: data.name || "",
       filename: data.filename,
@@ -287,7 +291,7 @@ function validateTemplate(template) {
   }
 
   errors.push(...checkLoopPairing(template.fields));
-  errors.push(...checkLoopNestingDepth(template.fields, 2)); // LOOPLEVEL 1 only
+  errors.push(...checkLoopNestingDepth(template.fields, 2)); // LOOPLEVEL 2 only
 
   const collectionError = checkCollectionEnableValid(template);
 
@@ -441,6 +445,11 @@ function getPossibleItemFields(name) {
   return data.fields ? computeTopLevelTextFields(data.fields) : [];
 }
 
+function getGuidFieldKey(fields = []) {
+  const f = fields.find((x) => x?.type === "guid");
+  return f ? f.key : null;
+}
+
 module.exports = {
   ensureTemplateDirectory,
   listTemplates,
@@ -452,4 +461,5 @@ module.exports = {
   seedBasicTemplateIfEmpty,
   getPossibleItemFields,
   getTagsFieldKey,
+  getGuidFieldKey,
 };

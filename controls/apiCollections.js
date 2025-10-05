@@ -14,6 +14,7 @@ const {
   collectionRev,
 } = require("./serverDataProvider");
 
+const templateManager = require("./templateManager");
 const formManager = require("./formManager");
 const configManager = require("./configManager");
 
@@ -134,11 +135,6 @@ function makeDataSchema(yaml) {
   };
 }
 
-function guidKeyOfTemplate(yaml) {
-  const f = (yaml?.fields || []).find((x) => x?.type === "guid");
-  return f ? f.key : null;
-}
-
 function mountApiCollections(app) {
   const router = express.Router();
 
@@ -188,12 +184,13 @@ function mountApiCollections(app) {
       return res.status(304).end();
     }
 
-    const { limit, offset, q, tags } = req.query;
+    const { limit, offset, q, tags, include } = req.query;
     const out = await listCollection(tmpl, {
       limit: Number(limit) || 100,
       offset: Number(offset) || 0,
       q: q || "",
       tags: tags || "",
+      include: (include || "summary").toLowerCase(),
     });
 
     if (!out.collectionEnabled) {
@@ -203,6 +200,16 @@ function mountApiCollections(app) {
     res.setHeader("ETag", rev.etag);
     res.setHeader("Last-Modified", rev.lastModified);
     res.json(out);
+  });
+
+  router.head("/collections/:template/:id", async (req, res) => {
+    const tmpl = `${req.params.template}.yaml`;
+    const resolved = await resolveFormById(tmpl, req.params.id);
+    if (!resolved.ok) return res.sendStatus(resolved.code || 404);
+    const rev = statRev(resolved.absPath);
+    res.setHeader("ETag", rev.etag);
+    res.setHeader("Last-Modified", rev.lastModified);
+    res.end();
   });
 
   router.get("/collections/:template/:id", async (req, res) => {
@@ -259,7 +266,7 @@ function mountApiCollections(app) {
       return res.status(403).json({ error: "collection-disabled" });
     }
 
-    const guidKey = guidKeyOfTemplate(yaml);
+    const guidKey = templateManager.getGuidFieldKey(yaml.fields || []);
     const payload = req.body || {};
     const data = payload.data || {};
     const meta = payload.meta || {};
@@ -272,7 +279,6 @@ function mountApiCollections(app) {
       });
     }
 
-    // reject if the GUID already exists:
     const exists = await resolveFormById(tmpl, String(guid));
     if (exists.ok) {
       return res
@@ -280,10 +286,8 @@ function mountApiCollections(app) {
         .json({ error: "already-exists", id: String(guid) });
     }
 
-    // choose a filename. simplest: GUID.meta.json
     const filename = `${String(guid)}.meta.json`;
 
-    // sanitize/validate via formManager.saveForm
     const result = formManager.saveForm(
       tmpl,
       filename,
@@ -336,7 +340,7 @@ function mountApiCollections(app) {
       return res.status(403).json({ error: "collection-disabled" });
     }
 
-    const guidKey = guidKeyOfTemplate(yaml);
+    const guidKey = templateManager.getGuidFieldKey(yaml.fields || []);
     const id = String(req.params.id);
 
     const resolved = await resolveFormById(tmpl, id);
@@ -349,14 +353,13 @@ function mountApiCollections(app) {
     const data = payload.data || {};
     const meta = payload.meta || {};
 
-    // guard: you may enforce id immutability here (incoming data must keep the same GUID)
     if (data?.[guidKey] && String(data[guidKey]) !== id) {
       return res.status(409).json({
         error: "guid-mismatch",
         message: `Payload ${guidKey} must equal path id.`,
       });
     }
-    // if not provided, keep the original GUID:
+
     if (!data?.[guidKey]) data[guidKey] = id;
 
     const result = formManager.saveForm(
@@ -393,6 +396,140 @@ function mountApiCollections(app) {
     });
   });
 
+  router.patch("/collections/:template/:id", async (req, res) => {
+    const tmpl = `${req.params.template}.yaml`;
+    const yaml = await loadTemplateYaml(tmpl);
+    if (!yaml || !isCollectionEnabled(yaml)) {
+      return res.status(403).json({ error: "collection-disabled" });
+    }
+
+    const id = String(req.params.id);
+    const resolved = await resolveFormById(tmpl, id);
+    if (!resolved.ok) {
+      return res
+        .status(resolved.code || 404)
+        .json({ error: resolved.reason || "not-found" });
+    }
+
+    if (req.headers["if-match"]) {
+      const rev = statRev(resolved.absPath);
+      if (req.headers["if-match"] !== rev.etag) {
+        return res
+          .status(412)
+          .json({ error: "precondition-failed", expected: rev.etag });
+      }
+    }
+
+    const guidKey = templateManager.getGuidFieldKey(yaml.fields || []);
+    const incoming = req.body || {};
+    const incData = incoming.data || undefined;
+    const incMeta = incoming.meta || undefined;
+
+    const merged = {
+      meta: incMeta
+        ? { ...(resolved.form.meta || {}), ...incMeta }
+        : resolved.form.meta || {},
+      data: incData
+        ? { ...(resolved.form.data || {}), ...incData }
+        : resolved.form.data || {},
+    };
+
+    if (merged.data[guidKey] && String(merged.data[guidKey]) !== id) {
+      return res.status(409).json({
+        error: "guid-mismatch",
+        message: `Payload ${guidKey} must equal path id.`,
+      });
+    }
+    merged.data[guidKey] = id;
+
+    const result = formManager.saveForm(
+      tmpl,
+      resolved.formFile,
+      merged,
+      yaml.fields
+    );
+    if (!result?.success) {
+      return res
+        .status(500)
+        .json({ error: "save-failed", detail: result?.error });
+    }
+
+    const rev = statRev(resolved.absPath);
+    res.setHeader("ETag", rev.etag);
+    res.setHeader("Last-Modified", rev.lastModified);
+    res.json({
+      template: req.params.template,
+      id,
+      filename: resolved.formFile,
+      meta: merged.meta,
+      data: merged.data,
+      links: {
+        self: `/api/collections/${encodeURIComponent(
+          req.params.template
+        )}/${encodeURIComponent(id)}`,
+        html: `/template/${encodeURIComponent(
+          req.params.template
+        )}/form/${encodeURIComponent(resolved.formFile)}`,
+      },
+      rev: { etag: rev.etag, lastModified: rev.lastModified },
+    });
+  });
+
+  router.patch("/collections/:template/:id/field/:key", async (req, res) => {
+    const tmpl = `${req.params.template}.yaml`;
+    const yaml = await loadTemplateYaml(tmpl);
+    if (!yaml || !isCollectionEnabled(yaml)) {
+      return res.status(403).json({ error: "collection-disabled" });
+    }
+
+    const id = String(req.params.id);
+    const key = String(req.params.key);
+    const resolved = await resolveFormById(tmpl, id);
+    if (!resolved.ok)
+      return res
+        .status(resolved.code || 404)
+        .json({ error: resolved.reason || "not-found" });
+
+    const guidKey = templateManager.getGuidFieldKey(yaml.fields || []);
+    if (key === guidKey)
+      return res.status(409).json({ error: "guid-immutable" });
+
+    const fieldDef = (yaml.fields || []).find((f) => f.key === key);
+    if (!fieldDef) return res.status(400).json({ error: "unknown-field", key });
+
+    let value =
+      req.body && Object.prototype.hasOwnProperty.call(req.body, "value")
+        ? req.body.value
+        : req.body;
+
+    const merged = {
+      meta: resolved.form.meta || {},
+      data: { ...(resolved.form.data || {}), [key]: value, [guidKey]: id },
+    };
+
+    const result = formManager.saveForm(
+      tmpl,
+      resolved.formFile,
+      merged,
+      yaml.fields
+    );
+    if (!result?.success)
+      return res
+        .status(500)
+        .json({ error: "save-failed", detail: result?.error });
+
+    const rev = statRev(resolved.absPath);
+    res.setHeader("ETag", rev.etag);
+    res.setHeader("Last-Modified", rev.lastModified);
+    res.json({
+      template: req.params.template,
+      id,
+      filename: resolved.formFile,
+      changed: { [key]: value },
+      rev: { etag: rev.etag, lastModified: rev.lastModified },
+    });
+  });
+
   router.delete("/collections/:template/:id", async (req, res) => {
     const tmpl = `${req.params.template}.yaml`;
     const yaml = await loadTemplateYaml(tmpl);
@@ -410,16 +547,6 @@ function mountApiCollections(app) {
     if (!ok) return res.status(500).json({ error: "delete-failed" });
 
     return res.sendStatus(204);
-  });
-
-  router.head("/collections/:template/:id", async (req, res) => {
-    const tmpl = `${req.params.template}.yaml`;
-    const resolved = await resolveFormById(tmpl, req.params.id);
-    if (!resolved.ok) return res.sendStatus(resolved.code || 404);
-    const rev = statRev(resolved.absPath);
-    res.setHeader("ETag", rev.etag);
-    res.setHeader("Last-Modified", rev.lastModified);
-    res.end();
   });
 
   router.get("/collections/:template/export.ndjson", async (req, res) => {
@@ -514,7 +641,6 @@ function mountApiCollections(app) {
     const templates = Object.entries(vfs.templateStorageFolders || {});
     const enabled = [];
 
-    // Build per-template schemas
     const schemas = {
       ItemBase: {
         type: "object",
@@ -541,23 +667,54 @@ function mountApiCollections(app) {
         },
         required: ["template", "id", "filename"],
       },
+
+      ItemSummary: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          filename: { type: "string" },
+          title: { type: "string" },
+          tags: { type: "array", items: { type: "string" } },
+          href: { type: "string" },
+        },
+        required: ["id", "filename", "title"],
+      },
     };
 
     const itemRefs = [];
     const payloadRefs = [];
+    const partialPayloadRefs = [];
 
     for (const [id, desc] of templates) {
       const y = await loadTemplateYaml(desc.filename);
-      const guidField = (y?.fields || []).find((f) => f.type === "guid");
-      if (!y || y.enable_collection !== true || !guidField) continue;
+      const guidKey = templateManager.getGuidFieldKey(y?.fields || []);
+      if (!y || y.enable_collection !== true || !guidKey) continue;
 
-      enabled.push({ id, yaml: y, guidKey: guidField.key });
+      enabled.push({ id, yaml: y, guidKey });
 
       const dataSchemaName = `Data_${id}`;
       const payloadName = `Upsert_${id}`;
+      const partialName = `UpsertPartial_${id}`;
       const itemName = `Item_${id}`;
 
       const dataSchema = makeDataSchema(y);
+
+      for (const f of y.fields || []) {
+        if (f.type === "table" && dataSchema.properties?.[f.key]) {
+          const cols = (f.options || []).map((o) => String(o.value));
+          dataSchema.properties[f.key] = {
+            type: "array",
+            description: "Array of rows; each row is an array of cell values",
+            items: {
+              type: "array",
+              items: { type: "string" },
+              ...(cols.length
+                ? { minItems: cols.length, maxItems: cols.length }
+                : {}),
+            },
+          };
+        }
+      }
 
       schemas[dataSchemaName] = dataSchema;
 
@@ -568,6 +725,18 @@ function mountApiCollections(app) {
           data: { $ref: `#/components/schemas/${dataSchemaName}` },
         },
         required: ["data"],
+      };
+
+      schemas[partialName] = {
+        type: "object",
+        properties: {
+          meta: { type: "object", additionalProperties: true },
+          data: {
+            type: "object",
+            additionalProperties: true,
+            properties: dataSchema.properties || {},
+          },
+        },
       };
 
       schemas[itemName] = {
@@ -585,15 +754,16 @@ function mountApiCollections(app) {
 
       itemRefs.push({ $ref: `#/components/schemas/${itemName}` });
       payloadRefs.push({ $ref: `#/components/schemas/${payloadName}` });
+      partialPayloadRefs.push({ $ref: `#/components/schemas/${partialName}` });
     }
 
-    const spec = {
+    return {
       openapi: "3.0.3",
       info: {
         title: "Formidable Collections API",
-        version: "1.1.0",
+        version: "1.3.0",
         description:
-          "CRUD for collection-enabled templates. Request/response schemas are generated from each template's fields.",
+          "CRUD for collection-enabled templates. Schemas are generated from template fields. Use `include` to control list payload size.",
       },
       servers: [{ url: baseUrl }],
       components: {
@@ -612,6 +782,13 @@ function mountApiCollections(app) {
             schema: { type: "string" },
             description: "Item GUID",
           },
+          KeyParam: {
+            name: "key",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+            description: "Field key within the template",
+          },
         },
         schemas: {
           ...schemas,
@@ -623,7 +800,10 @@ function mountApiCollections(app) {
               total: { type: "integer" },
               limit: { type: "integer" },
               offset: { type: "integer" },
-              items: { type: "array", items: { oneOf: itemRefs } },
+              items: {
+                type: "array",
+                items: { $ref: "#/components/schemas/ItemSummary" },
+              },
             },
             required: [
               "collectionEnabled",
@@ -633,6 +813,45 @@ function mountApiCollections(app) {
               "offset",
               "items",
             ],
+          },
+          ListResponseFull: {
+            type: "object",
+            properties: {
+              collectionEnabled: { type: "boolean" },
+              template: { type: "string" },
+              total: { type: "integer" },
+              limit: { type: "integer" },
+              offset: { type: "integer" },
+              items: {
+                type: "array",
+                items: { oneOf: itemRefs },
+              },
+            },
+            required: [
+              "collectionEnabled",
+              "template",
+              "total",
+              "limit",
+              "offset",
+              "items",
+            ],
+          },
+          // Field-level PATCH body
+          FieldPatchBody: {
+            oneOf: [
+              {
+                type: "object",
+                additionalProperties: false,
+                required: ["value"],
+                properties: { value: {} },
+              },
+              { type: "string" },
+              { type: "number" },
+              { type: "boolean" },
+              { type: "array", items: {} },
+              { type: "object" },
+            ],
+            description: "Either `{ value: ... }` or a raw JSON value.",
           },
         },
       },
@@ -660,13 +879,29 @@ function mountApiCollections(app) {
               },
               { name: "q", in: "query", schema: { type: "string" } },
               { name: "tags", in: "query", schema: { type: "string" } },
+              {
+                name: "include",
+                in: "query",
+                description:
+                  "Controls payload size: `summary` (default) | `data` | `meta` | `all`",
+                schema: {
+                  type: "string",
+                  enum: ["summary", "data", "meta", "all"],
+                  default: "summary",
+                },
+              },
             ],
             responses: {
               200: {
                 description: "OK",
                 content: {
                   "application/json": {
-                    schema: { $ref: "#/components/schemas/ListResponse" },
+                    schema: {
+                      oneOf: [
+                        { $ref: "#/components/schemas/ListResponse" },
+                        { $ref: "#/components/schemas/ListResponseFull" },
+                      ],
+                    },
                   },
                 },
               },
@@ -679,12 +914,7 @@ function mountApiCollections(app) {
             requestBody: {
               required: true,
               content: {
-                "application/json": {
-                  schema: {
-                    oneOf: payloadRefs,
-                    description: "Pick the schema matching the template path.",
-                  },
-                },
+                "application/json": { schema: { oneOf: payloadRefs } },
               },
             },
             responses: {
@@ -741,6 +971,32 @@ function mountApiCollections(app) {
               409: { description: "guid-mismatch" },
             },
           },
+          patch: {
+            summary: "Merge update (partial) by GUID",
+            parameters: [
+              { $ref: "#/components/parameters/TemplateParam" },
+              { $ref: "#/components/parameters/IdParam" },
+            ],
+            requestBody: {
+              required: true,
+              content: {
+                "application/json": { schema: { oneOf: partialPayloadRefs } },
+              },
+            },
+            responses: {
+              200: {
+                description: "OK",
+                content: {
+                  "application/json": { schema: { oneOf: itemRefs } },
+                },
+              },
+              403: { description: "collection-disabled" },
+              404: { description: "not-found" },
+              412: {
+                description: "precondition-failed (If-Match ETag mismatch)",
+              },
+            },
+          },
           delete: {
             summary: "Delete item by GUID",
             parameters: [
@@ -764,25 +1020,94 @@ function mountApiCollections(app) {
             },
           },
         },
+        "/collections/{template}/{id}/field/{key}": {
+          patch: {
+            summary: "Update a single field by key",
+            parameters: [
+              { $ref: "#/components/parameters/TemplateParam" },
+              { $ref: "#/components/parameters/IdParam" },
+              { $ref: "#/components/parameters/KeyParam" },
+            ],
+            requestBody: {
+              required: true,
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/FieldPatchBody" },
+                },
+              },
+            },
+            responses: {
+              200: {
+                description: "OK",
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      properties: {
+                        template: { type: "string" },
+                        id: { type: "string" },
+                        filename: { type: "string" },
+                        changed: { type: "object", additionalProperties: true },
+                        rev: {
+                          type: "object",
+                          properties: {
+                            etag: { type: "string" },
+                            lastModified: { type: "string" },
+                          },
+                        },
+                      },
+                      required: ["template", "id", "filename", "changed"],
+                    },
+                  },
+                },
+              },
+              400: { description: "unknown-field" },
+              403: { description: "collection-disabled" },
+              404: { description: "not-found" },
+              409: { description: "guid-immutable" },
+            },
+          },
+        },
       },
     };
-
-    return spec;
   }
 
-  // serve raw OpenAPI JSON
   router.get("/openapi.json", async (req, res) => {
     const spec = await buildOpenApiSpec("/api");
     res.json(spec);
   });
 
-  // pretty Swagger UI
   app.use(
     "/api/docs",
     swaggerUi.serve,
     swaggerUi.setup(undefined, {
       explorer: false,
       swaggerOptions: { url: "/api/openapi.json" },
+      customSiteTitle: "Formidable Collections API",
+      customfavIcon: "/assets/formidable.ico",
+      customJs: "/assets/internal-server/js/swagger-back.js",
+      customCss: `
+        /* keep the topbar as a flex row */
+        .swagger-ui .topbar .wrapper{display:flex;align-items:center;gap:.5rem;}
+
+        /* make OUR link small and ignore Swagger's button styles */
+        .swagger-ui .topbar .wrapper a.fm-docs-back{
+          all: unset;                        /* wipe inherited Swagger button styles */
+          margin-left: auto;                 /* push to the right */
+          display: inline-flex; align-items: center; gap: .35rem;
+          font: 600 12px/1.15 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif !important;
+          padding: .28rem .6rem !important;  /* tiny */
+          border-radius: 9999px !important;
+          border: 1px solid #dbe5ff !important;
+          background: #f7faff !important;
+          color: #2a62e0 !important;
+          text-decoration: none !important;
+          cursor: pointer;
+        }
+        .swagger-ui .topbar .wrapper a.fm-docs-back:hover{
+          background:#eff5ff !important; border-color:#c9d8ff !important;
+        }
+    `,
     })
   );
 

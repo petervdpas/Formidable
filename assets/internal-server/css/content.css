@@ -26,31 +26,79 @@ a.wiki-link:hover {
 /* ─────────────────────────────────────────────
    Semantic Colors
 ───────────────────────────────────────────── */
-.expr-text-green   { color: green; }
-.expr-text-blue    { color: blue; }
-.expr-text-red     { color: red; }
-.expr-text-orange  { color: orange; }
-.expr-text-yellow  { color: goldenrod; }
+.expr-text-green {
+    color: green;
+}
+
+.expr-text-blue {
+    color: blue;
+}
+
+.expr-text-red {
+    color: red;
+}
+
+.expr-text-orange {
+    color: orange;
+}
+
+.expr-text-yellow {
+    color: goldenrod;
+}
 
 /* ─────────────────────────────────────────────
    Neutral & Grayscale
 ───────────────────────────────────────────── */
-.expr-text-black      { color: black; }
-.expr-text-white      { color: white; }
-.expr-text-gray       { color: gray; }
-.expr-text-darkgray   { color: #444; }
-.expr-text-lightgray  { color: #ccc; }
+.expr-text-black {
+    color: black;
+}
+
+.expr-text-white {
+    color: white;
+}
+
+.expr-text-gray {
+    color: gray;
+}
+
+.expr-text-darkgray {
+    color: #444;
+}
+
+.expr-text-lightgray {
+    color: #ccc;
+}
 
 /* ─────────────────────────────────────────────
    Accent / UI Colors
 ───────────────────────────────────────────── */
-.expr-text-purple  { color: purple; }
-.expr-text-pink    { color: hotpink; }
-.expr-text-cyan    { color: cyan; }
-.expr-text-teal    { color: teal; }
-.expr-text-brown   { color: brown; }
-.expr-text-gold    { color: gold; }
-.expr-text-silver  { color: silver; }
+.expr-text-purple {
+    color: purple;
+}
+
+.expr-text-pink {
+    color: hotpink;
+}
+
+.expr-text-cyan {
+    color: cyan;
+}
+
+.expr-text-teal {
+    color: teal;
+}
+
+.expr-text-brown {
+    color: brown;
+}
+
+.expr-text-gold {
+    color: gold;
+}
+
+.expr-text-silver {
+    color: silver;
+}
 
 .expr-bold {
     font-weight: bold;
@@ -105,4 +153,50 @@ pre:not(.hljs) {
     padding: 1em;
     border-radius: 4px;
     overflow-x: auto;
+}
+
+.after-list {
+    margin-top: .9rem;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    color: #6b7280;
+    /* muted text */
+}
+
+.link-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .4em;
+    font-size: .9rem;
+    font-weight: 600;
+    text-decoration: none;
+    padding: .28rem .65rem;
+    border-radius: 999px;
+    border: 1px solid #dbe5ff;
+    background: #f7faff;
+    color: #2a62e0;
+}
+
+.link-chip::before {
+    content: "↗";
+    opacity: .6;
+    font-weight: 700;
+}
+
+.link-chip:hover {
+    background: #eff5ff;
+    border-color: #c9d8ff;
+    color: #1b4fcf;
+}
+
+.quiet-link {
+    color: #2a62e0;
+    border-bottom: 1px dashed #c9d8ff;
+    text-decoration: none;
+}
+
+.quiet-link:hover {
+    background: #f7faff;
+    color: #1b4fcf;
 }
