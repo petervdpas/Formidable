@@ -5,7 +5,7 @@ import {
   loadConfig,
   resolveGitPath,
   getProgressState,
-  getStatus,
+  getStatusFresh,
   GitRules,
 } from "../../utils/gitUtils.js";
 

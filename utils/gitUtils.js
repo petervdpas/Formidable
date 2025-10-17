@@ -117,20 +117,27 @@ export const GitRules = Object.freeze({
     );
   },
 
+  // Only push when we know we're ahead (> 0) and not busy.
+  // If strict, don't allow push when there are local changes.
   canPush(state, { strict = true } = {}) {
     if (state.busy) return false;
     if (strict && state.filesCount > 0) return false;
-    return state.ahead !== null && state.ahead > 0;
+    if (state.ahead == null) return false; // unknown → not pushable
+    return state.ahead > 0;
   },
 
+  // Only pull when we *know* we're behind (> 0), not busy, and no local changes.
+  // Unknown ahead/behind → neutral (not pullable).
   canPull(state) {
     if (state.busy) return false;
-    if (state.filesCount > 0) return false; // ⟵ pull blokkeren met unstaged changes
-    if (state.ahead === null || state.behind === null) return true;
-    if (state.ahead > 0) return false;
+    if (state.filesCount > 0) return false; // block pull with unstaged/staged changes
+    if (state.ahead == null || state.behind == null) return false; // unknown → neutral
+    if (state.ahead > 0) return false; // don't pull if we have outgoing commits
     return state.behind > 0;
   },
 
+  // For an auto-stash flow (if you add one): only when we *do* have changes,
+  // are strictly behind, and not ahead.
   canAutoStashPull(state) {
     return (
       !state.busy &&
@@ -261,7 +268,10 @@ export async function sync(
 }
 
 export async function continueAny(folderPath, message = null) {
-  const res = await callWithResponse("git:continue-any", { folderPath, message });
+  const res = await callWithResponse("git:continue-any", {
+    folderPath,
+    message,
+  });
   EventBus.emit("git:ui:update", { scope: "git", action: "progress" });
   return res;
 }
