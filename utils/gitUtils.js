@@ -186,6 +186,10 @@ export async function getStatus(folderPath) {
   return await callWithResponse("git:status", { folderPath });
 }
 
+export async function getStatusFresh(folderPath) {
+  return await callWithResponse("git:status-fresh", { folderPath });
+}
+
 export async function getRemoteInfo(folderPath) {
   return await callWithResponse("git:remote-info", { folderPath });
 }

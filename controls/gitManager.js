@@ -7,6 +7,7 @@ const fileManager = require("./fileManager");
 const { log, warn, error } = require("./nodeLogger");
 
 const gitConfigCache = new Set();
+const lastFetchByRepo = new Map();
 
 function normPair(index, work) {
   const i = String(index || "").trim();
@@ -31,6 +32,16 @@ async function withRepoLock(repoRoot, fn) {
     resolveNext();
     if (repoLocks.get(repoRoot) === next) repoLocks.delete(repoRoot);
   }
+}
+
+async function fetchIfStale(root, minAgeMs = 30000, remote = "origin", branch = undefined) {
+  const now = Date.now();
+  const last = lastFetchByRepo.get(root) || 0;
+  if (now - last < minAgeMs) return false;
+  const git = await getGitInstance(root);
+  await git.fetch(remote, branch, ["--prune"]);
+  lastFetchByRepo.set(root, now);
+  return true;
 }
 
 function toRepoRelPosix(root, anyPath) {
@@ -123,6 +134,36 @@ async function status(folderPath) {
     });
   } catch (err) {
     error("[GitManager] status failed:", err);
+    return fail(err);
+  }
+}
+
+async function statusFresh(folderPath, { minAgeMs = 30000, remote = "origin", branch } = {}) {
+  try {
+    const root = await resolveRoot(folderPath);
+    if (!root) return ok(null);
+    return await withRepoLock(root, async () => {
+      await fetchIfStale(root, minAgeMs, remote, branch);
+      const git = await getGitInstance(root);
+      const s = await git.status();
+      return ok({
+        created: s.created,
+        deleted: s.deleted,
+        modified: s.modified,
+        not_added: s.not_added,
+        staged: s.staged,
+        conflicted: s.conflicted,
+        renamed: s.renamed,
+        tracking: s.tracking,
+        current: s.current,
+        ahead: s.ahead,
+        behind: s.behind,
+        files: s.files.map(f => ({ path: f.path, index: f.index, working_dir: f.working_dir })),
+        clean: s.isClean?.(),
+      });
+    });
+  } catch (err) {
+    error("[GitManager] statusFresh failed:", err);
     return fail(err);
   }
 }
@@ -759,6 +800,7 @@ module.exports = {
   isGitRepo,
   getGitRoot,
   status,
+  statusFresh,
   remoteInfo,
   fetch,
   pull,

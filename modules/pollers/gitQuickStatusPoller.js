@@ -112,7 +112,7 @@ export async function startGitQuickStatusPoller(
   try {
     const [progress, status] = await Promise.all([
       getProgressState(gitPath),
-      getStatus(gitPath),
+      getStatusFresh(gitPath),
     ]);
     applyStateToButton(btnSelector, progress || {}, status || null);
   } catch {
@@ -133,7 +133,7 @@ export async function startGitQuickStatusPoller(
     fn: async (args, ctx) => {
       const [progress, status] = await Promise.all([
         getProgressState(args.gitPath).catch(() => null),
-        getStatus(args.gitPath).catch(() => null),
+        getStatusFresh(args.gitPath).catch(() => null),
       ]);
 
       const state = GitRules.deriveState(status || {}, progress || {});

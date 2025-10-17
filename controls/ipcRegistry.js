@@ -244,6 +244,9 @@ function registerIpcHandlers() {
   registerIpc("is-git-repo", (e, folder) => gitManager.isGitRepo(folder));
   registerIpc("get-git-root", (e, folder) => gitManager.getGitRoot(folder));
   registerIpc("git-status", (e, folder) => gitManager.status(folder));
+  registerIpc("git-status-fresh", (e, folder, opts) =>
+    gitManager.statusFresh(folder, opts)
+  );
   registerIpc("git-remote-info", (e, folder) => gitManager.remoteInfo(folder));
   registerIpc("git-pull", (e, folder) => gitManager.pull(folder));
   registerIpc("git-push", (e, folder) => gitManager.push(folder));

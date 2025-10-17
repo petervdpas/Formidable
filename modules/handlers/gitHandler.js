@@ -34,7 +34,8 @@ export async function handleGitGetRoot({ folderPath, callback }) {
 
 export async function handleGitStatus({ folderPath, callback }) {
   try {
-    const res = await window.api.git.gitStatus(folderPath);
+    const fn = window.api.git.gitStatusFresh ?? window.api.git.gitStatus;
+    const res = await fn(folderPath);
     pass(callback, res, null);
   } catch (err) {
     EventBus.emit("logging:error", [

@@ -85,6 +85,7 @@ const api = {
     "is-git-repo",
     "get-git-root",
     "git-status",
+    "git-status-fresh",
     "git-remote-info",
     "git-pull",
     "git-push",
