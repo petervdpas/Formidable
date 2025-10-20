@@ -57,6 +57,11 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
     latexUseFenced: container.querySelector("#edit-latex-usefenced"),
     latexRows: container.querySelector("#edit-latex-rows"),
+
+    apiCollection: container.querySelector("#edit-collection"),
+    apiId: container.querySelector("#edit-api-id"),
+    apiMap: container.querySelector("#edit-api-map"),
+    apiRows: container.querySelectorAll(".api-only"),
   };
 
   let labelLocked = false;
@@ -76,6 +81,45 @@ function setupFieldEditor(container, onChange, allFields = []) {
       },
       initialOptions: fieldOptions,
     });
+  }
+
+  function parseApiMap(raw) {
+    if (Array.isArray(raw)) return normalize(raw);
+
+    const s = String(raw || "").trim();
+    if (!s) return [];
+
+    try {
+      return normalize(JSON.parse(s));
+    } catch {}
+
+    try {
+      let x = s.replace(/'/g, '"');
+      x = x.replace(/([{,\s])([A-Za-z_]\w*)\s*:/g, '$1"$2":');
+      x = x.replace(/,\s*([}\]])/g, "$1");
+      return normalize(JSON.parse(x));
+    } catch {
+      return [];
+    }
+
+    function normalize(arr) {
+      const out = [];
+      const seen = new Set();
+      for (const it of arr) {
+        if (!it || typeof it !== "object") continue;
+        const key = typeof it.key === "string" ? it.key.trim() : "";
+        if (!key || seen.has(key)) continue;
+        const path =
+          typeof it.path === "string" && it.path.trim() ? it.path.trim() : key;
+        const mode =
+          String(it.mode || "static").toLowerCase() === "editable"
+            ? "editable"
+            : "static";
+        out.push({ key, path, mode });
+        seen.add(key);
+      }
+      return out;
+    }
   }
 
   function setField(field) {
@@ -188,6 +232,14 @@ function setupFieldEditor(container, onChange, allFields = []) {
     applyFieldAttributeDisabling(dom, field.type);
     initializeOptionsEditor(field.type, field.options);
 
+    // when seeding the editor
+    if (field.type === "api") {
+      dom.apiCollection && (dom.apiCollection.value = field.collection || "");
+      dom.apiId && (dom.apiId.value = field.id || "");
+      dom.apiMap &&
+        (dom.apiMap.value = JSON.stringify(field.map || [], null, 0));
+    }
+
     // LaTeX UI
     if (field.type === "latex") {
       if (dom.latexUseFenced) dom.latexUseFenced.checked = !!field.use_fenced;
@@ -257,6 +309,13 @@ function setupFieldEditor(container, onChange, allFields = []) {
       options,
       type,
     };
+
+    if (type === "api") {
+      field.collection = dom.apiCollection?.value?.trim() || "";
+      const id = dom.apiId?.value?.trim() || "";
+      if (id) field.id = id;
+      field.map = parseApiMap(dom.apiMap?.value);
+    }
 
     if (type === "textarea") {
       field.format = dom.formatTextarea?.value || "markdown"; // "markdown" or "plain"

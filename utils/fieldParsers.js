@@ -1,5 +1,6 @@
 // utils/fieldParsers.js
 
+import { EventBus } from "../modules/eventBus.js";
 import { ensureVirtualLocation } from "./vfsUtils.js";
 import { generateGuid } from "./domUtils.js";
 
@@ -219,4 +220,59 @@ export const parseLatexField = async function (_wrapper, _template, field) {
   // Normalize to a plain string, keep whitespace, normalize newlines if you like
   const v = String(field?.default ?? "");
   return v.replace(/\r\n?/g, "\n");
+};
+
+// API
+export const parseApiField = async function (wrapper, _template, field) {
+  if (!wrapper) return {};
+  const hidden = wrapper.querySelector('input[type="hidden"]');
+  if (!hidden) return {};
+
+  // hidden holds { id, overrides } (kept in sync by renderApiField)
+  let id = "";
+  let overrides = {};
+  try {
+    const obj = JSON.parse(hidden.value || "{}");
+    id = typeof obj.id === "string" ? obj.id : "";
+    overrides = (obj && typeof obj.overrides === "object" && obj.overrides) || {};
+  } catch {
+    id = hidden.value?.trim?.() || "";
+  }
+
+  // no id → nothing to fetch; persist empty object
+  if (!id) return {};
+
+  // fetch the remote document through the router
+  let doc = {};
+  try {
+    const res = await EventBus.emitWithResponse("api:get", {
+      collection: String(field.collection || ""),
+      id,
+    });
+    if (res?.ok) doc = res.data || {};
+  } catch {
+    // swallow; leave doc = {}
+  }
+
+  // build the snapshot we will SAVE
+  const mappings = Array.isArray(field.map) ? field.map : [];
+  if (mappings.length === 0) {
+    // no mapping → save whole doc plus id
+    return { id, ...doc };
+  }
+
+  // mapped snapshot (editable uses overrides if present)
+  const out = { id };
+  for (const m of mappings) {
+    const apiVal = (m.path || "")
+      .split(".")
+      .filter(Boolean)
+      .reduce((o, k) => (o && typeof o === "object" ? o[k] : undefined), doc);
+
+    out[m.key] = m.mode === "editable" && overrides.hasOwnProperty(m.key)
+      ? overrides[m.key]
+      : apiVal ?? null;
+  }
+
+  return out;
 };

@@ -5,10 +5,7 @@ import { createLinkOpenButton } from "../modules/uiButtons.js";
 import { ensureVirtualLocation } from "./vfsUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 import { createSortable } from "./domUtils.js";
-import {
-  addContainerElement,
-  createStyledLabel,
-} from "./elementBuilders.js";
+import { addContainerElement, createStyledLabel } from "./elementBuilders.js";
 
 export function applyGuidField(container, field, value) {
   const key = field.key;
@@ -586,6 +583,43 @@ export function applyLatexField(container, field, value) {
 
   const pre = wrap.querySelector(".latex-preview");
   if (pre) pre.textContent = v;
+}
+
+export function applyApiField(container, field, value) {
+  const key = field.key;
+  const wrap = container.querySelector(`[data-api-field="${key}"]`);
+  if (!wrap) return;
+
+  const hidden = wrap.querySelector(`input[type="hidden"][name="${key}"]`);
+  const idInput = wrap.querySelector(`input[name="${key}__id"]`);
+
+  const normalized =
+    value && typeof value === "object"
+      ? { id: String(value.id || ""), overrides: value.overrides || {} }
+      : { id: String(value || ""), overrides: {} };
+
+  if (idInput) idInput.value = normalized.id;
+
+  // apply editable overrides into their inputs
+  if (normalized.overrides && typeof normalized.overrides === "object") {
+    for (const [k, v] of Object.entries(normalized.overrides)) {
+      const el = wrap.querySelector(`input[name="${key}__map__${k}"]`);
+      if (el) el.value = String(v ?? "");
+    }
+  }
+
+  // also prefill readonly mapped inputs from the saved snapshot (value.<key>)
+  const mappings = Array.isArray(field.map) ? field.map : [];
+  if (value && typeof value === "object") {
+    for (const m of mappings) {
+      if (m.mode !== "editable") {
+        const el = wrap.querySelector(`input[name="${key}__map__${m.key}"]`);
+        if (el && value[m.key] != null) el.value = String(value[m.key]);
+      }
+    }
+  }
+
+  if (hidden) hidden.value = JSON.stringify(normalized);
 }
 
 export function applyGenericField(container, field, value) {

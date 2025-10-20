@@ -40,6 +40,19 @@ export function formatError(error) {
     case "invalid-template":
       return { key: "error.template.invalid", args: [error.message || ""] };
 
+          // ── API field cases ───────────────────────────────
+    case "api-collection-required":
+      return { key: "error.api.collection_required", args: [] };
+
+    case "api-map-invalid":
+      return { key: "error.api.map_invalid", args: [] };
+
+    case "api-map-key-required":
+      return { key: "error.api.map_key_required", args: [] };
+
+    case "api-map-duplicate-keys":
+      return { key: "error.api.map_duplicate_keys", args: [error.dup || ""] };
+      
     default:
       // Safe fallback
       return { key: "error.template.unknown", args: [JSON.stringify(error)] };
@@ -63,12 +76,11 @@ export function validateField(field, allFields = []) {
     return { valid: false, reason: "guid-key-must-be-id", key: rawKey };
   }
 
-  // Rule: Only one 'tags' field allowed in the template (proactive UI check)
+  // Rule: Only one 'tags' field allowed
   if (currentType === "tags") {
     const existingTags = allFields.some(
       (f) =>
         f.type === "tags" &&
-        // exclude the one currently being edited (by original key)
         (!isEditingExisting || f.key !== originalKey)
     );
     if (existingTags) {
@@ -76,7 +88,7 @@ export function validateField(field, allFields = []) {
     }
   }
 
-  // Rule: Duplicate key (excluding the same field when editing)
+  // Rule: Duplicate key (excluding the one being edited)
   const isDuplicate = allFields.some(
     (f) => f.key === rawKey && (!isEditingExisting || f.key !== originalKey)
   );
@@ -84,7 +96,7 @@ export function validateField(field, allFields = []) {
     return { valid: false, reason: "duplicate-key", key: rawKey };
   }
 
-  // Rule: Loop start/stop pairs (UI-level sanity: make sure partner exists somewhere)
+  // Rule: Loop start/stop pairs (sanity)
   if (["loopstart", "loopstop"].includes(currentType)) {
     const expectedPartnerType = currentType === "loopstart" ? "loopstop" : "loopstart";
 
@@ -96,7 +108,6 @@ export function validateField(field, allFields = []) {
       (f) =>
         f.key === rawKey &&
         f.type === expectedPartnerType &&
-        // exclude "this" field if we’re editing it
         (!isEditingExisting || f.key !== originalKey || f.type !== currentType)
     );
 
@@ -110,7 +121,31 @@ export function validateField(field, allFields = []) {
     }
   }
 
-  // Passed all checks
+  // Rule: API-specific validations
+  if (currentType === "api") {
+    const collection = String(field.collection || "").trim();
+    if (!collection) {
+      return { valid: false, reason: "api-collection-required" };
+    }
+
+    if (field.map != null) {
+      if (!Array.isArray(field.map)) {
+        return { valid: false, reason: "api-map-invalid" };
+      }
+      const seen = new Set();
+      for (const m of field.map) {
+        // must be an object with non-empty key
+        if (!m || typeof m !== "object" || !String(m.key || "").trim()) {
+          return { valid: false, reason: "api-map-key-required" };
+        }
+        const k = String(m.key).trim().toLowerCase();
+        if (seen.has(k)) {
+          return { valid: false, reason: "api-map-duplicate-keys", key: m.key };
+        }
+        seen.add(k);
+      }
+    }
+  }
+
   return { valid: true };
 }
-

@@ -266,6 +266,65 @@ function checkSingleTagsField(fields) {
   return null;
 }
 
+function checkApiFields(fields) {
+  const errors = [];
+  for (const f of fields || []) {
+    if (f?.type !== "api") continue;
+
+    const collection = String(f.collection || "").trim();
+    if (!collection) {
+      errors.push({
+        type: "api-collection-required",
+        field: f,
+        key: f.key || "(no key)",
+        message: "API field requires a non-empty collection name.",
+      });
+      continue; // other checks depend on collection being present
+    }
+
+    // id is optional → no check
+
+    // map is optional, but if present, it must be valid
+    if (f.map != null) {
+      if (!Array.isArray(f.map)) {
+        errors.push({
+          type: "api-map-invalid",
+          field: f,
+          key: f.key || "(no key)",
+          message: "API field map must be an array.",
+        });
+      } else {
+        const seen = new Set();
+        for (const m of f.map) {
+          const k = String(m?.key || "").trim();
+          if (!k) {
+            errors.push({
+              type: "api-map-key-required",
+              field: f,
+              key: f.key || "(no key)",
+              message: "Each API map entry must have a non-empty 'key'.",
+            });
+            break;
+          }
+          const kl = k.toLowerCase();
+          if (seen.has(kl)) {
+            errors.push({
+              type: "api-map-duplicate-keys",
+              field: f,
+              key: f.key || "(no key)",
+              dup: k,
+              message: `Duplicate API map key: ${k}`,
+            });
+            break;
+          }
+          seen.add(kl);
+        }
+      }
+    }
+  }
+  return errors;
+}
+
 function getTagsFieldKey(fields) {
   const f = fields.find((x) => x?.type === "tags");
   return f ? f.key : null;
@@ -304,6 +363,8 @@ function validateTemplate(template) {
     errors.push(tagsError);
   }
 
+  errors.push(...checkApiFields(template.fields));
+  
   return errors;
 }
 

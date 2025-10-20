@@ -10,6 +10,7 @@
   img-src 'self' data:;
   style-src 'self' 'unsafe-inline';
   font-src 'self' data:;
+  connect-src 'self' http://localhost:* http://127.0.0.1:* https://localhost:* ws://localhost:*;
 "
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -454,6 +455,27 @@
             value="10"
             style="width: 72px"
           />
+        </div>
+
+        <!-- API-specific settings -->
+        <div class="modal-form-row api-only" id="edit-collection-row" style="display:none">
+          <label for="edit-collection" data-i18n="field.api.collection">Collection</label>
+          <input type="text" id="edit-collection" placeholder="e.g. addresses" />
+        </div>
+
+        <div class="modal-form-row api-only" id="edit-api-id-row" style="display:none">
+          <label for="edit-api-id" data-i18n="field.api.id">Record ID</label>
+          <input type="text" id="edit-api-id" placeholder="document id (optional default)" />
+        </div>
+
+        <div class="modal-form-row api-only" id="edit-api-map-row" style="display:none">
+          <label for="edit-api-map">
+            <span data-i18n="field.api.map">Field Map</span>
+            <small class="label-subtext" data-i18n="field.api.map.hint">
+              [{ key, path, mode: "static"|"editable" }]
+            </small>
+          </label>
+          <textarea id="edit-api-map" rows="3" placeholder='[{"key":"name","path":"name","mode":"static"|"editable"}]'></textarea>
         </div>
 
         <!-- Default value -->

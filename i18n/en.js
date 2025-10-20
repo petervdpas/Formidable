@@ -68,6 +68,10 @@ export default {
     "Only one 'tags' field is allowed per template (found: {0}).",
   "error.template.invalid": "Invalid template: {0}",
   "error.template.unknown": "Unknown template error: {0}",
+  "error.api.collection_required": "API field requires a collection name.",
+  "error.api.map_invalid": "API field has an invalid map definition.",
+  "error.api.map_key_required": "API map entry is missing a key.",
+  "error.api.map_duplicate_keys": "API map entry has duplicate keys: {0}.",
 
   // Errors (field-level, optional if you show inline field messages via i18n too)
   "error.field.missing_key": "Field key is required.",

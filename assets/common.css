@@ -141,7 +141,7 @@
     --field-type-tags-border: #81c784;
     --field-type-tags-modal: #388e3c;
     --field-type-tags-badge: #66bb6a;
-    --field-type-tags-text: #ffffff;
+    --field-type-tags-text: #fff;
 
     --field-type-guid-bg: #444c54;
     --field-type-guid-border: #888c95;
@@ -160,4 +160,10 @@
     --field-type-latex-modal: #5c6bc0;
     --field-type-latex-badge: #7b88e0;
     --field-type-latex-text: #fff;
+
+    --field-type-api-bg:     #29434e;
+    --field-type-api-border: #80deea;
+    --field-type-api-modal:  #1f333b;
+    --field-type-api-badge:  #4dd0e1;
+    --field-type-api-text:   #f7fbfc;
 }

@@ -3,6 +3,7 @@
 import { EventBus } from "./eventBus.js";
 
 import * as systemHandler from "./handlers/systemHandler.js";
+import * as apiHandler from "./handlers/apiHandler.js";
 import * as tasksHandler from "./handlers/tasksHandler.js";
 import * as historyHandler from "./handlers/historyHandler.js";
 import * as encryptionHandler from "./handlers/encryptionHandler.js";
@@ -63,6 +64,12 @@ export function initEventRouter() {
 
   EventBus.off("system:execute", systemHandler.handleExecuteCommand);
   EventBus.on("system:execute", systemHandler.handleExecuteCommand);
+
+  // Collections API events
+  EventBus.off("api:get", apiHandler.handleApiGet);
+  EventBus.off("api:list", apiHandler.handleApiList);
+  EventBus.on("api:get", apiHandler.handleApiGet);
+  EventBus.on("api:list", apiHandler.handleApiList);
 
   // Task scheduler events
   EventBus.off("tasks:register", tasksHandler.handleTasksRegister);

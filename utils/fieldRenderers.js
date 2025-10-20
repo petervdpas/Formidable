@@ -1,5 +1,6 @@
 // utils/fieldRenderers.js
 
+import { EventBus } from "../modules/eventBus.js";
 import { ensureVirtualLocation } from "./vfsUtils.js";
 import {
   wrapInputWithLabel,
@@ -1868,6 +1869,160 @@ export async function renderLatexField(field, value = "") {
   return wrapInputWithLabel(
     wrapper,
     field.label || "LaTeX",
+    field.description || "",
+    field.two_column,
+    field.wrapper || "form-row"
+  );
+}
+
+// ─────────────────────────────────────────────
+// Type: api (collection/id + editable overrides)
+export async function renderApiField(field, value = "") {
+  // normalize incoming value
+  const initial =
+    typeof value === "object" && value !== null
+      ? { id: String(value.id || ""), overrides: value.overrides || {} }
+      : { id: String(value || field.id || ""), overrides: {} };
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "api-field";
+  wrapper.dataset.apiField = field.key;
+
+  // hidden value that participates in form data (JSON string)
+  const hidden = document.createElement("input");
+  hidden.type = "hidden";
+  hidden.name = field.key;
+  hidden.value = JSON.stringify(initial);
+  wrapper.appendChild(hidden);
+
+  // top row: ID + Fetch + status
+  const row = document.createElement("div");
+  row.style.display = "flex";
+  row.style.gap = "8px";
+  row.style.alignItems = "center";
+
+  const idInput = document.createElement("input");
+  idInput.type = "text";
+  idInput.placeholder = "record id";
+  idInput.value = initial.id || "";
+  idInput.style.minWidth = "220px";
+  idInput.name = `${field.key}__id`;
+  row.appendChild(idInput);
+
+  const fetchBtn = document.createElement("button");
+  fetchBtn.type = "button";
+  fetchBtn.textContent = "Fetch";
+  row.appendChild(fetchBtn);
+
+  const status = document.createElement("span");
+  status.className = "api-status muted";
+  status.textContent = "";
+  row.appendChild(status);
+
+  wrapper.appendChild(row);
+
+  // mapped fields container
+  const mapWrap = document.createElement("div");
+  mapWrap.className = "api-map-grid";
+  mapWrap.style.display = "grid";
+  mapWrap.style.gridTemplateColumns = "max(160px) 1fr";
+  mapWrap.style.gap = "6px 10px";
+  wrapper.appendChild(mapWrap);
+
+  // build mapped UI (static → readonly, editable → input)
+  const mappings = Array.isArray(field.map) ? field.map : [];
+  const editableInputs = new Map(); // key -> input
+
+  for (const m of mappings) {
+    const label = document.createElement("label");
+    label.textContent = m.key || m.path || "";
+    mapWrap.appendChild(label);
+
+    const ctrl =
+      m.mode === "editable"
+        ? document.createElement("input")
+        : document.createElement("input");
+    ctrl.type = "text";
+    ctrl.readOnly = m.mode !== "editable";
+    ctrl.placeholder = m.mode === "editable" ? "(override…)" : "(from API)";
+    ctrl.name = `${field.key}__map__${m.key}`;
+    // only prefill editable controls from overrides (static shows fetched value later)
+    if (
+      m.mode === "editable" &&
+      initial.overrides &&
+      initial.overrides[m.key] != null
+    ) {
+      ctrl.value = String(initial.overrides[m.key]);
+    }
+    mapWrap.appendChild(ctrl);
+    if (m.mode === "editable") editableInputs.set(m.key, ctrl);
+  }
+
+  // keep hidden in sync on any change
+  function updateHidden() {
+    const overrides = {};
+    for (const [k, el] of editableInputs.entries()) {
+      const v = el.value.trim();
+      if (v !== "") overrides[k] = v;
+    }
+    hidden.value = JSON.stringify({ id: idInput.value.trim(), overrides });
+  }
+  idInput.addEventListener("input", updateHidden);
+  for (const [, el] of editableInputs)
+    el.addEventListener("input", updateHidden);
+
+  // fetch handler (optional; no-op if server bridge missing)
+  async function doFetch() {
+    const id = idInput.value.trim();
+    const coll = (field.collection || "").trim();
+    if (!coll) {
+      status.textContent = "No collection";
+      return;
+    }
+    if (!id) {
+      status.textContent = "Enter id";
+      return;
+    }
+
+    status.textContent = "Loading…";
+    try {
+      const res = await EventBus.emitWithResponse("api:get", {
+        collection: coll,
+        id,
+      });
+      if (!res?.ok) throw new Error(res?.error || "API error");
+      const doc = res.data || {};
+
+      for (const m of mappings) {
+        if (!m) continue;
+        const ctl = mapWrap.querySelector(
+          `[name="${field.key}__map__${m.key}"]`
+        );
+        if (!ctl) continue;
+        if (m.mode !== "editable") {
+          const val = m.path
+            ?.split(".")
+            .reduce((o, k) => (o ? o[k] : undefined), doc);
+          ctl.value = val == null ? "" : String(val);
+        }
+      }
+      status.textContent = "OK";
+    } catch (e) {
+      status.textContent = "API error";
+    }
+  }
+
+  fetchBtn.addEventListener("click", doFetch);
+
+  applyFieldContextAttributes(wrapper, {
+    key: field.key,
+    type: field.type,
+    loopKey: field.loopKey || null,
+  });
+
+  return wrapInputWithLabel(
+    wrapper,
+    field.label || "API",
     field.description || "",
     field.two_column,
     field.wrapper || "form-row"

@@ -18,6 +18,7 @@ const knownTypes = [
   "link",
   "tags",
   "code",
+  "api",
 ];
 
 const textareaFormats = new Set(["markdown", "plain"]);
@@ -25,8 +26,6 @@ const textareaFormats = new Set(["markdown", "plain"]);
 const codeDefaults = {
   run_mode: "manual", // "manual" | "load" | "save"
   allow_run: false,
-
-  // execution hints for handler
   input_mode: "safe", // "safe" | "raw"
   api_mode: "frozen", // "frozen" | "raw"
   api_pick: [], // string[]
@@ -37,6 +36,30 @@ const latexDefaults = {
   use_fenced: true,
   placeholder: "",
 };
+
+const apiDefaults = {
+  collection: "",
+  id: "",
+  map: [], // [{ key: "name", path: "name", mode: "static"|"editable" }]
+};
+
+function normApiMap(arr) {
+  if (!Array.isArray(arr)) return [];
+  const out = [];
+  const seen = new Set();
+  for (const it of arr) {
+    if (!it || typeof it !== "object") continue;
+    const key = typeof it.key === "string" ? it.key.trim() : "";
+    if (!key || seen.has(key)) continue;
+    const path =
+      typeof it.path === "string" && it.path.trim() ? it.path.trim() : key;
+    const mode = String(it.mode || "static").toLowerCase();
+    const mm = mode === "editable" ? "editable" : "static";
+    out.push({ key, path, mode: mm });
+    seen.add(key);
+  }
+  return out;
+}
 
 module.exports = {
   defaults: {
@@ -159,6 +182,30 @@ module.exports = {
       delete field.language;
       delete field.sandbox;
       delete field.api;
+    }
+
+    // api-specific
+    if (field.type === "api") {
+      // merge defaults correctly
+      Object.assign(field, { ...apiDefaults, ...raw });
+
+      // normalize
+      field.collection =
+        typeof field.collection === "string" ? field.collection.trim() : "";
+      field.id = typeof field.id === "string" ? field.id.trim() : "";
+      field.map = normApiMap(field.map);
+
+      if (!field.collection) {
+        field.__invalid = "api.missing_collection";
+      }
+
+      delete field.default;
+      delete field.options;
+    } else {
+      delete field.collection;
+      delete field.id;
+      delete field.map;
+      delete field.__invalid;
     }
 
     return field;

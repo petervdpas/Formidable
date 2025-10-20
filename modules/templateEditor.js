@@ -95,6 +95,22 @@ function sanitizeField(f) {
       : [];
   }
 
+  // keep api-specific
+  if (f.type === "api") {
+    field.collection = String(f.collection || "").trim();
+    if (f.id) field.id = String(f.id).trim();
+    field.map = Array.isArray(f.map)
+      ? f.map
+          .filter((m) => m && typeof m.key === "string" && m.key.trim())
+          .map(({ key, path, mode }) => ({
+            key: String(key).trim(),
+            path: String(path || key).trim(),
+            mode:
+              String(mode).toLowerCase() === "editable" ? "editable" : "static",
+          }))
+      : [];
+  }
+  
   return field;
 }
 
@@ -117,9 +133,8 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     currentEditIndex = null;
 
   async function renderEditor(data) {
-
     disposeMainEditor();
-    
+
     if (!data) {
       EventBus.emit("logging:warning", [
         "[YamlEditor] renderEditor() called with null data",

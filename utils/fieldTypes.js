@@ -19,6 +19,13 @@ export const latexSpecific = Object.freeze([
   "latexRows", // rows + placeholder controls
 ]);
 
+export const apiSpecific = Object.freeze([
+  "apiCollection", // required collection name (template base)
+  "apiId", // record id to fetch
+  "apiMap", // field mapping [{key, path, mode}]
+  "apiRows", // controls visible only when API is used
+]);
+
 export function getFieldTypeDef(type) {
   return (
     fieldTypes[type] || {
@@ -32,6 +39,25 @@ export function getFieldTypeDef(type) {
 }
 
 export const fieldTypes = {
+  api: {
+    label: "API (Collection)",
+    cssClass: { main: "modal-api" },
+    selectorAttr: "data-api-field",
+    disabledAttributes: [
+      "summaryField",
+      "default",
+      "options",
+      "formatTextareaRow",
+      "expressionItemRow",
+      "twoColumnRow",
+      ...codeSpecific,
+      ...latexSpecific,
+    ],
+    defaultValue: () => ({ id: "", overrides: {} }),
+    renderInput: renderers.renderApiField,
+    parseValue: parsers.parseApiField,
+    applyValue: appliers.applyApiField,
+  },
   guid: {
     type: "guid",
     label: "Guid",
@@ -49,6 +75,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => generateGuid(),
     renderInput: renderers.renderGuidField,
@@ -69,6 +96,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
+      ...apiSpecific,
     ],
   },
 
@@ -87,6 +115,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => "",
     renderInput: renderers.renderLoopstartField,
@@ -106,6 +135,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => "",
     renderInput: renderers.renderLoopstopField,
@@ -121,6 +151,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => "",
     renderInput: renderers.renderTextField,
@@ -137,6 +168,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => false,
     renderInput: renderers.renderBooleanField,
@@ -153,6 +185,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => "",
     renderInput: renderers.renderDropdownField,
@@ -169,6 +202,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => [],
     renderInput: renderers.renderMultioptionField,
@@ -185,6 +219,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => "",
     renderInput: renderers.renderRadioField,
@@ -196,7 +231,12 @@ export const fieldTypes = {
     label: "Multiline Text",
     cssClass: { main: "modal-textarea" },
     selectorAttr: "data-textarea-field",
-    disabledAttributes: ["summaryField", ...codeSpecific, ...latexSpecific],
+    disabledAttributes: [
+      "summaryField",
+      ...codeSpecific,
+      ...latexSpecific,
+      ...apiSpecific,
+    ],
     defaultValue: () => "",
     renderInput: renderers.renderTextareaField,
     parseValue: parsers.parseTextareaField,
@@ -212,6 +252,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => 0,
     renderInput: renderers.renderNumberField,
@@ -228,6 +269,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => 50,
     renderInput: renderers.renderRangeField,
@@ -244,6 +286,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => "",
     renderInput: renderers.renderDateField,
@@ -260,6 +303,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => [],
     renderInput: renderers.renderListField,
@@ -276,6 +320,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => [],
     renderInput: renderers.renderTableField,
@@ -292,6 +337,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => "",
     renderInput: renderers.renderImageField,
@@ -308,6 +354,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => ({ href: "", text: "" }),
     renderInput: renderers.renderLinkField,
@@ -324,6 +371,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => [],
     renderInput: renderers.renderTagsField,
@@ -341,6 +389,7 @@ export const fieldTypes = {
       "expressionItemRow",
       "twoColumnRow",
       ...latexSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => "",
     renderInput: renderers.renderCodeField,
@@ -358,6 +407,7 @@ export const fieldTypes = {
       "expressionItemRow",
       "twoColumnRow",
       ...codeSpecific,
+      ...apiSpecific,
     ],
     defaultValue: () => "",
     renderInput: renderers.renderLatexField,

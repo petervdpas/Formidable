@@ -356,6 +356,31 @@
     color: var(--field-type-latex-text);
 }
 
+/* API (Collection) */
+.field-list-item[data-type="api"] {
+    background-color: var(--field-type-api-bg);
+    border-left: 4px solid var(--field-type-api-border);
+    color: var(--field-type-api-text);
+}
+
+.field-type.type-api {
+    background-color: var(--field-type-api-badge);
+    color: var(--field-type-api-text);
+}
+
+#field-edit-modal.modal-api {
+    background-color: var(--field-type-api-modal);
+    border-left: 6px solid var(--field-type-api-border);
+    color: var(--field-type-api-text);
+}
+
+#field-edit-modal.modal-api .modal-body {
+  background: color-mix(in srgb, var(--field-type-api-modal) 88%, transparent);
+  /* fallback if color-mix isn’t supported */
+  background: rgba(31, 51, 59, 0.88);
+  border-radius: 6px;
+}
+
 /* Fallback textarea before CodeMirror loads */
 #field-edit-modal textarea.code-textarea {
     width: 100%;

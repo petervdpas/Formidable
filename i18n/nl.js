@@ -68,6 +68,10 @@ export default {
     "Slechts één 'tags'-veld is toegestaan per sjabloon (gevonden: {0}).",
   "error.template.invalid": "Ongeldige sjabloon: {0}",
   "error.template.unknown": "Onbekende sjabloonfout: {0}",
+  "error.api.collection_required": "API-veld vereist een collectie naam.",
+  "error.api.map_invalid": "API-veld heeft een ongeldige kaartdefinitie.",
+  "error.api.map_key_required": "API-kaartvermelding mist een sleutel.",
+  "error.api.map_duplicate_keys": "API-kaartvermelding heeft duplicaat sleutels: {0}.",
 
   // Errors (field-level, optional if you show inline field messages via i18n too)
   "error.field.missing_key": "Veldsleutel is vereist.",
