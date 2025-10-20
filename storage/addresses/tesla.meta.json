@@ -1,0 +1,22 @@
+{
+  "meta": {
+    "id": "10b8c641-8774-409c-8cec-0c944920b313",
+    "author_name": "Utente Ribelle",
+    "author_email": "regular@example.com",
+    "template": "addresses.yaml",
+    "created": "2025-10-20T04:43:36.088Z",
+    "updated": "2025-10-20T04:43:36.087Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "10b8c641-8774-409c-8cec-0c944920b313",
+    "name": "Tesla",
+    "country": "us",
+    "unit-number": "1",
+    "street-address": "Tesla Road",
+    "city": "Austin",
+    "state-abbreviation": "TX",
+    "postal": "78725"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "meta": {
+    "id": "c34c4d20-f47d-4ec5-bde5-8085a92f77f0",
+    "author_name": "Utente Ribelle",
+    "author_email": "regular@example.com",
+    "template": "addresses.yaml",
+    "created": "2025-10-20T04:18:31.777Z",
+    "updated": "2025-10-20T04:18:31.775Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "c34c4d20-f47d-4ec5-bde5-8085a92f77f0",
+    "name": "Googleplex",
+    "country": "us",
+    "unit-number": "1600",
+    "street-address": "Amphitheatre Parkway",
+    "city": "Mountain View",
+    "state-abbreviation": "CA",
+    "postal": "94043"
+  }
+}

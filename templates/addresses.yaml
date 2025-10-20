@@ -1,0 +1,83 @@
+name: Street Addresses
+filename: addresses.yaml
+item_field: name
+markdown_template: |-
+  > {{field "name"}}
+
+  {{field "unit-number"}} {{field "street-address"}} <br />
+  {{field "city"}} {{field "state-abbreviation"}} {{field "postal"}} <br />
+  {{field "country"}} <br />
+sidebar_expression: >-
+  [ F["unit-number"] + " " + F["street-address"] | { text: F["unit-number"] + "
+  " + F["street-address"], classes: ["expr-text-blue", "expr-bold"] } ]
+enable_collection: true
+fields:
+  - key: id
+    type: guid
+    label: GUID
+    description: ''
+    expression_item: false
+    two_column: false
+    default: ''
+    options: &ref_0 []
+    primary_key: true
+  - key: name
+    type: text
+    label: Name
+    description: Give a name to this address
+    expression_item: true
+    two_column: true
+    default: ''
+    options: *ref_0
+  - key: country
+    type: dropdown
+    label: Country
+    description: Give the country for this address
+    expression_item: false
+    two_column: true
+    default: ''
+    options:
+      - value: us
+        label: United States
+      - value: uk
+        label: United Kingdom
+  - key: unit-number
+    type: text
+    label: Unit number
+    description: Give the unit number of the address
+    expression_item: true
+    two_column: true
+    default: ''
+    options: *ref_0
+  - key: street-address
+    type: text
+    label: Street Address
+    description: Give the street of the address
+    expression_item: true
+    two_column: true
+    default: ''
+    options: *ref_0
+  - key: city
+    type: text
+    label: City
+    description: Give the city for this address
+    expression_item: false
+    two_column: true
+    default: ''
+    options: *ref_0
+  - key: state-abbreviation
+    type: text
+    label: State abbreviation
+    description: Give the state abbreviation for the address
+    expression_item: false
+    two_column: true
+    default: ''
+    options: *ref_0
+  - key: postal
+    type: text
+    label: Postal
+    description: Give the postal of the address
+    expression_item: false
+    two_column: true
+    default: ''
+    options: *ref_0
