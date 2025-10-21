@@ -452,3 +452,10 @@ fields:
       - key: name
         path: name
         mode: static
+      - key: street-address
+        path: street-address
+        mode: editable
+    use_picker: true
+    allowed_ids:
+      - c34c4d20-f47d-4ec5-bde5-8085a92f77f0
+      - 10b8c641-8774-409c-8cec-0c944920b313

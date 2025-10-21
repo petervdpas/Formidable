@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-10-20T22:01:04.192Z",
+    "updated": "2025-10-21T00:15:09.039Z",
     "flagged": true,
     "tags": [
       "bye",
@@ -65,8 +65,9 @@
       "shortFile": "sane-20250530.meta.…"
     },
     "testapi": {
-      "id": "c34c4d20-f47d-4ec5-bde5-8085a92f77f0",
-      "name": "Googleplex"
+      "id": "10b8c641-8774-409c-8cec-0c944920b313",
+      "name": "Tesla",
+      "street-address": "Somewhere else"
     }
   }
 }

@@ -1895,91 +1895,36 @@ export async function renderApiField(field, value = "") {
   hidden.value = JSON.stringify(initial);
   wrapper.appendChild(hidden);
 
-  // top row: ID + Fetch + status
+  // top row: ID picker/input + Fetch + status
   const row = document.createElement("div");
   row.style.display = "flex";
   row.style.gap = "8px";
   row.style.alignItems = "center";
 
-  const idInput = document.createElement("input");
-  idInput.type = "text";
-  idInput.placeholder = "record id";
-  idInput.value = initial.id || "";
-  idInput.style.minWidth = "220px";
-  idInput.name = `${field.key}__id`;
-  row.appendChild(idInput);
-
-  const fetchBtn = document.createElement("button");
-  fetchBtn.type = "button";
-  fetchBtn.textContent = "Fetch";
-  row.appendChild(fetchBtn);
-
-  const status = document.createElement("span");
-  status.className = "api-status muted";
-  status.textContent = "";
-  row.appendChild(status);
-
-  wrapper.appendChild(row);
-
-  // mapped fields container
-  const mapWrap = document.createElement("div");
-  mapWrap.className = "api-map-grid";
-  mapWrap.style.display = "grid";
-  mapWrap.style.gridTemplateColumns = "max(160px) 1fr";
-  mapWrap.style.gap = "6px 10px";
-  wrapper.appendChild(mapWrap);
-
-  // build mapped UI (static → readonly, editable → input)
+  // helpers
+  const coll = (field.collection || "").trim();
   const mappings = Array.isArray(field.map) ? field.map : [];
   const editableInputs = new Map(); // key -> input
 
-  for (const m of mappings) {
-    const label = document.createElement("label");
-    label.textContent = m.key || m.path || "";
-    mapWrap.appendChild(label);
-
-    const ctrl =
-      m.mode === "editable"
-        ? document.createElement("input")
-        : document.createElement("input");
-    ctrl.type = "text";
-    ctrl.readOnly = m.mode !== "editable";
-    ctrl.placeholder = m.mode === "editable" ? "(override…)" : "(from API)";
-    ctrl.name = `${field.key}__map__${m.key}`;
-    // only prefill editable controls from overrides (static shows fetched value later)
-    if (
-      m.mode === "editable" &&
-      initial.overrides &&
-      initial.overrides[m.key] != null
-    ) {
-      ctrl.value = String(initial.overrides[m.key]);
-    }
-    mapWrap.appendChild(ctrl);
-    if (m.mode === "editable") editableInputs.set(m.key, ctrl);
-  }
-
-  // keep hidden in sync on any change
   function updateHidden() {
     const overrides = {};
     for (const [k, el] of editableInputs.entries()) {
       const v = el.value.trim();
       if (v !== "") overrides[k] = v;
     }
-    hidden.value = JSON.stringify({ id: idInput.value.trim(), overrides });
+    const currentId =
+      idSelect?.tagName === "SELECT" ? idSelect.value : idInput?.value || "";
+    hidden.value = JSON.stringify({ id: currentId.trim(), overrides });
   }
-  idInput.addEventListener("input", updateHidden);
-  for (const [, el] of editableInputs)
-    el.addEventListener("input", updateHidden);
 
-  // fetch handler (optional; no-op if server bridge missing)
   async function doFetch() {
-    const id = idInput.value.trim();
-    const coll = (field.collection || "").trim();
+    const currentId =
+      idSelect?.tagName === "SELECT" ? idSelect.value : idInput?.value || "";
     if (!coll) {
       status.textContent = "No collection";
       return;
     }
-    if (!id) {
+    if (!currentId) {
       status.textContent = "Enter id";
       return;
     }
@@ -1988,7 +1933,7 @@ export async function renderApiField(field, value = "") {
     try {
       const res = await EventBus.emitWithResponse("api:get", {
         collection: coll,
-        id,
+        id: currentId.trim(),
       });
       if (!res?.ok) throw new Error(res?.error || "API error");
       const doc = res.data || {};
@@ -2012,7 +1957,199 @@ export async function renderApiField(field, value = "") {
     }
   }
 
+  // ————— ID control: picker or text input —————
+  let idInput = null;
+  let idSelect = null;
+
+  // Make label text for a list item (tries common fields: name/title/label)
+  function labelForDoc(doc, { showId = false } = {}) {
+    const id = String(doc?.id ?? doc?._id ?? "").trim();
+    const title = doc?.title ?? doc?.name ?? doc?.label ?? doc?.filename ?? "";
+
+    const text = String(title || id || "");
+    return showId && id ? `${text} (${id})` : text;
+  }
+
+  // Build input/select based on use_picker
+  if (field.use_picker === true) {
+    idSelect = document.createElement("select");
+    idSelect.style.minWidth = "260px";
+    idSelect.name = `${field.key}__id`;
+
+    // placeholder option
+    const ph = document.createElement("option");
+    ph.value = "";
+    ph.textContent = "-- select --";
+    idSelect.appendChild(ph);
+
+    // Strategy:
+    //   1) if allowed_ids present → use it
+    //   2) else if collection set → fetch list from API
+    //   3) else → leave only placeholder (fallback)
+    async function populatePicker() {
+      // 1) If you have allowed_ids, try to fetch list and filter so we show titles
+      if (Array.isArray(field.allowed_ids) && field.allowed_ids.length > 0) {
+        if (coll) {
+          try {
+            const listRes = await EventBus.emitWithResponse("api:list", {
+              collection: coll,
+              include: "summary", // ← so we get "title"
+              limit: 1000, // adjust if you need more
+              offset: 0,
+            });
+
+            const all = Array.isArray(listRes?.data?.items)
+              ? listRes.data.items
+              : Array.isArray(listRes?.data)
+              ? listRes.data
+              : [];
+
+            const allowedSet = new Set(field.allowed_ids.map(String));
+            const filtered = all.filter((d) =>
+              allowedSet.has(String(d?.id ?? d?._id ?? ""))
+            );
+
+            // add known docs (with titles)
+            for (const doc of filtered) {
+              const id = String(doc?.id ?? doc?._id ?? "").trim();
+              if (!id) continue;
+              const o = document.createElement("option");
+              o.value = id;
+              o.textContent = labelForDoc(doc); // ← shows title
+              idSelect.appendChild(o);
+              allowedSet.delete(id); // mark as covered
+            }
+
+            // add any leftover allowed_ids we didn't find (ID as plain text)
+            for (const missingId of allowedSet) {
+              const o = document.createElement("option");
+              o.value = missingId;
+              o.textContent = missingId; // no title known
+              idSelect.appendChild(o);
+            }
+
+            idSelect.value = initial.id || "";
+            return;
+          } catch {
+            // fall through to plain IDs if list fails
+          }
+        }
+
+        // Fallback: just show the IDs if we couldn't fetch list
+        for (const id of field.allowed_ids) {
+          const o = document.createElement("option");
+          o.value = String(id);
+          o.textContent = String(id);
+          idSelect.appendChild(o);
+        }
+        idSelect.value = initial.id || "";
+        return;
+      }
+
+      // 2) No allowed_ids → fetch the collection to populate picker
+      if (coll) {
+        try {
+          const listRes = await EventBus.emitWithResponse("api:list", {
+            collection: coll,
+            include: "summary", // ← get title
+            limit: 1000,
+            offset: 0,
+          });
+
+          const items = Array.isArray(listRes?.data?.items)
+            ? listRes.data.items
+            : Array.isArray(listRes?.data)
+            ? listRes.data
+            : [];
+
+          for (const doc of items) {
+            const id = String(doc?.id ?? doc?._id ?? "").trim();
+            if (!id) continue;
+            const o = document.createElement("option");
+            o.value = id;
+            o.textContent = labelForDoc(doc); // ← shows title
+            idSelect.appendChild(o);
+          }
+          idSelect.value = initial.id || "";
+        } catch {
+          // keep placeholder if fetch fails
+        }
+      }
+    }
+
+    await populatePicker();
+
+    row.appendChild(idSelect);
+  } else {
+    // simple text input
+    idInput = document.createElement("input");
+    idInput.type = "text";
+    idInput.placeholder = "record id";
+    idInput.value = initial.id || "";
+    idInput.style.minWidth = "220px";
+    idInput.name = `${field.key}__id`;
+    row.appendChild(idInput);
+  }
+
+  const fetchBtn = document.createElement("button");
+  fetchBtn.type = "button";
+  fetchBtn.textContent = field.use_picker ? "Load" : "Fetch";
+  row.appendChild(fetchBtn);
+
+  const status = document.createElement("span");
+  status.className = "api-status muted";
+  status.textContent = "";
+  row.appendChild(status);
+
+  wrapper.appendChild(row);
+
+  // mapped fields container
+  const mapWrap = document.createElement("div");
+  mapWrap.className = "api-map-grid";
+  mapWrap.style.display = "grid";
+  mapWrap.style.gridTemplateColumns = "max(160px) 1fr";
+  mapWrap.style.gap = "6px 10px";
+  wrapper.appendChild(mapWrap);
+
+  // build mapped UI (static → readonly, editable → input)
+  for (const m of mappings) {
+    const label = document.createElement("label");
+    label.textContent = m.key || m.path || "";
+    mapWrap.appendChild(label);
+
+    const ctrl = document.createElement("input");
+    ctrl.type = "text";
+    ctrl.readOnly = m.mode !== "editable";
+    ctrl.placeholder = m.mode === "editable" ? "(override…)" : "(from API)";
+    ctrl.name = `${field.key}__map__${m.key}`;
+
+    // only prefill editable controls from overrides (static shows fetched value later)
+    if (
+      m.mode === "editable" &&
+      initial.overrides &&
+      initial.overrides[m.key] != null
+    ) {
+      ctrl.value = String(initial.overrides[m.key]);
+    }
+    mapWrap.appendChild(ctrl);
+    if (m.mode === "editable") editableInputs.set(m.key, ctrl);
+  }
+
+  // events
+  if (idInput) idInput.addEventListener("input", updateHidden);
+  if (idSelect) {
+    idSelect.addEventListener("change", () => {
+      updateHidden();
+      // nice UX: auto-load on change when picker is used
+      if (field.use_picker) doFetch();
+    });
+  }
+  for (const [, el] of editableInputs)
+    el.addEventListener("input", updateHidden);
   fetchBtn.addEventListener("click", doFetch);
+
+  // initial hidden sync
+  updateHidden();
 
   applyFieldContextAttributes(wrapper, {
     key: field.key,

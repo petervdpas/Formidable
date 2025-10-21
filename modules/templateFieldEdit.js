@@ -61,6 +61,8 @@ function setupFieldEditor(container, onChange, allFields = []) {
     apiCollection: container.querySelector("#edit-collection"),
     apiId: container.querySelector("#edit-api-id"),
     apiMap: container.querySelector("#edit-api-map"),
+    apiUsePicker: container.querySelector("#edit-api-usepicker"),
+    apiAllowedIds: container.querySelector("#edit-api-allowed"),
     apiRows: container.querySelectorAll(".api-only"),
   };
 
@@ -122,6 +124,29 @@ function setupFieldEditor(container, onChange, allFields = []) {
     }
   }
 
+  function parseAllowedIds(raw) {
+    if (!raw) return [];
+    if (Array.isArray(raw))
+      return raw
+        .map(String)
+        .map((s) => s.trim())
+        .filter(Boolean);
+    const s = String(raw).trim();
+    if (!s) return [];
+    try {
+      const arr = JSON.parse(s);
+      if (Array.isArray(arr))
+        return arr
+          .map(String)
+          .map((s) => s.trim())
+          .filter(Boolean);
+    } catch {}
+    return s
+      .split(/[,\s]+/)
+      .map((x) => x.trim())
+      .filter(Boolean);
+  }
+
   function setField(field) {
     // hard reset any previous CodeMirror cleanly
     if (dom.__codeEditor) {
@@ -137,7 +162,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
     originalKey = field.key?.trim() || "";
 
     dom.key.classList.remove("input-error");
-    confirmBtn = document.getElementById("btn-field-edit-confirm");
+    confirmBtn = document.getElementById("field-edit-confirm");
     if (confirmBtn) confirmBtn.disabled = false;
 
     const isGuid = field.type === "guid";
@@ -238,6 +263,20 @@ function setupFieldEditor(container, onChange, allFields = []) {
       dom.apiId && (dom.apiId.value = field.id || "");
       dom.apiMap &&
         (dom.apiMap.value = JSON.stringify(field.map || [], null, 0));
+
+      if (dom.apiUsePicker) {
+        dom.apiUsePicker.checked = !!(
+          field.use_picker ??
+          field.apiUsePicker ??
+          false
+        );
+      }
+      if (dom.apiAllowedIds) {
+        const allowed = field.allowed_ids ?? field.apiAllowedIds ?? [];
+        dom.apiAllowedIds.value = Array.isArray(allowed)
+          ? allowed.join(", ")
+          : String(allowed || "");
+      }
     }
 
     // LaTeX UI
@@ -315,6 +354,8 @@ function setupFieldEditor(container, onChange, allFields = []) {
       const id = dom.apiId?.value?.trim() || "";
       if (id) field.id = id;
       field.map = parseApiMap(dom.apiMap?.value);
+      field.use_picker = !!dom.apiUsePicker?.checked;
+      field.allowed_ids = parseAllowedIds(dom.apiAllowedIds?.value);
     }
 
     if (type === "textarea") {

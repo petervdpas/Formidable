@@ -109,8 +109,22 @@ function sanitizeField(f) {
               String(mode).toLowerCase() === "editable" ? "editable" : "static",
           }))
       : [];
+
+    const usePicker = f.use_picker ?? f.apiUsePicker ?? false;
+    field.use_picker = !!usePicker;
+
+    const allowedSrc = f.allowed_ids ?? f.apiAllowedIds ?? [];
+    field.allowed_ids = Array.isArray(allowedSrc)
+      ? allowedSrc
+          .map(String)
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : String(allowedSrc || "")
+          .split(/[,\s]+/)
+          .map((s) => s.trim())
+          .filter(Boolean);
   }
-  
+
   return field;
 }
 

@@ -24,6 +24,8 @@ export const apiSpecific = Object.freeze([
   "apiId", // record id to fetch
   "apiMap", // field mapping [{key, path, mode}]
   "apiRows", // controls visible only when API is used
+  "apiUsePicker", // show dropdown of records
+  "apiAllowedIds", // whitelist of IDs (array or csv)
 ]);
 
 export function getFieldTypeDef(type) {

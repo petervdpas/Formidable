@@ -151,7 +151,7 @@
           </section>
         </div>
       </div>
-      
+
       <!-- Shared Status Bar -->
       <div id="status-bar">
         <div id="status-bar-message">
@@ -458,24 +458,85 @@
         </div>
 
         <!-- API-specific settings -->
-        <div class="modal-form-row api-only" id="edit-collection-row" style="display:none">
-          <label for="edit-collection" data-i18n="field.api.collection">Collection</label>
-          <input type="text" id="edit-collection" placeholder="e.g. addresses" />
+        <div
+          class="modal-form-row api-only"
+          id="edit-collection-row"
+          style="display: none"
+        >
+          <label for="edit-collection" data-i18n="field.api.collection"
+            >Collection</label
+          >
+          <input
+            type="text"
+            id="edit-collection"
+            placeholder="e.g. addresses"
+          />
         </div>
 
-        <div class="modal-form-row api-only" id="edit-api-id-row" style="display:none">
+        <div
+          class="modal-form-row api-only"
+          id="edit-api-usepicker-row"
+          style="display: none"
+        >
+          <label for="edit-api-usepicker">
+            Use Record Picker
+            <small class="label-subtext"
+              >Show a dropdown of records from the collection</small
+            >
+          </label>
+          <label class="switch">
+            <input type="checkbox" id="edit-api-usepicker" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div
+          class="modal-form-row api-only"
+          id="edit-api-id-row"
+          style="display: none"
+        >
           <label for="edit-api-id" data-i18n="field.api.id">Record ID</label>
-          <input type="text" id="edit-api-id" placeholder="document id (optional default)" />
+          <input
+            type="text"
+            id="edit-api-id"
+            placeholder="document id (optional default)"
+          />
         </div>
 
-        <div class="modal-form-row api-only" id="edit-api-map-row" style="display:none">
+        <div
+          class="modal-form-row api-only"
+          id="edit-api-allowed-row"
+          style="display: none"
+        >
+          <label for="edit-api-allowed">
+            Allowed IDs
+            <small class="label-subtext"
+              >Comma-separated or JSON array of IDs</small
+            >
+          </label>
+          <textarea
+            id="edit-api-allowed"
+            rows="2"
+            placeholder='id1,id2 or ["id1","id2"]'
+          ></textarea>
+        </div>
+
+        <div
+          class="modal-form-row api-only"
+          id="edit-api-map-row"
+          style="display: none"
+        >
           <label for="edit-api-map">
             <span data-i18n="field.api.map">Field Map</span>
             <small class="label-subtext" data-i18n="field.api.map.hint">
               [{ key, path, mode: "static"|"editable" }]
             </small>
           </label>
-          <textarea id="edit-api-map" rows="3" placeholder='[{"key":"name","path":"name","mode":"static"|"editable"}]'></textarea>
+          <textarea
+            id="edit-api-map"
+            rows="3"
+            placeholder='[{"key":"name","path":"name","mode":"static"|"editable"}]'
+          ></textarea>
         </div>
 
         <!-- Default value -->

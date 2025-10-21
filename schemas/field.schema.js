@@ -41,7 +41,13 @@ const apiDefaults = {
   collection: "",
   id: "",
   map: [], // [{ key: "name", path: "name", mode: "static"|"editable" }]
+  use_picker: false,
+  allowed_ids: [], // array of ids
 };
+
+function toBool(v) {
+  return v === true || String(v).trim().toLowerCase() === "true";
+}
 
 function normApiMap(arr) {
   if (!Array.isArray(arr)) return [];
@@ -57,6 +63,37 @@ function normApiMap(arr) {
     const mm = mode === "editable" ? "editable" : "static";
     out.push({ key, path, mode: mm });
     seen.add(key);
+  }
+  return out;
+}
+
+function normAllowedIds(src) {
+  if (src == null) return [];
+
+  let arr;
+  if (Array.isArray(src)) {
+    arr = src;
+  } else if (typeof src === "string") {
+    const s = src.trim();
+    if (!s) return [];
+    try {
+      const maybe = JSON.parse(s);
+      arr = Array.isArray(maybe) ? maybe : s.split(/[,\s]+/);
+    } catch {
+      arr = s.split(/[,\s]+/);
+    }
+  } else {
+    if (src instanceof Set) arr = Array.from(src);
+    else return [];
+  }
+
+  const out = [];
+  const seen = new Set();
+  for (const v of arr) {
+    const id = String(v).trim();
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    out.push(id);
   }
   return out;
 }
@@ -195,6 +232,15 @@ module.exports = {
       field.id = typeof field.id === "string" ? field.id.trim() : "";
       field.map = normApiMap(field.map);
 
+      if (raw.apiUsePicker !== undefined && field.use_picker === false) {
+        field.use_picker = toBool(raw.apiUsePicker);
+      } else {
+        field.use_picker = toBool(field.use_picker);
+      }
+      const allowedSrc =
+        raw.apiAllowedIds !== undefined ? raw.apiAllowedIds : field.allowed_ids;
+      field.allowed_ids = normAllowedIds(allowedSrc);
+
       if (!field.collection) {
         field.__invalid = "api.missing_collection";
       }
@@ -205,6 +251,8 @@ module.exports = {
       delete field.collection;
       delete field.id;
       delete field.map;
+      delete field.use_picker;
+      delete field.allowed_ids;
       delete field.__invalid;
     }
 
