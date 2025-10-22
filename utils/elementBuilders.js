@@ -1014,7 +1014,71 @@ export function createOptionList(
   return list;
 }
 
-// utils/elementBuilders.js
+// A compact grid for label+input pairs only (no action cells).
+// Renders like:
+// [Label] [Control]
+// [Label] [Control]
+// ...
+export function buildInputFieldsGrid({
+  items = [],             // [{ label, control }, ...]
+  labelWidth = "max(160px)", // first column width
+  gap = "6px 10px",
+  className = "input-fields-grid",
+  suppressInnerLabel = true,
+} = {}) {
+  const grid = document.createElement("div");
+  grid.className = className;
+  grid.style.display = "grid";
+  grid.style.gridTemplateColumns = `${labelWidth} 1fr`;
+  grid.style.gap = gap;
+
+  const addRow = ({ label, control }) => {
+    // label cell
+    let labEl;
+    if (label instanceof HTMLElement) {
+      labEl = label;
+    } else if (typeof label === "string") {
+      labEl = document.createElement("label");
+      labEl.textContent = label;
+    } else if (typeof label === "function") {
+      labEl = label(); // user can return an element
+    }
+    if (!labEl) labEl = document.createElement("label");
+    grid.appendChild(labEl);
+
+    // control cell
+    const host = document.createElement("div");
+    host.style.minWidth = "0";
+    host.style.display = "flex";
+    host.style.alignItems = "center";
+    grid.appendChild(host);
+
+    let controlEl = null;
+    if (typeof control === "function") {
+      const maybe = control(host) || null;
+      controlEl =
+        maybe instanceof HTMLElement ? maybe : host.firstElementChild || host;
+    } else if (control instanceof HTMLElement) {
+      host.appendChild(control);
+      controlEl = control;
+    } else {
+      controlEl = host;
+    }
+
+    // strip inner labels from helpers if any
+    if (suppressInnerLabel) {
+      host.querySelectorAll(":scope > label").forEach((lab) => {
+        const txt = (lab.textContent || "").trim();
+        const hasI18n = lab.hasAttribute("data-i18n");
+        if (!txt && !hasI18n) lab.style.display = "none";
+      });
+    }
+  };
+
+  for (const it of items) addRow(it);
+  return grid;
+}
+
 export function createOptionPanel(
   { title = "", message = "", inputs = [], actions = [], className = "" } = {},
   onAction = null
