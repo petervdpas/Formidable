@@ -1938,9 +1938,7 @@ export async function renderApiField(field, value = "") {
       // fill read-only mapped values from API doc
       for (const m of mappings) {
         if (!m) continue;
-        const ctl = mapGrid?.querySelector(
-          `[name="${field.key}__map__${m.key}"]`
-        );
+        const ctl = mapGrid?.querySelector(`[name="${field.key}__map__${m.key}"]`);
         if (!ctl) continue;
         if (m.mode !== "editable") {
           const val = m.path?.split(".").reduce((o, k) => (o ? o[k] : undefined), doc);
@@ -1977,7 +1975,7 @@ export async function renderApiField(field, value = "") {
       // dropdown picker — NOT in the grid
       const dd = createDropdown({
         containerEl: host,
-        labelTextOrKey: "",              // suppress inner label
+        labelTextOrKey: "",
         selectedValue: initial.id || "",
         options: [{ value: "", label: "-- select --" }],
         i18nEnabled: false,
@@ -2014,8 +2012,7 @@ export async function renderApiField(field, value = "") {
                 : [];
               const allowedSet = new Set(field.allowed_ids.map(String));
               const filtered = all.filter((d) =>
-                allowedSet.has(String(d?.id ?? d?._id ?? ""))
-              );
+                allowedSet.has(String(d?.id ?? d?._id ?? "")));
               opts = opts.concat(
                 filtered.map((doc) => {
                   const id = String(doc?.id ?? doc?._id ?? "").trim();
@@ -2119,10 +2116,9 @@ export async function renderApiField(field, value = "") {
 
   mapGrid = buildInputFieldsGrid({
     items,
-    labelWidth: "var(--label-width, max(160px, 22ch))",
-    gap: "6px 10px",
-    rowAlign: "center",
     className: "api-map-grid",
+    labelCol: "var(--label-width, max(160px, 22ch))",
+    gap: "6px 10px",
   });
   wrapper.appendChild(mapGrid);
 
@@ -2153,7 +2149,6 @@ export async function renderApiField(field, value = "") {
     field.wrapper || "form-row"
   );
 }
-
 
 
 

@@ -1017,12 +1017,16 @@ export function createOptionList(
 // A compact grid for label+input pairs only (no action cells).
 // CSS lives outside; this function only sets classes / structure.
 export function buildInputFieldsGrid({
-  items = [],                    // [{ label, control, forId?, desc?, grow? }, ...]
+  items = [],                   // [{ label, control, forId?, desc?, grow? }, ...]
   className = "api-map-grid",
   suppressInnerLabel = true,
+  labelCol = null,              // optional: set CSS var --ifg-label-col for this instance
+  gap = null,                   // optional: set CSS var --ifg-gap for this instance
 } = {}) {
   const grid = document.createElement("div");
   grid.className = className; // style the grid via CSS
+  if (labelCol) grid.style.setProperty("--ifg-label-col", labelCol);
+  if (gap) grid.style.setProperty("--ifg-gap", gap);
 
   const addRow = ({ label, control, forId = null, desc = "", grow = true }) => {
     // label cell
