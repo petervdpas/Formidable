@@ -71,7 +71,8 @@ export default {
   "error.api.collection_required": "API-veld vereist een collectie naam.",
   "error.api.map_invalid": "API-veld heeft een ongeldige kaartdefinitie.",
   "error.api.map_key_required": "API-kaartvermelding mist een sleutel.",
-  "error.api.map_duplicate_keys": "API-kaartvermelding heeft duplicaat sleutels: {0}.",
+  "error.api.map_duplicate_keys":
+    "API-kaartvermelding heeft duplicaat sleutels: {0}.",
 
   // Errors (field-level, optional if you show inline field messages via i18n too)
   "error.field.missing_key": "Veldsleutel is vereist.",
@@ -247,7 +248,6 @@ export default {
   "toast.git.resolved.theirs": "Gemarkeerd als remote.",
   "toast.git.resolved.ours.all": "Resolved als lokaal.",
   "toast.git.resolved.theirs.all": "Resolved als remote.",
-
 
   "toast.profile.invalidName":
     "Gebruik kleine letters, koppeltekens en eindig met .json",
@@ -583,6 +583,29 @@ export default {
   "field.latex.hint": "Voegt ruwe \\LaTeX in; export als fenced {=latex}-blok.",
   "field.latex.placeholder": "\\begin{center} ... \\end{center}",
   "latex.required": "LaTeX-inhoud is verplicht.",
+
+  "field.api.collection": "Verzameling",
+  "field.api.collection.placeholder": "bijv. adressen",
+  "field.api.collection.title": "Naam van de verzameling om uit te lezen",
+  "field.api.usePicker": "Gebruik Record Picker",
+  "field.api.usePicker.hint": "Toon een dropdown van records uit de verzameling",
+  "field.api.usePicker.title": "Schakel record picker in",
+  "field.api.id": "Record ID",
+  "field.api.id.placeholder": "Document id (optionele standaard)",
+  "field.api.id.title": "Standaard record id wanneer geen selectie is gemaakt",
+  "field.api.allowed": "Toegestane ID's",
+  "field.api.allowed.hint": "Komma-gescheiden of JSON-array van ID's",
+  "field.api.allowed.placeholder": 'id1,id2 of ["id1","id2"]',
+  "field.api.allowed.title": "Beperk selecteerbare records tot deze ID's",
+  "field.api.map": "Veldmap",
+  "field.api.map.hint": '[{ key, path, mode: "static"|"editable" }]',
+  "field.api.map.placeholder": '[{"key":"name","path":"name","mode":"static"}]',
+  "field.api.map.title": "Map API-velden naar formulier velden",
+  "field.api.picker.placeholder": "Selecteer een record…",
+  "field.api.picker.title": "Kies een record uit de collectie",
+  "field.api.picker.item": "Record",
+  "field.api.help":
+    "Bind formulier velden aan een API-collectie, optioneel met een record picker.",
 
   // ── Modals ───────────────────
 

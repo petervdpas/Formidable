@@ -560,6 +560,29 @@ export default {
   "field.latex.placeholder": "\\begin{center} ... \\end{center}",
   "latex.required": "LaTeX content is required.",
 
+  "field.api.collection": "Collection",
+  "field.api.collection.placeholder": "e.g. addresses",
+  "field.api.collection.title": "Name of the collection to read from",
+  "field.api.usePicker": "Use Record Picker",
+  "field.api.usePicker.hint": "Show a dropdown of records from the collection",
+  "field.api.usePicker.title": "Toggle record picker",
+  "field.api.id": "Record ID",
+  "field.api.id.placeholder": "Document id (optional default)",
+  "field.api.id.title": "Default record id when no selection is made",
+  "field.api.allowed": "Allowed IDs",
+  "field.api.allowed.hint": "Comma-separated or JSON array of IDs",
+  "field.api.allowed.placeholder": 'id1,id2 or ["id1","id2"]',
+  "field.api.allowed.title": "Restrict selectable records to these IDs",
+  "field.api.map": "Field Map",
+  "field.api.map.hint": '[{ key, path, mode: "static"|"editable" }]',
+  "field.api.map.placeholder": '[{"key":"name","path":"name","mode":"static"}]',
+  "field.api.map.title": "Map API fields to form fields",
+  "field.api.picker.placeholder": "Select a record…",
+  "field.api.picker.title": "Choose a record from the collection",
+  "field.api.picker.item": "Record",
+  "field.api.help":
+    "Bind form fields to an API collection, optionally with a record picker.",
+
   // ── Modals ───────────────────
 
   "modal.settings.title": "Settings",

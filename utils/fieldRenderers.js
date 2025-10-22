@@ -1888,11 +1888,16 @@ async function getDesignLabelsFor(collection) {
   if (__apiDesignCache.has(collection)) return __apiDesignCache.get(collection);
 
   try {
-    const res = await EventBus.emitWithResponse("api:design", { template: collection });
+    const res = await EventBus.emitWithResponse("api:design", {
+      template: collection,
+    });
     const labels =
       res?.ok && Array.isArray(res?.data?.fields)
         ? Object.fromEntries(
-            res.data.fields.map(f => [String(f.key), String(f.label || f.key || "")])
+            res.data.fields.map((f) => [
+              String(f.key),
+              String(f.label || f.key || ""),
+            ])
           )
         : null;
     __apiDesignCache.set(collection, labels);
@@ -1914,9 +1919,9 @@ export async function renderApiField(field, value = "") {
 
   const coll = (field.collection || "").trim();
   const mappings = Array.isArray(field.map) ? field.map : [];
-  const editableInputs = new Map();          // key -> <input>
-  const mappingByKey = new Map();            // key -> { key, path, mode, ... }
-  mappings.forEach(m => m?.key && mappingByKey.set(m.key, m));
+  const editableInputs = new Map(); // key -> <input>
+  const mappingByKey = new Map(); // key -> { key, path, mode, ... }
+  mappings.forEach((m) => m?.key && mappingByKey.set(m.key, m));
 
   // 🔹 fetch design labels up-front (non-fatal if it fails)
   const designLabels = await getDesignLabelsFor(coll);
@@ -1935,9 +1940,9 @@ export async function renderApiField(field, value = "") {
     callback: (el) => (el.value = JSON.stringify(initial)),
   });
 
-  let idInput = null;   // non-picker
-  let idSelect = null;  // picker
-  let mapGrid = null;   // label+input grid
+  let idInput = null; // non-picker
+  let idSelect = null; // picker
+  let mapGrid = null; // label+input grid
   let lastFetchedDoc = null; // keep the last loaded doc to drive placeholders
 
   // ───────────────────────────────────────────
@@ -1948,7 +1953,7 @@ export async function renderApiField(field, value = "") {
       const v = el.value.trim();
       if (v !== "") overrides[k] = v; // ignore empty overrides
     }
-    const currentId = idSelect ? idSelect.value : (idInput?.value || "");
+    const currentId = idSelect ? idSelect.value : idInput?.value || "";
     hidden.value = JSON.stringify({ id: String(currentId).trim(), overrides });
   }
 
@@ -1975,9 +1980,15 @@ export async function renderApiField(field, value = "") {
   }
 
   async function doFetch() {
-    const currentId = idSelect ? idSelect.value : (idInput?.value || "");
-    if (!coll) { status.textContent = "No collection"; return; }
-    if (!currentId) { status.textContent = "Enter id"; return; }
+    const currentId = idSelect ? idSelect.value : idInput?.value || "";
+    if (!coll) {
+      status.textContent = "No collection";
+      return;
+    }
+    if (!currentId) {
+      status.textContent = "Enter id";
+      return;
+    }
 
     status.textContent = "Loading…";
     try {
@@ -1992,7 +2003,9 @@ export async function renderApiField(field, value = "") {
       // fill read-only mapped values from API doc
       for (const m of mappings) {
         if (!m) continue;
-        const ctl = mapGrid?.querySelector(`[name="${field.key}__map__${m.key}"]`);
+        const ctl = mapGrid?.querySelector(
+          `[name="${field.key}__map__${m.key}"]`
+        );
         if (!ctl) continue;
         if (m.mode !== "editable") {
           const val = resolveByPath(doc, m.path || "");
@@ -2070,7 +2083,8 @@ export async function renderApiField(field, value = "") {
                 : [];
               const allowedSet = new Set(field.allowed_ids.map(String));
               const filtered = all.filter((d) =>
-                allowedSet.has(String(d?.id ?? d?._id ?? "")));
+                allowedSet.has(String(d?.id ?? d?._id ?? ""))
+              );
               opts = opts.concat(
                 filtered.map((doc) => {
                   const id = String(doc?.id ?? doc?._id ?? "").trim();
@@ -2079,18 +2093,28 @@ export async function renderApiField(field, value = "") {
               );
               // ensure missing allowed ids still appear
               for (const missingId of allowedSet) {
-                if (!filtered.find((d) => String(d?.id ?? d?._id ?? "") === missingId)) {
+                if (
+                  !filtered.find(
+                    (d) => String(d?.id ?? d?._id ?? "") === missingId
+                  )
+                ) {
                   opts.push({ value: missingId, label: missingId });
                 }
               }
             } catch {
               opts = opts.concat(
-                field.allowed_ids.map((id) => ({ value: String(id), label: String(id) }))
+                field.allowed_ids.map((id) => ({
+                  value: String(id),
+                  label: String(id),
+                }))
               );
             }
           } else {
             opts = opts.concat(
-              field.allowed_ids.map((id) => ({ value: String(id), label: String(id) }))
+              field.allowed_ids.map((id) => ({
+                value: String(id),
+                label: String(id),
+              }))
             );
           }
         } else if (coll) {
@@ -2115,7 +2139,9 @@ export async function renderApiField(field, value = "") {
                 })
                 .filter(Boolean)
             );
-          } catch { /* keep placeholder */ }
+          } catch {
+            /* keep placeholder */
+          }
         }
 
         if (idSelect) populateSelectOptions(idSelect, opts, initial.id || "");
@@ -2157,9 +2183,11 @@ export async function renderApiField(field, value = "") {
   // Input-only grid for mapped fields (use real labels when available)
   const items = mappings.map((m) => {
     const niceLabel =
-      m.label ||                                   // explicit per-mapping label (optional)
-      (designLabels && designLabels[m.key]) ||     // real label from design
-      m.key || m.path || "";                       // fallback
+      m.label || // explicit per-mapping label (optional)
+      (designLabels && designLabels[m.key]) || // real label from design
+      m.key ||
+      m.path ||
+      ""; // fallback
 
     return {
       label: niceLabel,
@@ -2218,7 +2246,9 @@ export async function renderApiField(field, value = "") {
   // If an initial id exists, fetch once so placeholders for editable fields are filled
   if (coll && (initial.id || field.use_picker)) {
     // don't block rendering; kickoff and let it paint
-    setTimeout(() => { doFetch(); }, 0);
+    setTimeout(() => {
+      doFetch();
+    }, 0);
   }
 
   applyFieldContextAttributes(wrapper, {
@@ -2235,4 +2265,3 @@ export async function renderApiField(field, value = "") {
     field.wrapper || "form-row"
   );
 }
-

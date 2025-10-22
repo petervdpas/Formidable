@@ -72,7 +72,7 @@ export function tUp(key, fallback = "") {
  * Apply translations to all elements with [data-i18n]
  */
 export function translateDOM(root = document.body) {
-  // textContent translation with optional args
+  // textContent
   const elements = root.querySelectorAll("[data-i18n]");
   for (const el of elements) {
     const key = el.getAttribute("data-i18n");
@@ -82,21 +82,18 @@ export function translateDOM(root = document.body) {
     if (argsAttr) {
       try {
         const args = JSON.parse(argsAttr);
-        value = value.replace(/{(\d+)}/g, (match, index) =>
-          args[index] !== undefined ? String(args[index]) : match
+        value = value.replace(/{(\d+)}/g, (m, i) =>
+          args[i] !== undefined ? String(args[i]) : m
         );
       } catch (e) {
-        console.warn(
-          "[translateDOM] Invalid JSON in data-i18n-args:",
-          argsAttr
-        );
+        console.warn("[translateDOM] Invalid JSON in data-i18n-args:", argsAttr);
       }
     }
 
     if (value) el.textContent = value;
   }
 
-  // title attribute
+  // title
   const titleElements = root.querySelectorAll("[data-i18n-title]");
   for (const el of titleElements) {
     const key = el.getAttribute("data-i18n-title");
@@ -104,15 +101,33 @@ export function translateDOM(root = document.body) {
     if (value) el.setAttribute("title", value);
   }
 
-  // aria-label attribute
+  // aria-label
   const ariaElements = root.querySelectorAll("[data-i18n-aria]");
   for (const el of ariaElements) {
     const key = el.getAttribute("data-i18n-aria");
     const value = t(key);
     if (value) el.setAttribute("aria-label", value);
   }
-}
 
+  // placeholder (inputs & textareas)
+  const phElements = root.querySelectorAll("[data-i18n-placeholder]");
+  for (const el of phElements) {
+    const key = el.getAttribute("data-i18n-placeholder");
+    const value = t(key);
+    if (value) {
+      el.setAttribute("placeholder", value); // attribute
+      if ("placeholder" in el) el.placeholder = value; // property
+    }
+  }
+
+  // (optional) value for elements like <option>, if you ever use it
+  const valElements = root.querySelectorAll("[data-i18n-value]");
+  for (const el of valElements) {
+    const key = el.getAttribute("data-i18n-value");
+    const value = t(key);
+    if (value) el.setAttribute("value", value);
+  }
+}
 /**
  * Return a list of available languages with translated labels
  */

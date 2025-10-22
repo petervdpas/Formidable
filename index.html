@@ -471,6 +471,7 @@
             type="text"
             id="edit-collection"
             placeholder="e.g. addresses"
+            data-i18n-placeholder="field.api.collection.placeholder"
           />
         </div>
 
@@ -480,12 +481,16 @@
           style="display: none"
         >
           <label for="edit-api-usepicker">
-            Use Record Picker
-            <small class="label-subtext"
-              >Show a dropdown of records from the collection</small
-            >
+            <span data-i18n="field.api.usePicker">Use Record Picker</span>
+            <small class="label-subtext" data-i18n="field.api.usePicker.hint">
+              Show a dropdown of records from the collection
+            </small>
           </label>
-          <label class="switch">
+          <label
+            class="switch"
+            title="Toggle record picker"
+            data-i18n-title="field.api.usePicker.title"
+          >
             <input type="checkbox" id="edit-api-usepicker" />
             <span class="slider"></span>
           </label>
@@ -501,6 +506,7 @@
             type="text"
             id="edit-api-id"
             placeholder="document id (optional default)"
+            data-i18n-placeholder="field.api.id.placeholder"
           />
         </div>
 
@@ -510,15 +516,16 @@
           style="display: none"
         >
           <label for="edit-api-allowed">
-            Allowed IDs
-            <small class="label-subtext"
-              >Comma-separated or JSON array of IDs</small
-            >
+            <span data-i18n="field.api.allowed">Allowed IDs</span>
+            <small class="label-subtext" data-i18n="field.api.allowed.hint">
+              Comma-separated or JSON array of IDs
+            </small>
           </label>
           <textarea
             id="edit-api-allowed"
             rows="2"
             placeholder='id1,id2 or ["id1","id2"]'
+            data-i18n-placeholder="field.api.allowed.placeholder"
           ></textarea>
         </div>
 
@@ -537,6 +544,7 @@
             id="edit-api-map"
             rows="3"
             placeholder='[{"key":"name","path":"name","mode":"static"|"editable"}]'
+            data-i18n-placeholder="field.api.map.placeholder"
           ></textarea>
         </div>
 
