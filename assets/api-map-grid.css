@@ -1,0 +1,84 @@
+/* api-map-grid.css */
+
+/* ─────────────────────────────────────────
+   API mapped fields grid (two-column matrix)
+   ───────────────────────────────────────── */
+.api-map-grid {
+  display: grid;
+  grid-template-columns: var(--ifg-label-col) 1fr;
+  gap: var(--ifg-gap);
+  align-items: center;
+}
+
+/* label column */
+.api-map-grid > .ifg-label {
+  align-self: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 4px 0;
+}
+
+/* control column host */
+.api-map-grid > .ifg-control-cell {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 auto; /* grow to fill */
+}
+
+/* opt-out for a row that shouldn’t stretch */
+.api-map-grid > .ifg-control-cell.ifg-no-grow {
+  flex: 0 0 auto;
+}
+
+/* make common controls fill available width */
+.api-map-grid > .ifg-control-cell > input,
+.api-map-grid > .ifg-control-cell > select,
+.api-map-grid > .ifg-control-cell > textarea {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+/* clearable-input helper fills too */
+.api-map-grid > .ifg-control-cell > .clear-input { width: 100%; }
+.api-map-grid > .ifg-control-cell > .clear-input input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* optional small description under the control */
+.api-map-grid .ifg-desc {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  color: var(--muted-fg, #777);
+}
+
+/* readonly look for API-derived fields */
+.api-map-grid input[readonly] {
+  background: var(--readonly-bg, #f5f5f5);
+  color: var(--readonly-fg, inherit);
+  border-color: var(--readonly-border, #ddd);
+}
+
+/* neutralize random margins helpers may inject */
+.api-map-grid .ifg-control-cell > * { margin: 0; }
+
+/* hide helper-inserted empty labels inside control cells */
+.api-map-grid .ifg-suppress-inner-labels > label:empty:not([data-i18n]) {
+  display: none;
+}
+
+/* Responsive: stack on narrow screens */
+@media (max-width: 640px) {
+  .api-map-grid {
+    grid-template-columns: 1fr;
+    row-gap: 8px;
+    column-gap: 0;
+  }
+  .api-map-grid > .ifg-label { margin-bottom: 2px; }
+}

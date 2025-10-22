@@ -1015,24 +1015,16 @@ export function createOptionList(
 }
 
 // A compact grid for label+input pairs only (no action cells).
-// Renders like:
-// [Label] [Control]
-// [Label] [Control]
-// ...
+// CSS lives outside; this function only sets classes / structure.
 export function buildInputFieldsGrid({
-  items = [],             // [{ label, control }, ...]
-  labelWidth = "max(160px)", // first column width
-  gap = "6px 10px",
-  className = "input-fields-grid",
+  items = [],                    // [{ label, control, forId?, desc?, grow? }, ...]
+  className = "api-map-grid",
   suppressInnerLabel = true,
 } = {}) {
   const grid = document.createElement("div");
-  grid.className = className;
-  grid.style.display = "grid";
-  grid.style.gridTemplateColumns = `${labelWidth} 1fr`;
-  grid.style.gap = gap;
+  grid.className = className; // style the grid via CSS
 
-  const addRow = ({ label, control }) => {
+  const addRow = ({ label, control, forId = null, desc = "", grow = true }) => {
     // label cell
     let labEl;
     if (label instanceof HTMLElement) {
@@ -1041,23 +1033,30 @@ export function buildInputFieldsGrid({
       labEl = document.createElement("label");
       labEl.textContent = label;
     } else if (typeof label === "function") {
-      labEl = label(); // user can return an element
+      labEl = label() || document.createElement("label");
+    } else {
+      labEl = document.createElement("label");
     }
-    if (!labEl) labEl = document.createElement("label");
+    if (forId) labEl.htmlFor = forId;
+    labEl.classList.add("ifg-label");
     grid.appendChild(labEl);
 
     // control cell
     const host = document.createElement("div");
-    host.style.minWidth = "0";
-    host.style.display = "flex";
-    host.style.alignItems = "center";
+    host.classList.add("ifg-cell", "ifg-control-cell");
+    if (!grow) host.classList.add("ifg-no-grow");
+    if (suppressInnerLabel) host.classList.add("ifg-suppress-inner-labels");
     grid.appendChild(host);
 
     let controlEl = null;
     if (typeof control === "function") {
       const maybe = control(host) || null;
-      controlEl =
-        maybe instanceof HTMLElement ? maybe : host.firstElementChild || host;
+      if (maybe instanceof HTMLElement) {
+        if (!host.contains(maybe)) host.appendChild(maybe); // ensure mounted
+        controlEl = maybe;
+      } else {
+        controlEl = host.firstElementChild || host;
+      }
     } else if (control instanceof HTMLElement) {
       host.appendChild(control);
       controlEl = control;
@@ -1065,17 +1064,22 @@ export function buildInputFieldsGrid({
       controlEl = host;
     }
 
-    // strip inner labels from helpers if any
-    if (suppressInnerLabel) {
-      host.querySelectorAll(":scope > label").forEach((lab) => {
-        const txt = (lab.textContent || "").trim();
-        const hasI18n = lab.hasAttribute("data-i18n");
-        if (!txt && !hasI18n) lab.style.display = "none";
-      });
+    // optional small description under the control (still within control cell)
+    if (desc) {
+      const small = document.createElement("small");
+      small.className = "field-description ifg-desc";
+      small.textContent = desc;
+      host.appendChild(small);
     }
+
+    return { labEl, host, controlEl };
   };
 
   for (const it of items) addRow(it);
+
+  // expose a tiny API in case callers need to append later
+  grid.appendItem = (it) => addRow(it);
+
   return grid;
 }
 

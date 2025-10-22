@@ -10,6 +10,7 @@ import {
   createDirectoryPicker,
   createClearableInput,
   buildLabeledControl,
+  buildInputFieldsGrid,
   buildCompositeElementStacked,
 } from "./elementBuilders.js";
 import { createDropdown, populateSelectOptions } from "./dropdownUtils.js";
@@ -1904,6 +1905,10 @@ export async function renderApiField(field, value = "") {
     callback: (el) => (el.value = JSON.stringify(initial)),
   });
 
+  let idInput = null;   // non-picker
+  let idSelect = null;  // picker
+  let mapGrid = null;   // label+input grid
+
   // ───────────────────────────────────────────
   // Helpers
   function updateHidden() {
@@ -1912,21 +1917,14 @@ export async function renderApiField(field, value = "") {
       const v = el.value.trim();
       if (v !== "") overrides[k] = v;
     }
-    const currentId =
-      idSelect /* present when using picker */ ? idSelect.value : idInput?.value || "";
+    const currentId = idSelect ? idSelect.value : (idInput?.value || "");
     hidden.value = JSON.stringify({ id: String(currentId).trim(), overrides });
   }
 
   async function doFetch() {
-    const currentId = idSelect ? idSelect.value : idInput?.value || "";
-    if (!coll) {
-      status.textContent = "No collection";
-      return;
-    }
-    if (!currentId) {
-      status.textContent = "Enter id";
-      return;
-    }
+    const currentId = idSelect ? idSelect.value : (idInput?.value || "");
+    if (!coll) { status.textContent = "No collection"; return; }
+    if (!currentId) { status.textContent = "Enter id"; return; }
 
     status.textContent = "Loading…";
     try {
@@ -1937,9 +1935,12 @@ export async function renderApiField(field, value = "") {
       if (!res?.ok) throw new Error(res?.error || "API error");
       const doc = res.data || {};
 
+      // fill read-only mapped values from API doc
       for (const m of mappings) {
         if (!m) continue;
-        const ctl = mapWrap.querySelector(`[name="${field.key}__map__${m.key}"]`);
+        const ctl = mapGrid?.querySelector(
+          `[name="${field.key}__map__${m.key}"]`
+        );
         if (!ctl) continue;
         if (m.mode !== "editable") {
           const val = m.path?.split(".").reduce((o, k) => (o ? o[k] : undefined), doc);
@@ -1960,27 +1961,23 @@ export async function renderApiField(field, value = "") {
   }
 
   // ───────────────────────────────────────────
-  // Top row (built with buildLabeledControl so everything sits on one line)
-  let idInput = null;   // non-picker
-  let idSelect = null;  // picker
-
+  // Top row (single line): [Label] [control] [Load] [status]
   const fetchBtn = document.createElement("button");
   fetchBtn.type = "button";
   fetchBtn.textContent = field.use_picker ? "Load" : "Fetch";
-  fetchBtn.className = "btn btn-info btn-input-height";   // match input height
+  fetchBtn.className = "btn btn-info btn-input-height";
   fetchBtn.addEventListener("click", doFetch);
 
   const status = document.createElement("span");
   status.className = "api-status muted";
   status.textContent = "";
 
-  // control factory (passed into buildLabeledControl)
   const controlFactory = (host) => {
     if (field.use_picker === true) {
-      // mount dropdown (label suppressed by buildLabeledControl)
+      // dropdown picker — NOT in the grid
       const dd = createDropdown({
         containerEl: host,
-        labelTextOrKey: "",          // inner label hidden by buildLabeledControl
+        labelTextOrKey: "",              // suppress inner label
         selectedValue: initial.id || "",
         options: [{ value: "", label: "-- select --" }],
         i18nEnabled: false,
@@ -1993,10 +1990,11 @@ export async function renderApiField(field, value = "") {
       idSelect = dd?.selectElement || null;
       if (idSelect) {
         idSelect.name = `${field.key}__id`;
-        idSelect.style.marginBottom = "0"; // keep button aligned vertically
+        idSelect.style.marginBottom = "0";
         idSelect.style.minWidth = "260px";
       }
 
+      // populate picker
       (async function populatePicker() {
         let opts = [{ value: "", label: "-- select --" }];
 
@@ -2009,39 +2007,32 @@ export async function renderApiField(field, value = "") {
                 limit: 1000,
                 offset: 0,
               });
-
               const all = Array.isArray(listRes?.data?.items)
                 ? listRes.data.items
                 : Array.isArray(listRes?.data)
                 ? listRes.data
                 : [];
-
               const allowedSet = new Set(field.allowed_ids.map(String));
               const filtered = all.filter((d) =>
                 allowedSet.has(String(d?.id ?? d?._id ?? ""))
               );
-
               opts = opts.concat(
                 filtered.map((doc) => {
                   const id = String(doc?.id ?? doc?._id ?? "").trim();
                   return { value: id, label: labelForDoc(doc) };
                 })
               );
-
-              // add leftover ids not in the fetched list
               for (const missingId of allowedSet) {
                 if (!filtered.find((d) => String(d?.id ?? d?._id ?? "") === missingId)) {
                   opts.push({ value: missingId, label: missingId });
                 }
               }
             } catch {
-              // fallback: raw ids only
               opts = opts.concat(
                 field.allowed_ids.map((id) => ({ value: String(id), label: String(id) }))
               );
             }
           } else {
-            // no collection — just raw ids
             opts = opts.concat(
               field.allowed_ids.map((id) => ({ value: String(id), label: String(id) }))
             );
@@ -2054,13 +2045,11 @@ export async function renderApiField(field, value = "") {
               limit: 1000,
               offset: 0,
             });
-
             const items = Array.isArray(listRes?.data?.items)
               ? listRes.data.items
               : Array.isArray(listRes?.data)
               ? listRes.data
               : [];
-
             opts = opts.concat(
               items
                 .map((doc) => {
@@ -2070,15 +2059,13 @@ export async function renderApiField(field, value = "") {
                 })
                 .filter(Boolean)
             );
-          } catch {
-            // keep placeholder if listing fails
-          }
+          } catch { /* keep placeholder */ }
         }
 
         if (idSelect) populateSelectOptions(idSelect, opts, initial.id || "");
       })();
 
-      return host.firstElementChild || host; // dropdown renders into host
+      return host.firstElementChild || host;
     }
 
     // non-picker: clearable text input
@@ -2097,54 +2084,47 @@ export async function renderApiField(field, value = "") {
     return clear;
   };
 
-  // Build a single-line row: [Label] [control] [Load] [status]
   const topRow = buildLabeledControl({
     labelTextOrKey: field.id_label || "Record",
     control: controlFactory,
     actions: [fetchBtn, status],
     layout: "inline",
     className: "form-row tight-gap",
-    suppressInnerLabel: true, // hide dropdown's inner label
+    suppressInnerLabel: true,
     gap: "8px",
+    labelWidth: "var(--label-width, max(160px, 22ch))",
   });
-  // Make sure everything aligns nicely
   topRow.style.alignItems = "center";
   wrapper.appendChild(topRow);
 
   // ───────────────────────────────────────────
-  // Mapped fields grid
-  const mapWrap = addContainerElement({
-    parent: wrapper,
-    tag: "div",
-    className: "api-map-grid",
-    attributes: {
-      style: "display:grid;grid-template-columns:max(160px) 1fr;gap:6px 10px;",
+  // Input-only grid for mapped fields
+  const items = mappings.map((m) => ({
+    label: m.key || m.path || "",
+    forId: `${field.key}__map__${m.key}`,
+    control: () => {
+      const inp = document.createElement("input");
+      inp.type = "text";
+      inp.id = `${field.key}__map__${m.key}`;
+      inp.name = `${field.key}__map__${m.key}`;
+      inp.placeholder = m.mode === "editable" ? "(override…)" : "(from API)";
+      if (m.mode !== "editable") inp.readOnly = true;
+      if (m.mode === "editable" && initial.overrides?.[m.key] != null) {
+        inp.value = String(initial.overrides[m.key]);
+      }
+      if (m.mode === "editable") editableInputs.set(m.key, inp);
+      return inp;
     },
+  }));
+
+  mapGrid = buildInputFieldsGrid({
+    items,
+    labelWidth: "var(--label-width, max(160px, 22ch))",
+    gap: "6px 10px",
+    rowAlign: "center",
+    className: "api-map-grid",
   });
-
-  for (const m of mappings) {
-    addContainerElement({
-      parent: mapWrap,
-      tag: "label",
-      textContent: m.key || m.path || "",
-    });
-
-    const ctrl = addContainerElement({
-      parent: mapWrap,
-      tag: "input",
-      attributes: {
-        type: "text",
-        name: `${field.key}__map__${m.key}`,
-        placeholder: m.mode === "editable" ? "(override…)" : "(from API)",
-        ...(m.mode !== "editable" ? { readOnly: true } : {}),
-      },
-    });
-
-    if (m.mode === "editable" && initial.overrides && initial.overrides[m.key] != null) {
-      ctrl.value = String(initial.overrides[m.key]);
-    }
-    if (m.mode === "editable") editableInputs.set(m.key, ctrl);
-  }
+  wrapper.appendChild(mapGrid);
 
   // ───────────────────────────────────────────
   // Wire events + initial sync
@@ -2173,5 +2153,7 @@ export async function renderApiField(field, value = "") {
     field.wrapper || "form-row"
   );
 }
+
+
 
 

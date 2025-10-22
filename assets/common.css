@@ -27,6 +27,10 @@
     --divider-grad-size: 6px;
     --divider-grad-stop: 60%;
 
+    /* ───── Input Fields Grid ───── */
+    --ifg-label-col: var(--label-width);
+    --ifg-gap: 6px 10px;
+
     /* ───── Status Bar (state colors) ───── */
     /* INFO */
     --statusbar-state-info-fg: var(--generic-fg-info);
@@ -161,9 +165,9 @@
     --field-type-latex-badge: #7b88e0;
     --field-type-latex-text: #fff;
 
-    --field-type-api-bg:     #29434e;
+    --field-type-api-bg: #29434e;
     --field-type-api-border: #80deea;
-    --field-type-api-modal:  #1f333b;
-    --field-type-api-badge:  #4dd0e1;
-    --field-type-api-text:   #f7fbfc;
+    --field-type-api-modal: #1f333b;
+    --field-type-api-badge: #4dd0e1;
+    --field-type-api-text: #f7fbfc;
 }
