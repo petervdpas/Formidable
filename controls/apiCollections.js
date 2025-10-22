@@ -3,6 +3,7 @@
 const path = require("path");
 const express = require("express");
 const swaggerUi = require("swagger-ui-express");
+const fieldSchema = require("../schemas/field.schema.js");
 
 const {
   getVirtualStructure,
@@ -28,6 +29,10 @@ function fieldToProperty(f = {}) {
   );
 
   switch ((f.type || "").toLowerCase()) {
+    case "loopstart":
+    case "loopstop":
+      // Containers – no stored data value
+      return [null, null];
     case "guid":
       Object.assign(schema, { type: "string", description: "GUID field" });
       break;
@@ -110,6 +115,37 @@ function fieldToProperty(f = {}) {
     case "tags":
       Object.assign(schema, { type: "array", items: { type: "string" } });
       break;
+    case "api": {
+      // Persisted selection + mapped fields.
+      const mappedKeys = Array.isArray(f.map)
+        ? f.map
+            .map((it) =>
+              it && typeof it.key === "string" ? it.key.trim() : ""
+            )
+            .filter(Boolean)
+        : [];
+      const mappedProps = Object.fromEntries(
+        mappedKeys.map((k) => [k, { type: "string" }])
+      );
+      // Allow two shapes:
+      //  - just the selected id (string)
+      //  - object with id + mapped values (and allow extras to be forward-compatible)
+      const apiSchema = {
+        oneOf: [
+          { type: "string", description: "Selected item id" },
+          {
+            type: "object",
+            additionalProperties: true,
+            properties: { id: { type: "string" }, ...mappedProps },
+            required: ["id"],
+          },
+        ],
+        description:
+          "API-linked value: either the selected id (string) or an object with `id` plus mapped fields.",
+      };
+      return [f.key, apiSchema];
+    }
+
     default:
       Object.assign(schema, { type: "string" });
   }
@@ -123,7 +159,10 @@ function makeDataSchema(yaml) {
   const required = [];
   for (const f of yaml?.fields || []) {
     if (!f?.key) continue;
-    const [k, s] = fieldToProperty(f);
+    const out = fieldToProperty(f);
+    if (!out) continue;
+    const [k, s] = out;
+    if (!k || !s) continue; // skip container/non-storable fields
     props[k] = s;
     if (f.type === "guid") required.push(k);
   }
@@ -167,6 +206,51 @@ function mountApiCollections(app) {
       }
     }
     res.json(rows);
+  });
+
+  router.get("/collections/design/:template", async (req, res) => {
+    const id = req.params.template;
+    const tmpl = `${id}.yaml`;
+    const yaml = await loadTemplateYaml(tmpl);
+    if (!yaml) return res.status(404).json({ error: "template-not-found" });
+    if (!isCollectionEnabled(yaml)) {
+      return res.status(403).json({ error: "collection-disabled" });
+    }
+
+    const abs = path.join(configManager.getContextTemplatesPath(), tmpl);
+    try {
+      const { etag, lastModified } = statRev(abs);
+      res.setHeader("ETag", etag);
+      res.setHeader("Last-Modified", lastModified);
+    } catch {}
+    res.setHeader("Cache-Control", "no-store");
+
+    const normOptions = (opts) =>
+      Array.isArray(opts)
+        ? opts.map((o) =>
+            typeof o === "object" && o !== null
+              ? { value: o.value, label: o.label ?? String(o.value ?? "") }
+              : { value: o, label: String(o) }
+          )
+        : [];
+
+    const fields = (yaml.fields || []).map((raw) => {
+      const s = fieldSchema.sanitize(raw);
+      s.label = s.label || raw.key || "";
+      if (raw.primary_key !== undefined) s.primary_key = !!raw.primary_key;
+      s.options = normOptions(raw.options);
+      return s;
+    });
+
+    res.json({
+      name: yaml.name || id,
+      filename: tmpl,
+      item_field: yaml.item_field || "",
+      markdown_template: yaml.markdown_template || "",
+      sidebar_expression: yaml.sidebar_expression || "",
+      enable_collection: !!yaml.enable_collection,
+      fields,
+    });
   });
 
   router.get("/collections/:template", async (req, res) => {
@@ -641,6 +725,7 @@ function mountApiCollections(app) {
     const templates = Object.entries(vfs.templateStorageFolders || {});
     const enabled = [];
 
+    // ---------- shared + per-template schemas ----------
     const schemas = {
       ItemBase: {
         type: "object",
@@ -679,6 +764,156 @@ function mountApiCollections(app) {
         },
         required: ["id", "filename", "title"],
       },
+
+      TemplateField: {
+        type: "object",
+        additionalProperties: true,
+        properties: {
+          key: { type: "string" },
+          type: { type: "string" },
+          label: { type: "string" },
+          description: { type: "string" },
+          expression_item: { type: "boolean" },
+          two_column: { type: "boolean" },
+          default: {},
+          primary_key: { type: "boolean" },
+          options: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: { value: {}, label: { type: "string" } },
+            },
+          },
+
+          // textarea
+          format: { type: "string", enum: ["markdown", "plain"] },
+
+          // ✅ latex
+          rows: {
+            type: "integer",
+            minimum: 2,
+            maximum: 60,
+            description: "Visible line count",
+          },
+          use_fenced: {
+            type: "boolean",
+            description: "Wrap with fenced block by default",
+          },
+          placeholder: { type: "string", description: "UI hint text" },
+
+          // code
+          run_mode: { type: "string", enum: ["manual", "load", "save"] },
+          allow_run: { type: "boolean" },
+          input_mode: { type: "string", enum: ["safe", "raw"] },
+          api_mode: { type: "string", enum: ["frozen", "raw"] },
+          api_pick: { type: "array", items: { type: "string" } },
+
+          // api
+          collection: { type: "string" },
+          id: { type: "string" },
+          map: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                key: { type: "string" },
+                path: { type: "string" },
+                mode: { type: "string", enum: ["static", "editable"] },
+              },
+              required: ["key", "path", "mode"],
+            },
+          },
+          use_picker: { type: "boolean" },
+          allowed_ids: { type: "array", items: { type: "string" } },
+        },
+        required: ["key", "type", "label"],
+      },
+
+      TemplateDesign: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          filename: { type: "string" },
+          item_field: { type: "string" },
+          markdown_template: { type: "string" },
+          sidebar_expression: { type: "string" },
+          enable_collection: { type: "boolean" },
+          fields: {
+            type: "array",
+            items: { $ref: "#/components/schemas/TemplateField" },
+          },
+        },
+        required: ["name", "filename", "enable_collection", "fields"],
+      },
+
+      CountResponse: {
+        type: "object",
+        properties: {
+          template: { type: "string" },
+          total: { type: "integer" },
+        },
+        required: ["template", "total"],
+      },
+
+      FieldPatchBody: {
+        oneOf: [
+          {
+            type: "object",
+            additionalProperties: false,
+            required: ["value"],
+            properties: { value: {} },
+          },
+          { type: "string" },
+          { type: "number" },
+          { type: "boolean" },
+          { type: "array", items: {} },
+          { type: "object" },
+        ],
+        description: "Either `{ value: ... }` or a raw JSON value.",
+      },
+
+      ListResponse: {
+        type: "object",
+        properties: {
+          collectionEnabled: { type: "boolean" },
+          template: { type: "string" },
+          total: { type: "integer" },
+          limit: { type: "integer" },
+          offset: { type: "integer" },
+          items: {
+            type: "array",
+            items: { $ref: "#/components/schemas/ItemSummary" },
+          },
+        },
+        required: [
+          "collectionEnabled",
+          "template",
+          "total",
+          "limit",
+          "offset",
+          "items",
+        ],
+      },
+
+      ListResponseFull: {
+        type: "object",
+        properties: {
+          collectionEnabled: { type: "boolean" },
+          template: { type: "string" },
+          total: { type: "integer" },
+          limit: { type: "integer" },
+          offset: { type: "integer" },
+          items: { type: "array", items: { oneOf: [] } }, // fill later with itemRefs
+        },
+        required: [
+          "collectionEnabled",
+          "template",
+          "total",
+          "limit",
+          "offset",
+          "items",
+        ],
+      },
     };
 
     const itemRefs = [];
@@ -699,6 +934,7 @@ function mountApiCollections(app) {
 
       const dataSchema = makeDataSchema(y);
 
+      // table override: array-of-arrays in stored JSON
       for (const f of y.fields || []) {
         if (f.type === "table" && dataSchema.properties?.[f.key]) {
           const cols = (f.options || []).map((o) => String(o.value));
@@ -757,11 +993,14 @@ function mountApiCollections(app) {
       partialPayloadRefs.push({ $ref: `#/components/schemas/${partialName}` });
     }
 
+    // plug dynamic item refs into ListResponseFull
+    schemas.ListResponseFull.properties.items.items.oneOf = itemRefs;
+
     return {
       openapi: "3.0.3",
       info: {
         title: "Formidable Collections API",
-        version: "1.3.0",
+        version: "1.5.0",
         description:
           "CRUD for collection-enabled templates. Schemas are generated from template fields. Use `include` to control list payload size.",
       },
@@ -790,70 +1029,7 @@ function mountApiCollections(app) {
             description: "Field key within the template",
           },
         },
-        schemas: {
-          ...schemas,
-          ListResponse: {
-            type: "object",
-            properties: {
-              collectionEnabled: { type: "boolean" },
-              template: { type: "string" },
-              total: { type: "integer" },
-              limit: { type: "integer" },
-              offset: { type: "integer" },
-              items: {
-                type: "array",
-                items: { $ref: "#/components/schemas/ItemSummary" },
-              },
-            },
-            required: [
-              "collectionEnabled",
-              "template",
-              "total",
-              "limit",
-              "offset",
-              "items",
-            ],
-          },
-          ListResponseFull: {
-            type: "object",
-            properties: {
-              collectionEnabled: { type: "boolean" },
-              template: { type: "string" },
-              total: { type: "integer" },
-              limit: { type: "integer" },
-              offset: { type: "integer" },
-              items: {
-                type: "array",
-                items: { oneOf: itemRefs },
-              },
-            },
-            required: [
-              "collectionEnabled",
-              "template",
-              "total",
-              "limit",
-              "offset",
-              "items",
-            ],
-          },
-          // Field-level PATCH body
-          FieldPatchBody: {
-            oneOf: [
-              {
-                type: "object",
-                additionalProperties: false,
-                required: ["value"],
-                properties: { value: {} },
-              },
-              { type: "string" },
-              { type: "number" },
-              { type: "boolean" },
-              { type: "array", items: {} },
-              { type: "object" },
-            ],
-            description: "Either `{ value: ... }` or a raw JSON value.",
-          },
-        },
+        schemas,
       },
       paths: {
         "/collections": {
@@ -862,6 +1038,27 @@ function mountApiCollections(app) {
             responses: { 200: { description: "OK" } },
           },
         },
+
+        "/collections/design/{template}": {
+          get: {
+            summary:
+              "Get template design (labels, descriptions, options, markdown)",
+            parameters: [{ $ref: "#/components/parameters/TemplateParam" }],
+            responses: {
+              200: {
+                description: "OK",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "#/components/schemas/TemplateDesign" },
+                  },
+                },
+              },
+              403: { description: "collection-disabled" },
+              404: { description: "template-not-found" },
+            },
+          },
+        },
+
         "/collections/{template}": {
           get: {
             summary: "List items (paged)",
@@ -930,6 +1127,25 @@ function mountApiCollections(app) {
             },
           },
         },
+
+        "/collections/{template}/count": {
+          get: {
+            summary: "Count items in a collection",
+            parameters: [{ $ref: "#/components/parameters/TemplateParam" }],
+            responses: {
+              200: {
+                description: "OK",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "#/components/schemas/CountResponse" },
+                  },
+                },
+              },
+              403: { description: "collection-disabled" },
+            },
+          },
+        },
+
         "/collections/{template}/{id}": {
           get: {
             summary: "Fetch single item by GUID",
@@ -1020,6 +1236,7 @@ function mountApiCollections(app) {
             },
           },
         },
+
         "/collections/{template}/{id}/field/{key}": {
           patch: {
             summary: "Update a single field by key",
@@ -1065,6 +1282,54 @@ function mountApiCollections(app) {
               403: { description: "collection-disabled" },
               404: { description: "not-found" },
               409: { description: "guid-immutable" },
+            },
+          },
+        },
+
+        "/collections/{template}/export.ndjson": {
+          get: {
+            summary: "Export entire collection as NDJSON (stream)",
+            parameters: [{ $ref: "#/components/parameters/TemplateParam" }],
+            responses: {
+              200: {
+                description: "OK",
+                headers: {
+                  "Content-Type": {
+                    schema: {
+                      type: "string",
+                      example: "application/x-ndjson; charset=utf-8",
+                    },
+                  },
+                },
+              },
+              403: { description: "collection-disabled" },
+            },
+          },
+        },
+
+        "/collections/{template}/export.csv": {
+          get: {
+            summary: "Export collection summary as CSV",
+            parameters: [{ $ref: "#/components/parameters/TemplateParam" }],
+            responses: {
+              200: {
+                description: "OK",
+                headers: {
+                  "Content-Type": {
+                    schema: {
+                      type: "string",
+                      example: "text/csv; charset=utf-8",
+                    },
+                  },
+                  "Content-Disposition": {
+                    schema: {
+                      type: "string",
+                      example: 'attachment; filename="<template>-export.csv"',
+                    },
+                  },
+                },
+              },
+              403: { description: "collection-disabled" },
             },
           },
         },

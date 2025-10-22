@@ -591,31 +591,38 @@ export function applyApiField(container, field, value) {
   if (!wrap) return;
 
   const hidden = wrap.querySelector(`input[type="hidden"][name="${key}"]`);
-  const idInput = wrap.querySelector(`input[name="${key}__id"]`);
+  const idInput  = wrap.querySelector(`input[name="${key}__id"]`);
+  const idSelect = wrap.querySelector(`select[name="${key}__id"]`);
 
+  // Normalize saved value (id + overrides object)
   const normalized =
     value && typeof value === "object"
       ? { id: String(value.id || ""), overrides: value.overrides || {} }
       : { id: String(value || ""), overrides: {} };
 
-  if (idInput) idInput.value = normalized.id;
+  // Apply id to whichever control exists
+  if (idInput)  idInput.value  = normalized.id;
+  if (idSelect) idSelect.value = normalized.id;
 
-  // apply editable overrides into their inputs
-  if (normalized.overrides && typeof normalized.overrides === "object") {
-    for (const [k, v] of Object.entries(normalized.overrides)) {
-      const el = wrap.querySelector(`input[name="${key}__map__${k}"]`);
-      if (el) el.value = String(v ?? "");
-    }
-  }
-
-  // also prefill readonly mapped inputs from the saved snapshot (value.<key>)
+  // Prefill mapped inputs:
+  // - readonly: from saved snapshot top-level (value[m.key])
+  // - editable: prefer overrides, else fall back to saved snapshot
   const mappings = Array.isArray(field.map) ? field.map : [];
-  if (value && typeof value === "object") {
-    for (const m of mappings) {
-      if (m.mode !== "editable") {
-        const el = wrap.querySelector(`input[name="${key}__map__${m.key}"]`);
-        if (el && value[m.key] != null) el.value = String(value[m.key]);
-      }
+  for (const m of mappings) {
+    if (!m || !m.key) continue;
+    const el = wrap.querySelector(`input[name="${key}__map__${m.key}"]`);
+    if (!el) continue;
+
+    const savedTopLevel = value && typeof value === "object" ? value[m.key] : undefined;
+    if (m.mode === "editable") {
+      const fromOverrides = normalized.overrides?.[m.key];
+      el.value = fromOverrides != null
+        ? String(fromOverrides)
+        : savedTopLevel != null
+        ? String(savedTopLevel)
+        : "";
+    } else {
+      if (savedTopLevel != null) el.value = String(savedTopLevel);
     }
   }
 
