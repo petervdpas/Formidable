@@ -1880,7 +1880,32 @@ export async function renderLatexField(field, value = "") {
 }
 
 // ─────────────────────────────────────────────
+// Design labels cache + fetcher (once per collection)
+const __apiDesignCache = new Map();
+
+async function getDesignLabelsFor(collection) {
+  if (!collection) return null;
+  if (__apiDesignCache.has(collection)) return __apiDesignCache.get(collection);
+
+  try {
+    const res = await EventBus.emitWithResponse("api:design", { template: collection });
+    const labels =
+      res?.ok && Array.isArray(res?.data?.fields)
+        ? Object.fromEntries(
+            res.data.fields.map(f => [String(f.key), String(f.label || f.key || "")])
+          )
+        : null;
+    __apiDesignCache.set(collection, labels);
+    return labels;
+  } catch {
+    __apiDesignCache.set(collection, null);
+    return null;
+  }
+}
+
+// ─────────────────────────────────────────────
 // Type: api (collection/id + editable overrides)
+// Shows source (API) values as placeholders for editable fields when override is empty
 export async function renderApiField(field, value = "") {
   const initial =
     typeof value === "object" && value !== null
@@ -1889,7 +1914,12 @@ export async function renderApiField(field, value = "") {
 
   const coll = (field.collection || "").trim();
   const mappings = Array.isArray(field.map) ? field.map : [];
-  const editableInputs = new Map();
+  const editableInputs = new Map();          // key -> <input>
+  const mappingByKey = new Map();            // key -> { key, path, mode, ... }
+  mappings.forEach(m => m?.key && mappingByKey.set(m.key, m));
+
+  // 🔹 fetch design labels up-front (non-fatal if it fails)
+  const designLabels = await getDesignLabelsFor(coll);
 
   // Root wrapper + hidden JSON payload
   const wrapper = addContainerElement({
@@ -1908,6 +1938,7 @@ export async function renderApiField(field, value = "") {
   let idInput = null;   // non-picker
   let idSelect = null;  // picker
   let mapGrid = null;   // label+input grid
+  let lastFetchedDoc = null; // keep the last loaded doc to drive placeholders
 
   // ───────────────────────────────────────────
   // Helpers
@@ -1915,10 +1946,32 @@ export async function renderApiField(field, value = "") {
     const overrides = {};
     for (const [k, el] of editableInputs.entries()) {
       const v = el.value.trim();
-      if (v !== "") overrides[k] = v;
+      if (v !== "") overrides[k] = v; // ignore empty overrides
     }
     const currentId = idSelect ? idSelect.value : (idInput?.value || "");
     hidden.value = JSON.stringify({ id: String(currentId).trim(), overrides });
+  }
+
+  // Compute nested value with a safe path resolver
+  function resolveByPath(obj, path) {
+    if (!path) return undefined;
+    return path
+      .split(".")
+      .filter(Boolean)
+      .reduce((o, k) => (o && typeof o === "object" ? o[k] : undefined), obj);
+  }
+
+  // Set placeholders for editable inputs from the last fetched doc
+  function updateEditablePlaceholdersFromDoc() {
+    if (!lastFetchedDoc) return;
+    for (const [k, el] of editableInputs.entries()) {
+      const m = mappingByKey.get(k);
+      if (!m) continue;
+      const raw = resolveByPath(lastFetchedDoc, m.path || "");
+      const val = raw == null ? "" : String(raw);
+      // Always refresh placeholder; only show as text when input is empty
+      el.placeholder = val || "(override…)";
+    }
   }
 
   async function doFetch() {
@@ -1934,6 +1987,7 @@ export async function renderApiField(field, value = "") {
       });
       if (!res?.ok) throw new Error(res?.error || "API error");
       const doc = res.data || {};
+      lastFetchedDoc = doc;
 
       // fill read-only mapped values from API doc
       for (const m of mappings) {
@@ -1941,10 +1995,14 @@ export async function renderApiField(field, value = "") {
         const ctl = mapGrid?.querySelector(`[name="${field.key}__map__${m.key}"]`);
         if (!ctl) continue;
         if (m.mode !== "editable") {
-          const val = m.path?.split(".").reduce((o, k) => (o ? o[k] : undefined), doc);
+          const val = resolveByPath(doc, m.path || "");
           ctl.value = val == null ? "" : String(val);
         }
       }
+
+      // refresh placeholders for editable fields (only used when empty)
+      updateEditablePlaceholdersFromDoc();
+
       status.textContent = "OK";
     } catch {
       status.textContent = "API error";
@@ -2019,6 +2077,7 @@ export async function renderApiField(field, value = "") {
                   return { value: id, label: labelForDoc(doc) };
                 })
               );
+              // ensure missing allowed ids still appear
               for (const missingId of allowedSet) {
                 if (!filtered.find((d) => String(d?.id ?? d?._id ?? "") === missingId)) {
                   opts.push({ value: missingId, label: missingId });
@@ -2095,24 +2154,42 @@ export async function renderApiField(field, value = "") {
   wrapper.appendChild(topRow);
 
   // ───────────────────────────────────────────
-  // Input-only grid for mapped fields
-  const items = mappings.map((m) => ({
-    label: m.key || m.path || "",
-    forId: `${field.key}__map__${m.key}`,
-    control: () => {
-      const inp = document.createElement("input");
-      inp.type = "text";
-      inp.id = `${field.key}__map__${m.key}`;
-      inp.name = `${field.key}__map__${m.key}`;
-      inp.placeholder = m.mode === "editable" ? "(override…)" : "(from API)";
-      if (m.mode !== "editable") inp.readOnly = true;
-      if (m.mode === "editable" && initial.overrides?.[m.key] != null) {
-        inp.value = String(initial.overrides[m.key]);
-      }
-      if (m.mode === "editable") editableInputs.set(m.key, inp);
-      return inp;
-    },
-  }));
+  // Input-only grid for mapped fields (use real labels when available)
+  const items = mappings.map((m) => {
+    const niceLabel =
+      m.label ||                                   // explicit per-mapping label (optional)
+      (designLabels && designLabels[m.key]) ||     // real label from design
+      m.key || m.path || "";                       // fallback
+
+    return {
+      label: niceLabel,
+      forId: `${field.key}__map__${m.key}`,
+      control: () => {
+        const inp = document.createElement("input");
+        inp.type = "text";
+        inp.id = `${field.key}__map__${m.key}`;
+        inp.name = `${field.key}__map__${m.key}`;
+        inp.placeholder = "(override…)"; // will be replaced with source value after fetch
+        if (m.mode !== "editable") inp.readOnly = true;
+        if (m.mode === "editable" && initial.overrides?.[m.key] != null) {
+          inp.value = String(initial.overrides[m.key]);
+        }
+        if (m.mode === "editable") {
+          editableInputs.set(m.key, inp);
+          // when user clears the input, show source value as placeholder again
+          inp.addEventListener("input", () => {
+            if (inp.value === "") {
+              // repopulate placeholder from doc if we have it
+              const val = resolveByPath(lastFetchedDoc || {}, m.path || "");
+              inp.placeholder = val ? String(val) : "(override…)";
+            }
+            updateHidden();
+          });
+        }
+        return inp;
+      },
+    };
+  });
 
   mapGrid = buildInputFieldsGrid({
     items,
@@ -2131,9 +2208,18 @@ export async function renderApiField(field, value = "") {
       if (field.use_picker) doFetch();
     });
   }
-  for (const [, el] of editableInputs) el.addEventListener("input", updateHidden);
+  for (const [, el] of editableInputs) {
+    // already has an input listener above; keep this as a safety
+    el.addEventListener("change", updateHidden);
+  }
 
   updateHidden();
+
+  // If an initial id exists, fetch once so placeholders for editable fields are filled
+  if (coll && (initial.id || field.use_picker)) {
+    // don't block rendering; kickoff and let it paint
+    setTimeout(() => { doFetch(); }, 0);
+  }
 
   applyFieldContextAttributes(wrapper, {
     key: field.key,
@@ -2149,6 +2235,4 @@ export async function renderApiField(field, value = "") {
     field.wrapper || "form-row"
   );
 }
-
-
 

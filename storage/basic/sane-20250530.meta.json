@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-10-21T00:15:09.039Z",
+    "updated": "2025-10-22T22:38:59.291Z",
     "flagged": true,
     "tags": [
       "bye",
@@ -67,7 +67,7 @@
     "testapi": {
       "id": "10b8c641-8774-409c-8cec-0c944920b313",
       "name": "Tesla",
-      "street-address": "Somewhere else"
+      "street-address": "Tesla Road"
     }
   }
 }

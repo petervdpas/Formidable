@@ -75,3 +75,18 @@ export async function handleApiList({
     return { ok: false, error: String(e?.message || e) };
   }
 }
+
+// GET /api/collections/design/:template
+export async function handleApiDesign({ template }) {
+  const collection = template || undefined;
+  if (!collection) return { ok: false, error: "missing template" };
+  try {
+    const client = await getClient();
+    const json = await client.get(
+      `/api/collections/design/${encodeURIComponent(collection)}`
+    );
+    return { ok: true, data: json || {} };
+  } catch (e) {
+    return { ok: false, error: String(e?.message || e) };
+  }
+}

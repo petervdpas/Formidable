@@ -68,8 +68,10 @@ export function initEventRouter() {
   // Collections API events
   EventBus.off("api:get", apiHandler.handleApiGet);
   EventBus.off("api:list", apiHandler.handleApiList);
+  EventBus.off("api:design", apiHandler.handleApiDesign); 
   EventBus.on("api:get", apiHandler.handleApiGet);
   EventBus.on("api:list", apiHandler.handleApiList);
+  EventBus.on("api:design", apiHandler.handleApiDesign);
 
   // Task scheduler events
   EventBus.off("tasks:register", tasksHandler.handleTasksRegister);
