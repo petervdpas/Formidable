@@ -19,6 +19,7 @@ import {
   applyFieldContextAttributes,
   generateGuid,
 } from "./domUtils.js";
+import { createButton } from "./buttonUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 import { createRemoveImageButton } from "../modules/uiButtons.js";
 import { createIconButton } from "./buttonUtils.js";
@@ -1975,22 +1976,22 @@ export async function renderApiField(field, value = "") {
       const raw = resolveByPath(lastFetchedDoc, m.path || "");
       const val = raw == null ? "" : String(raw);
       // Always refresh placeholder; only show as text when input is empty
-      el.placeholder = val || "(override…)";
+      el.placeholder = val || t("field.api.override.placeholder", "(override…)");
     }
   }
 
   async function doFetch() {
     const currentId = idSelect ? idSelect.value : idInput?.value || "";
     if (!coll) {
-      status.textContent = "No collection";
+      status.textContent = t("field.api.status.nocollection", "No collection");
       return;
     }
     if (!currentId) {
-      status.textContent = "Enter id";
+      status.textContent = t("field.api.status.enterid", "Enter id");
       return;
     }
 
-    status.textContent = "Loading…";
+    status.textContent = t("field.api.status.loading", "Loading…");
     try {
       const res = await EventBus.emitWithResponse("api:get", {
         collection: coll,
@@ -2016,9 +2017,9 @@ export async function renderApiField(field, value = "") {
       // refresh placeholders for editable fields (only used when empty)
       updateEditablePlaceholdersFromDoc();
 
-      status.textContent = "OK";
+      status.textContent = t("field.api.status.ok", "OK");
     } catch {
-      status.textContent = "API error";
+      status.textContent = t("field.api.status.error", "API error");
     }
   }
 
@@ -2031,11 +2032,20 @@ export async function renderApiField(field, value = "") {
 
   // ───────────────────────────────────────────
   // Top row (single line): [Label] [control] [Load] [status]
-  const fetchBtn = document.createElement("button");
-  fetchBtn.type = "button";
-  fetchBtn.textContent = field.use_picker ? "Load" : "Fetch";
-  fetchBtn.className = "btn btn-info btn-input-height";
-  fetchBtn.addEventListener("click", doFetch);
+  const fetchBtn = createButton({
+    text: t(
+      field.use_picker ? "button.api.load" : "button.api.fetch",
+      field.use_picker ? "Load" : "Fetch"
+    ),
+    i18nKey: field.use_picker ? "button.api.load" : "button.api.fetch",
+    className: "btn-info btn-input-height",
+    identifier: `api-fetch-${field.key}`,
+    onClick: doFetch,
+    ariaLabel: t(
+      field.use_picker ? "button.api.load" : "button.api.fetch",
+      field.use_picker ? "Load" : "Fetch"
+    ),
+  });
 
   const status = document.createElement("span");
   status.className = "api-status muted";
@@ -2048,7 +2058,7 @@ export async function renderApiField(field, value = "") {
         containerEl: host,
         labelTextOrKey: "",
         selectedValue: initial.id || "",
-        options: [{ value: "", label: "-- select --" }],
+        options: [{ value: "", label: t("field.api.picker.placeholder", "-- select --") }],
         i18nEnabled: false,
         onChange: () => {
           updateHidden();
@@ -2065,7 +2075,7 @@ export async function renderApiField(field, value = "") {
 
       // populate picker
       (async function populatePicker() {
-        let opts = [{ value: "", label: "-- select --" }];
+        let opts = [{ value: "", label: t("field.api.picker.placeholder", "-- select --") }];
 
         if (Array.isArray(field.allowed_ids) && field.allowed_ids.length > 0) {
           if (coll) {
@@ -2153,7 +2163,7 @@ export async function renderApiField(field, value = "") {
     // non-picker: clearable text input
     const clear = createClearableInput({
       id: `${field.key}__id`,
-      placeholder: "record id",
+      placeholder: t("field.api.id.placeholder", "record id"),
       value: initial.id || "",
       size: "md",
       onInput: updateHidden,
@@ -2167,7 +2177,7 @@ export async function renderApiField(field, value = "") {
   };
 
   const topRow = buildLabeledControl({
-    labelTextOrKey: field.id_label || "Record",
+    labelTextOrKey: field.id_label || t("field.api.picker.item", "Record"),
     control: controlFactory,
     actions: [fetchBtn, status],
     layout: "inline",
@@ -2197,7 +2207,7 @@ export async function renderApiField(field, value = "") {
         inp.type = "text";
         inp.id = `${field.key}__map__${m.key}`;
         inp.name = `${field.key}__map__${m.key}`;
-        inp.placeholder = "(override…)"; // will be replaced with source value after fetch
+        inp.placeholder = t("field.api.map.placeholder", "(override…)"); // will be replaced with source value after fetch
         if (m.mode !== "editable") inp.readOnly = true;
         if (m.mode === "editable" && initial.overrides?.[m.key] != null) {
           inp.value = String(initial.overrides[m.key]);
@@ -2209,7 +2219,9 @@ export async function renderApiField(field, value = "") {
             if (inp.value === "") {
               // repopulate placeholder from doc if we have it
               const val = resolveByPath(lastFetchedDoc || {}, m.path || "");
-              inp.placeholder = val ? String(val) : "(override…)";
+              inp.placeholder = val
+                ? String(val)
+                : t("field.api.override.placeholder", "(override…)");
             }
             updateHidden();
           });
@@ -2222,7 +2234,7 @@ export async function renderApiField(field, value = "") {
   mapGrid = buildInputFieldsGrid({
     items,
     className: "api-map-grid",
-    labelCol: "var(--label-width, max(160px, 22ch))",
+    labelCol: "var(--ifg-label-width, max(160px, 22ch))",
     gap: "6px 10px",
   });
   wrapper.appendChild(mapGrid);

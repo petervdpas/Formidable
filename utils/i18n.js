@@ -128,6 +128,7 @@ export function translateDOM(root = document.body) {
     if (value) el.setAttribute("value", value);
   }
 }
+
 /**
  * Return a list of available languages with translated labels
  */

@@ -495,6 +495,10 @@ export default {
   "button.git.checkout": "Uitchecken",
   "button.git.create": "Aanmaken",
 
+  "button.api.load": "Laden",
+  "button.api.fetch": "Ophalen",
+  "button.api.clear": "Wissen",
+
   // ── ARIA Labels ───────────────────────────
   "aria.git.push": "Push naar remote",
   "aria.git.pull": "Pull van remote",
@@ -586,26 +590,26 @@ export default {
 
   "field.api.collection": "Verzameling",
   "field.api.collection.placeholder": "bijv. adressen",
-  "field.api.collection.title": "Naam van de verzameling om uit te lezen",
   "field.api.usePicker": "Gebruik Record Picker",
-  "field.api.usePicker.hint": "Toon een dropdown van records uit de verzameling",
+  "field.api.usePicker.hint":
+    "Toon een dropdown van records uit de verzameling",
   "field.api.usePicker.title": "Schakel record picker in",
   "field.api.id": "Record ID",
   "field.api.id.placeholder": "Document id (optionele standaard)",
-  "field.api.id.title": "Standaard record id wanneer geen selectie is gemaakt",
   "field.api.allowed": "Toegestane ID's",
   "field.api.allowed.hint": "Komma-gescheiden of JSON-array van ID's",
   "field.api.allowed.placeholder": 'id1,id2 of ["id1","id2"]',
-  "field.api.allowed.title": "Beperk selecteerbare records tot deze ID's",
   "field.api.map": "Veldmap",
   "field.api.map.hint": '[{ key, path, mode: "static"|"editable" }]',
   "field.api.map.placeholder": '[{"key":"name","path":"name","mode":"static"}]',
-  "field.api.map.title": "Map API-velden naar formulier velden",
   "field.api.picker.placeholder": "Selecteer een record…",
-  "field.api.picker.title": "Kies een record uit de collectie",
   "field.api.picker.item": "Record",
-  "field.api.help":
-    "Bind formulier velden aan een API-collectie, optioneel met een record picker.",
+  "field.api.status.nocollection": "Geen verzameling",
+  "field.api.status.enterid": "Voer ID (guid) in",
+  "field.api.status.loading": "Laden…",
+  "field.api.status.ok": "OK",
+  "field.api.status.error": "API-fout",
+  "field.api.override.placeholder": "(overschrijven met huidige waarde)",
 
   // ── Modals ───────────────────
 
