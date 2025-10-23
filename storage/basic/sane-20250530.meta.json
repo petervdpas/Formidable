@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-10-22T22:38:59.291Z",
+    "updated": "2025-10-23T00:34:53.978Z",
     "flagged": true,
     "tags": [
       "bye",
@@ -65,9 +65,9 @@
       "shortFile": "sane-20250530.meta.…"
     },
     "testapi": {
-      "id": "10b8c641-8774-409c-8cec-0c944920b313",
-      "name": "Tesla",
-      "street-address": "Tesla Road"
+      "id": "c34c4d20-f47d-4ec5-bde5-8085a92f77f0",
+      "name": "Googleplex",
+      "street-address": "Amphitheatre Parkway"
     }
   }
 }
