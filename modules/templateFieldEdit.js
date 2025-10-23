@@ -20,6 +20,7 @@ import {
   getSupportedOptionTypes,
   setupOptionsEditor,
 } from "../utils/optionsEditor.js";
+import { setupApiMapEditor } from "../utils/apiMapEditor.js";
 import {
   createInlineCodeMirror,
   destroyInlineCodeMirror,
@@ -68,12 +69,12 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
   let labelLocked = false;
   let optionsEditor = null;
+  let apiMapEditor = null;
   let originalKey = "";
   let confirmBtn = null;
 
   function initializeOptionsEditor(fieldType, fieldOptions = null) {
     if (optionsEditor?.destroy) optionsEditor.destroy();
-
     dom.options.value = "";
     optionsEditor = setupOptionsEditor({
       type: fieldType,
@@ -82,6 +83,38 @@ function setupFieldEditor(container, onChange, allFields = []) {
         containerRow: dom.options?.closest(".modal-form-row"),
       },
       initialOptions: fieldOptions,
+    });
+  }
+
+  function initializeApiMapEditor(fieldMapArray = []) {
+    if (apiMapEditor?.destroy) apiMapEditor.destroy();
+
+    const row = dom.apiMap?.closest(".modal-form-row");
+    if (!dom.apiMap || !row) return;
+
+    apiMapEditor = setupApiMapEditor({
+      dom: { textarea: dom.apiMap, containerRow: row },
+      initialMap: fieldMapArray,
+      onDirty: (rows) => {
+        // 1) re-run validation (to enable / disable Confirm button)
+        validate();
+
+        // 2) visual duplicate marker
+        const seen = new Map();
+        rows.forEach((r, i) => {
+          const k = String(r?.key || "")
+            .trim()
+            .toLowerCase();
+          if (!k) return;
+          if (!seen.has(k)) seen.set(k, []);
+          seen.get(k).push(i);
+        });
+        const dupIdx = [...seen.values()].filter((a) => a.length > 1).flat();
+        const rowEls = row.querySelectorAll(".api-map-row");
+        rowEls.forEach((el, idx) => {
+          el.classList.toggle("input-error", dupIdx.includes(idx));
+        });
+      },
     });
   }
 
@@ -246,6 +279,14 @@ function setupFieldEditor(container, onChange, allFields = []) {
               ? field.api_pick.join(", ")
               : "");
         }
+
+        if (currentType === "api") {
+          initializeApiMapEditor(parseApiMap(dom.apiMap?.value));
+        } else if (apiMapEditor?.destroy) {
+          apiMapEditor.destroy();
+          apiMapEditor = null;
+        }
+
         validate();
       };
     }
@@ -263,6 +304,8 @@ function setupFieldEditor(container, onChange, allFields = []) {
       dom.apiId && (dom.apiId.value = field.id || "");
       dom.apiMap &&
         (dom.apiMap.value = JSON.stringify(field.map || [], null, 0));
+
+      initializeApiMapEditor(field.map || []);
 
       if (dom.apiUsePicker) {
         dom.apiUsePicker.checked = !!(
@@ -353,7 +396,9 @@ function setupFieldEditor(container, onChange, allFields = []) {
       field.collection = dom.apiCollection?.value?.trim() || "";
       const id = dom.apiId?.value?.trim() || "";
       if (id) field.id = id;
-      field.map = parseApiMap(dom.apiMap?.value);
+      field.map = apiMapEditor?.getValues
+        ? apiMapEditor.getValues()
+        : parseApiMap(dom.apiMap?.value);
       field.use_picker = !!dom.apiUsePicker?.checked;
       field.allowed_ids = parseAllowedIds(dom.apiAllowedIds?.value);
     }
@@ -414,6 +459,10 @@ function setupFieldEditor(container, onChange, allFields = []) {
     if (dom.__codeEditor) {
       destroyInlineCodeMirror(dom.__codeEditor);
       dom.__codeEditor = null;
+    }
+    if (apiMapEditor?.destroy) {
+      apiMapEditor.destroy();
+      apiMapEditor = null;
     }
   }
 

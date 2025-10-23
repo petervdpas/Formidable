@@ -1,0 +1,84 @@
+/* ───── API Field Map Editor ───── */
+.api-map-editor {
+  max-height: 140px;
+  overflow-y: auto;
+  padding: 6px;
+  margin: 2px 0;
+  border: 1px solid var(--input-border-color);
+  border-radius: 4px;
+  background-color: var(--input-bg);
+  color: var(--input-fg);
+  width: 100%;
+  box-sizing: border-box;
+  display: grid;
+  gap: 6px;
+}
+
+/* header row */
+.api-map-head {
+  display: grid;
+  grid-template-columns: 1.2fr 1.6fr 0.9fr auto;
+  gap: 6px;
+  align-items: center;
+  font-size: 0.9em;
+  color: var(--readonly-fg);
+}
+
+/* rows container */
+.api-map-list { display: grid; gap: 6px; }
+
+/* single row */
+.api-map-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1.6fr 0.9fr auto;
+  gap: 6px;
+  align-items: center;
+}
+
+/* inputs/selects */
+.api-map-row input,
+.api-map-row select {
+  background-color: var(--input-bg);
+  color: var(--input-fg);
+  border: 1px solid var(--input-border-color);
+  padding: 4px 8px;
+  height: 32px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  width: 100%;
+}
+
+/* remove button */
+.api-map-remove {
+  background-color: transparent;
+  color: var(--input-fg);
+  border: 1px solid var(--input-border-color);
+  cursor: pointer;
+  padding: 0 10px;
+  height: 32px;
+  line-height: 1;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+.api-map-remove:hover { background-color: var(--input-border-color); }
+
+/* add button */
+.api-map-add {
+  margin-top: 2px;
+  padding: 4px 10px;
+  background-color: transparent;
+  color: var(--input-fg);
+  border: 1px solid var(--input-border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  align-self: flex-start;
+}
+.api-map-add:hover { background-color: var(--input-border-color); }
+
+/* keep consistent width inside modal rows */
+.modal-form-row .api-map-editor { width: 100%; }
+
+/* optional column hooks (already used by JS) */
+.api-map-head .col-actions,
+.api-map-row  .col-actions { display: flex; justify-content: flex-end; }
