@@ -47,6 +47,7 @@ $ImagesPath = $ImagesPath -replace '\\', '/'
 
 # Lua filter path
 $luaFilterPath = Join-Path -Path $scriptDir -ChildPath "meta-check.lua"
+$captionNoneFixPath = Join-Path -Path $scriptDir -ChildPath "caption-none-fix.tex"
 
 if (-not (Get-Command "pandoc" -ErrorAction SilentlyContinue)) {
     Write-Error "Pandoc is not installed or not in the PATH."
@@ -75,8 +76,9 @@ foreach ($MarkdownFile in $MarkdownFiles) {
             $MarkdownFile.FullName,
             '-o', $PdfPath,
             '--template', $TemplatePath,
-            '--listing',
-            "--resource-path=$resourcePaths"
+            '--syntax-highlighting=idiomatic',
+            "--resource-path=$resourcePaths",
+            '--include-in-header', $captionNoneFixPath
         )
 
         if ($UseCurrentDate) {
