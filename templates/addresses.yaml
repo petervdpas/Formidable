@@ -7,6 +7,14 @@ markdown_template: |-
   {{field "unit-number"}} {{field "street-address"}} <br />
   {{field "city"}} {{field "state-abbreviation"}} {{field "postal"}} <br />
   {{field "country"}} <br />
+
+  {{#with (fieldMeta "owners" "options") as |headers|}}
+  |{{#each headers}}{{label}}{{^label}}{{value}}{{/label}} |{{/each}}
+  |{{#each headers}}--|{{/each}}
+  {{/with}}
+  {{#each (fieldRaw "owners")}}
+  |{{#each this}}{{this}} |{{/each}}
+  {{/each}}
 sidebar_expression: >-
   [ F["unit-number"] + " " + F["street-address"] | { text: F["unit-number"] + "
   " + F["street-address"], classes: ["expr-text-blue", "expr-bold"] } ]
@@ -81,3 +89,15 @@ fields:
     two_column: true
     default: ''
     options: *ref_0
+  - key: owners
+    type: table
+    label: Owners
+    description: Give the owners for this address
+    expression_item: false
+    two_column: false
+    default: ''
+    options:
+      - value: firstname
+        label: Firstname
+      - value: lastname
+        label: Lastname

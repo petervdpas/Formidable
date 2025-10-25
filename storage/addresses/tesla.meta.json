@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
     "created": "2025-10-20T04:43:36.088Z",
-    "updated": "2025-10-20T04:43:36.087Z",
+    "updated": "2025-10-24T21:46:20.367Z",
     "flagged": false,
     "tags": []
   },
@@ -17,6 +17,12 @@
     "street-address": "Tesla Road",
     "city": "Austin",
     "state-abbreviation": "TX",
-    "postal": "78725"
+    "postal": "78725",
+    "owners": [
+      [
+        "Elon",
+        "Musk"
+      ]
+    ]
   }
 }

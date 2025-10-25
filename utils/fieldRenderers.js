@@ -2,12 +2,10 @@
 
 import { EventBus } from "../modules/eventBus.js";
 import { ensureVirtualLocation } from "./vfsUtils.js";
+import { resolveValue, createFieldDOM } from "./fieldFactory.js";
 import {
   wrapInputWithLabel,
-  buildSwitchElement,
   addContainerElement,
-  createFilePicker,
-  createDirectoryPicker,
   createClearableInput,
   buildLabeledControl,
   buildInputFieldsGrid,
@@ -20,27 +18,9 @@ import {
   generateGuid,
 } from "./domUtils.js";
 import { createButton } from "./buttonUtils.js";
-import { showOptionPopup } from "./popupUtils.js";
 import { createRemoveImageButton } from "../modules/uiButtons.js";
-import { createIconButton } from "./buttonUtils.js";
-import { getCurrentTheme } from "./themeUtils.js";
 import { t } from "./i18n.js";
 import { Toast } from "./toastUtils.js";
-
-function resolveOption(opt) {
-  return typeof opt === "string"
-    ? { value: opt, label: opt }
-    : { value: opt.value, label: opt.label ?? opt.value };
-}
-
-function resolveValue(field, value) {
-  return value !== undefined && value !== null ? value : field.default ?? "";
-}
-
-function isReadonly(field) {
-  const r = field?.readonly;
-  return typeof r === "string" ? r.trim().toLowerCase() === "true" : r === true;
-}
 
 // ─────────────────────────────────────────────
 // Type: guid
@@ -138,22 +118,12 @@ export async function renderLoopstopField(field, value = "") {
 // ─────────────────────────────────────────────
 // Type: text
 export async function renderTextField(field, value = "") {
-  const v = resolveValue(field, value);
-  const input = document.createElement("input");
-  input.type = "text";
-  input.name = field.key;
-  input.value = v;
-
-  if (isReadonly(field)) {
-    input.readOnly = true;
-  }
-
+  const input = createFieldDOM({ ...field, type: field.type }, value);
   applyFieldContextAttributes(input, {
     key: field.key,
     type: field.type,
     loopKey: field.loopKey || null,
   });
-
   return wrapInputWithLabel(
     input,
     field.label,
@@ -166,33 +136,12 @@ export async function renderTextField(field, value = "") {
 // ─────────────────────────────────────────────
 // Type: boolean
 export async function renderBooleanField(field, value = "") {
-  let trailingValues = ["On", "Off"];
-
-  if (Array.isArray(field.options) && field.options.length >= 2) {
-    const first = resolveOption(field.options[0]);
-    const second = resolveOption(field.options[1]);
-    trailingValues = [first.label, second.label];
-  }
-
-  const v = resolveValue(field, value);
-  const normalized = String(v).trim().toLowerCase();
-  const isChecked = normalized === "true" || normalized === "1";
-  const onFlip = typeof field.onFlip === "function" ? field.onFlip : null;
-
-  const { element: toggle } = buildSwitchElement({
-    id: field.key,
-    name: field.key,
-    checked: isChecked,
-    onFlip: onFlip,
-    trailingValues,
-  });
-
+  const toggle = createFieldDOM({ ...field, type: field.type }, value);
   applyFieldContextAttributes(toggle, {
     key: field.key,
     type: field.type,
     loopKey: field.loopKey || null,
   });
-
   return wrapInputWithLabel(
     toggle,
     field.label,
@@ -205,24 +154,12 @@ export async function renderBooleanField(field, value = "") {
 // ─────────────────────────────────────────────
 // Type: dropdown
 export async function renderDropdownField(field, value = "") {
-  const v = resolveValue(field, value);
-  const select = document.createElement("select");
-  (field.options || []).forEach((opt) => {
-    const { value, label } = resolveOption(opt);
-    const option = document.createElement("option");
-    option.value = value;
-    option.textContent = label;
-    select.appendChild(option);
-  });
-  select.name = field.key;
-  select.value = v;
-
+  const select = createFieldDOM({ ...field, type: field.type }, value);
   applyFieldContextAttributes(select, {
     key: field.key,
     type: field.type,
     loopKey: field.loopKey || null,
   });
-
   return wrapInputWithLabel(
     select,
     field.label,
@@ -235,42 +172,12 @@ export async function renderDropdownField(field, value = "") {
 // ─────────────────────────────────────────────
 // Type: multioption
 export async function renderMultioptionField(field, value = "") {
-  const v = resolveValue(field, value);
-  const selected = Array.isArray(v) ? v : [];
-
-  const wrapper = document.createElement("div");
-  wrapper.dataset.multioptionField = field.key;
-
-  (field.options || []).forEach((opt) => {
-    const { value, label } = resolveOption(opt);
-
-    const labelEl = addContainerElement({ parent: wrapper, tag: "label" });
-    labelEl.style.display = "block";
-
-    addContainerElement({
-      parent: labelEl,
-      tag: "input",
-      attributes: {
-        type: "checkbox",
-        name: field.key,
-        value: value,
-      },
-      callback: (el) => {
-        if (selected.includes(value)) {
-          el.checked = true;
-        }
-      },
-    });
-
-    labelEl.appendChild(document.createTextNode(" " + label));
-  });
-
+  const wrapper = createFieldDOM({ ...field, type: field.type }, value);
   applyFieldContextAttributes(wrapper, {
     key: field.key,
     type: field.type,
     loopKey: field.loopKey || null,
   });
-
   return wrapInputWithLabel(
     wrapper,
     field.label,
@@ -283,40 +190,12 @@ export async function renderMultioptionField(field, value = "") {
 // ─────────────────────────────────────────────
 // Type: radio
 export async function renderRadioField(field, value = "") {
-  const v = resolveValue(field, value);
-  const wrapper = document.createElement("div");
-  wrapper.dataset.radioGroup = field.key;
-
-  (field.options || []).forEach((opt) => {
-    const { value, label } = resolveOption(opt);
-
-    const labelEl = addContainerElement({ parent: wrapper, tag: "label" });
-    labelEl.style.display = "block";
-
-    addContainerElement({
-      parent: labelEl,
-      tag: "input",
-      attributes: {
-        type: "radio",
-        name: field.key,
-        value: value,
-      },
-      callback: (el) => {
-        if (String(v) === String(value)) {
-          el.checked = true;
-        }
-      },
-    });
-
-    labelEl.appendChild(document.createTextNode(" " + label));
-  });
-
+  const wrapper = createFieldDOM({ ...field, type: field.type }, value);
   applyFieldContextAttributes(wrapper, {
     key: field.key,
     type: field.type,
     loopKey: field.loopKey || null,
   });
-
   return wrapInputWithLabel(
     wrapper,
     field.label,
@@ -329,151 +208,12 @@ export async function renderRadioField(field, value = "") {
 // ─────────────────────────────────────────────
 // Type: textarea
 export async function renderTextareaField(field, value = "") {
-  const v = resolveValue(field, value);
-  const wrapper = document.createElement("div");
-  wrapper.className = "markdown-editor-wrapper"; // ok for both modes
-
-  const textarea = addContainerElement({
-    parent: wrapper,
-    tag: "textarea",
-    attributes: { name: field.key },
-  });
-
-  // Prevent HTML interpretation
-  // textarea.textContent = v;
-  textarea.value = v;
-
-  applyFieldContextAttributes(textarea, {
+  const wrapper = createFieldDOM({ ...field, type: field.type }, value);
+  applyFieldContextAttributes(wrapper.querySelector("textarea"), {
     key: field.key,
     type: field.type,
     loopKey: field.loopKey || null,
   });
-
-  // Plain mode: no EasyMDE, but keep counters + auto-grow
-  if (field.format === "plain" || typeof window.EasyMDE !== "function") {
-    // Status bar (lines / words / characters / keystrokes)
-    const status = document.createElement("div");
-    status.className = "textarea-statusbar";
-    status.innerHTML = `
-      <span class="lines">lines: 0</span>
-      <span class="words">words: 0</span>
-      <span class="characters">characters: 0</span>
-      <span class="keystrokes">0 Keystrokes</span>
-    `;
-    wrapper.appendChild(status);
-
-    let keystrokes = 0;
-
-    function updateStatus() {
-      const text = textarea.value || "";
-      const lines = text.split(/\r\n|\r|\n/).length;
-      const words = (text.trim().match(/\S+/g) || []).length;
-      const chars = text.length;
-      status.querySelector(".lines").textContent = `lines: ${lines}`;
-      status.querySelector(".words").textContent = `words: ${words}`;
-      status.querySelector(".characters").textContent = `characters: ${chars}`;
-      status.querySelector(
-        ".keystrokes"
-      ).textContent = `${keystrokes} Keystrokes`;
-    }
-
-    textarea.addEventListener("keydown", () => {
-      keystrokes++;
-    });
-    textarea.addEventListener("input", () => {
-      // keep the <textarea>’s .value as source of truth
-      updateStatus();
-      // optional: auto-grow
-      textarea.style.height = "auto";
-      textarea.style.height = Math.min(textarea.scrollHeight, 600) + "px";
-    });
-
-    // initial layout
-    requestAnimationFrame(() => {
-      textarea.style.minHeight = "80px";
-      textarea.style.height = "auto";
-      textarea.style.height = Math.min(textarea.scrollHeight, 600) + "px";
-      updateStatus();
-    });
-
-    return wrapInputWithLabel(
-      wrapper,
-      field.label,
-      field.description,
-      field.two_column,
-      field.wrapper || "form-row"
-    );
-  }
-
-  // Markdown mode (EasyMDE)
-  requestAnimationFrame(() => {
-    let keystrokeCount = 0;
-    let editorInstance = new EasyMDE({
-      element: textarea,
-      minHeight: "80px",
-      theme: getCurrentTheme() === "dark" ? "monokai" : "eclipse",
-      toolbar: [
-        "bold",
-        "italic",
-        "strikethrough",
-        "|",
-        "quote",
-        "unordered-list",
-        "ordered-list",
-        "|",
-        "horizontal-rule",
-        "code",
-      ],
-      status: [
-        "lines",
-        "words",
-        {
-          className: "characters",
-          defaultValue(el) {
-            el.innerHTML = "characters: 0";
-          },
-          onUpdate(el) {
-            const text = editorInstance?.value?.() || "";
-            el.innerHTML = `characters: ${text.length}`;
-          },
-        },
-        {
-          className: "keystrokes",
-          defaultValue(el) {
-            el.innerHTML = "0 Keystrokes";
-          },
-          onUpdate(el) {
-            el.innerHTML = `${keystrokeCount} Keystrokes`;
-          },
-        },
-      ],
-      spellChecker: false,
-      autoDownloadFontAwesome: false,
-    });
-
-    // Make the instance discoverable for the applier
-    textarea.__mde = editorInstance;
-
-    const cm = editorInstance.codemirror;
-    cm.on("keydown", () => {
-      keystrokeCount++;
-    });
-    cm.on("change", () => {
-      textarea.value = editorInstance.value();
-      editorInstance.updateStatusBar();
-    });
-
-    // Initial value already in textarea.value; ensure CM sees correct layout
-    setTimeout(() => cm.refresh(), 0);
-
-    // Optional: refresh when wrapper becomes visible (tabs/accordions)
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries)
-        if (e.isIntersecting) setTimeout(() => cm.refresh(), 0);
-    });
-    io.observe(wrapper);
-  });
-
   return wrapInputWithLabel(
     wrapper,
     field.label,
@@ -486,18 +226,12 @@ export async function renderTextareaField(field, value = "") {
 // ─────────────────────────────────────────────
 // Type: number
 export async function renderNumberField(field, value = "") {
-  const v = resolveValue(field, value);
-  const input = document.createElement("input");
-  input.type = "number";
-  input.name = field.key;
-  input.value = v;
-
+  const input = createFieldDOM({ ...field, type: field.type }, value);
   applyFieldContextAttributes(input, {
     key: field.key,
     type: field.type,
     loopKey: field.loopKey || null,
   });
-
   return wrapInputWithLabel(
     input,
     field.label,
@@ -510,57 +244,12 @@ export async function renderNumberField(field, value = "") {
 // ─────────────────────────────────────────────
 // Type: range
 export async function renderRangeField(field, value = "") {
-  const v = resolveValue(field, value);
-
-  const optMap = Object.fromEntries(
-    (field.options || []).map((pair) =>
-      Array.isArray(pair)
-        ? [pair[0], pair[1]]
-        : [pair.value ?? pair, pair.label ?? pair]
-    )
-  );
-
-  const min = parseFloat(optMap.min ?? field.min ?? 0);
-  const max = parseFloat(optMap.max ?? field.max ?? 100);
-  const step = parseFloat(optMap.step ?? field.step ?? 1);
-  const resolved = v !== "" ? v : (min + max) / 2;
-
-  const wrapper = document.createElement("div");
-  wrapper.dataset.rangeField = field.key;
-
-  const input = addContainerElement({
-    parent: wrapper,
-    tag: "input",
-    attributes: {
-      type: "range",
-      name: field.key,
-      min: min,
-      max: max,
-      step: step,
-    },
-    callback: (el) => {
-      el.value = resolved;
-    },
-  });
-
-  const display = addContainerElement({
-    parent: wrapper,
-    tag: "span",
-    className: "range-display",
-    textContent: resolved,
-    attributes: { style: "margin-left: 10px;" },
-  });
-
-  input.addEventListener("input", () => {
-    display.textContent = input.value;
-  });
-
+  const wrapper = createFieldDOM({ ...field, type: field.type }, value);
   applyFieldContextAttributes(wrapper, {
     key: field.key,
     type: field.type,
     loopKey: field.loopKey || null,
   });
-
   return wrapInputWithLabel(
     wrapper,
     field.label,
@@ -573,18 +262,12 @@ export async function renderRangeField(field, value = "") {
 // ─────────────────────────────────────────────
 // Type: date
 export async function renderDateField(field, value = "") {
-  const v = resolveValue(field, value);
-  const input = document.createElement("input");
-  input.type = "date";
-  input.name = field.key;
-  input.value = v;
-
+  const input = createFieldDOM({ ...field, type: field.type }, value);
   applyFieldContextAttributes(input, {
     key: field.key,
     type: field.type,
     loopKey: field.loopKey || null,
   });
-
   return wrapInputWithLabel(
     input,
     field.label,
@@ -597,58 +280,12 @@ export async function renderDateField(field, value = "") {
 // ─────────────────────────────────────────────
 // Type: list (dynamic add/remove)
 export async function renderListField(field, value = "") {
-  const v = resolveValue(field, value);
-  const items = Array.isArray(v) ? v : [];
-
-  const wrapper = document.createElement("div");
-  wrapper.dataset.type = "list";
-  wrapper.dataset.listField = field.key;
-
-  wrapper.classList.add("inner-dnd");
-  // Build a unique scope: list:<fieldKey>:<loopChain>:<uid>
-  const loopChain = Array.isArray(field.loopKey)
-    ? field.loopKey.join(".")
-    : field.loopKey || "root";
-  const scope = `list:${field.key}:${loopChain}:${crypto
-    .randomUUID()
-    .slice(0, 8)}`;
-  wrapper.dataset.dndScope = scope;
-
-  // Add sortable container inside wrapper
-  const sortableList = document.createElement("div");
-  sortableList.className = "sortable-list";
-  sortableList.dataset.dndScope = scope;
-  wrapper.appendChild(sortableList);
-
-  for (const item of items) {
-    const row = await createListItem(item, field.options || []);
-    sortableList.appendChild(row);
-  }
-
-  const addBtn = addContainerElement({
-    parent: wrapper,
-    tag: "button",
-    className: "add-list-button",
-    textContent: "+",
-    attributes: { type: "button" },
-  });
-
-  addBtn.addEventListener("click", async () => {
-    const row = await createListItem("", field.options || []);
-    sortableList.appendChild(row);
-    const input = row.querySelector("input");
-    if (input && input.readOnly && typeof input.onclick === "function") {
-      input.focus();
-      input.click();
-    }
-  });
-
+  const wrapper = createFieldDOM({ ...field, type: field.type }, value);
   applyFieldContextAttributes(wrapper, {
     key: field.key,
     type: field.type,
     loopKey: field.loopKey || null,
   });
-
   return wrapInputWithLabel(
     wrapper,
     field.label,
@@ -658,171 +295,15 @@ export async function renderListField(field, value = "") {
   );
 }
 
-async function createListItem(value, options = []) {
-  const container = addContainerElement({
-    tag: "div",
-    className: "list-field-item",
-  });
-
-  // Add drag handle
-  addContainerElement({
-    parent: container,
-    tag: "span",
-    className: "drag-handle list-handle",
-    textContent: "↕",
-  });
-
-  const input = addContainerElement({
-    parent: container,
-    tag: "input",
-    attributes: {
-      type: "text",
-      name: "list-item",
-      className: "list-input",
-    },
-    callback: (el) => {
-      el.value = value;
-    },
-  });
-
-  if (options.length > 0) {
-    input.readOnly = true;
-    input.onclick = () => showOptionPopup(input, options);
-
-    const isValid = options.some((opt) =>
-      typeof opt === "string" ? opt === value : opt.value === value
-    );
-
-    if (!isValid && value) {
-      input.classList.add("invalid-option");
-      input.placeholder = "⚠ Not in list";
-      input.title = "This value is not in the allowed options";
-    }
-  }
-
-  const removeBtn = addContainerElement({
-    parent: container,
-    tag: "button",
-    textContent: "-",
-    className: "remove-btn",
-  });
-
-  removeBtn.onclick = () => container.remove();
-
-  return container;
-}
-
 // ─────────────────────────────────────────────
 // Type: table
 export async function renderTableField(field, value = "") {
-  const v = resolveValue(field, value);
-  const rows = Array.isArray(v) ? v : [];
-  const columns = field.options || [];
-
-  const wrapper = document.createElement("div");
-  wrapper.className = "table-wrapper";
-  wrapper.dataset.type = "table";
-  wrapper.dataset.tableField = field.key;
-  wrapper.classList.add("inner-dnd");
-
-  const loopChain = Array.isArray(field.loopKey)
-    ? field.loopKey.join(".")
-    : field.loopKey || "root";
-  const scope = `table:${field.key}:${loopChain}:${crypto
-    .randomUUID()
-    .slice(0, 8)}`;
-  wrapper.dataset.dndScope = scope;
-
-  const table = addContainerElement({
-    parent: wrapper,
-    tag: "table",
-    className: "dynamic-table",
-  });
-
-  const thead = addContainerElement({ parent: table, tag: "thead" });
-  const headRow = addContainerElement({ parent: thead, tag: "tr" });
-
-  addContainerElement({ parent: headRow, tag: "th", textContent: "" }); // drag handle column header
-
-  columns.forEach((col) => {
-    const { label } = resolveOption(col);
-    addContainerElement({
-      parent: headRow,
-      tag: "th",
-      textContent: label,
-    });
-  });
-
-  addContainerElement({ parent: headRow, tag: "th", textContent: "" }); // remove button header
-
-  const tbody = addContainerElement({ parent: table, tag: "tbody" });
-  tbody.dataset.dndScope = scope;
-
-  function createRow(values = []) {
-    const tr = addContainerElement({ tag: "tr" });
-
-    // Drag handle column
-    const dragTd = addContainerElement({ parent: tr, tag: "td" });
-    addContainerElement({
-      parent: dragTd,
-      tag: "span",
-      className: "drag-handle row-handle",
-      textContent: "↕", // optional visual icon
-    });
-
-    // Data columns
-    columns.forEach((col, colIdx) => {
-      const { value } = resolveOption(col);
-      const td = addContainerElement({ parent: tr, tag: "td" });
-
-      addContainerElement({
-        parent: td,
-        tag: "input",
-        attributes: {
-          type: "text",
-          name: value,
-        },
-        callback: (el) => {
-          el.value = values[colIdx] || "";
-        },
-      });
-    });
-
-    // Remove button column
-    const tdRemove = addContainerElement({ parent: tr, tag: "td" });
-    const removeBtn = addContainerElement({
-      parent: tdRemove,
-      tag: "button",
-      textContent: "-",
-      className: "remove-btn",
-    });
-
-    removeBtn.onclick = () => tr.remove();
-
-    return tr;
-  }
-
-  rows.forEach((row) => {
-    tbody.appendChild(createRow(row));
-  });
-
-  const addBtn = addContainerElement({
-    parent: wrapper,
-    tag: "button",
-    textContent: "+",
-  });
-
-  addBtn.onclick = () => {
-    const newRow = createRow();
-    tbody.appendChild(newRow);
-  };
-
+  const wrapper = createFieldDOM({ ...field, type: field.type }, value);
   applyFieldContextAttributes(wrapper, {
     key: field.key,
     type: field.type,
     loopKey: field.loopKey || null,
   });
-
   return wrapInputWithLabel(
     wrapper,
     field.label,
@@ -1478,112 +959,44 @@ export async function renderTagsField(field, value = "") {
 // ─────────────────────────────────────────────
 // Type: file
 export async function renderFileField(field, value = "") {
-  const v = resolveValue(field, value);
-  const id = field.key;
+  const core = createFieldDOM({ ...field, type: field.type }, value);
 
-  const { element, input, button } = createFilePicker({
-    id,
-    value: v,
-    placeholder: field.placeholder || "",
-    noWrapping: true,
-    label: field.label || "Select File",
-    outerClass: field.wrapper || "form-row tight-gap",
-  });
-
-  input.name = field.key;
-
-  button.onclick = async () => {
-    const selected = await window.api.dialog.chooseFile();
-    if (selected) {
-      input.value = selected;
-      if (typeof field.onSave === "function") {
-        await field.onSave(field, selected);
-      }
-    }
-  };
-
-  applyFieldContextAttributes(element, {
+  applyFieldContextAttributes(core, {
     key: field.key,
     type: field.type,
     loopKey: field.loopKey || null,
   });
 
-  return element;
+  return core;
 }
 
 // ─────────────────────────────────────────────
 // Type: directory
 export async function renderDirectoryField(field, value = "") {
-  const v = resolveValue(field, value);
-  const id = field.key;
+  const core = createFieldDOM({ ...field, type: field.type }, value);
 
-  const { element, input, button } = createDirectoryPicker({
-    id,
-    value: v,
-    placeholder: field.placeholder || "",
-    noWrapping: true,
-    label: field.label || "Select Directory",
-    outerClass: field.wrapper || "form-row tight-gap",
-  });
-
-  input.name = field.key;
-
-  button.onclick = async () => {
-    const selected = await window.api.dialog.chooseDirectory();
-    if (selected) {
-      input.value = selected;
-      if (typeof field.onSave === "function") {
-        await field.onSave(field, selected);
-      }
-    }
-  };
-
-  applyFieldContextAttributes(element, {
+  applyFieldContextAttributes(core, {
     key: field.key,
     type: field.type,
     loopKey: field.loopKey || null,
   });
 
-  return element;
+  return core;
 }
 
 // ─────────────────────────────────────────────
 // Type: password
 export async function renderPasswordField(field, value = "") {
-  const v = value || "";
-  const wrapper = document.createElement("div");
-  wrapper.className = "input-with-button password-field-wrapper";
-
-  const input = document.createElement("input");
-  input.type = "password";
-  input.name = field.key;
-  input.value = v;
-  input.className = "input";
-  applyFieldContextAttributes(input, {
+  const core = createFieldDOM({ ...field, type: field.type }, value);
+  const inputEl =
+    core.querySelector("input") || core;
+  applyFieldContextAttributes(inputEl, {
     key: field.key,
     type: field.type,
     loopKey: field.loopKey || null,
   });
-
-  // Reveal/hide toggle
-  const toggleBtn = createIconButton({
-    iconClass: "fa fa-eye",
-    className: "toggle-password-btn",
-    ariaLabel: "Show/hide password",
-    onClick: () => {
-      input.type = input.type === "password" ? "text" : "password";
-      const icon = toggleBtn.querySelector("i");
-      if (icon)
-        icon.className =
-          input.type === "password" ? "fa fa-eye" : "fa fa-eye-slash";
-    },
-  });
-
-  wrapper.appendChild(input);
-  wrapper.appendChild(toggleBtn);
-
   return wrapInputWithLabel(
-    wrapper,
+    core,
     field.label,
     field.description,
     field.two_column,
@@ -1976,7 +1389,8 @@ export async function renderApiField(field, value = "") {
       const raw = resolveByPath(lastFetchedDoc, m.path || "");
       const val = raw == null ? "" : String(raw);
       // Always refresh placeholder; only show as text when input is empty
-      el.placeholder = val || t("field.api.override.placeholder", "(override…)");
+      el.placeholder =
+        val || t("field.api.override.placeholder", "(override…)");
     }
   }
 
@@ -2058,7 +1472,12 @@ export async function renderApiField(field, value = "") {
         containerEl: host,
         labelTextOrKey: "",
         selectedValue: initial.id || "",
-        options: [{ value: "", label: t("field.api.picker.placeholder", "-- select --") }],
+        options: [
+          {
+            value: "",
+            label: t("field.api.picker.placeholder", "-- select --"),
+          },
+        ],
         i18nEnabled: false,
         onChange: () => {
           updateHidden();
@@ -2075,7 +1494,12 @@ export async function renderApiField(field, value = "") {
 
       // populate picker
       (async function populatePicker() {
-        let opts = [{ value: "", label: t("field.api.picker.placeholder", "-- select --") }];
+        let opts = [
+          {
+            value: "",
+            label: t("field.api.picker.placeholder", "-- select --"),
+          },
+        ];
 
         if (Array.isArray(field.allowed_ids) && field.allowed_ids.length > 0) {
           if (coll) {
