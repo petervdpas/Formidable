@@ -153,6 +153,18 @@ fields:
     two_column: false
     default: ''
     options: *ref_0
+  - key: table_inside_loop
+    type: table
+    label: Table inside loop
+    description: Table inside loop for drag&drop testing
+    expression_item: false
+    two_column: false
+    default: ''
+    options:
+      - value: test1
+        label: Test 1
+      - value: test2
+        label: Test 2
   - key: looper
     type: loopstop
     label: Chapters

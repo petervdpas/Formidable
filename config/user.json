@@ -10,8 +10,8 @@
   "enable_plugins": true,
   "context_mode": "storage",
   "context_folder": "./",
-  "selected_template": "basic.yaml",
-  "selected_data_file": "sane-20250530.meta.json",
+  "selected_template": "loopie.yaml",
+  "selected_data_file": "test-20250711.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -22,10 +22,12 @@
   "internal_server_port": 8383,
   "window_bounds": {
     "width": 1412,
-    "height": 944
+    "height": 944,
+    "x": 254,
+    "y": 44
   },
   "template_sidebar_width": 352,
-  "storage_sidebar_width": 412,
+  "storage_sidebar_width": 321,
   "status_buttons": {
     "reloader": true,
     "charpicker": true,
