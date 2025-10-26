@@ -1,3 +1,14 @@
+% caption-none-fix.tex
+
+% Keep Pandoc/Eisvogel caption counter guard
 \makeatletter
 \@ifundefined{c@none}{\newcounter{none}}{}
 \makeatother
+
+% ▼ Default longtable font size (acts as a fallback).
+%    This will NOT overwrite a value you set elsewhere,
+%    because \providecommand only defines \LTSize if it is undefined.
+\providecommand{\LTSize}{\tiny}
+
+% Hook stays here because this is the only place it reliably works in your pipeline.
+\AtBeginEnvironment{longtable}{\LTSize}
