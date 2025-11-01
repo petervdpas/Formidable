@@ -1,0 +1,24 @@
+% formidable-added.latex — front-matter driven table font size (no @ in macro name)
+
+% Flag uit front-matter
+\newif\ifformidablefontsize
+$if(table-use-fontsize)$\formidablefontsizetrue$else$\formidablefontsizefalse$endif$
+
+% Maat uit front-matter met fallback
+\providecommand{\FormidableTableSize}{$if(table-fontsize)$$table-fontsize$$else$\small$endif$}
+
+\RequirePackage{etoolbox}
+\ifformidablefontsize
+  % longtable
+  \AtBeginEnvironment{longtable}{\begingroup\FormidableTableSize}
+  \AfterEndEnvironment{longtable}{\endgroup}
+  % tabular
+  \AtBeginEnvironment{tabular}{\begingroup\FormidableTableSize}
+  \AfterEndEnvironment{tabular}{\endgroup}
+  % tabularx
+  \AtBeginEnvironment{tabularx}{\begingroup\FormidableTableSize}
+  \AfterEndEnvironment{tabularx}{\endgroup}
+  % table float wrapper
+  \AtBeginEnvironment{table}{\begingroup\FormidableTableSize}
+  \AfterEndEnvironment{table}{\endgroup}
+\fi

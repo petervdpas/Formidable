@@ -41,6 +41,12 @@
 %%
 $passoptions.latex()$
 \documentclass[
+$for(babel-otherlangs)$
+  $babel-otherlangs$,
+$endfor$
+$if(babel-lang)$
+  $babel-lang$,
+$endif$
 $if(fontsize)$
   $fontsize$,
 $endif$
@@ -99,6 +105,8 @@ $header-includes$
 $endfor$
 $after-header-includes.latex()$
 $hypersetup.latex()$
+
+$formidable-added.latex()$
 
 $if(title)$
 \title{$title$$if(thanks)$\thanks{$thanks$}$endif$}
