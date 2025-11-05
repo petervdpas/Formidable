@@ -181,20 +181,51 @@ function debug(...args) {
   return args[0];
 }
 
+const exported = {
+   isSimilar,
+   typeOf,
+   today,
+   isOverdue,
+   isDueSoon,
+   isOverdueInDays,
+   isExpiredAfter,
+   isUpcomingBefore,
+   isFuture,
+   isToday,
+   daysBetween,
+   ageInDays,
+   defaultText,
+   notEmpty,
+   debug,
+};
+
+// ---- Allow-list machinery ----------------------------------------
+// Mark which functions are safe to expose to the VM as helpers.
+// By default: expose all functions except 'debug'. Tweak if needed.
+for (const [name, fn] of Object.entries(exported)) {
+  if (typeof fn === "function" && name !== "debug") {
+    Object.defineProperty(fn, "safe", { value: true });
+  }
+}
+
+// Return the list of helper names that are allowed
+function allowedHelperNames() {
+  return Object.entries(exported)
+    .filter(([_, v]) => typeof v === "function" && v.safe === true)
+    .map(([k]) => k);
+}
+
+// Return an object { name: function } of allowed helpers (convenience)
+function allowedHelpers() {
+  const out = Object.create(null);
+  for (const [name, fn] of Object.entries(exported)) {
+    if (typeof fn === "function" && fn.safe === true) out[name] = fn;
+  }
+  return out;
+}
+
 module.exports = {
-  isSimilar,
-  typeOf,
-  today,
-  isOverdue,
-  isDueSoon,
-  isOverdueInDays,
-  isExpiredAfter,
-  isUpcomingBefore,
-  isFuture,
-  isToday,
-  daysBetween,
-  ageInDays,
-  defaultText,
-  notEmpty,
-  debug,
+  ...exported,
+  allowedHelperNames,
+  allowedHelpers,
 };

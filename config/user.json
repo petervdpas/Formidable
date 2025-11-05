@@ -8,7 +8,7 @@
   "development_enable": true,
   "logging_enabled": true,
   "enable_plugins": true,
-  "context_mode": "storage",
+  "context_mode": "template",
   "context_folder": "./",
   "selected_template": "loopie.yaml",
   "selected_data_file": "test-20250711.meta.json",
