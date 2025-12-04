@@ -92,5 +92,8 @@
     "simple-git": "^3.28.0",
     "sortablejs": "^1.15.6",
     "swagger-ui-express": "^5.0.1"
+  },
+  "overrides": {
+    "glob": "10.5.0"
   }
 }
