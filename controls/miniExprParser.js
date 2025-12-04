@@ -7,6 +7,7 @@ const helpers = require("./expressionHelpers");
 // ==== Security switches =====================================================
 const MAX_EXPR_LEN = 1024;
 const SAFE_CHARS = /^[\s\w\d+\-*/%<>=!&|^?:(),.[\]{}'"]+$/u;
+const VM_ONLY_PATTERN = /\b(F|meta)\s*\[|\b(F|meta)\s*\./;
 
 // Ask helpers which functions are safe to expose
 const ALLOWED_HELPERS = (helpers.allowedHelperNames?.() || []);
@@ -166,10 +167,14 @@ function parseMiniExpr(expr, originalContext = {}) {
   let rawResult;
   try {
     const textExpr = sanitizeExpr(rawTextExpr);
-    const needsVm = /[?:{}]/.test(textExpr);
 
-    if (needsVm) {
-      rawResult = safeVmEval(textExpr, vmSandbox, true);
+    const needsVmSyntax = /[?:{}]/.test(textExpr);
+    const usesFormData  = VM_ONLY_PATTERN.test(textExpr);
+
+    const mustUseVm = needsVmSyntax || usesFormData;
+
+    if (mustUseVm) {
+      rawResult = safeVmEval(textExpr, vmSandbox, false);
     } else {
       rawResult = safeEval(parser, textExpr, exprEvalScope);
       if (rawResult === "" || typeof rawResult === "undefined") {
