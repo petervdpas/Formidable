@@ -3,6 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 const yaml = require("js-yaml");
+const { app: electronApp } = require("electron"); 
 const { log, warn, error } = require("./nodeLogger");
 
 let appRoot = null;
@@ -22,6 +23,20 @@ function getAppRoot() {
 
 function isAbsolute(p) {
   return path.isAbsolute(p);
+}
+
+function getAssetsRoot() {
+  // In packaged app: assets are copied to <resources>/assets by extraResources
+  if (electronApp && electronApp.isPackaged) {
+    return path.join(process.resourcesPath, "assets");
+  }
+  // In dev: assets live under app root
+  return path.join(getAppRoot(), "assets");
+}
+
+function resolveAssetPath(...segments) {
+  const base = getAssetsRoot();
+  return path.join(base, ...segments);
 }
 
 // Ensure a directory exists (creates if missing)
@@ -358,6 +373,8 @@ module.exports = {
   baseDir,
   setAppRoot,
   getAppRoot,
+  getAssetsRoot,
+  resolveAssetPath,
   ensureDirectory,
   makeRelative,
   toPosixPath,

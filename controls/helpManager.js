@@ -6,7 +6,7 @@ const matter = require("gray-matter");
 const helpCache = Object.create(null); // { [lang]: { [id]: HelpTopic } }
 
 function getHelpFolder() {
-  return fileManager.resolvePath("help");
+  return fileManager.resolveAssetPath("help");
 }
 
 function parseLangFromFilename(name) {
@@ -29,16 +29,17 @@ function loadMd(fullPath) {
 }
 
 function normalizeImageLinks(md, lang) {
-  // Prefer lang-specific folder first
-  const langPrefix   = `help/${lang}/images/`;
+  // Go through the internal server's /assets route
+  const langPrefix = `/assets/help/${lang}/images/`;
 
-  // Markdown image + Markdown link to images/...
   md = md
     .replace(/(!\[[^\]]*\]\()\s*(?:\.{0,2}\/)?images\//gi, `$1${langPrefix}`)
     .replace(/(\[[^\]]*\]\()\s*(?:\.{0,2}\/)?images\//gi, `$1${langPrefix}`);
 
-  // Raw HTML <img src="images/...">
-  md = md.replace(/(<img[^>]*\bsrc=["'])\s*(?:\.{0,2}\/)?images\//gi, `$1${langPrefix}`);
+  md = md.replace(
+    /(<img[^>]*\bsrc=["'])\s*(?:\.{0,2}\/)?images\//gi,
+    `$1${langPrefix}`
+  );
 
   return md;
 }
@@ -53,15 +54,15 @@ function normalizeImageLinks(md, lang) {
 function ensureLangLoaded(lang = "en") {
   if (helpCache[lang]) return;
 
-  const baseDir = getHelpFolder();
-  const langDir = fileManager.resolvePath("help", lang);
+  const baseDir = getHelpFolder();                         // assets/help
+  const langDir = fileManager.joinPath(baseDir, lang);     // assets/help/<lang>
   const result = Object.create(null); // by id
 
   // 3) Neutral files (lowest precedence)
   for (const entry of collectMarkdownEntries(baseDir)) {
     const { base, lang: suffix } = parseLangFromFilename(entry.name);
     if (suffix) continue; // neutral step only
-    const fullPath = fileManager.resolvePath(baseDir, entry.name);
+    const fullPath = fileManager.joinPath(baseDir, entry.name);
     const parsed = loadMd(fullPath);
     const id = parsed.data.id || base;
     result[id] = {
@@ -80,7 +81,7 @@ function ensureLangLoaded(lang = "en") {
   for (const entry of collectMarkdownEntries(baseDir)) {
     const { base, lang: suffix } = parseLangFromFilename(entry.name);
     if (!suffix || suffix !== lang) continue;
-    const fullPath = fileManager.resolvePath(baseDir, entry.name);
+    const fullPath = fileManager.joinPath(baseDir, entry.name);
     const parsed = loadMd(fullPath);
     const id = parsed.data.id || base;
     result[id] = {
@@ -100,7 +101,7 @@ function ensureLangLoaded(lang = "en") {
     const files = collectMarkdownEntries(langDir);
     for (const entry of files) {
       const { base } = parseLangFromFilename(entry.name); // don’t re-parse lang; folder defines it
-      const fullPath = fileManager.resolvePath(langDir, entry.name);
+      const fullPath = fileManager.joinPath(langDir, entry.name);
       const parsed = loadMd(fullPath);
       const id = parsed.data.id || base;
       result[id] = {
@@ -116,7 +117,6 @@ function ensureLangLoaded(lang = "en") {
     }
   }
 
-  // Normalize to a sorted array when listing
   helpCache[lang] = result;
 }
 
