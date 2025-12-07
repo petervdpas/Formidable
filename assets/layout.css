@@ -248,6 +248,37 @@ h3::before {
   overflow-y: auto;
 }
 
+.profile-item .list-item-main {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px;
+}
+
+.profile-item .list-item-label {
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-flag-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile-pill {
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 8px;
+}
+
+.profile-export-btn {
+  margin-left: 2px;
+}
+
 .empty-message {
   display: flex;
   justify-content: center;

@@ -29,8 +29,8 @@ function loadMd(fullPath) {
 }
 
 function normalizeImageLinks(md, lang) {
-  // Go through the internal server's /assets route
-  const langPrefix = `/assets/help/${lang}/images/`;
+  const assetsPrefix = fileManager.getAssetsWebPrefix();
+  const langPrefix   = `${assetsPrefix}help/${lang}/images/`;
 
   md = md
     .replace(/(!\[[^\]]*\]\()\s*(?:\.{0,2}\/)?images\//gi, `$1${langPrefix}`)
@@ -43,7 +43,6 @@ function normalizeImageLinks(md, lang) {
 
   return md;
 }
-
 /**
  * Build a language view into cache with fallback chain:
  * 1) help/<lang>/*.md

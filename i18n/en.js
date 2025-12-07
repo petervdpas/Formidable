@@ -239,6 +239,19 @@ export default {
   "toast.profile.invalidName": "Use lowercase, hyphens, and end with .json",
   "toast.profile.exists": "Profile already exists.",
   "toast.profile.switchFailed": "Failed to switch profile.",
+  "toast.profile.importSuccess": "Profile imported successfully.",
+  "toast.profile.importFailed": "Failed to import profile.",
+  "toast.profile.importFailed.reason": "Failed to import profile: {0}",
+
+  "toast.profile.import.error.not_found": "Source file could not be found.",
+  "toast.profile.import.error.invalid_name":
+    "Unable to derive a valid profile filename.",
+  "toast.profile.import.error.boot_forbidden":
+    "boot.json cannot be imported as a profile.",
+  "toast.profile.import.error.exists": "Profile already exists: {0}.",
+  "toast.profile.import.error.copy_failed": "Failed to copy the profile file.",
+  "toast.profile.import.error.invalid_config":
+    "Imported file is not a valid Formidable config.",
 
   "toast.template.not.selected":
     "No template selected. Please select a template first.",
@@ -475,6 +488,9 @@ export default {
   "button.api.load": "Load",
   "button.api.fetch": "Fetch",
   "button.api.clear": "Clear",
+
+  "button.profile.export": "Export",
+  "button.profile.import": "Import",
 
   // ── ARIA Labels ───────────────────────────
   "aria.git.push": "Push to remote",

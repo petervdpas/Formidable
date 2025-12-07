@@ -26,14 +26,16 @@
 }
 
 .modal .modal-body {
-  position: relative;
-  overflow: clip;
-  border-radius: inherit;
-  min-height: 0;
+    position: relative;
+    overflow: clip;
+    border-radius: inherit;
+    min-height: 0;
 }
 
 @supports not (overflow: clip) {
-  .modal .modal-body { overflow: hidden; }
+    .modal .modal-body {
+        overflow: hidden;
+    }
 }
 
 .modal.show {
@@ -133,7 +135,10 @@
 /* ───── Form Row: Label + Input Side-by-Side ───── */
 .modal-form-row {
     display: flex;
-    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
     gap: 8px;
     margin: 2px 0;
 }
@@ -389,16 +394,16 @@
 }
 
 .modal-split {
-  height: 100%;
-  overflow: hidden;
+    height: 100%;
+    overflow: hidden;
 }
 
 .modal-split-left,
 .modal-split-right {
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 6px;
-  padding: 10px;
-  overflow-y: auto;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 6px;
+    padding: 10px;
+    overflow-y: auto;
 }
 
 @media screen and (max-width: 768px) {

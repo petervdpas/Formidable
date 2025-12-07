@@ -253,6 +253,20 @@ export default {
     "Gebruik kleine letters, koppeltekens en eindig met .json",
   "toast.profile.exists": "Profiel bestaat al.",
   "toast.profile.switchFailed": "Wisselen van profiel mislukt.",
+  "toast.profile.importSuccess": "Profiel succesvol geïmporteerd.",
+  "toast.profile.importFailed": "Importeren van profiel mislukt.",
+  "toast.profile.importFailed.reason": "Importeren van profiel mislukt: {0}",
+  "toast.profile.import.error.not_found":
+    "Bronbestand kon niet worden gevonden.",
+  "toast.profile.import.error.invalid_name":
+    "Kan geen geldige profielbestandsnaam afleiden.",
+  "toast.profile.import.error.boot_forbidden":
+    "boot.json mag niet worden geïmporteerd als profiel.",
+  "toast.profile.import.error.exists": "Profiel bestaat al: {0}.",
+  "toast.profile.import.error.copy_failed":
+    "Kopiëren van het profielbestand is mislukt.",
+  "toast.profile.import.error.invalid_config":
+    "Geïmporteerd bestand is geen geldige Formidable-configuratie.",
 
   "toast.template.not.selected":
     "Geen sjabloon geselecteerd. Selecteer eerst een sjabloon.",
@@ -498,6 +512,9 @@ export default {
   "button.api.load": "Laden",
   "button.api.fetch": "Ophalen",
   "button.api.clear": "Wissen",
+
+  "button.profile.export": "Exporteren",
+  "button.profile.import": "Importeren",
 
   // ── ARIA Labels ───────────────────────────
   "aria.git.push": "Push naar remote",

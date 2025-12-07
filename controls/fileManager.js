@@ -34,6 +34,20 @@ function getAssetsRoot() {
   return path.join(getAppRoot(), "assets");
 }
 
+function getAssetsWebPrefix() {
+  const appRoot = getAppRoot();
+  const assetsRoot = getAssetsRoot();
+
+  let rel = path.relative(appRoot, assetsRoot);
+
+  if (!rel) rel = "assets";
+
+  rel = toPosixPath(rel);
+  if (!rel.endsWith("/")) rel += "/";
+
+  return rel;
+}
+
 function resolveAssetPath(...segments) {
   const base = getAssetsRoot();
   return path.join(base, ...segments);
@@ -374,6 +388,7 @@ module.exports = {
   setAppRoot,
   getAppRoot,
   getAssetsRoot,
+  getAssetsWebPrefix,
   resolveAssetPath,
   ensureDirectory,
   makeRelative,

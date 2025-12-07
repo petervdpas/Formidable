@@ -119,7 +119,7 @@ const api = {
     "git-mark-resolved",
     "git-revert-resolution",
     "git-continue-any",
-    "git-sync", 
+    "git-sync",
     "git-mergetool",
     "git-open-in-vscode",
   ]),
@@ -139,6 +139,8 @@ const api = {
     "get-template-meta-files",
     "get-template-image-files",
     "get-single-template-entry",
+    "export-user-profile",
+    "import-user-profile",
   ]),
   templates: buildGroup([
     "list-templates",

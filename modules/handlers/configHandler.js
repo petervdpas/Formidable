@@ -2,6 +2,18 @@
 
 import { EventBus } from "../eventBus.js";
 
+function joinFsPath(dir, file) {
+  if (!dir) return file;
+  if (!file) return dir;
+
+  if (dir.endsWith("/") || dir.endsWith("\\")) {
+    return `${dir}${file}`;
+  }
+
+  const sep = dir.includes("\\") ? "\\" : "/";
+  return `${dir}${sep}${file}`;
+}
+
 export async function handleConfigInvalidate() {
   try {
     await window.api.config.invalidateConfigCache();
@@ -86,7 +98,6 @@ export async function handleConfigUpdate(partial) {
       id: "user:config",
       value: fullConfig,
     });
-
   } catch (err) {
     EventBus.emit("logging:error", [
       "[ConfigHandler] Failed to update user config:",
@@ -182,5 +193,91 @@ export async function handleProfileSwitch({ filename, callback }) {
       err,
     ]);
     callback?.(false);
+  }
+}
+
+export async function handleProfileExport({ filename, callback }) {
+  try {
+    if (!filename) {
+      EventBus.emit("logging:warning", [
+        "[ConfigHandler] Profile export requested without filename",
+      ]);
+      callback?.({ success: false, error: "missing_filename" });
+      return;
+    }
+
+    const directory = await window.api.dialog.chooseDirectory();
+    if (!directory) {
+      EventBus.emit("logging:default", [
+        "[ConfigHandler] Profile export cancelled by user",
+      ]);
+      callback?.({ success: false, cancelled: true });
+      return;
+    }
+
+    const targetPath = joinFsPath(directory, filename);
+
+    const result = await window.api.config.exportUserProfile({
+      profileFilename: filename,
+      targetPath,
+      overwrite: false,
+    });
+
+    if (!result?.success) {
+      EventBus.emit("logging:error", [
+        "[ConfigHandler] Failed to export profile:",
+        result,
+      ]);
+    } else {
+      EventBus.emit("logging:default", [
+        `[ConfigHandler] Exported profile "${filename}" to "${targetPath}"`,
+      ]);
+    }
+
+    callback?.(result);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      "[ConfigHandler] Exception during profile export:",
+      err,
+    ]);
+    callback?.({ success: false, error: err?.message || "exception" });
+  }
+}
+
+export async function handleProfileImport({ callback }) {
+  try {
+    const sourcePath = await window.api.dialog.chooseFile();
+    if (!sourcePath) {
+      EventBus.emit("logging:default", [
+        "[ConfigHandler] Profile import cancelled by user",
+      ]);
+      callback?.({ success: false, cancelled: true });
+      return;
+    }
+
+    const result = await window.api.config.importUserProfile({
+      sourcePath,
+      overwrite: false,
+    });
+
+    if (!result?.success) {
+      EventBus.emit("logging:error", [
+        "[ConfigHandler] Failed to import profile from file:",
+        sourcePath,
+        result,
+      ]);
+    } else {
+      EventBus.emit("logging:default", [
+        `[ConfigHandler] Imported profile from "${sourcePath}" as "${result.filename}"`,
+      ]);
+    }
+
+    callback?.(result);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      "[ConfigHandler] Exception during profile import:",
+      err,
+    ]);
+    callback?.({ success: false, error: err?.message || "exception" });
   }
 }

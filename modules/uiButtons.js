@@ -58,6 +58,27 @@ export function createProfileAddButton(onClick) {
   });
 }
 
+export function createProfileExportButton(onClick) {
+  return createIconButton({
+    iconClass: "fa fa-download",
+    className: "btn-icon-default btn-icon-small profile-export-btn",
+    identifier: "profile-export",
+    onClick,
+    i18nTitle: "button.profile.export",
+    i18nAria:  "button.profile.export",
+  });
+}
+
+export function createProfileImportButton(onClick) {
+  return createButton({
+    text: t("button.profile.import"),
+    i18nKey: "button.profile.import",
+    className: "btn-info profile-import-btn",
+    identifier: "profile-import",
+    onClick,
+  });
+}
+
 export function createFieldEditIconButton(idx, onClick) {
   return createIconButton({
     iconClass: "fa fa-pencil",

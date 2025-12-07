@@ -68,7 +68,7 @@ export function initEventRouter() {
   // Collections API events
   EventBus.off("api:get", apiHandler.handleApiGet);
   EventBus.off("api:list", apiHandler.handleApiList);
-  EventBus.off("api:design", apiHandler.handleApiDesign); 
+  EventBus.off("api:design", apiHandler.handleApiDesign);
   EventBus.on("api:get", apiHandler.handleApiGet);
   EventBus.on("api:list", apiHandler.handleApiList);
   EventBus.on("api:design", apiHandler.handleApiDesign);
@@ -248,6 +248,10 @@ export function initEventRouter() {
   EventBus.on("config:profiles:list", configHandler.handleListProfiles);
   EventBus.off("config:profiles:switch", configHandler.handleProfileSwitch);
   EventBus.on("config:profiles:switch", configHandler.handleProfileSwitch);
+  EventBus.off("config:profiles:export", configHandler.handleProfileExport);
+  EventBus.on("config:profiles:export", configHandler.handleProfileExport);
+  EventBus.off("config:profiles:import", configHandler.handleProfileImport);
+  EventBus.on("config:profiles:import", configHandler.handleProfileImport);
 
   // Profile events
   EventBus.off("context:toggle", contextHandlers.handleContextToggle);

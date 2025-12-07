@@ -5,13 +5,31 @@ const nodeLogger = require("./nodeLogger");
 const { log, error } = nodeLogger;
 const fileManager = require("./fileManager");
 const schema = require("../schemas/config.schema");
-
 const bootSchema = require("../schemas/boot.schema");
 const BOOT_PATH = fileManager.resolvePath("config", "boot.json");
 
 let configPath = null;
 let cachedConfig = null;
 let virtualStructure = null;
+
+// ─────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────
+function normalizeProfileFilename(name) {
+  if (!name) return null;
+
+  // strip any folder, drop extension, normalize
+  const base = path
+    .basename(name)
+    .replace(/\.json$/i, "")
+    .toLowerCase();
+
+  // only [a-z0-9-], collapse others to "-"
+  const cleaned = base.replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "");
+  if (!cleaned) return null;
+
+  return `${cleaned}.json`;
+}
 
 // ─────────────────────────────────────────────
 // Resolve boot profile and ensure boot.json exists
@@ -351,6 +369,161 @@ function getSingleTemplateEntry(templateName) {
 }
 
 // ─────────────────────────────────────────────
+// Import / Export user profiles
+// ─────────────────────────────────────────────
+
+function exportUserProfile(
+  profileFilename,
+  targetPath,
+  { overwrite = false } = {}
+) {
+  if (!profileFilename || !targetPath) {
+    return {
+      success: false,
+      error: "Missing profileFilename or targetPath.",
+    };
+  }
+
+  const sourcePath = fileManager.resolvePath("config", profileFilename);
+
+  if (!fileManager.fileExists(sourcePath)) {
+    return {
+      success: false,
+      error: `Profile file not found: ${profileFilename}`,
+      code: "not_found",
+    };
+  }
+
+  const targetDir = path.dirname(targetPath);
+  fileManager.ensureDirectory(targetDir, {
+    label: "ProfileExport",
+    silent: true,
+  });
+
+  const result = fileManager.copyFile(sourcePath, targetPath, { overwrite });
+
+  const ok = typeof result === "object" ? result.success !== false : !!result;
+
+  if (!ok) {
+    return {
+      success: false,
+      error: (result && result.error) || "Copy failed.",
+      code: "copy_failed",
+    };
+  }
+
+  log(
+    `[ConfigManager] Exported profile "${profileFilename}" to "${targetPath}".`
+  );
+
+  return {
+    success: true,
+    profileFilename,
+    sourcePath,
+    targetPath,
+  };
+}
+
+function importUserProfile(
+  sourcePath,
+  { profileFilename, overwrite = false } = {}
+) {
+  if (!sourcePath) {
+    return {
+      success: false,
+      error: "Missing sourcePath.",
+    };
+  }
+
+  if (!fileManager.fileExists(sourcePath)) {
+    return {
+      success: false,
+      error: `Source file not found: ${sourcePath}`,
+      code: "not_found",
+    };
+  }
+
+  // Determine/normalise target filename
+  let finalFilename =
+    profileFilename || normalizeProfileFilename(path.basename(sourcePath));
+
+  if (!finalFilename) {
+    return {
+      success: false,
+      error: "Unable to derive a valid profile filename.",
+      code: "invalid_name",
+    };
+  }
+
+  // Reject boot.json explicitly – profiles only
+  if (finalFilename === "boot.json") {
+    return {
+      success: false,
+      error: "boot.json cannot be imported as a profile.",
+      code: "boot_forbidden",
+    };
+  }
+
+  const targetPath = fileManager.resolvePath("config", finalFilename);
+
+  if (fileManager.fileExists(targetPath) && !overwrite) {
+    return {
+      success: false,
+      error: `Profile already exists: ${finalFilename}`,
+      code: "exists",
+      filename: finalFilename,
+      targetPath,
+    };
+  }
+
+  const result = fileManager.copyFile(sourcePath, targetPath, { overwrite });
+  const ok = typeof result === "object" ? result.success !== false : !!result;
+
+  if (!ok) {
+    return {
+      success: false,
+      error: (result && result.error) || "Copy failed.",
+      code: "copy_failed",
+    };
+  }
+
+  // Make sure the imported file at least parses / sanitizes
+  try {
+    const raw = fileManager.loadFile(targetPath, {
+      format: "json",
+      silent: false,
+    });
+    const { config } = schema.sanitize(raw);
+    fileManager.saveFile(targetPath, config, { format: "json" });
+  } catch (err) {
+    error(
+      `[ConfigManager] Imported profile "${finalFilename}" is not a valid config:`,
+      err
+    );
+    return {
+      success: false,
+      error: "Imported file is not a valid Formidable config.",
+      code: "invalid_config",
+      filename: finalFilename,
+      targetPath,
+    };
+  }
+
+  log(
+    `[ConfigManager] Imported profile from "${sourcePath}" as "${finalFilename}".`
+  );
+
+  // Invalidate cache so it shows up correctly in listAvailableProfiles()
+  invalidateConfigCache();
+
+  return {
+    success: true,
+    filename: finalFilename,
+    targetPath,
+  };
+}
+
+// ─────────────────────────────────────────────
 // Exports
 // ─────────────────────────────────────────────
 module.exports = {
@@ -370,4 +543,6 @@ module.exports = {
   getTemplateMetaFiles,
   getTemplateImageFiles,
   getSingleTemplateEntry,
+  exportUserProfile,
+  importUserProfile,
 };

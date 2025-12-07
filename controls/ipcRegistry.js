@@ -429,6 +429,19 @@ function registerIpcHandlers() {
   registerIpc("get-single-template-entry", (e, templateFilename) =>
     configManager.getSingleTemplateEntry(templateFilename)
   );
+  registerIpc("export-user-profile", (e, args = {}) => {
+    const { profileFilename, targetPath, overwrite } = args;
+    return configManager.exportUserProfile(profileFilename, targetPath, {
+      overwrite,
+    });
+  });
+  registerIpc("import-user-profile", (e, args = {}) => {
+    const { sourcePath, profileFilename, overwrite } = args;
+    return configManager.importUserProfile(sourcePath, {
+      profileFilename,
+      overwrite,
+    });
+  });
 
   // MiniExprParser
   registerIpc("parse-mini-expr", (e, expr, context) =>
