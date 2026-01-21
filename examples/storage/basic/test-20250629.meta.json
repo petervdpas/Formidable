@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-29T09:32:36.440Z",
-    "updated": "2025-09-28T16:59:38.421Z",
+    "updated": "2026-01-21T13:10:56.564Z",
     "flagged": false,
     "tags": [
       "ch.01",
@@ -56,12 +56,13 @@
       "ch.01",
       "you lucky guy"
     ],
+    "calculatedSummary": "Test: Decline This One | Sanitized: some-value-here! | Capitalized: Decline This One | File: test-20250629.meta.…",
     "myScript": {
       "seenTest": "Decline This One",
       "cleanKey": "some-value-here!",
       "capName": "Decline This One",
       "shortFile": "test-20250629.meta.…"
     },
-    "latext": "\\begin{center}\n  \\fbox{%\n    \\begin{minipage}{0.6\\linewidth}\n      \\centering\n      \\vspace{1em}\n      \\includegraphics[width=0.5\\linewidth]{../.media/Images/signature-transparent.png}\\\\[0.5em]\n      \\textbf{Roadwarrior}\\\\\n      Software Engineer\\\\\n      09-09-2025\n      \\vspace{1em}\n    \\end{minipage}%\n  }\n\\end{center}\n"
+    "testapi": {}
   }
 }

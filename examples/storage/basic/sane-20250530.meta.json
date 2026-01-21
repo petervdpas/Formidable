@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2025-10-25T00:37:35.587Z",
+    "updated": "2026-01-21T13:39:40.173Z",
     "flagged": true,
     "tags": [
       "bye",
@@ -15,7 +15,7 @@
   },
   "data": {
     "id": "5a7bec64-f3f2-47cc-a836-2e4643e4f9a9",
-    "test": "Approve This one",
+    "test": "Approve This One",
     "check": true,
     "dropdown": "R",
     "multichoice": [
@@ -48,7 +48,7 @@
         "B"
       ]
     ],
-    "design": "formidable.png",
+    "design": "",
     "linktest": {
       "href": "formidable://basic.yaml:test-20250629.meta.json",
       "text": "Decline this one"
@@ -58,10 +58,11 @@
       "now what",
       "Great"
     ],
+    "calculatedSummary": "Test: Approve This One | Sanitized: some-value-here! | Capitalized: Approve This One | File: sane-20250530.meta.…",
     "myScript": {
-      "seenTest": "Approve This one",
+      "seenTest": "Approve This One",
       "cleanKey": "some-value-here!",
-      "capName": "Approve This one",
+      "capName": "Approve This One",
       "shortFile": "sane-20250530.meta.…"
     },
     "testapi": {

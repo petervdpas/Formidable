@@ -1,9 +1,10 @@
 // modules/handlers/formHandlers.js
 
 import { EventBus } from "../eventBus.js";
-import { clearContainerUI } from "../../utils/formUtils.js";
+import { clearContainerUI, resolveFieldElement } from "../../utils/formUtils.js";
 import { normalizeOptions } from "../../utils/opts.js";
 import { Toast } from "../../utils/toastUtils.js";
+import { fieldTypes } from "../../utils/fieldTypes.js";
 
 let formManager = null;
 let storageListManager = null;
@@ -337,6 +338,48 @@ export async function handleBeforeSaveRun(
       if (res?.ok) {
         updated[f.key] = res.result;
         formSnap.data = { ...updated }; // refresh snapshot for subsequent fields
+        
+        // Re-collect all field values from DOM after code execution
+        // This captures any changes made by CFA.field.setValueByKey() calls
+        const formContainer = document.querySelector('#form-container') || 
+                            document.querySelector('#form-area') ||
+                            document.body;
+        
+        if (formContainer) {
+          for (const field of fields) {
+            // Skip the code field itself
+            if (field.key === f.key || field.type === 'code') continue;
+            
+            // Use the proper field resolver to find the element
+            const fieldElement = resolveFieldElement(formContainer, {
+              key: field.key,
+              type: field.type,
+              loopKey: field.loopKey,
+            });
+            
+            if (!fieldElement) continue;
+            
+            // Get the field type configuration
+            const fieldConfig = fieldTypes[field.type];
+            if (!fieldConfig || !fieldConfig.parseValue) continue;
+            
+            try {
+              // Parse the current value from the DOM
+              const currentValue = await fieldConfig.parseValue(fieldElement, null, field);
+              
+              // Update the data object with the current DOM value
+              if (currentValue !== undefined) {
+                updated[field.key] = currentValue;
+                formSnap.data[field.key] = currentValue;
+              }
+            } catch (err) {
+              EventBus.emit("logging:warning", [
+                `[formHandlers] Failed to re-collect field "${field.key}" after code execution:`,
+                err
+              ]);
+            }
+          }
+        }
       } else {
         EventBus.emit("logging:warning", [
           `[formHandlers] Code field "${f.key}" (run_mode:save) failed:`,

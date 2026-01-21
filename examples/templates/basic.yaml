@@ -409,12 +409,20 @@ fields:
     two_column: false
     default: []
     options: *ref_0
+  - key: calculatedSummary
+    type: text
+    label: Calculated Summary
+    description: This field is automatically populated by the myScript code field
+    expression_item: false
+    two_column: false
+    default: ''
+    options: *ref_0
   - key: myScript
     type: code
     label: MyScript
     description: >-
-      Builds a summary from form-data: test value, sanitized key, capitalized
-      name, and truncated filename (runs on save).
+      Builds a summary from form-data and sets it into the calculatedSummary
+      field (runs on save, updates DOM, then value is collected and saved).
     expression_item: false
     two_column: false
     default: |
@@ -426,6 +434,15 @@ fields:
         const capName = api.string.capitalize(currentTest || "unnamed");
         const shortFile = api.string.truncate(snap?.filename || "", 20);
 
+        // Build summary string
+        const summary = `Test: ${currentTest} | Sanitized: ${cleanKey} | Capitalized: ${capName} | File: ${shortFile}`;
+        
+        // Set the value in the calculatedSummary field - this updates the DOM
+        await window.CFA.field.setValueByKey("calculatedSummary", summary);
+
+        // The system will now re-collect all field values from the DOM before saving
+        // So the calculatedSummary value will be captured in the saved data
+
         return { seenTest: currentTest, cleanKey, capName, shortFile };
       })(input, api);
     options:
@@ -436,10 +453,13 @@ fields:
     run_mode: save
     allow_run: true
     input_mode: safe
-    api_mode: frozen
+    api_mode: raw
     api_pick:
       - string
       - form
+      - field
+      - form
+      - field
   - key: testapi
     type: api
     label: Testapi
