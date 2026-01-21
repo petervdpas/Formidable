@@ -33,12 +33,15 @@ Comprehensive documentation covering all aspects of Formidable's architecture:
 - **[Handler Pattern](docs/HANDLER-PATTERN.md)** - Domain-specific event handler organization
 - **[IPC Bridge](docs/IPC-BRIDGE.md)** - Main ↔ Renderer process communication
 - **[Plugin System](docs/PLUGIN-SYSTEM.md)** - Extensible plugin architecture
+- **[Virtual File System](docs/VFS-SYSTEM.md)** - Storage organization, auto-sync, and context folders
+- **[Modal System](docs/MODAL-SYSTEM.md)** - Resizable modals, split-view, and popup management
 
 ### Form & Template Systems
 
 - **[Template & Schema System](docs/TEMPLATE-SCHEMA-SYSTEM.md)** - Form templates and 20+ field types
 - **[Form System](docs/FORM-SYSTEM.md)** - Form rendering, validation, and operations
 - **[Field GUID System](docs/FIELD-GUID-SYSTEM.md)** - Dynamic field identification and manipulation
+- **[Template Helpers](docs/TEMPLATE-HELPERS.md)** - Handlebars helpers for rendering (field, loop, math, stats)
 - **[Configuration System](docs/CONFIGURATION-SYSTEM.md)** - Settings, themes, and profiles
 
 ### API Reference
@@ -87,11 +90,12 @@ Comprehensive documentation covering all aspects of Formidable's architecture:
   - Profiles store their own author name, email, context folder, preferences
   - Supports collaborative and multi-project use
 
-- **📁 Virtual File System (VFS)**
+- **📁 Virtual File System (VFS)** → [Docs](docs/VFS-SYSTEM.md)
 
   - Organized storage by context and template
   - Full control over storage folders, paths, and metadata
   - Auto-synced view of the VFS in the sidebar
+  - Cache management and event-driven updates
 
 - **🔀 Git Integration (Optional)**
 
@@ -99,12 +103,13 @@ Comprehensive documentation covering all aspects of Formidable's architecture:
   - Git remote info and branch listing
   - Supports Azure DevOps workflows (credential.helper + useHttpPath)
 
-- **🖥️ Clean, Modern UI**
+- **🖥️ Clean, Modern UI** → [Modal Docs](docs/MODAL-SYSTEM.md)
 
-  - Modal-based dialogs (template edit, form edit, Git actions)
+  - Resizable, ESC-closable modals with backdrop click dismiss
   - **Markdown & Preview modal** — live output with split/closable panes
   - Full light/dark theming, configurable icon or label buttons
   - Split-view for template editing and form data
+  - Inert background and disabled state support
 
 - **🔗 Internal Linking & Wiki Support**
 

@@ -35,6 +35,22 @@ Secure inter-process communication between Electron's main and renderer processe
 
 - [IPC Bridge](./IPC-BRIDGE.md) - IPC architecture and API
 
+### Virtual File System
+
+Organized storage system with context folders, auto-sync, and template-based organization.
+
+**Key Documents**:
+
+- [Virtual File System](./VFS-SYSTEM.md) - VFS architecture, operations, and cache management
+
+### Modal System
+
+Flexible modal framework with resizing, split-view support, and keyboard shortcuts.
+
+**Key Documents**:
+
+- [Modal System](./MODAL-SYSTEM.md) - Modal types, options, and patterns
+
 ### Template & Schema System
 
 Schema-based template system for defining form structures with 20+ field types.
@@ -42,6 +58,7 @@ Schema-based template system for defining form structures with 20+ field types.
 **Key Documents**:
 
 - [Template & Schema System](./TEMPLATE-SCHEMA-SYSTEM.md) - Templates and field types
+- [Template Helpers](./TEMPLATE-HELPERS.md) - Handlebars helpers (field, loop, math, stats)
 - [Template Schema](../schemas/template.schema.js) - Template schema
 - [Field Schema](../schemas/field.schema.js) - Field schema
 
