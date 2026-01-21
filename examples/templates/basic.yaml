@@ -453,25 +453,32 @@ fields:
         await window.CFA.field.setValueByKey("calculatedSummary", summary);
 
         // Build detailed multi-line output with markdown formatting
-        let detailedText = `# Selected Options\n\n`;
+        const formatter = api.string.formatText();
+        
+        formatter.h1("Selected Options").blank();
         
         if (multiChoices.length > 0) {
-          detailedText += `You have selected ${multiChoices.length} option(s):\n\n`;
+          formatter.line(`You have selected ${multiChoices.length} option(s):`).blank();
           multiChoices.forEach((choice, idx) => {
-            detailedText += `${idx + 1}. **${choice}**\n`;
+            formatter.oli(`**${choice}**`, idx + 1);
           });
-          detailedText += `\n---\n\n`;
+          formatter.blank().hr();
         } else {
-          detailedText += `_No options selected_\n\n---\n\n`;
+          formatter.italic("No options selected").blank().hr();
         }
         
-        detailedText += `## Form Details\n\n`;
-        detailedText += `- **Filename**: \`${snap?.filename || 'unknown'}\`\n`;
-        detailedText += `- **Test Value**: "${currentTest}"\n`;
-        detailedText += `- **Sanitized**: \`${cleanKey}\`\n`;
-        detailedText += `- **Capitalized**: ${capName}\n`;
-        detailedText += `- **Short Name**: ${shortFile}\n\n`;
-        detailedText += `> Generated at: ${api.string.formatDate(new Date(), 'datetime')}`;
+        formatter
+          .h2("Form Details")
+          .blank()
+          .kv("Filename", `\`${snap?.filename || 'unknown'}\``)
+          .kv("Test Value", `"${currentTest}"`)
+          .kv("Sanitized", `\`${cleanKey}\``)
+          .kv("Capitalized", capName)
+          .kv("Short Name", shortFile)
+          .blank()
+          .quote(`Generated at: ${api.string.formatDate(new Date(), 'datetime')}`);
+        
+        const detailedText = formatter.toString();
         
         // Set the detailed output in the textarea field
         await window.CFA.field.setValueByKey("detailedOutput", detailedText);

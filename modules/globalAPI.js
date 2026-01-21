@@ -162,6 +162,7 @@ export function exposeGlobalAPI() {
       withDefault: stringUtils.withDefault,
       formatDate: stringUtils.formatDate,
       relativeTime: stringUtils.relativeTime,
+      formatText: stringUtils.formatText,
     },
 
     toast: Toast,

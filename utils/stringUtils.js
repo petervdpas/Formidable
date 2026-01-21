@@ -101,3 +101,115 @@ export function relativeTime(date) {
   
   return formatDate(d, "short");
 }
+
+/**
+ * Text formatter for building multi-line formatted output
+ * Provides fluent API for creating markdown-style formatted text
+ * @returns {Object} Formatter instance with chainable methods
+ */
+export function formatText() {
+  const lines = [];
+  
+  const api = {
+    // Add raw line
+    line(text = "") {
+      lines.push(text);
+      return api;
+    },
+    
+    // Add blank line
+    blank() {
+      lines.push("");
+      return api;
+    },
+    
+    // Add heading
+    h1(text) {
+      lines.push(`# ${text}`);
+      return api;
+    },
+    h2(text) {
+      lines.push(`## ${text}`);
+      return api;
+    },
+    h3(text) {
+      lines.push(`### ${text}`);
+      return api;
+    },
+    
+    // Add paragraph
+    p(text) {
+      lines.push(text, "");
+      return api;
+    },
+    
+    // Add bold text
+    bold(text) {
+      lines.push(`**${text}**`);
+      return api;
+    },
+    
+    // Add italic text
+    italic(text) {
+      lines.push(`_${text}_`);
+      return api;
+    },
+    
+    // Add inline code
+    code(text) {
+      lines.push(`\`${text}\``);
+      return api;
+    },
+    
+    // Add code block
+    codeBlock(text, lang = "") {
+      lines.push(`\`\`\`${lang}`, text, "```", "");
+      return api;
+    },
+    
+    // Add list item
+    li(text, indent = 0) {
+      const prefix = "  ".repeat(indent);
+      lines.push(`${prefix}- ${text}`);
+      return api;
+    },
+    
+    // Add numbered list item
+    oli(text, number, indent = 0) {
+      const prefix = "  ".repeat(indent);
+      lines.push(`${prefix}${number}. ${text}`);
+      return api;
+    },
+    
+    // Add horizontal rule
+    hr() {
+      lines.push("---", "");
+      return api;
+    },
+    
+    // Add blockquote
+    quote(text) {
+      lines.push(`> ${text}`);
+      return api;
+    },
+    
+    // Add key-value pair
+    kv(key, value, boldKey = true) {
+      const k = boldKey ? `**${key}**` : key;
+      lines.push(`- ${k}: ${value}`);
+      return api;
+    },
+    
+    // Build and return the formatted string
+    toString() {
+      return lines.join("\n");
+    },
+    
+    // Get as array of lines
+    toArray() {
+      return [...lines];
+    }
+  };
+  
+  return api;
+}
