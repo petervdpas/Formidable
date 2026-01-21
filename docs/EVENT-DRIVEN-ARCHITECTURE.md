@@ -33,6 +33,7 @@ EventBus.on("field:get-by-guid", fieldHandlers.handleGetFieldByGuid);
 ## Components
 
 ### 1. Field Handlers (`modules/handlers/fieldHandlers.js`)
+
 New handler module implementing all field operations:
 - `handleGetFieldByGuid` - Get element by GUID
 - `handleGetFieldByKey` - Get first element by key
@@ -67,6 +68,7 @@ const getFieldByGuid = async (guid) => {
 ## Benefits
 
 ### 1. Consistency
+
 - Matches existing Formidable architecture patterns
 - Same pattern as `form:context:get`, `template:load`, etc.
 - Follows established conventions throughout the codebase
@@ -88,7 +90,7 @@ const getFieldByGuid = async (guid) => {
 
 ## Event Flow
 
-```
+```text
 CodeField Execution
        │
        ▼
@@ -209,6 +211,7 @@ console.assert(
 ## Summary
 
 The Field GUID system now follows Formidable's established event-driven architecture:
+
 - ✅ Consistent with existing patterns
 - ✅ Maintainable and testable
 - ✅ Plugin-friendly

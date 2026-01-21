@@ -82,6 +82,7 @@ if (await CFA.field.getValueByKey("checkbox")) {
 ## Data Attributes
 
 Every field has:
+
 - `data-field-guid` → Unique ID (UUID v4)
 - `data-field-key` → Field key from template
 - `data-field-type` → Field type (text, boolean, etc.)

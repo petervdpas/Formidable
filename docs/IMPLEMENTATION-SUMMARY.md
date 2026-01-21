@@ -250,6 +250,7 @@ CFA.field.setValue(testGuid, originalValue); // Restore
 ## Future Enhancements
 
 Potential additions:
+
 1. **Field watching**: `CFA.field.watch(guid, callback)` for reactive updates
 2. **Bulk operations**: `CFA.field.setMultiple([{guid, value}, ...])`
 3. **Validation**: `CFA.field.validate(guid, rules)`

@@ -23,54 +23,98 @@
 
 ---
 
+## 📚 Documentation
+
+Comprehensive documentation covering all aspects of Formidable's architecture:
+
+### Architecture & Core Systems
+
+- **[EventBus System](docs/EVENTBUS-SYSTEM.md)** - Event-driven architecture and communication
+- **[Handler Pattern](docs/HANDLER-PATTERN.md)** - Domain-specific event handler organization
+- **[IPC Bridge](docs/IPC-BRIDGE.md)** - Main ↔ Renderer process communication
+- **[Plugin System](docs/PLUGIN-SYSTEM.md)** - Extensible plugin architecture
+
+### Form & Template Systems
+
+- **[Template & Schema System](docs/TEMPLATE-SCHEMA-SYSTEM.md)** - Form templates and 20+ field types
+- **[Form System](docs/FORM-SYSTEM.md)** - Form rendering, validation, and operations
+- **[Field GUID System](docs/FIELD-GUID-SYSTEM.md)** - Dynamic field identification and manipulation
+- **[Configuration System](docs/CONFIGURATION-SYSTEM.md)** - Settings, themes, and profiles
+
+### API Reference
+
+- **[Global API System](docs/GLOBAL-API-SYSTEM.md)** - FGA, CFA, and window.api reference
+- **[Documentation Index](docs/README.md)** - Complete documentation hub with quick start guide
+
+> 📖 **50,000+ words** of documentation with **200+ code examples**
+
+---
+
 ## ✨ Key Features
 
-* **⚙️ Dynamic Template & Form System**
+- **⚙️ Dynamic Template & Form System**
 
-  * YAML-based templates with async field renderers
-  * Visual form editor with live preview
-  * Full Markdown renderer using Handlebars-style syntax
+  - YAML-based templates with 20+ field types
+  - Schema validation and sanitization
+  - Visual form editor with live preview
+  - Full Markdown renderer using Handlebars-style syntax
+  - Field GUID system for dynamic updates
 
-* **🧩 Modular Event Architecture**
+- **🧩 Event-Driven Architecture**
 
-  * Custom global EventBus for decoupled module interaction
-  * Dynamic context switching (template + storage)
-  * Profile switching with per-profile configuration
+  - Centralized EventBus for decoupled communication
+  - 30+ domain-specific handler modules
+  - Event-driven field operations (CFA.field API)
+  - Async request-response patterns
 
-* **👥 Profile Switching**
+- **🔌 Extensible Plugin System**
 
-  * Easily switch between multiple user profiles
-  * Profiles store their own author name, email, context folder, preferences
-  * Supports collaborative and multi-project use
+  - Backend, frontend, and hybrid plugins
+  - Declarative IPC registration
+  - Hot-reloadable plugin architecture
+  - Plugin SDK with full API access
 
-* **📁 Virtual File System (VFS)**
+- **🎯 Global APIs**
 
-  * Organized storage by context and template
-  * Full control over storage folders, paths, and metadata
-  * Auto-synced view of the VFS in the sidebar
+  - **FGA** (Formidable Global API) - Form and field operations
+  - **CFA** (CodeField API) - Dynamic field manipulation from code
+  - **window.api** - Secure IPC bridge (100+ methods)
+  - **EventBus** - Direct event system access
 
-* **🔀 Git Integration (Optional)**
+- **👥 Profile Switching**
 
-  * Commit, push, pull from the UI
-  * Git remote info and branch listing
-  * Supports Azure DevOps workflows (credential.helper + useHttpPath)
+  - Easily switch between multiple user profiles
+  - Profiles store their own author name, email, context folder, preferences
+  - Supports collaborative and multi-project use
 
-* **🖥️ Clean, Modern UI**
+- **📁 Virtual File System (VFS)**
 
-  * Modal-based dialogs (template edit, form edit, Git actions)
-  * **Markdown & Preview modal** — live output with split/closable panes
-  * Full light/dark theming, configurable icon or label buttons
-  * Split-view for template editing and form data
+  - Organized storage by context and template
+  - Full control over storage folders, paths, and metadata
+  - Auto-synced view of the VFS in the sidebar
 
-* **🔗 Internal Linking & Wiki Support**
+- **🔀 Git Integration (Optional)**
 
-  * Support for internal form links (`formIdLink` fields)
-  * Future-proof architecture for internal wiki server (localhost)
+  - Commit, push, pull from the UI
+  - Git remote info and branch listing
+  - Supports Azure DevOps workflows (credential.helper + useHttpPath)
 
-* **🔎 Designed for Auditability**
+- **🖥️ Clean, Modern UI**
 
-  * "Auditability by Design" approach: trackable metadata, version control, profile isolation
-  * Suitable for regulated environments, audit preparation, compliance
+  - Modal-based dialogs (template edit, form edit, Git actions)
+  - **Markdown & Preview modal** — live output with split/closable panes
+  - Full light/dark theming, configurable icon or label buttons
+  - Split-view for template editing and form data
+
+- **🔗 Internal Linking & Wiki Support**
+
+  - Support for internal form links (`formIdLink` fields)
+  - Future-proof architecture for internal wiki server (localhost)
+
+- **🔎 Designed for Auditability**
+
+  - "Auditability by Design" approach: trackable metadata, version control, profile isolation
+  - Suitable for regulated environments, audit preparation, compliance
 
 ---
 
@@ -104,32 +148,38 @@ Formidable uses a Handlebars-inspired syntax for rendering:
 
 Reference helpers:
 
-* `{{field "key"}}` → formatted value
-* `{{fieldRaw "key"}}` → raw JS value
-* `{{fieldMeta "key" "property"}}` → field metadata access
+- `{{field "key"}}` → formatted value
+- `{{fieldRaw "key"}}` → raw JS value
+- `{{fieldMeta "key" "property"}}` → field metadata access
 
 ---
 
 ## 📋 Supported Field Types
 
-| Type                     | Description                      |
-| ------------------------ | -------------------------------- |
-| `text`                   | Single-line input                |
-| `textarea`               | Multi-line text block            |
-| `boolean`                | Checkbox toggle                  |
-| `dropdown`               | Select from list                 |
-| `multioption`            | Multiple choice (checkbox group) |
-| `radio`                  | Radio button group               |
-| `number`                 | Numeric input                    |
-| `range`                  | Range slider                     |
-| `date`                   | ISO-style date picker            |
-| `list`                   | Dynamic list input               |
-| `table`                  | Editable table grid (JSON)       |
-| `image`                  | Upload & preview image           |
-| `link`                   | Text input for URL or link       |
-| `formidable://` link     | Internal form link (formIdLink)  |
-| `loopstart` / `loopstop` | Define loop sections             |
-| `looper`                 | Looper meta block (inserts loop) |
+Formidable supports 20+ field types with full schema validation:
+
+| Type | Description | Documentation |
+| -- | -- | -- |
+| `text` | Single-line input | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#field-types) |
+| `textarea` | Multi-line text block (Markdown/Plain) | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#text-area-type-textarea) |
+| `boolean` | Checkbox toggle | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#field-types) |
+| `dropdown` | Select from list | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#dropdownradiomultioption) |
+| `multioption` | Multiple choice (checkbox group) | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#dropdownradiomultioption) |
+| `radio` | Radio button group | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#dropdownradiomultioption) |
+| `number` | Numeric input | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#field-types) |
+| `range` | Range slider | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#field-types) |
+| `date` | ISO-style date picker | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#field-types) |
+| `list` | Dynamic list input | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#field-types) |
+| `table` | Editable table grid (JSON) | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#field-types) |
+| `image` | Upload & preview image | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#field-types) |
+| `link` | Text input for URL or link | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#field-types) |
+| `tags` | Tag input field | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#field-types) |
+| `latex` | LaTeX editor with preview | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#latex-type-latex) |
+| `code` | Code editor with execution | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#code-field-type-code) |
+| `api` | API-linked field with mapping | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#api-field-type-api) |
+| `loopstart` / `loopstop` | Define repeating sections | [Docs](docs/TEMPLATE-SCHEMA-SYSTEM.md#loop-fields) |
+
+See [Template & Schema System](docs/TEMPLATE-SCHEMA-SYSTEM.md) for complete field documentation.
 
 ---
 
@@ -160,12 +210,14 @@ Saved to: `./config/user.json`
 }
 ```
 
-* Values are validated and auto-repaired on load.
-* UI updates are event-driven (`config:update`).
+- Values are validated and auto-repaired on load.
+- UI updates are event-driven (`config:update`).
 
 ---
 
 ## 🚀 Getting Started
+
+### Quick Start
 
 ```bash
 git clone https://github.com/petervdpas/formidable.git
@@ -173,6 +225,8 @@ cd formidable
 npm install
 npm start
 ```
+
+### Building
 
 To build the Windows executable:
 
@@ -183,20 +237,117 @@ npm run build
 > **Note:** Current packaging targets Windows.
 > Linux and Mac packaging will be added in future.
 
+### Learn More
+
+- **New to Formidable?** Start with the [Documentation Index](docs/README.md)
+- **Building plugins?** Check out the [Plugin System Guide](docs/PLUGIN-SYSTEM.md)
+- **Working with forms?** See the [Form System](docs/FORM-SYSTEM.md) and [Field GUID System](docs/FIELD-GUID-SYSTEM.md)
+- **Understanding architecture?** Read about [EventBus](docs/EVENTBUS-SYSTEM.md) and [Handler Pattern](docs/HANDLER-PATTERN.md)
+
 ---
 
 ## 🧑‍💻 Development Notes
 
-* **CTRL+ENTER** → toggle fullscreen on template editor
-* Templates = `.yaml`, Data = `.meta.json`, Images = `.jpg`/`.png`
-* VFS auto-updates on create/save/delete
-* Profile switching triggers full config refresh and context rehydration
-* Markdown & Preview modal: supports split view and pane closing
-* Modals: resizable, ESC-closable, backdrop click dismiss
-* Git config per repo is cached
+### Quick Tips
+
+- **CTRL+ENTER** → toggle fullscreen on template editor
+- Templates = `.yaml`, Data = `.meta.json`, Images = `.jpg`/`.png`
+- VFS auto-updates on create/save/delete
+- Profile switching triggers full config refresh and context rehydration
+- Markdown & Preview modal: supports split view and pane closing
+- Modals: resizable, ESC-closable, backdrop click dismiss
+- Git config per repo is cached
+
+### Architecture Highlights
+
+- **Event-Driven**: All operations flow through EventBus
+- **Handler Pattern**: 30+ domain-specific handler modules
+- **IPC Bridge**: Secure main ↔ renderer communication via contextBridge
+- **Plugin System**: Hot-reloadable with declarative IPC
+- **Field GUIDs**: Every field has a unique identifier for dynamic updates
+- **Schema Validation**: All data validated and sanitized on load
+
+### API Examples
+
+**Field Manipulation (from code fields)**:
+
+```javascript
+// Get field value
+const price = await CFA.field.getValue({ key: "price" });
+
+// Set field value
+await CFA.field.setValue({ key: "total", value: price * 1.2 });
+
+// Update field options
+await CFA.field.updateOptions({ 
+  key: "status", 
+  options: ["New", "Active", "Completed"] 
+});
+```
+
+**Event-Driven Operations**:
+
+```javascript
+// Save form
+await EventBus.emit("form:save", { 
+  template: "my-template", 
+  data: formData 
+});
+
+// Listen to events
+EventBus.on("form:saved", (data) => {
+  console.log("Form saved:", data);
+});
+```
+
+**Plugin Development**:
+
+```javascript
+// plugin.json
+{
+  "name": "MyPlugin",
+  "ipc": { "process": "handleProcess" }
+}
+
+// plugin.js
+module.exports = {
+  async run(context) {
+    // Plugin logic
+    return { success: true };
+  },
+  async handleProcess(event, payload) {
+    // IPC handler
+    return { result: "done" };
+  }
+};
+```
+
+See [Documentation](docs/README.md) for complete guides and examples.
 
 ---
 
 ## 📜 License
 
 MIT © 2025 Peter van de Pas
+
+---
+
+## 🙏 Acknowledgments
+
+Built with:
+
+- [Electron](https://www.electronjs.org/) - Cross-platform desktop framework
+- [CodeMirror](https://codemirror.net/) - Code editor component
+- [EasyMDE](https://github.com/Ionaru/easy-markdown-editor) - Markdown editor
+- [Handlebars](https://handlebarsjs.com/) - Template rendering
+
+Special thanks to the open-source community.
+
+---
+
+## 🔗 Links
+
+- **[GitHub Repository](https://github.com/petervdpas/Formidable)**
+- **[Documentation Hub](docs/README.md)**
+- **[Latest Release](https://github.com/petervdpas/Formidable/releases)**
+- **[Issue Tracker](https://github.com/petervdpas/Formidable/issues)**

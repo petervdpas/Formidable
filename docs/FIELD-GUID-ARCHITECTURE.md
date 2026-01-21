@@ -2,7 +2,7 @@
 
 ## System Overview
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                         FORMIDABLE FORM                         │
 ├─────────────────────────────────────────────────────────────────┤
@@ -54,7 +54,7 @@
 
 ### Field Creation Flow
 
-```
+```text
 Template Definition
        │
        ▼
@@ -99,7 +99,7 @@ Template Definition
 
 ### Field Access Flow
 
-```
+```text
 CodeField Execution
        │
        ▼
@@ -144,7 +144,7 @@ CodeField Execution
 
 ### Fields in Loop Structure
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │ Loop Container (data-loop-key="items")                  │
 │                                                          │
@@ -216,7 +216,7 @@ Access Patterns:
 
 ## API Layers
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                     USER CODE (CodeField)                   │
 └────────────────────────┬────────────────────────────────────┘
@@ -242,7 +242,7 @@ Access Patterns:
 
 ## Resolution Strategies
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │           Field Resolution Decision Tree                    │
 └─────────────────────────────────────────────────────────────┘
@@ -277,7 +277,7 @@ Use CFA.field      Is field in loop?
 
 ## Component Interaction
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    Template Definition                      │
 │  {                                                          │
@@ -341,7 +341,7 @@ Use CFA.field      Is field in loop?
 
 ## Use Case: Update Loop Field from CodeField
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │  User writes code in CodeField:                            │
 │                                                             │
