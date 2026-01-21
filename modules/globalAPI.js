@@ -12,6 +12,7 @@ import * as buttonUtils from "../utils/buttonUtils.js";
 import * as fieldRenderers from "../utils/fieldRenderers.js";
 import * as stringUtils from "../utils/stringUtils.js";
 import * as transform from "../utils/transformationUtils.js";
+import * as formUtils from "../utils/formUtils.js";
 import Toast from "../utils/toastUtils.js";
 
 export function exposeGlobalAPI() {
@@ -132,6 +133,13 @@ export function exposeGlobalAPI() {
       bindActionHandlers: domUtils.bindActionHandlers,
       syncScroll: domUtils.syncScroll,
       copyToClipboard: domUtils.copyToClipboard,
+    },
+
+    // Form utilities
+    form: {
+      resolveFieldElement: formUtils.resolveFieldElement,
+      resolveFieldByGuid: formUtils.resolveFieldByGuid,
+      getFormData: formUtils.getFormData,
     },
 
     button: {

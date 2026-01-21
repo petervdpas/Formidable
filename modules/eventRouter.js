@@ -21,6 +21,7 @@ import * as contextHandlers from "./handlers/contextHandlers.js";
 import * as templateHandlers from "./handlers/templateHandlers.js";
 import * as formHandlers from "./handlers/formHandlers.js";
 import * as formCtxHandlers from "./handlers/formContextHandlers.js";
+import * as fieldHandlers from "./handlers/fieldHandlers.js";
 import * as modalHandler from "./handlers/modalHandler.js";
 import * as themeHandler from "./handlers/themeHandler.js";
 import * as statusHandler from "./handlers/statusHandler.js";
@@ -327,6 +328,25 @@ export function initEventRouter() {
 
   EventBus.on("form:context:update", formCtxHandlers.handleFormContextUpdate);
   EventBus.on("form:context:get", formCtxHandlers.handleFormContextGet);
+
+  // Field events
+  EventBus.off("field:get-by-guid", fieldHandlers.handleGetFieldByGuid);
+  EventBus.off("field:get-by-key", fieldHandlers.handleGetFieldByKey);
+  EventBus.off("field:get-all-by-key", fieldHandlers.handleGetAllFieldsByKey);
+  EventBus.off("field:get-all", fieldHandlers.handleGetAllFields);
+  EventBus.off("field:get-value", fieldHandlers.handleGetFieldValue);
+  EventBus.off("field:get-value-by-key", fieldHandlers.handleGetFieldValueByKey);
+  EventBus.off("field:set-value", fieldHandlers.handleSetFieldValue);
+  EventBus.off("field:set-value-by-key", fieldHandlers.handleSetFieldValueByKey);
+
+  EventBus.on("field:get-by-guid", fieldHandlers.handleGetFieldByGuid);
+  EventBus.on("field:get-by-key", fieldHandlers.handleGetFieldByKey);
+  EventBus.on("field:get-all-by-key", fieldHandlers.handleGetAllFieldsByKey);
+  EventBus.on("field:get-all", fieldHandlers.handleGetAllFields);
+  EventBus.on("field:get-value", fieldHandlers.handleGetFieldValue);
+  EventBus.on("field:get-value-by-key", fieldHandlers.handleGetFieldValueByKey);
+  EventBus.on("field:set-value", fieldHandlers.handleSetFieldValue);
+  EventBus.on("field:set-value-by-key", fieldHandlers.handleSetFieldValueByKey);
 
   // Form events
   EventBus.off("form:selected", formHandlers.handleFormSelected);

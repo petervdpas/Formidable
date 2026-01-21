@@ -273,11 +273,14 @@ export function resolveScopedElement(container, field) {
   return container.querySelector(attr);
 }
 
-export function applyFieldContextAttributes(el, { key, type, loopKey = null }) {
+export function applyFieldContextAttributes(el, { key, type, loopKey = null, guid = null }) {
   if (!el || !key || !type) return;
 
   el.dataset.fieldKey = key;
   el.dataset.fieldType = type;
+
+  // Always add a unique GUID to enable precise field targeting (especially in loops)
+  el.dataset.fieldGuid = guid || generateGuid();
 
   if (loopKey) {
     // Support both string and array input

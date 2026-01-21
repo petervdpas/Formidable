@@ -175,7 +175,7 @@ export function collectLoopGroup(fields, startIdx, loopKey) {
 }
 
 export function resolveFieldElement(container, field) {
-  const { key, type } = field;
+  const { key, type, guid } = field;
   const loopKey = Array.isArray(field.loopKey)
     ? field.loopKey.join(".")
     : field.loopKey;
@@ -185,10 +185,28 @@ export function resolveFieldElement(container, field) {
     return null;
   }
 
+  // If guid is provided, use it for precise targeting (most specific)
+  if (guid) {
+    const el = container.querySelector(`[data-field-guid="${guid}"]`);
+    if (el) return el;
+  }
+
+  // Fallback to the existing key-based resolution
   const selectorParts = [`[data-field-key="${key}"]`];
   if (type) selectorParts.push(`[data-field-type="${type}"]`);
   if (loopKey) selectorParts.push(`[data-field-loop="${loopKey}"]`);
   return container.querySelector(selectorParts.join(""));
+}
+
+/**
+ * Resolve field element by GUID (most precise method)
+ * @param {HTMLElement} container - The container to search within
+ * @param {string} guid - The unique GUID of the field
+ * @returns {HTMLElement|null} - The field element or null
+ */
+export function resolveFieldByGuid(container, guid) {
+  if (!container || !guid) return null;
+  return container.querySelector(`[data-field-guid="${guid}"]`);
 }
 
 // ─────────────────────────────────────────────
