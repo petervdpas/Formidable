@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2026-01-21T13:39:40.173Z",
+    "updated": "2026-01-21T14:16:49.785Z",
     "flagged": true,
     "tags": [
       "bye",
@@ -15,7 +15,7 @@
   },
   "data": {
     "id": "5a7bec64-f3f2-47cc-a836-2e4643e4f9a9",
-    "test": "Approve This One",
+    "test": "Approve This Ones",
     "check": true,
     "dropdown": "R",
     "multichoice": [
@@ -58,12 +58,17 @@
       "now what",
       "Great"
     ],
-    "calculatedSummary": "Test: Approve This One | Sanitized: some-value-here! | Capitalized: Approve This One | File: sane-20250530.meta.…",
+    "calculatedSummary": "Test: Approve This Ones | Sanitized: some-value-here! | Capitalized: Approve This Ones | File: sane-20250530.meta.…",
+    "detailedOutput": "# Selected Options\\n\\nYou have selected 2 option(s):\\n\\n1. **A**\\n2. **C**\\n\\n---\\n\\n## Form Details\\n\\n- **Filename**: `sane-20250530.meta.json`\\n- **Test Value**: \"Approve This Ones\"\\n- **Sanitized**: `some-value-here!`\\n- **Capitalized**: Approve This Ones\\n- **Short Name**: sane-20250530.meta.…\\n\\n> Generated at: 2026-01-21T14:16:49.796Z",
     "myScript": {
-      "seenTest": "Approve This One",
+      "seenTest": "Approve This Ones",
       "cleanKey": "some-value-here!",
-      "capName": "Approve This One",
-      "shortFile": "sane-20250530.meta.…"
+      "capName": "Approve This Ones",
+      "shortFile": "sane-20250530.meta.…",
+      "choices": [
+        "A",
+        "C"
+      ]
     },
     "testapi": {
       "id": "c34c4d20-f47d-4ec5-bde5-8085a92f77f0",

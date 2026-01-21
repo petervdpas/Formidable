@@ -171,6 +171,15 @@ export const FieldBlueprints = {
     });
     textarea.value = v;
 
+    // Apply readonly for plain text mode only
+    const isPlainText = field.format === "plain" || typeof window.EasyMDE !== "function";
+    if (isPlainText && (
+      field.readonly === true ||
+      String(field.readonly).toLowerCase() === "true"
+    )) {
+      textarea.readOnly = true;
+    }
+
     // Plain mode or EasyMDE missing
     if (field.format === "plain" || typeof window.EasyMDE !== "function") {
       const status = document.createElement("div");

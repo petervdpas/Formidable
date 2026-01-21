@@ -44,6 +44,10 @@ function setupFieldEditor(container, onChange, allFields = []) {
     twoColumnRow: container
       .querySelector("#edit-two-column")
       ?.closest(".switch-row"),
+    readonly: container.querySelector("#edit-readonly"),
+    readonlyRow: container
+      .querySelector("#edit-readonly")
+      ?.closest(".switch-row"),
     default: container.querySelector("#edit-default"),
     options: container.querySelector("#edit-options"),
     type: container.querySelector("#edit-type-container select"),
@@ -208,8 +212,24 @@ function setupFieldEditor(container, onChange, allFields = []) {
     if (dom.summaryField) dom.summaryField.value = field.summary_field || "";
     dom.expressionItem.checked = !!field.expression_item;
     dom.twoColumn.checked = !!field.two_column;
+    dom.readonly.checked = !!field.readonly;
     if (dom.formatTextarea) dom.formatTextarea.value = field.format || "";
     dom.default.value = field.default ?? "";
+
+    // Hide readonly for markdown textarea
+    function updateReadonlyVisibility() {
+      if (field.type === "textarea" && dom.readonlyRow) {
+        const isMarkdown = dom.formatTextarea?.value === "markdown";
+        dom.readonlyRow.style.display = isMarkdown ? "none" : "";
+      }
+    }
+    updateReadonlyVisibility();
+
+    // Add listener for format changes
+    if (dom.formatTextarea && !dom.formatTextarea.__readonlyListenerAttached) {
+      dom.formatTextarea.__readonlyListenerAttached = true;
+      dom.formatTextarea.addEventListener("change", updateReadonlyVisibility);
+    }
 
     // label auto-sync
     labelLocked = !!field.label?.trim().length && field.label !== field.key;
@@ -387,6 +407,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
       summary_field: summaryField,
       expression_item: dom.expressionItem.checked,
       two_column: dom.twoColumn.checked,
+      readonly: dom.readonly.checked,
       default: dom.default.value,
       options,
       type,

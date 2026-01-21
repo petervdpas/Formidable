@@ -107,6 +107,7 @@ module.exports = {
     summary_field: "",
     expression_item: false,
     two_column: false,
+    readonly: false,
     default: "",
     options: [],
   },
@@ -127,6 +128,7 @@ module.exports = {
     // booleans
     field.expression_item = !!field.expression_item;
     field.two_column = !!field.two_column;
+    field.readonly = !!field.readonly;
 
     // summary_field only for loopstart
     if (field.type !== "loopstart") {

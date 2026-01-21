@@ -543,6 +543,7 @@ export default {
   "field.expression": "Expressieveld",
   "field.summary": "Samenvattingsveld",
   "field.twoColumn": "Twee kolommen",
+  "field.readonly": "Alleen-lezen",
   "field.placeholder.description": "Optionele beschrijving",
   "field.placeholder.default": "Stel de standaardwaarde in voor dit veld",
   "field.placeholder.options": "Komma-gescheiden",
