@@ -453,25 +453,25 @@ fields:
         await window.CFA.field.setValueByKey("calculatedSummary", summary);
 
         // Build detailed multi-line output with markdown formatting
-        let detailedText = `# Selected Options\\n\\n`;
+        let detailedText = `# Selected Options\n\n`;
         
         if (multiChoices.length > 0) {
-          detailedText += `You have selected ${multiChoices.length} option(s):\\n\\n`;
+          detailedText += `You have selected ${multiChoices.length} option(s):\n\n`;
           multiChoices.forEach((choice, idx) => {
-            detailedText += `${idx + 1}. **${choice}**\\n`;
+            detailedText += `${idx + 1}. **${choice}**\n`;
           });
-          detailedText += `\\n---\\n\\n`;
+          detailedText += `\n---\n\n`;
         } else {
-          detailedText += `_No options selected_\\n\\n---\\n\\n`;
+          detailedText += `_No options selected_\n\n---\n\n`;
         }
         
-        detailedText += `## Form Details\\n\\n`;
-        detailedText += `- **Filename**: \`${snap?.filename || 'unknown'}\`\\n`;
-        detailedText += `- **Test Value**: "${currentTest}"\\n`;
-        detailedText += `- **Sanitized**: \`${cleanKey}\`\\n`;
-        detailedText += `- **Capitalized**: ${capName}\\n`;
-        detailedText += `- **Short Name**: ${shortFile}\\n\\n`;
-        detailedText += `> Generated at: ${new Date().toISOString()}`;
+        detailedText += `## Form Details\n\n`;
+        detailedText += `- **Filename**: \`${snap?.filename || 'unknown'}\`\n`;
+        detailedText += `- **Test Value**: "${currentTest}"\n`;
+        detailedText += `- **Sanitized**: \`${cleanKey}\`\n`;
+        detailedText += `- **Capitalized**: ${capName}\n`;
+        detailedText += `- **Short Name**: ${shortFile}\n\n`;
+        detailedText += `> Generated at: ${api.string.formatDate(new Date(), 'datetime')}`;
         
         // Set the detailed output in the textarea field
         await window.CFA.field.setValueByKey("detailedOutput", detailedText);

@@ -160,6 +160,8 @@ export function exposeGlobalAPI() {
       toSnake: stringUtils.toSnake,
       truncate: stringUtils.truncate,
       withDefault: stringUtils.withDefault,
+      formatDate: stringUtils.formatDate,
+      relativeTime: stringUtils.relativeTime,
     },
 
     toast: Toast,
