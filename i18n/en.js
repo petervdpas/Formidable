@@ -547,6 +547,7 @@ export default {
   "field.code.runmode.load": "On Load",
   "field.code.runmode.save": "On Save",
   "field.code.allowrun": "Allow Execution",
+  "field.code.hidefield": "Hide Field",
   "field.code.inputmode": "Input Mode",
   "field.code.inputmode.safe": "Safe (data-only)",
   "field.code.inputmode.raw": "Raw (same realm)",

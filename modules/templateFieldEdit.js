@@ -56,6 +56,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
 
     runmode: container.querySelector("#edit-runmode"),
     allowRun: container.querySelector("#edit-allowrun"),
+    hideField: container.querySelector("#edit-hidefield"),
     inputMode: container.querySelector("#edit-inputmode"),
     apiMode: container.querySelector("#edit-apimode"),
     apiPick: container.querySelector("#edit-apipick"),
@@ -284,6 +285,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
           dom.runmode &&
             (dom.runmode.value = (field.run_mode || "manual").toLowerCase());
           dom.allowRun && (dom.allowRun.checked = !!field.allow_run);
+          dom.hideField && (dom.hideField.checked = !!field.hide_field);
           dom.inputMode &&
             (dom.inputMode.value =
               (field.input_mode || "safe").toLowerCase() === "raw"
@@ -353,6 +355,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
       dom.runmode &&
         (dom.runmode.value = (field.run_mode || "manual").toLowerCase());
       dom.allowRun && (dom.allowRun.checked = !!field.allow_run);
+      dom.hideField && (dom.hideField.checked = !!field.hide_field);
       dom.inputMode &&
         (dom.inputMode.value =
           (field.input_mode || "safe").toLowerCase() === "raw"
@@ -445,6 +448,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
         field.run_mode = "manual";
       }
       field.allow_run = !!dom.allowRun?.checked;
+      field.hide_field = !!dom.hideField?.checked;
 
       field.input_mode =
         (dom.inputMode?.value || "safe").toLowerCase() === "raw"

@@ -8,6 +8,7 @@ import { generateGuid } from "./domUtils.js";
 export const codeSpecific = Object.freeze([
   "runmode", // Execution trigger: manual/load/save
   "allowRun", // Allow execution at all
+  "hideField", // Hide from form display
   "inputMode", // 'safe' | 'raw'
   "api", // e.g. window.FGA
   "apiPick", // whitelist top-level keys: ['path','string']

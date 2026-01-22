@@ -1011,7 +1011,8 @@ export async function renderCodeField(field, value = "") {
   const runMode = String(
     field.run_mode || field.runMode || "manual"
   ).toLowerCase();
-  const allowRun = field.allow_run !== false; // default true unless explicitly false
+  const allowRun = field.allow_run !== false;
+  const hideField = field.hide_field === true;
 
   const wrapper = document.createElement("div");
   wrapper.className = `code-field code-mode-${runMode}`;
@@ -1196,7 +1197,7 @@ export async function renderCodeField(field, value = "") {
     loopKey: field.loopKey || null,
   });
 
-  return wrapInputWithLabel(
+  const outerWrapper = wrapInputWithLabel(
     wrapper,
     field.label || "Code",
     field.description ||
@@ -1208,6 +1209,12 @@ export async function renderCodeField(field, value = "") {
     field.two_column,
     field.wrapper || "form-row"
   );
+
+  if (hideField && runMode !== "manual") {
+    outerWrapper.style.display = "none";
+  }
+
+  return outerWrapper;
 
   // helpers
   function fmt(v) {

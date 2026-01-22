@@ -284,7 +284,24 @@ function saveFile(filepath, data, { format = "text", silent = false } = {}) {
   try {
     let content = data;
     if (format === "json") content = JSON.stringify(data, null, 2);
-    else if (format === "yaml") content = yaml.dump(data);
+    else if (format === "yaml") {
+      // Custom dumper to force literal style for multiline strings
+      const LiteralString = new yaml.Type('tag:yaml.org,2002:str', {
+        kind: 'scalar',
+        construct: (data) => data,
+        predicate: (obj) => typeof obj === 'string' && obj.includes('\n'),
+        represent: (obj) => obj,
+        defaultStyle: '|' // Force literal style for multiline strings
+      });
+      
+      const LITERAL_SCHEMA = yaml.DEFAULT_SCHEMA.extend([LiteralString]);
+      
+      content = yaml.dump(data, {
+        schema: LITERAL_SCHEMA,
+        lineWidth: -1, // Don't wrap long lines
+        noRefs: true, // Don't use YAML anchors/aliases
+      });
+    }
 
     fs.writeFileSync(filepath, content, "utf-8");
 

@@ -26,6 +26,7 @@ const textareaFormats = new Set(["markdown", "plain"]);
 const codeDefaults = {
   run_mode: "manual", // "manual" | "load" | "save"
   allow_run: false,
+  hide_field: false,
   input_mode: "safe", // "safe" | "raw"
   api_mode: "frozen", // "frozen" | "raw"
   api_pick: [], // string[]
@@ -181,6 +182,9 @@ module.exports = {
       // normalize allow_run
       field.allow_run = !!field.allow_run;
 
+      // normalize hide_field
+      field.hide_field = !!field.hide_field;
+
       // normalize input_mode
       const im = String(field.input_mode || "safe").toLowerCase();
       field.input_mode = im === "raw" ? "raw" : "safe";
@@ -215,6 +219,7 @@ module.exports = {
       // scrub code-only props
       delete field.run_mode;
       delete field.allow_run;
+      delete field.hide_field;
       delete field.input_mode;
       delete field.api_mode;
       delete field.api_pick;

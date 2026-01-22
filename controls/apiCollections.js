@@ -804,6 +804,7 @@ function mountApiCollections(app) {
           // code
           run_mode: { type: "string", enum: ["manual", "load", "save"] },
           allow_run: { type: "boolean" },
+          hide_field: { type: "boolean" },
           input_mode: { type: "string", enum: ["safe", "raw"] },
           api_mode: { type: "string", enum: ["frozen", "raw"] },
           api_pick: { type: "array", items: { type: "string" } },

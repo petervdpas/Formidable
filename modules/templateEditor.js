@@ -58,6 +58,7 @@ function sanitizeField(f) {
   if (f.summary_field?.trim()) field.summary_field = f.summary_field.trim();
   if (f.expression_item) field.expression_item = true;
   if (f.two_column) field.two_column = true;
+  if (f.readonly) field.readonly = true;
 
   if (f.type === "textarea") {
     const fmt = String(f.format || "markdown").toLowerCase();
@@ -81,6 +82,7 @@ function sanitizeField(f) {
     const rm = String(f.run_mode || "manual").toLowerCase();
     field.run_mode = ["manual", "load", "save"].includes(rm) ? rm : "manual";
     field.allow_run = !!f.allow_run;
+    field.hide_field = !!f.hide_field;
 
     const im = String(f.input_mode || "safe").toLowerCase();
     field.input_mode = im === "raw" ? "raw" : "safe";

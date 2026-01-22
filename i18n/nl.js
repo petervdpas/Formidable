@@ -570,6 +570,7 @@ export default {
   "field.code.runmode.load": "Bij Laden",
   "field.code.runmode.save": "Bij Opslaan",
   "field.code.allowrun": "Toestaan Uitvoering",
+  "field.code.hidefield": "Veld Verbergen",
   "field.code.inputmode": "Invoermodus",
   "field.code.inputmode.safe": "Veilig (alleen data)",
   "field.code.inputmode.raw": "Raw (zelfde domein)",
