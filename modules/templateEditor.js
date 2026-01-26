@@ -104,12 +104,18 @@ function sanitizeField(f) {
     field.map = Array.isArray(f.map)
       ? f.map
           .filter((m) => m && typeof m.key === "string" && m.key.trim())
-          .map(({ key, path, mode }) => ({
-            key: String(key).trim(),
-            path: String(path || key).trim(),
-            mode:
-              String(mode).toLowerCase() === "editable" ? "editable" : "static",
-          }))
+          .map(({ key, path, mode }) => {
+            const modeStr = String(mode).toLowerCase();
+            let finalMode = "static";
+            if (modeStr === "editable") finalMode = "editable";
+            else if (modeStr === "live-fill") finalMode = "live-fill";
+            else if (modeStr === "live-edit") finalMode = "live-edit";
+            return {
+              key: String(key).trim(),
+              path: String(path || key).trim(),
+              mode: finalMode,
+            };
+          })
       : [];
 
     const usePicker = f.use_picker ?? f.apiUsePicker ?? false;

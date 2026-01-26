@@ -9,8 +9,11 @@ function _normalizeApiMap(arr = []) {
     const key = String(it.key || "").trim();
     if (!key || seen.has(key)) continue;
     const path = String(it.path || key).trim();
-    const mode = String(it.mode || "static").toLowerCase() === "editable"
-      ? "editable" : "static";
+    const modeRaw = String(it.mode || "static").toLowerCase();
+    let mode = "static";
+    if (modeRaw === "editable") mode = "editable";
+    else if (modeRaw === "live-fill") mode = "live-fill";
+    else if (modeRaw === "live-edit") mode = "live-edit";
     out.push({ key, path, mode });
     seen.add(key);
   }
@@ -112,12 +115,12 @@ function createApiMapEditor(container, onChange) {
     const modeWrap = document.createElement("div");
     modeWrap.className = "col-mode";
     const modeSelect = document.createElement("select");
-    ["static", "editable"].forEach((m) => {
+    ["static", "editable", "live-fill", "live-edit"].forEach((m) => {
       const opt = document.createElement("option");
       opt.value = m; opt.textContent = m;
       modeSelect.appendChild(opt);
     });
-    modeSelect.value = mode === "editable" ? "editable" : "static";
+    modeSelect.value = mode;
     modeWrap.appendChild(modeSelect);
 
     // Actions
@@ -147,8 +150,11 @@ function createApiMapEditor(container, onChange) {
     const vals = rows.map((r) => {
       const key  = r.querySelector(".col-key input")?.value?.trim()  || "";
       const path = r.querySelector(".col-path input")?.value?.trim() || "";
-      const mode = (r.querySelector(".col-mode select")?.value === "editable")
-        ? "editable" : "static";
+      const modeSelect = r.querySelector(".col-mode select")?.value || "static";
+      let mode = "static";
+      if (modeSelect === "editable") mode = "editable";
+      else if (modeSelect === "live-fill") mode = "live-fill";
+      else if (modeSelect === "live-edit") mode = "live-edit";
       return key ? { key, path: path || key, mode } : null;
     }).filter(Boolean);
     return _normalizeApiMap(vals);

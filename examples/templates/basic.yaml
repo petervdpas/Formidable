@@ -527,13 +527,13 @@ fields:
     map:
       - key: name
         path: name
-        mode: static
+        mode: live-fill
       - key: street-address
         path: street-address
-        mode: editable
+        mode: live-edit
       - key: owners
         path: owners
-        mode: editable
+        mode: live-edit
     use_picker: true
     allowed_ids:
       - c34c4d20-f47d-4ec5-bde5-8085a92f77f0

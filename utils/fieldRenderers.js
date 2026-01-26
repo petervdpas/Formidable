@@ -1365,6 +1365,7 @@ export async function renderApiField(field, value = "") {
   let idSelect = null; // picker
   let mapGrid = null; // label+input grid
   let lastFetchedDoc = null; // keep the last loaded doc to drive placeholders
+  const staticFieldsFilled = new Set(); // track which static fields have been filled once
 
   // ───────────────────────────────────────────
   // Helpers
@@ -1422,17 +1423,32 @@ export async function renderApiField(field, value = "") {
       const doc = res.data || {};
       lastFetchedDoc = doc;
 
-      // fill read-only mapped values from API doc
+      // fill mapped values from API doc based on mode:
+      // - static: read-only, fill ONCE with API value, never update again
+      // - editable: user can override, API value only shown as placeholder when empty
+      // - live-fill: always overwrite field with API value on every fetch (read-only)
+      // - live-edit: always overwrite field with API value on every fetch (NOT read-only)
       for (const m of mappings) {
         if (!m) continue;
         const ctl = mapGrid?.querySelector(
           `[name="${field.key}__map__${m.key}"]`
         );
         if (!ctl) continue;
-        if (m.mode !== "editable") {
-          const val = resolveByPath(doc, m.path || "");
-          ctl.value = val == null ? "" : String(val);
+        
+        const val = resolveByPath(doc, m.path || "");
+        const apiValue = val == null ? "" : String(val);
+        
+        if (m.mode === "live-fill" || m.mode === "live-edit") {
+          // Always overwrite with API value, even if previously filled
+          ctl.value = apiValue;
+        } else if (m.mode === "static") {
+          // Static: fill once and lock, never update again
+          if (!staticFieldsFilled.has(m.key)) {
+            ctl.value = apiValue;
+            staticFieldsFilled.add(m.key);
+          }
         }
+        // editable mode: do nothing here, only update placeholder below
       }
 
       // refresh placeholders for editable fields (only used when empty)
@@ -1639,10 +1655,20 @@ export async function renderApiField(field, value = "") {
         inp.id = `${field.key}__map__${m.key}`;
         inp.name = `${field.key}__map__${m.key}`;
         inp.placeholder = t("field.api.map.placeholder", "(override…)"); // will be replaced with source value after fetch
-        if (m.mode !== "editable") inp.readOnly = true;
+        
+        // Set read-only state based on mode
+        // static and live-fill are read-only; editable and live-edit are NOT
+        if (m.mode === "static" || m.mode === "live-fill") {
+          inp.readOnly = true;
+        }
+        
+        // Only load initial overrides for editable fields
         if (m.mode === "editable" && initial.overrides?.[m.key] != null) {
           inp.value = String(initial.overrides[m.key]);
         }
+        
+        // Only editable fields can have user overrides saved
+        // live-edit is NOT saved as override - it gets overwritten on every fetch
         if (m.mode === "editable") {
           editableInputs.set(m.key, inp);
           // when user clears the input, show source value as placeholder again

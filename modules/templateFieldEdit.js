@@ -151,10 +151,11 @@ function setupFieldEditor(container, onChange, allFields = []) {
         if (!key || seen.has(key)) continue;
         const path =
           typeof it.path === "string" && it.path.trim() ? it.path.trim() : key;
-        const mode =
-          String(it.mode || "static").toLowerCase() === "editable"
-            ? "editable"
-            : "static";
+        const modeRaw = String(it.mode || "static").toLowerCase();
+        let mode = "static";
+        if (modeRaw === "editable") mode = "editable";
+        else if (modeRaw === "live-fill") mode = "live-fill";
+        else if (modeRaw === "live-edit") mode = "live-edit";
         out.push({ key, path, mode });
         seen.add(key);
       }

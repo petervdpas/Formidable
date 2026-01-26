@@ -41,7 +41,7 @@ const latexDefaults = {
 const apiDefaults = {
   collection: "",
   id: "",
-  map: [], // [{ key: "name", path: "name", mode: "static"|"editable" }]
+  map: [], // [{ key: "name", path: "name", mode: "static"|"editable"|"live-fill"|"live-edit" }]
   use_picker: false,
   allowed_ids: [], // array of ids
 };
@@ -61,7 +61,10 @@ function normApiMap(arr) {
     const path =
       typeof it.path === "string" && it.path.trim() ? it.path.trim() : key;
     const mode = String(it.mode || "static").toLowerCase();
-    const mm = mode === "editable" ? "editable" : "static";
+    let mm = "static";
+    if (mode === "editable") mm = "editable";
+    else if (mode === "live-fill") mm = "live-fill";
+    else if (mode === "live-edit") mm = "live-edit";
     out.push({ key, path, mode: mm });
     seen.add(key);
   }
