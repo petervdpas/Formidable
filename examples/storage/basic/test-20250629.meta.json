@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-29T09:32:36.440Z",
-    "updated": "2026-01-22T00:46:28.348Z",
+    "updated": "2026-01-26T21:52:50.688Z",
     "flagged": false,
     "tags": [
       "ch.01",
@@ -47,7 +47,7 @@
         "Mo"
       ]
     ],
-    "design": "",
+    "design": "GreenSignWhiteArrowPersonRunning.png",
     "linktest": {
       "href": "formidable://basic.yaml:sane-20250530.meta.json",
       "text": "Approve this one"
@@ -57,7 +57,7 @@
       "you lucky guy"
     ],
     "calculatedSummary": "Test: Decline This One | Sanitized: some-value-here! | Capitalized: Decline This One | File: test-20250629.meta.…",
-    "detailedOutput": "# Selected Options\n\nYou have selected 2 option(s):\n\n1. **A**\n2. **B**\n\n---\n\n## Form Details\n\n- **Filename**: `test-20250629.meta.json`\n- **Test Value**: \"Decline This One\"\n- **Sanitized**: `some-value-here!`\n- **Capitalized**: Decline This One\n- **Short Name**: test-20250629.meta.…\n\n> Generated at: Jan 22, 2026, 01:46 AM",
+    "detailedOutput": "# Selected Options\n\nYou have selected 2 option(s):\n\n1. **A**\n2. **B**\n\n---\n\n## Form Details\n\n- **Filename**: `test-20250629.meta.json`\n- **Test Value**: \"Decline This One\"\n- **Sanitized**: `some-value-here!`\n- **Capitalized**: Decline This One\n- **Short Name**: test-20250629.meta.…\n\n> Generated at: Jan 26, 2026, 10:52 PM",
     "myScript": {
       "seenTest": "Decline This One",
       "cleanKey": "some-value-here!",
@@ -68,6 +68,20 @@
         "B"
       ]
     },
-    "testapi": {}
+    "testapi": {
+      "id": "c34c4d20-f47d-4ec5-bde5-8085a92f77f0",
+      "name": "Googleplex",
+      "street-address": "Amphitheatre Parkway",
+      "owners": [
+        [
+          "Larry",
+          "Page"
+        ],
+        [
+          "Sergey",
+          "Brin"
+        ]
+      ]
+    }
   }
 }

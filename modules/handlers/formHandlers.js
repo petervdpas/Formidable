@@ -350,6 +350,16 @@ export async function handleBeforeSaveRun(
             // Skip the code field itself
             if (field.key === f.key || field.type === 'code') continue;
             
+            // Skip field types that require template context or complex handling
+            // These should only be parsed during normal save flow, not re-collection:
+            // - image: requires template.virtualLocation for file upload handling
+            // - api: requires template for API document fetching
+            // - link: requires template parameter
+            // - latex: meta-only field that uses template default
+            // - looper/loopstart/loopstop: meta-only fields with no user input
+            const skipTypes = ['image', 'api', 'link', 'latex', 'looper', 'loopstart', 'loopstop'];
+            if (skipTypes.includes(field.type)) continue;
+            
             // Use the proper field resolver to find the element
             const fieldElement = resolveFieldElement(formContainer, {
               key: field.key,
