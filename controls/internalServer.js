@@ -37,10 +37,52 @@ function startInternalServer(port = 8383) {
   const app = express(); // <-- this is the Express app (no clash now)
 
   // storage (as before)
-  app.use(
-    "/storage",
-    express.static(path.resolve(configManager.getContextStoragePath()))
-  );
+  const storagePath = path.resolve(configManager.getContextStoragePath());
+  log(`[InternalServer] Mounting /storage to: ${storagePath}`);
+  
+  app.use("/storage", express.static(storagePath, {
+    fallthrough: true,
+    redirect: false,
+  }));
+  
+  // If file not found, show detailed diagnostic page
+  app.use("/storage", (req, res, next) => {
+    const fs = require('fs');
+    const requestedPath = req.path;
+    const fullPath = path.join(storagePath, requestedPath);
+    const dir = path.dirname(fullPath);
+    
+    let dirExists = false;
+    let filesInDir = [];
+    try {
+      dirExists = fs.existsSync(dir);
+      if (dirExists) {
+        filesInDir = fs.readdirSync(dir);
+      }
+    } catch (err) {
+      // ignore
+    }
+    
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head><title>File Not Found - Formidable</title></head>
+      <body style="font-family: monospace; padding: 20px; background: #f5f5f5;">
+        <h2>❌ File Not Found</h2>
+        <p><strong>Requested URL:</strong> ${escapeHtml(req.url)}</p>
+        <p><strong>Storage Root:</strong> <code>${escapeHtml(storagePath)}</code></p>
+        <p><strong>Full Path:</strong> <code>${escapeHtml(fullPath)}</code></p>
+        <p><strong>Directory Exists:</strong> ${dirExists ? '✅ Yes' : '❌ No'}</p>
+        ${dirExists ? `
+          <p><strong>Files in directory:</strong></p>
+          <ul>${filesInDir.map(f => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
+        ` : `<p><strong>Directory:</strong> <code>${escapeHtml(dir)}</code></p>`}
+      </body>
+      </html>
+    `;
+    
+    res.status(404).send(html);
+  });
 
   // ----- Assets dir: packaged vs dev
   const assetsDir =
