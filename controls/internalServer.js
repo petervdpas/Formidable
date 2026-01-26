@@ -36,9 +36,13 @@ function startInternalServer(port = 8383) {
 
   const app = express(); // <-- this is the Express app (no clash now)
 
-  // storage (as before)
-  const storagePath = path.resolve(configManager.getContextStoragePath());
-  log(`[InternalServer] Mounting /storage to: ${storagePath}`);
+  // Storage: always get fresh config to ensure we use the correct user-configured path
+  const userConfig = configManager.loadUserConfig();
+  const contextBase = require('./fileManager').resolvePath(userConfig.context_folder || "./examples");
+  const storagePath = path.join(contextBase, "storage");
+  
+  log(`[InternalServer] Context folder: ${userConfig.context_folder}`);
+  log(`[InternalServer] Resolved storage path: ${storagePath}`);
   
   app.use("/storage", express.static(storagePath, {
     fallthrough: true,
