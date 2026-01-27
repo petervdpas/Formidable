@@ -36,17 +36,14 @@ function startInternalServer(port = 8383) {
 
   const app = express(); // <-- this is the Express app (no clash now)
 
-  // Get storage path from virtual structure - this respects user's context_folder config
-  const virtualStructure = configManager.getVirtualStructure();
-  const storagePath = virtualStructure.storage;
-  
-  log(`[InternalServer] Using storage path from VFS: ${storagePath}`);
+  log(`[InternalServer] Starting server - storage path will be resolved dynamically per request`);
   
   // Debug route to test image configuration
   app.get("/debug/images", (req, res) => {
     const fs = require('fs');
     const userConfig = configManager.loadUserConfig();
     const vfs = configManager.getVirtualStructure();
+    const storagePath = vfs.storage;
     
     let html = `
       <!DOCTYPE html>
@@ -97,16 +94,22 @@ function startInternalServer(port = 8383) {
     res.send(html);
   });
   
-  app.use("/storage", express.static(storagePath, {
-    fallthrough: true,
-    redirect: false,
-  }));
-  
-  // If file not found, show detailed diagnostic page
+  // Dynamic storage path middleware - resolves storage path PER REQUEST
   app.use("/storage", (req, res, next) => {
-    const fs = require('fs');
-    const requestedPath = req.path;
+    const vfs = configManager.getVirtualStructure();
+    const storagePath = vfs.storage;
+    
+    // Serve the file dynamically
+    const requestedPath = req.path.slice(1); // Remove leading slash
     const fullPath = path.join(storagePath, requestedPath);
+    const fs = require('fs');
+    
+    // Check if file exists
+    if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
+      return res.sendFile(fullPath);
+    }
+    
+    // File not found - show diagnostic page
     const dir = path.dirname(fullPath);
     
     let dirExists = false;
