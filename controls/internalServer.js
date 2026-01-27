@@ -100,7 +100,7 @@ function startInternalServer(port = 8383) {
     const storagePath = vfs.storage;
     
     // Serve the file dynamically
-    const requestedPath = req.path.slice(1); // Remove leading slash
+    const requestedPath = decodeURIComponent(req.path.slice(1)); // Remove leading slash and decode URL encoding
     const fullPath = path.join(storagePath, requestedPath);
     const fs = require('fs');
     
