@@ -36,13 +36,11 @@ function startInternalServer(port = 8383) {
 
   const app = express(); // <-- this is the Express app (no clash now)
 
-  // Storage: always get fresh config to ensure we use the correct user-configured path
-  const userConfig = configManager.loadUserConfig();
-  const contextBase = require('./fileManager').resolvePath(userConfig.context_folder || "./examples");
-  const storagePath = path.join(contextBase, "storage");
+  // Get storage path from virtual structure - this respects user's context_folder config
+  const virtualStructure = configManager.getVirtualStructure();
+  const storagePath = virtualStructure.storage;
   
-  log(`[InternalServer] Context folder: ${userConfig.context_folder}`);
-  log(`[InternalServer] Resolved storage path: ${storagePath}`);
+  log(`[InternalServer] Using storage path from VFS: ${storagePath}`);
   
   app.use("/storage", express.static(storagePath, {
     fallthrough: true,
