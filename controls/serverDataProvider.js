@@ -57,7 +57,19 @@ async function extendedListForms(templateName) {
 
 async function loadTemplateYaml(templateFilename) {
   if (!templateFilename) return null;
-  return templateManager.loadTemplate(templateFilename);
+  const template = templateManager.loadTemplate(templateFilename);
+  if (!template) return null;
+  
+  // Ensure template has virtualLocation set from current config
+  const templateName = templateFilename.replace(/\.yaml$/i, "");
+  const virtualStructure = configManager.getVirtualStructure();
+  const storageInfo = virtualStructure.templateStorageFolders[templateName];
+  
+  if (storageInfo && !template.virtualLocation) {
+    template.virtualLocation = storageInfo.path;
+  }
+  
+  return template;
 }
 
 async function loadFormFile(templateName, dataFile) {

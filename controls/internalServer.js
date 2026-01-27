@@ -42,6 +42,61 @@ function startInternalServer(port = 8383) {
   
   log(`[InternalServer] Using storage path from VFS: ${storagePath}`);
   
+  // Debug route to test image configuration
+  app.get("/debug/images", (req, res) => {
+    const fs = require('fs');
+    const userConfig = configManager.loadUserConfig();
+    const vfs = configManager.getVirtualStructure();
+    
+    let html = `
+      <!DOCTYPE html>
+      <html>
+      <head><title>Image Debug - Formidable</title></head>
+      <body style="font-family: monospace; padding: 20px; background: #f5f5f5;">
+        <h2>🔍 Image Configuration Debug</h2>
+        
+        <h3>User Config</h3>
+        <p><strong>context_folder:</strong> <code>${escapeHtml(userConfig.context_folder || 'NOT SET')}</code></p>
+        
+        <h3>Virtual File System</h3>
+        <p><strong>Context:</strong> <code>${escapeHtml(vfs.context)}</code></p>
+        <p><strong>Storage Root:</strong> <code>${escapeHtml(vfs.storage)}</code></p>
+        <p><strong>Templates Root:</strong> <code>${escapeHtml(vfs.templates)}</code></p>
+        
+        <h3>Template Storage Folders</h3>
+        <ul>`;
+    
+    for (const [name, info] of Object.entries(vfs.templateStorageFolders)) {
+      const imagesPath = path.join(info.path, 'images');
+      const imagesExist = fs.existsSync(imagesPath);
+      const imageFiles = imagesExist ? fs.readdirSync(imagesPath) : [];
+      
+      html += `
+        <li>
+          <strong>${escapeHtml(name)}</strong>
+          <ul>
+            <li>Path: <code>${escapeHtml(info.path)}</code></li>
+            <li>Images folder: <code>${escapeHtml(imagesPath)}</code> ${imagesExist ? '✅' : '❌'}</li>
+            ${imageFiles.length > 0 ? `
+              <li>Images (${imageFiles.length}):
+                <ul>${imageFiles.map(f => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
+              </li>
+            ` : ''}
+          </ul>
+        </li>`;
+    }
+    
+    html += `
+        </ul>
+        
+        <h3>Test Image URL</h3>
+        <p>Try accessing: <a href="/storage/basic/images/formidable.png" target="_blank">/storage/basic/images/formidable.png</a></p>
+      </body>
+      </html>`;
+    
+    res.send(html);
+  });
+  
   app.use("/storage", express.static(storagePath, {
     fallthrough: true,
     redirect: false,
