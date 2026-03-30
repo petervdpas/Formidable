@@ -13,6 +13,8 @@ function getBootPath() {
 let configPath = null;
 let cachedConfig = null;
 let virtualStructure = null;
+let virtualStructureBuiltAt = 0;
+const VIRTUAL_STRUCTURE_TTL = 2000; // ms
 
 // ─────────────────────────────────────────────
 // Helpers
@@ -227,11 +229,13 @@ function loadUserConfig() {
 
     cachedConfig = config;
     virtualStructure = buildVirtualStructure(config);
+    virtualStructureBuiltAt = Date.now();
     return config;
   } catch (err) {
     error("[ConfigManager] Failed to load config:", err);
     cachedConfig = { ...schema.defaults };
     virtualStructure = buildVirtualStructure(cachedConfig);
+    virtualStructureBuiltAt = Date.now();
     return cachedConfig;
   }
 }
@@ -241,12 +245,20 @@ function loadUserConfig() {
 // ─────────────────────────────────────────────
 function saveUserConfig(config) {
   try {
+    const contextChanged =
+      cachedConfig && config.context_folder !== cachedConfig.context_folder;
+
     fileManager.saveFile(configPath, config, {
       format: "json",
       silent: false,
     });
     cachedConfig = config;
-    virtualStructure = buildVirtualStructure(config);
+
+    if (contextChanged || !virtualStructure) {
+      virtualStructure = buildVirtualStructure(config);
+      virtualStructureBuiltAt = Date.now();
+    }
+
     log("[ConfigManager] Saved user config.");
   } catch (err) {
     error("[ConfigManager] Failed to save user config:", err);
@@ -279,6 +291,11 @@ function updateUserConfig(partial) {
 function invalidateConfigCache() {
   cachedConfig = null;
   virtualStructure = null;
+  virtualStructureBuiltAt = 0;
+}
+
+function dirtyVirtualStructure() {
+  virtualStructureBuiltAt = 0;
 }
 
 // ─────────────────────────────────────────────
@@ -286,42 +303,13 @@ function invalidateConfigCache() {
 // ─────────────────────────────────────────────
 function getVirtualStructure() {
   if (!cachedConfig || !virtualStructure) loadUserConfig();
-  return virtualStructure;
-}
 
-/**
- * Refresh the virtual structure.
- * Pass a templateName to only rescan that template's storage (incremental).
- * Pass nothing to do a full rebuild.
- */
-function refreshVirtualStructure(templateName) {
-  if (!cachedConfig) loadUserConfig();
-
-  if (templateName && virtualStructure) {
-    // Incremental: only rescan the affected template's storage
-    const name = templateName.replace(/\.yaml$/, "");
-    const storagePath = virtualStructure.storage;
-    const templateStoragePath = fileManager.joinPath(storagePath, name);
-    const imagesPath = fileManager.joinPath(templateStoragePath, "images");
-
-    fileManager.ensureDirectory(templateStoragePath, { label: `Storage<${name}>`, silent: true });
-    fileManager.ensureDirectory(imagesPath, { label: `Images<${name}>`, silent: true });
-
-    const metaFiles = fileManager.listFilesByExtension(templateStoragePath, ".meta.json", { silent: true });
-    const imageFiles = fileManager.listFiles(imagesPath, { silent: true });
-
-    virtualStructure.templateStorageFolders[name] = {
-      name,
-      filename: `${name}.yaml`,
-      path: templateStoragePath,
-      metaFiles,
-      imageFiles,
-    };
-    return virtualStructure;
+  // Rebuild if stale
+  if (Date.now() - virtualStructureBuiltAt > VIRTUAL_STRUCTURE_TTL) {
+    virtualStructure = buildVirtualStructure(cachedConfig);
+    virtualStructureBuiltAt = Date.now();
   }
 
-  // Full rebuild
-  virtualStructure = buildVirtualStructure(cachedConfig);
   return virtualStructure;
 }
 
@@ -366,40 +354,11 @@ function getTemplateImageFiles(templateFilename) {
 
 function getSingleTemplateEntry(templateName) {
   if (!templateName) return null;
-
-  const config = loadUserConfig();
-  const base = fileManager.resolvePath(config.context_folder || "./");
-  const storagePath = fileManager.joinPath(base, "storage");
-  const templateStoragePath = path.join(storagePath, templateName);
-  const imagesPath = path.join(templateStoragePath, "images");
-
-  fileManager.ensureDirectory(templateStoragePath, {
-    label: `Storage<${templateName}>`,
-    silent: true,
-  });
-
-  fileManager.ensureDirectory(imagesPath, {
-    label: `Images<${templateName}>`,
-    silent: true,
-  });
-
-  const metaFiles = fileManager.listFilesByExtension(
-    templateStoragePath,
-    ".meta.json",
-    {
-      silent: true,
-    }
-  );
-
-  const imageFiles = fileManager.listFiles(imagesPath, { silent: true });
-
+  const info = getVirtualStructure().templateStorageFolders[templateName] || null;
+  if (!info) return null;
   return {
     id: `template:${templateName}`,
-    name: templateName,
-    filename: `${templateName}.yaml`,
-    path: templateStoragePath,
-    metaFiles,
-    imageFiles,
+    ...info,
   };
 }
 
@@ -577,8 +536,8 @@ module.exports = {
   loadUserConfig,
   updateUserConfig,
   invalidateConfigCache,
+  dirtyVirtualStructure,
   getVirtualStructure,
-  refreshVirtualStructure,
   getContextPath,
   getContextTemplatesPath,
   getContextStoragePath,

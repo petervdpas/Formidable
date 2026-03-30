@@ -348,12 +348,16 @@ function registerIpcHandlers() {
   // Templates
   registerIpc("list-templates", () => templateManager.listTemplates());
   registerIpc("load-template", (e, name) => templateManager.loadTemplate(name));
-  registerIpc("save-template", (e, name, data) =>
-    templateManager.saveTemplate(name, data)
-  );
-  registerIpc("delete-template", (e, name) =>
-    templateManager.deleteTemplate(name)
-  );
+  registerIpc("save-template", (e, name, data) => {
+    const result = templateManager.saveTemplate(name, data);
+    configManager.dirtyVirtualStructure();
+    return result;
+  });
+  registerIpc("delete-template", (e, name) => {
+    const result = templateManager.deleteTemplate(name);
+    configManager.dirtyVirtualStructure();
+    return result;
+  });
   registerIpc("validate-template", (e, template) =>
     templateManager.validateTemplate(template)
   );
@@ -380,12 +384,16 @@ function registerIpcHandlers() {
   registerIpc("load-form", (e, templateFilename, dataFile, fields) =>
     formManager.loadForm(templateFilename, dataFile, fields)
   );
-  registerIpc("save-form", (e, templateFilename, dataFile, data, fields) =>
-    formManager.saveForm(templateFilename, dataFile, data, fields)
-  );
-  registerIpc("delete-form", (e, templateFilename, dataFile) =>
-    formManager.deleteForm(templateFilename, dataFile)
-  );
+  registerIpc("save-form", (e, templateFilename, dataFile, data, fields) => {
+    const result = formManager.saveForm(templateFilename, dataFile, data, fields);
+    configManager.dirtyVirtualStructure();
+    return result;
+  });
+  registerIpc("delete-form", (e, templateFilename, dataFile) => {
+    const result = formManager.deleteForm(templateFilename, dataFile);
+    configManager.dirtyVirtualStructure();
+    return result;
+  });
 
   // Config
   registerIpc("switch-user-profile", (e, profileFilename) =>
@@ -499,7 +507,7 @@ function registerIpcHandlers() {
   registerIpc("file-exists", (e, filePath) => fileManager.fileExists(filePath));
   registerIpc("save-image-file", async (e, storageLocation, fileName, buffer) => {
     const result = fileManager.saveImageFile(storageLocation, fileName, buffer);
-    configManager.refreshVirtualStructure();
+    configManager.dirtyVirtualStructure();
     return result;
   });
   registerIpc("copy-folder", (e, { from, to, overwrite }) => {

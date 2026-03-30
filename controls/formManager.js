@@ -100,7 +100,6 @@ function saveForm(templateFilename, datafile, data, templateFields = []) {
     const result = metaRepo.saveFromBase(storagePath, datafile, sanitized);
     if (result.success) {
       log("[FormManager] Saved form:", result.path);
-      configManager.refreshVirtualStructure(templateFilename);
     } else {
       error("[FormManager] Save failed:", result.error);
     }
@@ -114,7 +113,6 @@ function saveForm(templateFilename, datafile, data, templateFields = []) {
 function deleteForm(templateFilename, datafile) {
   const storagePath = configManager.getTemplateStoragePath(templateFilename);
   const result = metaRepo.deleteFromBase(storagePath, datafile);
-  configManager.refreshVirtualStructure(templateFilename);
   return result;
 }
 
