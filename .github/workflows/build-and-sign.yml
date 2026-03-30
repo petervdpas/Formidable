@@ -91,7 +91,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────
   linux_deb_arm64:
     name: Linux ARM64 .deb (Raspberry Pi)
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
