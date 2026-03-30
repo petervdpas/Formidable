@@ -10,8 +10,8 @@
   "enable_plugins": true,
   "context_mode": "storage",
   "context_folder": "./examples",
-  "selected_template": "basic.yaml",
-  "selected_data_file": "sane-20250530.meta.json",
+  "selected_template": "addresses.yaml",
+  "selected_data_file": "test-20250711.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -27,7 +27,7 @@
     "y": 181
   },
   "template_sidebar_width": 352,
-  "storage_sidebar_width": 401,
+  "storage_sidebar_width": 366,
   "status_buttons": {
     "reloader": true,
     "charpicker": true,
