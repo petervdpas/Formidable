@@ -6,7 +6,9 @@ const { log, error } = nodeLogger;
 const fileManager = require("./fileManager");
 const schema = require("../schemas/config.schema");
 const bootSchema = require("../schemas/boot.schema");
-const BOOT_PATH = fileManager.resolvePath("config", "boot.json");
+function getBootPath() {
+  return fileManager.resolvePath("config", "boot.json");
+}
 
 let configPath = null;
 let cachedConfig = null;
@@ -38,15 +40,15 @@ function resolveBootProfile() {
   const configDir = fileManager.resolvePath("config");
   fileManager.ensureDirectory(configDir, { label: "Boot", silent: true });
 
-  if (!fileManager.fileExists(BOOT_PATH)) {
-    fileManager.saveFile(BOOT_PATH, bootSchema.defaults, { format: "json" });
+  if (!fileManager.fileExists(getBootPath())) {
+    fileManager.saveFile(getBootPath(), bootSchema.defaults, { format: "json" });
   }
 
-  const raw = fileManager.loadFile(BOOT_PATH, { format: "json" });
+  const raw = fileManager.loadFile(getBootPath(), { format: "json" });
   const { boot, changed } = bootSchema.sanitize(raw);
 
   if (changed) {
-    fileManager.saveFile(BOOT_PATH, boot, { format: "json" });
+    fileManager.saveFile(getBootPath(), boot, { format: "json" });
   }
 
   return boot.active_profile;
@@ -61,14 +63,14 @@ function setUserConfigPath(profileFilename) {
   log(`[ConfigManager] Using config path: ${configPath}`);
 }
 
-setUserConfigPath(resolveBootProfile());
+// Initialization is deferred — call initialize() from main.js after setAppRoot()
 
 // ─────────────────────────────────────────────
 // Switch user profile and reload config
 // ─────────────────────────────────────────────
 function switchUserProfile(profileFilename) {
   const bootData = { active_profile: profileFilename };
-  fileManager.saveFile(BOOT_PATH, bootData, { format: "json" });
+  fileManager.saveFile(getBootPath(), bootData, { format: "json" });
 
   setUserConfigPath(profileFilename);
   return loadUserConfig(); // Refresh config and virtual structure
@@ -524,9 +526,17 @@ function importUserProfile(
 }
 
 // ─────────────────────────────────────────────
+// Deferred initialization (called from main.js)
+// ─────────────────────────────────────────────
+function initialize() {
+  setUserConfigPath(resolveBootProfile());
+}
+
+// ─────────────────────────────────────────────
 // Exports
 // ─────────────────────────────────────────────
 module.exports = {
+  initialize,
   switchUserProfile,
   listAvailableProfiles,
   getCurrentProfileFilename,

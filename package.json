@@ -23,7 +23,6 @@
       "!node_modules/*/{test,__tests__,tests}/**",
       "!node_modules/.bin",
       "!**/*.md",
-      "!**/*.meta.json",
       "!dist",
       "!build",
       "!temp"

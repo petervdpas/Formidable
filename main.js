@@ -10,6 +10,7 @@ const fileManager = require("./controls/fileManager");
 const pluginManager = require("./controls/pluginManager");
 const templateManager = require("./controls/templateManager");
 const configManager = require("./controls/configManager");
+const setupManager = require("./controls/setupManager");
 const { registerIpcHandlers } = require("./controls/ipcRegistry");
 const { getSafeBounds } = require("./controls/windowBounds");
 const { log, warn, error } = nodeLogger;
@@ -120,7 +121,23 @@ function createWindow() {
 // App lifecycle
 // ────────────────────────────────────────────────────────────
 app.whenReady().then(() => {
+  // 1. Set app root to bundled app directory first
+  const isPackaged = app.isPackaged;
+  const appRoot = isPackaged ? app.getAppPath() : process.cwd();
+  fileManager.setAppRoot(appRoot);
+
+  // 2. First-run setup: copy examples to user dir on Linux/Mac if needed
+  const userDataDir = setupManager.runSetup();
+
+  // 3. Redirect app root to user-writable directory if applicable
+  if (userDataDir) {
+    fileManager.setAppRoot(userDataDir);
+  }
+
+  // 4. Initialize config (now resolves against the correct root)
+  configManager.initialize();
   const userConfig = configManager.loadUserConfig();
+
   app.setName("Formidable v" + packageJson.version);
 
   // Spellchecker language mapping
@@ -133,10 +150,6 @@ app.whenReady().then(() => {
   };
   const spellLang = langMap[lang] || langMap.en;
   session.defaultSession.setSpellCheckerLanguages([spellLang]);
-
-  const isPackaged = app.isPackaged;
-  const root = isPackaged ? app.getAppPath() : process.cwd();
-  fileManager.setAppRoot(root);
 
   pluginManager.loadPlugins();
   registerIpcHandlers();
