@@ -5,8 +5,18 @@ on:
     branches:
       - pre-release/*
 
+permissions:
+  contents: write
+
+env:
+  NODE_VERSION: "20"
+
 jobs:
-  build:
+  # ───────────────────────────────────────────────────────────────
+  # Windows: NSIS installer (amd64)
+  # ───────────────────────────────────────────────────────────────
+  windows:
+    name: Windows Installer
     runs-on: windows-latest
 
     steps:
@@ -15,7 +25,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install dependencies
         run: npm ci
@@ -23,47 +33,129 @@ jobs:
       - name: Build Electron App
         run: npm run build
 
-      - name: Move installer to installer directory
+      - name: Collect installer
         shell: pwsh
         run: |
           $pkg = Get-Content package.json | ConvertFrom-Json
           $version = $pkg.version
           $src = "dist/Formidable Setup $version.exe"
-          $destDir = "installer"
-          $dest = "$destDir/Formidable Setup.exe"
-
-          if (-Not (Test-Path $destDir)) {
-            New-Item -ItemType Directory -Path $destDir | Out-Null
-          }
 
           if (-Not (Test-Path $src)) {
             Write-Error "Expected installer file '$src' not found!"
             exit 1
           }
 
-          Move-Item $src $dest -Force
+          New-Item -ItemType Directory -Force -Path release | Out-Null
+          Copy-Item $src "release/Formidable Setup $version.exe"
 
-      - name: Upload installer artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Formidable Installer (unsigned)
-          path: installer/Formidable Setup.exe
+          name: release-windows
+          path: release/*
+
+  # ───────────────────────────────────────────────────────────────
+  # Linux amd64: .deb (Debian/Ubuntu)
+  # ───────────────────────────────────────────────────────────────
+  linux_deb_amd64:
+    name: Linux amd64 .deb
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Electron App (Linux amd64 deb)
+        run: npx electron-builder --linux deb --x64
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p release
+          cp dist/*.deb release/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-linux-deb-amd64
+          path: release/*
+
+  # ───────────────────────────────────────────────────────────────
+  # Linux ARM64: .deb (Raspberry Pi)
+  # ───────────────────────────────────────────────────────────────
+  linux_deb_arm64:
+    name: Linux ARM64 .deb (Raspberry Pi)
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Electron App (Linux arm64 deb)
+        run: npx electron-builder --linux deb --arm64
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p release
+          cp dist/*.deb release/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-linux-deb-arm64
+          path: release/*
+
+  # ───────────────────────────────────────────────────────────────
+  # Publish GitHub Pre-Release
+  # ───────────────────────────────────────────────────────────────
+  release:
+    name: Publish GitHub Pre-Release
+    needs: [windows, linux_deb_amd64, linux_deb_arm64]
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Flatten artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          find artifacts -maxdepth 8 -type f -exec cp -v "{}" dist/ \;
+          echo "--- Release assets ---"
+          ls -la dist
 
       - name: Set version-based release metadata
-        shell: pwsh
         run: |
-          $version = (Get-Content package.json | ConvertFrom-Json).version
-          echo "TAG_NAME=v$version-pre" >> $env:GITHUB_ENV
-          echo "RELEASE_NAME=Formidable v$version Pre-Release" >> $env:GITHUB_ENV
+          VERSION=$(node -p "require('./package.json').version")
+          echo "TAG_NAME=v${VERSION}-pre" >> $GITHUB_ENV
+          echo "RELEASE_NAME=Formidable v${VERSION} Pre-Release" >> $GITHUB_ENV
 
       - name: Create GitHub Pre-Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG_NAME }}
           name: ${{ env.RELEASE_NAME }}
           draft: false
           prerelease: true
-          files: installer/Formidable Setup.exe
-          fail_on_unmatched_files: false
+          generate_release_notes: true
+          files: dist/*
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
