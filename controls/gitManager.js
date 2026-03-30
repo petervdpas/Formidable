@@ -64,8 +64,14 @@ async function getGitInstance(folderPath) {
 
   if (!gitConfigCache.has(absPath)) {
     try {
-      // sensible defaults; tweak if you want rebase pulls
-      await git.addConfig("credential.helper", "manager-core");
+      // credential helper per platform
+      if (process.platform === "win32") {
+        await git.addConfig("credential.helper", "manager");
+      } else if (process.platform === "darwin") {
+        await git.addConfig("credential.helper", "osxkeychain");
+      }
+      // Linux: leave credential.helper to the system default
+
       await git.addConfig("credential.useHttpPath", "true");
       await git.addConfig("pull.rebase", "false");
       gitConfigCache.add(absPath);

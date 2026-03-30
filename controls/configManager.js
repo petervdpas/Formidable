@@ -286,8 +286,41 @@ function invalidateConfigCache() {
 // ─────────────────────────────────────────────
 function getVirtualStructure() {
   if (!cachedConfig || !virtualStructure) loadUserConfig();
+  return virtualStructure;
+}
 
-  // Fully rebuild every time to stay in sync with filesystem
+/**
+ * Refresh the virtual structure.
+ * Pass a templateName to only rescan that template's storage (incremental).
+ * Pass nothing to do a full rebuild.
+ */
+function refreshVirtualStructure(templateName) {
+  if (!cachedConfig) loadUserConfig();
+
+  if (templateName && virtualStructure) {
+    // Incremental: only rescan the affected template's storage
+    const name = templateName.replace(/\.yaml$/, "");
+    const storagePath = virtualStructure.storage;
+    const templateStoragePath = fileManager.joinPath(storagePath, name);
+    const imagesPath = fileManager.joinPath(templateStoragePath, "images");
+
+    fileManager.ensureDirectory(templateStoragePath, { label: `Storage<${name}>`, silent: true });
+    fileManager.ensureDirectory(imagesPath, { label: `Images<${name}>`, silent: true });
+
+    const metaFiles = fileManager.listFilesByExtension(templateStoragePath, ".meta.json", { silent: true });
+    const imageFiles = fileManager.listFiles(imagesPath, { silent: true });
+
+    virtualStructure.templateStorageFolders[name] = {
+      name,
+      filename: `${name}.yaml`,
+      path: templateStoragePath,
+      metaFiles,
+      imageFiles,
+    };
+    return virtualStructure;
+  }
+
+  // Full rebuild
   virtualStructure = buildVirtualStructure(cachedConfig);
   return virtualStructure;
 }
@@ -545,6 +578,7 @@ module.exports = {
   updateUserConfig,
   invalidateConfigCache,
   getVirtualStructure,
+  refreshVirtualStructure,
   getContextPath,
   getContextTemplatesPath,
   getContextStoragePath,

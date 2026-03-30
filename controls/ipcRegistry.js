@@ -497,9 +497,11 @@ function registerIpcHandlers() {
   );
   registerIpc("empty-folder", (e, dirPath) => fileManager.emptyFolder(dirPath));
   registerIpc("file-exists", (e, filePath) => fileManager.fileExists(filePath));
-  registerIpc("save-image-file", async (e, storageLocation, fileName, buffer) =>
-    fileManager.saveImageFile(storageLocation, fileName, buffer)
-  );
+  registerIpc("save-image-file", async (e, storageLocation, fileName, buffer) => {
+    const result = fileManager.saveImageFile(storageLocation, fileName, buffer);
+    configManager.refreshVirtualStructure();
+    return result;
+  });
   registerIpc("copy-folder", (e, { from, to, overwrite }) => {
     return {
       success: fileManager.copyFolderRecursive(from, to, overwrite),

@@ -22,7 +22,8 @@
       "**/*",
       "!node_modules/*/{test,__tests__,tests}/**",
       "!node_modules/.bin",
-      "!**/*.md",
+      "!*.md",
+      "!docs/**/*.md",
       "!dist",
       "!build",
       "!temp"

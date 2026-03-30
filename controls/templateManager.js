@@ -88,6 +88,7 @@ function saveTemplate(name, data) {
 
     if (saved) {
       log("[TemplateManager] Saved template:", filePath);
+      configManager.refreshVirtualStructure();
       return true;
     } else {
       error("[TemplateManager] Failed to save template:", filePath);
@@ -105,6 +106,7 @@ function deleteTemplate(name) {
     const deleted = fileManager.deleteFile(filePath);
     if (deleted) {
       log("[TemplateManager] Deleted template:", filePath);
+      configManager.refreshVirtualStructure();
       return true;
     } else {
       warn("[TemplateManager] File not found or not deleted:", filePath);
@@ -470,6 +472,7 @@ function seedBasicTemplateIfEmpty() {
 
     if (saved) {
       log("[TemplateManager] Created basic.yaml at:", path);
+      configManager.refreshVirtualStructure();
     } else {
       error("[TemplateManager] Failed to create basic.yaml");
     }
