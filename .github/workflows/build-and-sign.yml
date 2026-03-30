@@ -75,6 +75,16 @@ jobs:
       - name: Build Electron App (Linux amd64 deb)
         run: npx electron-builder --linux deb --x64
 
+      - name: Patch deb — copy assets into resources/assets
+        run: |
+          set -euo pipefail
+          DEB=$(ls dist/*.deb)
+          WORK=$(mktemp -d)
+          dpkg-deb -R "$DEB" "$WORK"
+          cp -r "$WORK/opt/Formidable/resources/app/assets" "$WORK/opt/Formidable/resources/assets"
+          dpkg-deb -b "$WORK" "$DEB"
+          rm -rf "$WORK"
+
       - name: Collect artifacts
         run: |
           mkdir -p release
@@ -106,6 +116,16 @@ jobs:
 
       - name: Build Electron App (Linux arm64 deb)
         run: npx electron-builder --linux deb --arm64
+
+      - name: Patch deb — copy assets into resources/assets
+        run: |
+          set -euo pipefail
+          DEB=$(ls dist/*.deb)
+          WORK=$(mktemp -d)
+          dpkg-deb -R "$DEB" "$WORK"
+          cp -r "$WORK/opt/Formidable/resources/app/assets" "$WORK/opt/Formidable/resources/assets"
+          dpkg-deb -b "$WORK" "$DEB"
+          rm -rf "$WORK"
 
       - name: Collect artifacts
         run: |

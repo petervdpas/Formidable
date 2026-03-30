@@ -28,20 +28,20 @@
       "!build",
       "!temp"
     ],
-    "extraResources": [
-      {
-        "from": "assets/",
-        "to": "assets/",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ],
     "win": {
       "target": "nsis",
       "icon": "assets/formidable.ico",
       "signAndEditExecutable": false,
-      "signExts": []
+      "signExts": [],
+      "extraResources": [
+        {
+          "from": "assets/",
+          "to": "assets/",
+          "filter": [
+            "**/*"
+          ]
+        }
+      ]
     },
     "mac": {
       "icon": "assets/formidable.icns",
