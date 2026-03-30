@@ -122,19 +122,6 @@
   padding-left: var(--divider-space, 12px);
 }
 
-/* vertical hairline */
-.tabview.vtabs .tab-content::before {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 1px;
-  background: var(--divider-color, var(--border-color));
-  pointer-events: none;
-}
-
 .tabview.vtabs .tab-content::after {
   width: var(--divider-grad-size);
   background: linear-gradient(
@@ -165,6 +152,7 @@
 
 .modal .modal-body>.tabview.vtabs {
   align-items: stretch;
+  height: 100%;
 }
 
 .modal .modal-body>.tabview.vtabs .tab-buttons,

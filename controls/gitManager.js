@@ -364,9 +364,13 @@ async function checkout(folderPath, refName) {
 
 async function deleteBranch(folderPath, name, { force = false } = {}) {
   try {
-    const git = await getGitInstance(folderPath);
-    const res = await git.deleteLocalBranch(name, force);
-    return ok(res);
+    const root = await resolveRoot(folderPath);
+    if (!root) return fail("Not a repo");
+    return await withRepoLock(root, async () => {
+      const git = await getGitInstance(root);
+      const res = await git.deleteLocalBranch(name, force);
+      return ok(res);
+    });
   } catch (err) {
     return fail(err);
   }
@@ -408,9 +412,13 @@ async function logCommits(folderPath, { maxCount = 50, from, to } = {}) {
 
 async function resetHard(folderPath, ref = "HEAD") {
   try {
-    const git = await getGitInstance(folderPath);
-    const res = await git.reset(["--hard", ref]);
-    return ok(res);
+    const root = await resolveRoot(folderPath);
+    if (!root) return fail("Not a repo");
+    return await withRepoLock(root, async () => {
+      const git = await getGitInstance(root);
+      const res = await git.reset(["--hard", ref]);
+      return ok(res);
+    });
   } catch (err) {
     return fail(err);
   }
@@ -418,9 +426,13 @@ async function resetHard(folderPath, ref = "HEAD") {
 
 async function revertCommit(folderPath, hash, opts = []) {
   try {
-    const git = await getGitInstance(folderPath);
-    const res = await git.raw(["revert", hash, ...opts]);
-    return ok(res);
+    const root = await resolveRoot(folderPath);
+    if (!root) return fail("Not a repo");
+    return await withRepoLock(root, async () => {
+      const git = await getGitInstance(root);
+      const res = await git.raw(["revert", hash, ...opts]);
+      return ok(res);
+    });
   } catch (err) {
     return fail(err);
   }
@@ -486,9 +498,13 @@ async function rebaseAbort(folderPath) {
 
 async function mergeAbort(folderPath) {
   try {
-    const git = await getGitInstance(folderPath);
-    const res = await git.raw(["merge", "--abort"]);
-    return ok(res);
+    const root = await resolveRoot(folderPath);
+    if (!root) return fail("Not a repo");
+    return await withRepoLock(root, async () => {
+      const git = await getGitInstance(root);
+      const res = await git.raw(["merge", "--abort"]);
+      return ok(res);
+    });
   } catch (err) {
     return fail(err);
   }
@@ -510,11 +526,15 @@ async function mergeContinue(folderPath) {
 // ── Stash ──────────────────────────────────────────────────
 async function stashSave(folderPath, message = "") {
   try {
-    const git = await getGitInstance(folderPath);
-    const args = ["stash", "push"];
-    if (message) args.push("-m", message);
-    const res = await git.raw(args);
-    return ok(res);
+    const root = await resolveRoot(folderPath);
+    if (!root) return fail("Not a repo");
+    return await withRepoLock(root, async () => {
+      const git = await getGitInstance(root);
+      const args = ["stash", "push"];
+      if (message) args.push("-m", message);
+      const res = await git.raw(args);
+      return ok(res);
+    });
   } catch (err) {
     return fail(err);
   }
@@ -532,9 +552,13 @@ async function stashList(folderPath) {
 
 async function stashPop(folderPath, ref = "stash@{0}") {
   try {
-    const git = await getGitInstance(folderPath);
-    const res = await git.raw(["stash", "pop", ref]);
-    return ok(res);
+    const root = await resolveRoot(folderPath);
+    if (!root) return fail("Not a repo");
+    return await withRepoLock(root, async () => {
+      const git = await getGitInstance(root);
+      const res = await git.raw(["stash", "pop", ref]);
+      return ok(res);
+    });
   } catch (err) {
     return fail(err);
   }
@@ -545,26 +569,28 @@ async function discardFile(folderPath, filePath) {
   try {
     const absRepoPath = fileManager.resolvePath(folderPath);
     const absFilePath = fileManager.resolvePath(filePath);
-    const git = await getGitInstance(absRepoPath);
+    const root = await resolveRoot(absRepoPath);
+    if (!root) return fail("Not a repo");
+    return await withRepoLock(root, async () => {
+      const git = await getGitInstance(root);
+      const rel = fileManager.toPosixPath(
+        fileManager.makeRelative(root, absFilePath)
+      );
 
-    const root = (await git.revparse(["--show-toplevel"])).trim();
-    const rel = fileManager.toPosixPath(
-      fileManager.makeRelative(root, absFilePath)
-    );
+      const s = await git.status();
+      const isUntracked = s.not_added.includes(rel);
 
-    const s = await git.status();
-    const isUntracked = s.not_added.includes(rel);
-
-    if (isUntracked) {
-      log(`[GitManager] Deleting untracked file: ${rel}`);
-      const full = fileManager.resolvePath(root, rel);
-      const deleted = fileManager.deleteFile(full, { silent: true });
-      if (!deleted) throw new Error(`Failed to delete untracked file: ${rel}`);
-    } else {
-      log(`[GitManager] Discarding changes for: ${rel}`);
-      await git.checkout(["--", rel]);
-    }
-    return ok({ file: rel });
+      if (isUntracked) {
+        log(`[GitManager] Deleting untracked file: ${rel}`);
+        const full = fileManager.resolvePath(root, rel);
+        const deleted = fileManager.deleteFile(full, { silent: true });
+        if (!deleted) throw new Error(`Failed to delete untracked file: ${rel}`);
+      } else {
+        log(`[GitManager] Discarding changes for: ${rel}`);
+        await git.checkout(["--", rel]);
+      }
+      return ok({ file: rel });
+    });
   } catch (err) {
     return fail(err);
   }

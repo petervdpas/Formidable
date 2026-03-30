@@ -130,6 +130,53 @@ export function setupSplitter({
   });
 } 
 
+/**
+ * Create a splitter element between two flex siblings and wire up drag behavior.
+ * Inserts the splitter into the DOM between `left` and `right` inside `container`.
+ *
+ * @param {Object} opts
+ * @param {HTMLElement} opts.container  - flex parent holding both panes
+ * @param {HTMLElement} opts.left       - left/top pane
+ * @param {HTMLElement} opts.right      - right/bottom pane
+ * @param {number}      [opts.min=120]  - minimum pane width in px
+ * @param {string}      [opts.configKey]- optional config key for persistence
+ * @returns {HTMLElement} the splitter element
+ */
+export function createSplitter({ container, left, right, min = 120, configKey = null }) {
+  const splitter = document.createElement("div");
+  splitter.className = "modal-split-splitter";
+  Object.assign(splitter.style, {
+    width: "6px",
+    cursor: "col-resize",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: "0",
+    alignSelf: "stretch",
+    userSelect: "none",
+  });
+
+  const handle = document.createElement("div");
+  Object.assign(handle.style, {
+    width: "4px",
+    height: "40px",
+    borderRadius: "2px",
+    backgroundColor: "var(--resize-handle-bg, #4a90d9)",
+  });
+  splitter.appendChild(handle);
+
+  // Insert between left and right
+  left.after(splitter);
+
+  // Ensure flex layout on panes
+  left.style.flex = left.style.flex || "0 0 auto";
+  right.style.flex = "1 1 auto";
+  right.style.overflow = right.style.overflow || "auto";
+
+  setupSplitter({ splitter, left, right, container, min, configKey });
+  return splitter;
+}
+
 export function enableElementResizing(
   target,
   grip,

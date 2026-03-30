@@ -50,6 +50,8 @@ export default {
   "git.quick.state.conflicts": "{0} conflicten",
   "git.quick.state.conflict": "{0} conflict",
   "git.quick.ready.to.push": "klaar om te pushen ({0})",
+  "git.quick.ready.to.pull": "klaar om te pullen ({0})",
+  "git.quick.branch.clean": "op branch {0}",
 
   // Errors (template-level)
   "error.template.duplicate_keys": "Duplicaat sleutels: {0}",

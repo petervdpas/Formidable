@@ -45,7 +45,10 @@ function applyStateToButton(btnSelector, progress = {}, status = null) {
   el.classList.toggle("is-info", false);
 
   let title = defaultTitle;
-  const prefix = t("standard.git", "Git");
+  const branch = status?.current || "";
+  const prefix = branch
+    ? `${t("standard.git", "Git")} [${branch}]`
+    : t("standard.git", "Git");
 
   if (hasConflicts) {
     el.classList.add("has-conflicts", "is-danger");
@@ -93,6 +96,8 @@ function applyStateToButton(btnSelector, progress = {}, status = null) {
       `ready to push (${ahead})`
     );
     title = `${prefix}: ${tail}`;
+  } else if (branch) {
+    title = `${t("standard.git", "Git")}: ${t("git.quick.branch.clean", [branch], `on branch ${branch}`)}`;
   }
 
   el.title = title;
@@ -146,7 +151,9 @@ export async function startGitQuickStatusPoller(
       const ahead = state.ahead ?? -1;
       const behind = state.behind ?? -1;
 
+      const currentBranch = status?.current || "";
       const sig = [
+        currentBranch,
         hasConflicts,
         inMerge,
         inRebase,

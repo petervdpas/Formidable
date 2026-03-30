@@ -202,7 +202,8 @@ h3::before {
 }
 
 #template-splitter:hover,
-#storage-splitter:hover {
+#storage-splitter:hover,
+.modal-split-splitter:hover {
   background-color: var(--resize-handle-bg);
 }
 

@@ -1,5 +1,7 @@
 // utils/tabUtils.js
 
+import { createSplitter } from "./resizing.js";
+
 /**
  * Create a tab descriptor for createTabView.
  * Accepts both (id, label, buildFn, i18nKey) and (id, label, i18nKey, buildFn).
@@ -150,6 +152,10 @@ export function createTabView({
 
   root.append(tablist, contentHost);
 
+  if (vertical) {
+    createSplitter({ container: root, left: tablist, right: contentHost, min: 80 });
+  }
+
   // i18n relabel support
   function retitle() {
     if (!i18n?.t) return;
@@ -207,5 +213,13 @@ export function setTabviewOrientation(tabviewOrRoot, vertical) {
   const list = root.querySelector('.tab-buttons[role="tablist"]');
   if (list) {
     list.setAttribute("aria-orientation", vertical ? "vertical" : "horizontal");
+  }
+
+  // Add splitter when switching to vertical (if not already present)
+  if (vertical && !root.querySelector(".modal-split-splitter")) {
+    const contentHost = root.querySelector(".tab-content");
+    if (list && contentHost) {
+      createSplitter({ container: root, left: list, right: contentHost, min: 80 });
+    }
   }
 }

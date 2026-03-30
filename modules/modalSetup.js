@@ -10,6 +10,7 @@ import {
   setupModal,
   createSplitModalLayout,
 } from "../utils/modalUtils.js";
+import { createSplitter } from "../utils/resizing.js";
 import { extractFieldDefinition } from "../utils/formUtils.js";
 import { createDropdown } from "../utils/dropdownUtils.js";
 import { syncScroll } from "../utils/domUtils.js";
@@ -434,6 +435,12 @@ export function setupRenderModal() {
             showHtmlBtn.style.display = "inline-block";
           })
         );
+      }
+
+      // Add splitter between panes (once)
+      const body = modal.querySelector(".modal-body.two-pane");
+      if (body && rawPane && htmlPane && !body.querySelector(".modal-split-splitter")) {
+        createSplitter({ container: body, left: rawPane, right: htmlPane, min: 120 });
       }
 
       // Enable scroll sync

@@ -39,7 +39,8 @@
 }
 
 .modal.show {
-    display: block;
+    display: flex;
+    flex-direction: column;
     opacity: 1;
     pointer-events: auto;
 }
@@ -120,6 +121,8 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    flex: 1;
+    min-height: 0;
     gap: 2px;
     padding: 3px 4px;
 }

@@ -1,7 +1,7 @@
 // utils/modalUtils.js
 
 import { EventBus } from "../modules/eventBus.js";
-import { enableElementResizing } from "./resizing.js";
+import { enableElementResizing, createSplitter } from "./resizing.js";
 import {
   createButton,
   createCancelButton,
@@ -690,9 +690,18 @@ export function createSplitModalLayout({
   const addRight = showContent !== "left";
 
   if (addLeft && addRight) {
-    wrap.style.gridTemplateColumns = `${leftWidth} ${rightWidth}`;
+    wrap.style.display = "flex";
+    wrap.style.flexDirection = "row";
+
+    left.style.flex = `0 0 ${leftWidth}`;
+    left.style.overflow = "auto";
+
+    right.style.flex = "1 1 auto";
+    right.style.overflow = "auto";
+
     wrap.appendChild(left);
     wrap.appendChild(right);
+    createSplitter({ container: wrap, left, right, min: 120 });
   } else {
     wrap.style.gridTemplateColumns = "1fr";
     if (addLeft) wrap.appendChild(left);
