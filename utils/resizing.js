@@ -17,7 +17,7 @@ export function setupSplitter({
   let lastPx = null;    // current left width in px (clamped)
   let lastRatio = null; // only for internal resize math if you want it later
 
-  const handle = splitter.querySelector("div") || splitter;
+  const handle = splitter;
   const splitW = () => splitter.offsetWidth || 6;
   const cw = () => container.clientWidth || 0;
 
