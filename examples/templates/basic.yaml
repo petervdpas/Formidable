@@ -378,7 +378,16 @@ fields:
     two_column: false
     readonly: false
     default: ''
-    options: []
+    options:
+      - type: fixed
+        value: key
+        label: Key
+      - type: fixed
+        value: value
+        label: Value
+      - type: custom
+        value: custom
+        label: custom
   - key: datable
     type: table
     label: Table

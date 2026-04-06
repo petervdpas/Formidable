@@ -1,5 +1,44 @@
 // utils/optionsEditor.js
 
+const defaultColumns = [
+  { key: "value", type: "text", placeholder: "value" },
+  { key: "label", type: "text", placeholder: "label" },
+];
+
+const optionColumnPresets = {
+  list: [
+    {
+      key: "type",
+      type: "dropdown",
+      placeholder: "type",
+      options: ["fixed", "custom"],
+      defaultValue: "fixed",
+      onChange(value, row) {
+        if (value === "custom") {
+          row.value.el.value = "[[custom]]";
+          row.value.el.readOnly = true;
+        } else {
+          if (row.value.el.value === "[[custom]]") row.value.el.value = "";
+          row.value.el.readOnly = false;
+        }
+      },
+    },
+    { key: "value", type: "text", placeholder: "value" },
+    { key: "label", type: "text", placeholder: "label" },
+  ],
+  table: [
+    { key: "value", type: "text", placeholder: "key" },
+    {
+      key: "type",
+      type: "dropdown",
+      placeholder: "type",
+      options: ["string", "number", "date", "bool"],
+      defaultValue: "string",
+    },
+    { key: "label", type: "text", placeholder: "label" },
+  ],
+};
+
 export function getSupportedOptionTypes() {
   return [
     "boolean",
@@ -30,7 +69,9 @@ export function setupOptionsEditor({ type = "text", dom, initialOptions }) {
     return null;
   }
 
-  const editor = createOptionsEditor(containerRow, (newOptions) => {
+  const columns = optionColumnPresets[type] || defaultColumns;
+
+  const editor = createOptionsEditor(columns, containerRow, (newOptions) => {
     options.value = JSON.stringify(newOptions, null, 2);
   });
 
@@ -42,7 +83,7 @@ export function setupOptionsEditor({ type = "text", dom, initialOptions }) {
   return editor;
 }
 
-function createOptionsEditor(container, onChange) {
+function createOptionsEditor(columns, container, onChange) {
   const wrapper = document.createElement("div");
   wrapper.className = "options-editor";
 
@@ -61,19 +102,56 @@ function createOptionsEditor(container, onChange) {
   wrapper.appendChild(addBtn);
   container.appendChild(wrapper);
 
-  function addRow(value = "", label = "") {
+  function addRow(values = {}) {
     const row = document.createElement("div");
     row.className = "option-row";
 
-    const valueInput = document.createElement("input");
-    valueInput.type = "text";
-    valueInput.placeholder = "value";
-    valueInput.value = value;
+    const inputs = [];
+    const rowMap = {}; // { colKey: { el, type } } for callbacks
 
-    const labelInput = document.createElement("input");
-    labelInput.type = "text";
-    labelInput.placeholder = "label";
-    labelInput.value = label;
+    for (const col of columns) {
+      let entry;
+
+      if (col.type === "dropdown") {
+        const select = document.createElement("select");
+        for (const opt of col.options) {
+          const optEl = document.createElement("option");
+          optEl.value = opt;
+          optEl.textContent = opt;
+          select.appendChild(optEl);
+        }
+        select.value = values[col.key] || col.defaultValue || col.options[0];
+        entry = { key: col.key, el: select, type: "dropdown" };
+        row.appendChild(select);
+      } else {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = col.placeholder || col.key;
+        input.value = values[col.key] || "";
+        entry = { key: col.key, el: input, type: "text" };
+        row.appendChild(input);
+      }
+
+      inputs.push(entry);
+      rowMap[col.key] = entry;
+    }
+
+    // attach event listeners after all columns are created (so callbacks can reference siblings)
+    for (const col of columns) {
+      const entry = rowMap[col.key];
+      const eventName = col.type === "dropdown" ? "change" : "input";
+
+      entry.el.addEventListener(eventName, () => {
+        col.onChange?.(entry.el.value, rowMap);
+        emitChange();
+      });
+    }
+
+    // run onChange callbacks for initial state
+    for (const col of columns) {
+      const entry = rowMap[col.key];
+      col.onChange?.(entry.el.value, rowMap);
+    }
 
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
@@ -86,13 +164,11 @@ function createOptionsEditor(container, onChange) {
       emitChange();
     };
 
-    row.appendChild(valueInput);
-    row.appendChild(labelInput);
     row.appendChild(removeBtn);
     list.appendChild(row);
 
-    valueInput.addEventListener("input", emitChange);
-    labelInput.addEventListener("input", emitChange);
+    // store column refs on the row for getValues
+    row._optionInputs = inputs;
   }
 
   function emitChange() {
@@ -101,24 +177,32 @@ function createOptionsEditor(container, onChange) {
 
   function getValues() {
     const rows = list.querySelectorAll(".option-row");
-    const options = [];
+    const result = [];
     rows.forEach((row) => {
-      const [valueInput, labelInput] = row.querySelectorAll("input");
-      const value = valueInput.value.trim();
-      const label = labelInput.value.trim();
-      if (value) {
-        options.push({ value, label: label || value });
+      const entry = {};
+      for (const { key, el, type } of row._optionInputs || []) {
+        entry[key] = type === "dropdown" ? el.value : el.value.trim();
+      }
+      // only include rows that have a value key set
+      if (entry.value) {
+        // backfill label from value if missing
+        if (columns.some((c) => c.key === "label") && !entry.label) {
+          entry.label = entry.value;
+        }
+        result.push(entry);
       }
     });
-    return options;
+    return result;
   }
 
   function setValues(options) {
     list.innerHTML = "";
     options.forEach((opt) => {
-      const { value, label } =
-        typeof opt === "string" ? { value: opt, label: opt } : opt;
-      addRow(value, label);
+      if (typeof opt === "string") {
+        addRow({ value: opt, label: opt });
+      } else {
+        addRow(opt);
+      }
     });
   }
 
