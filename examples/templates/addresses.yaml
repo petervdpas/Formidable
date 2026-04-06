@@ -1,7 +1,7 @@
 name: Street Addresses
 filename: addresses.yaml
 item_field: name
-markdown_template: |-
+markdown_template: !!str |-
   > {{field "name"}}
 
   {{field "unit-number"}} {{field "street-address"}} <br />
@@ -15,9 +15,7 @@ markdown_template: |-
   {{#each (fieldRaw "owners")}}
   |{{#each this}}{{this}} |{{/each}}
   {{/each}}
-sidebar_expression: >-
-  [ F["unit-number"] + " " + F["street-address"] | { text: F["unit-number"] + "
-  " + F["street-address"], classes: ["expr-text-blue", "expr-bold"] } ]
+sidebar_expression: '[ F["unit-number"] + " " + F["street-address"] | { text: F["unit-number"] + " " + F["street-address"], classes: ["expr-text-blue", "expr-bold"] } ]'
 enable_collection: true
 fields:
   - key: id
@@ -26,8 +24,9 @@ fields:
     description: ''
     expression_item: false
     two_column: false
+    readonly: false
     default: ''
-    options: &ref_0 []
+    options: []
     primary_key: true
   - key: name
     type: text
@@ -35,14 +34,16 @@ fields:
     description: Give a name to this address
     expression_item: true
     two_column: true
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
   - key: country
     type: dropdown
     label: Country
     description: Give the country for this address
     expression_item: false
     two_column: true
+    readonly: false
     default: ''
     options:
       - value: us
@@ -55,49 +56,59 @@ fields:
     description: Give the unit number of the address
     expression_item: true
     two_column: true
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
   - key: street-address
     type: text
     label: Street Address
     description: Give the street of the address
     expression_item: true
     two_column: true
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
   - key: city
     type: text
     label: City
     description: Give the city for this address
     expression_item: false
     two_column: true
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
   - key: state-abbreviation
     type: text
     label: State abbreviation
     description: Give the state abbreviation for the address
     expression_item: false
     two_column: true
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
   - key: postal
     type: text
     label: Postal
     description: Give the postal of the address
     expression_item: false
     two_column: true
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
   - key: owners
     type: table
     label: Owners
     description: Give the owners for this address
     expression_item: false
     two_column: false
+    readonly: false
     default: ''
     options:
       - value: firstname
+        type: string
         label: Firstname
+        choices: ''
       - value: lastname
+        type: string
         label: Lastname
+        choices: ''

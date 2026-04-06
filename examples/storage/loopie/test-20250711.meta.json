@@ -4,7 +4,7 @@
     "author_email": "regular@example.com",
     "template": "loopie.yaml",
     "created": "2025-07-11T06:10:16.683Z",
-    "updated": "2026-03-30T14:51:03.810Z",
+    "updated": "2026-04-06T22:42:40.532Z",
     "flagged": false,
     "tags": []
   },
@@ -22,11 +22,11 @@
         "table_inside_loop": [
           [
             "test",
-            "test"
+            "2026-04-07"
           ],
           [
             "test 2",
-            "test 2"
+            "2026-04-08"
           ]
         ]
       },
@@ -38,7 +38,12 @@
             "subloop_title": "It's getting crazier!"
           }
         ],
-        "table_inside_loop": []
+        "table_inside_loop": [
+          [
+            "Today",
+            "2026-04-30"
+          ]
+        ]
       },
       {
         "inloop_title": "A splut sound is never good news",
@@ -54,11 +59,11 @@
         "table_inside_loop": [
           [
             "do",
-            "do"
+            "2026-04-09"
           ],
           [
             "bla",
-            "bla"
+            "2026-04-22"
           ]
         ]
       }

@@ -400,15 +400,23 @@ fields:
       - value: col1
         type: string
         label: Column 1
+        choices: ''
       - value: col2
         type: number
         label: Column 2
+        choices: ''
       - value: col3
         type: date
         label: Column 3
+        choices: ''
       - value: col4
         type: bool
         label: Column 4
+        choices: ''
+      - value: col5
+        type: dropdown
+        label: Column 5
+        choices: active:Active|inactive:Inactive|pending:Pending
   - key: design
     type: image
     label: Design

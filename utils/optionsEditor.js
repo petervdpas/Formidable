@@ -32,10 +32,22 @@ const optionColumnPresets = {
       key: "type",
       type: "dropdown",
       placeholder: "type",
-      options: ["string", "number", "date", "bool"],
+      options: ["string", "number", "date", "bool", "dropdown"],
       defaultValue: "string",
+      onChange(value, row) {
+        if (row._choicesRow) {
+          row._choicesRow.style.display = value === "dropdown" ? "" : "none";
+          if (value !== "dropdown") row._choicesInput.value = "";
+        }
+      },
     },
     { key: "label", type: "text", placeholder: "label" },
+    {
+      key: "choices",
+      type: "subrow",
+      placeholder: "key:Label | key:Label",
+      visibleWhen: { key: "type", value: "dropdown" },
+    },
   ],
 };
 
@@ -109,10 +121,37 @@ function createOptionsEditor(columns, container, onChange) {
     const inputs = [];
     const rowMap = {}; // { colKey: { el, type } } for callbacks
 
+    const subrows = []; // subrow elements to append after the main row
+
     for (const col of columns) {
       let entry;
 
-      if (col.type === "dropdown") {
+      if (col.type === "subrow") {
+        // render as a full-width input on a separate line
+        const subrow = document.createElement("div");
+        subrow.className = "option-subrow";
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = col.placeholder || col.key;
+        input.value = values[col.key] || "";
+        input.addEventListener("input", emitChange);
+
+        subrow.appendChild(input);
+        entry = { key: col.key, el: input, type: "text" };
+
+        // store refs for onChange callbacks
+        rowMap._choicesRow = subrow;
+        rowMap._choicesInput = input;
+
+        // visibility based on another column's value
+        if (col.visibleWhen) {
+          const depVal = values[col.visibleWhen.key];
+          subrow.style.display = depVal === col.visibleWhen.value ? "" : "none";
+        }
+
+        subrows.push(subrow);
+      } else if (col.type === "dropdown") {
         const select = document.createElement("select");
         for (const opt of col.options) {
           const optEl = document.createElement("option");
@@ -138,6 +177,7 @@ function createOptionsEditor(columns, container, onChange) {
 
     // attach event listeners after all columns are created (so callbacks can reference siblings)
     for (const col of columns) {
+      if (col.type === "subrow") continue; // already has listener
       const entry = rowMap[col.key];
       const eventName = col.type === "dropdown" ? "change" : "input";
 
@@ -149,6 +189,7 @@ function createOptionsEditor(columns, container, onChange) {
 
     // run onChange callbacks for initial state
     for (const col of columns) {
+      if (col.type === "subrow") continue;
       const entry = rowMap[col.key];
       col.onChange?.(entry.el.value, rowMap);
     }
@@ -161,11 +202,13 @@ function createOptionsEditor(columns, container, onChange) {
     removeBtn.title = "Remove option";
     removeBtn.onclick = () => {
       row.remove();
+      subrows.forEach((sr) => sr.remove());
       emitChange();
     };
 
     row.appendChild(removeBtn);
     list.appendChild(row);
+    subrows.forEach((sr) => list.appendChild(sr));
 
     // store column refs on the row for getValues
     row._optionInputs = inputs;

@@ -108,10 +108,16 @@ export const parseTableField = async function (wrapper) {
   const data = [];
   const rows = table.querySelectorAll("tbody tr");
   rows.forEach((tr) => {
-    const inputs = Array.from(tr.querySelectorAll("td input"));
-    const row = inputs.map((input) =>
-      input.type === "checkbox" ? String(input.checked) : input.value.trim()
-    );
+    const cells = Array.from(tr.querySelectorAll("td")).slice(1, -1); // skip drag handle and remove btn
+    const row = cells.map((td) => {
+      const input = td.querySelector("input");
+      if (input) {
+        return input.type === "checkbox" ? String(input.checked) : input.value.trim();
+      }
+      const select = td.querySelector("select");
+      if (select) return select.value;
+      return "";
+    });
     if (row.some((cell) => cell !== "" && cell !== "false")) {
       data.push(row);
     }

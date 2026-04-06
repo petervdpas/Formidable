@@ -11,6 +11,7 @@ import {
   buildSwitchElement,
 } from "./elementBuilders.js";
 import { getCurrentTheme } from "./themeUtils.js";
+import { parseChoices } from "./parseChoices.js";
 
 export function resolveOption(opt) {
   return typeof opt === "string"
@@ -497,6 +498,17 @@ export const FieldBlueprints = {
           lbl.appendChild(inp);
           lbl.appendChild(slider);
           td.appendChild(lbl);
+        } else if (colType === "dropdown") {
+          const sel = document.createElement("select");
+          sel.name = String(name ?? "");
+          parseChoices(c.choices).forEach(({ value, label }) => {
+            const opt = document.createElement("option");
+            opt.value = value;
+            opt.textContent = label;
+            sel.appendChild(opt);
+          });
+          sel.value = String(cellVal);
+          td.appendChild(sel);
         } else {
           const inp = document.createElement("input");
           inp.type = colType === "number" ? "number" : colType === "date" ? "date" : "text";

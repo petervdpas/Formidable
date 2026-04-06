@@ -238,7 +238,8 @@
 
 .dynamic-table td input[type="text"],
 .dynamic-table td input[type="number"],
-.dynamic-table td input[type="date"] {
+.dynamic-table td input[type="date"],
+.dynamic-table td select {
   width: 100%;
   box-sizing: border-box;
   padding: 6px 10px;
@@ -246,6 +247,7 @@
 }
 
 .dynamic-table td .switch {
+  display: block;
   margin: 4px 0;
 }
 

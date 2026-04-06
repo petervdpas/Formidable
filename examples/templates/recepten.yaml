@@ -1,90 +1,55 @@
 name: Kookrecepten
 filename: recepten.yaml
 item_field: naam
-markdown_template: >-
+markdown_template: !!str |-
   ---
-
   title: Recept
-
   subtitle: {{field "tickertape"}}
-
   author: {{field "auteur"}}
-
   keywords: [recept, {{tags (fieldRaw "labels") withHash=false}}]
-
   table-use-row-colors: true
-
   table-row-color: "D3D3D3"
-
   toc: true
-
   toc-title: Inhoudsopgave
-
   toc-own-page: true
-
   ---
-
 
   ## {{field "naam"}}
 
-
   **Door:** {{field "auteur"}}
-
 
   {{field "omschrijving"}}
 
-
-  > Moeilijkheid (10 is topkok niveau... 1 is, tja wat is 1?): **{{field
-  "moeilijkheid"}}**
-
+  > Moeilijkheid (10 is topkok niveau... 1 is, tja wat is 1?): **{{field "moeilijkheid"}}**
 
   {{#if (fieldRaw "foto")}}
-
   ![{{field "foto_bijschrift"}}]({{field "foto"}})
-
   {{else}}
-
   _Er is nog geen foto bij gerecht geplaatst..._
-
   {{/if}}
-
 
   ## Ingredienten
 
-
   {{#with (fieldMeta "ingredienten" "options") as |headers|}}
-
   |{{#each headers}}{{label}}{{^label}}{{value}}{{/label}} |{{/each}}
-
   |{{#each headers}}--|{{/each}}
     {{/with}}
     {{#each (fieldRaw "ingredienten")}}
   |{{#each this}}{{this}} |{{/each}}
-
   {{/each}}
-
 
   ## Bereiding
 
-
   {{field "bereiding"}}
-
 
   ## Gerelateerde recepten
 
-
   {{#loop "verwante_links"}}
-
   {{#if (fieldRaw "verwant_recept")}}
-
   {{field "verwant_recept"}}
-
   {{/if}}
-
   {{/loop}}
-sidebar_expression: >-
-  [ tickertape | { text: tickertape, classes: ["expr-text-yellow", "expr-bold",
-  "expr-ticker"] } ]
+sidebar_expression: '[ tickertape | { text: tickertape, classes: ["expr-text-yellow", "expr-bold", "expr-ticker"] } ]'
 enable_collection: false
 fields:
   - key: naam
@@ -93,16 +58,18 @@ fields:
     description: Geef de naam van het gerecht.
     expression_item: false
     two_column: true
+    readonly: false
     default: ''
-    options: &ref_0 []
+    options: []
   - key: omschrijving
     type: textarea
     label: Omschrijving gerecht
     description: Geef een korte omschrijving van het gerecht.
     expression_item: false
     two_column: true
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
     format: plain
   - key: moeilijkheid
     type: range
@@ -110,6 +77,7 @@ fields:
     description: Is het gerecht moeilijk om te maken?
     expression_item: false
     two_column: true
+    readonly: false
     default: '3'
     options:
       - value: min
@@ -124,64 +92,71 @@ fields:
     description: Hier kun je de auteur van her recept opgeven.
     expression_item: false
     two_column: true
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
   - key: tickertape
     type: text
     label: Tickertape
     description: Geef hier de tekst voor de zgn. tickertape
     expression_item: true
     two_column: true
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
   - key: labels
     type: tags
     label: Labels (Tags)
     description: Geef hier tags op die relevant zijn voor het gerecht.
     expression_item: false
     two_column: true
-    default: ''
-    options: *ref_0
+    readonly: false
+    default: []
+    options: []
   - key: foto
     type: image
     label: Foto van het bereide gerecht
-    description: >-
-      Hier kun je een foto uploaden van het bereide gerecht. Maak er een mooi en
-      smakelijk plaatje van.
+    description: Hier kun je een foto uploaden van het bereide gerecht. Maak er een mooi en smakelijk plaatje van.
     expression_item: false
     two_column: false
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
   - key: foto_bijschrift
     type: text
     label: Bijschrift bij foto
     description: Wanneer je een foto upload ook even het bijschrift van de foto invullen.
     expression_item: false
     two_column: true
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
   - key: ingredienten
     type: table
     label: Ingredienten voor het gerecht
     description: Geef hier de ingredienten voor het recept op
     expression_item: false
     two_column: false
+    readonly: false
     default: ''
     options:
       - value: ingredient
+        type: string
         label: Ingrediënt
+        choices: ''
       - value: hoeveelheid
+        type: string
         label: Hoeveelheid / Gewicht
+        choices: ''
   - key: bereiding
     type: textarea
     label: Bereiding van het recept
-    description: >-
-      Hier kun je de bereiding van het recept invullen. Beschrijf het niet te
-      uitgebreid, want dan is het niet goed te volgen in de keuken.
+    description: Hier kun je de bereiding van het recept invullen. Beschrijf het niet te uitgebreid, want dan is het niet goed te volgen in de keuken.
     expression_item: false
     two_column: false
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
     format: markdown
   - key: verwante_links
     type: loopstart
@@ -190,21 +165,24 @@ fields:
     summary_field: verwant_recept
     expression_item: false
     two_column: false
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
   - key: verwant_recept
     type: link
     label: Verwant recept
     description: Geef hier een link op naar recepten die goed bij dit gerecht passen.
     expression_item: false
     two_column: false
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
   - key: verwante_links
     type: loopstop
     label: Verwante recepten
     description: ''
     expression_item: false
     two_column: false
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []

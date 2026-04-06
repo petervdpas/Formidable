@@ -5,6 +5,7 @@ import { createLinkOpenButton } from "../modules/uiButtons.js";
 import { ensureVirtualLocation } from "./vfsUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 import { createSortable } from "./domUtils.js";
+import { parseChoices } from "./parseChoices.js";
 import { addContainerElement, createStyledLabel } from "./elementBuilders.js";
 
 export function applyGuidField(container, field, value) {
@@ -267,6 +268,16 @@ export function applyTableField(
         lbl.appendChild(input);
         lbl.appendChild(slider);
         td.appendChild(lbl);
+      } else if (colType === "dropdown") {
+        const sel = document.createElement("select");
+        parseChoices(col.choices).forEach(({ value, label }) => {
+          const opt = document.createElement("option");
+          opt.value = value;
+          opt.textContent = label;
+          sel.appendChild(opt);
+        });
+        sel.value = String(cellValue);
+        td.appendChild(sel);
       } else {
         const input = document.createElement("input");
         input.type = colType === "number" ? "number" : colType === "date" ? "date" : "text";

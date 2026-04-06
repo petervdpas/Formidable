@@ -1,7 +1,7 @@
 name: Looper example
 filename: loopie.yaml
 item_field: title
-markdown_template: |-
+markdown_template: !!str |-
   ---
   title: Auto-generated Report
   author: Formidable Generator
@@ -89,9 +89,7 @@ markdown_template: |-
   {{/loop}}
 
   {{/loop}}
-sidebar_expression: >-
-  [ title | { text: "expression: " + title, classes: ["expr-text-purple",
-  "expr-bold", "expr-ticker"] } ]
+sidebar_expression: '[ title | { text: "expression: " + title, classes: ["expr-text-purple", "expr-bold", "expr-ticker"] } ]'
 enable_collection: false
 fields:
   - key: title
@@ -100,8 +98,9 @@ fields:
     description: This is just a title....
     expression_item: true
     two_column: false
+    readonly: false
     default: ''
-    options: &ref_0 []
+    options: []
   - key: looper
     type: loopstart
     label: Chapters
@@ -109,24 +108,27 @@ fields:
     summary_field: inloop_title
     expression_item: false
     two_column: false
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
   - key: inloop_title
     type: text
     label: Inloop Title
     description: This is a title inside the looper....
     expression_item: false
     two_column: false
+    readonly: false
     default: Wauwie... I'm inside the looper
-    options: *ref_0
+    options: []
   - key: inloop_description
     type: textarea
     label: Inloop - Description
     description: This is a description inside the looper...
     expression_item: false
     two_column: false
+    readonly: false
     default: Describe how it feels to be inside a looper....
-    options: *ref_0
+    options: []
     format: markdown
   - key: subloop
     type: loopstart
@@ -135,41 +137,50 @@ fields:
     summary_field: subloop_title
     expression_item: false
     two_column: false
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
   - key: subloop_title
     type: text
     label: Sub loop titel
     description: A title field inside a loop inside a parent loop
     expression_item: false
     two_column: false
+    readonly: false
     default: This is Crazy!!
-    options: *ref_0
+    options: []
   - key: subloop
     type: loopstop
     label: Subloop
     description: ''
     expression_item: false
     two_column: false
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
   - key: table_inside_loop
     type: table
     label: Table inside loop
     description: Table inside loop for drag&drop testing
     expression_item: false
     two_column: false
+    readonly: false
     default: ''
     options:
       - value: test1
+        type: string
         label: Test 1
+        choices: ''
       - value: test2
-        label: Test 2
+        type: date
+        label: Test 2 (date)
+        choices: ''
   - key: looper
     type: loopstop
     label: Chapters
     description: ''
     expression_item: false
     two_column: false
+    readonly: false
     default: ''
-    options: *ref_0
+    options: []
