@@ -835,6 +835,12 @@ function maybeSwapDefaultForCode(dom, fieldType, field = {}) {
       modalBodyEl,
       height: 140,
     });
+    // Re-apply the original default: <input type="text"> strips newlines,
+    // so the textarea (and CM) received a garbled single-line string.
+    if (field.default != null) {
+      dom.__codeEditor.setValue(field.default);
+      dom.__codeEditor.save();
+    }
     return;
   }
 
@@ -860,6 +866,10 @@ function maybeSwapDefaultForCode(dom, fieldType, field = {}) {
       modalBodyEl,
       height: 140,
     });
+    if (field.default != null) {
+      dom.__codeEditor.setValue(field.default);
+      dom.__codeEditor.save();
+    }
     return;
   }
 

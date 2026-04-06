@@ -527,7 +527,7 @@ fields:
         label: Peter
       - value: myAge
         label: '57'
-    run_mode: save
+    run_mode: manual
     allow_run: true
     hide_field: true
     input_mode: safe

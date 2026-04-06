@@ -8,10 +8,10 @@
   "development_enable": true,
   "logging_enabled": true,
   "enable_plugins": true,
-  "context_mode": "storage",
+  "context_mode": "template",
   "context_folder": "./examples",
-  "selected_template": "recepten.yaml",
-  "selected_data_file": "groene-tapenade.meta.json",
+  "selected_template": "basic.yaml",
+  "selected_data_file": "sane-20250530.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -21,12 +21,12 @@
   "enable_internal_server": true,
   "internal_server_port": 8383,
   "window_bounds": {
-    "width": 1191,
-    "height": 871,
-    "x": 294,
-    "y": 120
+    "width": 1920,
+    "height": 1011,
+    "x": 0,
+    "y": 69
   },
-  "template_sidebar_width": 377,
+  "template_sidebar_width": 358,
   "storage_sidebar_width": 324,
   "status_buttons": {
     "reloader": true,
