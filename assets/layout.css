@@ -316,6 +316,7 @@ h3::before {
   min-height: 36px;
   box-sizing: border-box;
   background-color: var(--list-item-bg, transparent);
+  overflow: hidden;
 }
 
 .template-item:hover,
