@@ -236,11 +236,17 @@
   text-align: center;
 }
 
-.dynamic-table td input[type="text"] {
+.dynamic-table td input[type="text"],
+.dynamic-table td input[type="number"],
+.dynamic-table td input[type="date"] {
   width: 100%;
   box-sizing: border-box;
   padding: 6px 10px;
   border-radius: 4px;
+}
+
+.dynamic-table td .switch {
+  margin: 4px 0;
 }
 
 /* ───── List Field ───── */

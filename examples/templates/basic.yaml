@@ -386,8 +386,8 @@ fields:
         value: value
         label: Value
       - type: custom
-        value: custom
-        label: custom
+        value: '[[custom]]'
+        label: Enter you own value
   - key: datable
     type: table
     label: Table
@@ -398,11 +398,17 @@ fields:
     default: ''
     options:
       - value: col1
+        type: string
         label: Column 1
       - value: col2
+        type: number
         label: Column 2
       - value: col3
+        type: date
         label: Column 3
+      - value: col4
+        type: bool
+        label: Column 4
   - key: design
     type: image
     label: Design

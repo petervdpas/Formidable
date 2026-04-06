@@ -481,12 +481,29 @@ export const FieldBlueprints = {
       // cells
       columns.forEach((c, i) => {
         const { value: name } = resolveOption(c);
+        const colType = c.type || "string";
         const td = document.createElement("td");
-        const inp = document.createElement("input");
-        inp.type = "text";
-        inp.name = String(name ?? "");
-        inp.value = String(vals[i] ?? "");
-        td.appendChild(inp);
+        const cellVal = vals[i] ?? "";
+
+        if (colType === "bool") {
+          const lbl = document.createElement("label");
+          lbl.className = "switch";
+          const inp = document.createElement("input");
+          inp.type = "checkbox";
+          inp.name = String(name ?? "");
+          inp.checked = cellVal === true || cellVal === "true";
+          const slider = document.createElement("span");
+          slider.className = "slider";
+          lbl.appendChild(inp);
+          lbl.appendChild(slider);
+          td.appendChild(lbl);
+        } else {
+          const inp = document.createElement("input");
+          inp.type = colType === "number" ? "number" : colType === "date" ? "date" : "text";
+          inp.name = String(name ?? "");
+          inp.value = String(cellVal);
+          td.appendChild(inp);
+        }
         tr.appendChild(td);
       });
 

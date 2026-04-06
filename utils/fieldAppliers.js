@@ -143,18 +143,57 @@ export function applyListField(
     input.className = "list-input";
     input.value = item;
 
-    if (options.length > 0) {
-      input.readOnly = true;
-      input.onclick = () => showOptionPopup(input, options);
+    const hasCustom = options.some(
+      (opt) => typeof opt === "object" && opt.value === "[[custom]]"
+    );
+    const fixedOptions = options.filter(
+      (opt) => typeof opt === "string" || opt.value !== "[[custom]]"
+    );
 
-      const isValid = options.some((opt) =>
+    if (options.length > 0) {
+      const isFixedValue = fixedOptions.some((opt) =>
         typeof opt === "string" ? opt === item : opt.value === item
       );
 
-      if (!isValid && item) {
-        input.classList.add("invalid-option");
-        input.placeholder = "⚠ Not in list";
-        input.title = "This value is not in the allowed options";
+      if (hasCustom && fixedOptions.length === 0) {
+        // Only custom options — free text
+        const customOpt = options.find((o) => o.value === "[[custom]]");
+        input.placeholder = customOpt?.label || "Enter value...";
+      } else {
+        const popupOptions = [...fixedOptions];
+        const customOpt = options.find(
+          (opt) => typeof opt === "object" && opt.value === "[[custom]]"
+        );
+        if (customOpt) {
+          popupOptions.push({
+            value: "[[custom]]",
+            label: customOpt.label || "Custom...",
+          });
+        }
+
+        // If this is a custom-entered value (not in fixed options), keep it editable
+        if (hasCustom && !isFixedValue && item) {
+          input.placeholder = customOpt?.label || "Enter value...";
+        } else {
+          input.readOnly = true;
+          input.onclick = () => showOptionPopup(input, popupOptions, {
+            onCustom: customOpt
+              ? (inp) => {
+                  inp.readOnly = false;
+                  inp.value = "";
+                  inp.placeholder = customOpt.label || "Enter value...";
+                  inp.focus();
+                  inp.onclick = null;
+                }
+              : null,
+          });
+
+          if (!isFixedValue && item) {
+            input.classList.add("invalid-option");
+            input.placeholder = "⚠ Not in list";
+            input.title = "This value is not in the allowed options";
+          }
+        }
       }
     }
 
@@ -210,13 +249,30 @@ export function applyTableField(
     handleCell.appendChild(dragHandle);
     tr.appendChild(handleCell);
 
-    // Add data columns
-    row.forEach((cellValue) => {
+    // Add data columns (iterate columns, not data, for backward compat)
+    const columns = field.options || [];
+    columns.forEach((col, i) => {
+      const cellValue = row[i] ?? "";
+      const colType = col?.type || "string";
       const td = document.createElement("td");
-      const input = document.createElement("input");
-      input.type = "text";
-      input.value = cellValue;
-      td.appendChild(input);
+
+      if (colType === "bool") {
+        const lbl = document.createElement("label");
+        lbl.className = "switch";
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.checked = cellValue === true || cellValue === "true";
+        const slider = document.createElement("span");
+        slider.className = "slider";
+        lbl.appendChild(input);
+        lbl.appendChild(slider);
+        td.appendChild(lbl);
+      } else {
+        const input = document.createElement("input");
+        input.type = colType === "number" ? "number" : colType === "date" ? "date" : "text";
+        input.value = cellValue;
+        td.appendChild(input);
+      }
       tr.appendChild(td);
     });
 

@@ -1,6 +1,6 @@
 // utils/popupUtils.js
 
-export function showOptionPopup(triggerInput, options) {
+export function showOptionPopup(triggerInput, options, { onCustom } = {}) {
   // Remove any existing popup first
   const existing = document.querySelector(".popup-selector");
   if (existing) existing.remove();
@@ -35,9 +35,14 @@ export function showOptionPopup(triggerInput, options) {
     btn.className = "popup-option";
     btn.textContent = label || value;
     btn.onclick = () => {
-      triggerInput.value = value;
-      cleanup();
-      triggerInput.dispatchEvent(new Event("input", { bubbles: true }));
+      if (value === "[[custom]]" && onCustom) {
+        cleanup();
+        onCustom(triggerInput);
+      } else {
+        triggerInput.value = value;
+        cleanup();
+        triggerInput.dispatchEvent(new Event("input", { bubbles: true }));
+      }
     };
     popup.appendChild(btn);
   });

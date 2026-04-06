@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2026-03-30T15:03:01.149Z",
+    "updated": "2026-04-06T22:23:02.410Z",
     "flagged": true,
     "tags": [
       "bye",
@@ -34,18 +34,21 @@
     "datable": [
       [
         "One",
-        "Two",
-        "Three"
+        "6",
+        "2025-11-05",
+        "true"
       ],
       [
         "Add",
-        "in the",
-        "middle"
+        "5545",
+        "2026-04-09",
+        "false"
       ],
       [
         "Because",
-        "is with",
-        "B"
+        "5",
+        "2026-04-30",
+        "true"
       ]
     ],
     "design": "formidable.png",
@@ -59,7 +62,7 @@
       "Great"
     ],
     "calculatedSummary": "Test: Approve This One - code works | Sanitized: some-value-here! | Capitalized: Approve This One - code works | File: sane-20250530.meta.…",
-    "detailedOutput": "# Selected Options\n\nYou have selected 2 option(s):\n\n1. **B**\n2. **C**\n\n---\n\n## Form Details\n\n- **Filename**: `sane-20250530.meta.json`\n- **Test Value**: \"Approve This One - code works\"\n- **Sanitized**: `some-value-here!`\n- **Capitalized**: Approve This One - code works\n- **Short Name**: sane-20250530.meta.…\n\n> Generated at: Mar 30, 2026, 05:03 PM",
+    "detailedOutput": "# Selected Options\n\nYou have selected 2 option(s):\n\n1. **B**\n2. **C**\n\n---\n\n## Form Details\n\n- **Filename**: `sane-20250530.meta.json`\n- **Test Value**: \"Approve This One - code works\"\n- **Sanitized**: `some-value-here!`\n- **Capitalized**: Approve This One - code works\n- **Short Name**: sane-20250530.meta.…\n\n> Generated at: Apr 7, 2026, 12:23 AM",
     "myScript": {
       "seenTest": "Approve This One - code works",
       "cleanKey": "some-value-here!",
