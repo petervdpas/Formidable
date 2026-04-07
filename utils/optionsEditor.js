@@ -32,12 +32,16 @@ const optionColumnPresets = {
       key: "type",
       type: "dropdown",
       placeholder: "type",
-      options: ["string", "number", "date", "bool", "dropdown"],
+      options: ["string", "number", "date", "bool", "dropdown", "reference"],
       defaultValue: "string",
       onChange(value, row) {
         if (row._choicesRow) {
           row._choicesRow.style.display = value === "dropdown" ? "" : "none";
           if (value !== "dropdown") row._choicesInput.value = "";
+        }
+        if (row._refRow) {
+          row._refRow.style.display = value === "reference" ? "" : "none";
+          if (value !== "reference" && row._refSelect) row._refSelect.value = "";
         }
       },
     },
@@ -47,6 +51,37 @@ const optionColumnPresets = {
       type: "subrow",
       placeholder: "key:Label | key:Label",
       visibleWhen: { key: "type", value: "dropdown" },
+    },
+    {
+      key: "reference",
+      type: "subrow",
+      subType: "dropdown",
+      placeholder: "Select loop field…",
+      visibleWhen: { key: "type", value: "reference" },
+      buildOptions(allFields) {
+        const opts = [];
+        let inLoop = null;
+        let depth = 0;
+        for (const f of allFields) {
+          if (f.type === "loopstart") {
+            depth++;
+            if (depth === 1) inLoop = f.key;
+            continue;
+          }
+          if (f.type === "loopstop") {
+            if (depth === 1) inLoop = null;
+            depth--;
+            continue;
+          }
+          if (depth === 1 && inLoop && f.key && f.type === "text") {
+            opts.push({
+              value: `${inLoop}.${f.key}`,
+              label: `${inLoop} → ${f.label || f.key}`,
+            });
+          }
+        }
+        return opts;
+      },
     },
   ],
 };
@@ -64,7 +99,12 @@ export function getSupportedOptionTypes() {
   ];
 }
 
-export function setupOptionsEditor({ type = "text", dom, initialOptions }) {
+export function setupOptionsEditor({
+  type = "text",
+  dom,
+  initialOptions,
+  allFields = [],
+}) {
   const optionTypes = getSupportedOptionTypes();
   const { options, containerRow } = dom || {};
   if (!options || !containerRow) return null;
@@ -83,9 +123,14 @@ export function setupOptionsEditor({ type = "text", dom, initialOptions }) {
 
   const columns = optionColumnPresets[type] || defaultColumns;
 
-  const editor = createOptionsEditor(columns, containerRow, (newOptions) => {
-    options.value = JSON.stringify(newOptions, null, 2);
-  });
+  const editor = createOptionsEditor(
+    columns,
+    containerRow,
+    (newOptions) => {
+      options.value = JSON.stringify(newOptions, null, 2);
+    },
+    allFields
+  );
 
   if (Array.isArray(initialOptions) && initialOptions.some((o) => o?.value)) {
     editor.setValues(initialOptions);
@@ -95,7 +140,7 @@ export function setupOptionsEditor({ type = "text", dom, initialOptions }) {
   return editor;
 }
 
-function createOptionsEditor(columns, container, onChange) {
+function createOptionsEditor(columns, container, onChange, allFields = []) {
   const wrapper = document.createElement("div");
   wrapper.className = "options-editor";
 
@@ -131,18 +176,46 @@ function createOptionsEditor(columns, container, onChange) {
         const subrow = document.createElement("div");
         subrow.className = "option-subrow";
 
-        const input = document.createElement("input");
-        input.type = "text";
-        input.placeholder = col.placeholder || col.key;
-        input.value = values[col.key] || "";
-        input.addEventListener("input", emitChange);
+        let inputEl;
+        if (col.subType === "dropdown") {
+          // dropdown subrow — populated from allFields via buildOptions
+          inputEl = document.createElement("select");
+          const emptyOpt = document.createElement("option");
+          emptyOpt.value = "";
+          emptyOpt.textContent = col.placeholder || `-- ${col.key} --`;
+          inputEl.appendChild(emptyOpt);
+          const opts = col.buildOptions?.(allFields) || [];
+          for (const o of opts) {
+            const optEl = document.createElement("option");
+            optEl.value = o.value;
+            optEl.textContent = o.label || o.value;
+            inputEl.appendChild(optEl);
+          }
+          inputEl.value = values[col.key] || "";
+          inputEl.addEventListener("change", emitChange);
+        } else {
+          inputEl = document.createElement("input");
+          inputEl.type = "text";
+          inputEl.placeholder = col.placeholder || col.key;
+          inputEl.value = values[col.key] || "";
+          inputEl.addEventListener("input", emitChange);
+        }
 
-        subrow.appendChild(input);
-        entry = { key: col.key, el: input, type: "text" };
+        subrow.appendChild(inputEl);
+        entry = {
+          key: col.key,
+          el: inputEl,
+          type: col.subType === "dropdown" ? "dropdown" : "text",
+        };
 
-        // store refs for onChange callbacks
-        rowMap._choicesRow = subrow;
-        rowMap._choicesInput = input;
+        // store refs for onChange callbacks (keyed by column key)
+        if (col.key === "choices") {
+          rowMap._choicesRow = subrow;
+          rowMap._choicesInput = inputEl;
+        } else if (col.key === "reference") {
+          rowMap._refRow = subrow;
+          rowMap._refSelect = inputEl;
+        }
 
         // visibility based on another column's value
         if (col.visibleWhen) {
@@ -228,6 +301,8 @@ function createOptionsEditor(columns, container, onChange) {
       }
       // only include rows that have a value key set
       if (entry.value) {
+        // ref columns require a field reference
+        if (entry.type === "reference" && !entry.reference) return;
         // backfill label from value if missing
         if (columns.some((c) => c.key === "label") && !entry.label) {
           entry.label = entry.value;

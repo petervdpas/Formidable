@@ -88,6 +88,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
         containerRow: dom.options?.closest(".modal-form-row"),
       },
       initialOptions: fieldOptions,
+      allFields,
     });
   }
 

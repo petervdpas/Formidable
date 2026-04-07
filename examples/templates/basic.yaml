@@ -401,22 +401,32 @@ fields:
         type: string
         label: Column 1
         choices: ''
+        reference: ''
       - value: col2
         type: number
         label: Column 2
         choices: ''
+        reference: ''
       - value: col3
         type: date
         label: Column 3
         choices: ''
+        reference: ''
       - value: col4
         type: bool
         label: Column 4
         choices: ''
+        reference: ''
       - value: col5
         type: dropdown
         label: Column 5
         choices: active:Active|inactive:Inactive|pending:Pending
+        reference: ''
+      - value: col6
+        type: reference
+        label: Column 6
+        choices: ''
+        reference: Codes.Code
   - key: design
     type: image
     label: Design
@@ -561,3 +571,31 @@ fields:
     allowed_ids:
       - c34c4d20-f47d-4ec5-bde5-8085a92f77f0
       - 10b8c641-8774-409c-8cec-0c944920b313
+  - key: Codes
+    type: loopstart
+    label: Codes
+    description: ''
+    summary_field: Code
+    expression_item: false
+    two_column: false
+    readonly: false
+    default: ''
+    options: []
+  - key: Code
+    type: text
+    label: Code
+    description: Give codes for table
+    expression_item: false
+    two_column: false
+    readonly: false
+    default: ''
+    options: []
+  - key: Codes
+    type: loopstop
+    label: Codes
+    description: ''
+    expression_item: false
+    two_column: false
+    readonly: false
+    default: ''
+    options: []

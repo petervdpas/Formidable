@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2026-04-06T22:36:28.670Z",
+    "updated": "2026-04-07T23:57:16.087Z",
     "flagged": true,
     "tags": [
       "bye",
@@ -37,21 +37,29 @@
         "6",
         "2025-11-05",
         "true",
-        "active"
+        "active",
+        [
+          "A003",
+          "B005"
+        ]
       ],
       [
         "Add",
         "5545",
         "2026-04-09",
         "false",
-        "inactive"
+        "inactive",
+        []
       ],
       [
         "Because",
         "5",
         "2026-04-30",
         "true",
-        "pending"
+        "pending",
+        [
+          "A003"
+        ]
       ]
     ],
     "design": "formidable.png",
@@ -90,6 +98,14 @@
           "Brin"
         ]
       ]
-    }
+    },
+    "Codes": [
+      {
+        "Code": "A003"
+      },
+      {
+        "Code": "B005"
+      }
+    ]
   }
 }

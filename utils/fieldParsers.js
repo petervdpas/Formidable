@@ -110,6 +110,13 @@ export const parseTableField = async function (wrapper) {
   rows.forEach((tr) => {
     const cells = Array.from(tr.querySelectorAll("td")).slice(1, -1); // skip drag handle and remove btn
     const row = cells.map((td) => {
+      // reference tags cell
+      const refCell = td.querySelector(".ref-tags-cell");
+      if (refCell) {
+        return Array.from(refCell.querySelectorAll(".ref-tag-item"))
+          .map((el) => el.firstChild?.textContent?.trim())
+          .filter(Boolean);
+      }
       const input = td.querySelector("input");
       if (input) {
         return input.type === "checkbox" ? String(input.checked) : input.value.trim();
@@ -118,7 +125,7 @@ export const parseTableField = async function (wrapper) {
       if (select) return select.value;
       return "";
     });
-    if (row.some((cell) => cell !== "" && cell !== "false")) {
+    if (row.some((cell) => Array.isArray(cell) ? cell.length > 0 : cell !== "" && cell !== "false")) {
       data.push(row);
     }
   });

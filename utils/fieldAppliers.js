@@ -6,6 +6,7 @@ import { ensureVirtualLocation } from "./vfsUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 import { createSortable } from "./domUtils.js";
 import { parseChoices } from "./parseChoices.js";
+import { createRefTagsCell } from "./fieldFactory.js";
 import { addContainerElement, createStyledLabel } from "./elementBuilders.js";
 
 export function applyGuidField(container, field, value) {
@@ -278,6 +279,13 @@ export function applyTableField(
         });
         sel.value = String(cellValue);
         td.appendChild(sel);
+      } else if (colType === "reference") {
+        const tags = Array.isArray(cellValue)
+          ? cellValue
+          : typeof cellValue === "string" && cellValue
+            ? (() => { try { return JSON.parse(cellValue); } catch { return []; } })()
+            : [];
+        td.appendChild(createRefTagsCell(tags, col.reference || "", tableWrapper));
       } else {
         const input = document.createElement("input");
         input.type = colType === "number" ? "number" : colType === "date" ? "date" : "text";

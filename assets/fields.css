@@ -251,6 +251,58 @@
   margin: 4px 0;
 }
 
+/* ───── Reference Tags (in table cells) ───── */
+.ref-tags-cell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+  padding: 2px;
+  min-height: 30px;
+}
+
+.ref-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.ref-tag-item {
+  background-color: var(--tag-bg, #e0e0e0);
+  color: var(--tag-text, #222);
+  border: 1px solid var(--tag-border, #bbb);
+  border-radius: 3px;
+  padding: 1px 4px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.85em;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.ref-tag-remove {
+  background: none;
+  border: none;
+  color: var(--tag-text, #222);
+  padding: 0 2px;
+  margin-left: 2px;
+  font-size: 1em;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ref-tag-select {
+  flex: 0 0 auto;
+  min-width: 40px;
+  max-width: 100px;
+  padding: 2px 4px;
+  font-size: 0.85em;
+  border-radius: 4px;
+  background-color: var(--input-bg);
+  color: var(--input-fg);
+  border: 1px solid var(--input-border-color);
+}
+
 /* ───── List Field ───── */
 .list-field-item {
   display: flex;

@@ -43,6 +43,86 @@ function makeContainer(tag = "div", cls = "") {
 }
 
 // ─────────────────────────────────────────────
+// Reference tags cell for tables — mini tag picker sourced from loop DOM
+export function createRefTagsCell(tags, refSource, tableWrap) {
+  const [loopKey, fieldKey] = (refSource || "").split(".");
+  const container = document.createElement("div");
+  container.className = "ref-tags-cell";
+  container.dataset.refSource = refSource;
+
+  const tagContainer = document.createElement("div");
+  tagContainer.className = "ref-tags-container";
+
+  function createTag(text) {
+    const tag = document.createElement("span");
+    tag.className = "ref-tag-item";
+    tag.textContent = text;
+    const rm = document.createElement("button");
+    rm.type = "button";
+    rm.className = "ref-tag-remove";
+    rm.textContent = "×";
+    rm.onclick = () => { tag.remove(); updateSelect(); };
+    tag.appendChild(rm);
+    return tag;
+  }
+
+  tags.forEach((t) => { if (t) tagContainer.appendChild(createTag(t)); });
+
+  const select = document.createElement("select");
+  select.className = "ref-tag-select";
+
+  function getLoopValues() {
+    const form = tableWrap.closest("form") || tableWrap.closest("#template-content") || document;
+    const loopContainer = form.querySelector(`.loop-container[data-loop-key="${loopKey}"]`);
+    if (!loopContainer) return [];
+    const vals = [];
+    loopContainer.querySelectorAll(`.loop-item input[name="${fieldKey}"]`).forEach((inp) => {
+      const v = inp.value.trim();
+      if (v) vals.push(v);
+    });
+    return [...new Set(vals)];
+  }
+
+  function getSelectedTags() {
+    return Array.from(tagContainer.querySelectorAll(".ref-tag-item"))
+      .map((el) => el.firstChild?.textContent?.trim())
+      .filter(Boolean);
+  }
+
+  function updateSelect() {
+    const used = new Set(getSelectedTags());
+    const available = getLoopValues().filter((v) => !used.has(v));
+    select.innerHTML = "";
+    const empty = document.createElement("option");
+    empty.value = "";
+    empty.textContent = available.length ? "+" : "(none)";
+    select.appendChild(empty);
+    available.forEach((v) => {
+      const opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = v;
+      select.appendChild(opt);
+    });
+  }
+
+  select.addEventListener("focus", updateSelect);
+  select.addEventListener("change", () => {
+    const v = select.value;
+    if (v) {
+      tagContainer.appendChild(createTag(v));
+      select.value = "";
+      updateSelect();
+    }
+  });
+
+  updateSelect();
+
+  container.appendChild(tagContainer);
+  container.appendChild(select);
+  return container;
+}
+
+// ─────────────────────────────────────────────
 // Blueprints registry
 // Each entry: (field, value) => HTMLElement
 // Return value is the ROOT element for this field's core UI (no wrapper/label).
@@ -509,6 +589,14 @@ export const FieldBlueprints = {
           });
           sel.value = String(cellVal);
           td.appendChild(sel);
+        } else if (colType === "reference") {
+          const refSource = c.reference || "";
+          const tags = Array.isArray(cellVal)
+            ? cellVal
+            : typeof cellVal === "string" && cellVal
+              ? (() => { try { return JSON.parse(cellVal); } catch { return []; } })()
+              : [];
+          td.appendChild(createRefTagsCell(tags, refSource, wrap));
         } else {
           const inp = document.createElement("input");
           inp.type = colType === "number" ? "number" : colType === "date" ? "date" : "text";

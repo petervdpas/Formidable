@@ -105,7 +105,8 @@
   padding-left: 6px;
 }
 
-.option-subrow input {
+.option-subrow input,
+.option-subrow select {
   flex: 1;
   min-width: 0;
   background-color: var(--input-bg);
