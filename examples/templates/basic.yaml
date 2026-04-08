@@ -246,7 +246,7 @@ markdown_template: !!str |-
   > **detailedOutput**: `{{json (fieldRaw "detailedOutput")}}`
   > **myScript**: `{{json (fieldRaw "myScript")}}`
   > **testapi**: `{{json (fieldRaw "testapi")}}`
-sidebar_expression: '[ test | check ? { text: "You approved this!", classes: ["expr-text-green", "expr-bold"] } : { text: "You declined this!", classes: ["expr-text-red", "expr-bold", "expr-blinking"] } ]'
+sidebar_expression: '[ F["test"] | { text: notEmpty(F["test"]) ? F["test"] + " / " + F["dropdown"]  : F["dropdown"], classes: (F["dropdown"] == "L" ? ["expr-text-orange"] : F["dropdown"] == "R" ? ["expr-text-green", "expr-bold"] : ["expr-text-purple"]) } ]'
 enable_collection: true
 fields:
   - key: id
@@ -285,7 +285,7 @@ fields:
     type: dropdown
     label: Dropdown
     description: Select a single value from a dropdown menu.
-    expression_item: false
+    expression_item: true
     two_column: true
     readonly: false
     default: R

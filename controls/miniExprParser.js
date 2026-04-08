@@ -6,7 +6,7 @@ const helpers = require("./expressionHelpers");
 
 // ==== Security switches =====================================================
 const MAX_EXPR_LEN = 1024;
-const SAFE_CHARS = /^[\s\w\d+\-*/%<>=!&|^?:(),.[\]{}'"]+$/u;
+const SAFE_CHARS = /^[\s\w\d+\-*/%<>=!&|^?:(),.[\]{}'"\u00A0-\uFFFF]+$/u;
 const VM_ONLY_PATTERN = /\b(F|meta)\s*\[|\b(F|meta)\s*\./;
 
 // Ask helpers which functions are safe to expose
@@ -112,12 +112,7 @@ function buildVmSandbox(originalContext) {
   // ✅ Also expose helpers as top-level names (so notEmpty() works, not just h.notEmpty())
   for (const [name, fn] of Object.entries(pickedHelpers)) {
     if (!(name in base)) {
-      Object.defineProperty(base, name, {
-        value: fn,
-        enumerable: true,
-        configurable: false,
-        writable: false,
-      });
+      base[name] = fn;
     }
   }
 
@@ -167,9 +162,9 @@ function parseMiniExpr(expr, originalContext = {}) {
     log("[miniExprParser] rawTextExpr:", rawTextExpr);
     log("[miniExprParser] rawStyleExpr:", rawStyleExpr);
     log("[miniExprParser] F keys:", Object.keys(vmSandbox.F || {}));
-    log("[miniExprParser] today() via helpers:", helpers.today?.());
-    log("[miniExprParser] datum evaluatie:", vmSandbox.F?.["audit-control-datum-evaluatie"]);
-    log("[miniExprParser] allowed helpers:", ALLOWED_HELPERS);
+    log("[miniExprParser] sandbox top-level keys:", Object.keys(vmSandbox));
+    log("[miniExprParser] typeof notEmpty on sandbox:", typeof vmSandbox.notEmpty);
+    log("[miniExprParser] h keys:", Object.keys(vmSandbox.h || {}));
   } catch (e) {
     warn("[miniExprParser] Debug logging failed:", e.message);
   }
