@@ -400,8 +400,8 @@ function registerIpcHandlers() {
   registerIpc("csv-preview", (e, filePath, delimiter) =>
     csvManager.previewCsv(filePath, delimiter)
   );
-  registerIpc("csv-import-row", (e, templateFilename, entryFilename, data, fields) =>
-    formManager.saveForm(templateFilename, entryFilename, { data }, fields)
+  registerIpc("csv-import-row", (e, templateFilename, entryFilename, data, meta, fields) =>
+    formManager.saveForm(templateFilename, entryFilename, { data, meta }, fields)
   );
 
   // Config

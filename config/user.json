@@ -11,7 +11,7 @@
   "context_mode": "storage",
   "context_folder": "./examples",
   "selected_template": "addresses.yaml",
-  "selected_data_file": "white-house.meta.json",
+  "selected_data_file": "buckingham-palace.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -21,10 +21,8 @@
   "enable_internal_server": true,
   "internal_server_port": 8383,
   "window_bounds": {
-    "width": 1535,
-    "height": 749,
-    "x": 192,
-    "y": 181
+    "width": 1440,
+    "height": 749
   },
   "template_sidebar_width": 358,
   "storage_sidebar_width": 324,

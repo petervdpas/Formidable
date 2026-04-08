@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "id": null,
+    "author_name": "Utente Ribelle",
+    "author_email": "regular@example.com",
+    "template": "addresses.yaml",
+    "created": "2026-04-08T11:22:23.612Z",
+    "updated": "2026-04-08T11:22:23.612Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "",
+    "name": "White House",
+    "country": "us",
+    "unit-number": "1600",
+    "street-address": "Pennsylvania Avenue NW",
+    "city": "Washington",
+    "state-abbreviation": "DC",
+    "postal": "20500",
+    "owners": ""
+  }
+}

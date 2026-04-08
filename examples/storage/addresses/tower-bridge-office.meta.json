@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "id": null,
+    "author_name": "Utente Ribelle",
+    "author_email": "regular@example.com",
+    "template": "addresses.yaml",
+    "created": "2026-04-08T11:22:23.614Z",
+    "updated": "2026-04-08T11:22:23.614Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "",
+    "name": "Tower Bridge Office",
+    "country": "uk",
+    "unit-number": "1",
+    "street-address": "Tower Bridge Road",
+    "city": "London",
+    "state-abbreviation": "",
+    "postal": "SE1 2UP",
+    "owners": ""
+  }
+}

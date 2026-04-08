@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "id": null,
+    "author_name": "Utente Ribelle",
+    "author_email": "regular@example.com",
+    "template": "addresses.yaml",
+    "created": "2026-04-08T11:22:23.617Z",
+    "updated": "2026-04-08T11:22:23.617Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "",
+    "name": "Buckingham Palace",
+    "country": "uk",
+    "unit-number": "1",
+    "street-address": "Buckingham Palace Road",
+    "city": "London",
+    "state-abbreviation": "",
+    "postal": "SW1A 1AA",
+    "owners": ""
+  }
+}

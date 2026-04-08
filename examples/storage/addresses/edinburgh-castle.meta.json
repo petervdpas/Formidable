@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "id": null,
+    "author_name": "Utente Ribelle",
+    "author_email": "regular@example.com",
+    "template": "addresses.yaml",
+    "created": "2026-04-08T11:22:23.620Z",
+    "updated": "2026-04-08T11:22:23.620Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "",
+    "name": "Edinburgh Castle",
+    "country": "uk",
+    "unit-number": "1",
+    "street-address": "Castlehill",
+    "city": "Edinburgh",
+    "state-abbreviation": "",
+    "postal": "EH1 2NG",
+    "owners": ""
+  }
+}

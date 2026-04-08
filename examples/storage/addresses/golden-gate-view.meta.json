@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "id": null,
+    "author_name": "Utente Ribelle",
+    "author_email": "regular@example.com",
+    "template": "addresses.yaml",
+    "created": "2026-04-08T11:22:23.616Z",
+    "updated": "2026-04-08T11:22:23.616Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "",
+    "name": "Golden Gate View",
+    "country": "us",
+    "unit-number": "1",
+    "street-address": "Lincoln Boulevard",
+    "city": "San Francisco",
+    "state-abbreviation": "CA",
+    "postal": "94129",
+    "owners": ""
+  }
+}

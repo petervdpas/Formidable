@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "id": null,
+    "author_name": "Utente Ribelle",
+    "author_email": "regular@example.com",
+    "template": "addresses.yaml",
+    "created": "2026-04-08T11:22:23.619Z",
+    "updated": "2026-04-08T11:22:23.619Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "",
+    "name": "Central Park West",
+    "country": "us",
+    "unit-number": "115",
+    "street-address": "Central Park West",
+    "city": "New York",
+    "state-abbreviation": "NY",
+    "postal": "10023",
+    "owners": ""
+  }
+}

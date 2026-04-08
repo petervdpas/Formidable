@@ -29,17 +29,54 @@ export async function handleCsvPreview({ filePath, delimiter }, respond) {
  * Handle: csv:import:transformRow
  * Coerce a single raw CSV row into typed field values.
  *
- * Payload: { row: string[], colMapping: [{colIndex, fieldKey, field}] }
+ * Payload: { row: string[], colMapping: [{colIndex, fieldKey, field, transform?}] }
+ *           transform is { rule, n? } or a string
  * Returns: { [fieldKey]: coercedValue }
+ *
+ * Supports concat: multiple colMapping entries with the same fieldKey
+ * are joined with a space before coercion.
  */
-export function handleTransformRow({ row, colMapping }, respond) {
-  const data = {};
-  for (const { colIndex, fieldKey, field } of colMapping) {
-    const rawVal = colIndex < row.length ? row[colIndex] : "";
-    data[fieldKey] = coerceValue(rawVal, field);
+export function handleTransformRow({ row, colMapping, concatSeparator = " " }, respond) {
+  // Group by fieldKey to support concat
+  const groups = new Map();
+  for (const entry of colMapping) {
+    const { colIndex, fieldKey, transform } = entry;
+    let rawVal = colIndex < row.length ? row[colIndex] : "";
+    rawVal = applyTransformRule(rawVal, transform);
+    if (!groups.has(fieldKey)) groups.set(fieldKey, { field: entry.field, parts: [] });
+    groups.get(fieldKey).parts.push(rawVal);
   }
+
+  const data = {};
+  for (const [fieldKey, { field, parts }] of groups) {
+    const combined = parts.join(concatSeparator);
+    data[fieldKey] = coerceValue(combined, field);
+  }
+
   respond?.(data);
   return data;
+}
+
+// ── Transform rules (shared with csvImportModal.js) ───────────
+const transformRules = {
+  none:         (v) => v,
+  lowercase:    (v) => v.toLowerCase(),
+  uppercase:    (v) => v.toUpperCase(),
+  capitalize:   (v) => v.replace(/\b\w/g, (c) => c.toUpperCase()),
+  trim:         (v) => v.trim(),
+  "trim+lower": (v) => v.trim().toLowerCase(),
+  "trim+upper": (v) => v.trim().toUpperCase(),
+  "trim+cap":   (v) => v.trim().replace(/\b\w/g, (c) => c.toUpperCase()),
+  "first-n":    (v, n) => v.substring(0, n || v.length),
+  "last-n":     (v, n) => n ? v.slice(-n) : v,
+};
+
+function applyTransformRule(val, transform) {
+  if (!transform) return val;
+  const rule = typeof transform === "string" ? transform : transform.rule;
+  const n = typeof transform === "object" ? transform.n : 0;
+  const fn = transformRules[rule];
+  return fn ? fn(String(val), n) : val;
 }
 
 /**
@@ -49,10 +86,10 @@ export function handleTransformRow({ row, colMapping }, respond) {
  * Payload: { templateFilename, entryFilename, data, fields }
  * Returns: { success, error? }
  */
-export async function handleSaveRow({ templateFilename, entryFilename, data, fields }, respond) {
+export async function handleSaveRow({ templateFilename, entryFilename, data, meta, fields }, respond) {
   try {
     const result = await window.api.csv.csvImportRow(
-      templateFilename, entryFilename, data, fields
+      templateFilename, entryFilename, data, meta, fields
     );
     respond?.(result);
     return result;
@@ -68,11 +105,12 @@ export async function handleSaveRow({ templateFilename, entryFilename, data, fie
  * Handle: csv:import
  * Orchestrate the full import: transform each row, then save it.
  *
- * Payload: { rows, headers, templateFilename, mapping, fields, filenameField, guidFieldKey }
+ * Payload: { rows, headers, templateFilename, mapping, transforms, fields, filenameField, guidFieldKey }
  */
 export async function handleCsvImport(opts, respond) {
   const {
     rows, headers, templateFilename, mapping,
+    transforms = {}, concatSeparator = " ",
     fields, filenameField, guidFieldKey,
   } = opts;
 
@@ -86,24 +124,34 @@ export async function handleCsvImport(opts, respond) {
     if (!excludedTypes.has(f.type)) fieldMap.set(f.key, f);
   }
 
-  // Resolve column mapping: csvColumnIndex → { fieldKey, field }
+  // Resolve column mapping: csvColumnIndex → { fieldKey, field, transform }
   const colMapping = [];
   for (const [csvCol, fieldKey] of Object.entries(mapping)) {
     const colIndex = headers.indexOf(csvCol);
     if (colIndex === -1) continue;
     const field = fieldMap.get(fieldKey);
     if (!field) continue;
-    colMapping.push({ colIndex, fieldKey, field });
+    const transform = transforms[csvCol] || null;
+    colMapping.push({ colIndex, fieldKey, field, transform });
   }
 
   // Ensure storage directory exists
   await window.api.forms.ensureFormDir(templateFilename);
 
+  // Load user config for meta (author, template name)
+  const config = await window.api.config.loadUserConfig();
+  const templateName = templateFilename.replace(/\.yaml$/, "");
+  const baseMeta = {
+    author_name: config?.author_name || "Unknown",
+    author_email: config?.author_email || "",
+    template: templateFilename,
+  };
+
   for (let r = 0; r < rows.length; r++) {
     try {
       // Step 1: transform row via event
       const data = await EventBus.emitWithResponse("csv:import:transformRow", {
-        row: rows[r], colMapping,
+        row: rows[r], colMapping, concatSeparator,
       });
 
       // Step 2: derive entry filename
@@ -116,9 +164,9 @@ export async function handleCsvImport(opts, respond) {
         entryFilename = `import-${Date.now()}-${r}`;
       }
 
-      // Step 3: save row via event
+      // Step 3: save row via event (with meta)
       const result = await EventBus.emitWithResponse("csv:import:saveRow", {
-        templateFilename, entryFilename, data, fields,
+        templateFilename, entryFilename, data, meta: baseMeta, fields,
       });
 
       if (result?.success) {

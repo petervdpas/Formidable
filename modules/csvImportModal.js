@@ -19,6 +19,43 @@ const excludedTypes = new Set([
   "loopstart", "loopstop", "image", "code", "api",
 ]);
 
+// ── Transform rules ───────────────────────────────────────────
+// ── Transform rules ───────────────────────────────────────────
+// Parameterised rules (first-n, last-n) receive the "n" arg at apply-time.
+const transformRules = {
+  none:         (v) => v,
+  lowercase:    (v) => v.toLowerCase(),
+  uppercase:    (v) => v.toUpperCase(),
+  capitalize:   (v) => v.replace(/\b\w/g, (c) => c.toUpperCase()),
+  trim:         (v) => v.trim(),
+  "trim+lower": (v) => v.trim().toLowerCase(),
+  "trim+upper": (v) => v.trim().toUpperCase(),
+  "trim+cap":   (v) => v.trim().replace(/\b\w/g, (c) => c.toUpperCase()),
+  "first-n":    (v, n) => v.substring(0, n || v.length),
+  "last-n":     (v, n) => n ? v.slice(-n) : v,
+};
+
+// Rules that need the numeric "n" input
+const paramRules = new Set(["first-n", "last-n"]);
+
+const transformOptions = [
+  { value: "none",       label: t("csv.transform.none", "None") },
+  { value: "trim",       label: t("csv.transform.trim", "Trim") },
+  { value: "lowercase",  label: t("csv.transform.lowercase", "Lowercase") },
+  { value: "uppercase",  label: t("csv.transform.uppercase", "Uppercase") },
+  { value: "capitalize", label: t("csv.transform.capitalize", "Capitalize") },
+  { value: "trim+lower", label: t("csv.transform.trimlower", "Trim + Lower") },
+  { value: "trim+upper", label: t("csv.transform.trimupper", "Trim + Upper") },
+  { value: "trim+cap",   label: t("csv.transform.trimcap", "Trim + Capitalize") },
+  { value: "first-n",    label: t("csv.transform.firstn", "First N chars") },
+  { value: "last-n",     label: t("csv.transform.lastn", "Last N chars") },
+];
+
+function applyTransform(val, ruleKey, n) {
+  const fn = transformRules[ruleKey];
+  return fn ? fn(val, n) : val;
+}
+
 /**
  * Quick inline coerce for preview display (mirrors csvHandlers.coerceValue).
  */
@@ -51,7 +88,7 @@ function formatPreview(val) {
 }
 
 /**
- * Build the mapping table with Preview + Transformed columns.
+ * Build the mapping table with Transform, Preview + Transformed columns.
  */
 function buildMappingTable(container, csvHeaders, templateFields, firstRow) {
   container.innerHTML = "";
@@ -77,6 +114,7 @@ function buildMappingTable(container, csvHeaders, templateFields, firstRow) {
   for (const text of [
     t("csv.column", "CSV Column"),
     t("csv.field", "Template Field"),
+    t("csv.transform", "Transform"),
     t("csv.preview", "Preview"),
     t("csv.transformed", "Transformed"),
   ]) {
@@ -89,6 +127,9 @@ function buildMappingTable(container, csvHeaders, templateFields, firstRow) {
 
   const tbody = document.createElement("tbody");
   const dropdowns = {};
+  const transforms = {};
+  const nInputs = {};       // header → input element (for first-n / last-n)
+  const rowUpdaters = [];   // functions to refresh all transformed cells (for concat)
 
   for (let i = 0; i < csvHeaders.length; i++) {
     const header = csvHeaders[i];
@@ -100,13 +141,34 @@ function buildMappingTable(container, csvHeaders, templateFields, firstRow) {
     tdCol.textContent = header;
     tdCol.title = header;
 
-    // Dropdown
+    // Field dropdown
     const tdField = document.createElement("td");
     const dropContainer = document.createElement("div");
     dropContainer.className = "csv-map-dropdown";
     tdField.appendChild(dropContainer);
 
     const autoMatch = autoMatchField(header, mappableFields);
+
+    // Transform dropdown + N-chars input
+    const tdTransform = document.createElement("td");
+    const transformWrap = document.createElement("div");
+    transformWrap.className = "csv-transform-wrap";
+
+    const transformContainer = document.createElement("div");
+    transformContainer.className = "csv-map-dropdown";
+    transformWrap.appendChild(transformContainer);
+
+    const nInput = document.createElement("input");
+    nInput.type = "number";
+    nInput.min = "1";
+    nInput.max = "999";
+    nInput.className = "csv-n-input";
+    nInput.placeholder = "N";
+    nInput.style.display = "none";
+    transformWrap.appendChild(nInput);
+    nInputs[header] = nInput;
+
+    tdTransform.appendChild(transformWrap);
 
     // Preview cell (raw)
     const tdPreview = document.createElement("td");
@@ -118,22 +180,60 @@ function buildMappingTable(container, csvHeaders, templateFields, firstRow) {
     const tdTransformed = document.createElement("td");
     tdTransformed.className = "csv-transformed-cell";
 
-    function updateTransformed(fieldKey) {
-      if (!fieldKey) {
-        tdTransformed.textContent = "";
-        tdTransformed.title = "";
-        tdTransformed.classList.remove("csv-transformed-changed");
-        return;
+    // State for this row
+    let currentFieldKey = autoMatch;
+    let currentRule = "none";
+    let currentN = 0;
+
+    function updateTransformed() {
+      try {
+        if (!currentFieldKey) {
+          tdTransformed.textContent = "";
+          tdTransformed.title = "";
+          tdTransformed.classList.remove("csv-transformed-changed", "csv-transformed-concat");
+          return;
+        }
+        const field = fieldByKey.get(currentFieldKey);
+        if (!field) {
+          tdTransformed.textContent = "?";
+          return;
+        }
+
+        // Read N directly from DOM (don't rely on event-set variable)
+        const liveN = parseInt(nInput.value) || 0;
+
+        // Apply this row's own transform
+        const myVal = applyTransform(rawVal, currentRule, liveN);
+
+        // Check for concat: other rows also targeting the same field
+        const allReady = Object.keys(dropdowns).length === csvHeaders.length;
+        let isConcat = false;
+        let combined = myVal;
+
+        if (allReady) {
+          const parts = [];
+          for (let j = 0; j < csvHeaders.length; j++) {
+            const oh = csvHeaders[j];
+            if (!dropdowns[oh] || dropdowns[oh].getSelected() !== currentFieldKey) continue;
+            const oRaw = firstRow && j < firstRow.length ? firstRow[j] : "";
+            const oRule = transforms[oh] ? transforms[oh].getSelected() : "none";
+            const oN = nInputs[oh] ? (parseInt(nInputs[oh].value) || 0) : 0;
+            parts.push(applyTransform(oRaw, oRule, oN));
+          }
+          if (parts.length > 1) {
+            isConcat = true;
+            combined = parts.join(concatSepInput?.value ?? " ");
+          }
+        }
+
+        const transformed = previewCoerce(combined, field);
+        tdTransformed.textContent = formatPreview(transformed);
+        tdTransformed.title = transformed;
+        tdTransformed.classList.toggle("csv-transformed-changed", transformed !== rawVal.trim());
+        tdTransformed.classList.toggle("csv-transformed-concat", isConcat);
+      } catch (err) {
+        tdTransformed.textContent = `ERR: ${err.message}`;
       }
-      const field = fieldByKey.get(fieldKey);
-      if (!field) return;
-      const transformed = previewCoerce(rawVal, field);
-      tdTransformed.textContent = formatPreview(transformed);
-      tdTransformed.title = transformed;
-      tdTransformed.classList.toggle(
-        "csv-transformed-changed",
-        transformed !== rawVal.trim()
-      );
     }
 
     const dd = createDropdown({
@@ -141,22 +241,71 @@ function buildMappingTable(container, csvHeaders, templateFields, firstRow) {
       labelTextOrKey: "",
       options: fieldOptions,
       selectedValue: autoMatch,
-      onChange: (val) => updateTransformed(val),
+      onChange: (val) => {
+        currentFieldKey = val;
+        // Refresh all rows (concat may have changed)
+        rowUpdaters.forEach((fn) => fn());
+      },
     });
 
+    const tfDd = createDropdown({
+      containerEl: transformContainer,
+      labelTextOrKey: "",
+      options: transformOptions,
+      selectedValue: "none",
+      onChange: (val) => {
+        currentRule = val;
+        nInput.style.display = paramRules.has(val) ? "" : "none";
+        if (!paramRules.has(val)) { nInput.value = ""; currentN = 0; }
+        rowUpdaters.forEach((fn) => fn());
+      },
+    });
+
+    const onNChange = () => {
+      currentN = parseInt(nInput.value) || 0;
+      rowUpdaters.forEach((fn) => fn());
+    };
+    nInput.addEventListener("input", onNChange);
+    nInput.addEventListener("change", onNChange);
+
     dropdowns[header] = dd;
+    transforms[header] = tfDd;
+    rowUpdaters.push(updateTransformed);
 
     // Show initial transform if auto-matched
-    if (autoMatch) updateTransformed(autoMatch);
+    if (autoMatch) updateTransformed();
 
-    row.append(tdCol, tdField, tdPreview, tdTransformed);
+    row.append(tdCol, tdField, tdTransform, tdPreview, tdTransformed);
     tbody.appendChild(row);
   }
 
   table.appendChild(tbody);
   container.appendChild(table);
 
-  return { dropdowns, table };
+  // Concat hint + separator (returned separately, caller places it outside the table container)
+  const concatRow = document.createElement("div");
+  concatRow.className = "csv-concat-row";
+
+  const concatHint = document.createElement("span");
+  concatHint.className = "csv-concat-hint";
+  concatHint.textContent = t("csv.concat.hint", "Map multiple columns to the same field to concatenate.");
+
+  const concatSepLabel = document.createElement("label");
+  concatSepLabel.className = "csv-concat-sep-label";
+  concatSepLabel.textContent = t("csv.concat.separator", "Separator:");
+
+  const concatSepInput = document.createElement("input");
+  concatSepInput.type = "text";
+  concatSepInput.value = " ";
+  concatSepInput.className = "csv-concat-sep-input";
+  concatSepInput.title = t("csv.concat.separator.title", "Character(s) used to join concatenated values");
+  concatSepInput.addEventListener("input", () => {
+    rowUpdaters.forEach((fn) => fn());
+  });
+
+  concatRow.append(concatHint, concatSepLabel, concatSepInput);
+
+  return { dropdowns, transforms, nInputs, concatSepInput, concatRow, table };
 }
 
 /**
@@ -185,6 +334,24 @@ function collectMapping(dropdowns) {
 }
 
 /**
+ * Collect the transform rules from dropdowns: { csvColumn: { rule, n? } }
+ */
+function collectTransforms(transformDds, nInputs) {
+  const transforms = {};
+  for (const [csvCol, dd] of Object.entries(transformDds)) {
+    const rule = dd.getSelected();
+    if (rule && rule !== "none") {
+      const entry = { rule };
+      if (paramRules.has(rule) && nInputs[csvCol]) {
+        entry.n = parseInt(nInputs[csvCol].value) || 0;
+      }
+      transforms[csvCol] = entry;
+    }
+  }
+  return transforms;
+}
+
+/**
  * Resolve the current template filename (always ending in .yaml).
  */
 function getTemplateFilename() {
@@ -200,7 +367,7 @@ export function setupCsvImportModal() {
     escToClose: true,
     backdropClick: true,
     resizable: true,
-    width: "52em",
+    width: "68em",
     height: "auto",
     maxHeight: "80vh",
     onOpen: () => initModalState(),
@@ -211,6 +378,9 @@ export function setupCsvImportModal() {
   let csvHeaders = [];
   let csvRows = [];
   let dropdowns = {};
+  let transformDds = {};
+  let nInputsMap = {};
+  let concatSepEl = null;
   let selectedDelimiter = ",";
   let filenameFieldKey = "";
   let templateFields = [];
@@ -220,6 +390,8 @@ export function setupCsvImportModal() {
     csvHeaders = [];
     csvRows = [];
     dropdowns = {};
+    transformDds = {};
+    nInputsMap = {};
     filenameFieldKey = "";
     templateFields = [];
 
@@ -380,6 +552,14 @@ export function setupCsvImportModal() {
     const firstRow = csvRows.length > 0 ? csvRows[0] : null;
     const result = buildMappingTable(container, csvHeaders, templateFields, firstRow);
     dropdowns = result.dropdowns;
+    transformDds = result.transforms;
+    nInputsMap = result.nInputs;
+    concatSepEl = result.concatSepInput;
+
+    // Place concat row after the mapping container (outside the scrollable area)
+    const oldConcat = container.parentNode?.querySelector(".csv-concat-row");
+    if (oldConcat) oldConcat.remove();
+    container.after(result.concatRow);
 
     // Build filename-field dropdown
     buildFilenameFieldDropdown();
@@ -428,6 +608,7 @@ export function setupCsvImportModal() {
     }
 
     const mapping = collectMapping(dropdowns);
+    const transforms = collectTransforms(transformDds, nInputsMap);
     if (Object.keys(mapping).length === 0) {
       Toast.error("csv.error.no.mapping");
       return;
@@ -464,6 +645,8 @@ export function setupCsvImportModal() {
         headers: csvHeaders,
         templateFilename,
         mapping,
+        transforms,
+        concatSeparator: concatSepEl?.value ?? " ",
         fields: templateFields,
         filenameField: filenameFieldKey,
         guidFieldKey,
