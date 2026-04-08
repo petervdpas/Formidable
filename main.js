@@ -100,7 +100,6 @@ function createWindow() {
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
-      enableRemoteModule: false,
       preload: path.resolve(__dirname, "preload.js"),
     },
   });

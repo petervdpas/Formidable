@@ -6,6 +6,8 @@ const defaultAllowedConfigKeys = [
   "theme",
   "show_icon_buttons",
   "use_expressions",
+  "show_meta_section",
+  "loop_state_collapsed",
   "font_size",
   "development_enable",
   "logging_enabled",
@@ -25,6 +27,8 @@ const defaultAllowedConfigKeys = [
   "window_bounds",
   "template_sidebar_width",
   "storage_sidebar_width",
+  "status_buttons",
+  "history",
 ];
 
 export async function reloadUserConfig() {
