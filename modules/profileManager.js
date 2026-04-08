@@ -221,15 +221,14 @@ export function createProfileListManager({ currentProfile } = {}) {
           if (result?.cancelled) return;
 
           if (result?.success) {
-            Toast.success("toast.profile.exportSuccess");
+            Toast.success("toast.profile.exportSuccess", [base]);
           } else {
-            Toast.error("toast.profile.exportFailed");
+            Toast.error("toast.profile.exportFailed", [base]);
           }
         } catch (err) {
           const msg =
             (err && (err.message || String(err))) || "Unknown error";
-          // You can later add toast.profile.exportFailed.reason if you want args here too
-          Toast.error("toast.profile.exportFailed");
+          Toast.error("toast.profile.exportFailed", [base]);
           EventBus.emit("logging:error", [
             "[profiles] export failed",
             msg,

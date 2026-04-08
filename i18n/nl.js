@@ -262,6 +262,8 @@ export default {
   "toast.profile.importSuccess": "Profiel succesvol geïmporteerd.",
   "toast.profile.importFailed": "Importeren van profiel mislukt.",
   "toast.profile.importFailed.reason": "Importeren van profiel mislukt: {0}",
+  "toast.profile.exportSuccess": "Profiel '{0}' succesvol geëxporteerd.",
+  "toast.profile.exportFailed": "Exporteren van profiel '{0}' mislukt.",
   "toast.profile.import.error.not_found":
     "Bronbestand kon niet worden gevonden.",
   "toast.profile.import.error.invalid_name":

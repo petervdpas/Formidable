@@ -248,6 +248,8 @@ export default {
   "toast.profile.importSuccess": "Profile imported successfully.",
   "toast.profile.importFailed": "Failed to import profile.",
   "toast.profile.importFailed.reason": "Failed to import profile: {0}",
+  "toast.profile.exportSuccess": "Profile '{0}' exported successfully.",
+  "toast.profile.exportFailed": "Failed to export profile '{0}'.",
 
   "toast.profile.import.error.not_found": "Source file could not be found.",
   "toast.profile.import.error.invalid_name":
