@@ -1,6 +1,6 @@
 {
   "name": "formidable",
-  "version": "1.8.72",
+  "version": "1.8.74",
   "description": "Formidable is an Electron-based editor for templates and forms",
   "main": "main.js",
   "scripts": {
