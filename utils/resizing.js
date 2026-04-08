@@ -73,16 +73,25 @@ export function setupSplitter({
     document.body.style.cursor = active ? "col-resize" : "";
   };
 
+  // Cached config value — updated via EventBus
+  let savedConfigValue = null;
+
   // Restore from config (px preferred; ratio/% supported)
   const applyFromConfig = () => {
     if (!configKey) return false;
-    const saved = window.userConfig?.[configKey];
-    if (saved == null) return false;
-    const px = toPixels(saved, cw());
+    if (savedConfigValue == null) return false;
+    const px = toPixels(savedConfigValue, cw());
     if (!Number.isFinite(px)) return false;
     applyLeftWidth(px);
     return true;
   };
+
+  // Load initial config value via EventBus
+  if (configKey) {
+    EventBus.emit("config:load", (cfg) => {
+      savedConfigValue = cfg?.[configKey] ?? null;
+    });
+  }
 
   handle?.addEventListener("mousedown", (e) => {
     isDragging = true;
@@ -106,6 +115,7 @@ export function setupSplitter({
     if (configKey) {
       // SAVE AS PX (integer). No more 0.xxx values.
       const px = Math.round(getLeftBasisPx());
+      savedConfigValue = px;
       EventBus.emit("config:update", { [configKey]: px });
     }
   });
@@ -113,6 +123,7 @@ export function setupSplitter({
   // Keep handle sane on window/container resize.
   // Default behavior: keep absolute PX (lastPx) and just clamp.
   const onResize = () => {
+    if (cw() === 0) return; // container hidden or not laid out yet
     if (lastPx != null) {
       applyLeftWidth(lastPx);
     } else if (!applyFromConfig()) {
@@ -123,6 +134,18 @@ export function setupSplitter({
   window.addEventListener("resize", onResize);
   const ro = new ResizeObserver(onResize);
   ro.observe(container);
+
+  // Listen for explicit reapply event (e.g. after context switch)
+  if (configKey) {
+    EventBus.on(`splitter:reapply:${configKey}`, () => {
+      // Re-read config in case it changed
+      EventBus.emit("config:load", (cfg) => {
+        savedConfigValue = cfg?.[configKey] ?? savedConfigValue;
+        if (cw() === 0) return;
+        if (!applyFromConfig()) onResize();
+      });
+    });
+  }
 
   // Initial apply: use config if present; else default to 50%
   requestAnimationFrame(() => {

@@ -14,16 +14,15 @@ export async function handleContextToggle(isStorage) {
   const mode = isStorage ? "storage" : "template";
   EventBus.emit("logging:default", ["[Handler] Context toggled:", mode]);
 
+  // Sync toggle UI without dispatching change (avoids re-entrant loop)
   const toggle = document.getElementById("context-toggle");
   const menuToggle = document.getElementById("context-toggle-menu");
 
   if (toggle && toggle.checked !== isStorage) {
     toggle.checked = isStorage;
-    toggle.dispatchEvent(new Event("change"));
   }
   if (menuToggle && menuToggle.checked !== isStorage) {
     menuToggle.checked = isStorage;
-    menuToggle.dispatchEvent(new Event("change"));
   }
 
   setContextView(mode, containers);

@@ -44,38 +44,9 @@ export function setContextView(mode, containers) {
 
   initSplitters(mode);
 
-  // Restore sidebar width from config
-  EventBus.emit("config:load", (config) => {
-    const key = isStorage
-      ? "storage_sidebar_width"
-      : "template_sidebar_width";
-    const width = config[key];
-
-    if (typeof width === "number") {
-      const sidebar = isStorage
-        ? document.getElementById("storage-sidebar")
-        : document.getElementById("template-sidebar");
-      const container = isStorage
-        ? document.getElementById("storage-container")
-        : document.getElementById("template-container");
-      const splitter = isStorage
-        ? document.getElementById("storage-splitter")
-        : document.getElementById("template-splitter");
-      const workspace = isStorage
-        ? document.getElementById("storage-workspace")
-        : document.getElementById("template-workspace");
-
-      const totalWidth = container.clientWidth;
-      sidebar.style.width = `${width}px`;
-      workspace.style.width = `${
-        totalWidth - width - splitter.offsetWidth
-      }px`;
-
-      // Disable flex auto sizing
-      sidebar.style.flex = "none";
-      workspace.style.flex = "none";
-    }
-  });
+  // Tell the now-visible splitter to reapply its saved width
+  const configKey = isStorage ? "storage_sidebar_width" : "template_sidebar_width";
+  EventBus.emit(`splitter:reapply:${configKey}`);
 
   EventBus.emit("logging:default", ["[Context] Switched to:", mode]);
 }
