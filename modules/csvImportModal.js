@@ -10,6 +10,7 @@ import {
   createButton,
 } from "../utils/buttonUtils.js";
 import { createStyledLabel } from "../utils/elementBuilders.js";
+import { matchOption, parseAsList } from "../utils/stringUtils.js";
 import { Toast } from "../utils/toastUtils.js";
 import { t } from "../utils/i18n.js";
 
@@ -19,14 +20,46 @@ const excludedTypes = new Set([
 ]);
 
 /**
- * Build the mapping table: one row per CSV column, each with a dropdown to pick a template field.
+ * Quick inline coerce for preview display (mirrors csvHandlers.coerceValue).
  */
-function buildMappingTable(container, csvHeaders, templateFields) {
+function previewCoerce(raw, field) {
+  const val = typeof raw === "string" ? raw.trim() : String(raw ?? "");
+  switch (field.type) {
+    case "boolean":
+      return ["true", "1", "yes", "on"].includes(val.toLowerCase()) ? "true" : "false";
+    case "number":
+    case "range": {
+      const n = Number(val);
+      return Number.isFinite(n) ? String(n) : field.type === "range" ? "50" : "0";
+    }
+    case "dropdown":
+    case "radio":
+      return matchOption(val, field.options);
+    case "multioption":
+      return parseAsList(val).map((v) => matchOption(v, field.options)).join(", ");
+    case "tags":
+    case "list":
+      return parseAsList(val).join(", ");
+    default:
+      return val;
+  }
+}
+
+function formatPreview(val) {
+  const s = String(val ?? "");
+  return s.length > 50 ? s.substring(0, 47) + "..." : s;
+}
+
+/**
+ * Build the mapping table with Preview + Transformed columns.
+ */
+function buildMappingTable(container, csvHeaders, templateFields, firstRow) {
   container.innerHTML = "";
 
   const mappableFields = templateFields.filter(
     (f) => f.key && !excludedTypes.has(f.type)
   );
+  const fieldByKey = new Map(mappableFields.map((f) => [f.key, f]));
 
   const fieldOptions = [
     { value: "", label: `— ${t("csv.skip", "skip")} —` },
@@ -41,22 +74,25 @@ function buildMappingTable(container, csvHeaders, templateFields) {
 
   const thead = document.createElement("thead");
   const headRow = document.createElement("tr");
-
-  const thCsv = document.createElement("th");
-  thCsv.textContent = t("csv.column", "CSV Column");
-  const thField = document.createElement("th");
-  thField.textContent = t("csv.field", "Template Field");
-  const thPreview = document.createElement("th");
-  thPreview.textContent = t("csv.preview", "Preview");
-
-  headRow.append(thCsv, thField, thPreview);
+  for (const text of [
+    t("csv.column", "CSV Column"),
+    t("csv.field", "Template Field"),
+    t("csv.preview", "Preview"),
+    t("csv.transformed", "Transformed"),
+  ]) {
+    const th = document.createElement("th");
+    th.textContent = text;
+    headRow.appendChild(th);
+  }
   thead.appendChild(headRow);
   table.appendChild(thead);
 
   const tbody = document.createElement("tbody");
   const dropdowns = {};
 
-  for (const header of csvHeaders) {
+  for (let i = 0; i < csvHeaders.length; i++) {
+    const header = csvHeaders[i];
+    const rawVal = firstRow && i < firstRow.length ? firstRow[i] : "";
     const row = document.createElement("tr");
 
     // CSV column name
@@ -64,30 +100,56 @@ function buildMappingTable(container, csvHeaders, templateFields) {
     tdCol.textContent = header;
     tdCol.title = header;
 
-    // Dropdown for field selection
+    // Dropdown
     const tdField = document.createElement("td");
     const dropContainer = document.createElement("div");
     dropContainer.className = "csv-map-dropdown";
     tdField.appendChild(dropContainer);
 
-    // Auto-match: find field with matching key or label
     const autoMatch = autoMatchField(header, mappableFields);
+
+    // Preview cell (raw)
+    const tdPreview = document.createElement("td");
+    tdPreview.className = "csv-preview-cell";
+    tdPreview.textContent = formatPreview(rawVal);
+    tdPreview.title = rawVal;
+
+    // Transformed cell
+    const tdTransformed = document.createElement("td");
+    tdTransformed.className = "csv-transformed-cell";
+
+    function updateTransformed(fieldKey) {
+      if (!fieldKey) {
+        tdTransformed.textContent = "";
+        tdTransformed.title = "";
+        tdTransformed.classList.remove("csv-transformed-changed");
+        return;
+      }
+      const field = fieldByKey.get(fieldKey);
+      if (!field) return;
+      const transformed = previewCoerce(rawVal, field);
+      tdTransformed.textContent = formatPreview(transformed);
+      tdTransformed.title = transformed;
+      tdTransformed.classList.toggle(
+        "csv-transformed-changed",
+        transformed !== rawVal.trim()
+      );
+    }
 
     const dd = createDropdown({
       containerEl: dropContainer,
       labelTextOrKey: "",
       options: fieldOptions,
       selectedValue: autoMatch,
+      onChange: (val) => updateTransformed(val),
     });
 
     dropdowns[header] = dd;
 
-    // Preview cell (filled after file load)
-    const tdPreview = document.createElement("td");
-    tdPreview.className = "csv-preview-cell";
-    tdPreview.dataset.csvHeader = header;
+    // Show initial transform if auto-matched
+    if (autoMatch) updateTransformed(autoMatch);
 
-    row.append(tdCol, tdField, tdPreview);
+    row.append(tdCol, tdField, tdPreview, tdTransformed);
     tbody.appendChild(row);
   }
 
@@ -108,21 +170,6 @@ function autoMatchField(csvHeader, fields) {
     if (normKey === norm || normLabel === norm) return f.key;
   }
   return "";
-}
-
-/**
- * Fill preview cells with first-row data.
- */
-function fillPreviewCells(tbody, csvHeaders, firstRow) {
-  if (!firstRow) return;
-  for (let i = 0; i < csvHeaders.length; i++) {
-    const cell = tbody.querySelector(`td[data-csv-header="${CSS.escape(csvHeaders[i])}"]`);
-    if (cell) {
-      const val = i < firstRow.length ? firstRow[i] : "";
-      cell.textContent = val.length > 60 ? val.substring(0, 57) + "..." : val;
-      cell.title = val;
-    }
-  }
 }
 
 /**
@@ -254,6 +301,27 @@ export function setupCsvImportModal() {
     filenameContainer.className = "csv-import-step";
     filenameContainer.id = "csv-filename-field-container";
 
+    // ── Progress bar ──────────────────────────────────────────
+    const progressWrap = document.createElement("div");
+    progressWrap.className = "csv-progress-wrap";
+    progressWrap.id = "csv-progress-wrap";
+    progressWrap.style.display = "none";
+
+    const progressBar = document.createElement("div");
+    progressBar.className = "csv-progress-bar";
+
+    const progressFill = document.createElement("div");
+    progressFill.className = "csv-progress-fill";
+    progressFill.id = "csv-progress-fill";
+
+    progressBar.appendChild(progressFill);
+    progressWrap.appendChild(progressBar);
+
+    const progressLabel = document.createElement("span");
+    progressLabel.className = "csv-progress-label";
+    progressLabel.id = "csv-progress-label";
+    progressWrap.appendChild(progressLabel);
+
     // ── Status + buttons ──────────────────────────────────────
     const statusEl = document.createElement("div");
     statusEl.className = "csv-import-status";
@@ -276,7 +344,7 @@ export function setupCsvImportModal() {
 
     buttonsWrapper.appendChild(buildButtonGroup(importBtn, cancelBtn));
 
-    body.append(templateInfo, step1, mappingContainer, filenameContainer, statusEl, buttonsWrapper);
+    body.append(templateInfo, step1, mappingContainer, filenameContainer, progressWrap, statusEl, buttonsWrapper);
   }
 
   async function loadPreview() {
@@ -309,13 +377,9 @@ export function setupCsvImportModal() {
     const container = document.getElementById("csv-mapping-container");
     if (!container || csvHeaders.length === 0 || templateFields.length === 0) return;
 
-    const result = buildMappingTable(container, csvHeaders, templateFields);
+    const firstRow = csvRows.length > 0 ? csvRows[0] : null;
+    const result = buildMappingTable(container, csvHeaders, templateFields, firstRow);
     dropdowns = result.dropdowns;
-
-    // Fill preview from first row
-    if (csvRows.length > 0) {
-      fillPreviewCells(result.table.querySelector("tbody"), csvHeaders, csvRows[0]);
-    }
 
     // Build filename-field dropdown
     buildFilenameFieldDropdown();
@@ -352,12 +416,13 @@ export function setupCsvImportModal() {
 
   async function runImport() {
     const templateFilename = getTemplateFilename();
+    const tmpl = window.currentSelectedTemplate;
 
     if (!csvFilePath) {
       Toast.error("csv.error.no.file");
       return;
     }
-    if (!templateFilename) {
+    if (!templateFilename || !tmpl) {
       Toast.error("csv.error.no.template");
       return;
     }
@@ -369,17 +434,42 @@ export function setupCsvImportModal() {
     }
 
     modal.setDisabled();
+
+    // Show progress bar
+    const progressWrap = document.getElementById("csv-progress-wrap");
+    const progressFill = document.getElementById("csv-progress-fill");
+    const progressLabel = document.getElementById("csv-progress-label");
     const status = document.getElementById("csv-import-status");
+
+    if (progressWrap) progressWrap.style.display = "";
+    if (progressFill) progressFill.style.width = "0%";
     if (status) status.textContent = t("csv.importing", "Importing...");
+
+    // GUID field key
+    const guidField = templateFields.find((f) => f.type === "guid");
+    const guidFieldKey = guidField ? guidField.key : "";
+
+    // Listen for per-row progress
+    const onProgress = ({ row, total, imported, skipped }) => {
+      const pct = Math.round((row / total) * 100);
+      if (progressFill) progressFill.style.width = `${pct}%`;
+      if (progressLabel) progressLabel.textContent = `${row} / ${total}`;
+      if (status) status.textContent = `${imported} imported, ${skipped} skipped`;
+    };
+    EventBus.on("csv:import:progress", onProgress);
 
     try {
       const result = await EventBus.emitWithResponse("csv:import", {
-        filePath: csvFilePath,
+        rows: csvRows,
+        headers: csvHeaders,
         templateFilename,
         mapping,
-        delimiter: selectedDelimiter,
+        fields: templateFields,
         filenameField: filenameFieldKey,
+        guidFieldKey,
       });
+
+      if (progressFill) progressFill.style.width = "100%";
 
       if (result.success) {
         Toast.success("csv.import.success", [result.imported]);
@@ -387,9 +477,7 @@ export function setupCsvImportModal() {
           status.textContent = `${result.imported} imported, ${result.skipped} skipped`;
         }
 
-        // Refresh the storage list
         EventBus.emit("form:list:reload");
-
         const templateName = templateFilename.replace(/\.yaml$/, "");
         EventBus.emit("vfs:refreshTemplate", { templateName });
       } else {
@@ -400,14 +488,13 @@ export function setupCsvImportModal() {
       }
 
       if (result.errors?.length) {
-        EventBus.emit("logging:warning", [
-          "[CsvImport] Errors:", ...result.errors,
-        ]);
+        EventBus.emit("logging:warning", ["[CsvImport] Errors:", ...result.errors]);
       }
     } catch (err) {
       Toast.error("csv.import.failed");
       EventBus.emit("logging:error", ["[CsvImport] Import failed:", err]);
     } finally {
+      EventBus.off("csv:import:progress", onProgress);
       modal.setEnabled();
     }
   }

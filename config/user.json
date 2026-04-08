@@ -11,7 +11,7 @@
   "context_mode": "storage",
   "context_folder": "./examples",
   "selected_template": "addresses.yaml",
-  "selected_data_file": "graceland.meta.json",
+  "selected_data_file": "white-house.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",

@@ -162,7 +162,7 @@ const api = {
   ]),
   csv: buildGroup([
     "csv-preview",
-    "csv-import",
+    "csv-import-row",
   ]),
   transform: buildGroup([
     "render-markdown-template",

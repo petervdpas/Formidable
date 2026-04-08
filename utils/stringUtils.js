@@ -4,6 +4,34 @@ export function sanitize(str) {
   return str.trim().replace(/\s+/g, "-").toLowerCase();
 }
 
+/**
+ * Match a raw value against a list of { value, label } options (case-insensitive).
+ * Tries value match first, then label match. Returns the canonical option value.
+ * Mirrored in schemas/stringHelpers.js for backend (CJS) use.
+ */
+export function matchOption(raw, options) {
+  if (!Array.isArray(options) || !options.length || !raw) return raw;
+  const lower = String(raw).toLowerCase();
+  const byValue = options.find((o) => String(o.value).toLowerCase() === lower);
+  if (byValue) return byValue.value;
+  const byLabel = options.find((o) => String(o.label || "").toLowerCase() === lower);
+  if (byLabel) return byLabel.value;
+  return raw;
+}
+
+/**
+ * Parse a string as a list: try JSON array first, then split on , ; |
+ * Mirrored in schemas/stringHelpers.js for backend (CJS) use.
+ */
+export function parseAsList(val) {
+  if (!val) return [];
+  try {
+    const parsed = JSON.parse(val);
+    if (Array.isArray(parsed)) return parsed;
+  } catch { /* not JSON, split */ }
+  return val.split(/[,;|]/).map((s) => s.trim()).filter(Boolean);
+}
+
 export function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }

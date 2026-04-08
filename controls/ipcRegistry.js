@@ -396,11 +396,13 @@ function registerIpcHandlers() {
     return result;
   });
 
-  // CSV Import
+  // CSV
   registerIpc("csv-preview", (e, filePath, delimiter) =>
     csvManager.previewCsv(filePath, delimiter)
   );
-  registerIpc("csv-import", (e, opts) => csvManager.importCsv(opts));
+  registerIpc("csv-import-row", (e, templateFilename, entryFilename, data, fields) =>
+    formManager.saveForm(templateFilename, entryFilename, { data }, fields)
+  );
 
   // Config
   registerIpc("switch-user-profile", (e, profileFilename) =>
