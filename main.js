@@ -32,18 +32,25 @@ function debounce(fn, ms) {
 }
 
 function wireWindowPersistence(win) {
-  const saveBounds = debounce(() => {
+  const saveBoundsNow = () => {
     if (win.isMinimized() || win.isFullScreen()) return;
-    // Using frame bounds; if you switch to useContentSize, use getContentBounds() instead.
+    const isMaximized = win.isMaximized();
     const [width, height] = win.getSize();
     const [x, y] = win.getPosition();
-    configManager.updateUserConfig({ window_bounds: { width, height, x, y } });
-  }, DEBOUNCE_MS);
+    configManager.updateUserConfig({
+      window_bounds: { width, height, x, y, maximized: isMaximized },
+    });
+  };
+
+  const saveBounds = debounce(saveBoundsNow, DEBOUNCE_MS);
 
   win.on("resize", saveBounds);
   win.on("move", saveBounds);
   win.on("unmaximize", saveBounds);
   win.on("leave-full-screen", saveBounds);
+
+  // Flush pending save before window closes so bounds are never lost
+  win.on("close", saveBoundsNow);
 }
 
 function currentIconPath() {
@@ -102,7 +109,10 @@ function createWindow() {
 
   win.loadFile("index.html");
 
-  win.once("ready-to-show", () => win.show());
+  win.once("ready-to-show", () => {
+    if (userConfig.window_bounds?.maximized) win.maximize();
+    win.show();
+  });
 
   win.webContents.on("did-finish-load", () => {
     const versionedTitle = `Formidable v${packageJson.version}`;
