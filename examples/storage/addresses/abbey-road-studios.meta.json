@@ -1,16 +1,16 @@
 {
   "meta": {
-    "id": null,
+    "id": "31dc8a12-7830-4823-b550-85d356a56920",
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
-    "created": "2026-04-08T11:22:23.615Z",
-    "updated": "2026-04-08T11:22:23.615Z",
+    "created": "2026-04-08T14:29:43.478Z",
+    "updated": "2026-04-08T14:29:43.478Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "id": "",
+    "id": "31dc8a12-7830-4823-b550-85d356a56920",
     "name": "Abbey Road Studios",
     "country": "uk",
     "unit-number": "3",

@@ -1,16 +1,16 @@
 {
   "meta": {
-    "id": null,
+    "id": "4428d423-ee61-4c86-8d7e-70dd3b951d96",
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
-    "created": "2026-04-08T11:22:23.617Z",
-    "updated": "2026-04-08T11:22:23.617Z",
+    "created": "2026-04-08T14:29:43.479Z",
+    "updated": "2026-04-08T14:29:43.479Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "id": "",
+    "id": "4428d423-ee61-4c86-8d7e-70dd3b951d96",
     "name": "Buckingham Palace",
     "country": "uk",
     "unit-number": "1",

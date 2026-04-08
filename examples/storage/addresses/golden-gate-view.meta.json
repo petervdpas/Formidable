@@ -1,16 +1,16 @@
 {
   "meta": {
-    "id": null,
+    "id": "90f6f219-9c05-41ff-9592-de42a6de2844",
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
-    "created": "2026-04-08T11:22:23.616Z",
-    "updated": "2026-04-08T11:22:23.616Z",
+    "created": "2026-04-08T14:29:43.478Z",
+    "updated": "2026-04-08T14:29:43.478Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "id": "",
+    "id": "90f6f219-9c05-41ff-9592-de42a6de2844",
     "name": "Golden Gate View",
     "country": "us",
     "unit-number": "1",

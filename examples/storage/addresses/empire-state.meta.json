@@ -1,16 +1,16 @@
 {
   "meta": {
-    "id": null,
+    "id": "18cd9b4d-8715-4412-afa0-06e71f920827",
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
-    "created": "2026-04-08T11:22:23.613Z",
-    "updated": "2026-04-08T11:22:23.613Z",
+    "created": "2026-04-08T14:29:43.475Z",
+    "updated": "2026-04-08T14:29:43.475Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "id": "",
+    "id": "18cd9b4d-8715-4412-afa0-06e71f920827",
     "name": "Empire State",
     "country": "us",
     "unit-number": "350",

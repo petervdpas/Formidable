@@ -4,6 +4,15 @@ export function sanitize(str) {
   return str.trim().replace(/\s+/g, "-").toLowerCase();
 }
 
+const guidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Check whether a string is a valid UUID/GUID (v1–v5 format).
+ */
+export function isValidGuid(val) {
+  return typeof val === "string" && guidRe.test(val.trim());
+}
+
 /**
  * Match a raw value against a list of { value, label } options (case-insensitive).
  * Tries value match first, then label match. Returns the canonical option value.

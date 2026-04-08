@@ -1,16 +1,16 @@
 {
   "meta": {
-    "id": null,
+    "id": "badf088e-63f7-4c67-92b0-343e403437c8",
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
-    "created": "2026-04-08T11:22:23.619Z",
-    "updated": "2026-04-08T11:22:23.619Z",
+    "created": "2026-04-08T14:29:43.480Z",
+    "updated": "2026-04-08T14:29:43.480Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "id": "",
+    "id": "badf088e-63f7-4c67-92b0-343e403437c8",
     "name": "Central Park West",
     "country": "us",
     "unit-number": "115",

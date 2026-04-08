@@ -1,7 +1,7 @@
 // modules/handlers/csvHandlers.js
 
 import { EventBus } from "../eventBus.js";
-import { matchOption, parseAsList, sanitize } from "../../utils/stringUtils.js";
+import { matchOption, parseAsList, sanitize, isValidGuid } from "../../utils/stringUtils.js";
 
 // Field types excluded from CSV mapping
 const excludedTypes = new Set([
@@ -137,6 +137,9 @@ export async function handleCsvImport(opts, respond) {
     colMapping.push({ colIndex, fieldKey, field, transform });
   }
 
+  // Check if GUID field exists but isn't mapped → auto-generate per row
+  const guidMapped = guidFieldKey && colMapping.some((c) => c.fieldKey === guidFieldKey);
+
   // Ensure storage directory exists
   await window.api.forms.ensureFormDir(templateFilename);
 
@@ -156,11 +159,19 @@ export async function handleCsvImport(opts, respond) {
         row: rows[r], colMapping, concatSeparator,
       });
 
+      // GUID handling: auto-generate if unmapped, validate if mapped
+      if (guidFieldKey) {
+        if (!guidMapped) {
+          data[guidFieldKey] = crypto.randomUUID();
+        } else if (!isValidGuid(data[guidFieldKey])) {
+          errors.push(`Row ${r + 1}: invalid GUID "${data[guidFieldKey]}" — generated new one`);
+          data[guidFieldKey] = crypto.randomUUID();
+        }
+      }
+
       // Step 2: derive entry filename
       let entryFilename = "";
-      if (guidFieldKey && data[guidFieldKey]) {
-        entryFilename = data[guidFieldKey];
-      } else if (filenameField && data[filenameField]) {
+      if (filenameField && data[filenameField]) {
         entryFilename = sanitize(String(data[filenameField]));
       } else {
         entryFilename = `import-${Date.now()}-${r}`;

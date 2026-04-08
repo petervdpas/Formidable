@@ -1,16 +1,16 @@
 {
   "meta": {
-    "id": null,
+    "id": "f50aabd4-7f86-490b-aec9-14e098c2972a",
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
-    "created": "2026-04-08T11:22:23.615Z",
-    "updated": "2026-04-08T11:22:23.615Z",
+    "created": "2026-04-08T14:29:43.477Z",
+    "updated": "2026-04-08T14:29:43.477Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "id": "",
+    "id": "f50aabd4-7f86-490b-aec9-14e098c2972a",
     "name": "Graceland",
     "country": "us",
     "unit-number": "3764",

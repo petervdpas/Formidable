@@ -1,16 +1,16 @@
 {
   "meta": {
-    "id": null,
+    "id": "d9a254ad-680e-4f0b-8f29-4a9c1e594a3e",
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
-    "created": "2026-04-08T11:22:23.612Z",
-    "updated": "2026-04-08T11:22:23.612Z",
+    "created": "2026-04-08T14:29:43.474Z",
+    "updated": "2026-04-08T14:29:43.474Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "id": "",
+    "id": "d9a254ad-680e-4f0b-8f29-4a9c1e594a3e",
     "name": "White House",
     "country": "us",
     "unit-number": "1600",

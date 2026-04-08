@@ -556,7 +556,6 @@ fields:
     two_column: false
     readonly: false
     collection: addresses
-    id: c34c4d20-f47d-4ec5-bde5-8085a92f77f0
     map:
       - key: name
         path: name
@@ -568,9 +567,8 @@ fields:
         path: owners
         mode: live-edit
     use_picker: true
-    allowed_ids:
-      - c34c4d20-f47d-4ec5-bde5-8085a92f77f0
-      - 10b8c641-8774-409c-8cec-0c944920b313
+    allowed_ids: []
+    id: ''
   - key: Codes
     type: loopstart
     label: Codes
