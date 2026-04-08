@@ -124,9 +124,16 @@ export function setupSplitter({
   const ro = new ResizeObserver(onResize);
   ro.observe(container);
 
-  // Initial apply: use config if present; else normalize DOM
+  // Initial apply: use config if present; else default to 50%
   requestAnimationFrame(() => {
-    if (!applyFromConfig()) onResize();
+    if (!applyFromConfig()) {
+      const halfWidth = (cw() - splitW()) / 2;
+      if (halfWidth > min) {
+        applyLeftWidth(halfWidth);
+      } else {
+        onResize();
+      }
+    }
   });
 } 
 

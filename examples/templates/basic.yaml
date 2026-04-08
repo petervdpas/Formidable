@@ -5,7 +5,7 @@ markdown_template: !!str |-
   ---
   title: Auto-generated Report
   author: Formidable Generator
-  date: 2025-09-10
+  date: 2026-04-08
   toc: true
   toc-title: Contents
   toc-own-page: true
@@ -15,10 +15,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "id"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "id")}}
-  ```
   {{field "id"}}
   ---
 
@@ -26,10 +22,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "test"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "test")}}
-  ```
   {{field "test"}}
   ---
 
@@ -37,10 +29,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "check"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "check")}}
-  ```
   {{field "check"}}
   ---
 
@@ -48,14 +36,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "dropdown"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "dropdown")}}
-  ```
-  ```sh
-  [LOG]
-  {{json (fieldMeta "dropdown" "options")}}
-  ```
   Selected: {{field "dropdown"}}
   (Value: {{field "dropdown" "value"}})
   ---
@@ -64,14 +44,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "multichoice"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "multichoice")}}
-  ```
-  ```sh
-  [LOG]
-  {{json (fieldMeta "multichoice" "options")}}
-  ```
   - Labels:
   {{#each (fieldRaw "multichoice") as |val idx|}}
     {{#with (lookupOption (fieldMeta "multichoice" "options") val) as |opt|}}
@@ -93,14 +65,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "radio"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "radio")}}
-  ```
-  ```sh
-  [LOG]
-  {{json (fieldMeta "radio" "options")}}
-  ```
   Selected: {{field "radio"}}
   (Value: {{field "radio" "value"}})
   ---
@@ -109,10 +73,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "mline"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "mline")}}
-  ```
   {{field "mline"}}
   ---
 
@@ -120,10 +80,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "numpy"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "numpy")}}
-  ```
   {{field "numpy"}}
   ---
 
@@ -131,10 +87,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "rangie"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "rangie")}}
-  ```
   {{field "rangie"}}
   ---
 
@@ -142,10 +94,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "bday"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "bday")}}
-  ```
   {{field "bday"}}
   ---
 
@@ -153,10 +101,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "listy"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "listy")}}
-  ```
   {{#each (fieldRaw "listy")}}
   - {{this}}
   {{/each}}
@@ -166,14 +110,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "datable"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "datable")}}
-  ```
-  ```sh
-  [LOG]
-  {{json (fieldMeta "datable" "options")}}
-  ```
   {{#if (fieldRaw "datable")}}
 
   <!-- Column Values -->
@@ -201,10 +137,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "design"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "design")}}
-  ```
   {{#if (fieldRaw "design")}}
   ![Design]({{field "design"}})
   {{else}}
@@ -216,10 +148,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "linktest"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "linktest")}}
-  ```
   {{field "linktest"}}
   ---
 
@@ -227,10 +155,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "ttags"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "ttags")}}
-  ```
   {{#if (fieldRaw "ttags")}}
   Tags(regular): {{field "ttags"}}
   Tags(with #): {{tags (fieldRaw "ttags") withHash=true}}
@@ -240,15 +164,88 @@ markdown_template: !!str |-
   {{/if}}
   ---
 
+  ## Calculated Summary
+
+  _{{fieldDescription "calculatedSummary"}}_
+
+  {{field "calculatedSummary"}}
+  ---
+
+  ## Detailed Output
+
+  _{{fieldDescription "detailedOutput"}}_
+
+  {{field "detailedOutput"}}
+  ---
+
   ## MyScript
 
   _{{fieldDescription "myScript"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "myScript")}}
-  ```
   {{field "myScript"}}
+  ---
+
+  ## Testapi
+
+  _{{fieldDescription "testapi"}}_
+
+  {{field "testapi"}}
+  ---
+
+
+  ## Loop: Codes
+
+  {{#loop "Codes"}}
+  ### Codes index
+
+  _{{fieldDescription "Codes_index"}}_
+
+  {{field "Codes_index"}}
+  ---
+
+  ### Code
+
+  _{{fieldDescription "Code"}}_
+
+  {{field "Code"}}
+
+  ---
+
+  > _Debug: Remove this section when your template is complete._
+  >
+  > **Codes_index**: `{{json (fieldRaw "Codes_index")}}`
+  > **Code**: `{{json (fieldRaw "Code")}}`
+
+  {{/loop}}
+
+
+  ---
+
+  > _Debug: Remove this section when your template is complete._
+  >
+  > **id**: `{{json (fieldRaw "id")}}`
+  > **test**: `{{json (fieldRaw "test")}}`
+  > **check**: `{{json (fieldRaw "check")}}`
+  > **dropdown**: `{{json (fieldRaw "dropdown")}}`
+  > **dropdown** _(options)_: `{{json (fieldMeta "dropdown" "options")}}`
+  > **multichoice**: `{{json (fieldRaw "multichoice")}}`
+  > **multichoice** _(options)_: `{{json (fieldMeta "multichoice" "options")}}`
+  > **radio**: `{{json (fieldRaw "radio")}}`
+  > **radio** _(options)_: `{{json (fieldMeta "radio" "options")}}`
+  > **mline**: `{{json (fieldRaw "mline")}}`
+  > **numpy**: `{{json (fieldRaw "numpy")}}`
+  > **rangie**: `{{json (fieldRaw "rangie")}}`
+  > **bday**: `{{json (fieldRaw "bday")}}`
+  > **listy**: `{{json (fieldRaw "listy")}}`
+  > **datable**: `{{json (fieldRaw "datable")}}`
+  > **datable** _(options)_: `{{json (fieldMeta "datable" "options")}}`
+  > **design**: `{{json (fieldRaw "design")}}`
+  > **linktest**: `{{json (fieldRaw "linktest")}}`
+  > **ttags**: `{{json (fieldRaw "ttags")}}`
+  > **calculatedSummary**: `{{json (fieldRaw "calculatedSummary")}}`
+  > **detailedOutput**: `{{json (fieldRaw "detailedOutput")}}`
+  > **myScript**: `{{json (fieldRaw "myScript")}}`
+  > **testapi**: `{{json (fieldRaw "testapi")}}`
 sidebar_expression: '[ test | check ? { text: "You approved this!", classes: ["expr-text-green", "expr-bold"] } : { text: "You declined this!", classes: ["expr-text-red", "expr-bold", "expr-blinking"] } ]'
 enable_collection: true
 fields:

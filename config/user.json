@@ -8,10 +8,10 @@
   "development_enable": true,
   "logging_enabled": true,
   "enable_plugins": true,
-  "context_mode": "template",
+  "context_mode": "storage",
   "context_folder": "./examples",
-  "selected_template": "basic.yaml",
-  "selected_data_file": null,
+  "selected_template": "loopie.yaml",
+  "selected_data_file": "test-20250711.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -27,7 +27,7 @@
     "y": 181
   },
   "template_sidebar_width": 358,
-  "storage_sidebar_width": 364,
+  "storage_sidebar_width": 354,
   "status_buttons": {
     "reloader": true,
     "charpicker": true,

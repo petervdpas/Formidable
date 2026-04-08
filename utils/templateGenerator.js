@@ -15,11 +15,15 @@ export function generateTemplateCode(fields = []) {
     "",
   ].join("\n");
 
-  const body = renderFieldBlocks(fields);
-  return frontmatter + "\n" + body.join("\n---\n\n");
+  const topLevelLogs = [];
+  const body = renderFieldBlocks(fields, 2, topLevelLogs);
+  const content = body.join("\n---\n\n");
+  const logSection = buildLogSection(topLevelLogs);
+
+  return frontmatter + "\n" + content + logSection;
 }
 
-function renderFieldBlocks(fields, headingLevel = 2) {
+function renderFieldBlocks(fields, headingLevel = 2, logs = []) {
   const result = [];
   const seenKeys = new Set();
 
@@ -52,21 +56,27 @@ function renderFieldBlocks(fields, headingLevel = 2) {
         type: "number",
         description: `Auto-generated index for loop "${loopKey}"`,
       };
-      innerFields.unshift(indexField); // Before the actual fields
+      innerFields.unshift(indexField);
 
-      const loopContent = renderFieldBlocks(innerFields, headingLevel + 1).join(
-        "\n---\n\n"
-      );
+      // Loop fields get their own log collector (scoped inside the loop)
+      const loopLogs = [];
+      const loopContent = renderFieldBlocks(
+        innerFields,
+        headingLevel + 1,
+        loopLogs
+      ).join("\n---\n\n");
+
+      const loopLogBlock = buildLogSection(loopLogs);
 
       result.push(
         `\n${"#".repeat(
           headingLevel
-        )} Loop: ${loopKey}\n\n{{#loop "${loopKey}"}}\n${loopContent}\n{{/loop}}\n`
+        )} Loop: ${loopKey}\n\n{{#loop "${loopKey}"}}\n${loopContent}${loopLogBlock}\n{{/loop}}\n`
       );
 
       seenKeys.add(`${loopKey}_index`);
     } else if (type !== "loopstop" && !seenKeys.has(key)) {
-      result.push(generateSingleFieldBlock(field, headingLevel));
+      result.push(generateSingleFieldBlock(field, headingLevel, logs));
       seenKeys.add(key);
     }
   }
@@ -74,18 +84,16 @@ function renderFieldBlocks(fields, headingLevel = 2) {
   return result;
 }
 
-function generateSingleFieldBlock(field, headingLevel = 2) {
+function generateSingleFieldBlock(field, headingLevel = 2, logs = []) {
   const key = field.key || "unknown";
   const label = field.label || key;
   const type = (field.type || "text").toLowerCase();
 
-  const heading = "#".repeat(headingLevel);
-  const logs = ["```sh", `[LOG]\n{{json (fieldRaw "${key}")}}`, "```"];
-  if (["dropdown", "radio", "multioption", "table"].includes(type)) {
-    logs.push("```sh", `[LOG]\n{{json (fieldMeta "${key}" "options")}}`, "```");
-  }
+  collectLogs(logs, key, type);
 
+  const heading = "#".repeat(headingLevel);
   const header = `${heading} ${label}\n\n_{{fieldDescription "${key}"}}_\n`;
+
   const block = (() => {
     switch (type) {
       case "checkbox":
@@ -135,5 +143,26 @@ function generateSingleFieldBlock(field, headingLevel = 2) {
     }
   })();
 
-  return `${header}\n${logs.join("\n")}\n${block}`;
+  return `${header}\n${block}`;
+}
+
+function collectLogs(logs, key, type) {
+  logs.push(`> **${key}**: \`{{json (fieldRaw "${key}")}}\``);
+  if (["dropdown", "radio", "multioption", "table"].includes(type)) {
+    logs.push(`> **${key}** _(options)_: \`{{json (fieldMeta "${key}" "options")}}\``);
+  }
+}
+
+function buildLogSection(logs) {
+  if (logs.length === 0) return "";
+  return [
+    "",
+    "",
+    "---",
+    "",
+    "> _Debug: Remove this section when your template is complete._",
+    ">",
+    ...logs.map((line) => line),
+    "",
+  ].join("\n");
 }

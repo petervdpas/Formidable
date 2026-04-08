@@ -438,9 +438,17 @@ export function setupRenderModal() {
         );
       }
 
-      // Add splitter between panes (once)
+      // Reset pane layout and (re)create splitter for a clean 50/50 start
       const body = modal.querySelector(".modal-body.two-pane");
-      if (body && rawPane && htmlPane && !body.querySelector(".modal-split-splitter")) {
+      if (body && rawPane && htmlPane) {
+        const oldSplitter = body.querySelector(".modal-split-splitter");
+        if (oldSplitter) oldSplitter.remove();
+
+        rawPane.style.flex = "";
+        rawPane.style.removeProperty("flex-basis");
+        htmlPane.style.flex = "";
+        htmlPane.style.removeProperty("flex-basis");
+
         createSplitter({ container: body, left: rawPane, right: htmlPane, min: 120 });
       }
 

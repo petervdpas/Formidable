@@ -15,13 +15,8 @@ markdown_template: !!str |-
 
   _{{fieldDescription "title"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "title")}}
-  ```
   {{field "title"}}
   ---
-
 
   ## Loop: looper
 
@@ -30,10 +25,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "looper_index"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "looper_index")}}
-  ```
   {{field "looper_index"}}
   ---
 
@@ -41,10 +32,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "inloop_title"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "inloop_title")}}
-  ```
   {{field "inloop_title"}}
   ---
 
@@ -52,16 +39,8 @@ markdown_template: !!str |-
 
   _{{fieldDescription "inloop_description"}}_
 
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "inloop_description")}}
-  ```
-
   {{field "inloop_description"}}
-
   ---
-
 
   ### Loop: subloop
 
@@ -70,10 +49,6 @@ markdown_template: !!str |-
 
   _{{fieldDescription "subloop_index"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "subloop_index")}}
-  ```
   {{field "subloop_index"}}
   ---
 
@@ -81,14 +56,60 @@ markdown_template: !!str |-
 
   _{{fieldDescription "subloop_title"}}_
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "subloop_title")}}
-  ```
   {{field "subloop_title"}}
+
+  ---
+
+  > _Debug: Remove this section when your template is complete._
+  >
+  > **subloop_index**: `{{json (fieldRaw "subloop_index")}}`
+  > **subloop_title**: `{{json (fieldRaw "subloop_title")}}`
   {{/loop}}
 
+  ---
+
+  ### Table inside loop
+
+  _{{fieldDescription "table_inside_loop"}}_
+
+  {{#if (fieldRaw "table_inside_loop")}}
+
+  <!-- Column Values -->
+    {{#with (fieldMeta "table_inside_loop" "options") as |headers|}}
+  |{{#each headers}}{{value}} |{{/each}}
+  |{{#each headers}}--|{{/each}}
+    {{/with}}
+    {{#each (fieldRaw "table_inside_loop")}}
+  |{{#each this}}{{this}} |{{/each}}
+    {{/each}}
+
+  <!-- Column Labels -->
+    {{#with (fieldMeta "table_inside_loop" "options") as |headers|}}
+  |{{#each headers}}{{label}}{{^label}}{{value}}{{/label}} |{{/each}}
+  |{{#each headers}}--|{{/each}}
+    {{/with}}
+    {{#each (fieldRaw "table_inside_loop")}}
+  |{{#each this}}{{this}} |{{/each}}
+    {{/each}}
+
+  {{/if}}
+
+  ---
+
+  > _Debug: Remove this section when your template is complete._
+  >
+  > **looper_index**: `{{json (fieldRaw "looper_index")}}`
+  > **inloop_title**: `{{json (fieldRaw "inloop_title")}}`
+  > **inloop_description**: `{{json (fieldRaw "inloop_description")}}`
+  > **table_inside_loop**: `{{json (fieldRaw "table_inside_loop")}}`
+  > **table_inside_loop** _(options)_: `{{json (fieldMeta "table_inside_loop" "options")}}`
   {{/loop}}
+
+  ---
+
+  > _Debug: Remove this section when your template is complete._
+  >
+  > **title**: `{{json (fieldRaw "title")}}`
 sidebar_expression: '[ title | { text: "expression: " + title, classes: ["expr-text-purple", "expr-bold", "expr-ticker"] } ]'
 enable_collection: false
 fields:
