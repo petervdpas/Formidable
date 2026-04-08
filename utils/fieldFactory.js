@@ -505,6 +505,26 @@ export const FieldBlueprints = {
       const { label } = resolveOption(col);
       const th = document.createElement("th");
       th.textContent = String(label ?? "");
+
+      const handle = document.createElement("span");
+      handle.className = "col-resize-handle";
+      th.appendChild(handle);
+      handle.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const startX = e.clientX;
+        const startW = th.offsetWidth;
+        const onMove = (ev) => {
+          th.style.width = Math.max(40, startW + ev.clientX - startX) + "px";
+        };
+        const onUp = () => {
+          document.removeEventListener("mousemove", onMove);
+          document.removeEventListener("mouseup", onUp);
+        };
+        document.addEventListener("mousemove", onMove);
+        document.addEventListener("mouseup", onUp);
+      });
+
       trh.appendChild(th);
     }
 

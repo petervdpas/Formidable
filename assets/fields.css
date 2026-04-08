@@ -219,6 +219,23 @@
   /* border-bottom: 1px solid #444; */
 }
 
+.dynamic-table th {
+  position: relative;
+}
+
+.col-resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  cursor: col-resize;
+}
+
+.col-resize-handle:hover {
+  background: var(--resize-handle-bg, rgba(0,0,0,0.15));
+}
+
 .dynamic-table th:first-child,
 .dynamic-table td:first-child {
   width: 16px;

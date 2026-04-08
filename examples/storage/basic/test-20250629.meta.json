@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-29T09:32:36.440Z",
-    "updated": "2026-04-06T22:24:24.911Z",
+    "updated": "2026-04-08T00:40:42.615Z",
     "flagged": false,
     "tags": [
       "ch.01",
@@ -35,19 +35,25 @@
         "Do",
         "2",
         "2026-04-02",
-        "false"
+        "false",
+        "inactive",
+        []
       ],
       [
         "Da",
         "1",
         "2026-04-24",
-        "true"
+        "true",
+        "inactive",
+        []
       ],
       [
         "Me",
         "4",
         "2026-04-27",
-        "false"
+        "false",
+        "pending",
+        []
       ]
     ],
     "design": "GreenSignWhiteArrowPersonRunning.png",
@@ -81,6 +87,14 @@
           "Musk"
         ]
       ]
-    }
+    },
+    "Codes": [
+      {
+        "Code": "X300"
+      },
+      {
+        "Code": "X400"
+      }
+    ]
   }
 }
