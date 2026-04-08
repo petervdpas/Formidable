@@ -158,8 +158,8 @@
   color: var(--modal-fg, inherit);
 }
 
-.csv-n-input {
-  width: 48px;
+.csv-param-input {
+  width: 50px;
   padding: 4px 6px;
   font-size: 0.85em;
   border: 1px solid var(--border-color, #ccc);

@@ -69,14 +69,16 @@ const transformRules = {
   "trim+cap":   (v) => v.trim().replace(/\b\w/g, (c) => c.toUpperCase()),
   "first-n":    (v, n) => v.substring(0, n || v.length),
   "last-n":     (v, n) => n ? v.slice(-n) : v,
+  split:        (v, sep) => v.split(sep || ",").map((s) => s.trim()).filter(Boolean).join(", "),
+  "bool-match": (v, trueVal) => String(v.trim().toLowerCase() === String(trueVal).trim().toLowerCase()),
 };
 
 function applyTransformRule(val, transform) {
   if (!transform) return val;
   const rule = typeof transform === "string" ? transform : transform.rule;
-  const n = typeof transform === "object" ? transform.n : 0;
+  const param = typeof transform === "object" ? (transform.param ?? transform.n ?? "") : "";
   const fn = transformRules[rule];
-  return fn ? fn(String(val), n) : val;
+  return fn ? fn(String(val), param) : val;
 }
 
 /**

@@ -21,7 +21,8 @@ const excludedTypes = new Set([
 
 // ── Transform rules ───────────────────────────────────────────
 // ── Transform rules ───────────────────────────────────────────
-// Parameterised rules (first-n, last-n) receive the "n" arg at apply-time.
+// Parameterised rules receive an extra arg at apply-time.
+// "first-n" / "last-n" → numeric arg; "split" → separator string.
 const transformRules = {
   none:         (v) => v,
   lowercase:    (v) => v.toLowerCase(),
@@ -33,10 +34,17 @@ const transformRules = {
   "trim+cap":   (v) => v.trim().replace(/\b\w/g, (c) => c.toUpperCase()),
   "first-n":    (v, n) => v.substring(0, n || v.length),
   "last-n":     (v, n) => n ? v.slice(-n) : v,
+  split:        (v, sep) => v.split(sep || ",").map((s) => s.trim()).filter(Boolean).join(", "),
+  "bool-match": (v, trueVal) => String(v.trim().toLowerCase() === String(trueVal).trim().toLowerCase()),
 };
 
-// Rules that need the numeric "n" input
-const paramRules = new Set(["first-n", "last-n"]);
+// Rules that show an extra input: { type: "number"|"text", placeholder }
+const paramRuleDefs = {
+  "first-n": { type: "number", placeholder: "N", min: "1", max: "999" },
+  "last-n":  { type: "number", placeholder: "N", min: "1", max: "999" },
+  split:        { type: "text", placeholder: ", ; |" },
+  "bool-match": { type: "text", placeholder: null },  // set dynamically via i18n
+};
 
 const transformOptions = [
   { value: "none",       label: t("csv.transform.none", "None") },
@@ -49,11 +57,13 @@ const transformOptions = [
   { value: "trim+cap",   label: t("csv.transform.trimcap", "Trim + Capitalize") },
   { value: "first-n",    label: t("csv.transform.firstn", "First N chars") },
   { value: "last-n",     label: t("csv.transform.lastn", "Last N chars") },
+  { value: "split",      label: t("csv.transform.split", "Split to list") },
+  { value: "bool-match", label: t("csv.transform.boolmatch", "Boolean match") },
 ];
 
-function applyTransform(val, ruleKey, n) {
+function applyTransform(val, ruleKey, param) {
   const fn = transformRules[ruleKey];
-  return fn ? fn(val, n) : val;
+  return fn ? fn(val, param) : val;
 }
 
 /**
@@ -158,15 +168,11 @@ function buildMappingTable(container, csvHeaders, templateFields, firstRow) {
     transformContainer.className = "csv-map-dropdown";
     transformWrap.appendChild(transformContainer);
 
-    const nInput = document.createElement("input");
-    nInput.type = "number";
-    nInput.min = "1";
-    nInput.max = "999";
-    nInput.className = "csv-n-input";
-    nInput.placeholder = "N";
-    nInput.style.display = "none";
-    transformWrap.appendChild(nInput);
-    nInputs[header] = nInput;
+    const paramInput = document.createElement("input");
+    paramInput.className = "csv-param-input";
+    paramInput.style.display = "none";
+    transformWrap.appendChild(paramInput);
+    nInputs[header] = paramInput;
 
     tdTransform.appendChild(transformWrap);
 
@@ -199,11 +205,14 @@ function buildMappingTable(container, csvHeaders, templateFields, firstRow) {
           return;
         }
 
-        // Read N directly from DOM (don't rely on event-set variable)
-        const liveN = parseInt(nInput.value) || 0;
+        // Read param directly from DOM
+        const paramDef = paramRuleDefs[currentRule];
+        const liveParam = paramDef?.type === "number"
+          ? (parseInt(paramInput.value) || 0)
+          : (paramInput.value || "");
 
         // Apply this row's own transform
-        const myVal = applyTransform(rawVal, currentRule, liveN);
+        const myVal = applyTransform(rawVal, currentRule, liveParam);
 
         // Check for concat: other rows also targeting the same field
         const allReady = Object.keys(dropdowns).length === csvHeaders.length;
@@ -217,8 +226,11 @@ function buildMappingTable(container, csvHeaders, templateFields, firstRow) {
             if (!dropdowns[oh] || dropdowns[oh].getSelected() !== currentFieldKey) continue;
             const oRaw = firstRow && j < firstRow.length ? firstRow[j] : "";
             const oRule = transforms[oh] ? transforms[oh].getSelected() : "none";
-            const oN = nInputs[oh] ? (parseInt(nInputs[oh].value) || 0) : 0;
-            parts.push(applyTransform(oRaw, oRule, oN));
+            const oDef = paramRuleDefs[oRule];
+            const oParam = oDef?.type === "number"
+              ? (parseInt(nInputs[oh]?.value) || 0)
+              : (nInputs[oh]?.value || "");
+            parts.push(applyTransform(oRaw, oRule, oParam));
           }
           if (parts.length > 1) {
             isConcat = true;
@@ -255,18 +267,24 @@ function buildMappingTable(container, csvHeaders, templateFields, firstRow) {
       selectedValue: "none",
       onChange: (val) => {
         currentRule = val;
-        nInput.style.display = paramRules.has(val) ? "" : "none";
-        if (!paramRules.has(val)) { nInput.value = ""; currentN = 0; }
+        const def = paramRuleDefs[val];
+        if (def) {
+          paramInput.type = def.type || "text";
+          paramInput.placeholder = def.placeholder ?? t("csv.transform.boolmatch.placeholder", "= true");
+          if (def.min) paramInput.min = def.min;
+          if (def.max) paramInput.max = def.max;
+          paramInput.style.display = "";
+        } else {
+          paramInput.style.display = "none";
+          paramInput.value = "";
+        }
         rowUpdaters.forEach((fn) => fn());
       },
     });
 
-    const onNChange = () => {
-      currentN = parseInt(nInput.value) || 0;
-      rowUpdaters.forEach((fn) => fn());
-    };
-    nInput.addEventListener("input", onNChange);
-    nInput.addEventListener("change", onNChange);
+    const onParamChange = () => rowUpdaters.forEach((fn) => fn());
+    paramInput.addEventListener("input", onParamChange);
+    paramInput.addEventListener("change", onParamChange);
 
     dropdowns[header] = dd;
     transforms[header] = tfDd;
@@ -334,16 +352,19 @@ function collectMapping(dropdowns) {
 }
 
 /**
- * Collect the transform rules from dropdowns: { csvColumn: { rule, n? } }
+ * Collect the transform rules from dropdowns: { csvColumn: { rule, param? } }
  */
-function collectTransforms(transformDds, nInputs) {
+function collectTransforms(transformDds, paramInputs) {
   const transforms = {};
   for (const [csvCol, dd] of Object.entries(transformDds)) {
     const rule = dd.getSelected();
     if (rule && rule !== "none") {
       const entry = { rule };
-      if (paramRules.has(rule) && nInputs[csvCol]) {
-        entry.n = parseInt(nInputs[csvCol].value) || 0;
+      const def = paramRuleDefs[rule];
+      if (def && paramInputs[csvCol]) {
+        entry.param = def.type === "number"
+          ? (parseInt(paramInputs[csvCol].value) || 0)
+          : (paramInputs[csvCol].value || "");
       }
       transforms[csvCol] = entry;
     }
