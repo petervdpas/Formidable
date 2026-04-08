@@ -326,6 +326,7 @@ export default {
   "standard.create": "Create",
   "standard.edit": "Edit",
   "standard.delete": "Delete",
+  "standard.eg": "e.g.",
   "standard.add": "Add",
   "standard.save": "Save",
   "standard.quit": "Quit",

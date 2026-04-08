@@ -348,6 +348,7 @@ export default {
   "standard.create": "Aanmaken",
   "standard.edit": "Bewerken",
   "standard.delete": "Verwijderen",
+  "standard.eg": "bijv.",
   "standard.add": "Toevoegen",
   "standard.save": "Opslaan",
   "standard.quit": "Afsluiten",

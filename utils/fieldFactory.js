@@ -12,6 +12,7 @@ import {
 } from "./elementBuilders.js";
 import { getCurrentTheme } from "./themeUtils.js";
 import { parseChoices } from "./parseChoices.js";
+import { t } from "./i18n.js";
 
 export function resolveOption(opt) {
   return typeof opt === "string"
@@ -74,6 +75,12 @@ export function extractRefMatches(input, loopVals) {
     if (!matched) break;
   }
   return found;
+}
+
+export function buildRefPlaceholder(refSource, context) {
+  const vals = getRefLoopValues(refSource, context).slice(0, 3);
+  if (!vals.length) return "";
+  return `${t("standard.eg") || "e.g."} ${vals.join(", ")}`;
 }
 
 export function getRefLoopValues(refSource, context) {
@@ -583,7 +590,12 @@ export const FieldBlueprints = {
           inp.name = String(name ?? "");
           inp.dataset.refSource = c.reference || "";
           inp.value = normalizeRefTags(cellVal).join(", ");
-          inp.placeholder = "e.g. A003, B005";
+          requestAnimationFrame(() => {
+            inp.placeholder = buildRefPlaceholder(c.reference || "", wrap);
+          });
+          inp.addEventListener("focus", () => {
+            inp.placeholder = buildRefPlaceholder(c.reference || "", wrap);
+          });
           inp.addEventListener("blur", () => {
             const loopVals = getRefLoopValues(c.reference || "", wrap);
             inp.value = extractRefMatches(inp.value, loopVals).join(", ");

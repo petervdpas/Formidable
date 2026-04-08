@@ -6,7 +6,7 @@ import { ensureVirtualLocation } from "./vfsUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 import { createSortable } from "./domUtils.js";
 import { parseChoices } from "./parseChoices.js";
-import { normalizeRefTags, getRefLoopValues, extractRefMatches } from "./fieldFactory.js";
+import { normalizeRefTags, getRefLoopValues, extractRefMatches, buildRefPlaceholder } from "./fieldFactory.js";
 import { addContainerElement, createStyledLabel } from "./elementBuilders.js";
 
 export function applyGuidField(container, field, value) {
@@ -284,7 +284,12 @@ export function applyTableField(
         input.type = "text";
         input.dataset.refSource = col.reference || "";
         input.value = normalizeRefTags(cellValue).join(", ");
-        input.placeholder = "e.g. A003, B005";
+        requestAnimationFrame(() => {
+          input.placeholder = buildRefPlaceholder(col.reference || "", tableWrapper);
+        });
+        input.addEventListener("focus", () => {
+          input.placeholder = buildRefPlaceholder(col.reference || "", tableWrapper);
+        });
         input.addEventListener("blur", () => {
           const loopVals = getRefLoopValues(col.reference || "", tableWrapper);
           input.value = extractRefMatches(input.value, loopVals).join(", ");
