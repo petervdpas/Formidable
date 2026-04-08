@@ -400,9 +400,11 @@ function registerIpcHandlers() {
   registerIpc("csv-preview", (e, filePath, delimiter) =>
     csvManager.previewCsv(filePath, delimiter)
   );
-  registerIpc("csv-import-row", (e, templateFilename, entryFilename, data, meta, fields) =>
-    formManager.saveForm(templateFilename, entryFilename, { data, meta }, fields)
-  );
+  registerIpc("csv-import-row", (e, templateFilename, entryFilename, data, meta, fields) => {
+    const result = formManager.saveForm(templateFilename, entryFilename, { data, meta }, fields);
+    configManager.dirtyVirtualStructure();
+    return result;
+  });
 
   // Config
   registerIpc("switch-user-profile", (e, profileFilename) =>

@@ -1,16 +1,16 @@
 {
   "meta": {
-    "id": "4428d423-ee61-4c86-8d7e-70dd3b951d96",
+    "id": "8ff78c52-3d97-4b97-a9ed-bee308ddec1c",
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
-    "created": "2026-04-08T14:29:43.479Z",
-    "updated": "2026-04-08T14:29:43.479Z",
+    "created": "2026-04-08T14:49:16.868Z",
+    "updated": "2026-04-08T14:49:16.868Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "id": "4428d423-ee61-4c86-8d7e-70dd3b951d96",
+    "id": "8ff78c52-3d97-4b97-a9ed-bee308ddec1c",
     "name": "Buckingham Palace",
     "country": "uk",
     "unit-number": "1",
@@ -18,6 +18,11 @@
     "city": "London",
     "state-abbreviation": "",
     "postal": "SW1A 1AA",
-    "owners": ""
+    "owners": [
+      [
+        "Charles",
+        "Windsor"
+      ]
+    ]
   }
 }

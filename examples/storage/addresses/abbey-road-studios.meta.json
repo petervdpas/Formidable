@@ -1,16 +1,16 @@
 {
   "meta": {
-    "id": "31dc8a12-7830-4823-b550-85d356a56920",
+    "id": "f80578c7-33ce-4333-9a03-31a81c3fb820",
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
-    "created": "2026-04-08T14:29:43.478Z",
-    "updated": "2026-04-08T14:29:43.478Z",
+    "created": "2026-04-08T14:49:16.865Z",
+    "updated": "2026-04-08T14:49:16.865Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "id": "31dc8a12-7830-4823-b550-85d356a56920",
+    "id": "f80578c7-33ce-4333-9a03-31a81c3fb820",
     "name": "Abbey Road Studios",
     "country": "uk",
     "unit-number": "3",
@@ -18,6 +18,15 @@
     "city": "London",
     "state-abbreviation": "",
     "postal": "NW8 9AY",
-    "owners": ""
+    "owners": [
+      [
+        "John",
+        "Lennon"
+      ],
+      [
+        "Paul",
+        "McCartney"
+      ]
+    ]
   }
 }

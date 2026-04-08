@@ -1,16 +1,16 @@
 {
   "meta": {
-    "id": "18cd9b4d-8715-4412-afa0-06e71f920827",
+    "id": "ca3a0727-ae01-4b7f-b0cd-61ef115a7c9e",
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
-    "created": "2026-04-08T14:29:43.475Z",
-    "updated": "2026-04-08T14:29:43.475Z",
+    "created": "2026-04-08T14:49:16.860Z",
+    "updated": "2026-04-08T14:49:16.860Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "id": "18cd9b4d-8715-4412-afa0-06e71f920827",
+    "id": "ca3a0727-ae01-4b7f-b0cd-61ef115a7c9e",
     "name": "Empire State",
     "country": "us",
     "unit-number": "350",
@@ -18,6 +18,6 @@
     "city": "New York",
     "state-abbreviation": "NY",
     "postal": "10118",
-    "owners": ""
+    "owners": []
   }
 }

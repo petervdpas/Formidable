@@ -283,6 +283,7 @@ function mountApiCollections(app) {
 
     res.setHeader("ETag", rev.etag);
     res.setHeader("Last-Modified", rev.lastModified);
+    res.setHeader("Cache-Control", "no-cache");
     res.json(out);
   });
 

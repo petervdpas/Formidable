@@ -758,6 +758,7 @@ export default {
   "csv.transform.split": "Splits naar lijst",
   "csv.transform.boolmatch": "Boolean match",
   "csv.transform.boolmatch.placeholder": "= waar",
+  "csv.transform.splittable": "Splits naar tabel",
   "csv.concat.hint": "Tip: wijs meerdere kolommen toe aan hetzelfde veld om samen te voegen.",
   "csv.concat.separator": "Scheidingsteken:",
   "csv.concat.separator.title": "Teken(s) om samengevoegde waarden te verbinden",

@@ -20,6 +20,16 @@ const excludedTypes = new Set([
 ]);
 
 // ── Transform rules ───────────────────────────────────────────
+/**
+ * Parse "rowSep colSep" from a single param string.
+ * Default: row=";", col=","
+ * Examples: "; ," → [";", ","]   "| :" → ["|", ":"]   ";" → [";", ","]
+ */
+function parseSeps(seps) {
+  const parts = String(seps || "").split(/\s+/).filter(Boolean);
+  return [parts[0] || ";", parts[1] || ","];
+}
+
 // ── Transform rules ───────────────────────────────────────────
 // Parameterised rules receive an extra arg at apply-time.
 // "first-n" / "last-n" → numeric arg; "split" → separator string.
@@ -36,6 +46,10 @@ const transformRules = {
   "last-n":     (v, n) => n ? v.slice(-n) : v,
   split:        (v, sep) => v.split(sep || ",").map((s) => s.trim()).filter(Boolean).join(", "),
   "bool-match": (v, trueVal) => String(v.trim().toLowerCase() === String(trueVal).trim().toLowerCase()),
+  "split-table": (v, seps) => {
+    const [rs, cs] = parseSeps(seps);
+    return v.split(rs).map((r) => r.split(cs).map((c) => c.trim())).filter((r) => r.some(Boolean)).map((r) => r.join(", ")).join(" | ");
+  },
 };
 
 // Rules that show an extra input: { type: "number"|"text", placeholder }
@@ -43,7 +57,8 @@ const paramRuleDefs = {
   "first-n": { type: "number", placeholder: "N", min: "1", max: "999" },
   "last-n":  { type: "number", placeholder: "N", min: "1", max: "999" },
   split:        { type: "text", placeholder: ", ; |" },
-  "bool-match": { type: "text", placeholder: null },  // set dynamically via i18n
+  "bool-match":  { type: "text", placeholder: null },  // set dynamically via i18n
+  "split-table": { type: "text", placeholder: "; ," },
 };
 
 const transformOptions = [
@@ -58,7 +73,8 @@ const transformOptions = [
   { value: "first-n",    label: t("csv.transform.firstn", "First N chars") },
   { value: "last-n",     label: t("csv.transform.lastn", "Last N chars") },
   { value: "split",      label: t("csv.transform.split", "Split to list") },
-  { value: "bool-match", label: t("csv.transform.boolmatch", "Boolean match") },
+  { value: "bool-match",  label: t("csv.transform.boolmatch", "Boolean match") },
+  { value: "split-table", label: t("csv.transform.splittable", "Split to table") },
 ];
 
 function applyTransform(val, ruleKey, param) {

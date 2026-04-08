@@ -1,16 +1,16 @@
 {
   "meta": {
-    "id": "90f6f219-9c05-41ff-9592-de42a6de2844",
+    "id": "c739aeff-b484-4daf-8f98-9b9c6852ceb1",
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
-    "created": "2026-04-08T14:29:43.478Z",
-    "updated": "2026-04-08T14:29:43.478Z",
+    "created": "2026-04-08T14:49:16.866Z",
+    "updated": "2026-04-08T14:49:16.866Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "id": "90f6f219-9c05-41ff-9592-de42a6de2844",
+    "id": "c739aeff-b484-4daf-8f98-9b9c6852ceb1",
     "name": "Golden Gate View",
     "country": "us",
     "unit-number": "1",
@@ -18,6 +18,6 @@
     "city": "San Francisco",
     "state-abbreviation": "CA",
     "postal": "94129",
-    "owners": ""
+    "owners": []
   }
 }

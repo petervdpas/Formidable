@@ -1,16 +1,16 @@
 {
   "meta": {
-    "id": "badf088e-63f7-4c67-92b0-343e403437c8",
+    "id": "2b8da18f-3b13-4cdf-b197-0bb6dde5b38c",
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
-    "created": "2026-04-08T14:29:43.480Z",
-    "updated": "2026-04-08T14:29:43.480Z",
+    "created": "2026-04-08T14:49:16.871Z",
+    "updated": "2026-04-08T14:49:16.871Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "id": "badf088e-63f7-4c67-92b0-343e403437c8",
+    "id": "2b8da18f-3b13-4cdf-b197-0bb6dde5b38c",
     "name": "Central Park West",
     "country": "us",
     "unit-number": "115",
@@ -18,6 +18,15 @@
     "city": "New York",
     "state-abbreviation": "NY",
     "postal": "10023",
-    "owners": ""
+    "owners": [
+      [
+        "John",
+        "Lennon"
+      ],
+      [
+        "Yoko",
+        "Ono"
+      ]
+    ]
   }
 }

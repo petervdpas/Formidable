@@ -1,16 +1,16 @@
 {
   "meta": {
-    "id": "d9a254ad-680e-4f0b-8f29-4a9c1e594a3e",
+    "id": "3dab40e6-96c1-4798-86da-4458126b6c43",
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
-    "created": "2026-04-08T14:29:43.474Z",
-    "updated": "2026-04-08T14:29:43.474Z",
+    "created": "2026-04-08T14:49:16.858Z",
+    "updated": "2026-04-08T14:49:16.858Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "id": "d9a254ad-680e-4f0b-8f29-4a9c1e594a3e",
+    "id": "3dab40e6-96c1-4798-86da-4458126b6c43",
     "name": "White House",
     "country": "us",
     "unit-number": "1600",
@@ -18,6 +18,11 @@
     "city": "Washington",
     "state-abbreviation": "DC",
     "postal": "20500",
-    "owners": ""
+    "owners": [
+      [
+        "Joe",
+        "Biden"
+      ]
+    ]
   }
 }

@@ -71,6 +71,12 @@ const transformRules = {
   "last-n":     (v, n) => n ? v.slice(-n) : v,
   split:        (v, sep) => v.split(sep || ",").map((s) => s.trim()).filter(Boolean).join(", "),
   "bool-match": (v, trueVal) => String(v.trim().toLowerCase() === String(trueVal).trim().toLowerCase()),
+  "split-table": (v, seps) => {
+    const parts = String(seps || "").split(/\s+/).filter(Boolean);
+    const rs = parts[0] || ";";
+    const cs = parts[1] || ",";
+    return JSON.stringify(v.split(rs).map((r) => r.split(cs).map((c) => c.trim())).filter((r) => r.some(Boolean)));
+  },
 };
 
 function applyTransformRule(val, transform) {

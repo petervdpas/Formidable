@@ -1,16 +1,16 @@
 {
   "meta": {
-    "id": "f50aabd4-7f86-490b-aec9-14e098c2972a",
+    "id": "05386be2-1175-4f2e-9add-e33dd59ce3a5",
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
-    "created": "2026-04-08T14:29:43.477Z",
-    "updated": "2026-04-08T14:29:43.477Z",
+    "created": "2026-04-08T14:49:16.863Z",
+    "updated": "2026-04-08T14:49:16.863Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "id": "f50aabd4-7f86-490b-aec9-14e098c2972a",
+    "id": "05386be2-1175-4f2e-9add-e33dd59ce3a5",
     "name": "Graceland",
     "country": "us",
     "unit-number": "3764",
@@ -18,6 +18,11 @@
     "city": "Memphis",
     "state-abbreviation": "TN",
     "postal": "38116",
-    "owners": ""
+    "owners": [
+      [
+        "Elvis",
+        "Presley"
+      ]
+    ]
   }
 }

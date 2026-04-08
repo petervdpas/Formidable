@@ -1,16 +1,16 @@
 {
   "meta": {
-    "id": "9f7a5424-bc16-4819-aff7-c4c8a0ffda26",
+    "id": "b8498b24-89dd-4f94-bd34-ec3b2d05f9b0",
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
-    "created": "2026-04-08T14:29:43.473Z",
-    "updated": "2026-04-08T14:29:43.473Z",
+    "created": "2026-04-08T14:49:16.856Z",
+    "updated": "2026-04-08T14:49:16.856Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "id": "9f7a5424-bc16-4819-aff7-c4c8a0ffda26",
+    "id": "b8498b24-89dd-4f94-bd34-ec3b2d05f9b0",
     "name": "Baker Residence",
     "country": "uk",
     "unit-number": "221B",
@@ -18,6 +18,15 @@
     "city": "London",
     "state-abbreviation": "",
     "postal": "NW1 6XE",
-    "owners": ""
+    "owners": [
+      [
+        "Sherlock",
+        "Holmes"
+      ],
+      [
+        "John",
+        "Watson"
+      ]
+    ]
   }
 }

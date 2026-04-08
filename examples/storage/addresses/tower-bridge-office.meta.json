@@ -1,16 +1,16 @@
 {
   "meta": {
-    "id": "6deabca4-aee2-46e0-8176-74f27a684689",
+    "id": "6d404c6a-767d-4be5-ae6e-e2442e691ad7",
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
-    "created": "2026-04-08T14:29:43.476Z",
-    "updated": "2026-04-08T14:29:43.476Z",
+    "created": "2026-04-08T14:49:16.861Z",
+    "updated": "2026-04-08T14:49:16.861Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "id": "6deabca4-aee2-46e0-8176-74f27a684689",
+    "id": "6d404c6a-767d-4be5-ae6e-e2442e691ad7",
     "name": "Tower Bridge Office",
     "country": "uk",
     "unit-number": "1",
@@ -18,6 +18,15 @@
     "city": "London",
     "state-abbreviation": "",
     "postal": "SE1 2UP",
-    "owners": ""
+    "owners": [
+      [
+        "James",
+        "Bond"
+      ],
+      [
+        "M",
+        "Moneypenny"
+      ]
+    ]
   }
 }

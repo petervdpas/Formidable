@@ -732,6 +732,7 @@ export default {
   "csv.transform.split": "Split to list",
   "csv.transform.boolmatch": "Boolean match",
   "csv.transform.boolmatch.placeholder": "= true",
+  "csv.transform.splittable": "Split to table",
   "csv.concat.hint": "Tip: map multiple columns to the same field to concatenate.",
   "csv.concat.separator": "Separator:",
   "csv.concat.separator.title": "Character(s) used to join concatenated values",

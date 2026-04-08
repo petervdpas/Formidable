@@ -1,16 +1,16 @@
 {
   "meta": {
-    "id": "2830ee2c-d32d-42e4-8826-599f900ca515",
+    "id": "946185a4-0dbe-48c3-b211-f25bdd2e04ee",
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
-    "created": "2026-04-08T14:29:43.482Z",
-    "updated": "2026-04-08T14:29:43.482Z",
+    "created": "2026-04-08T14:49:16.877Z",
+    "updated": "2026-04-08T14:49:16.877Z",
     "flagged": false,
     "tags": []
   },
   "data": {
-    "id": "2830ee2c-d32d-42e4-8826-599f900ca515",
+    "id": "946185a4-0dbe-48c3-b211-f25bdd2e04ee",
     "name": "Edinburgh Castle",
     "country": "uk",
     "unit-number": "1",
@@ -18,6 +18,6 @@
     "city": "Edinburgh",
     "state-abbreviation": "",
     "postal": "EH1 2NG",
-    "owners": ""
+    "owners": []
   }
 }

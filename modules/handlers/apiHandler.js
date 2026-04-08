@@ -24,7 +24,7 @@ async function getClient() {
   return {
     async get(path) {
       const url = path.startsWith("http") ? path : base + path;
-      const res = await fetch(url, { headers: { accept: "application/json" } });
+      const res = await fetch(url, { headers: { accept: "application/json" }, cache: "no-store" });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json().catch(() => ({}));
     },
