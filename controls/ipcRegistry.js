@@ -26,6 +26,7 @@ const configManager = require("./configManager");
 const markdownRenderer = require("./markdownRenderer");
 const htmlRenderer = require("./htmlRenderer");
 const miniExprParser = require("./miniExprParser");
+const csvManager = require("./csvManager");
 
 const sfr = new SingleFileRepository();
 
@@ -394,6 +395,12 @@ function registerIpcHandlers() {
     configManager.dirtyVirtualStructure();
     return result;
   });
+
+  // CSV Import
+  registerIpc("csv-preview", (e, filePath, delimiter) =>
+    csvManager.previewCsv(filePath, delimiter)
+  );
+  registerIpc("csv-import", (e, opts) => csvManager.importCsv(opts));
 
   // Config
   registerIpc("switch-user-profile", (e, profileFilename) =>

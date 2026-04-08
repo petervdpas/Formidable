@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "id": null,
+    "author_name": "Unknown",
+    "author_email": "unknown@example.com",
+    "template": "unknown",
+    "created": "2026-04-08T10:23:20.873Z",
+    "updated": "2026-04-08T10:23:20.873Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "",
+    "name": "Baker Residence",
+    "country": "uk",
+    "unit-number": "221B",
+    "street-address": "Baker Street",
+    "city": "London",
+    "state-abbreviation": "",
+    "postal": "NW1 6XE",
+    "owners": ""
+  }
+}

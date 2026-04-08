@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "id": null,
+    "author_name": "Unknown",
+    "author_email": "unknown@example.com",
+    "template": "unknown",
+    "created": "2026-04-08T10:23:20.874Z",
+    "updated": "2026-04-08T10:23:20.874Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "",
+    "name": "Central Park West",
+    "country": "us",
+    "unit-number": "115",
+    "street-address": "Central Park West",
+    "city": "New York",
+    "state-abbreviation": "NY",
+    "postal": "10023",
+    "owners": ""
+  }
+}

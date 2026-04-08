@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "id": null,
+    "author_name": "Unknown",
+    "author_email": "unknown@example.com",
+    "template": "unknown",
+    "created": "2026-04-08T10:23:20.874Z",
+    "updated": "2026-04-08T10:23:20.874Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "",
+    "name": "Graceland",
+    "country": "us",
+    "unit-number": "3764",
+    "street-address": "Elvis Presley Boulevard",
+    "city": "Memphis",
+    "state-abbreviation": "TN",
+    "postal": "38116",
+    "owners": ""
+  }
+}

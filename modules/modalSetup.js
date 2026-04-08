@@ -35,6 +35,7 @@ import {
   createPluginCreateButton,
 } from "./uiButtons.js";
 import { t } from "../utils/i18n.js";
+export { setupCsvImportModal } from "./csvImportModal.js";
 
 export function setupProfileModal() {
   return setupModal("profile-modal", {

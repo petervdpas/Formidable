@@ -32,6 +32,7 @@ import * as editorHandler from "./handlers/editorHandler.js";
 import * as linkHandler from "./handlers/linkHandler.js";
 import * as toastHandler from "./handlers/toastHandler.js";
 import * as codeExecHandler from "./handlers/codeExecHandler.js";
+import * as csvHandlers from "./handlers/csvHandlers.js";
 
 let routerInitialized = false;
 let autobindRegistered = false;
@@ -406,6 +407,13 @@ export function initEventRouter() {
   EventBus.off("modal:entry:confirm", modalHandler.handleEntryConfirm);
   EventBus.on("modal:template:confirm", modalHandler.handleTemplateConfirm);
   EventBus.on("modal:entry:confirm", modalHandler.handleEntryConfirm);
+
+  // CSV events
+  EventBus.off("csv:preview", csvHandlers.handleCsvPreview);
+  EventBus.off("csv:import", csvHandlers.handleCsvImport);
+
+  EventBus.on("csv:preview", csvHandlers.handleCsvPreview);
+  EventBus.on("csv:import", csvHandlers.handleCsvImport);
 
   // Editor events
   EventBus.off("editor:save", editorHandler.handleSaveTemplate);

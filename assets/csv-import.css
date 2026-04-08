@@ -1,0 +1,102 @@
+/* assets/csv-import.css — theme-aware via CSS custom properties */
+
+.csv-import-step {
+  margin-bottom: 12px;
+}
+
+.csv-import-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.csv-file-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--modal-fg, inherit);
+  opacity: 0.7;
+  font-size: 0.9em;
+}
+
+.csv-delim-container {
+  min-width: 160px;
+}
+
+.csv-template-container {
+  min-width: 200px;
+}
+
+.csv-map-dropdown label {
+  display: none;
+}
+
+.csv-mapping-container {
+  max-height: 45vh;
+  overflow: auto;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: 4px;
+}
+
+/* ── Mapping table ─────────────────────────────── */
+.csv-mapping-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+  color: var(--modal-fg, inherit);
+}
+
+.csv-mapping-table th,
+.csv-mapping-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border-color, #ccc);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.csv-mapping-table th {
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  background: var(--modal-bg, #fff);
+  color: var(--modal-fg, inherit);
+  z-index: 1;
+}
+
+.csv-mapping-table tr:hover td {
+  background: var(--modal-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.csv-mapping-table td:first-child {
+  font-weight: 500;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.csv-preview-cell {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.65;
+  font-size: 0.85em;
+}
+
+/* ── Status & buttons ──────────────────────────── */
+.csv-import-status {
+  padding: 6px 0;
+  font-size: 0.9em;
+  color: var(--modal-fg, inherit);
+  opacity: 0.8;
+}
+
+.csv-import-buttons {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+}

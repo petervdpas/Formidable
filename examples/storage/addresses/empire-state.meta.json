@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "id": null,
+    "author_name": "Unknown",
+    "author_email": "unknown@example.com",
+    "template": "unknown",
+    "created": "2026-04-08T10:23:20.873Z",
+    "updated": "2026-04-08T10:23:20.873Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "",
+    "name": "Empire State",
+    "country": "us",
+    "unit-number": "350",
+    "street-address": "Fifth Avenue",
+    "city": "New York",
+    "state-abbreviation": "NY",
+    "postal": "10118",
+    "owners": ""
+  }
+}

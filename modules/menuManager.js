@@ -64,7 +64,7 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
     });
   }
 
-  // ─── File & Config Menu ─────────────────────
+  // ─── File Menu ──────────────────────────────
   menuBar.append(
     createMenuGroup("standard.file", [
       {
@@ -84,7 +84,31 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
       },
       "separator",
       { label: "standard.quit", i18n: true, action: "quit" },
-    ]),
+    ])
+  );
+
+  // ─── Data Menu (only when active template has collections) ──
+  const currentTmpl = window.currentSelectedTemplate;
+  if (currentTmpl?.enable_collection) {
+    menuBar.append(
+      createMenuGroup("standard.data", [
+        {
+          label: "menu.data.import",
+          i18n: true,
+          action: "open-csv-import",
+        },
+        {
+          label: "menu.data.export",
+          i18n: true,
+          action: "open-csv-export",
+          disabled: true,
+        },
+      ])
+    );
+  }
+
+  // ─── Config Menu ──────────────────────────────
+  menuBar.append(
     createMenuGroup("standard.config", [
       {
         label: "menu.config.switchProfile",
@@ -239,6 +263,11 @@ function createMenuGroup(titleKey, items) {
       }
 
       child.dataset.action = item.action;
+
+      if (item.disabled) {
+        child.classList.add("disabled");
+        child.setAttribute("aria-disabled", "true");
+      }
     }
 
     submenu.appendChild(child);
@@ -403,6 +432,10 @@ export async function handleMenuAction(action) {
 
     case "open-git-modal":
       window.openGitModal?.();
+      break;
+
+    case "open-csv-import":
+      window.openCsvImportModal?.();
       break;
 
     case "start-internal-server":

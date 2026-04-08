@@ -31,6 +31,7 @@ import {
   setupPluginModal,
   setuHelpModal,
   setupAboutModal,
+  setupCsvImportModal,
 } from "./modules/modalSetup.js";
 
 import {
@@ -138,6 +139,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const pluginModal = setupPluginModal();
   const helpModal = setuHelpModal();
   const aboutModal = setupAboutModal();
+  const csvImportModal = setupCsvImportModal();
 
   window.openProfileModal = profile.show;
   window.openSettingsModal = settings.show;
@@ -146,6 +148,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   window.openAboutModal = aboutModal.show;
   window.openHelpModal = helpModal.show;
   window.openPluginModal = pluginModal.show;
+  window.openCsvImportModal = csvImportModal.show;
 
   // ── Form System ──
   const formManager = createFormManager("storage-content");

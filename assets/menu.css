@@ -118,6 +118,12 @@
     background: var(--submenu-hover-bg);
 }
 
+.submenu li.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: default;
+}
+
 .submenu .separator {
     border-top: 1px solid var(--submenu-separator);
     margin: 4px 0;

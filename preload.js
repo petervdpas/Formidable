@@ -160,6 +160,10 @@ const api = {
     "save-image-file",
     "delete-form",
   ]),
+  csv: buildGroup([
+    "csv-preview",
+    "csv-import",
+  ]),
   transform: buildGroup([
     "render-markdown-template",
     "render-html-preview",

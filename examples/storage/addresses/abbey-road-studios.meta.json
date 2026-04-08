@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "id": null,
+    "author_name": "Unknown",
+    "author_email": "unknown@example.com",
+    "template": "unknown",
+    "created": "2026-04-08T10:23:20.874Z",
+    "updated": "2026-04-08T10:23:20.874Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "",
+    "name": "Abbey Road Studios",
+    "country": "uk",
+    "unit-number": "3",
+    "street-address": "Abbey Road",
+    "city": "London",
+    "state-abbreviation": "",
+    "postal": "NW8 9AY",
+    "owners": ""
+  }
+}

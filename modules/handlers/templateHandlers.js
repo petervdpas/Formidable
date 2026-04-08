@@ -1,6 +1,7 @@
 // modules/handlers/templateHandlers.js
 
 import { EventBus } from "../eventBus.js";
+import { rebuildMenu } from "../menuManager.js";
 
 let formManager = null;
 let storageListManager = null;
@@ -46,6 +47,9 @@ export async function handleTemplateSelected({ name, yaml }) {
 
     window.currentSelectedTemplateName = name;
     window.currentSelectedTemplate = yaml;
+
+    // Rebuild menu to show/hide Data menu based on enable_collection
+    rebuildMenu();
 
     if (templateEditor) {
       templateEditor.render(yaml);
