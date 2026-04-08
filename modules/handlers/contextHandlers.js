@@ -10,8 +10,18 @@ export function bindContextDependencies(deps) {
   dropdown = deps.dropdown;
 }
 
+let currentMode = null;
+
 export async function handleContextToggle(isStorage) {
   const mode = isStorage ? "storage" : "template";
+
+  // Skip if already in the requested mode (prevents re-entrant flipping)
+  if (mode === currentMode) {
+    EventBus.emit("logging:default", ["[Handler] Context already in mode:", mode]);
+    return;
+  }
+  currentMode = mode;
+
   EventBus.emit("logging:default", ["[Handler] Context toggled:", mode]);
 
   // Sync toggle UI without dispatching change (avoids re-entrant loop)

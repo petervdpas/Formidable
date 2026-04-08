@@ -539,6 +539,7 @@ export async function rebuildMenu() {
   const menuBar = document.getElementById("app-menu");
   if (!menuBar) return;
 
+  cachedConfig = await reloadUserConfig();
   menuBar.innerHTML = "";
   await buildMenu("app-menu", handleMenuAction);
 }

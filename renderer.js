@@ -277,11 +277,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     templateDropdown.refresh?.() ?? Promise.resolve(),
   ]);
 
-  // ── Force context view BEFORE selection (but no emit yet)
-  setContextView(config.context_mode, {
-    templateContainer,
-    storageContainer,
-  });
+  // Context view is set by boot:initialize → context:toggle handler
 
   // ── Initialize from Config ──
   EventBus.emit("boot:initialize", config);
