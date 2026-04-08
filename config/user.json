@@ -11,7 +11,7 @@
   "context_mode": "storage",
   "context_folder": "./examples",
   "selected_template": "addresses.yaml",
-  "selected_data_file": "baker-residence.meta.json",
+  "selected_data_file": "abbey-road-studios.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -27,8 +27,8 @@
     "y": 129,
     "maximized": false
   },
-  "template_sidebar_width": 328,
-  "storage_sidebar_width": 346,
+  "template_sidebar_width": 310,
+  "storage_sidebar_width": 344,
   "status_buttons": {
     "reloader": true,
     "charpicker": true,
