@@ -3,6 +3,7 @@
 import { EventBus } from "../modules/eventBus.js";
 import { ensureVirtualLocation } from "./vfsUtils.js";
 import { generateGuid } from "./domUtils.js";
+import { getRefLoopValues, extractRefMatches } from "./fieldFactory.js";
 
 // GUID
 export const parseGuidField = async function (input) {
@@ -110,14 +111,11 @@ export const parseTableField = async function (wrapper) {
   rows.forEach((tr) => {
     const cells = Array.from(tr.querySelectorAll("td")).slice(1, -1); // skip drag handle and remove btn
     const row = cells.map((td) => {
-      // reference tags cell
-      const refCell = td.querySelector(".ref-tags-cell");
-      if (refCell) {
-        return Array.from(refCell.querySelectorAll(".ref-tag-item"))
-          .map((el) => el.firstChild?.textContent?.trim())
-          .filter(Boolean);
-      }
       const input = td.querySelector("input");
+      if (input?.dataset?.refSource) {
+        const loopVals = getRefLoopValues(input.dataset.refSource, td);
+        return extractRefMatches(input.value, loopVals);
+      }
       if (input) {
         return input.type === "checkbox" ? String(input.checked) : input.value.trim();
       }

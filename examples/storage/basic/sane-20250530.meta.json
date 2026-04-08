@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2025-06-04T13:22:47.470Z",
-    "updated": "2026-04-07T23:57:16.087Z",
+    "updated": "2026-04-08T00:21:53.176Z",
     "flagged": true,
     "tags": [
       "bye",
@@ -39,8 +39,7 @@
         "true",
         "active",
         [
-          "A003",
-          "B005"
+          "A003"
         ]
       ],
       [
@@ -105,6 +104,9 @@
       },
       {
         "Code": "B005"
+      },
+      {
+        "Code": "C006"
       }
     ]
   }

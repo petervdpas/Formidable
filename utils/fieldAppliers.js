@@ -6,7 +6,7 @@ import { ensureVirtualLocation } from "./vfsUtils.js";
 import { showOptionPopup } from "./popupUtils.js";
 import { createSortable } from "./domUtils.js";
 import { parseChoices } from "./parseChoices.js";
-import { createRefTagsCell } from "./fieldFactory.js";
+import { normalizeRefTags, getRefLoopValues, extractRefMatches } from "./fieldFactory.js";
 import { addContainerElement, createStyledLabel } from "./elementBuilders.js";
 
 export function applyGuidField(container, field, value) {
@@ -280,16 +280,20 @@ export function applyTableField(
         sel.value = String(cellValue);
         td.appendChild(sel);
       } else if (colType === "reference") {
-        const tags = Array.isArray(cellValue)
-          ? cellValue
-          : typeof cellValue === "string" && cellValue
-            ? (() => { try { return JSON.parse(cellValue); } catch { return []; } })()
-            : [];
-        td.appendChild(createRefTagsCell(tags, col.reference || "", tableWrapper));
+        const input = document.createElement("input");
+        input.type = "text";
+        input.dataset.refSource = col.reference || "";
+        input.value = normalizeRefTags(cellValue).join(", ");
+        input.placeholder = "e.g. A003, B005";
+        input.addEventListener("blur", () => {
+          const loopVals = getRefLoopValues(col.reference || "", tableWrapper);
+          input.value = extractRefMatches(input.value, loopVals).join(", ");
+        });
+        td.appendChild(input);
       } else {
         const input = document.createElement("input");
         input.type = colType === "number" ? "number" : colType === "date" ? "date" : "text";
-        input.value = cellValue;
+        input.value = Array.isArray(cellValue) ? cellValue.join(", ") : cellValue;
         td.appendChild(input);
       }
       tr.appendChild(td);
