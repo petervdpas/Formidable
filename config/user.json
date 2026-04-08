@@ -8,7 +8,7 @@
   "development_enable": true,
   "logging_enabled": true,
   "enable_plugins": true,
-  "context_mode": "template",
+  "context_mode": "storage",
   "context_folder": "./examples",
   "selected_template": "basic.yaml",
   "selected_data_file": "test-20250629.meta.json",
@@ -24,7 +24,7 @@
     "width": 1440,
     "height": 749,
     "x": 240,
-    "y": 155,
+    "y": 181,
     "maximized": false
   },
   "template_sidebar_width": 328,

@@ -449,7 +449,7 @@ export function setupRenderModal() {
         htmlPane.style.flex = "";
         htmlPane.style.removeProperty("flex-basis");
 
-        createSplitter({ container: body, left: rawPane, right: htmlPane, min: 120 });
+        createSplitter({ container: body, left: rawPane, right: htmlPane, min: 120, defaultHalf: true });
       }
 
       // Enable scroll sync

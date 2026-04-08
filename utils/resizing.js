@@ -10,6 +10,7 @@ export function setupSplitter({
   container,
   min = 150,
   configKey = null,
+  defaultHalf = false,
 }) {
   let isDragging = false;
   let startX = 0;
@@ -147,12 +148,11 @@ export function setupSplitter({
     });
   }
 
-  // Initial apply: use config if present; else default to 50%
+  // Initial apply: use config if present; else normalize DOM
   requestAnimationFrame(() => {
     if (!applyFromConfig()) {
-      const halfWidth = (cw() - splitW()) / 2;
-      if (halfWidth > min) {
-        applyLeftWidth(halfWidth);
+      if (defaultHalf && cw() > 0) {
+        applyLeftWidth((cw() - splitW()) / 2);
       } else {
         onResize();
       }
@@ -172,7 +172,7 @@ export function setupSplitter({
  * @param {string}      [opts.configKey]- optional config key for persistence
  * @returns {HTMLElement} the splitter element
  */
-export function createSplitter({ container, left, right, min = 120, configKey = null }) {
+export function createSplitter({ container, left, right, min = 120, configKey = null, defaultHalf = false }) {
   const splitter = document.createElement("div");
   splitter.className = "modal-split-splitter";
   Object.assign(splitter.style, {
@@ -203,7 +203,7 @@ export function createSplitter({ container, left, right, min = 120, configKey = 
   right.style.flex = "1 1 auto";
   right.style.overflow = right.style.overflow || "auto";
 
-  setupSplitter({ splitter, left, right, container, min, configKey });
+  setupSplitter({ splitter, left, right, container, min, configKey, defaultHalf });
   return splitter;
 }
 
