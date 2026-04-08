@@ -769,6 +769,7 @@ export default {
   "csv.importing": "Bezig met importeren...",
   "csv.rows.found": "{0} rijen gevonden",
   "csv.import.success": "{0} items succesvol geïmporteerd.",
+  "csv.export.success": "{0} items succesvol geëxporteerd.",
   "csv.import.failed": "CSV-import mislukt.",
   "csv.error.parse": "CSV kon niet worden geparsed: {0}",
   "csv.error.template": "Sjabloon kon niet worden geladen.",

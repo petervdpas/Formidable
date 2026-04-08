@@ -743,6 +743,7 @@ export default {
   "csv.importing": "Importing...",
   "csv.rows.found": "{0} rows found",
   "csv.import.success": "{0} entries imported successfully.",
+  "csv.export.success": "{0} entries exported successfully.",
   "csv.import.failed": "CSV import failed.",
   "csv.error.parse": "Failed to parse CSV: {0}",
   "csv.error.template": "Failed to load template.",

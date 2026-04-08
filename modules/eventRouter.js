@@ -413,11 +413,13 @@ export function initEventRouter() {
   EventBus.off("csv:import", csvHandlers.handleCsvImport);
   EventBus.off("csv:import:transformRow", csvHandlers.handleTransformRow);
   EventBus.off("csv:import:saveRow", csvHandlers.handleSaveRow);
+  EventBus.off("csv:export", csvHandlers.handleCsvExport);
 
   EventBus.on("csv:preview", csvHandlers.handleCsvPreview);
   EventBus.on("csv:import", csvHandlers.handleCsvImport);
   EventBus.on("csv:import:transformRow", csvHandlers.handleTransformRow);
   EventBus.on("csv:import:saveRow", csvHandlers.handleSaveRow);
+  EventBus.on("csv:export", csvHandlers.handleCsvExport);
 
   // Editor events
   EventBus.off("editor:save", editorHandler.handleSaveTemplate);

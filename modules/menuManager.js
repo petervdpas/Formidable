@@ -101,7 +101,6 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
           label: "menu.data.export",
           i18n: true,
           action: "open-csv-export",
-          disabled: true,
         },
       ])
     );
@@ -436,6 +435,10 @@ export async function handleMenuAction(action) {
 
     case "open-csv-import":
       window.openCsvImportModal?.();
+      break;
+
+    case "open-csv-export":
+      EventBus.emit("csv:export");
       break;
 
     case "start-internal-server":

@@ -163,6 +163,7 @@ const api = {
   csv: buildGroup([
     "csv-preview",
     "csv-import-row",
+    "csv-write",
   ]),
   transform: buildGroup([
     "render-markdown-template",
@@ -197,6 +198,7 @@ const api = {
   dialog: {
     chooseDirectory: () => ipcRenderer.invoke("dialog-choose-directory"),
     chooseFile: () => ipcRenderer.invoke("dialog-choose-file"),
+    chooseSaveFile: (opts) => ipcRenderer.invoke("dialog-choose-save-file", opts),
   },
 };
 

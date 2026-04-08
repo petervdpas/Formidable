@@ -253,3 +253,101 @@ function coerceValue(raw, field) {
       return val;
   }
 }
+
+// ── Export ─────────────────────────────────────────────────────
+
+/**
+ * Format a field value to a CSV-friendly string (reverse of coerceValue).
+ */
+function formatValue(val, field) {
+  if (val == null) return "";
+  switch (field.type) {
+    case "boolean":
+      return val === true ? "true" : "false";
+    case "number":
+    case "range":
+      return String(val);
+    case "multioption":
+    case "tags":
+    case "list":
+      return Array.isArray(val) ? JSON.stringify(val) : String(val);
+    case "table":
+      return Array.isArray(val) ? JSON.stringify(val) : "";
+    default:
+      return String(val);
+  }
+}
+
+/**
+ * Handle: csv:export
+ * Export all storage entries for the current template to a CSV file.
+ */
+export async function handleCsvExport(_, respond) {
+  const tmpl = window.currentSelectedTemplate;
+  const templateFilename =
+    (window.currentSelectedTemplateName || "").endsWith(".yaml")
+      ? window.currentSelectedTemplateName
+      : `${window.currentSelectedTemplateName || ""}.yaml`;
+
+  if (!tmpl || !templateFilename) {
+    EventBus.emit("logging:warning", ["[csvExport] No template selected"]);
+    respond?.({ success: false, error: "No template selected" });
+    return;
+  }
+
+  // Ask user for save location
+  const templateName = templateFilename.replace(/\.yaml$/, "");
+  const filePath = await window.api.dialog.chooseSaveFile({
+    defaultPath: `${templateName}-export.csv`,
+    extensions: ["csv"],
+  });
+  if (!filePath) {
+    respond?.({ success: false, error: "Cancelled" });
+    return;
+  }
+
+  try {
+    const fields = (tmpl.fields || []).filter(
+      (f) => f.key && !excludedTypes.has(f.type)
+    );
+
+    // Load all storage entries
+    const files = await window.api.forms.listForms(templateFilename);
+    if (!files || files.length === 0) {
+      EventBus.emit("logging:warning", ["[csvExport] No entries to export"]);
+      respond?.({ success: false, error: "No entries to export" });
+      return;
+    }
+
+    // Header row: field keys
+    const headers = fields.map((f) => f.key);
+    const rows = [headers];
+
+    for (const filename of files) {
+      const form = await window.api.forms.loadForm(templateFilename, filename, tmpl.fields);
+      if (!form?.data) continue;
+
+      const row = fields.map((f) => formatValue(form.data[f.key], f));
+      rows.push(row);
+
+      EventBus.emit("csv:export:progress", {
+        current: rows.length - 1,
+        total: files.length,
+      });
+    }
+
+    // Write via IPC
+    const result = await window.api.csv.csvWrite(filePath, rows);
+
+    if (result.success) {
+      const { Toast } = await import("../../utils/toastUtils.js");
+      Toast.success("csv.export.success", [rows.length - 1]);
+    }
+
+    respond?.(result);
+    return result;
+  } catch (err) {
+    EventBus.emit("logging:error", ["[csvExport] Export failed:", err]);
+    respond?.({ success: false, error: err.message });
+  }
+}

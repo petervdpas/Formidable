@@ -400,6 +400,9 @@ function registerIpcHandlers() {
   registerIpc("csv-preview", (e, filePath, delimiter) =>
     csvManager.previewCsv(filePath, delimiter)
   );
+  registerIpc("csv-write", (e, filePath, rows, delimiter) =>
+    csvManager.writeCsv(filePath, rows, delimiter)
+  );
   registerIpc("csv-import-row", (e, templateFilename, entryFilename, data, meta, fields) => {
     const result = formManager.saveForm(templateFilename, entryFilename, { data, meta }, fields);
     configManager.dirtyVirtualStructure();
@@ -495,6 +498,23 @@ function registerIpcHandlers() {
       properties: ["openFile"],
     });
     return result.canceled ? null : result.filePaths[0];
+  });
+
+  registerIpc("dialog-choose-save-file", async (e, opts = {}) => {
+    const extensions = Array.isArray(opts.extensions) && opts.extensions.length
+      ? opts.extensions
+      : ["*"];
+    const filters = [
+      { name: extensions.filter((e) => e !== "*").join(", ").toUpperCase() || "Files", extensions },
+    ];
+    if (!extensions.includes("*")) {
+      filters.push({ name: "All Files", extensions: ["*"] });
+    }
+    const result = await dialog.showSaveDialog({
+      defaultPath: opts.defaultPath || "",
+      filters,
+    });
+    return result.canceled ? null : result.filePath;
   });
 
   registerIpc("get-app-root", () => fileManager.getAppRoot());

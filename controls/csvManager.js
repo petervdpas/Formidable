@@ -93,7 +93,41 @@ function previewCsv(filePath, delimiter = ",") {
   }
 }
 
+/**
+ * Escape and quote a CSV cell value.
+ */
+function csvCell(val, delimiter = ",") {
+  const s = String(val ?? "");
+  if (s.includes('"') || s.includes(delimiter) || s.includes("\n") || s.includes("\r")) {
+    return `"${s.replace(/"/g, '""')}"`;
+  }
+  return s;
+}
+
+/**
+ * Write rows (array of arrays) to a CSV file.
+ *
+ * @param {string}     filePath   Absolute path to write
+ * @param {string[][]} rows       Array of rows (first row = headers)
+ * @param {string}     delimiter  CSV delimiter (default: ",")
+ * @returns {{ success: boolean, error?: string }}
+ */
+function writeCsv(filePath, rows, delimiter = ",") {
+  try {
+    const lines = rows.map((row) =>
+      row.map((cell) => csvCell(cell, delimiter)).join(delimiter)
+    );
+    fs.writeFileSync(filePath, lines.join("\n"), "utf-8");
+    log("[CsvManager] Wrote CSV:", filePath);
+    return { success: true };
+  } catch (err) {
+    error("[CsvManager] Failed to write CSV:", err);
+    return { success: false, error: err.message };
+  }
+}
+
 module.exports = {
   parseCsv,
   previewCsv,
+  writeCsv,
 };
