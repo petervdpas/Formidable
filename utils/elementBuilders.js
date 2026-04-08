@@ -600,7 +600,10 @@ export function buildExpressionLabel({
     tickerWrap.className = "expr-ticker-container";
     tickerWrap.appendChild(span);
     container.appendChild(tickerWrap);
-    requestAnimationFrame(() => setupTicker(span, tickerDuration));
+    // Double rAF: first ensures DOM insertion, second ensures layout is settled
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setupTicker(span, tickerDuration));
+    });
   } else {
     container.appendChild(span);
   }
