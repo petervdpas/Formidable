@@ -109,6 +109,18 @@ function buildVmSandbox(originalContext) {
     });
   }
 
+  // ✅ Also expose helpers as top-level names (so notEmpty() works, not just h.notEmpty())
+  for (const [name, fn] of Object.entries(pickedHelpers)) {
+    if (!(name in base)) {
+      Object.defineProperty(base, name, {
+        value: fn,
+        enumerable: true,
+        configurable: false,
+        writable: false,
+      });
+    }
+  }
+
   // Safe globals
   base.Math = Math;
   base.JSON = JSON;
