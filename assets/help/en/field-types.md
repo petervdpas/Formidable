@@ -113,6 +113,44 @@ An input for entering tags or keywords. Use this field when you want to allow us
 
 ![Tags Field](images/template-field-tags.png)
 
+### 16. Code Field (Programmable)
+
+A programmable JavaScript field with a built-in code editor (CodeMirror). Code fields can execute scripts that read and write other form fields, making them useful for calculations, validations, and auto-populating data.
+
+> **Run Mode**: `manual` (button click), `load` (on form load), or `save` (before saving).
+>
+> **Allow Run**: Enable or disable the execution button.
+>
+> **Hide Field**: Hide the code editor from the form display — useful for background scripts.
+>
+> **Input Mode**: `safe` (sanitized input) or `raw` (unfiltered).
+>
+> **API Mode**: `frozen` (read-only API surface) or `raw` (full access).
+>
+> **API Pick**: Whitelist which API modules are available (e.g. `string`, `form`, `field`).
+
+### 17. LaTeX Field
+
+A field for entering raw LaTeX markup, rendered with a CodeMirror editor in `stex` mode. LaTeX fields are exported as fenced code blocks for processing by tools like Pandoc.
+
+> **Use Fenced**: Wrap the LaTeX output in a fenced raw block for export.
+>
+> **Rows**: Number of visible editor rows (2–60).
+
+### 18. API Field (Collection)
+
+A field that fetches data from another template's data collection. API fields allow you to reference and pull in values from other forms, creating relationships between templates.
+
+> **Collection**: The template collection to fetch data from.
+>
+> **ID**: Specific record ID to fetch (optional).
+>
+> **Map**: Field mapping array defining which fields to pull and how (`static`, `editable`, `live-fill`, `live-edit`).
+>
+> **Use Picker**: Show a dropdown to select from available records.
+>
+> **Allowed IDs**: Whitelist of record IDs that can be selected.
+
 ---
 
 ## Loop Field (LoopStart/LoopStop)

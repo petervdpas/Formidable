@@ -63,16 +63,74 @@ Geeft het veld `status` weer in blauw.
 
 Toont de datum van vandaag met behulp van de ingebouwde `today()` helper.
 
+#### 6. Velden opvragen via F["key"] met helpers en conditionele klassen
+
+```text
+[ F["datum_wijziging"]
+  | { text: notEmpty(F["datum_wijziging"])
+        ? F["auteur"] + " / " + F["datum_wijziging"]
+        : F["auteur"],
+      classes: (F["status"] == "concept"
+        ? ["expr-text-orange"]
+        : F["status"] == "actief"
+        ? ["expr-text-green", "expr-bold"]
+        : ["expr-text-red", "expr-bold"])
+    }
+]
+```
+
+Gebruikt `F["key"]` om veldwaarden op te vragen, `notEmpty()` om te controleren op lege waarden, en geneste ternaries voor conditionele CSS-klassen.
+
 ---
 
 ### Ondersteunde functies
 
 * **Platte tekst of veldnamen** (bijv. `title`, `author`).
+* **F["key"] syntax** om velden op naam op te vragen (vereist voor keys met speciale tekens).
 * **Ternary-expressies** `cond ? waarde1 : waarde2`.
+* **Stringvergelijking** `F["status"] == "actief"`.
+* **Stringconcatenatie** `F["naam"] + " / " + F["datum"]`.
 * **Objecten** `{ text: "...", classes: [...], color: "..." }`.
 * **Pipe-syntax** om tekst en stijl te scheiden: `[ expr | stijl ]`.
-* **Helpers** uit `expressionHelpers.js` zoals `today()`.
-* **Contexttoegang**: velden zijn beschikbaar als variabelen; ook via `F` of `meta`.
+* **Contexttoegang**: velden gemarkeerd als `expression_item` zijn beschikbaar als variabelen en via `F` of `meta`.
+
+---
+
+### Beschikbare hulpfuncties
+
+Alle helpers kunnen direct bij naam worden gebruikt (bijv. `notEmpty(...)`) of via `h.notEmpty(...)`.
+
+| Helper | Beschrijving | Voorbeeld |
+|--------|-------------|---------|
+| `notEmpty(val)` | Geeft true als waarde niet null of leeg is | `notEmpty(F["naam"])` |
+| `today()` | Geeft de datum van vandaag (JJJJ-MM-DD) | `today()` |
+| `isOverdue(datum)` | True als datum voor vandaag ligt | `isOverdue(F["deadline"])` |
+| `isFuture(datum)` | True als datum na vandaag ligt | `isFuture(F["start"])` |
+| `isToday(datum)` | True als datum vandaag is | `isToday(F["event"])` |
+| `isDueSoon(datum, dagen)` | True als datum binnen N dagen valt | `isDueSoon(F["due"], 7)` |
+| `isOverdueInDays(datum, dagen)` | True als datum binnen N dagen voor vandaag valt | `isOverdueInDays(F["review"], 3)` |
+| `isExpiredAfter(datum, dagen)` | True als datum + dagen voor vandaag ligt | `isExpiredAfter(F["start"], 30)` |
+| `isUpcomingBefore(datum, dagen)` | True als vandaag voor datum - dagen ligt | `isUpcomingBefore(F["event"], 5)` |
+| `daysBetween(datum1, datum2)` | Aantal dagen tussen twee datums | `daysBetween(F["start"], F["eind"])` |
+| `ageInDays(datum)` | Dagen sinds de opgegeven datum | `ageInDays(F["aangemaakt"])` |
+| `defaultText(val, terugval)` | Geeft terugval als waarde leeg is | `defaultText(F["notitie"], "N.v.t.")` |
+| `isSimilar(a, b, drempel)` | True als stringovereenkomst >= drempel | `isSimilar(F["naam"], "test", 0.8)` |
+| `typeOf(val)` | Geeft het type van een waarde | `typeOf(F["bedrag"])` |
+
+---
+
+### Beschikbare CSS-klassen
+
+| Klasse | Effect |
+|--------|--------|
+| `expr-text-green` | Groene tekst |
+| `expr-text-red` | Rode tekst |
+| `expr-text-orange` | Oranje tekst |
+| `expr-text-yellow` | Gele tekst |
+| `expr-text-purple` | Paarse tekst |
+| `expr-bold` | Vetgedrukte tekst |
+| `expr-ticker` | Ticker/scrollende animatie |
+| `expr-blinking` | Knipperende animatie |
 
 ---
 

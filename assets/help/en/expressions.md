@@ -63,16 +63,74 @@ Displays the `status` field in blue.
 
 Shows today’s date using the built-in `today()` helper.
 
+#### 6. Access fields via F["key"] with helpers and conditional classes
+
+```text
+[ F["date_modified"]
+  | { text: notEmpty(F["date_modified"])
+        ? F["author"] + " / " + F["date_modified"]
+        : F["author"],
+      classes: (F["status"] == "concept"
+        ? ["expr-text-orange"]
+        : F["status"] == "active"
+        ? ["expr-text-green", "expr-bold"]
+        : ["expr-text-red", "expr-bold"])
+    }
+]
+```
+
+Uses `F["key"]` to access field values by name, `notEmpty()` to check for empty values, and nested ternaries for conditional CSS classes.
+
 ---
 
 ### Supported Features
 
 * **Plain text or field names** (e.g. `title`, `author`).
+* **F["key"] syntax** for accessing fields by name (required for keys with special characters).
 * **Ternary expressions** `cond ? value1 : value2`.
+* **String comparison** `F["status"] == "active"`.
+* **String concatenation** `F["name"] + " / " + F["date"]`.
 * **Objects** `{ text: "...", classes: [...], color: "..." }`.
 * **Pipe syntax** to separate text and style: `[ expr | style ]`.
-* **Helpers** from `expressionHelpers.js` such as `today()`.
-* **Context access**: fields are available as variables; also via `F` or `meta`.
+* **Context access**: fields marked as `expression_item` are available as variables and via `F` or `meta`.
+
+---
+
+### Available Helper Functions
+
+All helpers can be used directly by name (e.g. `notEmpty(...)`) or via `h.notEmpty(...)`.
+
+| Helper | Description | Example |
+|--------|-------------|---------|
+| `notEmpty(val)` | Returns true if value is not null or empty | `notEmpty(F["name"])` |
+| `today()` | Returns today’s date (YYYY-MM-DD) | `today()` |
+| `isOverdue(date)` | True if date is before today | `isOverdue(F["deadline"])` |
+| `isFuture(date)` | True if date is after today | `isFuture(F["start"])` |
+| `isToday(date)` | True if date is today | `isToday(F["event"])` |
+| `isDueSoon(date, days)` | True if date is within N days from now | `isDueSoon(F["due"], 7)` |
+| `isOverdueInDays(date, days)` | True if date is within N days before today | `isOverdueInDays(F["review"], 3)` |
+| `isExpiredAfter(date, days)` | True if date + days is before today | `isExpiredAfter(F["start"], 30)` |
+| `isUpcomingBefore(date, days)` | True if today is before date - days | `isUpcomingBefore(F["event"], 5)` |
+| `daysBetween(date1, date2)` | Number of days between two dates | `daysBetween(F["start"], F["end"])` |
+| `ageInDays(date)` | Days since the given date | `ageInDays(F["created"])` |
+| `defaultText(val, fallback)` | Returns fallback if value is empty | `defaultText(F["note"], "N/A")` |
+| `isSimilar(a, b, threshold)` | True if string similarity >= threshold | `isSimilar(F["name"], "test", 0.8)` |
+| `typeOf(val)` | Returns the type of a value | `typeOf(F["amount"])` |
+
+---
+
+### Available CSS Classes
+
+| Class | Effect |
+|-------|--------|
+| `expr-text-green` | Green text |
+| `expr-text-red` | Red text |
+| `expr-text-orange` | Orange text |
+| `expr-text-yellow` | Yellow text |
+| `expr-text-purple` | Purple text |
+| `expr-bold` | Bold text |
+| `expr-ticker` | Ticker/scrolling animation |
+| `expr-blinking` | Blinking animation |
 
 ---
 
