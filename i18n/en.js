@@ -529,6 +529,7 @@ export default {
   "field.expression": "Expression field",
   "field.summary": "Summary field",
   "field.twoColumn": "Two columns",
+  "field.collapsible": "Collapsible",
   "field.readonly": "Read-only",
   "field.placeholder.description": "Optional description",
   "field.placeholder.default": "Set the default value for this field",

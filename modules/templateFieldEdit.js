@@ -44,6 +44,10 @@ function setupFieldEditor(container, onChange, allFields = []) {
     twoColumnRow: container
       .querySelector("#edit-two-column")
       ?.closest(".switch-row"),
+    collapsible: container.querySelector("#edit-collapsible"),
+    collapsibleRow: container
+      .querySelector("#edit-collapsible")
+      ?.closest(".switch-row"),
     readonly: container.querySelector("#edit-readonly"),
     readonlyRow: container
       .querySelector("#edit-readonly")
@@ -215,6 +219,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
     if (dom.summaryField) dom.summaryField.value = field.summary_field || "";
     dom.expressionItem.checked = !!field.expression_item;
     dom.twoColumn.checked = !!field.two_column;
+    if (dom.collapsible) dom.collapsible.checked = !!field.collapsible;
     dom.readonly.checked = !!field.readonly;
     if (dom.formatTextarea) dom.formatTextarea.value = field.format || "";
     dom.default.value = field.default ?? "";
@@ -412,6 +417,7 @@ function setupFieldEditor(container, onChange, allFields = []) {
       summary_field: summaryField,
       expression_item: dom.expressionItem.checked,
       two_column: dom.twoColumn.checked,
+      collapsible: !!dom.collapsible?.checked,
       readonly: dom.readonly.checked,
       default: dom.default.value,
       options,

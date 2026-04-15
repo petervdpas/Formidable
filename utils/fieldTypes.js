@@ -53,6 +53,7 @@ export const fieldTypes = {
       "formatTextareaRow",
       "expressionItemRow",
       "twoColumnRow",
+      "collapsibleRow",
       "readonlyRow",
       ...codeSpecific,
       ...latexSpecific,
@@ -76,6 +77,7 @@ export const fieldTypes = {
       "summaryField",
       "expressionItemRow",
       "twoColumnRow",
+      "collapsibleRow",
       "readonlyRow",
       "formatTextareaRow",
       ...codeSpecific,
@@ -98,6 +100,7 @@ export const fieldTypes = {
       "options",
       "expressionItemRow",
       "twoColumnRow",
+      "collapsibleRow",
       "readonlyRow",
       "formatTextareaRow",
       ...codeSpecific,
@@ -118,6 +121,7 @@ export const fieldTypes = {
       "options",
       "expressionItemRow",
       "twoColumnRow",
+      "collapsibleRow",
       "readonlyRow",
       "formatTextareaRow",
       ...codeSpecific,
@@ -139,6 +143,7 @@ export const fieldTypes = {
       "options",
       "expressionItemRow",
       "twoColumnRow",
+      "collapsibleRow",
       "readonlyRow",
       "formatTextareaRow",
       ...codeSpecific,
@@ -156,6 +161,7 @@ export const fieldTypes = {
     selectorAttr: "data-text-field",
     disabledAttributes: [
       "summaryField",
+      "collapsibleRow",
       "formatTextareaRow",
       ...codeSpecific,
       ...latexSpecific,
@@ -173,6 +179,7 @@ export const fieldTypes = {
     selectorAttr: "data-boolean-field",
     disabledAttributes: [
       "summaryField",
+      "collapsibleRow",
       "readonlyRow",
       "formatTextareaRow",
       ...codeSpecific,
@@ -191,6 +198,7 @@ export const fieldTypes = {
     selectorAttr: "data-dropdown-field",
     disabledAttributes: [
       "summaryField",
+      "collapsibleRow",
       "readonlyRow",
       "formatTextareaRow",
       ...codeSpecific,
@@ -209,6 +217,7 @@ export const fieldTypes = {
     selectorAttr: "data-multioption-field",
     disabledAttributes: [
       "summaryField",
+      "collapsibleRow",
       "readonlyRow",
       "formatTextareaRow",
       ...codeSpecific,
@@ -227,6 +236,7 @@ export const fieldTypes = {
     selectorAttr: "data-radio-field",
     disabledAttributes: [
       "summaryField",
+      "collapsibleRow",
       "readonlyRow",
       "formatTextareaRow",
       ...codeSpecific,
@@ -245,6 +255,7 @@ export const fieldTypes = {
     selectorAttr: "data-textarea-field",
     disabledAttributes: [
       "summaryField",
+      "collapsibleRow",
       ...codeSpecific,
       ...latexSpecific,
       ...apiSpecific,
@@ -261,6 +272,7 @@ export const fieldTypes = {
     selectorAttr: "data-number-field",
     disabledAttributes: [
       "summaryField",
+      "collapsibleRow",
       "readonlyRow",
       "formatTextareaRow",
       ...codeSpecific,
@@ -279,6 +291,7 @@ export const fieldTypes = {
     selectorAttr: "data-range-field",
     disabledAttributes: [
       "summaryField",
+      "collapsibleRow",
       "readonlyRow",
       "formatTextareaRow",
       ...codeSpecific,
@@ -297,6 +310,7 @@ export const fieldTypes = {
     selectorAttr: "data-date-field",
     disabledAttributes: [
       "summaryField",
+      "collapsibleRow",
       "readonlyRow",
       "formatTextareaRow",
       ...codeSpecific,
@@ -351,6 +365,7 @@ export const fieldTypes = {
     selectorAttr: "data-image-field",
     disabledAttributes: [
       "summaryField",
+      "collapsibleRow",
       "readonlyRow",
       "formatTextareaRow",
       ...codeSpecific,
@@ -369,6 +384,7 @@ export const fieldTypes = {
     selectorAttr: "data-link-field",
     disabledAttributes: [
       "summaryField",
+      "collapsibleRow",
       "readonlyRow",
       "formatTextareaRow",
       ...codeSpecific,
@@ -387,6 +403,7 @@ export const fieldTypes = {
     selectorAttr: "data-tags-field",
     disabledAttributes: [
       "summaryField",
+      "collapsibleRow",
       "readonlyRow",
       "formatTextareaRow",
       ...codeSpecific,
@@ -405,6 +422,7 @@ export const fieldTypes = {
     selectorAttr: "data-code-field",
     disabledAttributes: [
       "summaryField",
+      "collapsibleRow",
       "readonlyRow",
       "formatTextareaRow",
       "expressionItemRow",
@@ -424,6 +442,7 @@ export const fieldTypes = {
     selectorAttr: "data-latex-field",
     disabledAttributes: [
       "summaryField",
+      "collapsibleRow",
       "readonlyRow",
       "formatTextareaRow",
       "expressionItemRow",

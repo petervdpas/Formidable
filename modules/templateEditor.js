@@ -58,6 +58,7 @@ function sanitizeField(f) {
   if (f.summary_field?.trim()) field.summary_field = f.summary_field.trim();
   if (f.expression_item) field.expression_item = true;
   if (f.two_column) field.two_column = true;
+  if (f.collapsible) field.collapsible = true;
   if (f.readonly) field.readonly = true;
 
   if (f.type === "textarea") {

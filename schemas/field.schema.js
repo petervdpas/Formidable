@@ -111,6 +111,7 @@ module.exports = {
     summary_field: "",
     expression_item: false,
     two_column: false,
+    collapsible: false,
     readonly: false,
     default: "",
     options: [],
@@ -133,6 +134,13 @@ module.exports = {
     field.expression_item = !!field.expression_item;
     field.two_column = !!field.two_column;
     field.readonly = !!field.readonly;
+
+    // collapsible only for list/table
+    if (field.type === "list" || field.type === "table") {
+      field.collapsible = !!field.collapsible;
+    } else {
+      delete field.collapsible;
+    }
 
     // summary_field only for loopstart
     if (field.type !== "loopstart") {

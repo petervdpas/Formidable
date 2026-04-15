@@ -286,13 +286,14 @@ export async function renderListField(field, value = "") {
     type: field.type,
     loopKey: field.loopKey || null,
   });
-  return wrapInputWithLabel(
+  const row = wrapInputWithLabel(
     wrapper,
     field.label,
     field.description,
     field.two_column,
     field.wrapper || "form-row"
   );
+  return applyCollapsibleField(row, wrapper, field);
 }
 
 // ─────────────────────────────────────────────
@@ -304,13 +305,46 @@ export async function renderTableField(field, value = "") {
     type: field.type,
     loopKey: field.loopKey || null,
   });
-  return wrapInputWithLabel(
+  const row = wrapInputWithLabel(
     wrapper,
     field.label,
     field.description,
     field.two_column,
     field.wrapper || "form-row"
   );
+  return applyCollapsibleField(row, wrapper, field);
+}
+
+function applyCollapsibleField(formRow, inputElement, field) {
+  if (!field.collapsible) return formRow;
+
+  const label = formRow.querySelector("label");
+  if (!label) return formRow;
+
+  formRow.classList.add("collapsible-field");
+
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "collapse-toggle";
+  toggle.innerHTML = "▼";
+  toggle.setAttribute("aria-expanded", "true");
+  toggle.setAttribute("title", t("standard.collapse") || "Collapse");
+
+  toggle.addEventListener("click", () => {
+    const isCollapsed = formRow.classList.toggle("collapsed");
+    toggle.innerHTML = isCollapsed ? "▶" : "▼";
+    toggle.setAttribute("aria-expanded", String(!isCollapsed));
+    toggle.setAttribute(
+      "title",
+      isCollapsed
+        ? t("standard.expand") || "Expand"
+        : t("standard.collapse") || "Collapse"
+    );
+    inputElement.style.display = isCollapsed ? "none" : "";
+  });
+
+  label.insertBefore(toggle, label.firstChild);
+  return formRow;
 }
 
 // ─────────────────────────────────────────────

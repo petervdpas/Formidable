@@ -776,6 +776,7 @@ function mountApiCollections(app) {
           description: { type: "string" },
           expression_item: { type: "boolean" },
           two_column: { type: "boolean" },
+          collapsible: { type: "boolean" },
           default: {},
           primary_key: { type: "boolean" },
           options: {
