@@ -181,6 +181,18 @@ export async function renderSettings() {
 
       panel.appendChild(
         createSwitch(
+          "field-collapse-toggle",
+          "modal.settings.display.field.collapsed",
+          cachedConfig.field_state_collapsed ?? false,
+          null,
+          "block",
+          ["standard.on", "standard.off"],
+          true
+        )
+      );
+
+      panel.appendChild(
+        createSwitch(
           "show-meta-toggle",
           "modal.settings.display.meta",
           cachedConfig.show_meta_section ?? true,
@@ -460,6 +472,7 @@ function setupBindings(config, gitRootPicker) {
     EventBus.emit("screen:meta:visibility", enabled);
   });
   bindToggleSwitch("loop-collapse-toggle", "loop_state_collapsed");
+  bindToggleSwitch("field-collapse-toggle", "field_state_collapsed");
   bindToggleSwitch("plugin-toggle", "enable_plugins");
   bindToggleSwitch("settings-development-toggle", "development_enable");
   bindToggleSwitch("logging-toggle", "logging_enabled", (enabled) =>

@@ -293,7 +293,7 @@ export async function renderListField(field, value = "") {
     field.two_column,
     field.wrapper || "form-row"
   );
-  return applyCollapsibleField(row, wrapper, field);
+  return await applyCollapsibleField(row, wrapper, field);
 }
 
 // ─────────────────────────────────────────────
@@ -312,11 +312,16 @@ export async function renderTableField(field, value = "") {
     field.two_column,
     field.wrapper || "form-row"
   );
-  return applyCollapsibleField(row, wrapper, field);
+  return await applyCollapsibleField(row, wrapper, field);
 }
 
-function applyCollapsibleField(formRow, inputElement, field) {
+async function applyCollapsibleField(formRow, inputElement, field) {
   if (!field.collapsible) return formRow;
+
+  const cfg = await new Promise((resolve) => {
+    EventBus.emit("config:load", (c) => resolve(c || {}));
+  });
+  const startCollapsed = cfg.field_state_collapsed === true;
 
   const label = formRow.querySelector("label");
   if (!label) return formRow;
@@ -326,21 +331,24 @@ function applyCollapsibleField(formRow, inputElement, field) {
   const toggle = document.createElement("button");
   toggle.type = "button";
   toggle.className = "collapse-toggle";
-  toggle.innerHTML = "▼";
-  toggle.setAttribute("aria-expanded", "true");
-  toggle.setAttribute("title", t("standard.collapse") || "Collapse");
 
-  toggle.addEventListener("click", () => {
-    const isCollapsed = formRow.classList.toggle("collapsed");
-    toggle.innerHTML = isCollapsed ? "▶" : "▼";
-    toggle.setAttribute("aria-expanded", String(!isCollapsed));
+  const setState = (collapsed) => {
+    formRow.classList.toggle("collapsed", collapsed);
+    toggle.innerHTML = collapsed ? "▶" : "▼";
+    toggle.setAttribute("aria-expanded", String(!collapsed));
     toggle.setAttribute(
       "title",
-      isCollapsed
+      collapsed
         ? t("standard.expand") || "Expand"
         : t("standard.collapse") || "Collapse"
     );
-    inputElement.style.display = isCollapsed ? "none" : "";
+    inputElement.style.display = collapsed ? "none" : "";
+  };
+
+  setState(startCollapsed);
+
+  toggle.addEventListener("click", () => {
+    setState(!formRow.classList.contains("collapsed"));
   });
 
   label.insertBefore(toggle, label.firstChild);

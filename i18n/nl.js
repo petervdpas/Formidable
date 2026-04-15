@@ -670,6 +670,7 @@ export default {
   "modal.settings.display.theme.purplish": "Purperachtig (experimenteel)",
   "modal.settings.display.meta": "Toon Meta Sectie",
   "modal.settings.display.loop.collapsed": "Ingeklapte Lus-items",
+  "modal.settings.display.field.collapsed": "Ingeklapte Lijst/Tabel-velden",
   "modal.settings.icon.buttons": "Pictogram knoppen",
   "modal.settings.context.folder": "Contextmap",
   "modal.settings.git.root": "Git-rootmap",

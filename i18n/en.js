@@ -644,6 +644,7 @@ export default {
   "modal.settings.display.theme.purplish": "Purplish (experimental)",
   "modal.settings.display.meta": "Show Meta Section",
   "modal.settings.display.loop.collapsed": "Collapse Loop Items",
+  "modal.settings.display.field.collapsed": "Collapse List/Table Fields",
   "modal.settings.icon.buttons": "Icon-based Buttons",
   "modal.settings.context.folder": "Context Directory",
   "modal.settings.git.root": "Git Root Directory",

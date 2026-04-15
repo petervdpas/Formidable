@@ -7,6 +7,7 @@ module.exports = {
     use_expressions: false,
     show_meta_section: true,
     loop_state_collapsed: false,
+    field_state_collapsed: false,
     font_size: 14,
     development_enable: false,
     logging_enabled: false,
