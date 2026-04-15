@@ -40,8 +40,9 @@ function getTemplateFilename() {
 function buildColumnRow({
   initial,
   isComputed,
-  mappableFields,
-  fieldByKey,
+  getSourceOptions,
+  describeKey,
+  resolvePreviewValue,
   sampleEntry,
   refreshAll,
 }) {
@@ -80,8 +81,7 @@ function buildColumnRow({
       sourceKeys.forEach((key, idx) => {
         const chip = document.createElement("span");
         chip.className = "csv-source-chip";
-        const field = fieldByKey.get(key);
-        chip.textContent = field ? (field.label || field.key) : key;
+        chip.textContent = describeKey(key);
         const rm = document.createElement("button");
         rm.type = "button";
         rm.className = "csv-chip-remove";
@@ -98,9 +98,8 @@ function buildColumnRow({
 
       const addContainer = document.createElement("div");
       addContainer.className = "csv-source-add";
-      const remaining = mappableFields
-        .filter((f) => !sourceKeys.includes(f.key))
-        .map((f) => ({ value: f.key, label: `${f.label || f.key} (${f.type})` }));
+      const remaining = getSourceOptions()
+        .filter((o) => !sourceKeys.includes(o.value));
       if (remaining.length > 0) {
         createDropdown({
           containerEl: addContainer,
@@ -121,10 +120,9 @@ function buildColumnRow({
     } else {
       // Single field — fixed label
       const key = sourceKeys[0];
-      const field = fieldByKey.get(key);
       const label = document.createElement("span");
       label.className = "csv-source-label";
-      label.textContent = field ? `${field.label || field.key} (${field.type})` : key;
+      label.textContent = describeKey(key);
       sourceWrap.appendChild(label);
     }
   }
@@ -249,10 +247,7 @@ function buildColumnRow({
         tdPreview.title = "";
         return;
       }
-      const parts = sourceKeys.map((key) => {
-        const field = fieldByKey.get(key);
-        return field ? formatValue(sampleEntry[key], field) : "";
-      });
+      const parts = sourceKeys.map((key) => resolvePreviewValue(sampleEntry, key));
       const joined = parts.length === 1 ? parts[0] : parts.join(separator);
       const def = paramRuleDefs[currentRule];
       const liveParam = def?.type === "number"
@@ -290,18 +285,83 @@ export function setupCsvExportModal() {
   let rowAccessors = [];
   let tbodyEl = null;
   let selectedDelimiter = ",";
+  let alignSource = "";   // fieldKey of list/table used for unroll, or ""
 
   function refreshAll() {
     rowAccessors = rowAccessors.filter((a) => !a.removed);
     rowAccessors.forEach((a) => a.refresh());
   }
 
+  function parseKey(key) {
+    const dot = key.indexOf(".");
+    return dot === -1
+      ? { root: key, sub: null }
+      : { root: key.substring(0, dot), sub: key.substring(dot + 1) };
+  }
+
+  function describeKey(key) {
+    const { root, sub } = parseKey(key);
+    const field = fieldByKey.get(root);
+    if (!field) return key;
+    const rootLabel = field.label || field.key;
+    if (!sub) return `${rootLabel} (${field.type})`;
+    // Table subfield: find the column definition
+    const col = (field.options || []).find((o) => o.value === sub);
+    const subLabel = col ? (col.label || col.value) : sub;
+    return `${rootLabel} → ${subLabel}`;
+  }
+
+  function getTableSubkeys(tableField) {
+    return (tableField.options || [])
+      .filter((o) => o.value)
+      .map((o) => ({
+        value: `${tableField.key}.${o.value}`,
+        label: `${tableField.label || tableField.key} → ${o.label || o.value}`,
+      }));
+  }
+
+  function getSourceOptions() {
+    const alignField = alignSource ? fieldByKey.get(alignSource) : null;
+    const opts = [];
+    for (const f of mappableFields) {
+      opts.push({ value: f.key, label: `${f.label || f.key} (${f.type})` });
+    }
+    if (alignField && alignField.type === "table") {
+      opts.push(...getTableSubkeys(alignField));
+    }
+    return opts;
+  }
+
+  function resolvePreviewValue(entry, key) {
+    if (!entry) return "";
+    const { root, sub } = parseKey(key);
+    const field = fieldByKey.get(root);
+    if (!field) return "";
+
+    if (root === alignSource) {
+      const arr = Array.isArray(entry[root]) ? entry[root] : [];
+      const item = arr[0];
+      if (item == null) return "";
+      if (sub) {
+        if (Array.isArray(item)) {
+          const idx = (field.options || []).findIndex((o) => o.value === sub);
+          return idx >= 0 ? String(item[idx] ?? "") : "";
+        }
+        return String(item?.[sub] ?? "");
+      }
+      if (typeof item === "object") return JSON.stringify(item);
+      return String(item);
+    }
+    return formatValue(entry[root], field);
+  }
+
   function addColumnRow(isComputed, initial = {}) {
     const accessor = buildColumnRow({
       initial,
       isComputed,
-      mappableFields,
-      fieldByKey,
+      getSourceOptions,
+      describeKey,
+      resolvePreviewValue,
       sampleEntry,
       refreshAll,
     });
@@ -309,6 +369,49 @@ export function setupCsvExportModal() {
     if (tbodyEl) tbodyEl.appendChild(accessor.row);
     accessor.refresh();
     return accessor;
+  }
+
+  function rebuildDefaultRows() {
+    if (!tbodyEl) return;
+    // Drop only non-computed (default) rows; keep user's computed columns.
+    const kept = [];
+    for (const a of rowAccessors) {
+      if (a.isComputed && !a.removed) {
+        kept.push(a);
+      } else {
+        a.row.remove();
+      }
+    }
+    rowAccessors = [];
+
+    const alignField = alignSource ? fieldByKey.get(alignSource) : null;
+    const alignIsTable = alignField?.type === "table";
+
+    for (const f of mappableFields) {
+      if (alignIsTable && f.key === alignSource) {
+        // Expand table into one row per subfield
+        for (const sub of getTableSubkeys(f)) {
+          addColumnRow(false, {
+            enabled: true,
+            header: sub.value.replace(".", "-"),
+            sourceKeys: [sub.value],
+          });
+        }
+      } else {
+        addColumnRow(false, {
+          enabled: true,
+          header: f.key,
+          sourceKeys: [f.key],
+        });
+      }
+    }
+
+    // Re-attach preserved computed rows at the end
+    for (const a of kept) {
+      rowAccessors.push(a);
+      tbodyEl.appendChild(a.row);
+    }
+    refreshAll();
   }
 
   async function loadSampleEntry(templateFilename) {
@@ -371,6 +474,34 @@ export function setupCsvExportModal() {
       i18nEnabled: true,
     });
     delimRow.appendChild(delimContainer);
+
+    // ── Align rows on ──
+    const alignContainer = document.createElement("div");
+    alignContainer.className = "csv-delim-container";
+    const alignableFields = mappableFields.filter(
+      (f) => f.type === "list" || f.type === "table"
+    );
+    const alignOptions = [
+      { value: "", label: `— ${t("csv.export.align.none", "No alignment")} —` },
+      ...alignableFields.map((f) => ({
+        value: f.key,
+        label: `${f.label || f.key} (${f.type})`,
+      })),
+    ];
+    alignSource = "";
+    createDropdown({
+      containerEl: alignContainer,
+      labelTextOrKey: "csv.export.align",
+      options: alignOptions,
+      selectedValue: "",
+      onChange: (val) => {
+        alignSource = val;
+        rebuildDefaultRows();
+      },
+      i18nEnabled: true,
+    });
+    delimRow.appendChild(alignContainer);
+
     delimStep.appendChild(delimRow);
 
     // Sample entry for preview
@@ -413,14 +544,8 @@ export function setupCsvExportModal() {
     table.appendChild(tbodyEl);
     tableWrap.appendChild(table);
 
-    // One default row per mappable field
-    for (const f of mappableFields) {
-      addColumnRow(false, {
-        enabled: true,
-        header: f.key,
-        sourceKeys: [f.key],
-      });
-    }
+    // One default row per mappable field (alignment may regenerate this).
+    rebuildDefaultRows();
 
     // ── Below-table actions row ──
     const actionRow = document.createElement("div");
@@ -520,6 +645,7 @@ export function setupCsvExportModal() {
         columns,
         filePath,
         delimiter: selectedDelimiter,
+        alignSource: alignSource || null,
       });
 
       if (progressFill) progressFill.style.width = "100%";

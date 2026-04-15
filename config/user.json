@@ -11,8 +11,8 @@
   "enable_plugins": true,
   "context_mode": "storage",
   "context_folder": "./examples",
-  "selected_template": "basic.yaml",
-  "selected_data_file": "sane-20250530.meta.json",
+  "selected_template": "addresses.yaml",
+  "selected_data_file": "abbey-road-studios.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -24,8 +24,8 @@
   "window_bounds": {
     "width": 1440,
     "height": 853,
-    "x": 240,
-    "y": 129,
+    "x": 195,
+    "y": 140,
     "maximized": false
   },
   "template_sidebar_width": 310,

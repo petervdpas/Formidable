@@ -795,4 +795,6 @@ export default {
   "csv.export.add.computed": "+ Samengestelde kolom toevoegen",
   "csv.export.computed.default": "samengesteld",
   "csv.export.error.no.columns": "Selecteer minstens één kolom om te exporteren.",
+  "csv.export.align": "Rijen uitlijnen op",
+  "csv.export.align.none": "Geen uitlijning",
 };

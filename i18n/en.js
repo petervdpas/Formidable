@@ -769,4 +769,6 @@ export default {
   "csv.export.add.computed": "+ Add computed column",
   "csv.export.computed.default": "computed",
   "csv.export.error.no.columns": "Select at least one column to export.",
+  "csv.export.align": "Align rows on",
+  "csv.export.align.none": "No alignment",
 };

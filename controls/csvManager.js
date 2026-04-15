@@ -117,7 +117,7 @@ function writeCsv(filePath, rows, delimiter = ",") {
     const lines = rows.map((row) =>
       row.map((cell) => csvCell(cell, delimiter)).join(delimiter)
     );
-    fs.writeFileSync(filePath, lines.join("\n"), "utf-8");
+    fs.writeFileSync(filePath, lines.join("\n") + "\n", "utf-8");
     log("[CsvManager] Wrote CSV:", filePath);
     return { success: true };
   } catch (err) {

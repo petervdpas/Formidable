@@ -181,27 +181,60 @@ export async function handleCsvImport(opts, respond) {
 // ── Export ─────────────────────────────────────────────────────
 
 /**
- * Build one output CSV cell for a given entry, based on a column spec.
+ * Resolve a (possibly dotted) source key against an entry + alignment context.
+ *
+ * Plain key "country"            → entry.country (singular; repeats in aligned rows).
+ * Dotted key "owners.firstname"  → entry.owners[alignIndex].firstname (when root === alignSource).
+ * Bare alignment root "owners"   → entry.owners[alignIndex] (list case).
+ *
+ * Returns a formatted string.
+ */
+function resolveSourceValue(entry, sourceKey, fieldMap, alignCtx) {
+  if (!sourceKey) return "";
+  const dot = sourceKey.indexOf(".");
+  const root = dot === -1 ? sourceKey : sourceKey.substring(0, dot);
+  const sub = dot === -1 ? null : sourceKey.substring(dot + 1);
+  const rootField = fieldMap.get(root);
+  if (!rootField) return "";
+
+  const isAligned = alignCtx && alignCtx.source === root;
+
+  if (isAligned) {
+    const arr = Array.isArray(entry?.[root]) ? entry[root] : [];
+    const item = arr[alignCtx.index];
+    if (item == null) return "";
+    if (sub) {
+      // Table rows are stored as positional arrays; resolve sub → column index via field.options
+      if (Array.isArray(item)) {
+        const idx = (rootField.options || []).findIndex((o) => o.value === sub);
+        return idx >= 0 ? String(item[idx] ?? "") : "";
+      }
+      return String(item?.[sub] ?? "");
+    }
+    if (typeof item === "object") return JSON.stringify(item);
+    return String(item);
+  }
+
+  // Singular (non-aligned) — format with the root field's formatter.
+  return formatValue(entry?.[root], rootField);
+}
+
+/**
+ * Build one output CSV cell for a given entry + column spec.
  *
  * Column spec:
  *   { header, sourceKeys: [fieldKey, ...], separator?, transform? }
  *
- * If sourceKeys has one entry  → plain export of that field.
- * If sourceKeys has 2+ entries → concat of field values with separator, then optional transform.
+ * alignCtx (optional): { source: fieldKey, index: n } — when producing a row
+ * under alignment, keys matching `source` pull their i-th item.
  */
-function buildExportCell(entry, colSpec, fieldMap) {
+function buildExportCell(entry, colSpec, fieldMap, alignCtx) {
   const { sourceKeys = [], separator = " ", transform = null } = colSpec;
   if (sourceKeys.length === 0) return "";
 
-  const parts = sourceKeys.map((key) => {
-    const field = fieldMap.get(key);
-    return field ? formatValue(entry?.[key], field) : "";
-  });
-
+  const parts = sourceKeys.map((key) => resolveSourceValue(entry, key, fieldMap, alignCtx));
   const joined = parts.length === 1 ? parts[0] : parts.join(separator);
 
-  // For single-source plain columns, the transform applies on the formatted value.
-  // For computed columns, the transform applies on the joined string.
   return applyTransformRule(joined, transform, { mode: "storage" });
 }
 
@@ -215,7 +248,14 @@ function buildExportCell(entry, colSpec, fieldMap) {
  *     templateFilename,
  *     columns: [{ header, sourceKeys: [...], separator?, transform? }],
  *     filePath  (destination; modal picked via save-dialog),
+ *     delimiter (default ","),
+ *     alignSource (optional list/table fieldKey — unroll one row per item),
  *   }
+ *
+ * Alignment: sourceKeys under the aligned field may use dotted form
+ * "tableField.subkey" to pull a table column. Non-aligned sources repeat
+ * across the rows produced by a single entry. Entries with empty aligned
+ * arrays still emit one row (with blank aligned cells).
  *
  * If called with no payload (legacy menu → EventBus.emit("csv:export")),
  * falls back to exporting all non-excluded fields using field.key as header.
@@ -266,6 +306,10 @@ export async function handleCsvExport(opts, respond) {
       return;
     }
 
+    const alignSource = opts?.alignSource || null;
+    const alignField = alignSource ? fieldMap.get(alignSource) : null;
+    const alignEnabled = !!alignField && (alignField.type === "list" || alignField.type === "table");
+
     const headerRow = columns.map((c) => c.header);
     const rows = [headerRow];
 
@@ -273,8 +317,19 @@ export async function handleCsvExport(opts, respond) {
       const form = await window.api.forms.loadForm(templateFilename, filename, tmpl.fields);
       if (!form?.data) continue;
 
-      const row = columns.map((col) => buildExportCell(form.data, col, fieldMap));
-      rows.push(row);
+      if (alignEnabled) {
+        const arr = Array.isArray(form.data[alignSource]) ? form.data[alignSource] : [];
+        // Always emit at least one row (blank aligned cells if the entry has no items).
+        const n = Math.max(arr.length, 1);
+        for (let i = 0; i < n; i++) {
+          const ctx = { source: alignSource, index: i };
+          const row = columns.map((col) => buildExportCell(form.data, col, fieldMap, ctx));
+          rows.push(row);
+        }
+      } else {
+        const row = columns.map((col) => buildExportCell(form.data, col, fieldMap));
+        rows.push(row);
+      }
 
       EventBus.emit("csv:export:progress", {
         current: rows.length - 1,
