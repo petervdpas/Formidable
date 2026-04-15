@@ -1,12 +1,13 @@
 // modules/handlers/csvHandlers.js
 
 import { EventBus } from "../eventBus.js";
-import { matchOption, parseAsList, sanitize, isValidGuid } from "../../utils/stringUtils.js";
-
-// Field types excluded from CSV mapping
-const excludedTypes = new Set([
-  "loopstart", "loopstop", "image", "code", "api",
-]);
+import { sanitize, isValidGuid } from "../../utils/stringUtils.js";
+import {
+  excludedTypes,
+  applyTransformRule,
+  coerceValue,
+  formatValue,
+} from "../../utils/csvTransforms.js";
 
 /**
  * Handle: csv:preview
@@ -30,14 +31,13 @@ export async function handleCsvPreview({ filePath, delimiter }, respond) {
  * Coerce a single raw CSV row into typed field values.
  *
  * Payload: { row: string[], colMapping: [{colIndex, fieldKey, field, transform?}] }
- *           transform is { rule, n? } or a string
+ *           transform is { rule, param? } or a string
  * Returns: { [fieldKey]: coercedValue }
  *
  * Supports concat: multiple colMapping entries with the same fieldKey
- * are joined with a space before coercion.
+ * are joined with concatSeparator before coercion.
  */
 export function handleTransformRow({ row, colMapping, concatSeparator = " " }, respond) {
-  // Group by fieldKey to support concat
   const groups = new Map();
   for (const entry of colMapping) {
     const { colIndex, fieldKey, transform } = entry;
@@ -55,36 +55,6 @@ export function handleTransformRow({ row, colMapping, concatSeparator = " " }, r
 
   respond?.(data);
   return data;
-}
-
-// ── Transform rules (shared with csvImportModal.js) ───────────
-const transformRules = {
-  none:         (v) => v,
-  lowercase:    (v) => v.toLowerCase(),
-  uppercase:    (v) => v.toUpperCase(),
-  capitalize:   (v) => v.replace(/\b\w/g, (c) => c.toUpperCase()),
-  trim:         (v) => v.trim(),
-  "trim+lower": (v) => v.trim().toLowerCase(),
-  "trim+upper": (v) => v.trim().toUpperCase(),
-  "trim+cap":   (v) => v.trim().replace(/\b\w/g, (c) => c.toUpperCase()),
-  "first-n":    (v, n) => v.substring(0, n || v.length),
-  "last-n":     (v, n) => n ? v.slice(-n) : v,
-  split:        (v, sep) => v.split(sep || ",").map((s) => s.trim()).filter(Boolean).join(", "),
-  "bool-match": (v, trueVal) => String(v.trim().toLowerCase() === String(trueVal).trim().toLowerCase()),
-  "split-table": (v, seps) => {
-    const parts = String(seps || "").split(/\s+/).filter(Boolean);
-    const rs = parts[0] || ";";
-    const cs = parts[1] || ",";
-    return JSON.stringify(v.split(rs).map((r) => r.split(cs).map((c) => c.trim())).filter((r) => r.some(Boolean)));
-  },
-};
-
-function applyTransformRule(val, transform) {
-  if (!transform) return val;
-  const rule = typeof transform === "string" ? transform : transform.rule;
-  const param = typeof transform === "object" ? (transform.param ?? transform.n ?? "") : "";
-  const fn = transformRules[rule];
-  return fn ? fn(String(val), param) : val;
 }
 
 /**
@@ -151,7 +121,6 @@ export async function handleCsvImport(opts, respond) {
 
   // Load user config for meta (author, template name)
   const config = await window.api.config.loadUserConfig();
-  const templateName = templateFilename.replace(/\.yaml$/, "");
   const baseMeta = {
     author_name: config?.author_name || "Unknown",
     author_email: config?.author_email || "",
@@ -199,7 +168,6 @@ export async function handleCsvImport(opts, respond) {
       errors.push(`Row ${r + 1}: ${err.message}`);
     }
 
-    // Progress event
     EventBus.emit("csv:import:progress", {
       row: r + 1, total: rows.length, imported, skipped,
     });
@@ -210,84 +178,55 @@ export async function handleCsvImport(opts, respond) {
   return result;
 }
 
-// ── Coercion (used by handleTransformRow) ─────────────────────
-
-function coerceValue(raw, field) {
-  const val = typeof raw === "string" ? raw.trim() : String(raw ?? "");
-  switch (field.type) {
-    case "boolean":
-      return ["true", "1", "yes", "on"].includes(val.toLowerCase());
-
-    case "number":
-    case "range": {
-      const n = Number(val);
-      return Number.isFinite(n) ? n : field.type === "range" ? 50 : 0;
-    }
-
-    case "date":
-      return val || "";
-
-    case "dropdown":
-    case "radio":
-      return matchOption(val, field.options);
-
-    case "multioption": {
-      const items = parseAsList(val);
-      return items.map((v) => matchOption(v, field.options));
-    }
-
-    case "tags":
-    case "list":
-      return parseAsList(val);
-
-    case "table": {
-      if (!val) return [];
-      try {
-        const parsed = JSON.parse(val);
-        if (Array.isArray(parsed)) return parsed;
-      } catch { /* ignore */ }
-      return [];
-    }
-
-    default:
-      return val;
-  }
-}
-
 // ── Export ─────────────────────────────────────────────────────
 
 /**
- * Format a field value to a CSV-friendly string (reverse of coerceValue).
+ * Build one output CSV cell for a given entry, based on a column spec.
+ *
+ * Column spec:
+ *   { header, sourceKeys: [fieldKey, ...], separator?, transform? }
+ *
+ * If sourceKeys has one entry  → plain export of that field.
+ * If sourceKeys has 2+ entries → concat of field values with separator, then optional transform.
  */
-function formatValue(val, field) {
-  if (val == null) return "";
-  switch (field.type) {
-    case "boolean":
-      return val === true ? "true" : "false";
-    case "number":
-    case "range":
-      return String(val);
-    case "multioption":
-    case "tags":
-    case "list":
-      return Array.isArray(val) ? JSON.stringify(val) : String(val);
-    case "table":
-      return Array.isArray(val) ? JSON.stringify(val) : "";
-    default:
-      return String(val);
-  }
+function buildExportCell(entry, colSpec, fieldMap) {
+  const { sourceKeys = [], separator = " ", transform = null } = colSpec;
+  if (sourceKeys.length === 0) return "";
+
+  const parts = sourceKeys.map((key) => {
+    const field = fieldMap.get(key);
+    return field ? formatValue(entry?.[key], field) : "";
+  });
+
+  const joined = parts.length === 1 ? parts[0] : parts.join(separator);
+
+  // For single-source plain columns, the transform applies on the formatted value.
+  // For computed columns, the transform applies on the joined string.
+  return applyTransformRule(joined, transform, { mode: "storage" });
 }
 
 /**
  * Handle: csv:export
- * Export all storage entries for the current template to a CSV file.
+ * Export template entries to a CSV file, with user-selected columns
+ * and optional computed (concat) columns.
+ *
+ * Payload (from csvExportModal):
+ *   {
+ *     templateFilename,
+ *     columns: [{ header, sourceKeys: [...], separator?, transform? }],
+ *     filePath  (destination; modal picked via save-dialog),
+ *   }
+ *
+ * If called with no payload (legacy menu → EventBus.emit("csv:export")),
+ * falls back to exporting all non-excluded fields using field.key as header.
  */
-export async function handleCsvExport(_, respond) {
+export async function handleCsvExport(opts, respond) {
   const tmpl = window.currentSelectedTemplate;
   const templateFilename =
-    (window.currentSelectedTemplateName || "").endsWith(".yaml")
+    opts?.templateFilename
+    || ((window.currentSelectedTemplateName || "").endsWith(".yaml")
       ? window.currentSelectedTemplateName
-      : `${window.currentSelectedTemplateName || ""}.yaml`;
+      : `${window.currentSelectedTemplateName || ""}.yaml`);
 
   if (!tmpl || !templateFilename) {
     EventBus.emit("logging:warning", ["[csvExport] No template selected"]);
@@ -295,23 +234,31 @@ export async function handleCsvExport(_, respond) {
     return;
   }
 
-  // Ask user for save location
-  const templateName = templateFilename.replace(/\.yaml$/, "");
-  const filePath = await window.api.dialog.chooseSaveFile({
-    defaultPath: `${templateName}-export.csv`,
-    extensions: ["csv"],
-  });
+  const allFields = (tmpl.fields || []).filter(
+    (f) => f.key && !excludedTypes.has(f.type)
+  );
+  const fieldMap = new Map(allFields.map((f) => [f.key, f]));
+
+  // Resolve columns: prefer payload, else default to one column per field.
+  let columns = Array.isArray(opts?.columns) && opts.columns.length > 0
+    ? opts.columns
+    : allFields.map((f) => ({ header: f.key, sourceKeys: [f.key] }));
+
+  // Resolve destination path
+  let filePath = opts?.filePath;
+  if (!filePath) {
+    const templateName = templateFilename.replace(/\.yaml$/, "");
+    filePath = await window.api.dialog.chooseSaveFile({
+      defaultPath: `${templateName}-export.csv`,
+      extensions: ["csv"],
+    });
+  }
   if (!filePath) {
     respond?.({ success: false, error: "Cancelled" });
     return;
   }
 
   try {
-    const fields = (tmpl.fields || []).filter(
-      (f) => f.key && !excludedTypes.has(f.type)
-    );
-
-    // Load all storage entries
     const files = await window.api.forms.listForms(templateFilename);
     if (!files || files.length === 0) {
       EventBus.emit("logging:warning", ["[csvExport] No entries to export"]);
@@ -319,15 +266,14 @@ export async function handleCsvExport(_, respond) {
       return;
     }
 
-    // Header row: field keys
-    const headers = fields.map((f) => f.key);
-    const rows = [headers];
+    const headerRow = columns.map((c) => c.header);
+    const rows = [headerRow];
 
     for (const filename of files) {
       const form = await window.api.forms.loadForm(templateFilename, filename, tmpl.fields);
       if (!form?.data) continue;
 
-      const row = fields.map((f) => formatValue(form.data[f.key], f));
+      const row = columns.map((col) => buildExportCell(form.data, col, fieldMap));
       rows.push(row);
 
       EventBus.emit("csv:export:progress", {
@@ -336,8 +282,7 @@ export async function handleCsvExport(_, respond) {
       });
     }
 
-    // Write via IPC
-    const result = await window.api.csv.csvWrite(filePath, rows);
+    const result = await window.api.csv.csvWrite(filePath, rows, opts?.delimiter || ",");
 
     if (result.success) {
       const { Toast } = await import("../../utils/toastUtils.js");

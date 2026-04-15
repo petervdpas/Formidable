@@ -780,4 +780,19 @@ export default {
   "csv.error.no.file": "Selecteer eerst een CSV-bestand.",
   "csv.error.no.template": "Selecteer eerst een sjabloon.",
   "csv.error.no.mapping": "Wijs minstens één kolom toe aan een veld.",
+
+  // ── CSV Export ──────────────────────────────
+  "modal.csv.export.title": "CSV exporteren",
+  "csv.export": "Exporteren",
+  "csv.exporting": "Bezig met exporteren...",
+  "csv.export.done": "Export voltooid.",
+  "csv.export.failed": "CSV-export mislukt.",
+  "csv.export.include": "Opnemen",
+  "csv.export.source": "Bronveld(en)",
+  "csv.export.separator": "Sep.",
+  "csv.export.actions": "",
+  "csv.export.add.field": "Veld toevoegen",
+  "csv.export.add.computed": "+ Samengestelde kolom toevoegen",
+  "csv.export.computed.default": "samengesteld",
+  "csv.export.error.no.columns": "Selecteer minstens één kolom om te exporteren.",
 };

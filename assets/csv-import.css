@@ -213,3 +213,102 @@
   justify-content: flex-end;
   padding-top: 8px;
 }
+
+/* ── Export-specific ───────────────────────────── */
+.csv-export-table th:nth-child(1),
+.csv-export-table td:nth-child(1) { width: 5%;  text-align: center; }  /* Include */
+.csv-export-table th:nth-child(2),
+.csv-export-table td:nth-child(2) { width: 26%; }                      /* Source */
+.csv-export-table th:nth-child(3),
+.csv-export-table td:nth-child(3) { width: 17%; }                      /* Header */
+.csv-export-table th:nth-child(4),
+.csv-export-table td:nth-child(4) { width: 6%;  text-align: center; }  /* Sep */
+.csv-export-table th:nth-child(5),
+.csv-export-table td:nth-child(5) { width: 22%; }                      /* Transform */
+.csv-export-table th:nth-child(6),
+.csv-export-table td:nth-child(6) { width: 18%; }                      /* Preview */
+.csv-export-table th:nth-child(7),
+.csv-export-table td:nth-child(7) { width: 6%;  text-align: center; }  /* Actions */
+
+.csv-export-table tr.csv-row-disabled td {
+  opacity: 0.4;
+}
+
+.csv-header-input {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 0.9em;
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: 3px;
+  background: var(--modal-bg, #fff);
+  color: var(--modal-fg, inherit);
+  box-sizing: border-box;
+}
+
+.csv-source-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.csv-source-label {
+  font-size: 0.9em;
+}
+
+.csv-source-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.csv-source-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: var(--list-item-selected-bg, #2196f3);
+  color: var(--list-item-selected-fg, #fff);
+  border-radius: 10px;
+  font-size: 0.8em;
+  opacity: 0.85;
+}
+
+.csv-chip-remove {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1.1em;
+  line-height: 1;
+  padding: 0 2px;
+  opacity: 0.8;
+}
+
+.csv-chip-remove:hover {
+  opacity: 1;
+}
+
+.csv-source-add {
+  max-width: 200px;
+}
+
+.csv-cell-dim {
+  opacity: 0.4;
+  text-align: center;
+}
+
+.csv-export-actions-row {
+  display: flex;
+  justify-content: flex-start;
+  padding: 8px 0;
+}
+
+.csv-row-remove {
+  padding: 2px 8px;
+  font-size: 1em;
+  line-height: 1;
+}
+
+.csv-actions-cell {
+  text-align: center;
+}

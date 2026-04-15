@@ -754,4 +754,19 @@ export default {
   "csv.error.no.file": "Please select a CSV file first.",
   "csv.error.no.template": "Please select a template first.",
   "csv.error.no.mapping": "Please map at least one column to a field.",
+
+  // ── CSV Export ──────────────────────────────
+  "modal.csv.export.title": "Export CSV",
+  "csv.export": "Export",
+  "csv.exporting": "Exporting...",
+  "csv.export.done": "Export complete.",
+  "csv.export.failed": "CSV export failed.",
+  "csv.export.include": "Include",
+  "csv.export.source": "Source field(s)",
+  "csv.export.separator": "Sep.",
+  "csv.export.actions": "",
+  "csv.export.add.field": "Add field",
+  "csv.export.add.computed": "+ Add computed column",
+  "csv.export.computed.default": "computed",
+  "csv.export.error.no.columns": "Select at least one column to export.",
 };

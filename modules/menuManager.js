@@ -438,7 +438,7 @@ export async function handleMenuAction(action) {
       break;
 
     case "open-csv-export":
-      EventBus.emit("csv:export");
+      window.openCsvExportModal?.();
       break;
 
     case "start-internal-server":
