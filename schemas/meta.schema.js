@@ -13,6 +13,7 @@ module.exports = {
       updated = null,
       flagged = false,
       tags = [],
+      gigot_enabled = false,
     } = {}
   ) {
     const rawData = raw.data || raw;
@@ -85,6 +86,11 @@ module.exports = {
         author_email:
           rawMeta.author_email || injected.author_email || author_email,
         template: rawMeta.template || injected.template || templateName,
+        gigot_enabled:
+          rawMeta.gigot_enabled ??
+          injected.gigot_enabled ??
+          gigot_enabled ??
+          false,
         created:
           rawMeta.created ||
           injected.created ||

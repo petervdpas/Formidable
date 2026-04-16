@@ -12,6 +12,8 @@ export async function handleSaveTemplate({ container, fields, callback }) {
   const markdownTemplate = getMarkdownTemplate();
   const enableCollection =
     document.getElementById("template-enable-collection")?.checked === true;
+  const gigotEnabled =
+    document.getElementById("template-enable-gigot")?.checked === true;
   const sidebarExpression =
     container.querySelector("#sidebar-expression")?.value.trim() || "";
 
@@ -21,6 +23,7 @@ export async function handleSaveTemplate({ container, fields, callback }) {
     markdown_template: markdownTemplate,
     sidebar_expression: sidebarExpression,
     enable_collection: enableCollection,
+    gigot_enabled: gigotEnabled,
     fields,
   };
 

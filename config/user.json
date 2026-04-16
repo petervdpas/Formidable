@@ -13,7 +13,7 @@
   "context_mode": "storage",
   "context_folder": "./examples",
   "selected_template": "addresses.yaml",
-  "selected_data_file": "abbey-road-studios.meta.json",
+  "selected_data_file": "baker-residence.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -24,10 +24,13 @@
   "internal_server_port": 8383,
   "window_bounds": {
     "width": 1440,
-    "height": 853
+    "height": 853,
+    "x": 240,
+    "y": 129,
+    "maximized": false
   },
   "template_sidebar_width": 310,
-  "storage_sidebar_width": 342,
+  "storage_sidebar_width": 338,
   "status_buttons": {
     "reloader": true,
     "charpicker": true,

@@ -249,6 +249,7 @@ function mountApiCollections(app) {
       markdown_template: yaml.markdown_template || "",
       sidebar_expression: yaml.sidebar_expression || "",
       enable_collection: !!yaml.enable_collection,
+      gigot_enabled: !!yaml.gigot_enabled,
       fields,
     });
   });
@@ -841,6 +842,7 @@ function mountApiCollections(app) {
           markdown_template: { type: "string" },
           sidebar_expression: { type: "string" },
           enable_collection: { type: "boolean" },
+          gigot_enabled: { type: "boolean" },
           fields: {
             type: "array",
             items: { $ref: "#/components/schemas/TemplateField" },

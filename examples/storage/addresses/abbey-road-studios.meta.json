@@ -4,8 +4,9 @@
     "author_name": "Utente Ribelle",
     "author_email": "regular@example.com",
     "template": "addresses.yaml",
+    "gigot_enabled": true,
     "created": "2026-04-08T14:49:16.865Z",
-    "updated": "2026-04-16T10:17:27.793Z",
+    "updated": "2026-04-16T10:37:31.351Z",
     "flagged": false,
     "tags": []
   },

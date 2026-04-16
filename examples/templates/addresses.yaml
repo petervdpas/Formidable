@@ -17,6 +17,7 @@ markdown_template: !!str |-
   {{/each}}
 sidebar_expression: '[ F["unit-number"] + " " + F["street-address"] | { text: F["unit-number"] + " " + F["street-address"], classes: ["expr-text-blue", "expr-bold"] } ]'
 enable_collection: true
+gigot_enabled: true
 fields:
   - key: id
     type: guid
@@ -101,6 +102,7 @@ fields:
     description: Give the owners for this address
     expression_item: false
     two_column: false
+    collapsible: false
     readonly: false
     default: ''
     options:

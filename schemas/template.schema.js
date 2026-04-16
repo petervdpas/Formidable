@@ -10,6 +10,7 @@ module.exports = {
     markdown_template: "",
     sidebar_expression: "",
     enable_collection: false,
+    gigot_enabled: false,
     fields: [],
   },
 
@@ -25,6 +26,7 @@ module.exports = {
       markdown_template: obj.markdown_template || "",
       sidebar_expression: obj.sidebar_expression || "",
       enable_collection: obj.enable_collection === true,
+      gigot_enabled: obj.gigot_enabled === true,
       fields: Array.isArray(obj.fields)
         ? obj.fields.map((f) => fieldSchema.sanitize(f))
         : [],
@@ -40,6 +42,7 @@ module.exports = {
           "markdown_template",
           "sidebar_expression",
           "enable_collection",
+          "gigot_enabled",
           "fields",
         ].includes(key)
       ) {

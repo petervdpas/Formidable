@@ -713,6 +713,7 @@ export default {
   "modal.template.label.sidebar": "Zijpaneel Expressie",
   "modal.template.placeholder.filename": "bijv. gebruikers-enquête",
   "modal.template.enable.collection": "Inschakelen Verzameling",
+  "modal.template.enable.gigot": "Inschakelen GiGot",
   "modal.template.label.code": "Sjablooncode",
   "modal.template.label.code.expand": "CTRL+ENTER voor volledig scherm",
 
