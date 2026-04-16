@@ -477,7 +477,7 @@ export function initEventRouter() {
   EventBus.off("git:check", gitHandler.handleGitIsRepo);
   EventBus.off("git:root", gitHandler.handleGitGetRoot);
   EventBus.off("git:status", gitHandler.handleGitStatus);
-  EventBus.off("git:status-fresh", gitHandler.handleGitStatus);
+  EventBus.off("git:status-fresh", gitHandler.handleGitStatusFresh);
   EventBus.off("git:remote-info", gitHandler.handleGitRemoteInfo);
   EventBus.off("git:pull", gitHandler.handleGitPull);
   EventBus.off("git:push", gitHandler.handleGitPush);
@@ -518,7 +518,7 @@ export function initEventRouter() {
   EventBus.on("git:check", gitHandler.handleGitIsRepo);
   EventBus.on("git:root", gitHandler.handleGitGetRoot);
   EventBus.on("git:status", gitHandler.handleGitStatus);
-  EventBus.on("git:status-fresh", gitHandler.handleGitStatus);
+  EventBus.on("git:status-fresh", gitHandler.handleGitStatusFresh);
   EventBus.on("git:remote-info", gitHandler.handleGitRemoteInfo);
   EventBus.on("git:pull", gitHandler.handleGitPull);
   EventBus.on("git:push", gitHandler.handleGitPush);

@@ -243,25 +243,26 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
 
   const renderTrackingRow = () => {
     trackingRow.innerHTML = "";
+    const s = status || {};
     const line1 = addContainerElement({ parent: trackingRow });
     addContainerElement({ parent: line1, tag: "span", i18nKey: "git.branch" });
     addContainerElement({ parent: line1, tag: "span", textContent: ": " });
     addContainerElement({
       parent: line1,
       tag: "b",
-      textContent: status.current || "",
+      textContent: s.current || "",
     });
 
     const badges = addContainerElement({ parent: trackingRow });
     makeGitBadge({
       parent: badges,
       key: "git.badge.ahead",
-      count: status.ahead,
+      count: s.ahead,
     });
     makeGitBadge({
       parent: badges,
       key: "git.badge.behind",
-      count: status.behind,
+      count: s.behind,
       marginLeft: "6px",
     });
 
@@ -272,11 +273,11 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
       i18nKey: "git.tracked",
     });
     addContainerElement({ parent: line2, tag: "span", textContent: ": " });
-    if (status.tracking) {
+    if (s.tracking) {
       addContainerElement({
         parent: line2,
         tag: "span",
-        textContent: status.tracking,
+        textContent: s.tracking,
       });
     } else {
       addContainerElement({
@@ -382,7 +383,7 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   });
 
   let currentProgress = { inMerge: false, inRebase: false, conflicted: [] };
-  let currentStatus = status;
+  let currentStatus = status || {};
 
   function recomputeSyncButton() {
     const ev = GitRules.evaluate({
@@ -692,7 +693,7 @@ export async function buildGitControlRightPane({ gitPath, status, modalApi }) {
     attributes: { id: fileListId },
   });
 
-  let currentStatus = status;
+  let currentStatus = status || {};
   let currentProgress = await getProgressState(gitPath);
   let commitMessage = "";
 

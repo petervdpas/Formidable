@@ -34,12 +34,25 @@ export async function handleGitGetRoot({ folderPath, callback }) {
 
 export async function handleGitStatus({ folderPath, callback }) {
   try {
+    const res = await window.api.git.gitStatus(folderPath);
+    pass(callback, res, null);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      "[GitHandler] Failed to get Git status:",
+      err,
+    ]);
+    callback?.(null);
+  }
+}
+
+export async function handleGitStatusFresh({ folderPath, callback }) {
+  try {
     const fn = window.api.git.gitStatusFresh ?? window.api.git.gitStatus;
     const res = await fn(folderPath);
     pass(callback, res, null);
   } catch (err) {
     EventBus.emit("logging:error", [
-      "[GitHandler] Failed to get Git status:",
+      "[GitHandler] Failed to get fresh Git status:",
       err,
     ]);
     callback?.(null);
