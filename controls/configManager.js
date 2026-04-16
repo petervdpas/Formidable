@@ -89,7 +89,7 @@ function listAvailableProfiles() {
     .filter((f) => f !== "boot.json")
     .map((filename) => {
       const fullPath = fileManager.resolvePath("config", filename);
-      let authorName = "(unknown)";
+      let profileName = "(unknown)";
 
       try {
         const raw = fileManager.loadFile(fullPath, {
@@ -97,14 +97,17 @@ function listAvailableProfiles() {
           silent: true,
         });
         const { config } = schema.sanitize(raw);
-        authorName = config?.author_name?.trim() || "(unnamed)";
+        profileName =
+          config?.profile_name?.trim() ||
+          config?.author_name?.trim() ||
+          "(unnamed)";
       } catch (err) {
         log(`[ConfigManager] Could not read ${filename}: ${err.message}`);
       }
 
       return {
         value: filename,
-        display: `${authorName}`,
+        display: `${profileName}`,
       };
     });
 }

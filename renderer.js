@@ -123,10 +123,12 @@ window.addEventListener("DOMContentLoaded", async () => {
   const templateContainer = document.getElementById("template-container");
   const storageContainer = document.getElementById("storage-container");
 
-  if (config?.author_name) {
+  const profileLabel =
+    config?.profile_name?.trim() || config?.author_name?.trim() || "";
+  if (profileLabel) {
     setStatusInfo("special.user.profile", {
       i18nEnabled: true,
-      args: [config.author_name],
+      args: [profileLabel],
     });
   }
 

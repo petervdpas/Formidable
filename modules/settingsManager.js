@@ -48,6 +48,15 @@ export async function renderSettings() {
         i18nKey: "modal.settings.tab.general.description",
       });
 
+      // Profile name (identifies this config profile)
+      panel.appendChild(
+        bindFormInput(
+          "profile-name",
+          "profile_name",
+          "modal.settings.profile.name"
+        )
+      );
+
       // Language dropdown host (setupLanguageDropdown binds to this id)
       const languageRow = document.createElement("div");
       languageRow.id = "settings-language";

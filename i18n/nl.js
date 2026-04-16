@@ -17,6 +17,7 @@ export default {
   "config.context_folder": "Contextmap",
   "config.selected_template": "Sjabloon",
   "config.selected_data_file": "Gegevensbestand",
+  "config.profile_name": "Profielnaam",
   "config.author_name": "Auteur",
   "config.author_email": "Auteur E-mail",
   "config.language": "Taal",
@@ -661,6 +662,7 @@ export default {
   "modal.settings.tab.advanced": "Geavanceerd",
   "modal.settings.tab.advanced.description":
     "Geavanceerde systeemopties. Gebruik met voorzichtigheid.",
+  "modal.settings.profile.name": "Profielnaam",
   "modal.settings.author.name": "Auteur Naam",
   "modal.settings.author.email": "Auteur E-mail",
   "modal.settings.author.language": "Taal",

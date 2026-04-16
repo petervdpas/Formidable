@@ -2,6 +2,7 @@
 
 module.exports = {
   defaults: {
+    profile_name: "Default Profile",
     theme: "light",
     show_icon_buttons: false,
     use_expressions: false,

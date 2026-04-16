@@ -17,6 +17,7 @@ export default {
   "config.context_folder": "Context Folder",
   "config.selected_template": "Template",
   "config.selected_data_file": "Data File",
+  "config.profile_name": "Profile Name",
   "config.author_name": "Author Name",
   "config.author_email": "Author Email",
   "config.language": "Language",
@@ -635,6 +636,7 @@ export default {
   "modal.settings.tab.advanced": "Advanced",
   "modal.settings.tab.advanced.description":
     "Advanced system options. Use with caution.",
+  "modal.settings.profile.name": "Profile Name",
   "modal.settings.author.name": "Author Name",
   "modal.settings.author.email": "Author Email",
   "modal.settings.author.language": "Language",

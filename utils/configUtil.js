@@ -3,6 +3,7 @@ import { EventBus } from "../modules/eventBus.js";
 let cachedConfig = null;
 
 const defaultAllowedConfigKeys = [
+  "profile_name",
   "theme",
   "show_icon_buttons",
   "use_expressions",
