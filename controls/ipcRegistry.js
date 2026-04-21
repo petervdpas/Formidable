@@ -20,6 +20,7 @@ const helpManager = require("./helpManager");
 const packageJson = require("../package.json");
 const fileManager = require("./fileManager");
 const gitManager = require("./gitManager");
+const gigotManager = require("./gigotManager");
 const templateManager = require("./templateManager");
 const formManager = require("./formManager");
 const configManager = require("./configManager");
@@ -344,6 +345,16 @@ function registerIpcHandlers() {
   );
   registerIpc("git-open-in-vscode", (e, folder, file) =>
     gitManager.openInVSCode(folder, file)
+  );
+
+  // GiGot (remote-sync backend sibling of git)
+  registerIpc("gigot-ping", (e, conn) => gigotManager.ping(conn));
+  registerIpc("gigot-status", (e, conn) => gigotManager.status(conn));
+  registerIpc("gigot-list-destinations", (e, conn) =>
+    gigotManager.listDestinations(conn)
+  );
+  registerIpc("gigot-sync-destination", (e, conn, id) =>
+    gigotManager.syncDestination(conn, id)
   );
 
   // Templates

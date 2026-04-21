@@ -31,6 +31,30 @@ export function generateGuid() {
   return crypto.randomUUID();
 }
 
+/**
+ * Declarative mutual-exclusive visibility. Show elements tagged with
+ * `data-field-group="<active>"` and hide every other element tagged
+ * with `data-field-group` under `root`. Elements without the attribute
+ * are untouched. When no element matches `active` (e.g. "none"), every
+ * tagged element is hidden — the intended behaviour for radio/dropdown
+ * selectors that have an "off" option.
+ *
+ * `root` defaults to `document` but can be any container, including a
+ * detached DOM fragment still being assembled — `querySelectorAll`
+ * works on detached roots, unlike `document.getElementById`. Pass the
+ * nearest scoping container when applying visibility at render time,
+ * before the subtree is attached to the document.
+ *
+ * Uses the native HTML `hidden` attribute (browsers render
+ * `[hidden] { display: none }` by default), so no CSS is required.
+ */
+export function showFieldGroup(active, root = document) {
+  const els = root.querySelectorAll("[data-field-group]");
+  els.forEach((el) => {
+    el.hidden = el.dataset.fieldGroup !== active;
+  });
+}
+
 export function clearHighlighted(container) {
   if (!container) return;
 

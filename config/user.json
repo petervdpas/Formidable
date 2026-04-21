@@ -20,21 +20,22 @@
   "encryption_key": "",
   "use_git": true,
   "git_root": "./",
+  "remote_backend": "git",
+  "gigot_base_url": "http://127.0.0.1:3417",
+  "gigot_repo_name": "BrainDamage",
+  "gigot_token": "6950a20cdf99e97cc4655876cb205a9447ed990c67dbab200f8c24790b765d34",
   "enable_internal_server": true,
   "internal_server_port": 8383,
   "window_bounds": {
     "width": 1440,
-    "height": 853,
-    "x": 240,
-    "y": 129,
-    "maximized": false
+    "height": 853
   },
   "template_sidebar_width": 310,
-  "storage_sidebar_width": 338,
+  "storage_sidebar_width": 374,
   "status_buttons": {
     "reloader": true,
     "charpicker": true,
-    "gitquick": true
+    "gitquick": false
   },
   "history": {
     "enabled": true,

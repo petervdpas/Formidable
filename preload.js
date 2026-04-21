@@ -123,6 +123,12 @@ const api = {
     "git-mergetool",
     "git-open-in-vscode",
   ]),
+  gigot: buildGroup([
+    "gigot-ping",
+    "gigot-status",
+    "gigot-list-destinations",
+    "gigot-sync-destination",
+  ]),
   config: buildGroup([
     "switch-user-profile",
     "list-user-profiles",

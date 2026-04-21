@@ -10,6 +10,9 @@ import {
   addContainerElement,
 } from "../utils/elementBuilders.js";
 import { createDropdown } from "../utils/dropdownUtils.js";
+import { createButton } from "../utils/buttonUtils.js";
+import { deriveBackend } from "../utils/backendUtils.js";
+import { showFieldGroup } from "../utils/domUtils.js";
 import {
   t,
   loadLocale,
@@ -226,7 +229,7 @@ export async function renderSettings() {
     }
   );
 
-  // ─── Directories & Git (factory) ─────────────────
+  // ─── Directories & Remote Backend (factory) ─────────────────
   const directoriesTab = makeTab(
     "directories",
     t("modal.settings.tab.directories"),
@@ -249,33 +252,83 @@ export async function renderSettings() {
       });
       panel.appendChild(contextFolderPicker.element);
 
-      // Use Git switch
-      panel.appendChild(
-        createSwitch(
-          "settings-use-git",
-          "modal.settings.git.enabled",
-          cachedConfig.use_git ?? false,
-          null,
-          "block",
-          ["standard.enabled", "standard.disabled"],
-          true
-        )
-      );
+      // Remote backend dropdown host (bound by setupRemoteBackendDropdown)
+      const backendRow = document.createElement("div");
+      backendRow.id = "settings-remote-backend";
+      backendRow.className = "modal-form-row";
+      panel.appendChild(backendRow);
 
-      // Git root picker (assign to outer-scoped variable for setupBindings)
+      // Git group — visible when backend === "git"
+      const gitGroup = document.createElement("div");
+      gitGroup.id = "settings-git-group";
+      gitGroup.dataset.fieldGroup = "git";
+
       gitRootPicker = createDirectoryPicker({
         id: "settings-git-root",
         label: t("modal.settings.git.root"),
         value: cachedConfig.git_root || "",
         outerClass: "modal-form-row tight-gap",
       });
-      panel.appendChild(gitRootPicker.element);
+      gitGroup.appendChild(gitRootPicker.element);
+      panel.appendChild(gitGroup);
 
-      // Initial enable/disable state driven by use_git
-      const isGitEnabled = cachedConfig.use_git === true;
-      gitRootPicker.input.disabled = !isGitEnabled;
-      gitRootPicker.button.disabled = !isGitEnabled;
-      gitRootPicker.element.classList.toggle("disabled", !isGitEnabled);
+      // GiGot group — visible when backend === "gigot"
+      const gigotGroup = document.createElement("div");
+      gigotGroup.id = "settings-gigot-group";
+      gigotGroup.dataset.fieldGroup = "gigot";
+
+      gigotGroup.appendChild(
+        bindFormInput(
+          "settings-gigot-base-url",
+          "gigot_base_url",
+          "modal.settings.gigot.baseUrl"
+        )
+      );
+      gigotGroup.appendChild(
+        bindFormInput(
+          "settings-gigot-repo-name",
+          "gigot_repo_name",
+          "modal.settings.gigot.repoName"
+        )
+      );
+      gigotGroup.appendChild(
+        createFormRowInput({
+          id: "settings-gigot-token",
+          labelOrKey: "modal.settings.gigot.token",
+          type: "password",
+          value: cachedConfig.gigot_token || "",
+          configKey: "gigot_token",
+          onSave: async (val) => {
+            await EventBus.emit("config:update", { gigot_token: val });
+            cachedConfig = await reloadUserConfig();
+            emitConfigStatus("gigot_token", "•••••");
+          },
+          i18nEnabled: true,
+        })
+      );
+
+      // Test connection button
+      const testRow = document.createElement("div");
+      testRow.className = "modal-form-row tight-gap";
+      const testBtn = createButton({
+        text: t("modal.settings.gigot.test") || "Test connection",
+        i18nKey: "modal.settings.gigot.test",
+        identifier: "gigot-test",
+      });
+      const testOut = document.createElement("span");
+      testOut.id = "settings-gigot-test-out";
+      testOut.className = "label-subtext";
+      testOut.style.marginLeft = "0.75rem";
+      testRow.appendChild(testBtn);
+      testRow.appendChild(testOut);
+      gigotGroup.appendChild(testRow);
+
+      panel.appendChild(gigotGroup);
+
+      // Initial visibility. Pass `panel` as root: at this point the
+      // panel is still a detached fragment so document.getElementById
+      // can't find the groups yet, but querySelectorAll on panel does.
+      showFieldGroup(deriveBackend(cachedConfig), panel);
     }
   );
 
@@ -469,6 +522,7 @@ export async function renderSettings() {
   // Bind everything after DOM is in place
   setupLanguageDropdown(config);
   setupThemeDropdown(config);
+  setupRemoteBackendDropdown(config);
   setupBindings(config, gitRootPicker);
 
   return tv;
@@ -489,17 +543,10 @@ function setupBindings(config, gitRootPicker) {
   );
 
   bindDirButton("settings-context-folder", "context_folder");
-  bindToggleSwitch("settings-use-git", "use_git", async (enabled) => {
-    gitRootPicker.input.disabled = !enabled;
-    gitRootPicker.button.disabled = !enabled;
-    gitRootPicker.element.classList.toggle("disabled", !enabled);
-    if (!enabled) {
-      gitRootPicker.input.value = "";
-      EventBus.emit("config:update", { git_root: "" });
-    }
-    await enforceGitQuickConstraint(enabled);
-  });
   bindDirButton("settings-git-root", "git_root");
+  // Note: gigot_base_url / gigot_repo_name / gigot_token inputs are
+  // self-wired by bindFormInput / createFormRowInput at render time.
+  // The dropdown itself is bound in setupRemoteBackendDropdown.
 
   bindToggleSwitch("internal-server-toggle", "enable_internal_server");
 
@@ -718,6 +765,83 @@ function bindStatusButtons(config) {
   }
 
   enforceGitQuickConstraint(cachedConfig?.use_git === true);
+}
+
+function setupRemoteBackendDropdown(config) {
+  createDropdown({
+    containerId: "settings-remote-backend",
+    labelTextOrKey: "modal.settings.remote.backend",
+    selectedValue: deriveBackend(config),
+    options: [
+      {
+        value: "none",
+        label: t("modal.settings.remote.backend.none") || "None (local only)",
+      },
+      {
+        value: "git",
+        label: t("modal.settings.remote.backend.git") || "Git",
+      },
+      {
+        value: "gigot",
+        label: t("modal.settings.remote.backend.gigot") || "GiGot",
+      },
+    ],
+    onChange: async (value) => {
+      // Legacy `use_git` is still read by status-buttons (gitquick) and
+      // the config schema defaults. Keep it in lockstep with the new
+      // dropdown until those callers migrate to deriveBackend().
+      await EventBus.emit("config:update", {
+        remote_backend: value,
+        use_git: value === "git",
+      });
+      cachedConfig = await reloadUserConfig();
+      showFieldGroup(value);
+      await enforceGitQuickConstraint(value === "git");
+      emitConfigStatus("remote_backend", value);
+    },
+    i18nEnabled: true,
+  });
+
+  // Wire the Test-connection button. Reads *live* input values so
+  // unsaved keystrokes are included in the probe.
+  const btn = document.getElementById("btn-gigot-test");
+  const out = document.getElementById("settings-gigot-test-out");
+  if (!btn || !out) return;
+
+  btn.onclick = async () => {
+    const baseUrl = (
+      document.getElementById("settings-gigot-base-url")?.value || ""
+    ).trim();
+    const repoName = (
+      document.getElementById("settings-gigot-repo-name")?.value || ""
+    ).trim();
+    const token =
+      document.getElementById("settings-gigot-token")?.value || "";
+
+    out.textContent = t("modal.settings.gigot.test.running") || "…";
+    out.style.color = "";
+    btn.disabled = true;
+
+    await new Promise((resolve) => {
+      EventBus.emit("gigot:status", {
+        conn: { baseUrl, token, repoName },
+        callback: (res) => {
+          btn.disabled = false;
+          if (res?.ok) {
+            out.textContent =
+              t("modal.settings.gigot.test.ok") || "Connected";
+            out.style.color = "var(--color-success, green)";
+          } else {
+            const prefix =
+              t("modal.settings.gigot.test.fail") || "Failed";
+            out.textContent = `${prefix}: ${res?.error || "unknown"}`;
+            out.style.color = "var(--color-error, crimson)";
+          }
+          resolve();
+        },
+      });
+    });
+  };
 }
 
 function setupLanguageDropdown(config) {

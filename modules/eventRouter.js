@@ -13,6 +13,7 @@ import * as helpHandler from "./handlers/helpHandler.js";
 import * as cacheHandler from "./handlers/cacheHandler.js";
 import * as vfsHandler from "./handlers/vfsHandler.js";
 import * as gitHandler from "./handlers/gitHandler.js";
+import * as gigotHandler from "./handlers/gigotHandler.js";
 import * as bootHandlers from "./handlers/bootHandlers.js";
 import * as configHandler from "./handlers/configHandler.js";
 import * as screenHandlers from "./handlers/screenHandlers.js";
@@ -559,6 +560,17 @@ export function initEventRouter() {
   // Special case for UI update to ensure only one listener is active
   EventBus.off("git:ui:update", gitHandler.handleGitUiUpdate);
   EventBus.on("git:ui:update", gitHandler.handleGitUiUpdate);
+
+  // GiGot events (sibling of git:* — remote-sync backend)
+  EventBus.off("gigot:ping", gigotHandler.handleGigotPing);
+  EventBus.off("gigot:status", gigotHandler.handleGigotStatus);
+  EventBus.off("gigot:list-destinations", gigotHandler.handleGigotListDestinations);
+  EventBus.off("gigot:sync-destination", gigotHandler.handleGigotSyncDestination);
+
+  EventBus.on("gigot:ping", gigotHandler.handleGigotPing);
+  EventBus.on("gigot:status", gigotHandler.handleGigotStatus);
+  EventBus.on("gigot:list-destinations", gigotHandler.handleGigotListDestinations);
+  EventBus.on("gigot:sync-destination", gigotHandler.handleGigotSyncDestination);
 
   // Cache events
   EventBus.off("cache:init", cacheHandler.initCache);

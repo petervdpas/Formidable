@@ -23,6 +23,10 @@ module.exports = {
     encryption_key: "",
     use_git: false,
     git_root: "",
+    remote_backend: "none",
+    gigot_base_url: "",
+    gigot_repo_name: "",
+    gigot_token: "",
     enable_internal_server: false,
     internal_server_port: 8383,
     window_bounds: {
