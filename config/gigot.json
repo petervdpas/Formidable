@@ -10,7 +10,7 @@
   "development_enable": true,
   "logging_enabled": false,
   "enable_plugins": true,
-  "context_mode": "template",
+  "context_mode": "storage",
   "context_folder": "/home/peter/Projects/Braindamage",
   "selected_template": "basic.yaml",
   "selected_data_file": "soup-20260421.meta.json",
@@ -34,7 +34,7 @@
     "maximized": false
   },
   "template_sidebar_width": 300,
-  "storage_sidebar_width": 374,
+  "storage_sidebar_width": 359,
   "status_buttons": {
     "reloader": true,
     "charpicker": true,

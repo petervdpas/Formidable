@@ -41,6 +41,12 @@ export function setupModal(
     resizable = true,
     inertBackground = false,
     disableCloseWhenDisabled = true,
+    // When true, the modal grows horizontally if its content needs
+    // more room than `width` provides (via min-width: fit-content).
+    // Useful for small form modals where a fixed width can cram the
+    // label/input row. Off by default — modals that want a hard cap
+    // stay predictable.
+    autoFit = false,
   } = {}
 ) {
   const modal = document.getElementById(modalId);
@@ -84,6 +90,13 @@ export function setupModal(
     modal.style.height = height;
   }
   if (maxHeight) modal.style.maxHeight = maxHeight;
+  if (autoFit) {
+    // min-width: fit-content lets the modal grow past `width` when
+    // its content can't squeeze into the fixed box. A hard ceiling
+    // (max-width: 90vw) keeps it from blowing out on long content.
+    modal.style.minWidth = "fit-content";
+    if (!modal.style.maxWidth) modal.style.maxWidth = "90vw";
+  }
 
   // Optional resizer (idempotent)
   // Reuse existing resizer if present; only enable once.

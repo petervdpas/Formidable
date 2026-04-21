@@ -271,6 +271,9 @@ export function setupEntryModal() {
     backdropClick: true,
     width: "30em",
     height: "auto",
+    // Grow horizontally if the label+input row needs it — prevents
+    // the input from getting squeezed into a sliver at 30em.
+    autoFit: true,
   });
 }
 
@@ -281,6 +284,7 @@ export function setupTemplateModal() {
     backdropClick: true,
     width: "30em",
     height: "auto",
+    autoFit: true,
     onOpen: async () => {
       const modal = document.getElementById("template-modal");
       const input = modal?.querySelector("input#context-folder");
