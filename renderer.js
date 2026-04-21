@@ -28,6 +28,7 @@ import {
   setupEntryModal,
   setupTemplateModal,
   setupGitModal,
+  setupGigotSyncModal,
   setupPluginModal,
   setuHelpModal,
   setupAboutModal,
@@ -139,6 +140,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const entryInputModal = setupEntryModal();
   const templateModal = setupTemplateModal();
   const gitModal = setupGitModal();
+  const gigotSyncModal = setupGigotSyncModal();
   const pluginModal = setupPluginModal();
   const helpModal = setuHelpModal();
   const aboutModal = setupAboutModal();
@@ -149,6 +151,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   window.openSettingsModal = settings.show;
   window.openWorkspaceModal = workspaceModal.show;
   window.openGitModal = gitModal.show;
+  window.openGigotSyncModal = gigotSyncModal.show;
   window.openAboutModal = aboutModal.show;
   window.openHelpModal = helpModal.show;
   window.openPluginModal = pluginModal.show;

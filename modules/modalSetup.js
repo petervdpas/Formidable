@@ -25,6 +25,7 @@ import {
   buildGitControlLeftPane,
   buildGitControlRightPane,
 } from "./gitControlModal.js";
+import { renderGigotSyncBody } from "./gigotSyncModal.js";
 
 import {
   createSettingsRestartIconButton,
@@ -215,6 +216,21 @@ export function setupGitModal() {
     },
   });
   return modal;
+}
+
+export function setupGigotSyncModal() {
+  return setupModal("gigot-sync-modal", {
+    closeBtn: "gigot-sync-close",
+    escToClose: true,
+    backdropClick: true,
+    width: "42em",
+    height: "32em",
+    onOpen: async () => {
+      const container = document.getElementById("gigot-sync-modal-body");
+      if (!container) return;
+      await renderGigotSyncBody(container);
+    },
+  });
 }
 
 export function setupEntryModal() {

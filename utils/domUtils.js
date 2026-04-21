@@ -436,6 +436,12 @@ export function bindActionHandlers(container, selector, callback) {
       `[bindActionHandlers] Binding action handler: ${action}`,
     ]);
     el.addEventListener("click", () => {
+      if (
+        el.classList.contains("disabled") ||
+        el.getAttribute("aria-disabled") === "true"
+      ) {
+        return;
+      }
       EventBus.emit("logging:default", [
         `[bindActionHandlers] Triggered action: ${action}`,
       ]);

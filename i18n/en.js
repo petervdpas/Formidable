@@ -161,6 +161,8 @@ export default {
   "menu.config.settings": "Settings...",
   "menu.config.workspace": "Workspace...",
   "menu.git.control": "Git Control...",
+  "menu.sync.git": "Git Control...",
+  "menu.sync.gigot": "GiGot Sync...",
   "menu.server.start": "Start Server",
   "menu.server.stop": "Stop Server",
   "menu.server.status": "Server Status",
@@ -359,6 +361,7 @@ export default {
   "standard.open": "Open",
   "standard.config": "Config",
   "standard.git": "Git",
+  "standard.sync": "Sync",
   "standard.server": "Server",
   "standard.port": "Port",
   "standard.running": "Running",
@@ -685,6 +688,16 @@ export default {
 
   "modal.git.title": "Git Control",
   "modal.git.no.changes.detected": "No Changes Detected",
+
+  "modal.gigot.title": "Sync (GiGot)",
+  "modal.gigot.destinations": "Mirror Destinations",
+  "modal.gigot.destinations.empty": "No mirror destinations configured.",
+  "modal.gigot.refresh": "Refresh",
+  "modal.gigot.retry": "Retry",
+  "modal.gigot.retrying": "Retrying…",
+  "modal.gigot.loading": "Loading…",
+  "modal.gigot.connected": "Connected",
+  "modal.gigot.failed": "Connection failed",
 
   "modal.workspace.title": "Workspace Settings",
 

@@ -172,6 +172,8 @@ export default {
   "menu.config.settings": "Instellingen...",
   "menu.config.workspace": "Werkruimte...",
   "menu.git.control": "Git Besturing...",
+  "menu.sync.git": "Git Besturing...",
+  "menu.sync.gigot": "GiGot Synchronisatie...",
   "menu.server.start": "Start server",
   "menu.server.stop": "Stop server",
   "menu.server.status": "Serverstatus",
@@ -381,6 +383,7 @@ export default {
   "standard.open": "Openen",
   "standard.config": "Configuratie",
   "standard.git": "Git",
+  "standard.sync": "Synchroniseren",
   "standard.server": "Server",
   "standard.port": "Poort",
   "standard.running": "Actief",
@@ -711,6 +714,16 @@ export default {
 
   "modal.git.title": "Git Besturing",
   "modal.git.no.changes.detected": "Geen wijzigingen gevonden",
+
+  "modal.gigot.title": "Synchronisatie (GiGot)",
+  "modal.gigot.destinations": "Mirror-bestemmingen",
+  "modal.gigot.destinations.empty": "Geen mirror-bestemmingen geconfigureerd.",
+  "modal.gigot.refresh": "Vernieuwen",
+  "modal.gigot.retry": "Opnieuw",
+  "modal.gigot.retrying": "Bezig…",
+  "modal.gigot.loading": "Laden…",
+  "modal.gigot.connected": "Verbonden",
+  "modal.gigot.failed": "Verbinding mislukt",
 
   "modal.workspace.title": "Werkruimte-instellingen",
 

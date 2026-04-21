@@ -6,6 +6,7 @@ import { bindActionHandlers } from "../utils/domUtils.js";
 import { createSwitch } from "../utils/elementBuilders.js";
 import { t } from "../utils/i18n.js";
 import { Toast } from "../utils/toastUtils.js";
+import { deriveBackend } from "../utils/backendUtils.js";
 import {
   createHistoryBackIconButton,
   createHistoryForwardIconButton,
@@ -123,11 +124,27 @@ export async function buildMenu(containerId = "app-menu", commandHandler) {
     ])
   );
 
-  // ─── Git Menu ────────────────────────────────
-  if (cachedConfig.use_git) {
+  // ─── Sync Menu ───────────────────────────────
+  // Shown whenever the profile has a remote backend configured. Both
+  // items are always listed so the user sees which backends exist;
+  // the one that doesn't match the active backend is disabled so a
+  // stray click can't open a modal against an unconfigured backend.
+  const syncBackend = deriveBackend(cachedConfig);
+  if (syncBackend !== "none") {
     menuBar.append(
-      createMenuGroup("standard.git", [
-        { label: "menu.git.control", i18n: true, action: "open-git-modal" },
+      createMenuGroup("standard.sync", [
+        {
+          label: "menu.sync.git",
+          i18n: true,
+          action: "open-git-modal",
+          disabled: syncBackend !== "git",
+        },
+        {
+          label: "menu.sync.gigot",
+          i18n: true,
+          action: "open-gigot-modal",
+          disabled: syncBackend !== "gigot",
+        },
       ])
     );
   }
@@ -431,6 +448,10 @@ export async function handleMenuAction(action) {
 
     case "open-git-modal":
       window.openGitModal?.();
+      break;
+
+    case "open-gigot-modal":
+      window.openGigotSyncModal?.();
       break;
 
     case "open-csv-import":

@@ -797,6 +797,7 @@ function setupRemoteBackendDropdown(config) {
       cachedConfig = await reloadUserConfig();
       showFieldGroup(value);
       await enforceGitQuickConstraint(value === "git");
+      await rebuildMenu();
       emitConfigStatus("remote_backend", value);
     },
     i18nEnabled: true,
