@@ -698,6 +698,10 @@ export default {
   "modal.gigot.loading": "Loading…",
   "modal.gigot.connected": "Connected",
   "modal.gigot.failed": "Connection failed",
+  "modal.gigot.push": "Push now",
+  "modal.gigot.pushing": "Pushing…",
+  "modal.gigot.push.ok": "Pushed",
+  "modal.gigot.push.fail": "Push failed",
 
   "modal.workspace.title": "Workspace Settings",
 
@@ -710,7 +714,6 @@ export default {
   "modal.template.label.sidebar": "Sidebar Expression",
   "modal.template.placeholder.filename": "e.g., user-survey",
   "modal.template.enable.collection": "Enable Collection",
-  "modal.template.enable.gigot": "Enable GiGot",
   "modal.template.label.code": "Template Code",
   "modal.template.label.code.expand": "CTRL+ENTER for full screen",
 

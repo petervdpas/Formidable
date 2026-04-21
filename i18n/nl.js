@@ -724,6 +724,10 @@ export default {
   "modal.gigot.loading": "Laden…",
   "modal.gigot.connected": "Verbonden",
   "modal.gigot.failed": "Verbinding mislukt",
+  "modal.gigot.push": "Nu pushen",
+  "modal.gigot.pushing": "Pushen…",
+  "modal.gigot.push.ok": "Gepusht",
+  "modal.gigot.push.fail": "Push mislukt",
 
   "modal.workspace.title": "Werkruimte-instellingen",
 
@@ -736,7 +740,6 @@ export default {
   "modal.template.label.sidebar": "Zijpaneel Expressie",
   "modal.template.placeholder.filename": "bijv. gebruikers-enquête",
   "modal.template.enable.collection": "Inschakelen Verzameling",
-  "modal.template.enable.gigot": "Inschakelen GiGot",
   "modal.template.label.code": "Sjablooncode",
   "modal.template.label.code.expand": "CTRL+ENTER voor volledig scherm",
 

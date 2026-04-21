@@ -566,11 +566,13 @@ export function initEventRouter() {
   EventBus.off("gigot:status", gigotHandler.handleGigotStatus);
   EventBus.off("gigot:list-destinations", gigotHandler.handleGigotListDestinations);
   EventBus.off("gigot:sync-destination", gigotHandler.handleGigotSyncDestination);
+  EventBus.off("gigot:push-local", gigotHandler.handleGigotPushLocal);
 
   EventBus.on("gigot:ping", gigotHandler.handleGigotPing);
   EventBus.on("gigot:status", gigotHandler.handleGigotStatus);
   EventBus.on("gigot:list-destinations", gigotHandler.handleGigotListDestinations);
   EventBus.on("gigot:sync-destination", gigotHandler.handleGigotSyncDestination);
+  EventBus.on("gigot:push-local", gigotHandler.handleGigotPushLocal);
 
   // Cache events
   EventBus.off("cache:init", cacheHandler.initCache);

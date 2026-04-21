@@ -33,6 +33,7 @@ export async function renderGigotSyncBody(container) {
   container.innerHTML = "";
   const cfg = await reloadUserConfig();
   const conn = resolveGigotConn(cfg);
+  const contextFolder = cfg?.context_folder || "";
 
   // Connection status box
   const statusBox = document.createElement("div");
@@ -52,7 +53,17 @@ export async function renderGigotSyncBody(container) {
 
   // Actions row
   const actionsRow = document.createElement("div");
-  actionsRow.className = "modal-form-row";
+  actionsRow.className = "modal-form-row gigot-actions-row";
+
+  const pushBtn = createButton({
+    text: t("modal.gigot.push") || "Push now",
+    i18nKey: "modal.gigot.push",
+    identifier: "gigot-push",
+    className: "btn-primary",
+    onClick: () => pushLocal(),
+  });
+  actionsRow.appendChild(pushBtn);
+
   const refreshBtn = createButton({
     text: t("modal.gigot.refresh") || "Refresh",
     i18nKey: "modal.gigot.refresh",
@@ -60,7 +71,40 @@ export async function renderGigotSyncBody(container) {
     onClick: () => repaint(),
   });
   actionsRow.appendChild(refreshBtn);
+
+  const pushOut = document.createElement("span");
+  pushOut.id = "gigot-push-out";
+  pushOut.className = "label-subtext gigot-push-out";
+  actionsRow.appendChild(pushOut);
+
   container.appendChild(actionsRow);
+
+  async function pushLocal() {
+    pushBtn.disabled = true;
+    refreshBtn.disabled = true;
+    pushOut.textContent = t("modal.gigot.pushing") || "Pushing…";
+    pushOut.className = "label-subtext gigot-push-out";
+
+    const res = await callBus("gigot:push-local", { conn, contextFolder });
+
+    pushBtn.disabled = false;
+    refreshBtn.disabled = false;
+
+    if (res?.ok) {
+      const version = (res.data?.version || "").slice(0, 7);
+      pushOut.textContent = `${
+        t("modal.gigot.push.ok") || "Pushed"
+      }${version ? " · " + version : ""}`;
+      pushOut.classList.add("ok");
+      // Refresh destinations — GiGot may have fanned out to mirrors
+      await repaint();
+    } else {
+      pushOut.textContent = `${
+        t("modal.gigot.push.fail") || "Push failed"
+      }: ${res?.error || "unknown"}`;
+      pushOut.classList.add("error");
+    }
+  }
 
   async function repaint() {
     statusBox.className = "gigot-sync-status loading";

@@ -63,7 +63,6 @@ function saveTemplate(name, data) {
       markdown_template: data.markdown_template || "",
       sidebar_expression: data.sidebar_expression || "",
       enable_collection: data.enable_collection === true,
-      gigot_enabled: data.gigot_enabled === true,
       fields: sanitizedFields,
     };
 
@@ -77,7 +76,6 @@ function saveTemplate(name, data) {
           "markdown_template",
           "sidebar_expression",
           "enable_collection",
-          "gigot_enabled",
           "fields",
         ].includes(key)
       ) {

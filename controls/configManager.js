@@ -171,20 +171,10 @@ function buildVirtualStructure(config) {
 
     const imageFiles = fileManager.listFiles(imagesPath, { silent: true });
 
-    let gigotEnabled = false;
-    try {
-      const yaml = fileManager.loadFile(
-        fileManager.joinPath(templatesPath, file),
-        { format: "yaml", silent: true }
-      );
-      gigotEnabled = yaml?.gigot_enabled === true;
-    } catch {}
-
     templateStorageFolders[name] = {
       name, // e.g. "basic"
       filename: file, // e.g. "basic.yaml"
       path: templateStoragePath,
-      gigot_enabled: gigotEnabled,
       metaFiles,
       imageFiles,
     };

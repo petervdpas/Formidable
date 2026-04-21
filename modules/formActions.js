@@ -90,7 +90,6 @@ export async function saveForm(container, template) {
         author_name: userConfig.author_name || "unknown",
         author_email: userConfig.author_email || "unknown@example.com",
         template: template.filename || "unknown",
-        gigot_enabled: template?.gigot_enabled === true,
         created,
         updated: new Date().toISOString(),
       },

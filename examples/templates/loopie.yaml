@@ -185,6 +185,7 @@ fields:
     description: Table inside loop for drag&drop testing
     expression_item: false
     two_column: false
+    collapsible: false
     readonly: false
     default: ''
     options:

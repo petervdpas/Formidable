@@ -266,18 +266,6 @@ export function initTemplateEditor(containerId, onSaveCallback) {
     );
     setupFieldset.appendChild(collectionSwitch);
 
-    // ─── Enable GiGot Switch ───────────
-    const gigotSwitch = createSwitch(
-      "template-enable-gigot",
-      "modal.template.enable.gigot",
-      currentData.gigot_enabled === true,
-      null,
-      "block",
-      ["standard.enabled", "standard.disabled"],
-      true
-    );
-    setupFieldset.appendChild(gigotSwitch);
-
     // ─── Fields Fieldset ────────────────
     const fieldsFieldset = document.createElement("fieldset");
     fieldsFieldset.appendChild(
@@ -333,8 +321,6 @@ export function initTemplateEditor(containerId, onSaveCallback) {
       );
       const hasGuidField = fieldsSanitized.some((f) => f.type === "guid");
 
-      const gigotElement = document.getElementById("template-enable-gigot");
-
       const fullTemplate = {
         name: container.querySelector("#yaml-name")?.value.trim() || "Unnamed",
         item_field:
@@ -345,7 +331,6 @@ export function initTemplateEditor(containerId, onSaveCallback) {
         enable_collection: hasGuidField
           ? collectionElement?.checked === true
           : false,
-        gigot_enabled: gigotElement?.checked === true,
         fields: fieldsSanitized,
       };
 

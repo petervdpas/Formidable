@@ -137,6 +137,7 @@ fields:
     description: Geef hier de ingredienten voor het recept op
     expression_item: false
     two_column: false
+    collapsible: false
     readonly: false
     default: ''
     options:

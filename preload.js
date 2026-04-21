@@ -128,6 +128,7 @@ const api = {
     "gigot-status",
     "gigot-list-destinations",
     "gigot-sync-destination",
+    "gigot-push-local",
   ]),
   config: buildGroup([
     "switch-user-profile",

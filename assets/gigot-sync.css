@@ -124,3 +124,24 @@
   opacity: 0.7;
   font-style: italic;
 }
+
+/* Actions row with Push / Refresh / inline status */
+.gigot-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  margin-top: 0.5em;
+}
+
+.gigot-push-out {
+  margin-left: 0.4em;
+  font-weight: 500;
+}
+
+.gigot-push-out.ok {
+  color: #1b5e1b;
+}
+
+.gigot-push-out.error {
+  color: #8b1a1a;
+}

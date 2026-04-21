@@ -46,3 +46,9 @@ export async function handleGigotSyncDestination({ conn, id, callback }) {
     window.api.gigot.gigotSyncDestination(conn, id)
   );
 }
+
+export async function handleGigotPushLocal({ conn, contextFolder, callback }) {
+  await run("pushLocal", callback, () =>
+    window.api.gigot.gigotPushLocal(conn, contextFolder)
+  );
+}
