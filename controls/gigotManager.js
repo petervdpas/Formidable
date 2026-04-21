@@ -4,6 +4,7 @@
 // Stateless; caller passes a conn object built from the profile config.
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const { error } = require("./nodeLogger");
 
 function ok(data) {
@@ -11,7 +12,73 @@ function ok(data) {
 }
 function fail(err) {
   const msg = typeof err === "string" ? err : err?.message || "Unknown error";
-  return { ok: false, error: msg };
+  const out = { ok: false, error: msg };
+  if (err && typeof err === "object" && err.status) out.status = err.status;
+  return out;
+}
+
+// Compute a file's git blob SHA1 — same hash git uses for tree entries.
+// Lets us compare local bytes to remote tree entries without downloading
+// remote content. Formula: SHA1("blob " + len + "\0" + content).
+function gitBlobSha(buffer) {
+  const header = `blob ${buffer.length}\0`;
+  const h = crypto.createHash("sha1");
+  h.update(header);
+  h.update(buffer);
+  return h.digest("hex");
+}
+
+// ─────────────────────────────────────────────────────────
+// Track-record — double-ledger bookkeeping
+//
+// GiGot's refs/audit/main + commit log is the server-side ledger:
+// tamper-evident, append-only, authoritative. This file is the
+// client-side ledger: a per-context-folder snapshot of "what version
+// did I last agree with the server on, and what was each file's blob
+// SHA at that moment." Lets us compute accurate local diffs without
+// re-fetching /tree every sync, survives Formidable restarts, and
+// reconciles against the server's version on every push.
+//
+// Lives at <contextFolder>/.formidable/sync.json — the walker ignores
+// .formidable/ so this never leaks to the remote. Each team member
+// has their own local copy; it is deliberately *not* shared.
+// ─────────────────────────────────────────────────────────
+
+const TRACK_REL = ".formidable/sync.json";
+
+function trackRecordPath(contextFolder) {
+  return path.join(path.resolve(contextFolder), TRACK_REL);
+}
+
+function emptyTrackRecord() {
+  return { version: null, lastSync: null, files: {} };
+}
+
+function readTrackRecord(contextFolder) {
+  const p = trackRecordPath(contextFolder);
+  if (!fs.existsSync(p)) return emptyTrackRecord();
+  try {
+    const raw = fs.readFileSync(p, "utf8");
+    const parsed = JSON.parse(raw);
+    return {
+      version: parsed.version || null,
+      lastSync: parsed.lastSync || null,
+      files: parsed.files && typeof parsed.files === "object" ? parsed.files : {},
+    };
+  } catch (err) {
+    // Corrupt or unreadable track-record — treat as empty so sync can
+    // self-heal by re-seeding from /tree on the next operation.
+    error("[GigotManager] readTrackRecord failed:", err);
+    return emptyTrackRecord();
+  }
+}
+
+function writeTrackRecord(contextFolder, record) {
+  const p = trackRecordPath(contextFolder);
+  fs.mkdirSync(path.dirname(p), { recursive: true });
+  const tmp = `${p}.tmp-${process.pid}-${Date.now()}`;
+  fs.writeFileSync(tmp, JSON.stringify(record, null, 2));
+  fs.renameSync(tmp, p);
 }
 
 // conn = { baseUrl, token, repoName }
@@ -226,12 +293,13 @@ function buildCommitMessage(conn, changes) {
   return `${header}\n\n${body}${tail}`;
 }
 
-// Walk a Formidable context folder and build a changes[] array for
-// POST /commits. Only collects templates/ (*.yaml) and storage/
-// (**/*.meta.json, **/images/*). Skips .formidable/ (GiGot-owned) and
-// any file outside those two subtrees.
-function collectFormidableChanges(contextFolder) {
-  const changes = [];
+// Walk a Formidable context folder and return every file under
+// templates/ (*.yaml, non-recursive) and storage/ (recursive). Each
+// entry carries the buffer + git blob SHA so callers can diff against
+// the remote tree before deciding what to commit. Skips .formidable/
+// (GiGot-owned marker) implicitly by only descending templates + storage.
+function collectFormidableFiles(contextFolder) {
+  const files = [];
   const root = path.resolve(contextFolder);
 
   const templatesDir = path.join(root, "templates");
@@ -240,61 +308,117 @@ function collectFormidableChanges(contextFolder) {
       if (!entry.isFile()) continue;
       if (!entry.name.endsWith(".yaml")) continue;
       const abs = path.join(templatesDir, entry.name);
-      changes.push(readAsChange(abs, `templates/${entry.name}`));
+      files.push(readFormidableFile(abs, `templates/${entry.name}`));
     }
   }
 
   const storageDir = path.join(root, "storage");
   if (fs.existsSync(storageDir)) {
-    walkStorage(storageDir, "storage", changes);
+    walkStorage(storageDir, "storage", files);
   }
 
-  return changes;
+  return files;
 }
 
-function walkStorage(absDir, relDir, changes) {
+function walkStorage(absDir, relDir, files) {
   for (const entry of fs.readdirSync(absDir, { withFileTypes: true })) {
     const abs = path.join(absDir, entry.name);
     const rel = `${relDir}/${entry.name}`;
     if (entry.isDirectory()) {
-      walkStorage(abs, rel, changes);
+      walkStorage(abs, rel, files);
     } else if (entry.isFile()) {
-      // storage is free-form; accept .meta.json and images under images/
-      // but also anything else the user has put there — GiGot will
-      // receive the bytes and decide how to treat them server-side.
-      changes.push(readAsChange(abs, rel));
+      files.push(readFormidableFile(abs, rel));
     }
   }
 }
 
-function readAsChange(absPath, repoRelPath) {
+function readFormidableFile(absPath, repoRelPath) {
   const buf = fs.readFileSync(absPath);
   return {
-    op: "put",
     path: repoRelPath,
-    content_b64: buf.toString("base64"),
+    buf,
+    sha: gitBlobSha(buf),
   };
 }
 
-// Orchestrator: fetch HEAD, walk the context folder, push a single
-// atomic commit with every Formidable file. One HTTP round-trip for
-// HEAD + one for the commit, regardless of file count.
+function fileToChange(f) {
+  return {
+    op: "put",
+    path: f.path,
+    content_b64: f.buf.toString("base64"),
+  };
+}
+
+// Orchestrator: walk the local context folder, diff against the
+// client-side track-record (double-ledger bookkeeping), and commit
+// only files whose content differs from what the track-record says
+// was last synced. Every commit in GiGot's audit trail represents a
+// real content change.
+//
+// On first sync (empty track-record) we seed from the remote /tree
+// so we don't blindly re-push files the remote already has. Steady
+// state is /head + /commits only — no /tree fetch per push.
+//
+// The local folder is NOT assumed to be a git repo. Blob SHAs are
+// computed from raw file bytes; nothing here needs git or a .git dir.
 async function pushLocal(conn, contextFolder) {
   const v = validateConn(conn);
   if (v) return fail(v);
   if (!contextFolder) return fail("Missing context folder");
 
-  let changes;
+  // 1. Walk local files (templates/ + storage/), compute blob SHAs.
+  let localFiles;
   try {
-    changes = collectFormidableChanges(contextFolder);
+    localFiles = collectFormidableFiles(contextFolder);
   } catch (err) {
     error("[GigotManager] pushLocal walk failed:", err);
     return fail(err);
   }
-  if (changes.length === 0) {
+  if (localFiles.length === 0) {
     return fail("No Formidable files found in context folder");
   }
 
+  // 2. Load the client-side ledger. If empty, seed it from the remote
+  //    /tree once — this covers first-time sync against an existing
+  //    repo where we shouldn't blindly re-push everything.
+  let record = readTrackRecord(contextFolder);
+  if (!record.version) {
+    const treeRes = await tree(conn);
+    if (treeRes.ok) {
+      const seeded = emptyTrackRecord();
+      seeded.version = treeRes.data?.version || null;
+      for (const e of treeRes.data?.files || []) {
+        seeded.files[e.path] = e.blob;
+      }
+      record = seeded;
+    } else if (treeRes.status && treeRes.status !== 409) {
+      return treeRes;
+    }
+    // 409 empty-repo → record stays empty → every local file counts.
+  }
+
+  // 3. Diff local against the ledger.
+  const changedFiles = localFiles.filter(
+    (f) => record.files[f.path] !== f.sha
+  );
+
+  if (changedFiles.length === 0) {
+    // Persist any seeding we did above so the next push skips /tree.
+    record.lastSync = new Date().toISOString();
+    try {
+      writeTrackRecord(contextFolder, record);
+    } catch (err) {
+      error("[GigotManager] writeTrackRecord failed:", err);
+    }
+    return ok({
+      version: record.version || "",
+      noop: true,
+      pushed: 0,
+      scanned: localFiles.length,
+    });
+  }
+
+  // 4. Fetch HEAD for parent_version and commit.
   const headRes = await head(conn);
   if (!headRes.ok) return headRes;
   const parentVersion = headRes.data?.version;
@@ -302,11 +426,46 @@ async function pushLocal(conn, contextFolder) {
     return fail("Remote repo has no HEAD (empty repo?)");
   }
 
-  return await commitChanges(conn, {
+  const changes = changedFiles.map(fileToChange);
+  const commitRes = await commitChanges(conn, {
     parentVersion,
     changes,
     message: buildCommitMessage(conn, changes),
   });
+  if (!commitRes.ok) return commitRes;
+
+  // 5. Reconcile the ledger. The server is authoritative for both the
+  //    new version and the post-commit blob SHA at each path — use the
+  //    server's `changes[]` when present (handles F1 auto-merge where
+  //    server-resolved content differs from what we sent). Fall back
+  //    to our locally-computed SHAs for older GiGot versions that
+  //    don't echo the change list back.
+  record.version = commitRes.data?.version || parentVersion;
+  record.lastSync = new Date().toISOString();
+  const serverChanges = Array.isArray(commitRes.data?.changes)
+    ? commitRes.data.changes
+    : null;
+  if (serverChanges) {
+    for (const c of serverChanges) {
+      if (!c?.path) continue;
+      if (c.op === "deleted") {
+        delete record.files[c.path];
+      } else if (c.blob) {
+        record.files[c.path] = c.blob;
+      }
+    }
+  } else {
+    for (const f of changedFiles) {
+      record.files[f.path] = f.sha;
+    }
+  }
+  try {
+    writeTrackRecord(contextFolder, record);
+  } catch (err) {
+    error("[GigotManager] writeTrackRecord failed:", err);
+  }
+
+  return ok({ ...commitRes.data, pushed: changedFiles.length, noop: false });
 }
 
 // GET /api/repos/{name}/tree — recursive file listing at HEAD.
@@ -356,6 +515,11 @@ function encodeFilePath(repoRelPath) {
 // local files under templates/ and storage/ with remote bytes. Does NOT
 // delete local files that are absent from remote (reserved for a future
 // reconciliation pass — safer default for a team tool).
+//
+// After a successful pull, the client-side ledger is rebuilt from the
+// server's tree response. The server is authoritative for what's in
+// the repo at this version, so we replace the record wholesale rather
+// than merging — any local drift is resolved in favor of the server.
 async function pullLocal(conn, contextFolder) {
   const v = validateConn(conn);
   if (v) return fail(v);
@@ -364,8 +528,8 @@ async function pullLocal(conn, contextFolder) {
   const treeRes = await tree(conn);
   if (!treeRes.ok) return treeRes;
 
-  const files = Array.isArray(treeRes.data?.files) ? treeRes.data.files : [];
-  const formidableFiles = files.filter(
+  const allFiles = Array.isArray(treeRes.data?.files) ? treeRes.data.files : [];
+  const formidableFiles = allFiles.filter(
     (f) =>
       f.path.startsWith("templates/") || f.path.startsWith("storage/")
   );
@@ -386,6 +550,21 @@ async function pullLocal(conn, contextFolder) {
     } catch (err) {
       return fail(`write failed for ${entry.path}: ${err.message}`);
     }
+  }
+
+  // Rebuild the ledger from the authoritative tree — includes both
+  // templates/+storage/ entries we just wrote and any .formidable/*
+  // tree entries so drift detection works for the whole repo.
+  const record = emptyTrackRecord();
+  record.version = treeRes.data?.version || null;
+  record.lastSync = new Date().toISOString();
+  for (const e of allFiles) {
+    record.files[e.path] = e.blob;
+  }
+  try {
+    writeTrackRecord(contextFolder, record);
+  } catch (err) {
+    error("[GigotManager] writeTrackRecord failed:", err);
   }
 
   return ok({
@@ -412,10 +591,13 @@ async function sync(conn, contextFolder) {
     return { ok: false, error: pullRes.error, stage: "pull" };
   }
 
+  const pushedCount = pushRes.data?.pushed ?? 0;
+  const pulledCount = pullRes.data?.files ?? 0;
   return ok({
     version: pullRes.data?.version || pushRes.data?.version || "",
-    pushed: pushRes.data,
-    pulled: pullRes.data?.files || 0,
+    pushed: pushedCount,
+    pulled: pulledCount,
+    noop: pushedCount === 0 && pulledCount === 0,
   });
 }
 

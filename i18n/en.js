@@ -702,6 +702,7 @@ export default {
   "modal.gigot.syncing": "Syncing…",
   "modal.gigot.sync.ok": "Synced",
   "modal.gigot.sync.fail": "Sync failed",
+  "modal.gigot.sync.uptodate": "Already in sync",
   "modal.gigot.history": "History",
   "modal.gigot.history.empty": "No commits yet.",
   "modal.gigot.history.fail": "Log failed",

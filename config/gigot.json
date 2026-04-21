@@ -14,8 +14,8 @@
   "context_folder": "/home/peter/Projects/Braindamage",
   "selected_template": "basic.yaml",
   "selected_data_file": "soup-20260421.meta.json",
-  "author_name": "unknown",
-  "author_email": "unknown@example.com",
+  "author_name": "RoadWarrior",
+  "author_email": "roadwarrior@example.com",
   "language": "en",
   "encryption_key": "",
   "use_git": false,
@@ -29,8 +29,8 @@
   "window_bounds": {
     "width": 1440,
     "height": 849,
-    "x": 293,
-    "y": 105,
+    "x": 370,
+    "y": 127,
     "maximized": false
   },
   "template_sidebar_width": 300,

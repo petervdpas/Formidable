@@ -147,30 +147,58 @@
   color: #8b1a1a;
 }
 
-/* History — collapsible commit log */
-.gigot-history {
-  margin-top: 0.8em;
+/* ── Split-pane modal ─────────────────────────────── */
+/* Left pane (status + destinations + actions) scrolls if the list
+ * of destinations gets long; right pane (history) scrolls
+ * independently regardless of length. */
+.gigot-split .modal-split-left,
+.gigot-split .modal-split-right {
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* lets inner scrollers compute against flex height */
+  overflow: hidden;
+}
+
+.gigot-sync-left,
+.gigot-sync-right {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  gap: 0.5em;
+}
+
+.gigot-sync-left > .gigot-dests-list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+  margin-bottom: 0;
+  padding-right: 0.4em;
+}
+
+.gigot-sync-left > .gigot-actions-row {
+  flex-shrink: 0;
+  margin-bottom: 0;
+  padding-top: 0.4em;
   border-top: 1px solid var(--border-color, #ccc);
-  padding-top: 0.6em;
 }
 
-.gigot-history-summary {
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 1rem;
-  padding: 0.2em 0;
-  user-select: none;
+/* ── History ─────────────────────────────────────── */
+.gigot-history-heading {
+  margin: 0 0 0.4em 0;
+  flex-shrink: 0;
 }
 
-.gigot-history-summary:hover {
-  color: var(--accent-color, #3b7ec4);
-}
-
-.gigot-history-list {
-  margin-top: 0.6em;
+.gigot-history-scroll {
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 0.3em;
+  padding-right: 0.4em; /* keeps scrollbar off the card borders */
+  border-top: 1px solid var(--border-color, #ccc);
+  padding-top: 0.4em;
 }
 
 .gigot-history-row {
@@ -183,6 +211,7 @@
   border-radius: 4px;
   background-color: var(--input-background, #f9f9f9);
   font-size: 0.9rem;
+  flex-shrink: 0;
 }
 
 .gigot-history-sha {

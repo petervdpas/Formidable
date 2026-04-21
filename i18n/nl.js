@@ -728,6 +728,7 @@ export default {
   "modal.gigot.syncing": "Bezig…",
   "modal.gigot.sync.ok": "Gesynchroniseerd",
   "modal.gigot.sync.fail": "Synchronisatie mislukt",
+  "modal.gigot.sync.uptodate": "Al gesynchroniseerd",
   "modal.gigot.history": "Geschiedenis",
   "modal.gigot.history.empty": "Nog geen commits.",
   "modal.gigot.history.fail": "Log mislukt",

@@ -25,7 +25,11 @@ import {
   buildGitControlLeftPane,
   buildGitControlRightPane,
 } from "./gitControlModal.js";
-import { renderGigotSyncBody } from "./gigotSyncModal.js";
+import {
+  getGigotSyncContext,
+  buildGigotSyncLeftPane,
+  buildGigotSyncRightPane,
+} from "./gigotSyncModal.js";
 
 import {
   createSettingsRestartIconButton,
@@ -219,18 +223,43 @@ export function setupGitModal() {
 }
 
 export function setupGigotSyncModal() {
-  return setupModal("gigot-sync-modal", {
+  const modal = setupModal("gigot-sync-modal", {
     closeBtn: "gigot-sync-close",
     escToClose: true,
     backdropClick: true,
-    width: "44em",
-    height: "26em",
+    width: "60em",
+    height: "32em",
     onOpen: async () => {
       const container = document.getElementById("gigot-sync-modal-body");
       if (!container) return;
-      await renderGigotSyncBody(container);
+
+      const modalEl = container.closest(".modal");
+      const { conn, contextFolder } = await getGigotSyncContext();
+
+      // Build right first so left can trigger its refresh on sync success.
+      const right = buildGigotSyncRightPane({ conn });
+      const left = buildGigotSyncLeftPane({
+        conn,
+        contextFolder,
+        onSyncDone: () => right.refresh(),
+      });
+
+      const split = createSplitModalLayout({
+        modalEl,
+        leftContent: left.node,
+        rightContent: right.node,
+        leftWidth: "1fr",
+        rightWidth: "1fr",
+        gap: "12px",
+        className: "gigot-split",
+        showContent: "both",
+      });
+      if (!split) return;
+
+      await Promise.all([left.init(), right.init()]);
     },
   });
+  return modal;
 }
 
 export function setupEntryModal() {

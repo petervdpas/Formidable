@@ -1,13 +1,10 @@
 // modules/gigotSyncModal.js
-// The GiGot-in-Formidable sync surface. Single-modal UX:
-//   • Connection banner (status badge)
-//   • Mirror Destinations card list (with per-row Retry)
-//   • Sync button (one-click push + pull), Refresh button
-//   • Collapsible History section (recent commits from `git log`)
-//
-// Formidable is used by a 15-person team and the integration goal is
-// painless cooperation across teams — every UX choice here optimizes
-// for multi-writer reality (see memory: formidable_team_usage).
+// The GiGot-in-Formidable sync surface as a split modal (sibling of
+// gitControlModal). Left pane = sync controls (status banner, mirror
+// destinations, Sync/Refresh buttons). Right pane = scrollable
+// History (recent commits from the git log). Formidable is used by
+// a 15-person team; every UX choice here optimizes for multi-writer
+// cooperation (see memory: formidable_team_usage).
 
 import { EventBus } from "./eventBus.js";
 import { createButton } from "../utils/buttonUtils.js";
@@ -23,7 +20,6 @@ function callBus(event, payload) {
   });
 }
 
-/** Pull the destinations array from whatever envelope GiGot returns. */
 function extractDests(res) {
   if (!res || !res.ok) return [];
   const d = res.data;
@@ -57,27 +53,39 @@ function relativeTime(iso) {
   return then.toLocaleDateString();
 }
 
-export async function renderGigotSyncBody(container) {
-  container.innerHTML = "";
+/**
+ * Resolve profile → conn once, share across both panes. Each pane is
+ * self-contained after construction (owns its DOM, exposes refresh()
+ * for external triggers like "sync just finished").
+ */
+export async function getGigotSyncContext() {
   const cfg = await reloadUserConfig();
-  const conn = resolveGigotConn(cfg);
-  const contextFolder = cfg?.context_folder || "";
+  return {
+    conn: resolveGigotConn(cfg),
+    contextFolder: cfg?.context_folder || "",
+  };
+}
 
-  // Connection status box
+// ─────────────────────────────────────────────────────────
+// Left pane — status + mirror destinations + actions
+// ─────────────────────────────────────────────────────────
+export function buildGigotSyncLeftPane({ conn, contextFolder, onSyncDone }) {
+  const node = document.createElement("div");
+  node.className = "gigot-sync-left";
+
   const statusBox = document.createElement("div");
   statusBox.className = "gigot-sync-status";
-  container.appendChild(statusBox);
+  node.appendChild(statusBox);
 
-  // Destinations heading + list
   addContainerElement({
-    parent: container,
+    parent: node,
     tag: "h3",
     textContent: t("modal.gigot.destinations") || "Mirror Destinations",
     i18nKey: "modal.gigot.destinations",
   });
   const destsList = document.createElement("div");
   destsList.className = "gigot-dests-list";
-  container.appendChild(destsList);
+  node.appendChild(destsList);
 
   // Actions row: Sync (primary) / Refresh / inline status
   const actionsRow = document.createElement("div");
@@ -105,24 +113,7 @@ export async function renderGigotSyncBody(container) {
   syncOut.className = "label-subtext gigot-sync-out";
   actionsRow.appendChild(syncOut);
 
-  container.appendChild(actionsRow);
-
-  // Collapsible History section — native <details> for zero-dep toggle.
-  const historyDetails = document.createElement("details");
-  historyDetails.className = "gigot-history";
-  const historySummary = document.createElement("summary");
-  historySummary.className = "gigot-history-summary";
-  historySummary.textContent = t("modal.gigot.history") || "History";
-  historyDetails.appendChild(historySummary);
-  const historyList = document.createElement("div");
-  historyList.className = "gigot-history-list";
-  historyDetails.appendChild(historyList);
-  container.appendChild(historyDetails);
-
-  // Lazy-load history on first expand; refresh on subsequent expands.
-  historyDetails.addEventListener("toggle", () => {
-    if (historyDetails.open) repaintHistory();
-  });
+  node.appendChild(actionsRow);
 
   async function syncNow() {
     syncBtn.disabled = true;
@@ -137,14 +128,19 @@ export async function renderGigotSyncBody(container) {
 
     if (res?.ok) {
       const v = (res.data?.version || "").slice(0, 7);
+      const pushed = res.data?.pushed ?? 0;
       const pulled = res.data?.pulled ?? 0;
-      syncOut.textContent = `${t("modal.gigot.sync.ok") || "Synced"} · ↓${pulled}${
-        v ? " · " + v : ""
-      }`;
+      const vTag = v ? " · " + v : "";
+      if (res.data?.noop) {
+        syncOut.textContent = `${t("modal.gigot.sync.uptodate") || "Already in sync"}${vTag}`;
+      } else {
+        syncOut.textContent = `${
+          t("modal.gigot.sync.ok") || "Synced"
+        } · ↑${pushed} ↓${pulled}${vTag}`;
+      }
       syncOut.classList.add("ok");
-      // Refresh destinations (mirror may have fanned out) + history
       await repaint();
-      if (historyDetails.open) await repaintHistory();
+      if (typeof onSyncDone === "function") await onSyncDone();
     } else {
       const stage = res?.stage ? ` (${res.stage})` : "";
       syncOut.textContent = `${t("modal.gigot.sync.fail") || "Sync failed"}${stage}: ${
@@ -171,14 +167,12 @@ export async function renderGigotSyncBody(container) {
     if (statusRes?.ok) {
       const name = statusRes.data?.name || conn.repoName;
       statusBox.className = "gigot-sync-status ok";
-      statusBox.textContent = `${
-        t("modal.gigot.connected") || "Connected"
-      }: ${name}`;
+      statusBox.textContent = `${t("modal.gigot.connected") || "Connected"}: ${name}`;
     } else {
       statusBox.className = "gigot-sync-status error";
-      statusBox.textContent = `${
-        t("modal.gigot.failed") || "Connection failed"
-      }: ${statusRes?.error || "unknown"}`;
+      statusBox.textContent = `${t("modal.gigot.failed") || "Connection failed"}: ${
+        statusRes?.error || "unknown"
+      }`;
       return;
     }
 
@@ -201,78 +195,10 @@ export async function renderGigotSyncBody(container) {
     }
   }
 
-  async function repaintHistory() {
-    historyList.innerHTML = "";
-    addContainerElement({
-      parent: historyList,
-      tag: "div",
-      className: "gigot-history-loading",
-      textContent: t("modal.gigot.loading") || "Loading…",
-    });
-
-    const res = await callBus("gigot:log", { conn, limit: 20 });
-
-    historyList.innerHTML = "";
-    if (!res?.ok) {
-      addContainerElement({
-        parent: historyList,
-        tag: "div",
-        className: "gigot-history-error",
-        textContent: `${t("modal.gigot.history.fail") || "Log failed"}: ${
-          res?.error || "unknown"
-        }`,
-      });
-      return;
-    }
-
-    const entries = extractLogEntries(res);
-    if (entries.length === 0) {
-      addContainerElement({
-        parent: historyList,
-        tag: "div",
-        className: "gigot-history-empty",
-        textContent: t("modal.gigot.history.empty") || "No commits yet.",
-      });
-      return;
-    }
-
-    for (const e of entries) {
-      historyList.appendChild(renderHistoryRow(e));
-    }
-  }
-
-  function renderHistoryRow(entry) {
-    const row = document.createElement("div");
-    row.className = "gigot-history-row";
-
-    const sha = (entry.hash || "").slice(0, 7);
-    const shaEl = document.createElement("span");
-    shaEl.className = "gigot-history-sha";
-    shaEl.textContent = sha;
-    row.appendChild(shaEl);
-
-    // First line of message — commit subject
-    const msg = (entry.message || "").split("\n")[0];
-    const msgEl = document.createElement("span");
-    msgEl.className = "gigot-history-msg";
-    msgEl.textContent = msg;
-    row.appendChild(msgEl);
-
-    const metaEl = document.createElement("span");
-    metaEl.className = "gigot-history-meta";
-    const who = entry.author || "unknown";
-    const when = entry.date ? relativeTime(entry.date) : "";
-    metaEl.textContent = `${who}${when ? " · " + when : ""}`;
-    row.appendChild(metaEl);
-
-    return row;
-  }
-
   function renderDestCard(d, onRetryDone) {
     const card = document.createElement("div");
     card.className = "gigot-dest-card";
 
-    // Header row: title (grows) + status pill + retry button
     const header = document.createElement("div");
     header.className = "gigot-dest-header";
 
@@ -340,5 +266,102 @@ export async function renderGigotSyncBody(container) {
     return card;
   }
 
-  await repaint();
+  return {
+    node,
+    init: () => repaint(),
+  };
+}
+
+// ─────────────────────────────────────────────────────────
+// Right pane — History (scrollable commit log)
+// ─────────────────────────────────────────────────────────
+export function buildGigotSyncRightPane({ conn }) {
+  const node = document.createElement("div");
+  node.className = "gigot-sync-right";
+
+  addContainerElement({
+    parent: node,
+    tag: "h3",
+    textContent: t("modal.gigot.history") || "History",
+    i18nKey: "modal.gigot.history",
+    className: "gigot-history-heading",
+  });
+
+  const scroller = document.createElement("div");
+  scroller.className = "gigot-history-scroll";
+  node.appendChild(scroller);
+
+  async function repaint() {
+    scroller.innerHTML = "";
+    addContainerElement({
+      parent: scroller,
+      tag: "div",
+      className: "gigot-history-loading",
+      textContent: t("modal.gigot.loading") || "Loading…",
+    });
+
+    const res = await callBus("gigot:log", { conn, limit: 50 });
+
+    scroller.innerHTML = "";
+    if (!res?.ok) {
+      addContainerElement({
+        parent: scroller,
+        tag: "div",
+        className: "gigot-history-error",
+        textContent: `${t("modal.gigot.history.fail") || "Log failed"}: ${
+          res?.error || "unknown"
+        }`,
+      });
+      return;
+    }
+
+    const entries = extractLogEntries(res);
+    if (entries.length === 0) {
+      addContainerElement({
+        parent: scroller,
+        tag: "div",
+        className: "gigot-history-empty",
+        textContent: t("modal.gigot.history.empty") || "No commits yet.",
+      });
+      return;
+    }
+
+    for (const e of entries) {
+      scroller.appendChild(renderHistoryRow(e));
+    }
+  }
+
+  function renderHistoryRow(entry) {
+    const row = document.createElement("div");
+    row.className = "gigot-history-row";
+
+    const sha = (entry.hash || "").slice(0, 7);
+    const shaEl = document.createElement("span");
+    shaEl.className = "gigot-history-sha";
+    shaEl.textContent = sha;
+    row.appendChild(shaEl);
+
+    const msg = (entry.message || "").split("\n")[0];
+    const msgEl = document.createElement("span");
+    msgEl.className = "gigot-history-msg";
+    msgEl.textContent = msg;
+    msgEl.title = entry.message || "";
+    row.appendChild(msgEl);
+
+    const metaEl = document.createElement("span");
+    metaEl.className = "gigot-history-meta";
+    const who = entry.author || "unknown";
+    const when = entry.date ? relativeTime(entry.date) : "";
+    metaEl.textContent = `${who}${when ? " · " + when : ""}`;
+    metaEl.title = entry.date || "";
+    row.appendChild(metaEl);
+
+    return row;
+  }
+
+  return {
+    node,
+    init: () => repaint(),
+    refresh: () => repaint(),
+  };
 }
