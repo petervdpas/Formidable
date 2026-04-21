@@ -52,3 +52,21 @@ export async function handleGigotPushLocal({ conn, contextFolder, callback }) {
     window.api.gigot.gigotPushLocal(conn, contextFolder)
   );
 }
+
+export async function handleGigotPullLocal({ conn, contextFolder, callback }) {
+  await run("pullLocal", callback, () =>
+    window.api.gigot.gigotPullLocal(conn, contextFolder)
+  );
+}
+
+export async function handleGigotSyncLocal({ conn, contextFolder, callback }) {
+  await run("syncLocal", callback, () =>
+    window.api.gigot.gigotSyncLocal(conn, contextFolder)
+  );
+}
+
+export async function handleGigotLog({ conn, limit, callback }) {
+  await run("log", callback, () =>
+    window.api.gigot.gigotLog(conn, limit || 20)
+  );
+}

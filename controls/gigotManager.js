@@ -159,6 +159,8 @@ async function head(conn) {
 
 // POST /api/repos/{name}/commits — atomic multi-file commit.
 // changes: [{ op: "put"|"delete", path, content_b64? }]
+// When conn.author is populated, passes it through so git log shows
+// the real team member instead of the subscription-key identity.
 async function commitChanges(conn, { parentVersion, changes, message }) {
   const v = validateConn(conn);
   if (v) return fail(v);
@@ -166,24 +168,62 @@ async function commitChanges(conn, { parentVersion, changes, message }) {
   if (!Array.isArray(changes) || changes.length === 0) {
     return fail("No changes to commit");
   }
+  const body = {
+    parent_version: parentVersion,
+    changes,
+    message: message || "Formidable push",
+  };
+  if (conn.author && conn.author.name && conn.author.email) {
+    body.author = { name: conn.author.name, email: conn.author.email };
+  }
   try {
     const data = await request(
       conn,
       "POST",
       `/api/repos/${encodeURIComponent(conn.repoName)}/commits`,
-      {
-        body: {
-          parent_version: parentVersion,
-          changes,
-          message: message || "Formidable push",
-        },
-      }
+      { body }
     );
     return ok(data);
   } catch (err) {
     error("[GigotManager] commitChanges failed:", err);
     return fail(err);
   }
+}
+
+// GET /api/repos/{name}/log?limit=N — recent commits.
+// Each entry: { hash, author, date, message }.
+async function log(conn, limit = 20) {
+  const v = validateConn(conn);
+  if (v) return fail(v);
+  try {
+    const data = await request(
+      conn,
+      "GET",
+      `/api/repos/${encodeURIComponent(conn.repoName)}/log`,
+      { query: { limit } }
+    );
+    return ok(data);
+  } catch (err) {
+    error("[GigotManager] log failed:", err);
+    return fail(err);
+  }
+}
+
+// Build a multi-line audit-friendly commit message: author header
+// line followed by the changed paths as a bulleted list. Keeps the
+// path list bounded so very large syncs don't produce unreadable
+// messages.
+function buildCommitMessage(conn, changes) {
+  const who = conn.author?.name || "Formidable";
+  const count = changes.length;
+  const header = `${who}: sync ${count} file${count === 1 ? "" : "s"}`;
+  const shown = changes.slice(0, 20);
+  const body = shown.map((c) => `- ${c.path}`).join("\n");
+  const tail =
+    changes.length > shown.length
+      ? `\n…and ${changes.length - shown.length} more`
+      : "";
+  return `${header}\n\n${body}${tail}`;
 }
 
 // Walk a Formidable context folder and build a changes[] array for
@@ -265,7 +305,117 @@ async function pushLocal(conn, contextFolder) {
   return await commitChanges(conn, {
     parentVersion,
     changes,
-    message: `Formidable push (${changes.length} file${changes.length === 1 ? "" : "s"})`,
+    message: buildCommitMessage(conn, changes),
+  });
+}
+
+// GET /api/repos/{name}/tree — recursive file listing at HEAD.
+async function tree(conn) {
+  const v = validateConn(conn);
+  if (v) return fail(v);
+  try {
+    const data = await request(
+      conn,
+      "GET",
+      `/api/repos/${encodeURIComponent(conn.repoName)}/tree`
+    );
+    return ok(data);
+  } catch (err) {
+    error("[GigotManager] tree failed:", err);
+    return fail(err);
+  }
+}
+
+// GET /api/repos/{name}/files/{path} — one blob.
+async function getFile(conn, repoRelPath) {
+  const v = validateConn(conn);
+  if (v) return fail(v);
+  try {
+    const data = await request(
+      conn,
+      "GET",
+      `/api/repos/${encodeURIComponent(conn.repoName)}/files/${encodeFilePath(repoRelPath)}`
+    );
+    return ok(data);
+  } catch (err) {
+    error("[GigotManager] getFile failed:", err);
+    return fail(err);
+  }
+}
+
+function encodeFilePath(repoRelPath) {
+  // The server accepts the path as-is after /files/; each segment
+  // URI-encoded individually preserves directory slashes.
+  return repoRelPath
+    .split("/")
+    .map((seg) => encodeURIComponent(seg))
+    .join("/");
+}
+
+// Pull every Formidable file from remote into contextFolder. Overwrites
+// local files under templates/ and storage/ with remote bytes. Does NOT
+// delete local files that are absent from remote (reserved for a future
+// reconciliation pass — safer default for a team tool).
+async function pullLocal(conn, contextFolder) {
+  const v = validateConn(conn);
+  if (v) return fail(v);
+  if (!contextFolder) return fail("Missing context folder");
+
+  const treeRes = await tree(conn);
+  if (!treeRes.ok) return treeRes;
+
+  const files = Array.isArray(treeRes.data?.files) ? treeRes.data.files : [];
+  const formidableFiles = files.filter(
+    (f) =>
+      f.path.startsWith("templates/") || f.path.startsWith("storage/")
+  );
+
+  let written = 0;
+  for (const entry of formidableFiles) {
+    const blobRes = await getFile(conn, entry.path);
+    if (!blobRes.ok) return blobRes;
+    const b64 = blobRes.data?.content_b64 || "";
+    const buf = Buffer.from(b64, "base64");
+    const abs = path.join(contextFolder, entry.path);
+    try {
+      fs.mkdirSync(path.dirname(abs), { recursive: true });
+      const tmp = `${abs}.tmp-${process.pid}-${Date.now()}`;
+      fs.writeFileSync(tmp, buf);
+      fs.renameSync(tmp, abs);
+      written += 1;
+    } catch (err) {
+      return fail(`write failed for ${entry.path}: ${err.message}`);
+    }
+  }
+
+  return ok({
+    version: treeRes.data?.version || "",
+    files: written,
+  });
+}
+
+// One-button sync: push local → pull merged state. On push 409 we
+// deliberately skip the pull to preserve the user's unpushed local
+// changes so they can resolve the conflict manually.
+async function sync(conn, contextFolder) {
+  const v = validateConn(conn);
+  if (v) return fail(v);
+  if (!contextFolder) return fail("Missing context folder");
+
+  const pushRes = await pushLocal(conn, contextFolder);
+  if (!pushRes.ok) {
+    return { ok: false, error: pushRes.error, stage: "push" };
+  }
+
+  const pullRes = await pullLocal(conn, contextFolder);
+  if (!pullRes.ok) {
+    return { ok: false, error: pullRes.error, stage: "pull" };
+  }
+
+  return ok({
+    version: pullRes.data?.version || pushRes.data?.version || "",
+    pushed: pushRes.data,
+    pulled: pullRes.data?.files || 0,
   });
 }
 
@@ -277,4 +427,9 @@ module.exports = {
   head,
   commitChanges,
   pushLocal,
+  tree,
+  getFile,
+  pullLocal,
+  sync,
+  log,
 };

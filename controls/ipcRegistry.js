@@ -359,6 +359,13 @@ function registerIpcHandlers() {
   registerIpc("gigot-push-local", (e, conn, contextFolder) =>
     gigotManager.pushLocal(conn, contextFolder)
   );
+  registerIpc("gigot-pull-local", (e, conn, contextFolder) =>
+    gigotManager.pullLocal(conn, contextFolder)
+  );
+  registerIpc("gigot-sync-local", (e, conn, contextFolder) =>
+    gigotManager.sync(conn, contextFolder)
+  );
+  registerIpc("gigot-log", (e, conn, limit) => gigotManager.log(conn, limit));
 
   // Templates
   registerIpc("list-templates", () => templateManager.listTemplates());

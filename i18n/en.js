@@ -698,10 +698,13 @@ export default {
   "modal.gigot.loading": "Loading…",
   "modal.gigot.connected": "Connected",
   "modal.gigot.failed": "Connection failed",
-  "modal.gigot.push": "Push now",
-  "modal.gigot.pushing": "Pushing…",
-  "modal.gigot.push.ok": "Pushed",
-  "modal.gigot.push.fail": "Push failed",
+  "modal.gigot.sync": "Sync",
+  "modal.gigot.syncing": "Syncing…",
+  "modal.gigot.sync.ok": "Synced",
+  "modal.gigot.sync.fail": "Sync failed",
+  "modal.gigot.history": "History",
+  "modal.gigot.history.empty": "No commits yet.",
+  "modal.gigot.history.fail": "Log failed",
 
   "modal.workspace.title": "Workspace Settings",
 

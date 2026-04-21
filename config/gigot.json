@@ -11,7 +11,7 @@
   "logging_enabled": false,
   "enable_plugins": true,
   "context_mode": "storage",
-  "context_folder": "/home/peter/Projects/Braindamage/Formidable",
+  "context_folder": "/home/peter/Projects/Braindamage",
   "selected_template": "basic.yaml",
   "selected_data_file": "soup-20260421.meta.json",
   "author_name": "unknown",
@@ -28,13 +28,13 @@
   "internal_server_port": 8383,
   "window_bounds": {
     "width": 1440,
-    "height": 769,
-    "x": 240,
-    "y": 171,
+    "height": 849,
+    "x": 293,
+    "y": 105,
     "maximized": false
   },
   "template_sidebar_width": 300,
-  "storage_sidebar_width": 300,
+  "storage_sidebar_width": 382,
   "status_buttons": {
     "reloader": true,
     "charpicker": true,

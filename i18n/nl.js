@@ -724,10 +724,13 @@ export default {
   "modal.gigot.loading": "Laden…",
   "modal.gigot.connected": "Verbonden",
   "modal.gigot.failed": "Verbinding mislukt",
-  "modal.gigot.push": "Nu pushen",
-  "modal.gigot.pushing": "Pushen…",
-  "modal.gigot.push.ok": "Gepusht",
-  "modal.gigot.push.fail": "Push mislukt",
+  "modal.gigot.sync": "Synchroniseren",
+  "modal.gigot.syncing": "Bezig…",
+  "modal.gigot.sync.ok": "Gesynchroniseerd",
+  "modal.gigot.sync.fail": "Synchronisatie mislukt",
+  "modal.gigot.history": "Geschiedenis",
+  "modal.gigot.history.empty": "Nog geen commits.",
+  "modal.gigot.history.fail": "Log mislukt",
 
   "modal.workspace.title": "Werkruimte-instellingen",
 

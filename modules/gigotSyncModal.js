@@ -1,9 +1,13 @@
 // modules/gigotSyncModal.js
-// Slice 2 of the GiGot-in-Formidable integration. Shows the active
-// GiGot connection + mirror destinations with a one-click retry per
-// destination. Sibling of gitControlModal.js but deliberately much
-// smaller — no branches, no commit, no push/pull yet. Those land in
-// the next slice once gigotManager grows its push/pull surface.
+// The GiGot-in-Formidable sync surface. Single-modal UX:
+//   • Connection banner (status badge)
+//   • Mirror Destinations card list (with per-row Retry)
+//   • Sync button (one-click push + pull), Refresh button
+//   • Collapsible History section (recent commits from `git log`)
+//
+// Formidable is used by a 15-person team and the integration goal is
+// painless cooperation across teams — every UX choice here optimizes
+// for multi-writer reality (see memory: formidable_team_usage).
 
 import { EventBus } from "./eventBus.js";
 import { createButton } from "../utils/buttonUtils.js";
@@ -29,6 +33,30 @@ function extractDests(res) {
   return [];
 }
 
+function extractLogEntries(res) {
+  if (!res || !res.ok) return [];
+  const d = res.data;
+  if (Array.isArray(d?.entries)) return d.entries;
+  if (Array.isArray(d)) return d;
+  return [];
+}
+
+function relativeTime(iso) {
+  const then = new Date(iso);
+  const now = new Date();
+  const diffMs = now - then;
+  if (Number.isNaN(diffMs)) return iso;
+  const sec = Math.round(diffMs / 1000);
+  if (sec < 60) return `${sec}s ago`;
+  const min = Math.round(sec / 60);
+  if (min < 60) return `${min}m ago`;
+  const hr = Math.round(min / 60);
+  if (hr < 24) return `${hr}h ago`;
+  const days = Math.round(hr / 24);
+  if (days < 30) return `${days}d ago`;
+  return then.toLocaleDateString();
+}
+
 export async function renderGigotSyncBody(container) {
   container.innerHTML = "";
   const cfg = await reloadUserConfig();
@@ -51,18 +79,18 @@ export async function renderGigotSyncBody(container) {
   destsList.className = "gigot-dests-list";
   container.appendChild(destsList);
 
-  // Actions row
+  // Actions row: Sync (primary) / Refresh / inline status
   const actionsRow = document.createElement("div");
   actionsRow.className = "modal-form-row gigot-actions-row";
 
-  const pushBtn = createButton({
-    text: t("modal.gigot.push") || "Push now",
-    i18nKey: "modal.gigot.push",
-    identifier: "gigot-push",
+  const syncBtn = createButton({
+    text: t("modal.gigot.sync") || "Sync",
+    i18nKey: "modal.gigot.sync",
+    identifier: "gigot-sync",
     className: "btn-primary",
-    onClick: () => pushLocal(),
+    onClick: () => syncNow(),
   });
-  actionsRow.appendChild(pushBtn);
+  actionsRow.appendChild(syncBtn);
 
   const refreshBtn = createButton({
     text: t("modal.gigot.refresh") || "Refresh",
@@ -72,37 +100,57 @@ export async function renderGigotSyncBody(container) {
   });
   actionsRow.appendChild(refreshBtn);
 
-  const pushOut = document.createElement("span");
-  pushOut.id = "gigot-push-out";
-  pushOut.className = "label-subtext gigot-push-out";
-  actionsRow.appendChild(pushOut);
+  const syncOut = document.createElement("span");
+  syncOut.id = "gigot-sync-out";
+  syncOut.className = "label-subtext gigot-sync-out";
+  actionsRow.appendChild(syncOut);
 
   container.appendChild(actionsRow);
 
-  async function pushLocal() {
-    pushBtn.disabled = true;
+  // Collapsible History section — native <details> for zero-dep toggle.
+  const historyDetails = document.createElement("details");
+  historyDetails.className = "gigot-history";
+  const historySummary = document.createElement("summary");
+  historySummary.className = "gigot-history-summary";
+  historySummary.textContent = t("modal.gigot.history") || "History";
+  historyDetails.appendChild(historySummary);
+  const historyList = document.createElement("div");
+  historyList.className = "gigot-history-list";
+  historyDetails.appendChild(historyList);
+  container.appendChild(historyDetails);
+
+  // Lazy-load history on first expand; refresh on subsequent expands.
+  historyDetails.addEventListener("toggle", () => {
+    if (historyDetails.open) repaintHistory();
+  });
+
+  async function syncNow() {
+    syncBtn.disabled = true;
     refreshBtn.disabled = true;
-    pushOut.textContent = t("modal.gigot.pushing") || "Pushing…";
-    pushOut.className = "label-subtext gigot-push-out";
+    syncOut.textContent = t("modal.gigot.syncing") || "Syncing…";
+    syncOut.className = "label-subtext gigot-sync-out";
 
-    const res = await callBus("gigot:push-local", { conn, contextFolder });
+    const res = await callBus("gigot:sync-local", { conn, contextFolder });
 
-    pushBtn.disabled = false;
+    syncBtn.disabled = false;
     refreshBtn.disabled = false;
 
     if (res?.ok) {
-      const version = (res.data?.version || "").slice(0, 7);
-      pushOut.textContent = `${
-        t("modal.gigot.push.ok") || "Pushed"
-      }${version ? " · " + version : ""}`;
-      pushOut.classList.add("ok");
-      // Refresh destinations — GiGot may have fanned out to mirrors
+      const v = (res.data?.version || "").slice(0, 7);
+      const pulled = res.data?.pulled ?? 0;
+      syncOut.textContent = `${t("modal.gigot.sync.ok") || "Synced"} · ↓${pulled}${
+        v ? " · " + v : ""
+      }`;
+      syncOut.classList.add("ok");
+      // Refresh destinations (mirror may have fanned out) + history
       await repaint();
+      if (historyDetails.open) await repaintHistory();
     } else {
-      pushOut.textContent = `${
-        t("modal.gigot.push.fail") || "Push failed"
-      }: ${res?.error || "unknown"}`;
-      pushOut.classList.add("error");
+      const stage = res?.stage ? ` (${res.stage})` : "";
+      syncOut.textContent = `${t("modal.gigot.sync.fail") || "Sync failed"}${stage}: ${
+        res?.error || "unknown"
+      }`;
+      syncOut.classList.add("error");
     }
   }
 
@@ -153,6 +201,73 @@ export async function renderGigotSyncBody(container) {
     }
   }
 
+  async function repaintHistory() {
+    historyList.innerHTML = "";
+    addContainerElement({
+      parent: historyList,
+      tag: "div",
+      className: "gigot-history-loading",
+      textContent: t("modal.gigot.loading") || "Loading…",
+    });
+
+    const res = await callBus("gigot:log", { conn, limit: 20 });
+
+    historyList.innerHTML = "";
+    if (!res?.ok) {
+      addContainerElement({
+        parent: historyList,
+        tag: "div",
+        className: "gigot-history-error",
+        textContent: `${t("modal.gigot.history.fail") || "Log failed"}: ${
+          res?.error || "unknown"
+        }`,
+      });
+      return;
+    }
+
+    const entries = extractLogEntries(res);
+    if (entries.length === 0) {
+      addContainerElement({
+        parent: historyList,
+        tag: "div",
+        className: "gigot-history-empty",
+        textContent: t("modal.gigot.history.empty") || "No commits yet.",
+      });
+      return;
+    }
+
+    for (const e of entries) {
+      historyList.appendChild(renderHistoryRow(e));
+    }
+  }
+
+  function renderHistoryRow(entry) {
+    const row = document.createElement("div");
+    row.className = "gigot-history-row";
+
+    const sha = (entry.hash || "").slice(0, 7);
+    const shaEl = document.createElement("span");
+    shaEl.className = "gigot-history-sha";
+    shaEl.textContent = sha;
+    row.appendChild(shaEl);
+
+    // First line of message — commit subject
+    const msg = (entry.message || "").split("\n")[0];
+    const msgEl = document.createElement("span");
+    msgEl.className = "gigot-history-msg";
+    msgEl.textContent = msg;
+    row.appendChild(msgEl);
+
+    const metaEl = document.createElement("span");
+    metaEl.className = "gigot-history-meta";
+    const who = entry.author || "unknown";
+    const when = entry.date ? relativeTime(entry.date) : "";
+    metaEl.textContent = `${who}${when ? " · " + when : ""}`;
+    row.appendChild(metaEl);
+
+    return row;
+  }
+
   function renderDestCard(d, onRetryDone) {
     const card = document.createElement("div");
     card.className = "gigot-dest-card";
@@ -195,7 +310,6 @@ export async function renderGigotSyncBody(container) {
     header.appendChild(actions);
     card.appendChild(header);
 
-    // URL (monospace, dim) — below the header
     if (d.url) {
       addContainerElement({
         parent: card,
@@ -205,7 +319,6 @@ export async function renderGigotSyncBody(container) {
       });
     }
 
-    // Last-sync timestamp — small, below URL
     if (d.last_sync_at) {
       addContainerElement({
         parent: card,
@@ -215,7 +328,6 @@ export async function renderGigotSyncBody(container) {
       });
     }
 
-    // Error (if any) — red, below the rest
     if (d.last_sync_error) {
       addContainerElement({
         parent: card,

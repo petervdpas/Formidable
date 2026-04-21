@@ -125,23 +125,94 @@
   font-style: italic;
 }
 
-/* Actions row with Push / Refresh / inline status */
+/* Actions row with Sync / Refresh / inline status */
 .gigot-actions-row {
   display: flex;
   align-items: center;
   gap: 0.6em;
   margin-top: 0.5em;
+  margin-bottom: 1em;
 }
 
-.gigot-push-out {
+.gigot-sync-out {
   margin-left: 0.4em;
   font-weight: 500;
 }
 
-.gigot-push-out.ok {
+.gigot-sync-out.ok {
   color: #1b5e1b;
 }
 
-.gigot-push-out.error {
+.gigot-sync-out.error {
   color: #8b1a1a;
+}
+
+/* History — collapsible commit log */
+.gigot-history {
+  margin-top: 0.8em;
+  border-top: 1px solid var(--border-color, #ccc);
+  padding-top: 0.6em;
+}
+
+.gigot-history-summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.2em 0;
+  user-select: none;
+}
+
+.gigot-history-summary:hover {
+  color: var(--accent-color, #3b7ec4);
+}
+
+.gigot-history-list {
+  margin-top: 0.6em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+}
+
+.gigot-history-row {
+  display: grid;
+  grid-template-columns: 5em 1fr auto;
+  gap: 0.6em;
+  align-items: baseline;
+  padding: 0.4em 0.6em;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 4px;
+  background-color: var(--input-background, #f9f9f9);
+  font-size: 0.9rem;
+}
+
+.gigot-history-sha {
+  font-family: var(--mono-font, monospace);
+  font-size: 0.85rem;
+  color: var(--text-color-subtle, #666);
+}
+
+.gigot-history-msg {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gigot-history-meta {
+  font-size: 0.8rem;
+  color: var(--text-color-subtle, #777);
+  white-space: nowrap;
+}
+
+.gigot-history-empty,
+.gigot-history-loading,
+.gigot-history-error {
+  padding: 0.6em;
+  font-style: italic;
+  color: var(--text-color-subtle, #777);
+}
+
+.gigot-history-error {
+  color: #8b1a1a;
+  font-style: normal;
 }
