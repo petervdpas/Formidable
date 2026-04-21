@@ -61,7 +61,13 @@
   font-weight: 600;
   flex-grow: 1;
   min-width: 0;
-  word-break: break-all;
+  /* A long token like "fO_IByOXcQ4P8TfX" should truncate with an
+   * ellipsis in a narrow pane rather than wrap character-by-character
+   * into a vertical stack. `title` attribute on the element exposes
+   * the full name on hover. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .gigot-dest-actions {

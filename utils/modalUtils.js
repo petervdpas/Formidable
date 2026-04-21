@@ -649,6 +649,15 @@ export function createSplitModalLayout({
   gap = "12px",
   className = "",
   showContent = "both",
+  // When true, the splitter initialises at 50% of the container
+  // regardless of leftWidth. Useful for modals that want a symmetric
+  // default; the user can still drag. Off by default so existing
+  // callers keep their asymmetric leftWidth hint.
+  defaultHalf = false,
+  // Optional persistence key for drag position (passed to
+  // createSplitter → configKey). Not wired by default — most modals
+  // want a fresh split per open, not per-user persistence.
+  configKey = null,
 } = {}) {
   if (!modalEl) {
     EventBus.emit("logging:warning", [
@@ -701,7 +710,14 @@ export function createSplitModalLayout({
 
     wrap.appendChild(left);
     wrap.appendChild(right);
-    createSplitter({ container: wrap, left, right, min: 120 });
+    createSplitter({
+      container: wrap,
+      left,
+      right,
+      min: 120,
+      defaultHalf,
+      configKey,
+    });
   } else {
     wrap.style.gridTemplateColumns = "1fr";
     if (addLeft) wrap.appendChild(left);

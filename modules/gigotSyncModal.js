@@ -202,11 +202,13 @@ export function buildGigotSyncLeftPane({ conn, contextFolder, onSyncDone }) {
     const header = document.createElement("div");
     header.className = "gigot-dest-header";
 
+    const titleText = d.name || d.id || "(unnamed)";
     addContainerElement({
       parent: header,
       tag: "div",
       className: "gigot-dest-title",
-      textContent: d.name || d.id || "(unnamed)",
+      textContent: titleText,
+      attributes: { title: titleText },
     });
 
     const actions = document.createElement("div");

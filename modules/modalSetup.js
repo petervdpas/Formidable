@@ -248,11 +248,13 @@ export function setupGigotSyncModal() {
         modalEl,
         leftContent: left.node,
         rightContent: right.node,
-        leftWidth: "1fr",
-        rightWidth: "1fr",
         gap: "12px",
         className: "gigot-split",
         showContent: "both",
+        // Split evenly on open; the user can still drag. Matches
+        // createSplitter's built-in centering path — no geometry
+        // guesswork with flex-basis percentages.
+        defaultHalf: true,
       });
       if (!split) return;
 
