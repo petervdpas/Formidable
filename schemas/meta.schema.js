@@ -16,8 +16,20 @@ module.exports = {
       gigot_enabled = false,
     } = {}
   ) {
-    const rawData = raw.data || raw;
-    const rawMeta = raw.meta || {};
+    // Two call shapes reach this:
+    //  - Disk envelope: { meta: {...}, data: {...} } — use raw.data
+    //  - Save payload:  { ...userFields, _meta: {...} } — use raw itself
+    // The original `raw.data || raw` broke when a template had a field
+    // literally named `data` (truthy string → rawData became the string
+    // "TEst" and every field lookup returned undefined → saves went empty).
+    // Shape-detect the envelope: both `meta` and `data` must be plain
+    // objects. A user field named `data` or `meta` won't pass (strings,
+    // arrays, etc.). Falls through to bare `raw` in every non-envelope case.
+    const isPlainObject = (v) =>
+      v !== null && typeof v === "object" && !Array.isArray(v);
+    const isEnvelope = isPlainObject(raw.meta) && isPlainObject(raw.data);
+    const rawData = isEnvelope ? raw.data : raw;
+    const rawMeta = isPlainObject(raw.meta) ? raw.meta : {};
     const injected = raw._meta || {};
 
     const result = {};

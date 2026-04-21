@@ -6,7 +6,7 @@
     "template": "basic.yaml",
     "gigot_enabled": false,
     "created": "2026-04-21T20:08:07.534Z",
-    "updated": "2026-04-21T20:09:16.367Z",
+    "updated": "2026-04-21T20:41:56.204Z",
     "flagged": false,
     "tags": [
       "rabbit"
@@ -14,14 +14,14 @@
   },
   "data": {
     "id": "721640fe-d312-4d64-ac8a-f7413b0eecb5",
-    "test": "Soup",
+    "test": "Soup Can",
     "check": true,
     "dropdown": "L",
     "multichoice": [
       "C"
     ],
     "radio": "BIRD",
-    "mline": "What is it that you want to say?",
+    "mline": "What is it that you really want to say?",
     "numpy": 17,
     "rangie": 20,
     "bday": "1968-12-23",
