@@ -1,0 +1,126 @@
+/* GiGot Sync modal — sibling of git-control.css */
+
+/* Connection banner at the top of the modal body */
+.gigot-sync-status {
+  display: inline-block;
+  padding: 0.4em 0.8em;
+  border-radius: 4px;
+  font-weight: 500;
+  margin-bottom: 1em;
+  border: 1px solid var(--border-color, #ccc);
+  background-color: var(--input-background, #f9f9f9);
+}
+
+.gigot-sync-status.ok {
+  background-color: var(--git-bg-added, #e2f5e2);
+  border-color: var(--git-bg-added, #bcdcbc);
+}
+
+.gigot-sync-status.error {
+  background-color: var(--git-bg-deleted, #ffe0e0);
+  border-color: var(--git-bg-deleted, #e0b0b0);
+}
+
+.gigot-sync-status.loading {
+  color: var(--text-color, #777);
+  background-color: transparent;
+  border-style: dashed;
+}
+
+/* Destinations list */
+.gigot-dests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  margin-top: 0.4em;
+  margin-bottom: 1em;
+}
+
+/* One destination */
+.gigot-dest-card {
+  padding: 0.7em 0.9em;
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: 4px;
+  background-color: var(--input-background, #f9f9f9);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+}
+
+.gigot-dest-card:hover {
+  filter: brightness(0.98);
+}
+
+.gigot-dest-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+
+.gigot-dest-title {
+  font-weight: 600;
+  flex-grow: 1;
+  min-width: 0;
+  word-break: break-all;
+}
+
+.gigot-dest-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  flex-shrink: 0;
+}
+
+/* Status pill next to the destination name */
+.gigot-dest-status {
+  display: inline-block;
+  padding: 0.15em 0.6em;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gigot-dest-status.ok {
+  background-color: var(--git-bg-added, #dff5df);
+  color: #1b5e1b;
+}
+
+.gigot-dest-status.error {
+  background-color: var(--git-bg-deleted, #ffe0e0);
+  color: #8b1a1a;
+}
+
+.gigot-dest-status.never {
+  background-color: var(--git-bg-default, #ececec);
+  color: var(--text-color, #666);
+}
+
+.gigot-dest-url {
+  font-family: var(--mono-font, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.85rem;
+  color: var(--text-color, #555);
+  opacity: 0.8;
+  word-break: break-all;
+}
+
+.gigot-dest-meta {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.gigot-dest-error {
+  color: #8b1a1a;
+  font-size: 0.85rem;
+  word-break: break-word;
+}
+
+/* Empty state */
+.gigot-dests-empty {
+  padding: 1em;
+  text-align: center;
+  color: var(--text-color, #666);
+  opacity: 0.7;
+  font-style: italic;
+}

@@ -223,8 +223,8 @@ export function setupGigotSyncModal() {
     closeBtn: "gigot-sync-close",
     escToClose: true,
     backdropClick: true,
-    width: "42em",
-    height: "32em",
+    width: "44em",
+    height: "26em",
     onOpen: async () => {
       const container = document.getElementById("gigot-sync-modal-body");
       if (!container) return;

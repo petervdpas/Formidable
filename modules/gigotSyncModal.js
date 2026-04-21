@@ -29,14 +29,6 @@ function extractDests(res) {
   return [];
 }
 
-function formatSyncStatus(d) {
-  const status = d.last_sync_status || "never";
-  const ts = d.last_sync_at
-    ? ` · ${new Date(d.last_sync_at).toLocaleString()}`
-    : "";
-  return `${status}${ts}`;
-}
-
 export async function renderGigotSyncBody(container) {
   container.innerHTML = "";
   const cfg = await reloadUserConfig();
@@ -102,8 +94,8 @@ export async function renderGigotSyncBody(container) {
     if (dests.length === 0) {
       addContainerElement({
         parent: destsList,
-        tag: "p",
-        className: "form-info-text",
+        tag: "div",
+        className: "gigot-dests-empty",
         textContent:
           t("modal.gigot.destinations.empty") ||
           "No mirror destinations configured.",
@@ -121,37 +113,27 @@ export async function renderGigotSyncBody(container) {
     const card = document.createElement("div");
     card.className = "gigot-dest-card";
 
+    // Header row: title (grows) + status pill + retry button
+    const header = document.createElement("div");
+    header.className = "gigot-dest-header";
+
     addContainerElement({
-      parent: card,
+      parent: header,
       tag: "div",
       className: "gigot-dest-title",
       textContent: d.name || d.id || "(unnamed)",
     });
 
-    if (d.url) {
-      addContainerElement({
-        parent: card,
-        tag: "div",
-        className: "gigot-dest-url label-subtext",
-        textContent: d.url,
-      });
-    }
+    const actions = document.createElement("div");
+    actions.className = "gigot-dest-actions";
 
+    const statusKey = d.last_sync_status || "never";
     addContainerElement({
-      parent: card,
-      tag: "div",
-      className: `gigot-dest-status ${d.last_sync_status || "never"}`,
-      textContent: formatSyncStatus(d),
+      parent: actions,
+      tag: "span",
+      className: `gigot-dest-status ${statusKey}`,
+      textContent: statusKey,
     });
-
-    if (d.last_sync_error) {
-      addContainerElement({
-        parent: card,
-        tag: "div",
-        className: "gigot-dest-error label-subtext",
-        textContent: d.last_sync_error,
-      });
-    }
 
     const retryBtn = createButton({
       text: t("modal.gigot.retry") || "Retry",
@@ -164,7 +146,40 @@ export async function renderGigotSyncBody(container) {
         await onRetryDone();
       },
     });
-    card.appendChild(retryBtn);
+    actions.appendChild(retryBtn);
+
+    header.appendChild(actions);
+    card.appendChild(header);
+
+    // URL (monospace, dim) — below the header
+    if (d.url) {
+      addContainerElement({
+        parent: card,
+        tag: "div",
+        className: "gigot-dest-url",
+        textContent: d.url,
+      });
+    }
+
+    // Last-sync timestamp — small, below URL
+    if (d.last_sync_at) {
+      addContainerElement({
+        parent: card,
+        tag: "div",
+        className: "gigot-dest-meta",
+        textContent: new Date(d.last_sync_at).toLocaleString(),
+      });
+    }
+
+    // Error (if any) — red, below the rest
+    if (d.last_sync_error) {
+      addContainerElement({
+        parent: card,
+        tag: "div",
+        className: "gigot-dest-error",
+        textContent: d.last_sync_error,
+      });
+    }
 
     return card;
   }
