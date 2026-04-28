@@ -1,0 +1,126 @@
+{
+  "meta": {
+    "id": "640d738a-e2f2-44ad-994c-6c2fa1cc4449",
+    "author_name": "Utente Ribelle",
+    "author_email": "regular@example.com",
+    "template": "fcdm-entities.yaml",
+    "created": "2026-04-28T20:38:24.103Z",
+    "updated": "2026-04-28T20:57:03.140Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "640d738a-e2f2-44ad-994c-6c2fa1cc4449",
+    "name": "Account",
+    "namespace": "Acme.Domain.Crm",
+    "kind": "class",
+    "ontology": "entity",
+    "base-entity": "BaseEntity",
+    "interfaces": [
+      "IAuditable",
+      "ISoftDelete"
+    ],
+    "attributes": [
+      [
+        "Id",
+        "Guid",
+        "true",
+        "false",
+        "false",
+        "true",
+        "false",
+        "Unieke identifier van het account."
+      ],
+      [
+        "Bk",
+        "string",
+        "false",
+        "false",
+        "false",
+        "true",
+        "false",
+        "Business key (natuurlijke sleutel)."
+      ],
+      [
+        "Pcn",
+        "string",
+        "false",
+        "false",
+        "false",
+        "true",
+        "false",
+        "Persoonscijfer."
+      ],
+      [
+        "Username",
+        "string",
+        "false",
+        "false",
+        "false",
+        "true",
+        "false",
+        "Inlognaam."
+      ],
+      [
+        "SurfUsername",
+        "string",
+        "false",
+        "true",
+        "false",
+        "false",
+        "false",
+        "SURFconext-loginnaam (optioneel)."
+      ],
+      [
+        "Weergavenaam",
+        "string",
+        "false",
+        "false",
+        "false",
+        "false",
+        "true",
+        "Afgeleid van Voornaam + Achternaam."
+      ],
+      [
+        "Status",
+        "AccessRights",
+        "false",
+        "false",
+        "false",
+        "true",
+        "false",
+        "Toegekende rechten op het account."
+      ],
+      [
+        "Roles",
+        "string",
+        "false",
+        "false",
+        "true",
+        "false",
+        "false",
+        "Toegekende rollen."
+      ],
+      [
+        "CreatedAt",
+        "DateTime",
+        "false",
+        "false",
+        "false",
+        "true",
+        "false",
+        "Aanmaakdatum."
+      ],
+      [
+        "DisabledAt",
+        "DateTime",
+        "false",
+        "true",
+        "false",
+        "false",
+        "false",
+        "Datum waarop het account is uitgeschakeld."
+      ]
+    ]
+  }
+}

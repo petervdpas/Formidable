@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "id": "f70a342d-0b71-4901-b71a-a2c08660ba86",
+    "author_name": "Utente Ribelle",
+    "author_email": "regular@example.com",
+    "template": "fcdm-enums.yaml",
+    "created": "2026-04-28T20:38:11.491Z",
+    "updated": "2026-04-28T20:38:11.490Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "f70a342d-0b71-4901-b71a-a2c08660ba86",
+    "name": "AccessRights",
+    "namespace": "Acme.Domain.Crm",
+    "underlying-type": "int",
+    "is-flags": true,
+    "definition": "Bitwise combineerbare rechten die aan een account kunnen worden toegekend.",
+    "members": [
+      ["None", "0", "Geen rechten."],
+      ["Read", "1", "Mag lezen."],
+      ["Write", "2", "Mag aanmaken en wijzigen."],
+      ["Delete", "4", "Mag verwijderen."],
+      ["Manage", "8", "Mag rechten van anderen beheren."],
+      ["All", "15", "Alle rechten gecombineerd."]
+    ]
+  }
+}

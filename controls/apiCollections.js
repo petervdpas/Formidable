@@ -355,6 +355,8 @@ function mountApiCollections(app) {
     const payload = req.body || {};
     const data = payload.data || {};
     const meta = payload.meta || {};
+    const upsert =
+      String(req.query.upsert || "").toLowerCase() === "true";
 
     const guid = data?.[guidKey];
     if (!guid) {
@@ -365,13 +367,16 @@ function mountApiCollections(app) {
     }
 
     const exists = await resolveFormById(tmpl, String(guid));
-    if (exists.ok) {
+    if (exists.ok && !upsert) {
       return res
         .status(409)
         .json({ error: "already-exists", id: String(guid) });
     }
 
-    const filename = `${String(guid)}.meta.json`;
+    const isCreate = !exists.ok;
+    const filename = exists.ok
+      ? exists.formFile
+      : `${String(guid)}.meta.json`;
 
     const result = formManager.saveForm(
       tmpl,
@@ -394,7 +399,7 @@ function mountApiCollections(app) {
     res.setHeader("ETag", rev.etag);
     res.setHeader("Last-Modified", rev.lastModified);
     res
-      .status(201)
+      .status(isCreate ? 201 : 200)
       .location(
         `/api/collections/${encodeURIComponent(
           req.params.template
@@ -427,9 +432,11 @@ function mountApiCollections(app) {
 
     const guidKey = templateManager.getGuidFieldKey(yaml.fields || []);
     const id = String(req.params.id);
+    const upsert =
+      String(req.query.upsert || "").toLowerCase() === "true";
 
     const resolved = await resolveFormById(tmpl, id);
-    if (!resolved.ok)
+    if (!resolved.ok && !upsert)
       return res
         .status(resolved.code || 404)
         .json({ error: resolved.reason || "not-found" });
@@ -447,9 +454,12 @@ function mountApiCollections(app) {
 
     if (!data?.[guidKey]) data[guidKey] = id;
 
+    const isCreate = !resolved.ok;
+    const filename = resolved.ok ? resolved.formFile : `${id}.meta.json`;
+
     const result = formManager.saveForm(
       tmpl,
-      resolved.formFile,
+      filename,
       { meta, data },
       yaml.fields
     );
@@ -459,14 +469,17 @@ function mountApiCollections(app) {
         .json({ error: "save-failed", detail: result?.error });
     }
 
-    const rev = statRev(resolved.absPath);
+    const absPath = resolved.ok
+      ? resolved.absPath
+      : path.join(configManager.getTemplateStoragePath(tmpl), filename);
+    const rev = statRev(absPath);
     res.setHeader("ETag", rev.etag);
     res.setHeader("Last-Modified", rev.lastModified);
 
-    res.json({
+    res.status(isCreate ? 201 : 200).json({
       template: req.params.template,
       id,
-      filename: resolved.formFile,
+      filename,
       meta,
       data,
       links: {
@@ -475,7 +488,7 @@ function mountApiCollections(app) {
         )}/${encodeURIComponent(id)}`,
         html: `/template/${encodeURIComponent(
           req.params.template
-        )}/form/${encodeURIComponent(resolved.formFile)}`,
+        )}/form/${encodeURIComponent(filename)}`,
       },
       rev: { etag: rev.etag, lastModified: rev.lastModified },
     });
@@ -632,6 +645,115 @@ function mountApiCollections(app) {
     if (!ok) return res.status(500).json({ error: "delete-failed" });
 
     return res.sendStatus(204);
+  });
+
+  router.post("/collections/:template/batch", async (req, res) => {
+    const tmpl = `${req.params.template}.yaml`;
+    const yaml = await loadTemplateYaml(tmpl);
+    if (!yaml || !isCollectionEnabled(yaml)) {
+      return res.status(403).json({ error: "collection-disabled" });
+    }
+
+    const mode = String(req.query.mode || "create").toLowerCase();
+    if (!["create", "replace", "merge"].includes(mode)) {
+      return res.status(400).json({
+        error: "invalid-mode",
+        message: "mode must be one of: create, replace, merge.",
+      });
+    }
+
+    const items = Array.isArray(req.body?.items) ? req.body.items : null;
+    if (!items) {
+      return res.status(400).json({
+        error: "items-missing",
+        message: "Body must include an `items` array.",
+      });
+    }
+
+    const guidKey = templateManager.getGuidFieldKey(yaml.fields || []);
+    const created = [];
+    const updated = [];
+    const errors = [];
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i] || {};
+      const data = item.data || {};
+      const incMeta = item.meta || {};
+      const guid = data?.[guidKey];
+
+      if (!guid) {
+        errors.push({
+          index: i,
+          error: "guid-missing",
+          message: `Item.data must include the GUID field "${guidKey}".`,
+        });
+        continue;
+      }
+
+      const id = String(guid);
+
+      try {
+        const exists = await resolveFormById(tmpl, id);
+
+        if (mode === "create" && exists.ok) {
+          errors.push({ index: i, id, error: "already-exists" });
+          continue;
+        }
+
+        let filename;
+        let toSave;
+
+        if (exists.ok) {
+          filename = exists.formFile;
+          if (mode === "merge") {
+            toSave = {
+              meta: { ...(exists.form?.meta || {}), ...incMeta },
+              data: { ...(exists.form?.data || {}), ...data, [guidKey]: id },
+            };
+          } else {
+            toSave = { meta: incMeta, data: { ...data, [guidKey]: id } };
+          }
+        } else {
+          filename = `${id}.meta.json`;
+          toSave = { meta: incMeta, data: { ...data, [guidKey]: id } };
+        }
+
+        const result = formManager.saveForm(
+          tmpl,
+          filename,
+          toSave,
+          yaml.fields
+        );
+        if (!result?.success) {
+          errors.push({
+            index: i,
+            id,
+            error: "save-failed",
+            message: result?.error,
+          });
+          continue;
+        }
+
+        if (exists.ok) updated.push({ id, filename });
+        else created.push({ id, filename });
+      } catch (e) {
+        errors.push({
+          index: i,
+          id,
+          error: "exception",
+          message: e?.message || String(e),
+        });
+      }
+    }
+
+    res.json({
+      template: req.params.template,
+      mode,
+      totalItems: items.length,
+      created,
+      updated,
+      errors,
+    });
   });
 
   router.get("/collections/:template/export.ndjson", async (req, res) => {
@@ -917,6 +1039,78 @@ function mountApiCollections(app) {
           "items",
         ],
       },
+
+      BatchRequest: {
+        type: "object",
+        required: ["items"],
+        properties: {
+          items: {
+            type: "array",
+            items: {
+              type: "object",
+              required: ["data"],
+              properties: {
+                meta: { type: "object", additionalProperties: true },
+                data: {
+                  type: "object",
+                  additionalProperties: true,
+                  description:
+                    "Must include the template's GUID field as a property.",
+                },
+              },
+            },
+          },
+        },
+      },
+
+      BatchResultRow: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          filename: { type: "string" },
+        },
+        required: ["id", "filename"],
+      },
+
+      BatchErrorRow: {
+        type: "object",
+        properties: {
+          index: { type: "integer" },
+          id: { type: "string" },
+          error: { type: "string" },
+          message: { type: "string" },
+        },
+        required: ["index", "error"],
+      },
+
+      BatchResponse: {
+        type: "object",
+        properties: {
+          template: { type: "string" },
+          mode: { type: "string", enum: ["create", "replace", "merge"] },
+          totalItems: { type: "integer" },
+          created: {
+            type: "array",
+            items: { $ref: "#/components/schemas/BatchResultRow" },
+          },
+          updated: {
+            type: "array",
+            items: { $ref: "#/components/schemas/BatchResultRow" },
+          },
+          errors: {
+            type: "array",
+            items: { $ref: "#/components/schemas/BatchErrorRow" },
+          },
+        },
+        required: [
+          "template",
+          "mode",
+          "totalItems",
+          "created",
+          "updated",
+          "errors",
+        ],
+      },
     };
 
     const itemRefs = [];
@@ -1109,8 +1303,17 @@ function mountApiCollections(app) {
             },
           },
           post: {
-            summary: "Create new item",
-            parameters: [{ $ref: "#/components/parameters/TemplateParam" }],
+            summary: "Create new item (or upsert with `?upsert=true`)",
+            parameters: [
+              { $ref: "#/components/parameters/TemplateParam" },
+              {
+                name: "upsert",
+                in: "query",
+                schema: { type: "boolean", default: false },
+                description:
+                  "If true, an existing item with the same GUID is replaced (200) instead of returning 409.",
+              },
+            ],
             requestBody: {
               required: true,
               content: {
@@ -1118,6 +1321,12 @@ function mountApiCollections(app) {
               },
             },
             responses: {
+              200: {
+                description: "Replaced (only when `upsert=true` and item existed)",
+                content: {
+                  "application/json": { schema: { oneOf: itemRefs } },
+                },
+              },
               201: {
                 description: "Created",
                 content: {
@@ -1149,6 +1358,48 @@ function mountApiCollections(app) {
           },
         },
 
+        "/collections/{template}/batch": {
+          post: {
+            summary: "Bulk create / replace / merge",
+            description:
+              "Apply many items in one request. Each item must carry the template's GUID field inside `data`. Per-item failures are collected in `errors` rather than aborting the batch.",
+            parameters: [
+              { $ref: "#/components/parameters/TemplateParam" },
+              {
+                name: "mode",
+                in: "query",
+                schema: {
+                  type: "string",
+                  enum: ["create", "replace", "merge"],
+                  default: "create",
+                },
+                description:
+                  "create = fail on existing GUIDs; replace = full upsert (PUT-style); merge = partial upsert (PATCH-style).",
+              },
+            ],
+            requestBody: {
+              required: true,
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/BatchRequest" },
+                },
+              },
+            },
+            responses: {
+              200: {
+                description: "OK; per-item outcomes in body",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "#/components/schemas/BatchResponse" },
+                  },
+                },
+              },
+              400: { description: "items-missing or invalid-mode" },
+              403: { description: "collection-disabled" },
+            },
+          },
+        },
+
         "/collections/{template}/{id}": {
           get: {
             summary: "Fetch single item by GUID",
@@ -1167,10 +1418,17 @@ function mountApiCollections(app) {
             },
           },
           put: {
-            summary: "Replace item by GUID",
+            summary: "Replace item by GUID (or upsert with `?upsert=true`)",
             parameters: [
               { $ref: "#/components/parameters/TemplateParam" },
               { $ref: "#/components/parameters/IdParam" },
+              {
+                name: "upsert",
+                in: "query",
+                schema: { type: "boolean", default: false },
+                description:
+                  "If true, the item is created (201) when missing instead of returning 404.",
+              },
             ],
             requestBody: {
               required: true,
@@ -1180,7 +1438,13 @@ function mountApiCollections(app) {
             },
             responses: {
               200: {
-                description: "OK",
+                description: "Replaced",
+                content: {
+                  "application/json": { schema: { oneOf: itemRefs } },
+                },
+              },
+              201: {
+                description: "Created (only when `upsert=true` and item was missing)",
                 content: {
                   "application/json": { schema: { oneOf: itemRefs } },
                 },

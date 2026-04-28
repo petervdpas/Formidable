@@ -1,0 +1,247 @@
+name: 'FIP: FCDM Entities'
+filename: fcdm-entities.yaml
+item_field: name
+markdown_template: !!str |-
+  ---
+  title: Auto-generated Report
+  author: Formidable Generator
+  date: 2026-04-28
+  toc: true
+  toc-title: Contents
+  toc-own-page: true
+  ---
+
+  ## GUID
+
+  _{{fieldDescription "id"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "id")}}
+  ```
+  {{field "id"}}
+  ---
+
+  ## Naam
+
+  _{{fieldDescription "name"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "name")}}
+  ```
+  {{field "name"}}
+  ---
+
+  ## Namespace
+
+  _{{fieldDescription "namespace"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "namespace")}}
+  ```
+  {{field "namespace"}}
+  ---
+
+  ## Kind
+
+  _{{fieldDescription "kind"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "kind")}}
+  ```
+  Selected: {{field "kind"}}
+  (Value: {{field "kind" "value"}})
+  ---
+
+  ## Ontologie
+
+  _{{fieldDescription "ontology"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "ontology")}}
+  ```
+  Selected: {{field "ontology"}}
+  (Value: {{field "ontology" "value"}})
+  ---
+
+  ## Basis Entiteit
+
+  _{{fieldDescription "base-entity"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "base-entity")}}
+  ```
+  {{field "base-entity"}}
+  ---
+
+  ## Interfaces
+
+  _{{fieldDescription "interfaces"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "interfaces")}}
+  ```
+  {{#each (fieldRaw "interfaces")}}
+  - {{this}}
+  {{/each}}
+  ---
+
+  ## Attributes
+
+  _{{fieldDescription "attributes"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "attributes")}}
+  ```
+  ```sh
+  [LOG]
+  {{json (fieldMeta "attributes" "options")}}
+  ```
+  {{#if (fieldRaw "attributes")}}
+
+    {{#with (fieldMeta "attributes" "options") as |headers|}}
+  |{{#each headers}}{{label}}{{^label}}{{value}}{{/label}} |{{/each}}
+  |{{#each headers}}--|{{/each}}
+    {{/with}}
+    {{#each (fieldRaw "attributes")}}
+  |{{#each this}}{{this}} |{{/each}}
+    {{/each}}
+
+  {{/if}}
+sidebar_expression: '[F["ontology"] == "entity" ? { text: "Entiteit", classes: ["expr-text-green", "expr-bold"] } : F["ontology"] == "event" ? { text: "Event", classes: ["expr-text-blue", "expr-bold"] } : { text: F["ontology"], classes: ["expr-bold"] }]'
+enable_collection: true
+fields:
+  - key: id
+    type: guid
+    label: GUID
+    description: ''
+    expression_item: false
+    two_column: false
+    readonly: false
+    default: ''
+    options: []
+    primary_key: true
+  - key: name
+    type: text
+    label: Naam
+    description: Geef de naam van het type.
+    expression_item: true
+    two_column: true
+    readonly: false
+    default: ''
+    options: []
+  - key: namespace
+    type: text
+    label: Namespace
+    description: Volledige namespace (bijv. Acme.Domain.Crm).
+    expression_item: true
+    two_column: true
+    readonly: false
+    default: ''
+    options: []
+  - key: kind
+    type: dropdown
+    label: Kind
+    description: Soort type (class, record, struct of interface).
+    expression_item: false
+    two_column: true
+    readonly: false
+    default: class
+    options:
+      - value: class
+        label: Class
+      - value: record
+        label: Record
+      - value: struct
+        label: Struct
+      - value: interface
+        label: Interface
+  - key: ontology
+    type: radio
+    label: Ontologie
+    description: Geef het ontologies onderscheid van dit informatie object.
+    expression_item: true
+    two_column: true
+    readonly: false
+    default: entity
+    options:
+      - value: entity
+        label: Entiteit
+      - value: event
+        label: Event
+  - key: base-entity
+    type: text
+    label: Basis Entiteit
+    description: Geef eventueel de basis entiteit op.
+    expression_item: false
+    two_column: true
+    readonly: false
+    default: ''
+    options: []
+  - key: interfaces
+    type: list
+    label: Interfaces
+    description: Geef eventuele geïmplementeerde interfaces op.
+    expression_item: false
+    two_column: false
+    collapsible: false
+    readonly: false
+    default: ''
+    options: []
+  - key: attributes
+    type: table
+    label: Attributes
+    description: Geef de attributen voor dit informatie object.
+    expression_item: false
+    two_column: false
+    collapsible: false
+    readonly: false
+    default: ''
+    options:
+      - value: attribute
+        type: string
+        label: Attribuut
+        choices: ''
+        reference: ''
+      - value: type
+        type: string
+        label: Type
+        choices: ''
+        reference: ''
+      - value: key
+        type: bool
+        label: Key
+        choices: ''
+        reference: ''
+      - value: nullable
+        type: bool
+        label: Nullable
+        choices: ''
+        reference: ''
+      - value: collection
+        type: bool
+        label: Collection
+        choices: ''
+        reference: ''
+      - value: required
+        type: bool
+        label: Verplicht
+        choices: ''
+        reference: ''
+      - value: derived
+        type: bool
+        label: Afgeleid
+        choices: ''
+        reference: ''
+      - value: definition
+        type: string
+        label: Definitie
+        choices: ''
+        reference: ''

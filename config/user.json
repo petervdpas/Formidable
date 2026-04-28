@@ -10,10 +10,10 @@
   "development_enable": true,
   "logging_enabled": true,
   "enable_plugins": true,
-  "context_mode": "template",
+  "context_mode": "storage",
   "context_folder": "./examples",
-  "selected_template": "recepten.yaml",
-  "selected_data_file": "vinaigrette.meta.json",
+  "selected_template": "fcdm-entities.yaml",
+  "selected_data_file": "test.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -28,9 +28,12 @@
   "internal_server_port": 8383,
   "window_bounds": {
     "width": 1440,
-    "height": 853
+    "height": 849,
+    "x": 240,
+    "y": 133,
+    "maximized": false
   },
-  "template_sidebar_width": 310,
+  "template_sidebar_width": 466,
   "storage_sidebar_width": 374,
   "status_buttons": {
     "reloader": true,

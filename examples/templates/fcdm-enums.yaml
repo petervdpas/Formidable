@@ -1,0 +1,207 @@
+name: 'FIP: FCDM Enums'
+filename: fcdm-enums.yaml
+item_field: name
+markdown_template: !!str |-
+  ---
+  title: Auto-generated Report
+  author: Formidable Generator
+  date: 2026-04-28
+  toc: true
+  toc-title: Contents
+  toc-own-page: true
+  ---
+
+  ## GUID
+
+  _{{fieldDescription "id"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "id")}}
+  ```
+  {{field "id"}}
+  ---
+
+  ## Naam
+
+  _{{fieldDescription "name"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "name")}}
+  ```
+  {{field "name"}}
+  ---
+
+  ## Namespace
+
+  _{{fieldDescription "namespace"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "namespace")}}
+  ```
+  {{field "namespace"}}
+  ---
+
+  ## Underlying Type
+
+  _{{fieldDescription "underlying-type"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "underlying-type")}}
+  ```
+  Selected: {{field "underlying-type"}}
+  (Value: {{field "underlying-type" "value"}})
+  ---
+
+  ## Flags
+
+  _{{fieldDescription "is-flags"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "is-flags")}}
+  ```
+  {{field "is-flags"}}
+  ---
+
+  ## Definitie
+
+  _{{fieldDescription "definition"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "definition")}}
+  ```
+  {{field "definition"}}
+  ---
+
+  ## Members
+
+  _{{fieldDescription "members"}}_
+
+  ```sh
+  [LOG]
+  {{json (fieldRaw "members")}}
+  ```
+  ```sh
+  [LOG]
+  {{json (fieldMeta "members" "options")}}
+  ```
+  {{#if (fieldRaw "members")}}
+
+    {{#with (fieldMeta "members" "options") as |headers|}}
+  |{{#each headers}}{{label}}{{^label}}{{value}}{{/label}} |{{/each}}
+  |{{#each headers}}--|{{/each}}
+    {{/with}}
+    {{#each (fieldRaw "members")}}
+  |{{#each this}}{{this}} |{{/each}}
+    {{/each}}
+
+  {{/if}}
+sidebar_expression: '[F["is-flags"] == true ? { text: F["name"] + " [Flags]", classes: ["expr-text-purple", "expr-bold"] } : { text: F["name"], classes: ["expr-text-purple", "expr-bold"] }]'
+enable_collection: true
+fields:
+  - key: id
+    type: guid
+    label: GUID
+    description: ''
+    expression_item: false
+    two_column: false
+    readonly: false
+    default: ''
+    options: []
+    primary_key: true
+  - key: name
+    type: text
+    label: Naam
+    description: Geef de naam van de enum.
+    expression_item: true
+    two_column: true
+    readonly: false
+    default: ''
+    options: []
+  - key: namespace
+    type: text
+    label: Namespace
+    description: Volledige namespace (bijv. Acme.Domain.Crm).
+    expression_item: true
+    two_column: true
+    readonly: false
+    default: ''
+    options: []
+  - key: underlying-type
+    type: dropdown
+    label: Underlying Type
+    description: Onderliggend numeriek type van de enum.
+    expression_item: false
+    two_column: true
+    readonly: false
+    default: int
+    options:
+      - value: byte
+        label: byte
+      - value: sbyte
+        label: sbyte
+      - value: short
+        label: short
+      - value: ushort
+        label: ushort
+      - value: int
+        label: int
+      - value: uint
+        label: uint
+      - value: long
+        label: long
+      - value: ulong
+        label: ulong
+  - key: is-flags
+    type: boolean
+    label: Flags
+    description: Of dit een [Flags]-enum is (bitwise combineerbaar).
+    expression_item: true
+    two_column: true
+    readonly: false
+    default: ''
+    options:
+      - value: true
+        label: 'Ja'
+      - value: false
+        label: 'Nee'
+  - key: definition
+    type: textarea
+    label: Definitie
+    description: Vrije omschrijving van deze enum.
+    expression_item: false
+    two_column: false
+    readonly: false
+    default: ''
+    options: []
+    format: plain
+  - key: members
+    type: table
+    label: Members
+    description: Geef de leden van de enum (naam, waarde, omschrijving).
+    expression_item: false
+    two_column: false
+    collapsible: false
+    readonly: false
+    default: ''
+    options:
+      - value: name
+        type: string
+        label: Naam
+        choices: ''
+        reference: ''
+      - value: value
+        type: number
+        label: Waarde
+        choices: ''
+        reference: ''
+      - value: description
+        type: string
+        label: Omschrijving
+        choices: ''
+        reference: ''
