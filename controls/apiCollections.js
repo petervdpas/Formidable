@@ -1,9 +1,41 @@
 // controls/apiCollections.js
 
 const path = require("path");
+const fs = require("fs");
 const express = require("express");
 const swaggerUi = require("swagger-ui-express");
 const fieldSchema = require("../schemas/field.schema.js");
+
+// Build a human-readable filename slug from a string (lowercase, dashed,
+// alphanumeric only, length-capped). Empty/null input returns "".
+function slugify(s) {
+  return String(s ?? "")
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "") // strip diacritics
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .substring(0, 80);
+}
+
+// Pick a filename for a NEW item. Prefers the template's item_field value
+// (e.g. "Product" -> "product.meta.json"), with a numeric suffix when that
+// slug is already taken. Falls back to the GUID when no usable item_field
+// value is present, so collections without item_field still work.
+function deriveNewFilename(yaml, data, guid, storagePath) {
+  const itemField = (yaml.item_field || "").toString().trim();
+  const raw = itemField && data ? data[itemField] : null;
+  const base = slugify(raw);
+  if (!base) return `${String(guid)}.meta.json`;
+
+  let candidate = `${base}.meta.json`;
+  for (let n = 2; n < 1000; n++) {
+    if (!fs.existsSync(path.join(storagePath, candidate))) return candidate;
+    candidate = `${base}-${n}.meta.json`;
+  }
+  // Pathological — fall back to GUID.
+  return `${String(guid)}.meta.json`;
+}
 
 const {
   getVirtualStructure,
@@ -376,7 +408,12 @@ function mountApiCollections(app) {
     const isCreate = !exists.ok;
     const filename = exists.ok
       ? exists.formFile
-      : `${String(guid)}.meta.json`;
+      : deriveNewFilename(
+          yaml,
+          data,
+          guid,
+          configManager.getTemplateStoragePath(tmpl)
+        );
 
     const result = formManager.saveForm(
       tmpl,
@@ -455,7 +492,14 @@ function mountApiCollections(app) {
     if (!data?.[guidKey]) data[guidKey] = id;
 
     const isCreate = !resolved.ok;
-    const filename = resolved.ok ? resolved.formFile : `${id}.meta.json`;
+    const filename = resolved.ok
+      ? resolved.formFile
+      : deriveNewFilename(
+          yaml,
+          data,
+          id,
+          configManager.getTemplateStoragePath(tmpl)
+        );
 
     const result = formManager.saveForm(
       tmpl,
@@ -714,7 +758,12 @@ function mountApiCollections(app) {
             toSave = { meta: incMeta, data: { ...data, [guidKey]: id } };
           }
         } else {
-          filename = `${id}.meta.json`;
+          filename = deriveNewFilename(
+            yaml,
+            { ...data, [guidKey]: id },
+            id,
+            configManager.getTemplateStoragePath(tmpl)
+          );
           toSave = { meta: incMeta, data: { ...data, [guidKey]: id } };
         }
 

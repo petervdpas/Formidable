@@ -20,7 +20,7 @@ markdown_template: !!str |-
   {
   {{#each (fieldRaw "attributes")}}
       {{#if (cell this "definition" "attributes")}}/// <summary>{{cell this "definition" "attributes"}}</summary>
-      {{/if}}public {{#unless (eq (cell this "derived" "attributes") "true")}}{{#if (eq (cell this "required" "attributes") "true")}}required {{/if}}{{/unless}}{{#if (eq (cell this "collection" "attributes") "true")}}List<{{cell this "type" "attributes"}}>{{else}}{{cell this "type" "attributes"}}{{/if}}{{#if (eq (cell this "nullable" "attributes") "true")}}?{{/if}} {{cell this "attribute" "attributes"}} { get;{{#unless (eq (cell this "derived" "attributes") "true")}} set;{{/unless}} }
+      {{/if}}public {{#unless (eq (cell this "derived" "attributes") "true")}}{{#unless (eq (cell this "accessor" "attributes") "get")}}{{#if (eq (cell this "required" "attributes") "true")}}required {{/if}}{{/unless}}{{/unless}}{{#if (eq (cell this "collection" "attributes") "true")}}List<{{cell this "type" "attributes"}}>{{else}}{{cell this "type" "attributes"}}{{/if}}{{#if (eq (cell this "nullable" "attributes") "true")}}?{{/if}} {{cell this "attribute" "attributes"}} { get;{{#if (eq (cell this "accessor" "attributes") "set")}} set;{{else}}{{#if (eq (cell this "accessor" "attributes") "init")}} init;{{else}}{{#unless (cell this "accessor" "attributes")}}{{#unless (eq (cell this "derived" "attributes") "true")}} set;{{/unless}}{{/unless}}{{/if}}{{/if}} }
   {{/each}}
   }
   ```
@@ -153,4 +153,9 @@ fields:
         type: string
         label: Definitie
         choices: ''
+        reference: ''
+      - value: accessor
+        type: dropdown
+        label: Accessor
+        choices: 'get:get|init:get,init|set:get,set'
         reference: ''
