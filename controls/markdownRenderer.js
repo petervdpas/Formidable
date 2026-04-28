@@ -205,6 +205,13 @@ function registerHelpers(filePrefix = true) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   });
 
+  Handlebars.registerHelper("camel", function (s) {
+    if (s == null) return "";
+    const str = String(s);
+    if (str.length === 0) return "";
+    return str.charAt(0).toLowerCase() + str.slice(1);
+  });
+
   Handlebars.registerHelper("cell", function (row, colName, tableKey, options) {
     const ctx = options?.data?.root || this;
     const fields = ctx._fields || [];
