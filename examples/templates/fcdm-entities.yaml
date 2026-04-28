@@ -11,110 +11,19 @@ markdown_template: !!str |-
   toc-own-page: true
   ---
 
-  ## GUID
+  ## {{field "name"}}
 
-  _{{fieldDescription "id"}}_
+  ```csharp
+  {{#if (fieldRaw "namespace")}}namespace {{field "namespace"}};
 
-  ```sh
-  [LOG]
-  {{json (fieldRaw "id")}}
-  ```
-  {{field "id"}}
-  ---
-
-  ## Naam
-
-  _{{fieldDescription "name"}}_
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "name")}}
-  ```
-  {{field "name"}}
-  ---
-
-  ## Namespace
-
-  _{{fieldDescription "namespace"}}_
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "namespace")}}
-  ```
-  {{field "namespace"}}
-  ---
-
-  ## Kind
-
-  _{{fieldDescription "kind"}}_
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "kind")}}
-  ```
-  Selected: {{field "kind"}}
-  (Value: {{field "kind" "value"}})
-  ---
-
-  ## Ontologie
-
-  _{{fieldDescription "ontology"}}_
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "ontology")}}
-  ```
-  Selected: {{field "ontology"}}
-  (Value: {{field "ontology" "value"}})
-  ---
-
-  ## Basis Entiteit
-
-  _{{fieldDescription "base-entity"}}_
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "base-entity")}}
-  ```
-  {{field "base-entity"}}
-  ---
-
-  ## Interfaces
-
-  _{{fieldDescription "interfaces"}}_
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "interfaces")}}
-  ```
-  {{#each (fieldRaw "interfaces")}}
-  - {{this}}
+  {{/if}}public {{field "kind" "value"}} {{field "name"}}{{#if (fieldRaw "base-entity")}} : {{field "base-entity"}}{{#each (fieldRaw "interfaces")}}, {{this}}{{/each}}{{else}}{{#if (length (fieldRaw "interfaces"))}} : {{#each (fieldRaw "interfaces")}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}{{/if}}
+  {
+  {{#each (fieldRaw "attributes")}}
+      {{#if (cell this "definition" "attributes")}}/// <summary>{{cell this "definition" "attributes"}}</summary>
+      {{/if}}public {{#unless (eq (cell this "derived" "attributes") "true")}}{{#if (eq (cell this "required" "attributes") "true")}}required {{/if}}{{/unless}}{{#if (eq (cell this "collection" "attributes") "true")}}List<{{cell this "type" "attributes"}}>{{else}}{{cell this "type" "attributes"}}{{/if}}{{#if (eq (cell this "nullable" "attributes") "true")}}?{{/if}} {{cell this "attribute" "attributes"}} { get;{{#unless (eq (cell this "derived" "attributes") "true")}} set;{{/unless}} }
   {{/each}}
-  ---
-
-  ## Attributes
-
-  _{{fieldDescription "attributes"}}_
-
-  ```sh
-  [LOG]
-  {{json (fieldRaw "attributes")}}
+  }
   ```
-  ```sh
-  [LOG]
-  {{json (fieldMeta "attributes" "options")}}
-  ```
-  {{#if (fieldRaw "attributes")}}
-
-    {{#with (fieldMeta "attributes" "options") as |headers|}}
-  |{{#each headers}}{{label}}{{^label}}{{value}}{{/label}} |{{/each}}
-  |{{#each headers}}--|{{/each}}
-    {{/with}}
-    {{#each (fieldRaw "attributes")}}
-  |{{#each this}}{{this}} |{{/each}}
-    {{/each}}
-
-  {{/if}}
 sidebar_expression: '[F["ontology"] == "entity" ? { text: "Entiteit", classes: ["expr-text-green", "expr-bold"] } : F["ontology"] == "event" ? { text: "Event", classes: ["expr-text-blue", "expr-bold"] } : { text: F["ontology"], classes: ["expr-bold"] }]'
 enable_collection: true
 fields:

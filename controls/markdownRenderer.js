@@ -198,6 +198,18 @@ function registerHelpers(filePrefix = true) {
     (array, value) => Array.isArray(array) && array.includes(value)
   );
 
+  Handlebars.registerHelper("cell", function (row, colName, tableKey, options) {
+    const ctx = options?.data?.root || this;
+    const fields = ctx._fields || [];
+    const tableField = fields.find((f) => f.key === tableKey);
+    if (!tableField || !Array.isArray(tableField.options)) return "";
+    const idx = tableField.options.findIndex(
+      (o) => (typeof o === "string" ? o : o.value) === colName
+    );
+    if (idx === -1 || !Array.isArray(row)) return "";
+    return row[idx];
+  });
+
   Handlebars.registerHelper("lookupOption", function (options, value) {
     if (!Array.isArray(options)) return { value, label: value };
 
