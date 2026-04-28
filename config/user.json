@@ -13,7 +13,7 @@
   "context_mode": "storage",
   "context_folder": "./examples",
   "selected_template": "fcdm-entities.yaml",
-  "selected_data_file": "test.meta.json",
+  "selected_data_file": "address.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -29,8 +29,8 @@
   "window_bounds": {
     "width": 1440,
     "height": 849,
-    "x": 240,
-    "y": 131,
+    "x": 312,
+    "y": 71,
     "maximized": false
   },
   "template_sidebar_width": 466,

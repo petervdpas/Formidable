@@ -18,7 +18,9 @@ markdown_template: !!str |-
 
   {{/if}}public {{field "kind" "value"}} {{field "name"}}{{#if (fieldRaw "base-entity")}} : {{field "base-entity"}}{{#each (fieldRaw "interfaces")}}, {{this}}{{/each}}{{else}}{{#if (length (fieldRaw "interfaces"))}} : {{#each (fieldRaw "interfaces")}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}{{/if}}
   {
-  {{#each (fieldRaw "attributes")}}
+  {{#if (length (fieldRaw "constructor-parameters"))}}    public {{field "name"}}({{#each (fieldRaw "constructor-parameters")}}{{cell this "type" "constructor-parameters"}} {{cell this "name" "constructor-parameters"}}{{#unless @last}}, {{/unless}}{{/each}}) { }
+
+  {{/if}}{{#each (fieldRaw "attributes")}}
       {{#if (cell this "definition" "attributes")}}/// <summary>{{cell this "definition" "attributes"}}</summary>
       {{/if}}public {{#unless (eq (cell this "derived" "attributes") "true")}}{{#unless (eq (cell this "accessor" "attributes") "get")}}{{#if (eq (cell this "required" "attributes") "true")}}required {{/if}}{{/unless}}{{/unless}}{{#if (eq (cell this "collection" "attributes") "true")}}List<{{cell this "type" "attributes"}}>{{else}}{{cell this "type" "attributes"}}{{/if}}{{#if (eq (cell this "nullable" "attributes") "true")}}?{{/if}} {{cell this "attribute" "attributes"}} { get;{{#if (eq (cell this "accessor" "attributes") "set")}} set;{{else}}{{#if (eq (cell this "accessor" "attributes") "init")}} init;{{else}}{{#unless (cell this "accessor" "attributes")}}{{#unless (eq (cell this "derived" "attributes") "true")}} set;{{/unless}}{{/unless}}{{/if}}{{/if}} }
   {{/each}}
@@ -104,6 +106,26 @@ fields:
     readonly: false
     default: ''
     options: []
+  - key: constructor-parameters
+    type: table
+    label: Constructor
+    description: Parameters van de primary constructor (type, naam).
+    expression_item: false
+    two_column: false
+    collapsible: false
+    readonly: false
+    default: ''
+    options:
+      - value: type
+        type: string
+        label: Type
+        choices: ''
+        reference: ''
+      - value: name
+        type: string
+        label: Naam
+        choices: ''
+        reference: ''
   - key: attributes
     type: table
     label: Attributes
