@@ -1,0 +1,126 @@
+{
+  "meta": {
+    "id": "17d65f4b-7360-f265-2d36-f5a6c9883d40",
+    "author_name": "Unknown",
+    "author_email": "unknown@example.com",
+    "template": "unknown",
+    "created": "2026-04-28T23:33:42.248Z",
+    "updated": "2026-04-28T23:33:42.248Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "17d65f4b-7360-f265-2d36-f5a6c9883d40",
+    "name": "Person",
+    "namespace": "Acme.Domain",
+    "kind": "class",
+    "ontology": "entity",
+    "base-entity": "",
+    "interfaces": [],
+    "constructor-parameters": [
+      [
+        "string",
+        "id"
+      ],
+      [
+        "string",
+        "givenName"
+      ],
+      [
+        "string",
+        "familyName"
+      ],
+      [
+        "DateOnly?",
+        "dateOfBirth"
+      ],
+      [
+        "IReadOnlyList<ContactChannel>",
+        "channels"
+      ],
+      [
+        "IReadOnlyList<Address>",
+        "addresses"
+      ]
+    ],
+    "attributes": [
+      [
+        "Id",
+        "string",
+        "true",
+        "false",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "GivenName",
+        "string",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "FamilyName",
+        "string",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "DateOfBirth",
+        "DateOnly",
+        "false",
+        "true",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "Channels",
+        "ContactChannel",
+        "false",
+        "false",
+        "true",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "Addresses",
+        "Address",
+        "false",
+        "false",
+        "true",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "FullName",
+        "string",
+        "false",
+        "false",
+        "false",
+        "false",
+        "true",
+        "",
+        "get"
+      ]
+    ]
+  }
+}

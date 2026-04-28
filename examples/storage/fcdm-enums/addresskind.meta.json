@@ -1,0 +1,42 @@
+{
+  "meta": {
+    "id": "8639034b-1751-a7bb-858a-afe42a9855fa",
+    "author_name": "Unknown",
+    "author_email": "unknown@example.com",
+    "template": "unknown",
+    "created": "2026-04-28T23:33:42.292Z",
+    "updated": "2026-04-28T23:33:42.292Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "8639034b-1751-a7bb-858a-afe42a9855fa",
+    "name": "AddressKind",
+    "namespace": "Acme.Domain",
+    "underlying-type": "int",
+    "is-flags": false,
+    "definition": "",
+    "members": [
+      [
+        "Home",
+        "0",
+        ""
+      ],
+      [
+        "Work",
+        "1",
+        ""
+      ],
+      [
+        "Shipping",
+        "2",
+        ""
+      ],
+      [
+        "Billing",
+        "3",
+        ""
+      ]
+    ]
+  }
+}

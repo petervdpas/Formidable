@@ -1,0 +1,111 @@
+{
+  "meta": {
+    "id": "e3784e53-00fd-9296-5c11-8eb500eff1cd",
+    "author_name": "Unknown",
+    "author_email": "unknown@example.com",
+    "template": "unknown",
+    "created": "2026-04-28T23:33:42.244Z",
+    "updated": "2026-04-28T23:33:42.244Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "e3784e53-00fd-9296-5c11-8eb500eff1cd",
+    "name": "Order",
+    "namespace": "Acme.Domain",
+    "kind": "class",
+    "ontology": "entity",
+    "base-entity": "",
+    "interfaces": [],
+    "constructor-parameters": [
+      [
+        "string",
+        "id"
+      ],
+      [
+        "string",
+        "customerId"
+      ],
+      [
+        "DateTimeOffset",
+        "placedAtUtc"
+      ],
+      [
+        "IReadOnlyList<OrderLine>",
+        "lines"
+      ],
+      [
+        "OrderStatus",
+        "status"
+      ]
+    ],
+    "attributes": [
+      [
+        "Id",
+        "string",
+        "true",
+        "false",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "CustomerId",
+        "string",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "PlacedAtUtc",
+        "DateTimeOffset",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "Lines",
+        "OrderLine",
+        "false",
+        "false",
+        "true",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "Status",
+        "OrderStatus",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "Total",
+        "decimal",
+        "false",
+        "false",
+        "false",
+        "false",
+        "true",
+        "",
+        "get"
+      ]
+    ]
+  }
+}

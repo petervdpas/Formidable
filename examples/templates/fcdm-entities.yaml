@@ -18,7 +18,10 @@ markdown_template: !!str |-
 
   {{/if}}public {{field "kind" "value"}} {{field "name"}}{{#if (fieldRaw "base-entity")}} : {{field "base-entity"}}{{#each (fieldRaw "interfaces")}}, {{this}}{{/each}}{{else}}{{#if (length (fieldRaw "interfaces"))}} : {{#each (fieldRaw "interfaces")}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}{{/if}}
   {
-  {{#if (length (fieldRaw "constructor-parameters"))}}    public {{field "name"}}({{#each (fieldRaw "constructor-parameters")}}{{cell this "type" "constructor-parameters"}} {{cell this "name" "constructor-parameters"}}{{#unless @last}}, {{/unless}}{{/each}}) { }
+  {{#if (length (fieldRaw "constructor-parameters"))}}    public {{field "name"}}({{#each (fieldRaw "constructor-parameters")}}{{cell this "type" "constructor-parameters"}} {{cell this "name" "constructor-parameters"}}{{#unless @last}}, {{/unless}}{{/each}})
+      {
+  {{#each (fieldRaw "constructor-parameters")}}        {{pascal (cell this "name" "constructor-parameters")}} = {{cell this "name" "constructor-parameters"}};
+  {{/each}}    }
 
   {{/if}}{{#each (fieldRaw "attributes")}}
       {{#if (cell this "definition" "attributes")}}/// <summary>{{cell this "definition" "attributes"}}</summary>

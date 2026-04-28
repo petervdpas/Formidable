@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "id": "bdffcd41-0d56-8e4e-dc3c-65c86bba7ad3",
+    "author_name": "Unknown",
+    "author_email": "unknown@example.com",
+    "template": "unknown",
+    "created": "2026-04-28T23:33:42.294Z",
+    "updated": "2026-04-28T23:33:42.294Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "bdffcd41-0d56-8e4e-dc3c-65c86bba7ad3",
+    "name": "CustomerTier",
+    "namespace": "Acme.Domain",
+    "underlying-type": "int",
+    "is-flags": false,
+    "definition": "",
+    "members": [
+      [
+        "Free",
+        "0",
+        ""
+      ],
+      [
+        "Pro",
+        "1",
+        ""
+      ],
+      [
+        "Enterprise",
+        "2",
+        ""
+      ]
+    ]
+  }
+}

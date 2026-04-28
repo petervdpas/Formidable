@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "id": "ef939309-27bd-b85b-72e8-f3e58520ffdc",
+    "author_name": "Unknown",
+    "author_email": "unknown@example.com",
+    "template": "unknown",
+    "created": "2026-04-28T23:33:42.296Z",
+    "updated": "2026-04-28T23:33:42.296Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "ef939309-27bd-b85b-72e8-f3e58520ffdc",
+    "name": "OrderStatus",
+    "namespace": "Acme.Domain",
+    "underlying-type": "int",
+    "is-flags": false,
+    "definition": "",
+    "members": [
+      [
+        "Pending",
+        "0",
+        ""
+      ],
+      [
+        "Paid",
+        "1",
+        ""
+      ],
+      [
+        "Shipped",
+        "2",
+        ""
+      ],
+      [
+        "Delivered",
+        "3",
+        ""
+      ],
+      [
+        "Cancelled",
+        "4",
+        ""
+      ]
+    ]
+  }
+}

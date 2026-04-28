@@ -1,0 +1,70 @@
+{
+  "meta": {
+    "id": "6d972c47-02ad-99db-d8f4-1692d0be554f",
+    "author_name": "Unknown",
+    "author_email": "unknown@example.com",
+    "template": "unknown",
+    "created": "2026-04-28T23:33:42.251Z",
+    "updated": "2026-04-28T23:33:42.251Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "6d972c47-02ad-99db-d8f4-1692d0be554f",
+    "name": "ContactChannel",
+    "namespace": "Acme.Domain",
+    "kind": "class",
+    "ontology": "entity",
+    "base-entity": "",
+    "interfaces": [],
+    "constructor-parameters": [
+      [
+        "ContactChannelKind",
+        "kind"
+      ],
+      [
+        "string",
+        "value"
+      ],
+      [
+        "bool",
+        "isPrimary"
+      ]
+    ],
+    "attributes": [
+      [
+        "Kind",
+        "ContactChannelKind",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "Value",
+        "string",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "IsPrimary",
+        "bool",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ]
+    ]
+  }
+}

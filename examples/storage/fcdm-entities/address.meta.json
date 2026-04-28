@@ -1,0 +1,130 @@
+{
+  "meta": {
+    "id": "421a9966-4518-70f8-23f2-0b80e17ac2cc",
+    "author_name": "Unknown",
+    "author_email": "unknown@example.com",
+    "template": "unknown",
+    "created": "2026-04-28T23:33:42.240Z",
+    "updated": "2026-04-28T23:33:42.240Z",
+    "flagged": false,
+    "tags": []
+  },
+  "data": {
+    "id": "421a9966-4518-70f8-23f2-0b80e17ac2cc",
+    "name": "Address",
+    "namespace": "Acme.Domain",
+    "kind": "class",
+    "ontology": "entity",
+    "base-entity": "",
+    "interfaces": [],
+    "constructor-parameters": [
+      [
+        "string",
+        "line1"
+      ],
+      [
+        "string?",
+        "line2"
+      ],
+      [
+        "string",
+        "city"
+      ],
+      [
+        "string",
+        "state"
+      ],
+      [
+        "string",
+        "postalCode"
+      ],
+      [
+        "string",
+        "country"
+      ],
+      [
+        "AddressKind",
+        "kind"
+      ]
+    ],
+    "attributes": [
+      [
+        "Line1",
+        "string",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "Line2",
+        "string",
+        "false",
+        "true",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "City",
+        "string",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "State",
+        "string",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "PostalCode",
+        "string",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "Country",
+        "string",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ],
+      [
+        "Kind",
+        "AddressKind",
+        "false",
+        "false",
+        "false",
+        "false",
+        "false",
+        "",
+        "init"
+      ]
+    ]
+  }
+}
