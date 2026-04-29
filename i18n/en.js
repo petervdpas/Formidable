@@ -629,7 +629,7 @@ export default {
     "Configure history settings like enabled, persist and max size.",
   "modal.settings.tab.display": "Display",
   "modal.settings.tab.display.description":
-    "Configure the display theme and toggle icon-based buttons.",
+    "Configure the display theme and visibility of UI elements.",
   "modal.settings.tab.directories": "Locations",
   "modal.settings.tab.directories.description":
     "Configure the context folder and the optional remote backend (Git or GiGot).",
@@ -650,7 +650,8 @@ export default {
   "modal.settings.display.meta": "Show Meta Section",
   "modal.settings.display.loop.collapsed": "Collapse Loop Items",
   "modal.settings.display.field.collapsed": "Collapse List/Table Fields",
-  "modal.settings.icon.buttons": "Icon-based Buttons",
+  "modal.settings.icon.buttons": "Icon-based",
+  "modal.settings.paste.buttons": "Paste-data on Lists/Tables",
   "modal.settings.context.folder": "Context Directory",
   "modal.settings.git.root": "Git Root Directory",
   "modal.settings.remote.backend": "Remote Backend",

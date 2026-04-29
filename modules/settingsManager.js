@@ -226,6 +226,18 @@ export async function renderSettings() {
           true
         )
       );
+
+      panel.appendChild(
+        createSwitch(
+          "show-paste-toggle",
+          "modal.settings.paste.buttons",
+          cachedConfig.show_paste_buttons ?? true,
+          null,
+          "block",
+          ["standard.on", "standard.off"],
+          true
+        )
+      );
     }
   );
 
@@ -530,6 +542,9 @@ export async function renderSettings() {
 
 function setupBindings(config, gitRootPicker) {
   bindToggleSwitch("show-icons-toggle", "show_icon_buttons");
+  bindToggleSwitch("show-paste-toggle", "show_paste_buttons", (enabled) => {
+    EventBus.emit("screen:paste:visibility", enabled);
+  });
   bindToggleSwitch("show-expressions-toggle", "use_expressions");
   bindToggleSwitch("show-meta-toggle", "show_meta_section", (enabled) => {
     EventBus.emit("screen:meta:visibility", enabled);

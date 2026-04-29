@@ -655,7 +655,7 @@ export default {
     "Configureer geschiedenisinstellingen zoals inschakelen, behouden en maximale grootte.",
   "modal.settings.tab.display": "Weergave",
   "modal.settings.tab.display.description":
-    "Configureer het weergavethema en schakel op pictogrammen gebaseerde knoppen in.",
+    "Configureer het weergavethema en de zichtbaarheid van UI-elementen.",
   "modal.settings.tab.directories": "Locaties",
   "modal.settings.tab.directories.description":
     "Configureer de contextmap en de optionele externe backend (Git of GiGot).",
@@ -676,7 +676,8 @@ export default {
   "modal.settings.display.meta": "Toon Meta Sectie",
   "modal.settings.display.loop.collapsed": "Ingeklapte Lus-items",
   "modal.settings.display.field.collapsed": "Ingeklapte Lijst/Tabel-velden",
-  "modal.settings.icon.buttons": "Pictogram knoppen",
+  "modal.settings.icon.buttons": "Pictogrammen",
+  "modal.settings.paste.buttons": "Plak-data bij Lijsten/Tabellen",
   "modal.settings.context.folder": "Contextmap",
   "modal.settings.git.root": "Git-rootmap",
   "modal.settings.remote.backend": "Externe Backend",

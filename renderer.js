@@ -113,6 +113,9 @@ window.addEventListener("DOMContentLoaded", async () => {
   document.documentElement.setAttribute("lang", config.language || "en");
   translateDOM();
 
+  // Apply user-toggleable display flags via the same handlers used at runtime.
+  EventBus.emit("screen:paste:visibility", config.show_paste_buttons !== false);
+
   // ── Menu ──
   buildMenu("app-menu", handleMenuAction);
   initStatusHandler("status-bar");

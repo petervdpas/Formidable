@@ -323,6 +323,11 @@
   background: var(--btn-hover-bg, rgba(0, 0, 0, 0.06));
 }
 
+/* User setting: hide all paste-data buttons (controlled by show_paste_buttons) */
+body.no-paste-buttons .paste-data-button {
+  display: none !important;
+}
+
 /* paste-data popup textarea: sized like a usable scratchpad */
 .paste-data-popup .panel-row textarea {
   min-height: 160px;

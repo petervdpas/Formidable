@@ -2,6 +2,7 @@
   "profile_name": "Default Profile",
   "theme": "light",
   "show_icon_buttons": false,
+  "show_paste_buttons": false,
   "use_expressions": true,
   "show_meta_section": true,
   "loop_state_collapsed": true,
@@ -28,10 +29,7 @@
   "internal_server_port": 8383,
   "window_bounds": {
     "width": 1440,
-    "height": 849,
-    "x": 240,
-    "y": 131,
-    "maximized": false
+    "height": 849
   },
   "template_sidebar_width": 466,
   "storage_sidebar_width": 360,

@@ -5,6 +5,7 @@ module.exports = {
     profile_name: "Default Profile",
     theme: "light",
     show_icon_buttons: false,
+    show_paste_buttons: true,
     use_expressions: false,
     show_meta_section: true,
     loop_state_collapsed: false,

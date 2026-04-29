@@ -187,6 +187,10 @@ export function initEventRouter() {
     "screen:meta:visibility",
     screenHandlers.handleStorageMetaVisibility
   );
+  EventBus.off(
+    "screen:paste:visibility",
+    screenHandlers.handlePasteButtonVisibility
+  );
   EventBus.off("theme:toggle", themeHandler.handleThemeToggle);
   EventBus.off("status:update", statusHandler.handleStatusUpdate);
 
@@ -200,6 +204,10 @@ export function initEventRouter() {
   EventBus.on(
     "screen:meta:visibility",
     screenHandlers.handleStorageMetaVisibility
+  );
+  EventBus.on(
+    "screen:paste:visibility",
+    screenHandlers.handlePasteButtonVisibility
   );
 
   EventBus.on("theme:toggle", themeHandler.handleThemeToggle);

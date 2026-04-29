@@ -6,6 +6,7 @@ const defaultAllowedConfigKeys = [
   "profile_name",
   "theme",
   "show_icon_buttons",
+  "show_paste_buttons",
   "use_expressions",
   "show_meta_section",
   "loop_state_collapsed",

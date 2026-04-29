@@ -39,6 +39,13 @@ export function handleFullscreenToggle(targetId) {
   });
 }
 
+export function handlePasteButtonVisibility(enabled) {
+  // Single global class toggled on <body>; CSS hides .paste-data-button
+  // when the class is present. Body class so it covers both the table and
+  // list field renderers (and any future paste-button host).
+  document.body.classList.toggle("no-paste-buttons", !enabled);
+}
+
 export function handleStorageMetaVisibility(enabled) {
   const show = !!enabled;
 
