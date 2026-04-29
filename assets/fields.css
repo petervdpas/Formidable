@@ -301,6 +301,36 @@
   width: 16px;
 }
 
+/* ───── Field action row (+ / paste / etc.) ───── */
+.field-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.field-actions .paste-data-button {
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid var(--input-border-color, #888);
+  border-radius: 4px;
+  cursor: pointer;
+  color: inherit;
+  line-height: 1;
+}
+
+.field-actions .paste-data-button:hover {
+  background: var(--btn-hover-bg, rgba(0, 0, 0, 0.06));
+}
+
+/* paste-data popup textarea: sized like a usable scratchpad */
+.paste-data-popup .panel-row textarea {
+  min-height: 160px;
+  resize: vertical;
+  font-family: var(--mono-font, monospace);
+  font-size: 12px;
+}
+
 /* ───── Tags Field ───── */
 
 .tags-field {

@@ -12,8 +12,8 @@
   "enable_plugins": true,
   "context_mode": "storage",
   "context_folder": "./examples",
-  "selected_template": "fcdm-entities.yaml",
-  "selected_data_file": "order.meta.json",
+  "selected_template": "basic.yaml",
+  "selected_data_file": "sane-20250530.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -29,12 +29,12 @@
   "window_bounds": {
     "width": 1440,
     "height": 849,
-    "x": 274,
-    "y": 322,
+    "x": 240,
+    "y": 131,
     "maximized": false
   },
   "template_sidebar_width": 466,
-  "storage_sidebar_width": 513,
+  "storage_sidebar_width": 360,
   "status_buttons": {
     "reloader": true,
     "charpicker": true,

@@ -830,4 +830,15 @@ export default {
   "csv.export.error.no.columns": "Selecteer minstens één kolom om te exporteren.",
   "csv.export.align": "Rijen uitlijnen op",
   "csv.export.align.none": "Geen uitlijning",
+
+  // ── Paste data widget ───────────────────────
+  "paste.title": "Data plakken",
+  "paste.subtitle": "Plak rijen uit Excel — één rij per regel, kolommen gescheiden door tabs.",
+  "paste.list.subtitle": "De eerste kolom van elke geplakte rij wordt als nieuw item toegevoegd.",
+  "paste.table.subtitle": "Elke geplakte rij wordt als nieuwe tabelrij toegevoegd, kolommen worden van links naar rechts ingevuld.",
+  "paste.placeholder": "Plak hier (Ctrl+V) en klik op Verwerken.",
+  "paste.process": "Verwerken",
+  "paste.empty": "Niets om te verwerken.",
+  "paste.success": "{0} rijen toegevoegd.",
+  "paste.failed": "Geplakte data kon niet worden verwerkt.",
 };

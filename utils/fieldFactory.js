@@ -13,6 +13,8 @@ import {
 import { getCurrentTheme } from "./themeUtils.js";
 import { parseChoices } from "./parseChoices.js";
 import { t } from "./i18n.js";
+import { openPasteDataWidget } from "./pasteDataWidget.js";
+import { rowsToListValues } from "./pasteDataUtils.js";
 
 export function resolveOption(opt) {
   return typeof opt === "string"
@@ -449,13 +451,22 @@ export const FieldBlueprints = {
     sortableList.dataset.dndScope = scope;
     wrapper.appendChild(sortableList);
 
-    for (const item of items) {
-      const row = createListItem(item, field.options || []);
+    function addItem(value = "") {
+      const row = createListItem(value, field.options || []);
       sortableList.appendChild(row);
+      return row;
     }
 
-    const addBtn = addContainerElement({
+    for (const item of items) addItem(item);
+
+    const actions = addContainerElement({
       parent: wrapper,
+      tag: "div",
+      className: "field-actions",
+    });
+
+    const addBtn = addContainerElement({
+      parent: actions,
       tag: "button",
       className: "add-list-button",
       textContent: "+",
@@ -463,13 +474,32 @@ export const FieldBlueprints = {
     });
 
     addBtn.addEventListener("click", async () => {
-      const row = createListItem("", field.options || []);
-      sortableList.appendChild(row);
+      const row = addItem("");
       const input = row.querySelector("input");
       if (input && input.readOnly && typeof input.onclick === "function") {
         input.focus();
         input.click();
       }
+    });
+
+    const pasteBtn = addContainerElement({
+      parent: actions,
+      tag: "button",
+      className: "paste-data-button",
+      attributes: { type: "button", title: t("paste.title", "Paste data") },
+    });
+    pasteBtn.innerHTML = '<i class="fa fa-paste"></i>';
+    pasteBtn.addEventListener("click", () => {
+      openPasteDataWidget({
+        triggerEl: pasteBtn,
+        subtitle: t(
+          "paste.list.subtitle",
+          "First column of each pasted row is added as a new list item."
+        ),
+        onProcess: (rows) => {
+          for (const v of rowsToListValues(rows)) addItem(v);
+        },
+      });
     });
 
     return wrapper;
@@ -626,12 +656,35 @@ export const FieldBlueprints = {
 
     (rows || []).forEach(addRow);
 
+    const actions = document.createElement("div");
+    actions.className = "field-actions";
+
     const add = document.createElement("button");
     add.type = "button";
     add.textContent = "+";
     add.onclick = () => addRow([]);
+    actions.appendChild(add);
 
-    wrap.appendChild(add);
+    const pasteBtn = document.createElement("button");
+    pasteBtn.type = "button";
+    pasteBtn.className = "paste-data-button";
+    pasteBtn.title = t("paste.title", "Paste data");
+    pasteBtn.innerHTML = '<i class="fa fa-paste"></i>';
+    pasteBtn.onclick = () => {
+      openPasteDataWidget({
+        triggerEl: pasteBtn,
+        subtitle: t(
+          "paste.table.subtitle",
+          "Each pasted row is appended as a new table row, columns mapped left-to-right."
+        ),
+        onProcess: (parsedRows) => {
+          for (const row of parsedRows) addRow(row);
+        },
+      });
+    };
+    actions.appendChild(pasteBtn);
+
+    wrap.appendChild(actions);
 
     return wrap;
   },

@@ -804,4 +804,15 @@ export default {
   "csv.export.error.no.columns": "Select at least one column to export.",
   "csv.export.align": "Align rows on",
   "csv.export.align.none": "No alignment",
+
+  // ── Paste data widget ───────────────────────
+  "paste.title": "Paste data",
+  "paste.subtitle": "Paste rows from Excel — one row per line, columns separated by tabs.",
+  "paste.list.subtitle": "First column of each pasted row is added as a new list item.",
+  "paste.table.subtitle": "Each pasted row is appended as a new table row, columns mapped left-to-right.",
+  "paste.placeholder": "Paste here (Ctrl+V) and click Process.",
+  "paste.process": "Process",
+  "paste.empty": "Nothing to paste.",
+  "paste.success": "{0} rows added.",
+  "paste.failed": "Could not process pasted data.",
 };
