@@ -205,6 +205,18 @@ export async function renderSettings() {
 
       panel.appendChild(
         createSwitch(
+          "show-paste-toggle",
+          "modal.settings.paste.buttons",
+          cachedConfig.show_paste_buttons ?? true,
+          null,
+          "block",
+          ["standard.on", "standard.off"],
+          true
+        )
+      );
+
+      panel.appendChild(
+        createSwitch(
           "show-meta-toggle",
           "modal.settings.display.meta",
           cachedConfig.show_meta_section ?? true,
@@ -223,18 +235,6 @@ export async function renderSettings() {
           null,
           "block",
           ["standard.on.experimental", "standard.off"],
-          true
-        )
-      );
-
-      panel.appendChild(
-        createSwitch(
-          "show-paste-toggle",
-          "modal.settings.paste.buttons",
-          cachedConfig.show_paste_buttons ?? true,
-          null,
-          "block",
-          ["standard.on", "standard.off"],
           true
         )
       );
