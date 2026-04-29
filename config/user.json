@@ -30,12 +30,12 @@
   "window_bounds": {
     "width": 1440,
     "height": 849,
-    "x": 240,
-    "y": 131,
+    "x": 351,
+    "y": 210,
     "maximized": false
   },
   "template_sidebar_width": 466,
-  "storage_sidebar_width": 360,
+  "storage_sidebar_width": 459,
   "status_buttons": {
     "reloader": true,
     "charpicker": true,
