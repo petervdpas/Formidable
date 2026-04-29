@@ -5,7 +5,7 @@
     "author_email": "regular@example.com",
     "template": "basic.yaml",
     "created": "2026-04-21T20:08:07.534Z",
-    "updated": "2026-04-21T21:05:24.674Z",
+    "updated": "2026-04-29T18:51:08.429Z",
     "flagged": false,
     "tags": [
       "rabbit"
@@ -24,13 +24,43 @@
     "numpy": 17,
     "rangie": 20,
     "bday": "1968-12-23",
-    "listy": [],
+    "listy": [
+      "Dog",
+      "Fox",
+      "Yankee",
+      "Juliet",
+      "Banana"
+    ],
     "datable": [
       [
-        "X",
-        "1",
-        "2026-04-21",
+        "Dog",
+        "410",
+        "2024-05-24",
         "true",
+        "active",
+        []
+      ],
+      [
+        "Fox",
+        "9675",
+        "2024-01-14",
+        "true",
+        "active",
+        []
+      ],
+      [
+        "Yankee",
+        "9864",
+        "2024-09-01",
+        "false",
+        "active",
+        []
+      ],
+      [
+        "Juliet",
+        "107",
+        "2026-03-25",
+        "false",
         "inactive",
         []
       ]
