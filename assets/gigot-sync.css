@@ -251,3 +251,87 @@
   color: #8b1a1a;
   font-style: normal;
 }
+
+/* ── Mirror destinations: header + add form ───────── */
+.gigot-dests-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6em;
+  margin-top: 0.4em;
+}
+
+.gigot-dests-header > h3 {
+  margin: 0;
+}
+
+.gigot-dest-add {
+  flex-shrink: 0;
+}
+
+.gigot-dest-form-host {
+  margin-bottom: 0.6em;
+}
+
+.gigot-dest-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  padding: 0.7em 0.9em;
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: 4px;
+  background-color: var(--input-background, #f9f9f9);
+}
+
+.gigot-dest-form__input {
+  width: 100%;
+  padding: 0.4em 0.6em;
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: 4px;
+  background-color: var(--input-background, #fff);
+  color: var(--text-color, #222);
+  font-size: 0.9rem;
+}
+
+.gigot-dest-form__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  font-size: 0.9rem;
+  color: var(--text-color, #333);
+}
+
+.gigot-dest-form__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5em;
+}
+
+.gigot-dest-form__status {
+  margin-right: auto;
+  font-size: 0.85rem;
+  color: var(--text-color-subtle, #666);
+}
+
+.gigot-dest-form__status.error {
+  color: #8b1a1a;
+}
+
+/* Disabled mirror — visually de-emphasised so the user can see at a
+ * glance which mirrors won't auto-push. Manual Retry still works. */
+.gigot-dest-card.disabled {
+  opacity: 0.65;
+}
+
+.gigot-dest-enabled {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Delete button — armed state asks for a second click. */
+.gigot-dest-actions .btn-danger.armed {
+  background-color: #8b1a1a;
+  color: #fff;
+}

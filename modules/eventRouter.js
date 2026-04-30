@@ -573,6 +573,9 @@ export function initEventRouter() {
   EventBus.off("gigot:ping", gigotHandler.handleGigotPing);
   EventBus.off("gigot:status", gigotHandler.handleGigotStatus);
   EventBus.off("gigot:list-destinations", gigotHandler.handleGigotListDestinations);
+  EventBus.off("gigot:create-destination", gigotHandler.handleGigotCreateDestination);
+  EventBus.off("gigot:update-destination", gigotHandler.handleGigotUpdateDestination);
+  EventBus.off("gigot:delete-destination", gigotHandler.handleGigotDeleteDestination);
   EventBus.off("gigot:sync-destination", gigotHandler.handleGigotSyncDestination);
   EventBus.off("gigot:push-local", gigotHandler.handleGigotPushLocal);
   EventBus.off("gigot:pull-local", gigotHandler.handleGigotPullLocal);
@@ -582,6 +585,9 @@ export function initEventRouter() {
   EventBus.on("gigot:ping", gigotHandler.handleGigotPing);
   EventBus.on("gigot:status", gigotHandler.handleGigotStatus);
   EventBus.on("gigot:list-destinations", gigotHandler.handleGigotListDestinations);
+  EventBus.on("gigot:create-destination", gigotHandler.handleGigotCreateDestination);
+  EventBus.on("gigot:update-destination", gigotHandler.handleGigotUpdateDestination);
+  EventBus.on("gigot:delete-destination", gigotHandler.handleGigotDeleteDestination);
   EventBus.on("gigot:sync-destination", gigotHandler.handleGigotSyncDestination);
   EventBus.on("gigot:push-local", gigotHandler.handleGigotPushLocal);
   EventBus.on("gigot:pull-local", gigotHandler.handleGigotPullLocal);
