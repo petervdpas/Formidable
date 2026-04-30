@@ -37,6 +37,21 @@ function extractLogEntries(res) {
   return [];
 }
 
+// shortenUrl mirrors the helper on GiGot's admin Repositories page
+// so the destination title in the Formidable modal reads the same as
+// the destination summary in the admin UI ("github.com/owner/repo"
+// instead of the opaque server-generated id). Falls through to the
+// raw URL on parse failure so we never display nothing.
+function shortenUrl(url) {
+  if (!url) return "";
+  try {
+    const u = new URL(url);
+    return u.host + u.pathname.replace(/\.git$/, "");
+  } catch {
+    return url;
+  }
+}
+
 function relativeTime(iso) {
   const then = new Date(iso);
   const now = new Date();
@@ -220,13 +235,19 @@ export function buildGigotSyncLeftPane({ conn, contextFolder, onSyncDone }) {
     const header = document.createElement("div");
     header.className = "gigot-dest-header";
 
-    const titleText = d.name || d.id || "(unnamed)";
+    // Title prefers the URL-derived shorthand (matches the GiGot
+    // admin Repositories page summary). Fall back to a server-set
+    // name field, then the destination id, so the card always has
+    // some recognisable label even with malformed data. The full
+    // URL still renders below in .gigot-dest-url.
+    const titleText =
+      shortenUrl(d.url) || d.name || d.id || "(unnamed)";
     addContainerElement({
       parent: header,
       tag: "div",
       className: "gigot-dest-title",
       textContent: titleText,
-      attributes: { title: titleText },
+      attributes: { title: d.url || titleText },
     });
 
     const actions = document.createElement("div");
