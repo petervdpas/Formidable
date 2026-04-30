@@ -356,11 +356,31 @@ function buildCommitMessage(conn, changes) {
   return `${header}\n\n${body}${tail}`;
 }
 
+// Files Formidable manages at the repo root in addition to templates/
+// and storage/. Seeded by the GiGot scaffolder; treated as first-class
+// Formidable content for both push and pull so a fresh clone actually
+// receives the README and .gitignore. Anything else at root (notes,
+// IDE config, dotfiles) stays local-only.
+const ROOT_FILE_ALLOWLIST = new Set(["README.md", ".gitignore"]);
+
+// True iff a remote tree path belongs to Formidable's managed set:
+// templates/, storage/, or one of the allowlisted root files. Used by
+// pullLocal to filter the server's tree response.
+function isFormidablePath(repoRelPath) {
+  if (repoRelPath.startsWith("templates/")) return true;
+  if (repoRelPath.startsWith("storage/")) return true;
+  if (!repoRelPath.includes("/") && ROOT_FILE_ALLOWLIST.has(repoRelPath)) {
+    return true;
+  }
+  return false;
+}
+
 // Walk a Formidable context folder and return every file under
-// templates/ (*.yaml, non-recursive) and storage/ (recursive). Each
-// entry carries the buffer + git blob SHA so callers can diff against
-// the remote tree before deciding what to commit. Skips .formidable/
-// (GiGot-owned marker) implicitly by only descending templates + storage.
+// templates/ (*.yaml, non-recursive), storage/ (recursive), plus any
+// allowlisted root files. Each entry carries the buffer + git blob SHA
+// so callers can diff against the remote tree before deciding what to
+// commit. Skips .formidable/ (GiGot-owned marker + local-only ledger)
+// implicitly by only touching the listed locations.
 function collectFormidableFiles(contextFolder) {
   const files = [];
   const root = path.resolve(contextFolder);
@@ -378,6 +398,13 @@ function collectFormidableFiles(contextFolder) {
   const storageDir = path.join(root, "storage");
   if (fs.existsSync(storageDir)) {
     walkStorage(storageDir, "storage", files);
+  }
+
+  for (const name of ROOT_FILE_ALLOWLIST) {
+    const abs = path.join(root, name);
+    if (fs.existsSync(abs) && fs.statSync(abs).isFile()) {
+      files.push(readFormidableFile(abs, name));
+    }
   }
 
   return files;
@@ -592,10 +619,7 @@ async function pullLocal(conn, contextFolder) {
   if (!treeRes.ok) return treeRes;
 
   const allFiles = Array.isArray(treeRes.data?.files) ? treeRes.data.files : [];
-  const formidableFiles = allFiles.filter(
-    (f) =>
-      f.path.startsWith("templates/") || f.path.startsWith("storage/")
-  );
+  const formidableFiles = allFiles.filter((f) => isFormidablePath(f.path));
 
   let written = 0;
   for (const entry of formidableFiles) {

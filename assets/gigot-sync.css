@@ -8,7 +8,7 @@
   font-weight: 500;
   margin-bottom: 1em;
   border: 1px solid var(--border-color, #ccc);
-  background-color: var(--input-background, #f9f9f9);
+  background-color: var(--modal-highlight-bg, #f1f3f5);
 }
 
 .gigot-sync-status.ok {
@@ -41,7 +41,7 @@
   padding: 0.7em 0.9em;
   border: 1px solid var(--border-color, #ccc);
   border-radius: 4px;
-  background-color: var(--input-background, #f9f9f9);
+  background-color: var(--modal-highlight-bg, #f1f3f5);
   display: flex;
   flex-direction: column;
   gap: 0.35em;
@@ -215,7 +215,7 @@
   padding: 0.4em 0.6em;
   border: 1px solid var(--border-color, #ddd);
   border-radius: 4px;
-  background-color: var(--input-background, #f9f9f9);
+  background-color: var(--modal-highlight-bg, #f1f3f5);
   font-size: 0.9rem;
   flex-shrink: 0;
 }
@@ -280,16 +280,18 @@
   padding: 0.7em 0.9em;
   border: 1px solid var(--border-color, #ccc);
   border-radius: 4px;
-  background-color: var(--input-background, #f9f9f9);
+  background-color: var(--modal-highlight-bg, #f1f3f5);
 }
 
+/* Width only — inputs.css already paints text/background/border using
+ * the theme's --input-bg / --input-fg / --input-border-color vars,
+ * via a :where() selector at zero specificity. Anything we set here
+ * with class specificity would beat that and re-introduce the bright
+ * fallback in dark mode. */
 .gigot-dest-form__input {
   width: 100%;
   padding: 0.4em 0.6em;
-  border: 1px solid var(--border-color, #ccc);
   border-radius: 4px;
-  background-color: var(--input-background, #fff);
-  color: var(--text-color, #222);
   font-size: 0.9rem;
 }
 

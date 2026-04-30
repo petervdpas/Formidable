@@ -1,6 +1,6 @@
 {
   "profile_name": "Formidable Tools",
-  "theme": "dark",
+  "theme": "purplish",
   "show_icon_buttons": false,
   "show_paste_buttons": true,
   "use_expressions": true,
@@ -11,7 +11,7 @@
   "development_enable": true,
   "logging_enabled": false,
   "enable_plugins": true,
-  "context_mode": "storage",
+  "context_mode": "template",
   "context_folder": "/home/peter/Projects/Example",
   "selected_template": "basic.yaml",
   "selected_data_file": "test-20260430.meta.json",
@@ -34,7 +34,7 @@
     "y": 139,
     "maximized": false
   },
-  "template_sidebar_width": 300,
+  "template_sidebar_width": 404,
   "storage_sidebar_width": 396,
   "status_buttons": {
     "reloader": true,
