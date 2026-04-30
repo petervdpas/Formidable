@@ -279,6 +279,15 @@ export default {
   "toast.profile.import.error.invalid_config":
     "Geïmporteerd bestand is geen geldige Formidable-configuratie.",
 
+  "toast.profile.deleteSuccess": "Profiel '{0}' verwijderd.",
+  "toast.profile.deleteFailed": "Verwijderen van profiel '{0}' mislukt.",
+  "toast.profile.delete.error.active_profile":
+    "Het actieve profiel kan niet worden verwijderd. Wissel eerst van profiel.",
+  "toast.profile.delete.error.boot_forbidden":
+    "boot.json mag niet worden verwijderd.",
+  "toast.profile.delete.error.not_found":
+    "Profielbestand kon niet worden gevonden.",
+
   "toast.template.not.selected":
     "Geen sjabloon geselecteerd. Selecteer eerst een sjabloon.",
   "toast.template.enable.collection":
@@ -312,6 +321,8 @@ export default {
     "Weet je zeker dat je de wijzigingen wilt verwerpen in",
   "special.plugin.delete.sure":
     "Weet je zeker dat je deze plugin wilt verwijderen?",
+  "special.profile.delete.sure":
+    "Weet je zeker dat je dit profiel wilt verwijderen?",
   "special.loop.delete.sure":
     "Weet je zeker dat je dit lusitem wilt verwijderen?",
   "special.system.restart.sure":
@@ -528,6 +539,7 @@ export default {
 
   "button.profile.export": "Exporteren",
   "button.profile.import": "Importeren",
+  "button.profile.delete": "Profiel verwijderen",
 
   // ── ARIA Labels ───────────────────────────
   "aria.git.push": "Push naar remote",

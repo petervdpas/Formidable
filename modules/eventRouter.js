@@ -263,6 +263,8 @@ export function initEventRouter() {
   EventBus.on("config:profiles:export", configHandler.handleProfileExport);
   EventBus.off("config:profiles:import", configHandler.handleProfileImport);
   EventBus.on("config:profiles:import", configHandler.handleProfileImport);
+  EventBus.off("config:profiles:delete", configHandler.handleProfileDelete);
+  EventBus.on("config:profiles:delete", configHandler.handleProfileDelete);
 
   // Profile events
   EventBus.off("context:toggle", contextHandlers.handleContextToggle);

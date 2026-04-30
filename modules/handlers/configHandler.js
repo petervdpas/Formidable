@@ -244,6 +244,39 @@ export async function handleProfileExport({ filename, callback }) {
   }
 }
 
+export async function handleProfileDelete({ filename, callback }) {
+  try {
+    if (!filename) {
+      EventBus.emit("logging:warning", [
+        "[ConfigHandler] Profile delete requested without filename",
+      ]);
+      callback?.({ success: false, error: "missing_filename" });
+      return;
+    }
+
+    const result = await window.api.config.deleteUserProfile(filename);
+
+    if (!result?.success) {
+      EventBus.emit("logging:error", [
+        "[ConfigHandler] Failed to delete profile:",
+        result,
+      ]);
+    } else {
+      EventBus.emit("logging:default", [
+        `[ConfigHandler] Deleted profile "${filename}"`,
+      ]);
+    }
+
+    callback?.(result);
+  } catch (err) {
+    EventBus.emit("logging:error", [
+      "[ConfigHandler] Exception during profile delete:",
+      err,
+    ]);
+    callback?.({ success: false, error: err?.message || "exception" });
+  }
+}
+
 export async function handleProfileImport({ callback }) {
   try {
     const sourcePath = await window.api.dialog.chooseFile();

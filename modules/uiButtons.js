@@ -79,6 +79,17 @@ export function createProfileImportButton(onClick) {
   });
 }
 
+export function createProfileDeleteButton(onClick) {
+  return createIconButton({
+    iconClass: "fa fa-trash-o",
+    className: "btn-icon btn-icon-danger btn-icon-small profile-delete-btn",
+    identifier: "profile-delete",
+    onClick,
+    i18nTitle: "button.profile.delete",
+    i18nAria: "button.profile.delete",
+  });
+}
+
 export function createFieldEditIconButton(idx, onClick) {
   return createIconButton({
     iconClass: "fa fa-pencil",

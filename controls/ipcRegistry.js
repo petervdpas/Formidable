@@ -485,6 +485,9 @@ function registerIpcHandlers() {
       overwrite,
     });
   });
+  registerIpc("delete-user-profile", (e, profileFilename) =>
+    configManager.deleteUserProfile(profileFilename)
+  );
 
   // MiniExprParser
   registerIpc("parse-mini-expr", (e, expr, context) =>

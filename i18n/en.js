@@ -264,6 +264,15 @@ export default {
   "toast.profile.import.error.invalid_config":
     "Imported file is not a valid Formidable config.",
 
+  "toast.profile.deleteSuccess": "Profile '{0}' deleted.",
+  "toast.profile.deleteFailed": "Failed to delete profile '{0}'.",
+  "toast.profile.delete.error.active_profile":
+    "The active profile cannot be deleted. Switch to another profile first.",
+  "toast.profile.delete.error.boot_forbidden":
+    "boot.json cannot be deleted.",
+  "toast.profile.delete.error.not_found":
+    "Profile file could not be found.",
+
   "toast.template.not.selected":
     "No template selected. Please select a template first.",
   "toast.template.enable.collection":
@@ -293,6 +302,7 @@ export default {
   "special.file.delete.sure": "Are you sure you want to delete this file?",
   "special.git.discard.sure": "Are you sure you want to discard changes in",
   "special.plugin.delete.sure": "Are you sure you want to delete this plugin?",
+  "special.profile.delete.sure": "Are you sure you want to delete this profile?",
   "special.loop.delete.sure": "Are you sure you want to remove this loop item?",
   "special.system.restart.sure": "Are you sure you want to restart the system?",
   "special.context.selection.hint":
@@ -504,6 +514,7 @@ export default {
 
   "button.profile.export": "Export",
   "button.profile.import": "Import",
+  "button.profile.delete": "Delete profile",
 
   // ── ARIA Labels ───────────────────────────
   "aria.git.push": "Push to remote",

@@ -151,6 +151,7 @@ const api = {
     "get-single-template-entry",
     "export-user-profile",
     "import-user-profile",
+    "delete-user-profile",
   ]),
   templates: buildGroup([
     "list-templates",

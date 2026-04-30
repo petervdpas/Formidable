@@ -10,7 +10,9 @@ import {
   createProfileAddButton,
   createProfileExportButton,
   createProfileImportButton,
+  createProfileDeleteButton,
 } from "./uiButtons.js";
+import { showConfirmModal } from "../utils/modalUtils.js";
 
 async function createOrSwitchProfileByName(name) {
   const valid = /^[a-z0-9-]+\.json$/.test(name);
@@ -53,6 +55,15 @@ async function exportProfileByName(filename) {
 async function importProfileFromFile() {
   return await new Promise((resolve) => {
     EventBus.emit("config:profiles:import", {
+      callback: resolve,
+    });
+  });
+}
+
+async function deleteProfileByName(filename) {
+  return await new Promise((resolve) => {
+    EventBus.emit("config:profiles:delete", {
+      filename,
       callback: resolve,
     });
   });
@@ -236,15 +247,69 @@ export function createProfileListManager({ currentProfile } = {}) {
         }
       });
 
+      const deleteBtn = isCurrent
+        ? null
+        : createProfileDeleteButton(async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const confirmed = await showConfirmModal(
+              "special.profile.delete.sure",
+              `<div class="modal-message-highlight"><strong>${base}</strong></div>`,
+              {
+                okKey: "standard.delete",
+                cancelKey: "standard.cancel",
+                width: "auto",
+                height: "auto",
+              }
+            );
+
+            if (!confirmed) return;
+
+            try {
+              const result = await deleteProfileByName(base);
+
+              if (result?.success) {
+                Toast.success("toast.profile.deleteSuccess", [base]);
+                await listManager.loadList();
+                return;
+              }
+
+              switch (result?.code) {
+                case "active_profile":
+                  Toast.error("toast.profile.delete.error.active_profile");
+                  return;
+                case "boot_forbidden":
+                  Toast.error("toast.profile.delete.error.boot_forbidden");
+                  return;
+                case "not_found":
+                  Toast.error("toast.profile.delete.error.not_found");
+                  return;
+                default:
+                  Toast.error("toast.profile.deleteFailed", [base]);
+              }
+            } catch (err) {
+              const msg =
+                (err && (err.message || String(err))) || "Unknown error";
+              Toast.error("toast.profile.deleteFailed", [base]);
+              EventBus.emit("logging:error", [
+                "[profiles] delete failed",
+                msg,
+              ]);
+            }
+          });
+
       const flagWrapper = itemNode.querySelector(".list-item-flag");
       if (flagWrapper) {
         flagWrapper.classList.add("profile-flag-wrap");
         flagWrapper.innerHTML = "";
         flagWrapper.appendChild(pill);
         flagWrapper.appendChild(exportBtn);
+        if (deleteBtn) flagWrapper.appendChild(deleteBtn);
       } else {
         itemNode.appendChild(pill);
         itemNode.appendChild(exportBtn);
+        if (deleteBtn) itemNode.appendChild(deleteBtn);
       }
     },
 

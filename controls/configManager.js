@@ -421,6 +421,59 @@ function exportUserProfile(
   };
 }
 
+function deleteUserProfile(profileFilename) {
+  if (!profileFilename) {
+    return {
+      success: false,
+      error: "Missing profileFilename.",
+      code: "missing_filename",
+    };
+  }
+
+  if (profileFilename === "boot.json") {
+    return {
+      success: false,
+      error: "boot.json cannot be deleted.",
+      code: "boot_forbidden",
+    };
+  }
+
+  const currentFilename = getCurrentProfileFilename();
+  if (currentFilename && profileFilename === currentFilename) {
+    return {
+      success: false,
+      error: "The active profile cannot be deleted.",
+      code: "active_profile",
+    };
+  }
+
+  const targetPath = fileManager.resolvePath("config", profileFilename);
+
+  if (!fileManager.fileExists(targetPath)) {
+    return {
+      success: false,
+      error: `Profile file not found: ${profileFilename}`,
+      code: "not_found",
+    };
+  }
+
+  const ok = fileManager.deleteFile(targetPath);
+  if (!ok) {
+    return {
+      success: false,
+      error: "Failed to delete profile file.",
+      code: "delete_failed",
+    };
+  }
+
+  log(`[ConfigManager] Deleted profile "${profileFilename}".`);
+
+  return {
+    success: true,
+    filename: profileFilename,
+  };
+}
+
 function importUserProfile(
   sourcePath,
   { profileFilename, overwrite = false } = {}
@@ -551,4 +604,5 @@ module.exports = {
   getSingleTemplateEntry,
   exportUserProfile,
   importUserProfile,
+  deleteUserProfile,
 };
