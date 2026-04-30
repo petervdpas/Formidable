@@ -185,69 +185,6 @@ async function listDestinations(conn) {
   }
 }
 
-// POST /api/repos/{name}/destinations — register a new mirror target.
-// body: { url, credential_name, enabled }. credential_name must
-// resolve against the GiGot credential vault (a PAT for the mirror
-// remote). Returns the created DestinationView.
-async function createDestination(conn, body) {
-  const v = validateConn(conn);
-  if (v) return fail(v);
-  if (!body || !body.url) return fail("Missing destination url");
-  if (!body.credential_name) return fail("Missing credential_name");
-  try {
-    const data = await request(
-      conn,
-      "POST",
-      `/api/repos/${encodeURIComponent(conn.repoName)}/destinations`,
-      { body }
-    );
-    return ok(data);
-  } catch (err) {
-    error("[GigotManager] createDestination failed:", err);
-    return fail(err);
-  }
-}
-
-// PATCH /api/repos/{name}/destinations/{id} — partial update. Mutable
-// server-side fields are `enabled` and `credential_name`; URL is
-// immutable (delete + recreate to change it).
-async function updateDestination(conn, destinationId, body) {
-  const v = validateConn(conn);
-  if (v) return fail(v);
-  if (!destinationId) return fail("Missing destination id");
-  try {
-    const data = await request(
-      conn,
-      "PATCH",
-      `/api/repos/${encodeURIComponent(conn.repoName)}/destinations/${encodeURIComponent(destinationId)}`,
-      { body: body || {} }
-    );
-    return ok(data);
-  } catch (err) {
-    error("[GigotManager] updateDestination failed:", err);
-    return fail(err);
-  }
-}
-
-// DELETE /api/repos/{name}/destinations/{id} — drop a mirror target.
-// 204 on success → null data; UI just refreshes the list.
-async function deleteDestination(conn, destinationId) {
-  const v = validateConn(conn);
-  if (v) return fail(v);
-  if (!destinationId) return fail("Missing destination id");
-  try {
-    const data = await request(
-      conn,
-      "DELETE",
-      `/api/repos/${encodeURIComponent(conn.repoName)}/destinations/${encodeURIComponent(destinationId)}`
-    );
-    return ok(data);
-  } catch (err) {
-    error("[GigotManager] deleteDestination failed:", err);
-    return fail(err);
-  }
-}
-
 // POST /api/repos/{name}/destinations/{id}/sync — manual retry of a
 // failed mirror push. Synchronous on the server; return payload
 // carries the updated last_sync_* fields.
@@ -692,9 +629,6 @@ module.exports = {
   ping,
   status,
   listDestinations,
-  createDestination,
-  updateDestination,
-  deleteDestination,
   syncDestination,
   head,
   commitChanges,

@@ -353,15 +353,6 @@ function registerIpcHandlers() {
   registerIpc("gigot-list-destinations", (e, conn) =>
     gigotManager.listDestinations(conn)
   );
-  registerIpc("gigot-create-destination", (e, conn, body) =>
-    gigotManager.createDestination(conn, body)
-  );
-  registerIpc("gigot-update-destination", (e, conn, id, body) =>
-    gigotManager.updateDestination(conn, id, body)
-  );
-  registerIpc("gigot-delete-destination", (e, conn, id) =>
-    gigotManager.deleteDestination(conn, id)
-  );
   registerIpc("gigot-sync-destination", (e, conn, id) =>
     gigotManager.syncDestination(conn, id)
   );

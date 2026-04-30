@@ -41,24 +41,6 @@ export async function handleGigotListDestinations({ conn, callback }) {
   );
 }
 
-export async function handleGigotCreateDestination({ conn, body, callback }) {
-  await run("createDestination", callback, () =>
-    window.api.gigot.gigotCreateDestination(conn, body)
-  );
-}
-
-export async function handleGigotUpdateDestination({ conn, id, body, callback }) {
-  await run("updateDestination", callback, () =>
-    window.api.gigot.gigotUpdateDestination(conn, id, body)
-  );
-}
-
-export async function handleGigotDeleteDestination({ conn, id, callback }) {
-  await run("deleteDestination", callback, () =>
-    window.api.gigot.gigotDeleteDestination(conn, id)
-  );
-}
-
 export async function handleGigotSyncDestination({ conn, id, callback }) {
   await run("syncDestination", callback, () =>
     window.api.gigot.gigotSyncDestination(conn, id)

@@ -77,64 +77,22 @@ export function buildGigotSyncLeftPane({ conn, contextFolder, onSyncDone }) {
   statusBox.className = "gigot-sync-status";
   node.appendChild(statusBox);
 
-  const destsHeader = document.createElement("div");
-  destsHeader.className = "gigot-dests-header";
+  // Mirror destinations are managed on the GiGot admin Repositories
+  // page (see remote-sync.md §2.4 + §3.7 — adding a destination
+  // requires the privacy-notice consent gesture, which deliberately
+  // belongs outside Formidable's day-to-day surface). This pane is
+  // read-only: it lists what's been configured server-side and
+  // exposes one action per row, "Sync now", which fires
+  // POST /api/repos/{name}/destinations/{id}/sync.
   addContainerElement({
-    parent: destsHeader,
+    parent: node,
     tag: "h3",
     textContent: t("modal.gigot.destinations") || "Mirror Destinations",
     i18nKey: "modal.gigot.destinations",
   });
-  const addBtn = createButton({
-    text: t("modal.gigot.destinations.add") || "+ Add mirror",
-    i18nKey: "modal.gigot.destinations.add",
-    identifier: "gigot-dest-add",
-    className: "btn-secondary gigot-dest-add",
-    onClick: () => toggleAddForm(),
-  });
-  destsHeader.appendChild(addBtn);
-  node.appendChild(destsHeader);
-
-  // Inline add-form host. Built once on first open, toggled with hidden
-  // attribute. Lives above the list so the new entry visually drops in.
-  const addFormHost = document.createElement("div");
-  addFormHost.className = "gigot-dest-form-host";
-  addFormHost.hidden = true;
-  node.appendChild(addFormHost);
-
   const destsList = document.createElement("div");
   destsList.className = "gigot-dests-list";
   node.appendChild(destsList);
-
-  function toggleAddForm() {
-    if (!addFormHost.hidden) {
-      addFormHost.hidden = true;
-      addFormHost.innerHTML = "";
-      return;
-    }
-    addFormHost.innerHTML = "";
-    addFormHost.appendChild(buildDestForm({
-      onCancel: () => {
-        addFormHost.hidden = true;
-        addFormHost.innerHTML = "";
-      },
-      onSubmit: async (body, statusEl) => {
-        statusEl.textContent =
-          t("modal.gigot.destinations.saving") || "Saving…";
-        statusEl.className = "gigot-dest-form__status";
-        const res = await callBus("gigot:create-destination", { conn, body });
-        if (res?.ok) {
-          addFormHost.hidden = true;
-          addFormHost.innerHTML = "";
-          await repaint();
-        } else {
-          statusEl.textContent = res?.error || "Failed";
-          statusEl.className = "gigot-dest-form__status error";
-        }
-      },
-    }));
-    addFormHost.hidden = false;
-  }
 
   // Actions row: Sync (primary) / Refresh / inline status
   const actionsRow = document.createElement("div");
@@ -244,7 +202,17 @@ export function buildGigotSyncLeftPane({ conn, contextFolder, onSyncDone }) {
     }
   }
 
-  function renderDestCard(d, onRetryDone) {
+  // Read-only destination card. The only verb a Formidable-side caller
+  // exposes is "Sync now" — fires
+  // POST /api/repos/{name}/destinations/{id}/sync. All
+  // configuration (URL, credential binding, enabled flag, removal)
+  // happens on the GiGot admin Repositories page (remote-sync.md
+  // §3.7's privacy-notice consent gesture lives there). Keeping
+  // it that way means Formidable never has to know about credential
+  // names, never duplicates the consent prompt, and matches the
+  // single-source-of-truth rule — GiGot owns destinations, the
+  // client only triggers them.
+  function renderDestCard(d, onSyncDone) {
     const card = document.createElement("div");
     card.className = "gigot-dest-card";
     if (d.enabled === false) card.classList.add("disabled");
@@ -272,90 +240,20 @@ export function buildGigotSyncLeftPane({ conn, contextFolder, onSyncDone }) {
       textContent: statusKey,
     });
 
-    // Enabled toggle — patches `enabled` on the destination. Off means
-    // the post-receive fan-out skips this mirror; manual Retry still
-    // works (server design choice, not a bug to paper over).
-    const enabledLabel = document.createElement("label");
-    enabledLabel.className = "gigot-dest-enabled";
-    const enabledBox = document.createElement("input");
-    enabledBox.type = "checkbox";
-    enabledBox.checked = d.enabled !== false;
-    enabledBox.title =
-      t("modal.gigot.destinations.enabled") ||
-      "Enabled (auto-push on every commit)";
-    enabledBox.addEventListener("change", async () => {
-      enabledBox.disabled = true;
-      const res = await callBus("gigot:update-destination", {
-        conn,
-        id: d.id,
-        body: { enabled: enabledBox.checked },
-      });
-      enabledBox.disabled = false;
-      if (!res?.ok) {
-        // Revert local state and surface the error in the card.
-        enabledBox.checked = !enabledBox.checked;
-        renderInlineError(card, res?.error || "update failed");
-        return;
-      }
-      await onRetryDone();
-    });
-    enabledLabel.appendChild(enabledBox);
-    actions.appendChild(enabledLabel);
-
-    const retryBtn = createButton({
-      text: t("modal.gigot.retry") || "Retry",
-      i18nKey: "modal.gigot.retry",
-      identifier: `gigot-retry-${d.id}`,
+    const syncBtn = createButton({
+      text: t("modal.gigot.destinations.sync") || "Sync now",
+      i18nKey: "modal.gigot.destinations.sync",
+      identifier: `gigot-dest-sync-${d.id}`,
+      className: "btn-primary",
       onClick: async () => {
-        retryBtn.disabled = true;
-        retryBtn.textContent = t("modal.gigot.retrying") || "Retrying…";
+        syncBtn.disabled = true;
+        syncBtn.textContent =
+          t("modal.gigot.destinations.syncing") || "Syncing…";
         await callBus("gigot:sync-destination", { conn, id: d.id });
-        await onRetryDone();
+        await onSyncDone();
       },
     });
-    actions.appendChild(retryBtn);
-
-    // Two-step delete: first click arms, second click confirms. Avoids
-    // a window.confirm() dialog stacked over the modal.
-    let armed = false;
-    const deleteBtn = createButton({
-      text: t("modal.gigot.destinations.delete") || "Delete",
-      i18nKey: "modal.gigot.destinations.delete",
-      identifier: `gigot-delete-${d.id}`,
-      className: "btn-danger",
-      onClick: async () => {
-        if (!armed) {
-          armed = true;
-          deleteBtn.textContent =
-            t("modal.gigot.destinations.confirm") || "Confirm delete";
-          deleteBtn.classList.add("armed");
-          setTimeout(() => {
-            if (!armed) return;
-            armed = false;
-            deleteBtn.textContent =
-              t("modal.gigot.destinations.delete") || "Delete";
-            deleteBtn.classList.remove("armed");
-          }, 4000);
-          return;
-        }
-        deleteBtn.disabled = true;
-        deleteBtn.textContent =
-          t("modal.gigot.destinations.deleting") || "Deleting…";
-        const res = await callBus("gigot:delete-destination", {
-          conn,
-          id: d.id,
-        });
-        if (!res?.ok) {
-          deleteBtn.disabled = false;
-          deleteBtn.textContent =
-            t("modal.gigot.destinations.delete") || "Delete";
-          renderInlineError(card, res?.error || "delete failed");
-          return;
-        }
-        await onRetryDone();
-      },
-    });
-    actions.appendChild(deleteBtn);
+    actions.appendChild(syncBtn);
 
     header.appendChild(actions);
     card.appendChild(header);
@@ -388,107 +286,6 @@ export function buildGigotSyncLeftPane({ conn, contextFolder, onSyncDone }) {
     }
 
     return card;
-  }
-
-  // Add or replace an inline error row at the bottom of the card.
-  function renderInlineError(card, message) {
-    let slot = card.querySelector(".gigot-dest-error.transient");
-    if (!slot) {
-      slot = document.createElement("div");
-      slot.className = "gigot-dest-error transient";
-      card.appendChild(slot);
-    }
-    slot.textContent = message;
-  }
-
-  // Compact create form — URL + credential name + enabled checkbox.
-  // Lives inline above the list; not a nested modal.
-  function buildDestForm({ onSubmit, onCancel }) {
-    const form = document.createElement("form");
-    form.className = "gigot-dest-form";
-    form.addEventListener("submit", (ev) => ev.preventDefault());
-
-    const urlField = document.createElement("input");
-    urlField.type = "url";
-    urlField.required = true;
-    urlField.className = "gigot-dest-form__input";
-    urlField.placeholder =
-      t("modal.gigot.destinations.url") ||
-      "Mirror URL (e.g. https://github.com/owner/repo.git)";
-
-    const credField = document.createElement("input");
-    credField.type = "text";
-    credField.required = true;
-    credField.className = "gigot-dest-form__input";
-    credField.placeholder =
-      t("modal.gigot.destinations.credential") ||
-      "Credential name (vault entry holding the PAT)";
-
-    const enabledLabel = document.createElement("label");
-    enabledLabel.className = "gigot-dest-form__check";
-    const enabledBox = document.createElement("input");
-    enabledBox.type = "checkbox";
-    enabledBox.checked = true;
-    enabledLabel.appendChild(enabledBox);
-    enabledLabel.appendChild(
-      document.createTextNode(
-        " " +
-          (t("modal.gigot.destinations.enabled") ||
-            "Enabled (auto-push on every commit)")
-      )
-    );
-
-    const status = document.createElement("span");
-    status.className = "gigot-dest-form__status";
-
-    const actionsRow = document.createElement("div");
-    actionsRow.className = "gigot-dest-form__actions";
-
-    const cancelBtn = createButton({
-      text: t("modal.gigot.destinations.cancel") || "Cancel",
-      i18nKey: "modal.gigot.destinations.cancel",
-      identifier: "gigot-dest-cancel",
-      onClick: () => onCancel?.(),
-    });
-
-    const saveBtn = createButton({
-      text: t("modal.gigot.destinations.save") || "Save",
-      i18nKey: "modal.gigot.destinations.save",
-      identifier: "gigot-dest-save",
-      className: "btn-primary",
-      onClick: async () => {
-        if (!urlField.value.trim() || !credField.value.trim()) {
-          status.textContent = "URL and credential name are required.";
-          status.className = "gigot-dest-form__status error";
-          return;
-        }
-        saveBtn.disabled = true;
-        cancelBtn.disabled = true;
-        await onSubmit?.(
-          {
-            url: urlField.value.trim(),
-            credential_name: credField.value.trim(),
-            enabled: enabledBox.checked,
-          },
-          status
-        );
-        saveBtn.disabled = false;
-        cancelBtn.disabled = false;
-      },
-    });
-
-    actionsRow.appendChild(status);
-    actionsRow.appendChild(cancelBtn);
-    actionsRow.appendChild(saveBtn);
-
-    form.appendChild(urlField);
-    form.appendChild(credField);
-    form.appendChild(enabledLabel);
-    form.appendChild(actionsRow);
-
-    setTimeout(() => urlField.focus(), 0);
-
-    return form;
   }
 
   return {

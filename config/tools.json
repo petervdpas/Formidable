@@ -1,6 +1,6 @@
 {
   "profile_name": "Formidable Tools",
-  "theme": "purplish",
+  "theme": "dark",
   "show_icon_buttons": false,
   "show_paste_buttons": true,
   "use_expressions": true,
@@ -30,11 +30,11 @@
   "window_bounds": {
     "width": 1440,
     "height": 833,
-    "x": 240,
-    "y": 139,
+    "x": 279,
+    "y": 179,
     "maximized": false
   },
-  "template_sidebar_width": 404,
+  "template_sidebar_width": 451,
   "storage_sidebar_width": 396,
   "status_buttons": {
     "reloader": true,

@@ -252,88 +252,10 @@
   font-style: normal;
 }
 
-/* ── Mirror destinations: header + add form ───────── */
-.gigot-dests-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6em;
-  margin-top: 0.4em;
-}
-
-.gigot-dests-header > h3 {
-  margin: 0;
-}
-
-.gigot-dest-add {
-  flex-shrink: 0;
-}
-
-.gigot-dest-form-host {
-  margin-bottom: 0.6em;
-}
-
-.gigot-dest-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5em;
-  padding: 0.7em 0.9em;
-  border: 1px solid var(--border-color, #ccc);
-  border-radius: 4px;
-  background-color: var(--modal-highlight-bg, #f1f3f5);
-}
-
-/* Width only — inputs.css already paints text/background/border using
- * the theme's --input-bg / --input-fg / --input-border-color vars,
- * via a :where() selector at zero specificity. Anything we set here
- * with class specificity would beat that and re-introduce the bright
- * fallback in dark mode. */
-.gigot-dest-form__input {
-  width: 100%;
-  padding: 0.4em 0.6em;
-  border-radius: 4px;
-  font-size: 0.9rem;
-}
-
-.gigot-dest-form__check {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4em;
-  font-size: 0.9rem;
-  color: var(--text-color, #333);
-}
-
-.gigot-dest-form__actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.5em;
-}
-
-.gigot-dest-form__status {
-  margin-right: auto;
-  font-size: 0.85rem;
-  color: var(--text-color-subtle, #666);
-}
-
-.gigot-dest-form__status.error {
-  color: #8b1a1a;
-}
-
-/* Disabled mirror — visually de-emphasised so the user can see at a
- * glance which mirrors won't auto-push. Manual Retry still works. */
+/* Disabled mirror — visually de-emphasised in the read-only listing
+ * so the user can see at a glance which mirrors won't auto-push.
+ * The "Sync now" button still fires manual pushes regardless of this
+ * flag (server treats manual triggers as explicit operator intent). */
 .gigot-dest-card.disabled {
   opacity: 0.65;
-}
-
-.gigot-dest-enabled {
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-/* Delete button — armed state asks for a second click. */
-.gigot-dest-actions .btn-danger.armed {
-  background-color: #8b1a1a;
-  color: #fff;
 }
