@@ -3,7 +3,7 @@ name: Build Formidable (Release)
 on:
   push:
     branches:
-      - release/*
+      - master
 
 permissions:
   contents: write
@@ -13,10 +13,39 @@ env:
 
 jobs:
   # ───────────────────────────────────────────────────────────────
+  # Gate: only proceed if package.json version differs from last tag
+  # ───────────────────────────────────────────────────────────────
+  check_version:
+    name: Verify version bumped
+    runs-on: ubuntu-latest
+    outputs:
+      bumped: ${{ steps.diff.outputs.bumped }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        run: |
+          NEW=$(node -p "require('./package.json').version")
+          LAST_TAG=$(git tag --list 'v*' --sort=-v:refname | head -n1)
+          if [ -z "$LAST_TAG" ]; then
+            echo "No prior v* tag found — proceeding with v${NEW}."
+            echo "bumped=true" >> $GITHUB_OUTPUT
+          elif [ "v${NEW}" = "$LAST_TAG" ]; then
+            echo "Version ${NEW} already released as ${LAST_TAG} — skipping."
+            echo "bumped=false" >> $GITHUB_OUTPUT
+          else
+            echo "Version ${NEW} differs from last tag ${LAST_TAG} — proceeding."
+            echo "bumped=true" >> $GITHUB_OUTPUT
+          fi
+
+  # ───────────────────────────────────────────────────────────────
   # Windows: NSIS installer (amd64)
   # ───────────────────────────────────────────────────────────────
   windows:
     name: Windows Installer
+    needs: check_version
+    if: needs.check_version.outputs.bumped == 'true'
     runs-on: windows-latest
 
     steps:
@@ -59,6 +88,8 @@ jobs:
   # ───────────────────────────────────────────────────────────────
   linux_deb_amd64:
     name: Linux amd64 .deb
+    needs: check_version
+    if: needs.check_version.outputs.bumped == 'true'
     runs-on: ubuntu-24.04
 
     steps:
@@ -101,6 +132,8 @@ jobs:
   # ───────────────────────────────────────────────────────────────
   linux_deb_arm64:
     name: Linux ARM64 .deb (Raspberry Pi)
+    needs: check_version
+    if: needs.check_version.outputs.bumped == 'true'
     runs-on: ubuntu-24.04
 
     steps:
@@ -143,7 +176,8 @@ jobs:
   # ───────────────────────────────────────────────────────────────
   release:
     name: Publish GitHub Release
-    needs: [windows, linux_deb_amd64, linux_deb_arm64]
+    needs: [check_version, windows, linux_deb_amd64, linux_deb_arm64]
+    if: needs.check_version.outputs.bumped == 'true'
     runs-on: ubuntu-24.04
 
     steps:
