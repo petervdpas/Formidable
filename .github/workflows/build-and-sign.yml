@@ -1,9 +1,11 @@
-name: Build Formidable (Pre-Release)
+name: Build Formidable (Release)
 
 on:
   push:
     branches:
-      - pre-release/*
+      - release/*
+    paths:
+      - package.json
 
 permissions:
   contents: write
@@ -142,7 +144,7 @@ jobs:
   # Publish GitHub Pre-Release
   # ───────────────────────────────────────────────────────────────
   release:
-    name: Publish GitHub Pre-Release
+    name: Publish GitHub Release
     needs: [windows, linux_deb_amd64, linux_deb_arm64]
     runs-on: ubuntu-24.04
 
@@ -165,16 +167,16 @@ jobs:
       - name: Set version-based release metadata
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          echo "TAG_NAME=v${VERSION}-pre" >> $GITHUB_ENV
-          echo "RELEASE_NAME=Formidable v${VERSION} Pre-Release" >> $GITHUB_ENV
+          echo "TAG_NAME=v${VERSION}" >> $GITHUB_ENV
+          echo "RELEASE_NAME=Formidable v${VERSION}" >> $GITHUB_ENV
 
-      - name: Create GitHub Pre-Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG_NAME }}
           name: ${{ env.RELEASE_NAME }}
           draft: false
-          prerelease: true
+          prerelease: false
           generate_release_notes: true
           files: dist/*
         env:
