@@ -16,8 +16,10 @@
 
 > See the [latest release notes](https://github.com/petervdpas/Formidable/releases/latest) for details.
 
-**Latest Windows Installer**:
-👉 [Formidable Setup.exe](https://github.com/petervdpas/Formidable/releases/latest/download/Formidable.Setup.exe)
+**Latest Installers**:
+- 🪟 Windows: 👉 [Formidable.Setup.exe](https://github.com/petervdpas/Formidable/releases/latest/download/Formidable.Setup.exe)
+- 🐧 Linux (amd64 .deb): 👉 [formidable_amd64.deb](https://github.com/petervdpas/Formidable/releases/latest/download/formidable_amd64.deb)
+- 🥧 Linux ARM64 .deb (Raspberry Pi): 👉 [formidable_arm64.deb](https://github.com/petervdpas/Formidable/releases/latest/download/formidable_arm64.deb)
 
 ---
 
