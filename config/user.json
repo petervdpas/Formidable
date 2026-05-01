@@ -30,7 +30,10 @@
   "internal_server_port": 8383,
   "window_bounds": {
     "width": 1440,
-    "height": 833
+    "height": 833,
+    "x": 240,
+    "y": 139,
+    "maximized": false
   },
   "template_sidebar_width": 466,
   "storage_sidebar_width": 459,

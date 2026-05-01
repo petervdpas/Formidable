@@ -99,9 +99,15 @@ Comprehensive documentation covering all aspects of Formidable's architecture:
 
 - **🔀 Git Integration (Optional)**
 
-  - Commit, push, pull from the UI
-  - Git remote info and branch listing
+  - Branch selection in Settings → Locations
+  - Commit, push, pull, sync, and conflict resolution from the Git Control modal
   - Supports Azure DevOps workflows (credential.helper + useHttpPath)
+
+- **📦 GiGot Integration (Optional)**
+
+  - Token-based remote-sync alternative to Git, with a tamper-evident server-side audit log — see [GiGot](https://github.com/petervdpas/GiGot)
+  - Configure base URL, repo name, and token in Settings → Locations
+  - Push, pull, and sync without a full Git workflow
 
 - **🖥️ Clean, Modern UI** → [Modal Docs](docs/MODAL-SYSTEM.md)
 
@@ -205,6 +211,7 @@ Saved to: `./config/user.json`
   "author_email": "regular@example.com",
   "use_git": true,
   "git_root": "./",
+  "git_branch": "master",
   "show_icon_buttons": true,
   "window_bounds": {
     "width": 1280,
