@@ -5,9 +5,6 @@ import {
   createGitCommitButton,
   createGitDiscardButton,
   createGitSyncButton,
-  createGitFetchButton,
-  createGitCheckoutButton,
-  createGitCreateCheckoutButton,
   createGitPullButton,
   createGitPushButton,
 } from "./uiButtons.js";
@@ -17,14 +14,12 @@ import {
 } from "../utils/elementBuilders.js";
 import { createListManager } from "../utils/listUtils.js";
 import { showConfirmModal } from "../utils/modalUtils.js";
-import { createDropdown } from "../utils/dropdownUtils.js";
 import { t, translateDOM } from "../utils/i18n.js";
 import { Toast } from "../utils/toastUtils.js";
 import {
   loadConfig,
   resolveGitPath,
   getStatus,
-  getRemoteInfo,
   commit as gitCommit,
   pull as gitPull,
   push as gitPush,
@@ -70,11 +65,8 @@ function emitStatusBar(
 export async function getGitContext() {
   const cfg = await loadConfig();
   const gitPath = resolveGitPath(cfg);
-  const [status, remoteInfo] = await Promise.all([
-    getStatus(gitPath),
-    getRemoteInfo(gitPath),
-  ]);
-  return { gitPath, status, remoteInfo };
+  const status = await getStatus(gitPath);
+  return { gitPath, status };
 }
 
 function makeGitBadge({ parent, key, count, marginLeft = "" }) {
@@ -88,7 +80,7 @@ function makeGitBadge({ parent, key, count, marginLeft = "" }) {
   });
 }
 
-export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
+export async function buildGitControlLeftPane({ gitPath, status }) {
   const node = document.createElement("div");
 
   const section = addContainerElement({
@@ -98,143 +90,9 @@ export async function buildGitControlLeftPane({ gitPath, status, remoteInfo }) {
   addContainerElement({
     parent: section,
     tag: "h3",
-    i18nKey: "git.branches",
+    i18nKey: "git.branch",
     attributes: { style: "margin-top:0" },
   });
-
-  const remotes = remoteInfo?.remotes?.map((r) => r.name) || [];
-  let selectedRemote = remotes.includes("origin") ? "origin" : remotes[0] || "";
-  let selectedRemoteBranch = "";
-
-  const fetchBtn = createGitFetchButton(async () => {
-    try {
-      fetchBtn.disabled = true;
-      await EventBus.emitWithResponse("git:fetch", {
-        folderPath: gitPath,
-        remote: selectedRemote,
-        opts: ["--prune"],
-      });
-      Toast.success("toast.git.fetch.complete");
-      emitStatusBar("toast.git.fetch.complete", "success");
-      await refreshRemoteBranches();
-      pingGitUI("fetch");
-    } finally {
-      fetchBtn.disabled = false;
-    }
-  });
-
-  const checkoutBtn = createGitCheckoutButton(async () => {
-    if (!selectedRemote || !selectedRemoteBranch) return;
-    await EventBus.emitWithResponse("git:branch-create", {
-      folderPath: gitPath,
-      name: selectedRemoteBranch,
-      opts: { checkout: true },
-    });
-    await EventBus.emitWithResponse("git:set-upstream", {
-      folderPath: gitPath,
-      remote: selectedRemote,
-      branch: selectedRemoteBranch,
-    });
-    Toast.success("toast.git.checkout.complete");
-    emitStatusBar("toast.git.checkout.complete", "success");
-    pingGitUI("checkout");
-  });
-
-  let remoteBranchDDWrap = null;
-  let rebuildRemoteBranches = () => {};
-  async function refreshRemoteBranches() {
-    const latest = await getRemoteInfo(gitPath);
-    remoteInfo = latest || remoteInfo;
-    rebuildRemoteBranches();
-  }
-
-  section.appendChild(
-    buildLabeledControl({
-      labelTextOrKey: "git.remote",
-      i18nEnabled: true,
-      layout: "two-column",
-      labelWidth: "120px",
-      control: (mount) => {
-        createDropdown({
-          containerEl: mount,
-          labelTextOrKey: "",
-          options: remotes.map((n) => ({ value: n, label: n })),
-          selectedValue: selectedRemote,
-          onChange: (v) => {
-            selectedRemote = v;
-            rebuildRemoteBranches();
-          },
-        });
-      },
-      actions: [fetchBtn],
-    })
-  );
-
-  section.appendChild(
-    buildLabeledControl({
-      labelTextOrKey: "git.branches",
-      i18nEnabled: true,
-      layout: "two-column",
-      labelWidth: "120px",
-      control: (mount) => {
-        remoteBranchDDWrap = mount;
-        rebuildRemoteBranches = () => {
-          remoteBranchDDWrap.innerHTML = "";
-          const branches = (remoteInfo?.remoteBranches || [])
-            .filter((b) => selectedRemote && b.startsWith(`${selectedRemote}/`))
-            .map((b) => b.replace(`${selectedRemote}/`, ""));
-          selectedRemoteBranch = branches[0] || "";
-          createDropdown({
-            containerEl: remoteBranchDDWrap,
-            labelTextOrKey: "",
-            options: branches.map((n) => ({ value: n, label: n })),
-            selectedValue: selectedRemoteBranch,
-            onChange: (v) => (selectedRemoteBranch = v),
-          });
-        };
-        rebuildRemoteBranches();
-      },
-      actions: [checkoutBtn],
-    })
-  );
-
-  const nameInput = document.createElement("input");
-  nameInput.type = "text";
-  nameInput.id = "git-new-branch";
-  nameInput.setAttribute("data-i18n-placeholder", "git.branch.new.placeholder");
-
-  const createBtn = createGitCreateCheckoutButton(async () => {
-    const name = nameInput.value.trim();
-    if (!name) return;
-    await EventBus.emitWithResponse("git:branch-create", {
-      folderPath: gitPath,
-      name,
-      opts: { checkout: true },
-    });
-    if (selectedRemote) {
-      await EventBus.emitWithResponse("git:set-upstream", {
-        folderPath: gitPath,
-        remote: selectedRemote,
-        branch: name,
-      });
-    }
-    Toast.success("toast.git.branch.created");
-    emitStatusBar("toast.git.branch.created", "success");
-    nameInput.value = "";
-    pingGitUI("branch-create");
-  });
-
-  section.appendChild(
-    buildLabeledControl({
-      labelTextOrKey: "git.branch.new",
-      i18nEnabled: true,
-      forId: nameInput.id,
-      layout: "two-column",
-      labelWidth: "120px",
-      control: nameInput,
-      actions: [createBtn],
-    })
-  );
 
   const trackingRow = addContainerElement({
     parent: section,

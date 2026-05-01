@@ -692,6 +692,7 @@ export default {
   "modal.settings.paste.buttons": "Plak-data bij Lijsten/Tabellen",
   "modal.settings.context.folder": "Contextmap",
   "modal.settings.git.root": "Git-rootmap",
+  "modal.settings.git.branch": "Branch",
   "modal.settings.remote.backend": "Externe Backend",
   "modal.settings.remote.backend.none": "Geen (alleen lokaal)",
   "modal.settings.remote.backend.git": "Git",

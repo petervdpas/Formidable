@@ -223,48 +223,12 @@ export async function handleGitBranches({ folderPath, callback }) {
   }
 }
 
-export async function handleGitBranchCreate({
-  folderPath,
-  name,
-  opts,
-  callback,
-}) {
-  try {
-    const res = await window.api.git.gitBranchCreate(folderPath, name, opts);
-    pass(callback, res, null);
-  } catch (err) {
-    EventBus.emit("logging:error", [
-      "[GitHandler] Failed to create branch:",
-      err,
-    ]);
-    callback?.(null);
-  }
-}
-
 export async function handleGitCheckout({ folderPath, ref, callback }) {
   try {
     const res = await window.api.git.gitCheckout(folderPath, ref);
     pass(callback, res, null);
   } catch (err) {
     EventBus.emit("logging:error", ["[GitHandler] Failed to checkout:", err]);
-    callback?.(null);
-  }
-}
-
-export async function handleGitBranchDelete({
-  folderPath,
-  name,
-  force,
-  callback,
-}) {
-  try {
-    const res = await window.api.git.gitBranchDelete(folderPath, name, force);
-    pass(callback, res, null);
-  } catch (err) {
-    EventBus.emit("logging:error", [
-      "[GitHandler] Failed to delete branch:",
-      err,
-    ]);
     callback?.(null);
   }
 }

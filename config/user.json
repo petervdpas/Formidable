@@ -21,6 +21,7 @@
   "encryption_key": "",
   "use_git": true,
   "git_root": "./",
+  "git_branch": "",
   "remote_backend": "git",
   "gigot_base_url": "http://127.0.0.1:3417",
   "gigot_repo_name": "BrainDamage",
@@ -29,10 +30,7 @@
   "internal_server_port": 8383,
   "window_bounds": {
     "width": 1440,
-    "height": 833,
-    "x": 640,
-    "y": 186,
-    "maximized": false
+    "height": 833
   },
   "template_sidebar_width": 466,
   "storage_sidebar_width": 459,

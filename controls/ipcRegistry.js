@@ -278,14 +278,8 @@ function registerIpcHandlers() {
     gitManager.commitPaths(folder, message, paths)
   );
   registerIpc("git-branches", (e, folder) => gitManager.branches(folder));
-  registerIpc("git-branch-create", (e, folder, name, opts) =>
-    gitManager.createBranch(folder, name, opts)
-  );
   registerIpc("git-checkout", (e, folder, ref) =>
     gitManager.checkout(folder, ref)
-  );
-  registerIpc("git-branch-delete", (e, folder, name, force) =>
-    gitManager.deleteBranch(folder, name, { force })
   );
   registerIpc("git-diff-name-only", (e, folder, base) =>
     gitManager.diffNameOnly(folder, base)

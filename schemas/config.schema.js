@@ -24,6 +24,7 @@ module.exports = {
     encryption_key: "",
     use_git: false,
     git_root: "",
+    git_branch: "",
     remote_backend: "none",
     gigot_base_url: "",
     gigot_repo_name: "",

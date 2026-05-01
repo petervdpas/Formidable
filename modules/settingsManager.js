@@ -282,6 +282,13 @@ export async function renderSettings() {
         outerClass: "modal-form-row tight-gap",
       });
       gitGroup.appendChild(gitRootPicker.element);
+
+      // Branch dropdown host (bound by setupGitBranchDropdown)
+      const branchRow = document.createElement("div");
+      branchRow.id = "settings-git-branch";
+      branchRow.className = "modal-form-row";
+      gitGroup.appendChild(branchRow);
+
       panel.appendChild(gitGroup);
 
       // GiGot group — visible when backend === "gigot"
@@ -535,6 +542,7 @@ export async function renderSettings() {
   setupLanguageDropdown(config);
   setupThemeDropdown(config);
   setupRemoteBackendDropdown(config);
+  setupGitBranchDropdown(config);
   setupBindings(config, gitRootPicker);
 
   return tv;
@@ -858,6 +866,38 @@ function setupRemoteBackendDropdown(config) {
       });
     });
   };
+}
+
+async function setupGitBranchDropdown(config) {
+  const cfgPath = config?.git_root || config?.context_folder || ".";
+
+  const result = await new Promise((resolve) => {
+    EventBus.emit("git:branches", { folderPath: cfgPath, callback: resolve });
+  });
+
+  const list = result?.all || [];
+  const selected = config?.git_branch || result?.current || "";
+
+  createDropdown({
+    containerId: "settings-git-branch",
+    labelTextOrKey: "modal.settings.git.branch",
+    selectedValue: selected,
+    options: list.map((name) => ({ value: name, label: name })),
+    onChange: async (value) => {
+      if (!value) return;
+      await new Promise((resolve) => {
+        EventBus.emit("git:checkout", {
+          folderPath: cfgPath,
+          ref: value,
+          callback: resolve,
+        });
+      });
+      await EventBus.emit("config:update", { git_branch: value });
+      cachedConfig = await reloadUserConfig();
+      emitConfigStatus("git_branch", value);
+    },
+    i18nEnabled: true,
+  });
 }
 
 function setupLanguageDropdown(config) {

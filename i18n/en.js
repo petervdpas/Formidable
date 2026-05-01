@@ -665,6 +665,7 @@ export default {
   "modal.settings.paste.buttons": "Paste-data on Lists/Tables",
   "modal.settings.context.folder": "Context Directory",
   "modal.settings.git.root": "Git Root Directory",
+  "modal.settings.git.branch": "Branch",
   "modal.settings.remote.backend": "Remote Backend",
   "modal.settings.remote.backend.none": "None (local only)",
   "modal.settings.remote.backend.git": "Git",

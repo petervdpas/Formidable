@@ -501,9 +501,7 @@ export function initEventRouter() {
   EventBus.off("git:reset-paths", gitHandler.handleGitResetPaths);
   EventBus.off("git:commit-paths", gitHandler.handleGitCommitPaths);
   EventBus.off("git:branches", gitHandler.handleGitBranches);
-  EventBus.off("git:branch-create", gitHandler.handleGitBranchCreate);
   EventBus.off("git:checkout", gitHandler.handleGitCheckout);
-  EventBus.off("git:branch-delete", gitHandler.handleGitBranchDelete);
   EventBus.off("git:diff-name-only", gitHandler.handleGitDiffNameOnly);
   EventBus.off("git:diff-file", gitHandler.handleGitDiffFile);
   EventBus.off("git:log", gitHandler.handleGitLog);
@@ -542,9 +540,7 @@ export function initEventRouter() {
   EventBus.on("git:reset-paths", gitHandler.handleGitResetPaths);
   EventBus.on("git:commit-paths", gitHandler.handleGitCommitPaths);
   EventBus.on("git:branches", gitHandler.handleGitBranches);
-  EventBus.on("git:branch-create", gitHandler.handleGitBranchCreate);
   EventBus.on("git:checkout", gitHandler.handleGitCheckout);
-  EventBus.on("git:branch-delete", gitHandler.handleGitBranchDelete);
   EventBus.on("git:diff-name-only", gitHandler.handleGitDiffNameOnly);
   EventBus.on("git:diff-file", gitHandler.handleGitDiffFile);
   EventBus.on("git:log", gitHandler.handleGitLog);
