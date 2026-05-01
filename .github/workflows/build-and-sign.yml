@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - release/*
-    paths:
-      - package.json
 
 permissions:
   contents: write
