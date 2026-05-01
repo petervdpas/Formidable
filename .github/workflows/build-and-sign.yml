@@ -75,7 +75,7 @@ jobs:
           }
 
           New-Item -ItemType Directory -Force -Path release | Out-Null
-          Copy-Item $src "release/Formidable Setup $version.exe"
+          Copy-Item $src "release/Formidable.Setup.exe"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -118,8 +118,9 @@ jobs:
 
       - name: Collect artifacts
         run: |
+          set -euo pipefail
           mkdir -p release
-          cp dist/*.deb release/
+          cp dist/*.deb release/formidable_amd64.deb
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -162,8 +163,9 @@ jobs:
 
       - name: Collect artifacts
         run: |
+          set -euo pipefail
           mkdir -p release
-          cp dist/*.deb release/
+          cp dist/*.deb release/formidable_arm64.deb
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
