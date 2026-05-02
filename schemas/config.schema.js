@@ -40,7 +40,8 @@ module.exports = {
     status_buttons: {
       reloader: true,
       charpicker: true,
-      gitquick: true,
+      gitquick: false,
+      gigotload: false,
     },
     history: {
       enabled: true,

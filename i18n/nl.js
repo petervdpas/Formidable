@@ -718,9 +718,21 @@ export default {
     "Geen statusknoppen gedefinieerd in uw configuratie.",
   "modal.settings.statusButtons.charpicker": "Karakterkiezer",
   "modal.settings.statusButtons.gitquick": "Git Snelle Acties",
-  "modal.settings.statusButtons.gitquick.dependsOnGit":
-    "Vereist dat Git is ingeschakeld.",
+  "modal.settings.statusButtons.gitquick.dependsOnGit": "Vereist Git-backend.",
   "modal.settings.statusButtons.reloader": "Herlaad Knop",
+  "modal.settings.statusButtons.gigotload": "GiGot Belastingsindicator",
+  "modal.settings.statusButtons.gigotload.dependsOnGigot": "Vereist GiGot-backend.",
+
+  "status.buttonBar.aria.gigotLoad": "GiGot belasting",
+  "status.buttonBar.tooltip.gigotLoad": "GiGot serverbelasting",
+  "status.buttonBar.tooltip.gigotLoad.low": "GiGot: rustig",
+  "status.buttonBar.tooltip.gigotLoad.medium": "GiGot: druk",
+  "status.buttonBar.tooltip.gigotLoad.high": "GiGot: overbelast",
+
+  "gigot.quick.title": "GiGot synchroniseren",
+  "gigot.quick.subtitle": "Lokale wijzigingen pushen en nieuwe wijzigingen van de server pullen.",
+  "gigot.quick.sync": "Nu synchroniseren",
+  "gigot.quick.open_full": "Open synchronisatie…",
 
   "modal.profile.title": "Wissel gebruikersprofiel",
   "modal.profile.label.newProfile": "Nieuw profiel",

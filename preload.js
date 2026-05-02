@@ -130,6 +130,7 @@ const api = {
     "gigot-pull-local",
     "gigot-sync-local",
     "gigot-log",
+    "gigot-last-known-load",
   ]),
   config: buildGroup([
     "switch-user-profile",

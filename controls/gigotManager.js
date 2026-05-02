@@ -8,13 +8,33 @@ const crypto = require("crypto");
 const { error } = require("./nodeLogger");
 
 function ok(data) {
-  return { ok: true, data };
+  const out = { ok: true, data };
+  if (lastKnownLoad) out.load = lastKnownLoad;
+  return out;
 }
 function fail(err) {
   const msg = typeof err === "string" ? err : err?.message || "Unknown error";
   const out = { ok: false, error: msg };
   if (err && typeof err === "object" && err.status) out.status = err.status;
+  if (lastKnownLoad) out.load = lastKnownLoad;
   return out;
+}
+
+const LOAD_LEVELS = new Set(["low", "medium", "high"]);
+let lastKnownLoad = null;
+
+function recordLoad(headerValue) {
+  if (!headerValue) return;
+  const v = String(headerValue).trim().toLowerCase();
+  if (LOAD_LEVELS.has(v)) lastKnownLoad = v;
+}
+
+function getLastKnownLoad() {
+  return lastKnownLoad;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // Compute a file's git blob SHA1 — same hash git uses for tree entries.
@@ -90,6 +110,11 @@ function validateConn(conn, { requireRepo = true } = {}) {
   return null;
 }
 
+// Cap a transparent 429 retry at 30s so a misconfigured server
+// can't park the sync thread; admin UI bounds retry-after to 3600s
+// server-side, this is a defensive client-side floor on responsiveness.
+const MAX_RETRY_AFTER_MS = 30 * 1000;
+
 async function request(conn, method, pathname, { body, query } = {}) {
   const url = new URL(pathname, conn.baseUrl);
   if (query) {
@@ -111,7 +136,18 @@ async function request(conn, method, pathname, { body, query } = {}) {
     init.body = typeof body === "string" ? body : JSON.stringify(body);
   }
 
-  const res = await fetch(url, init);
+  // Two attempts max: retry once on 429 + Retry-After, otherwise
+  // surface as a regular failure with status=429.
+  let res;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    res = await fetch(url, init);
+    recordLoad(res.headers.get("X-GiGot-Load"));
+    if (res.status !== 429 || attempt === 1) break;
+    const retryMs = parseRetryAfter(res.headers.get("Retry-After"));
+    if (retryMs == null || retryMs > MAX_RETRY_AFTER_MS) break;
+    await sleep(retryMs);
+  }
+
   const text = await res.text();
   let data = null;
   if (text) {
@@ -131,6 +167,17 @@ async function request(conn, method, pathname, { body, query } = {}) {
     throw err;
   }
   return data;
+}
+
+// parseRetryAfter accepts the integer-seconds form of the Retry-After
+// header (RFC 7231 also allows an HTTP-date, but GiGot only ever
+// emits the seconds form — see handler_admin_benchmark.go). Returns
+// milliseconds or null if the header is missing/unparseable.
+function parseRetryAfter(headerValue) {
+  if (!headerValue) return null;
+  const n = parseInt(String(headerValue).trim(), 10);
+  if (!Number.isFinite(n) || n < 0) return null;
+  return n * 1000;
 }
 
 // GET /api/health — public, no token required. Use to verify base URL
@@ -638,4 +685,5 @@ module.exports = {
   pullLocal,
   sync,
   log,
+  getLastKnownLoad,
 };

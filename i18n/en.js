@@ -691,9 +691,21 @@ export default {
     "No status buttons defined in your configuration.",
   "modal.settings.statusButtons.charpicker": "Character Picker",
   "modal.settings.statusButtons.gitquick": "Git Quick Actions",
-  "modal.settings.statusButtons.gitquick.dependsOnGit":
-    "Requires Git to be enabled.",
+  "modal.settings.statusButtons.gitquick.dependsOnGit": "Requires Git backend.",
   "modal.settings.statusButtons.reloader": "Reload Button",
+  "modal.settings.statusButtons.gigotload": "GiGot Load Indicator",
+  "modal.settings.statusButtons.gigotload.dependsOnGigot": "Requires GiGot backend.",
+
+  "status.buttonBar.aria.gigotLoad": "GiGot load",
+  "status.buttonBar.tooltip.gigotLoad": "GiGot server load",
+  "status.buttonBar.tooltip.gigotLoad.low": "GiGot: idle",
+  "status.buttonBar.tooltip.gigotLoad.medium": "GiGot: busy",
+  "status.buttonBar.tooltip.gigotLoad.high": "GiGot: overloaded",
+
+  "gigot.quick.title": "Sync GiGot",
+  "gigot.quick.subtitle": "Push local changes and pull anything new from the server.",
+  "gigot.quick.sync": "Sync now",
+  "gigot.quick.open_full": "Open Sync…",
 
   "modal.profile.title": "Switch User Profile",
   "modal.profile.label.newProfile": "New Profile",

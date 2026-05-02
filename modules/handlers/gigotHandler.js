@@ -1,11 +1,11 @@
 // modules/handlers/gigotHandler.js
 // EventBus → window.api.gigot.* bridge. Sibling of gitHandler.js.
-// Unlike git, we pass the full {ok, data, error} envelope to the
-// callback so the UI can distinguish "unreachable" from "unauthorized"
-// from "repo not found" — the Test-connection button needs the error
-// string verbatim.
+// Passes the full {ok, data, error, load} envelope to the callback so
+// the UI can distinguish error shapes verbatim.
 
 import { EventBus } from "../eventBus.js";
+
+let lastKnownLoad = null;
 
 function logIfFailed(where, res) {
   if (res && res.ok === false) {
@@ -15,10 +15,20 @@ function logIfFailed(where, res) {
   }
 }
 
+function observeLoad(res) {
+  if (!res || typeof res !== "object") return;
+  const next = res.load;
+  if (!next || next === lastKnownLoad) return;
+  const previous = lastKnownLoad;
+  lastKnownLoad = next;
+  EventBus.emit("gigot:load:changed", [{ previous, current: next }]);
+}
+
 async function run(where, callback, fn) {
   try {
     const res = await fn();
     logIfFailed(where, res);
+    observeLoad(res);
     callback?.(res);
   } catch (err) {
     const msg = String(err?.message || err);
@@ -69,4 +79,14 @@ export async function handleGigotLog({ conn, limit, callback }) {
   await run("log", callback, () =>
     window.api.gigot.gigotLog(conn, limit || 20)
   );
+}
+
+export async function handleGigotLastKnownLoad({ callback }) {
+  await run("lastKnownLoad", callback, () =>
+    window.api.gigot.gigotLastKnownLoad()
+  );
+}
+
+export function getLastKnownLoad() {
+  return lastKnownLoad;
 }

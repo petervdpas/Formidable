@@ -9,6 +9,8 @@ import {
 import { allCharacters, toGridOptions } from "../utils/characterUtils.js";
 import { createStatusButtonConfig } from "../utils/buttonUtils.js";
 import { Toast } from "../utils/toastUtils.js";
+import * as gigotHandler from "./handlers/gigotHandler.js";
+import { getGigotSyncContext } from "./gigotSyncModal.js";
 import {
   loadConfig,
   resolveGitPath,
@@ -377,9 +379,115 @@ function installGitQuickButton({ addStatusButton, EventBus, config }) {
   );
 }
 
+function createStatusGigotLoadButtonConfig(onClick) {
+  return createStatusButtonConfig({
+    id: "status-gigotload-btn",
+    label: t("status.buttonBar.aria.gigotLoad") || "GiGot load",
+    iconClass: "fa fa-code-fork",
+    titleKey: "status.buttonBar.tooltip.gigotLoad",
+    ariaKey: "status.buttonBar.aria.gigotLoad",
+    className: "btn-gigotload is-success",
+    onClick,
+  });
+}
+
+const GIGOT_LOAD_STATE = {
+  low: "is-success",
+  medium: "is-warning",
+  high: "is-danger",
+};
+
+function installGigotLoadButton({ addStatusButton, EventBus, config }) {
+  if (!getFlag(config, "status_buttons.gigotload", false)) return null;
+  if (config?.remote_backend !== "gigot") return null;
+
+  const btn = addStatusButton(
+    createStatusGigotLoadButtonConfig(async (e, btnEl) => {
+      const { conn, contextFolder } = await getGigotSyncContext();
+
+      const panel = createOptionPanel(
+        {
+          title: t("gigot.quick.title") || "Sync GiGot",
+          message:
+            t("gigot.quick.subtitle") ||
+            "Push local changes and pull anything new from the server.",
+          actions: [
+            {
+              value: "sync",
+              label: t("gigot.quick.sync") || "Sync now",
+              variant: "primary",
+            },
+            {
+              value: "open_full",
+              label: t("gigot.quick.open_full") || "Open Sync…",
+              variant: "info",
+            },
+            {
+              value: "cancel",
+              label: t("standard.cancel") || "Cancel",
+              variant: "quiet",
+            },
+          ],
+        },
+        async (val) => {
+          switch (val) {
+            case "sync": {
+              try {
+                await new Promise((resolve) =>
+                  EventBus.emit("gigot:sync-local", {
+                    conn,
+                    contextFolder,
+                    callback: resolve,
+                  })
+                ).then((res) => {
+                  if (res?.ok) {
+                    Toast.success("toast.gigot.sync.complete");
+                  } else if (res?.error) {
+                    Toast.error(res.error);
+                  }
+                });
+              } catch {}
+              activePopup?.hide?.();
+              break;
+            }
+            case "open_full":
+              window.openGigotSyncModal?.();
+              activePopup?.hide?.();
+              break;
+            case "cancel":
+              activePopup?.hide?.();
+              break;
+          }
+        }
+      );
+
+      openSharedPopup(e?.currentTarget || btnEl, panel.element);
+    })
+  );
+
+  function paint(level) {
+    if (!btn) return;
+    const lvl = GIGOT_LOAD_STATE[level] ? level : "low";
+    btn.classList.remove("is-success", "is-warning", "is-danger");
+    btn.classList.add(GIGOT_LOAD_STATE[lvl]);
+    const labels = {
+      low: t("status.buttonBar.tooltip.gigotLoad.low") || "GiGot: idle",
+      medium: t("status.buttonBar.tooltip.gigotLoad.medium") || "GiGot: busy",
+      high: t("status.buttonBar.tooltip.gigotLoad.high") || "GiGot: overloaded",
+    };
+    btn.title = labels[lvl];
+    btn.setAttribute("aria-label", labels[lvl]);
+  }
+
+  paint(gigotHandler.getLastKnownLoad());
+  EventBus.on("gigot:load:changed", (payload) => paint(payload?.current));
+  return btn;
+}
+
 export function installStatusButtons(deps) {
   const charBtn = installCharPickerButton(deps);
   const gitBtn = installGitQuickButton(deps);
   const reloadBtn = installReloadButton(deps);
-  return { charBtn, gitBtn, reloadBtn };
+  const gigotLoadBtn = installGigotLoadButton(deps);
+  return { charBtn, gitBtn, reloadBtn, gigotLoadBtn };
 }

@@ -576,6 +576,7 @@ export function initEventRouter() {
   EventBus.off("gigot:pull-local", gigotHandler.handleGigotPullLocal);
   EventBus.off("gigot:sync-local", gigotHandler.handleGigotSyncLocal);
   EventBus.off("gigot:log", gigotHandler.handleGigotLog);
+  EventBus.off("gigot:last-known-load", gigotHandler.handleGigotLastKnownLoad);
 
   EventBus.on("gigot:ping", gigotHandler.handleGigotPing);
   EventBus.on("gigot:status", gigotHandler.handleGigotStatus);
@@ -585,6 +586,7 @@ export function initEventRouter() {
   EventBus.on("gigot:pull-local", gigotHandler.handleGigotPullLocal);
   EventBus.on("gigot:sync-local", gigotHandler.handleGigotSyncLocal);
   EventBus.on("gigot:log", gigotHandler.handleGigotLog);
+  EventBus.on("gigot:last-known-load", gigotHandler.handleGigotLastKnownLoad);
 
   // Cache events
   EventBus.off("cache:init", cacheHandler.initCache);

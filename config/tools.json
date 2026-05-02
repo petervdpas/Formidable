@@ -11,7 +11,7 @@
   "development_enable": true,
   "logging_enabled": false,
   "enable_plugins": true,
-  "context_mode": "template",
+  "context_mode": "storage",
   "context_folder": "/home/peter/Projects/Example",
   "selected_template": "basic.yaml",
   "selected_data_file": "test-20260430.meta.json",
@@ -21,6 +21,7 @@
   "encryption_key": "",
   "use_git": false,
   "git_root": "",
+  "git_branch": "",
   "remote_backend": "gigot",
   "gigot_base_url": "https://gigot.formidable.tools",
   "gigot_repo_name": "example",
@@ -29,14 +30,18 @@
   "internal_server_port": 8383,
   "window_bounds": {
     "width": 1440,
-    "height": 833
+    "height": 864,
+    "x": 240,
+    "y": 124,
+    "maximized": false
   },
-  "template_sidebar_width": 501,
-  "storage_sidebar_width": 396,
+  "template_sidebar_width": 498,
+  "storage_sidebar_width": 445,
   "status_buttons": {
     "reloader": true,
     "charpicker": true,
-    "gitquick": false
+    "gitquick": false,
+    "gigotload": true
   },
   "history": {
     "enabled": true,

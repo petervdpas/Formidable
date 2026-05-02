@@ -359,7 +359,13 @@ function registerIpcHandlers() {
   registerIpc("gigot-sync-local", (e, conn, contextFolder) =>
     gigotManager.sync(conn, contextFolder)
   );
-  registerIpc("gigot-log", (e, conn, limit) => gigotManager.log(conn, limit));
+  registerIpc("gigot-log", (e, conn, limit) => 
+    gigotManager.log(conn, limit)
+  );
+  registerIpc("gigot-last-known-load", () => ({
+    ok: true,
+    data: gigotManager.getLastKnownLoad(),
+  }));
 
   // Templates
   registerIpc("list-templates", () => templateManager.listTemplates());

@@ -66,6 +66,26 @@ label small {
   color: inherit;
 }
 
+.status-btn-hint.is-ok,
+.status-btn-hint.is-blocked {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.7em;
+  opacity: 1;
+  margin-left: 6px;
+}
+.status-btn-hint.is-ok {
+  background: rgba(46, 160, 67, 0.18);
+  color: var(--status-success-color, #2ea043);
+  border: 1px solid rgba(46, 160, 67, 0.4);
+}
+.status-btn-hint.is-blocked {
+  background: rgba(218, 54, 51, 0.18);
+  color: var(--status-error-color, #f85149);
+  border: 1px solid rgba(218, 54, 51, 0.4);
+}
+
 /* Row layout */
 .form-row {
   display: flex;

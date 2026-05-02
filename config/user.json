@@ -14,7 +14,7 @@
   "context_mode": "storage",
   "context_folder": "./examples",
   "selected_template": "basic.yaml",
-  "selected_data_file": "sane-20250530.meta.json",
+  "selected_data_file": "soup-20260421.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -30,7 +30,7 @@
   "internal_server_port": 8383,
   "window_bounds": {
     "width": 1440,
-    "height": 833,
+    "height": 864,
     "x": 240,
     "y": 139,
     "maximized": false

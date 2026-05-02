@@ -497,19 +497,36 @@ export async function renderSettings() {
           true
         );
 
-        // Special rule: gitquick depends on use_git
-        if (key === "gitquick" && cachedConfig.use_git !== true) {
-          const input = sw.querySelector('input[type="checkbox"]');
-          if (input) input.disabled = true;
-
-          addContainerElement({
+        if (key === "gitquick") {
+          const hint = addContainerElement({
             parent: sw,
             tag: "small",
-            className: "label-subtext",
-            textContent:
-              t("modal.settings.statusButtons.gitquick.dependsOnGit") ||
-              "Requires Git to be enabled.",
+            className: "label-subtext status-btn-hint",
+            i18nKey: "modal.settings.statusButtons.gitquick.dependsOnGit",
           });
+          hint.dataset.statusBtnHint = "gitquick";
+          const gitOk = cachedConfig.use_git === true;
+          hint.classList.add(gitOk ? "is-ok" : "is-blocked");
+          if (!gitOk) {
+            const input = sw.querySelector('input[type="checkbox"]');
+            if (input) input.disabled = true;
+          }
+        }
+
+        if (key === "gigotload") {
+          const hint = addContainerElement({
+            parent: sw,
+            tag: "small",
+            className: "label-subtext status-btn-hint",
+            i18nKey: "modal.settings.statusButtons.gigotload.dependsOnGigot",
+          });
+          hint.dataset.statusBtnHint = "gigotload";
+          const gigotOk = cachedConfig.remote_backend === "gigot";
+          hint.classList.add(gigotOk ? "is-ok" : "is-blocked");
+          if (!gigotOk) {
+            const input = sw.querySelector('input[type="checkbox"]');
+            if (input) input.disabled = true;
+          }
         }
 
         panel.appendChild(sw);
@@ -620,6 +637,12 @@ async function enforceGitQuickConstraint(useGitEnabled) {
   const input = getSwitchInputById("status-btn-gitquick");
   if (!input) return;
 
+  const hint = document.querySelector('[data-status-btn-hint="gitquick"]');
+  if (hint) {
+    hint.classList.toggle("is-ok", !!useGitEnabled);
+    hint.classList.toggle("is-blocked", !useGitEnabled);
+  }
+
   if (!useGitEnabled) {
     input.disabled = true;
 
@@ -641,6 +664,46 @@ async function enforceGitQuickConstraint(useGitEnabled) {
         i18nEnabled: true,
         args: [
           t("modal.settings.statusButtons.gitquick") || "Git Quick Actions",
+        ],
+        variant: "warning",
+      });
+    }
+  } else {
+    input.disabled = false;
+  }
+}
+
+async function enforceGigotLoadConstraint(gigotEnabled) {
+  const input = getSwitchInputById("status-btn-gigotload");
+  if (!input) return;
+
+  const hint = document.querySelector('[data-status-btn-hint="gigotload"]');
+  if (hint) {
+    hint.classList.toggle("is-ok", !!gigotEnabled);
+    hint.classList.toggle("is-blocked", !gigotEnabled);
+  }
+
+  if (!gigotEnabled) {
+    input.disabled = true;
+
+    if (input.checked || cachedConfig.status_buttons?.gigotload === true) {
+      input.checked = false;
+
+      const nextStatusButtons = {
+        ...(cachedConfig.status_buttons ?? {}),
+        gigotload: false,
+      };
+
+      await EventBus.emit("config:update", {
+        status_buttons: nextStatusButtons,
+      });
+      cachedConfig = await reloadUserConfig();
+
+      EventBus.emit("status:update", {
+        languageKey: "status.config.disabled",
+        i18nEnabled: true,
+        args: [
+          t("modal.settings.statusButtons.gigotload") || "GiGot Load Indicator",
         ],
         variant: "warning",
       });
@@ -762,6 +825,12 @@ function bindStatusButtons(config) {
         return;
       }
 
+      if (key === "gigotload" && cachedConfig?.remote_backend !== "gigot") {
+        input.checked = false;
+        await enforceGigotLoadConstraint(false);
+        return;
+      }
+
       const enabled = !!input.checked;
       const nextStatusButtons = {
         ...(cachedConfig.status_buttons ?? {}),
@@ -788,6 +857,7 @@ function bindStatusButtons(config) {
   }
 
   enforceGitQuickConstraint(cachedConfig?.use_git === true);
+  enforceGigotLoadConstraint(cachedConfig?.remote_backend === "gigot");
 }
 
 function setupRemoteBackendDropdown(config) {
@@ -820,6 +890,7 @@ function setupRemoteBackendDropdown(config) {
       cachedConfig = await reloadUserConfig();
       showFieldGroup(value);
       await enforceGitQuickConstraint(value === "git");
+      await enforceGigotLoadConstraint(value === "gigot");
       await rebuildMenu();
       emitConfigStatus("remote_backend", value);
     },
