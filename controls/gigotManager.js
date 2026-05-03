@@ -7,6 +7,61 @@ const path = require("path");
 const crypto = require("crypto");
 const { error } = require("./nodeLogger");
 const changes = require("./changes");
+const apiClient = require("./apiClient");
+
+// Single source of truth for every GiGot endpoint Formidable hits.
+// Path patterns use {placeholder}; gigotRequest() interpolates them.
+// Adding a new endpoint = one row here + one wrapper function below.
+const ROUTES = {
+  health:          { method: "GET",  path: "/api/health" },
+  status:          { method: "GET",  path: "/api/repos/{repo}" },
+  head:            { method: "GET",  path: "/api/repos/{repo}/head" },
+  tree:            { method: "GET",  path: "/api/repos/{repo}/tree" },
+  file:            { method: "GET",  path: "/api/repos/{repo}/files/{filePath}" },
+  log:             { method: "GET",  path: "/api/repos/{repo}/log" },
+  commits:         { method: "POST", path: "/api/repos/{repo}/commits" },
+  destinations:    { method: "GET",  path: "/api/repos/{repo}/destinations" },
+  destinationSync: { method: "POST", path: "/api/repos/{repo}/destinations/{destId}/sync" },
+};
+
+// Encode a single path placeholder. {filePath} carries embedded
+// forward slashes that must survive (path-level), with each segment
+// URI-encoded; everything else is a single segment.
+function encodePathParam(name, value) {
+  if (name === "filePath") {
+    return String(value)
+      .split("/")
+      .map((seg) => encodeURIComponent(seg))
+      .join("/");
+  }
+  return encodeURIComponent(String(value));
+}
+
+function routePath(routeName, params = {}) {
+  const route = ROUTES[routeName];
+  if (!route) throw new Error(`Unknown GiGot route: ${routeName}`);
+  let p = route.path;
+  for (const [k, v] of Object.entries(params)) {
+    p = p.replace(`{${k}}`, encodePathParam(k, v));
+  }
+  return p;
+}
+
+// Thin wrapper around apiClient.request that bakes in GiGot's
+// per-conn shape (baseUrl, token) and the X-GiGot-Load telemetry hook.
+async function gigotRequest(conn, routeName, { params, body, query } = {}) {
+  const route = ROUTES[routeName];
+  if (!route) throw new Error(`Unknown GiGot route: ${routeName}`);
+  return apiClient.request({
+    baseUrl: conn.baseUrl,
+    token: conn.token,
+    method: route.method,
+    path: routePath(routeName, params),
+    body,
+    query,
+    onResponse: (res) => recordLoad(res.headers.get("X-GiGot-Load")),
+  });
+}
 
 function ok(data) {
   const out = { ok: true, data };
@@ -32,10 +87,6 @@ function recordLoad(headerValue) {
 
 function getLastKnownLoad() {
   return lastKnownLoad;
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // Compute a file's git blob SHA1 — same hash git uses for tree entries.
@@ -111,76 +162,6 @@ function validateConn(conn, { requireRepo = true } = {}) {
   return null;
 }
 
-// Cap a transparent 429 retry at 30s so a misconfigured server
-// can't park the sync thread; admin UI bounds retry-after to 3600s
-// server-side, this is a defensive client-side floor on responsiveness.
-const MAX_RETRY_AFTER_MS = 30 * 1000;
-
-async function request(conn, method, pathname, { body, query } = {}) {
-  const url = new URL(pathname, conn.baseUrl);
-  if (query) {
-    for (const [k, v] of Object.entries(query)) {
-      if (v != null) url.searchParams.set(k, String(v));
-    }
-  }
-  const init = {
-    method,
-    headers: {
-      Accept: "application/json",
-    },
-  };
-  if (conn.token) {
-    init.headers.Authorization = `Bearer ${conn.token}`;
-  }
-  if (body != null) {
-    init.headers["Content-Type"] = "application/json";
-    init.body = typeof body === "string" ? body : JSON.stringify(body);
-  }
-
-  // Two attempts max: retry once on 429 + Retry-After, otherwise
-  // surface as a regular failure with status=429.
-  let res;
-  for (let attempt = 0; attempt < 2; attempt++) {
-    res = await fetch(url, init);
-    recordLoad(res.headers.get("X-GiGot-Load"));
-    if (res.status !== 429 || attempt === 1) break;
-    const retryMs = parseRetryAfter(res.headers.get("Retry-After"));
-    if (retryMs == null || retryMs > MAX_RETRY_AFTER_MS) break;
-    await sleep(retryMs);
-  }
-
-  const text = await res.text();
-  let data = null;
-  if (text) {
-    try {
-      data = JSON.parse(text);
-    } catch {
-      data = text;
-    }
-  }
-  if (!res.ok) {
-    const msg =
-      (data && typeof data === "object" && data.error) ||
-      `${res.status} ${res.statusText}`;
-    const err = new Error(msg);
-    err.status = res.status;
-    err.body = data;
-    throw err;
-  }
-  return data;
-}
-
-// parseRetryAfter accepts the integer-seconds form of the Retry-After
-// header (RFC 7231 also allows an HTTP-date, but GiGot only ever
-// emits the seconds form — see handler_admin_benchmark.go). Returns
-// milliseconds or null if the header is missing/unparseable.
-function parseRetryAfter(headerValue) {
-  if (!headerValue) return null;
-  const n = parseInt(String(headerValue).trim(), 10);
-  if (!Number.isFinite(n) || n < 0) return null;
-  return n * 1000;
-}
-
 // GET /api/health — public, no token required. Use to verify base URL
 // before a full status call so the user sees a clean "unreachable" vs
 // "unauthorized" distinction.
@@ -188,7 +169,7 @@ async function ping(conn) {
   const v = validateConn(conn, { requireRepo: false });
   if (v) return fail(v);
   try {
-    const data = await request({ baseUrl: conn.baseUrl }, "GET", "/api/health");
+    const data = await gigotRequest({ baseUrl: conn.baseUrl }, "health");
     return ok(data);
   } catch (err) {
     error("[GigotManager] ping failed:", err);
@@ -202,11 +183,9 @@ async function status(conn) {
   const v = validateConn(conn);
   if (v) return fail(v);
   try {
-    const data = await request(
-      conn,
-      "GET",
-      `/api/repos/${encodeURIComponent(conn.repoName)}`
-    );
+    const data = await gigotRequest(conn, "status", {
+      params: { repo: conn.repoName },
+    });
     return ok(data);
   } catch (err) {
     error("[GigotManager] status failed:", err);
@@ -221,11 +200,9 @@ async function listDestinations(conn) {
   const v = validateConn(conn);
   if (v) return fail(v);
   try {
-    const data = await request(
-      conn,
-      "GET",
-      `/api/repos/${encodeURIComponent(conn.repoName)}/destinations`
-    );
+    const data = await gigotRequest(conn, "destinations", {
+      params: { repo: conn.repoName },
+    });
     return ok(data);
   } catch (err) {
     error("[GigotManager] listDestinations failed:", err);
@@ -241,11 +218,9 @@ async function syncDestination(conn, destinationId) {
   if (v) return fail(v);
   if (!destinationId) return fail("Missing destination id");
   try {
-    const data = await request(
-      conn,
-      "POST",
-      `/api/repos/${encodeURIComponent(conn.repoName)}/destinations/${encodeURIComponent(destinationId)}/sync`
-    );
+    const data = await gigotRequest(conn, "destinationSync", {
+      params: { repo: conn.repoName, destId: destinationId },
+    });
     return ok(data);
   } catch (err) {
     error("[GigotManager] syncDestination failed:", err);
@@ -260,11 +235,9 @@ async function head(conn) {
   const v = validateConn(conn);
   if (v) return fail(v);
   try {
-    const data = await request(
-      conn,
-      "GET",
-      `/api/repos/${encodeURIComponent(conn.repoName)}/head`
-    );
+    const data = await gigotRequest(conn, "head", {
+      params: { repo: conn.repoName },
+    });
     return ok(data);
   } catch (err) {
     error("[GigotManager] head failed:", err);
@@ -292,12 +265,10 @@ async function commitChanges(conn, { parentVersion, changes, message }) {
     body.author = { name: conn.author.name, email: conn.author.email };
   }
   try {
-    const data = await request(
-      conn,
-      "POST",
-      `/api/repos/${encodeURIComponent(conn.repoName)}/commits`,
-      { body }
-    );
+    const data = await gigotRequest(conn, "commits", {
+      params: { repo: conn.repoName },
+      body,
+    });
     return ok(data);
   } catch (err) {
     error("[GigotManager] commitChanges failed:", err);
@@ -311,12 +282,10 @@ async function log(conn, limit = 20) {
   const v = validateConn(conn);
   if (v) return fail(v);
   try {
-    const data = await request(
-      conn,
-      "GET",
-      `/api/repos/${encodeURIComponent(conn.repoName)}/log`,
-      { query: { limit } }
-    );
+    const data = await gigotRequest(conn, "log", {
+      params: { repo: conn.repoName },
+      query: { limit },
+    });
     return ok(data);
   } catch (err) {
     error("[GigotManager] log failed:", err);
@@ -574,11 +543,9 @@ async function tree(conn) {
   const v = validateConn(conn);
   if (v) return fail(v);
   try {
-    const data = await request(
-      conn,
-      "GET",
-      `/api/repos/${encodeURIComponent(conn.repoName)}/tree`
-    );
+    const data = await gigotRequest(conn, "tree", {
+      params: { repo: conn.repoName },
+    });
     return ok(data);
   } catch (err) {
     error("[GigotManager] tree failed:", err);
@@ -591,25 +558,14 @@ async function getFile(conn, repoRelPath) {
   const v = validateConn(conn);
   if (v) return fail(v);
   try {
-    const data = await request(
-      conn,
-      "GET",
-      `/api/repos/${encodeURIComponent(conn.repoName)}/files/${encodeFilePath(repoRelPath)}`
-    );
+    const data = await gigotRequest(conn, "file", {
+      params: { repo: conn.repoName, filePath: repoRelPath },
+    });
     return ok(data);
   } catch (err) {
     error("[GigotManager] getFile failed:", err);
     return fail(err);
   }
-}
-
-function encodeFilePath(repoRelPath) {
-  // The server accepts the path as-is after /files/; each segment
-  // URI-encoded individually preserves directory slashes.
-  return repoRelPath
-    .split("/")
-    .map((seg) => encodeURIComponent(seg))
-    .join("/");
 }
 
 // Pull every Formidable file from remote into contextFolder. Overwrites

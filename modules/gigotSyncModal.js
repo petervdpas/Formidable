@@ -261,20 +261,37 @@ export function buildGigotSyncLeftPane({ conn, contextFolder, onSyncDone }) {
       textContent: statusKey,
     });
 
-    const syncBtn = createButton({
-      text: t("modal.gigot.destinations.sync") || "Sync now",
-      i18nKey: "modal.gigot.destinations.sync",
-      identifier: `gigot-dest-sync-${d.id}`,
-      className: "btn-primary",
-      onClick: async () => {
-        syncBtn.disabled = true;
-        syncBtn.textContent =
-          t("modal.gigot.destinations.syncing") || "Syncing…";
-        await callBus("gigot:sync-destination", { conn, id: d.id });
-        await onSyncDone();
-      },
-    });
-    actions.appendChild(syncBtn);
+    // Auto-mirror ON: the GiGot server fans out a push to this
+    // destination on every accepted commit. No manual button — the
+    // status pill above already conveys whether the last auto-push
+    // succeeded. Auto-mirror OFF: the only way to push is the manual
+    // "Sync now" button. Reaching this code at all means the
+    // subscription holds the `mirror` ability (the destinations list
+    // endpoint is gated on it), so the button is safe to render.
+    if (d.enabled) {
+      addContainerElement({
+        parent: actions,
+        tag: "span",
+        className: "gigot-dest-mode auto",
+        textContent: t("modal.gigot.destinations.auto") || "auto-mirror",
+        i18nKey: "modal.gigot.destinations.auto",
+      });
+    } else {
+      const syncBtn = createButton({
+        text: t("modal.gigot.destinations.sync") || "Sync now",
+        i18nKey: "modal.gigot.destinations.sync",
+        identifier: `gigot-dest-sync-${d.id}`,
+        className: "btn-primary",
+        onClick: async () => {
+          syncBtn.disabled = true;
+          syncBtn.textContent =
+            t("modal.gigot.destinations.syncing") || "Syncing…";
+          await callBus("gigot:sync-destination", { conn, id: d.id });
+          await onSyncDone();
+        },
+      });
+      actions.appendChild(syncBtn);
+    }
 
     header.appendChild(actions);
     card.appendChild(header);
