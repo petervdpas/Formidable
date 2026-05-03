@@ -8,12 +8,10 @@ const JOURNAL_FILE = ".changes.log";
 const LOG_PATTERNS = ["*.log", "**/*.log"];
 
 let currentContextFolder = "";
-let currentActor = "";
 let currentBackend = "";
 
-function configure({ contextFolder, actor, backend } = {}) {
+function configure({ contextFolder, backend } = {}) {
   currentContextFolder = (contextFolder || "").trim();
-  currentActor = (actor || "").trim();
   currentBackend = (backend || "").trim().toLowerCase();
   ensureGitignorePatterns();
 }
@@ -104,8 +102,26 @@ function recordOp(op, absPath, { bytes } = {}) {
 
   const entry = { ts: new Date().toISOString(), op, path: rel };
   if (bytes != null) entry.bytes = bytes;
-  if (currentActor) entry.actor = currentActor;
 
+  appendEntry(entry);
+}
+
+// Append a sync-completion marker. Reading the journal back, every
+// entry whose ts is older than the latest sync marker is considered
+// "on the remote" (backend = git or gigot); entries newer than the
+// last sync marker are still local. Append-only; never rewrites past
+// entries.
+function recordSync({ backend, version, pushed, pulled } = {}) {
+  if (!currentContextFolder) return;
+  if (!backend) return;
+  const entry = { ts: new Date().toISOString(), op: "sync", backend };
+  if (version) entry.version = version;
+  if (typeof pushed === "number") entry.pushed = pushed;
+  if (typeof pulled === "number") entry.pulled = pulled;
+  appendEntry(entry);
+}
+
+function appendEntry(entry) {
   const journalPath = path.join(currentContextFolder, JOURNAL_FILE);
   try {
     fs.appendFileSync(journalPath, JSON.stringify(entry) + "\n", "utf-8");
@@ -162,7 +178,6 @@ function init() {
     } catch (_) {}
     const entry = { ts, op: "baseline", path: rel };
     if (bytes != null) entry.bytes = bytes;
-    if (currentActor) entry.actor = currentActor;
     return JSON.stringify(entry);
   });
   try {
@@ -174,4 +189,4 @@ function init() {
   }
 }
 
-module.exports = { configure, recordOp, init };
+module.exports = { configure, recordOp, recordSync, init };

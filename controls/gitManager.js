@@ -5,6 +5,7 @@ const { exec } = require("child_process");
 const simpleGit = require("simple-git");
 const fileManager = require("./fileManager");
 const changes = require("./changes");
+const changeJournal = require("./changeJournal");
 const { log, warn, error } = require("./nodeLogger");
 
 const gitConfigCache = new Set();
@@ -787,6 +788,19 @@ async function sync(folderPath, remote = "origin", branch = undefined) {
         await git.push(["-u", remote, branch]);
       } else {
         await git.push(remote, branch);
+      }
+      // Mark the sync in the journal. HEAD is read post-push so the
+      // recorded version reflects what's actually on the remote.
+      // Best-effort — log but don't fail the sync if the marker
+      // append breaks for any reason.
+      try {
+        const head = await git.revparse(["HEAD"]);
+        changeJournal.recordSync({
+          backend: "git",
+          version: (head || "").trim(),
+        });
+      } catch (e) {
+        warn("[GitManager] sync marker skipped:", e?.message || e);
       }
       return ok({ needsResolution: false });
     });

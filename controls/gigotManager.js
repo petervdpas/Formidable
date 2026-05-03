@@ -8,6 +8,7 @@ const crypto = require("crypto");
 const { error } = require("./nodeLogger");
 const changes = require("./changes");
 const apiClient = require("./apiClient");
+const changeJournal = require("./changeJournal");
 
 // Single source of truth for every GiGot endpoint Formidable hits.
 // Path patterns use {placeholder}; gigotRequest() interpolates them.
@@ -726,9 +727,25 @@ async function sync(conn, contextFolder) {
   const pushedDeleted = pushRes.data?.deleted ?? 0;
   const pulledCount = pullRes.data?.files ?? 0;
   const pulledDeleted = pullRes.data?.deleted ?? 0;
+  const version = pullRes.data?.version || pushRes.data?.version || "";
+  const isNoop =
+    pushedCount === 0 &&
+    pushedDeleted === 0 &&
+    pulledCount === 0 &&
+    pulledDeleted === 0;
+  // Only mark a sync in the journal when something actually moved.
+  // Noops would clutter the log with one entry per auto-poller tick.
+  if (!isNoop) {
+    changeJournal.recordSync({
+      backend: "gigot",
+      version,
+      pushed: pushedCount + pushedDeleted,
+      pulled: pulledCount + pulledDeleted,
+    });
+  }
   changes.reset();
   return ok({
-    version: pullRes.data?.version || pushRes.data?.version || "",
+    version,
     pushed: pushedCount,
     pushedDeleted,
     pulled: pulledCount,

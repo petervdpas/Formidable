@@ -12,7 +12,6 @@ function syncJournalFromConfig(config) {
   const ctx = config?.context_folder || "";
   changeJournal.configure({
     contextFolder: ctx,
-    actor: config?.author_name || "",
     backend: config?.remote_backend || "",
   });
   const result = changeJournal.init();
