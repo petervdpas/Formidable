@@ -4,8 +4,28 @@ const path = require("path");
 const nodeLogger = require("./nodeLogger");
 const { log, error } = nodeLogger;
 const fileManager = require("./fileManager");
+const changeJournal = require("./changeJournal");
 const schema = require("../schemas/config.schema");
 const bootSchema = require("../schemas/boot.schema");
+
+function syncJournalFromConfig(config) {
+  const ctx = config?.context_folder || "";
+  changeJournal.configure({
+    contextFolder: ctx,
+    actor: config?.author_name || "",
+    backend: config?.remote_backend || "",
+  });
+  const result = changeJournal.init();
+  if (result.created) {
+    log(
+      `[ConfigManager] Initialized change journal at ${ctx} with ${result.entries} baseline entries.`
+    );
+  } else {
+    log(
+      `[ConfigManager] Journal init skipped for ${ctx || "(no context)"}: ${result.reason}`
+    );
+  }
+}
 function getBootPath() {
   return fileManager.resolvePath("config", "boot.json");
 }
@@ -233,12 +253,14 @@ function loadUserConfig() {
     cachedConfig = config;
     virtualStructure = buildVirtualStructure(config);
     virtualStructureBuiltAt = Date.now();
+    syncJournalFromConfig(config);
     return config;
   } catch (err) {
     error("[ConfigManager] Failed to load config:", err);
     cachedConfig = { ...schema.defaults };
     virtualStructure = buildVirtualStructure(cachedConfig);
     virtualStructureBuiltAt = Date.now();
+    syncJournalFromConfig(cachedConfig);
     return cachedConfig;
   }
 }
@@ -261,6 +283,7 @@ function saveUserConfig(config) {
       virtualStructure = buildVirtualStructure(config);
       virtualStructureBuiltAt = Date.now();
     }
+    syncJournalFromConfig(config);
 
     log("[ConfigManager] Saved user config.");
   } catch (err) {

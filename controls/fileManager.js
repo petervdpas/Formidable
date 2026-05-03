@@ -3,8 +3,9 @@
 const fs = require("fs");
 const path = require("path");
 const yaml = require("js-yaml");
-const { app: electronApp } = require("electron"); 
+const { app: electronApp } = require("electron");
 const { log, warn, error } = require("./nodeLogger");
+const changeJournal = require("./changeJournal");
 
 let appRoot = null;
 
@@ -303,7 +304,11 @@ function saveFile(filepath, data, { format = "text", silent = false } = {}) {
       });
     }
 
+    const existed = fs.existsSync(filepath);
     fs.writeFileSync(filepath, content, "utf-8");
+    changeJournal.recordOp(existed ? "update" : "create", filepath, {
+      bytes: Buffer.byteLength(content, "utf-8"),
+    });
 
     if (!silent) log(`[FileManager] Saved ${format} file: ${filepath}`);
     return true;
@@ -325,7 +330,12 @@ function saveImageFile(
     ensureDirectory(imageDir, { silent });
     const targetPath = path.join(imageDir, filename);
 
-    fs.writeFileSync(targetPath, Buffer.from(buffer));
+    const existed = fs.existsSync(targetPath);
+    const buf = Buffer.from(buffer);
+    fs.writeFileSync(targetPath, buf);
+    changeJournal.recordOp(existed ? "update" : "create", targetPath, {
+      bytes: buf.length,
+    });
     if (!silent) log(`[FileManager] Saved image to: ${targetPath}`);
 
     return { success: true, path: targetPath };
@@ -335,11 +345,23 @@ function saveImageFile(
   }
 }
 
+// Walk a directory and yield every absolute file path under it.
+function walkFiles(dir) {
+  const out = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, entry.name);
+    if (entry.isDirectory()) out.push(...walkFiles(p));
+    else if (entry.isFile()) out.push(p);
+  }
+  return out;
+}
+
 // Delete a file if it exists
 function deleteFile(filepath, { silent = false } = {}) {
   try {
     if (fs.existsSync(filepath)) {
       fs.unlinkSync(filepath);
+      changeJournal.recordOp("delete", filepath);
       if (!silent) log(`[FileManager] Deleted file: ${filepath}`);
       return true;
     } else {
@@ -357,7 +379,14 @@ function deleteFolder(dirPath, { silent = false } = {}) {
   try {
     const fullPath = resolvePath(dirPath);
     if (fs.existsSync(fullPath)) {
+      // Enumerate before delete so the journal records every leaf
+      // file that disappeared, not just the folder.
+      let leaves = [];
+      try {
+        leaves = walkFiles(fullPath);
+      } catch (_) {}
       fs.rmSync(fullPath, { recursive: true, force: true });
+      for (const leaf of leaves) changeJournal.recordOp("delete", leaf);
       if (!silent) log(`[FileManager] Deleted folder: ${fullPath}`);
       return true;
     } else {
@@ -386,9 +415,15 @@ function emptyFolder(dirPath, { silent = false } = {}) {
     for (const entry of entries) {
       const entryPath = path.join(fullPath, entry.name);
       if (entry.isDirectory()) {
+        let leaves = [];
+        try {
+          leaves = walkFiles(entryPath);
+        } catch (_) {}
         fs.rmSync(entryPath, { recursive: true, force: true });
+        for (const leaf of leaves) changeJournal.recordOp("delete", leaf);
       } else {
         fs.unlinkSync(entryPath);
+        changeJournal.recordOp("delete", entryPath);
       }
     }
 
