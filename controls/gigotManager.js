@@ -24,27 +24,17 @@ const ROUTES = {
   destinationSync: { method: "POST", path: "/api/repos/{repo}/destinations/{destId}/sync" },
 };
 
-// Encode a single path placeholder. {filePath} carries embedded
-// forward slashes that must survive (path-level), with each segment
-// URI-encoded; everything else is a single segment.
-function encodePathParam(name, value) {
-  if (name === "filePath") {
-    return String(value)
-      .split("/")
-      .map((seg) => encodeURIComponent(seg))
-      .join("/");
-  }
-  return encodeURIComponent(String(value));
-}
+// {filePath} is a `/`-separated repo-relative path whose slashes
+// must reach the server intact; every other placeholder is a single
+// segment that gets fully URI-encoded.
+const MULTI_SEGMENT_PARAMS = ["filePath"];
 
 function routePath(routeName, params = {}) {
   const route = ROUTES[routeName];
   if (!route) throw new Error(`Unknown GiGot route: ${routeName}`);
-  let p = route.path;
-  for (const [k, v] of Object.entries(params)) {
-    p = p.replace(`{${k}}`, encodePathParam(k, v));
-  }
-  return p;
+  return apiClient.interpolatePath(route.path, params, {
+    multiSegment: MULTI_SEGMENT_PARAMS,
+  });
 }
 
 // Thin wrapper around apiClient.request that bakes in GiGot's

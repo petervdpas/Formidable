@@ -18,6 +18,22 @@ function parseRetryAfter(headerValue) {
   return n * 1000;
 }
 
+// Interpolate {placeholder} segments in a path template with their
+// URL-encoded values. Param names listed in `multiSegment` are
+// treated as `/`-separated paths whose embedded slashes are
+// preserved (each segment URI-encoded individually) — useful for
+// routes like /files/{filePath} where the value spans directories.
+function interpolatePath(template, params = {}, { multiSegment = [] } = {}) {
+  let p = template;
+  for (const [k, v] of Object.entries(params)) {
+    const encoded = multiSegment.includes(k)
+      ? String(v).split("/").map(encodeURIComponent).join("/")
+      : encodeURIComponent(String(v));
+    p = p.replace(`{${k}}`, encoded);
+  }
+  return p;
+}
+
 function buildUrl(baseUrl, pathname, query) {
   const url = new URL(pathname, baseUrl);
   if (query) {
@@ -97,4 +113,4 @@ async function request({
   return data;
 }
 
-module.exports = { request };
+module.exports = { request, interpolatePath };
