@@ -14,7 +14,9 @@ const apiClient = require("./apiClient");
 // Adding a new endpoint = one row here + one wrapper function below.
 const ROUTES = {
   health:          { method: "GET",  path: "/api/health" },
-  status:          { method: "GET",  path: "/api/repos/{repo}" },
+  me:              { method: "GET",  path: "/api/me" },
+  context:         { method: "GET",  path: "/api/repos/{repo}/context" },
+  formidable:      { method: "GET",  path: "/api/repos/{repo}/formidable" },
   head:            { method: "GET",  path: "/api/repos/{repo}/head" },
   tree:            { method: "GET",  path: "/api/repos/{repo}/tree" },
   file:            { method: "GET",  path: "/api/repos/{repo}/files/{filePath}" },
@@ -152,14 +154,19 @@ function validateConn(conn, { requireRepo = true } = {}) {
   return null;
 }
 
-// GET /api/health — public, no token required. Use to verify base URL
-// before a full status call so the user sees a clean "unreachable" vs
-// "unauthorized" distinction.
+// GET /api/health — public on a vanilla GiGot, but deployments often
+// front everything with edge auth (Cloudflare Access, oauth proxy)
+// that 401s any token-less request. Forwarding the bearer when we
+// have one is harmless on the unauthenticated case (server ignores
+// it) and unblocks the gated case.
 async function ping(conn) {
   const v = validateConn(conn, { requireRepo: false });
   if (v) return fail(v);
   try {
-    const data = await gigotRequest({ baseUrl: conn.baseUrl }, "health");
+    const data = await gigotRequest(
+      { baseUrl: conn.baseUrl, token: conn.token },
+      "health"
+    );
     return ok(data);
   } catch (err) {
     error("[GigotManager] ping failed:", err);
@@ -167,18 +174,59 @@ async function ping(conn) {
   }
 }
 
-// GET /api/repos/{name} — requires token + in-scope repo. Returns
-// repo info including destination count, head sha, etc.
-async function status(conn) {
+// GET /api/me — bearer-aware self-introspection. Returns the
+// caller's account (username, provider, role) plus the single
+// subscription their token represents (repo + abilities[]). The
+// repo-scoped /context covers the common per-repo bootstrap; /me
+// is the repo-agnostic equivalent for callers that don't yet know
+// which repo they're targeting (e.g. an account-picker UI).
+async function me(conn) {
+  const v = validateConn(conn, { requireRepo: false });
+  if (v) return fail(v);
+  try {
+    const data = await gigotRequest(conn, "me");
+    return ok(data);
+  } catch (err) {
+    error("[GigotManager] me failed:", err);
+    return fail(err);
+  }
+}
+
+// GET /api/repos/{name}/context — bootstrap for a repo connection.
+// Single read returns {user, subscription, repo}: who am I, what
+// can I do here, what does this repo offer (head, branch, empty
+// flag, is_formidable, destinations summary). Renders the modal
+// off this response with no inference from error codes.
+async function context(conn) {
   const v = validateConn(conn);
   if (v) return fail(v);
   try {
-    const data = await gigotRequest(conn, "status", {
+    const data = await gigotRequest(conn, "context", {
       params: { repo: conn.repoName },
     });
     return ok(data);
   } catch (err) {
-    error("[GigotManager] status failed:", err);
+    error("[GigotManager] context failed:", err);
+    return fail(err);
+  }
+}
+
+// GET /api/repos/{name}/formidable — Formidable-shape bootstrap.
+// Returns the scaffold marker (version + scaffolded_by + at), the
+// templates list under templates/, and the storage layout
+// (per-template file counts). Non-Formidable repos return 200 with
+// marker_present=false and empty arrays so the client can
+// distinguish "not Formidable" from "doesn't exist".
+async function formidable(conn) {
+  const v = validateConn(conn);
+  if (v) return fail(v);
+  try {
+    const data = await gigotRequest(conn, "formidable", {
+      params: { repo: conn.repoName },
+    });
+    return ok(data);
+  } catch (err) {
+    error("[GigotManager] formidable failed:", err);
     return fail(err);
   }
 }
@@ -605,11 +653,24 @@ async function pullLocal(conn, contextFolder) {
 
   let written = 0;
   for (const entry of formidableFiles) {
+    const abs = path.join(contextFolder, entry.path);
+    // Cheap short-circuit: if the local file already hashes to the
+    // server's blob SHA, the bytes match exactly and there's nothing
+    // to fetch. Without this, every sync re-downloads every managed
+    // file and the "↓N" toast is misleadingly large for noop pulls.
+    if (fs.existsSync(abs)) {
+      try {
+        const localBuf = fs.readFileSync(abs);
+        if (gitBlobSha(localBuf) === entry.blob) continue;
+      } catch (err) {
+        // Read failure → fall through, treat as "needs refresh".
+        error("[GigotManager] pullLocal local-read failed:", entry.path, err);
+      }
+    }
     const blobRes = await getFile(conn, entry.path);
     if (!blobRes.ok) return blobRes;
     const b64 = blobRes.data?.content_b64 || "";
     const buf = Buffer.from(b64, "base64");
-    const abs = path.join(contextFolder, entry.path);
     try {
       fs.mkdirSync(path.dirname(abs), { recursive: true });
       const tmp = `${abs}.tmp-${process.pid}-${Date.now()}`;
@@ -683,7 +744,9 @@ async function sync(conn, contextFolder) {
 
 module.exports = {
   ping,
-  status,
+  me,
+  context,
+  formidable,
   listDestinations,
   syncDestination,
   head,

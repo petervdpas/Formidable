@@ -16,6 +16,7 @@ import { EventBus } from "../eventBus.js";
 import { reloadUserConfig } from "../../utils/configUtil.js";
 import { startGitQuickStatusPoller } from "./gitQuickStatusPoller.js";
 import { startGigotQuickStatusPoller } from "./gigotQuickStatusPoller.js";
+import { startGigotAutoSyncPoller } from "./gigotAutoSyncPoller.js";
 
 export async function startPendingChangesPoller() {
   const POLLER_ID = "changes:counter";
@@ -46,5 +47,6 @@ export async function startPendingChangesPoller() {
     await startGitQuickStatusPoller("status-gitquick-btn");
   } else if (backend === "gigot") {
     await startGigotQuickStatusPoller("status-gigotload-btn");
+    await startGigotAutoSyncPoller();
   }
 }

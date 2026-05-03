@@ -570,7 +570,9 @@ export function initEventRouter() {
 
   // GiGot events (sibling of git:* — remote-sync backend)
   EventBus.off("gigot:ping", gigotHandler.handleGigotPing);
-  EventBus.off("gigot:status", gigotHandler.handleGigotStatus);
+  EventBus.off("gigot:me", gigotHandler.handleGigotMe);
+  EventBus.off("gigot:context", gigotHandler.handleGigotContext);
+  EventBus.off("gigot:formidable", gigotHandler.handleGigotFormidable);
   EventBus.off("gigot:list-destinations", gigotHandler.handleGigotListDestinations);
   EventBus.off("gigot:sync-destination", gigotHandler.handleGigotSyncDestination);
   EventBus.off("gigot:push-local", gigotHandler.handleGigotPushLocal);
@@ -583,7 +585,9 @@ export function initEventRouter() {
   EventBus.off("changes:reset", changeHandler.handleChangesReset);
 
   EventBus.on("gigot:ping", gigotHandler.handleGigotPing);
-  EventBus.on("gigot:status", gigotHandler.handleGigotStatus);
+  EventBus.on("gigot:me", gigotHandler.handleGigotMe);
+  EventBus.on("gigot:context", gigotHandler.handleGigotContext);
+  EventBus.on("gigot:formidable", gigotHandler.handleGigotFormidable);
   EventBus.on("gigot:list-destinations", gigotHandler.handleGigotListDestinations);
   EventBus.on("gigot:sync-destination", gigotHandler.handleGigotSyncDestination);
   EventBus.on("gigot:push-local", gigotHandler.handleGigotPushLocal);

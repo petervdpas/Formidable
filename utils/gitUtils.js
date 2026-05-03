@@ -396,9 +396,6 @@ export async function pullWithRebase(folderPath, remote, branch) {
  * - if behind, do a pull and toast result
  */
 export async function safeAutoSyncOnReload(cfg) {
-  const cfgPath = resolveGitPath(cfg);
-  console.log("[Git][AutoSync] start", { use_git: cfg?.use_git, cfgPath });
-
   try {
     // Bail silently when the active backend isn't git — no toast for
     // "Git auto-sync is disabled" while the user is on gigot or
@@ -406,6 +403,10 @@ export async function safeAutoSyncOnReload(cfg) {
     if (cfg?.remote_backend && cfg.remote_backend !== "git") {
       return { skipped: "not_git_backend" };
     }
+
+    const cfgPath = resolveGitPath(cfg);
+    console.log("[Git][AutoSync] start", { use_git: cfg?.use_git, cfgPath });
+
     if (!cfg?.use_git) {
       Toast.info("toast.git.autosync.disabled");
       return { skipped: "git_disabled" };

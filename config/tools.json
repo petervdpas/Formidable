@@ -14,7 +14,7 @@
   "context_mode": "storage",
   "context_folder": "/home/peter/Projects/Example",
   "selected_template": "basic.yaml",
-  "selected_data_file": "bumping-20260503.meta.json",
+  "selected_data_file": "again-20260502.meta.json",
   "author_name": "Peter van de Pas",
   "author_email": "peter.vdpas@protonmail.com",
   "language": "en",
@@ -31,8 +31,8 @@
   "window_bounds": {
     "width": 1448,
     "height": 864,
-    "x": 419,
-    "y": 164,
+    "x": 236,
+    "y": 124,
     "maximized": false
   },
   "template_sidebar_width": 498,

@@ -109,7 +109,9 @@ export function buildGigotSyncLeftPane({ conn, contextFolder, onSyncDone }) {
   destsList.className = "gigot-dests-list";
   node.appendChild(destsList);
 
-  // Actions row: Sync (primary) / Refresh / inline status
+  // Actions row: Sync (primary) + inline status. No Refresh button —
+  // the modal repaints on open and after every Sync, and reopening
+  // is the explicit "fetch the latest from GiGot" gesture.
   const actionsRow = document.createElement("div");
   actionsRow.className = "modal-form-row gigot-actions-row";
 
@@ -122,14 +124,6 @@ export function buildGigotSyncLeftPane({ conn, contextFolder, onSyncDone }) {
   });
   actionsRow.appendChild(syncBtn);
 
-  const refreshBtn = createButton({
-    text: t("modal.gigot.refresh") || "Refresh",
-    i18nKey: "modal.gigot.refresh",
-    identifier: "gigot-refresh",
-    onClick: () => repaint(),
-  });
-  actionsRow.appendChild(refreshBtn);
-
   const syncOut = document.createElement("span");
   syncOut.id = "gigot-sync-out";
   syncOut.className = "label-subtext gigot-sync-out";
@@ -139,14 +133,12 @@ export function buildGigotSyncLeftPane({ conn, contextFolder, onSyncDone }) {
 
   async function syncNow() {
     syncBtn.disabled = true;
-    refreshBtn.disabled = true;
     syncOut.textContent = t("modal.gigot.syncing") || "Syncing…";
     syncOut.className = "label-subtext gigot-sync-out";
 
     const res = await callBus("gigot:sync-local", { conn, contextFolder });
 
     syncBtn.disabled = false;
-    refreshBtn.disabled = false;
 
     if (res?.ok) {
       const v = (res.data?.version || "").slice(0, 7);
@@ -172,32 +164,64 @@ export function buildGigotSyncLeftPane({ conn, contextFolder, onSyncDone }) {
     }
   }
 
+  // Cached on each repaint so renderDestCard can decide whether the
+  // manual "Sync now" button is allowed without re-asking the server.
+  // Set from /api/repos/{name}/context's subscription.abilities — no
+  // more inferring "I must have mirror because the destinations list
+  // returned." If the bootstrap call ever fails we treat it as
+  // no-abilities so we err on the side of NOT showing destructive UI.
+  let currentAbilities = [];
+
   async function repaint() {
     statusBox.className = "gigot-sync-status loading";
     statusBox.textContent = t("modal.gigot.loading") || "Loading…";
     destsList.innerHTML = "";
-    refreshBtn.disabled = true;
 
-    const [statusRes, destsRes] = await Promise.all([
-      callBus("gigot:status", { conn }),
-      callBus("gigot:list-destinations", { conn }),
-    ]);
+    // Bootstrap first — one call returns user/subscription/repo so the
+    // banner, the abilities gate, and the destinations summary all
+    // come from a single source of truth.
+    const ctxRes = await callBus("gigot:context", { conn });
 
-    refreshBtn.disabled = false;
     statusBox.innerHTML = "";
 
-    if (statusRes?.ok) {
-      const name = statusRes.data?.name || conn.repoName;
-      statusBox.className = "gigot-sync-status ok";
-      statusBox.textContent = `${t("modal.gigot.connected") || "Connected"}: ${name}`;
-    } else {
+    if (!ctxRes?.ok) {
+      currentAbilities = [];
       statusBox.className = "gigot-sync-status error";
       statusBox.textContent = `${t("modal.gigot.failed") || "Connection failed"}: ${
-        statusRes?.error || "unknown"
+        ctxRes?.error || "unknown"
       }`;
       return;
     }
 
+    const name = ctxRes.data?.repo?.name || conn.repoName;
+    statusBox.className = "gigot-sync-status ok";
+    statusBox.textContent = `${t("modal.gigot.connected") || "Connected"}: ${name}`;
+
+    currentAbilities = Array.isArray(ctxRes.data?.subscription?.abilities)
+      ? ctxRes.data.subscription.abilities
+      : [];
+
+    // Skip the destinations roundtrip when the bootstrap already
+    // reported zero destinations — saves one call per repaint on
+    // the common "freshly attached repo" case.
+    const totalFromContext = ctxRes.data?.repo?.destinations?.total ?? null;
+    if (totalFromContext === 0) {
+      addContainerElement({
+        parent: destsList,
+        tag: "div",
+        className: "gigot-dests-empty",
+        textContent:
+          t("modal.gigot.destinations.empty") ||
+          "No mirror destinations configured.",
+        i18nKey: "modal.gigot.destinations.empty",
+      });
+      return;
+    }
+
+    // Read split: any in-scope subscriber can list destinations even
+    // without the mirror ability. The ability gates only the manual
+    // "Sync now" button on each card (see renderDestCard).
+    const destsRes = await callBus("gigot:list-destinations", { conn });
     const dests = extractDests(destsRes);
     if (dests.length === 0) {
       addContainerElement({
@@ -230,7 +254,6 @@ export function buildGigotSyncLeftPane({ conn, contextFolder, onSyncDone }) {
   function renderDestCard(d, onSyncDone) {
     const card = document.createElement("div");
     card.className = "gigot-dest-card";
-    if (d.enabled === false) card.classList.add("disabled");
 
     const header = document.createElement("div");
     header.className = "gigot-dest-header";
@@ -253,32 +276,31 @@ export function buildGigotSyncLeftPane({ conn, contextFolder, onSyncDone }) {
     const actions = document.createElement("div");
     actions.className = "gigot-dest-actions";
 
-    const statusKey = d.last_sync_status || "never";
+    // Auto-mirror ON: render the status pill (green "ok" / red "error" /
+    // gray "never") — the pill *is* the auto-mirror indicator. Server
+    // fans out the push on every accepted commit; no manual button.
+    // Auto-mirror OFF + caller has `mirror` ability: render the manual
+    // "Sync mirror" button (no pill — there's no auto-status to show).
+    // Auto-mirror OFF + no ability: explicit read-only label.
+    // Ability is taken from the bootstrap response (currentAbilities),
+    // not inferred from "did the destinations list return".
+    // Always render the auto-mirror badge: green when auto-mirror is
+    // engaged (server fans out a push on every commit), orange when
+    // it's off (the destination exists but won't auto-push). The
+    // manual "Sync mirror" button only appears for users with the
+    // `mirror` ability AND when auto-mirror is off — when auto is on,
+    // there's nothing to manually trigger.
     addContainerElement({
       parent: actions,
       tag: "span",
-      className: `gigot-dest-status ${statusKey}`,
-      textContent: statusKey,
+      className: `gigot-dest-status ${d.enabled ? "ok" : "warn"}`,
+      textContent: t("modal.gigot.destinations.auto") || "auto-mirror",
+      i18nKey: "modal.gigot.destinations.auto",
     });
 
-    // Auto-mirror ON: the GiGot server fans out a push to this
-    // destination on every accepted commit. No manual button — the
-    // status pill above already conveys whether the last auto-push
-    // succeeded. Auto-mirror OFF: the only way to push is the manual
-    // "Sync now" button. Reaching this code at all means the
-    // subscription holds the `mirror` ability (the destinations list
-    // endpoint is gated on it), so the button is safe to render.
-    if (d.enabled) {
-      addContainerElement({
-        parent: actions,
-        tag: "span",
-        className: "gigot-dest-mode auto",
-        textContent: t("modal.gigot.destinations.auto") || "auto-mirror",
-        i18nKey: "modal.gigot.destinations.auto",
-      });
-    } else {
+    if (!d.enabled && currentAbilities.includes("mirror")) {
       const syncBtn = createButton({
-        text: t("modal.gigot.destinations.sync") || "Sync now",
+        text: t("modal.gigot.destinations.sync") || "Sync mirror",
         i18nKey: "modal.gigot.destinations.sync",
         identifier: `gigot-dest-sync-${d.id}`,
         className: "btn-primary",

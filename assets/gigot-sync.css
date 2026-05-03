@@ -78,30 +78,27 @@
   flex-shrink: 0;
 }
 
-/* Status pill next to the destination name */
+/* Auto-mirror badge next to the destination name. Solid colour
+ * pills with white text — green when auto-mirror is engaged, orange
+ * when it isn't. Small uppercase print so it reads as a label, not
+ * an action. */
 .gigot-dest-status {
   display: inline-block;
   padding: 0.15em 0.6em;
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
+  color: #fff;
 }
 
 .gigot-dest-status.ok {
-  background-color: var(--git-bg-added, #dff5df);
-  color: #1b5e1b;
+  background-color: #2e7d32;
 }
 
-.gigot-dest-status.error {
-  background-color: var(--git-bg-deleted, #ffe0e0);
-  color: #8b1a1a;
-}
-
-.gigot-dest-status.never {
-  background-color: var(--git-bg-default, #ececec);
-  color: var(--text-color, #666);
+.gigot-dest-status.warn {
+  background-color: #e6841a;
 }
 
 .gigot-dest-url {
@@ -253,10 +250,3 @@
   font-style: normal;
 }
 
-/* Disabled mirror — visually de-emphasised in the read-only listing
- * so the user can see at a glance which mirrors won't auto-push.
- * The "Sync now" button still fires manual pushes regardless of this
- * flag (server treats manual triggers as explicit operator intent). */
-.gigot-dest-card.disabled {
-  opacity: 0.65;
-}

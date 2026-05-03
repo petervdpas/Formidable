@@ -918,13 +918,25 @@ function setupRemoteBackendDropdown(config) {
     btn.disabled = true;
 
     await new Promise((resolve) => {
-      EventBus.emit("gigot:status", {
+      // Probe via the bootstrap endpoint — same auth/scope check as
+      // the modal does on open, with a richer payload (role +
+      // abilities) we can surface in the success message so the user
+      // immediately knows what their key is allowed to do.
+      EventBus.emit("gigot:context", {
         conn: { baseUrl, token, repoName },
         callback: (res) => {
           btn.disabled = false;
           if (res?.ok) {
+            const role = res.data?.user?.role || "";
+            const abilities = res.data?.subscription?.abilities || [];
+            const detail =
+              role && abilities.length > 0
+                ? ` (${role} · ${abilities.join(", ")})`
+                : role
+                ? ` (${role})`
+                : "";
             out.textContent =
-              t("modal.settings.gigot.test.ok") || "Connected";
+              (t("modal.settings.gigot.test.ok") || "Connected") + detail;
             out.style.color = "var(--color-success, green)";
           } else {
             const prefix =

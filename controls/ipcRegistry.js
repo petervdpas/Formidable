@@ -344,7 +344,9 @@ function registerIpcHandlers() {
 
   // GiGot (remote-sync backend sibling of git)
   registerIpc("gigot-ping", (e, conn) => gigotManager.ping(conn));
-  registerIpc("gigot-status", (e, conn) => gigotManager.status(conn));
+  registerIpc("gigot-me", (e, conn) => gigotManager.me(conn));
+  registerIpc("gigot-context", (e, conn) => gigotManager.context(conn));
+  registerIpc("gigot-formidable", (e, conn) => gigotManager.formidable(conn));
   registerIpc("gigot-list-destinations", (e, conn) =>
     gigotManager.listDestinations(conn)
   );

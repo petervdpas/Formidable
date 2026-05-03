@@ -437,15 +437,10 @@ function installGigotLoadButton({ addStatusButton, EventBus, config }) {
                   EventBus.emit("gigot:sync-local", {
                     conn,
                     contextFolder,
+                    notify: true,
                     callback: resolve,
                   })
-                ).then((res) => {
-                  if (res?.ok) {
-                    Toast.success("toast.gigot.sync.complete");
-                  } else if (res?.error) {
-                    Toast.error(res.error);
-                  }
-                });
+                );
               } catch {}
               activePopup?.hide?.();
               break;

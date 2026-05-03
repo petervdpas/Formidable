@@ -15,7 +15,7 @@ export function handleTasksRegister(spec) {
 
 export function handleTasksUnregister(id) {
   const ok = Scheduler.unregister(id);
-  EventBus.emit(ok ? "logging:default" : "logging:warning", [
+  EventBus.emit("logging:default", [
     ok ? `[Tasks] Unregistered "${id}"` : `[Tasks] Not found "${id}"`,
   ]);
 }

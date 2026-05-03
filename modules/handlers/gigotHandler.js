@@ -4,6 +4,7 @@
 // the UI can distinguish error shapes verbatim.
 
 import { EventBus } from "../eventBus.js";
+import { Toast } from "../../utils/toastUtils.js";
 
 let lastKnownLoad = null;
 
@@ -44,8 +45,18 @@ export async function handleGigotPing({ conn, callback }) {
   await run("ping", callback, () => window.api.gigot.gigotPing(conn));
 }
 
-export async function handleGigotStatus({ conn, callback }) {
-  await run("status", callback, () => window.api.gigot.gigotStatus(conn));
+export async function handleGigotMe({ conn, callback }) {
+  await run("me", callback, () => window.api.gigot.gigotMe(conn));
+}
+
+export async function handleGigotContext({ conn, callback }) {
+  await run("context", callback, () => window.api.gigot.gigotContext(conn));
+}
+
+export async function handleGigotFormidable({ conn, callback }) {
+  await run("formidable", callback, () =>
+    window.api.gigot.gigotFormidable(conn)
+  );
 }
 
 export async function handleGigotListDestinations({ conn, callback }) {
@@ -72,10 +83,29 @@ export async function handleGigotPullLocal({ conn, contextFolder, callback }) {
   );
 }
 
-export async function handleGigotSyncLocal({ conn, contextFolder, callback }) {
-  await run("syncLocal", callback, () =>
-    window.api.gigot.gigotSyncLocal(conn, contextFolder)
-  );
+export async function handleGigotSyncLocal({
+  conn,
+  contextFolder,
+  notify,
+  callback,
+}) {
+  await run("syncLocal", callback, async () => {
+    const res = await window.api.gigot.gigotSyncLocal(conn, contextFolder);
+    if (notify) {
+      if (res?.ok) {
+        if (res.data?.noop) {
+          Toast.success("toast.gigot.sync.uptodate");
+        } else {
+          const pushed = res.data?.pushed ?? 0;
+          const pulled = res.data?.pulled ?? 0;
+          Toast.success("toast.gigot.sync.complete", [pushed, pulled]);
+        }
+      } else if (res && res.ok === false) {
+        Toast.error(res.error || "unknown");
+      }
+    }
+    return res;
+  });
 }
 
 export async function handleGigotLog({ conn, limit, callback }) {

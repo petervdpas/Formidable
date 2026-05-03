@@ -123,7 +123,9 @@ const api = {
   ]),
   gigot: buildGroup([
     "gigot-ping",
-    "gigot-status",
+    "gigot-me",
+    "gigot-context",
+    "gigot-formidable",
     "gigot-list-destinations",
     "gigot-sync-destination",
     "gigot-push-local",
