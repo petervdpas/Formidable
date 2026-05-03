@@ -15,7 +15,8 @@
     "icon": "assets/formidable.ico",
     "asar": false,
     "publish": null,
-    "directories": {
+    "directories":
+     {
       "output": "dist"
     },
     "files": [

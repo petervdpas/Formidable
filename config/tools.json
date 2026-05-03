@@ -14,7 +14,7 @@
   "context_mode": "storage",
   "context_folder": "/home/peter/Projects/Example",
   "selected_template": "basic.yaml",
-  "selected_data_file": "test-20260430.meta.json",
+  "selected_data_file": "bumping-20260503.meta.json",
   "author_name": "Peter van de Pas",
   "author_email": "peter.vdpas@protonmail.com",
   "language": "en",
@@ -29,7 +29,7 @@
   "enable_internal_server": true,
   "internal_server_port": 8383,
   "window_bounds": {
-    "width": 1440,
+    "width": 1448,
     "height": 864,
     "x": 240,
     "y": 124,

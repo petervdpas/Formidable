@@ -3,6 +3,7 @@
 module.exports = {
   defaults: {
     active_profile: "user.json",
+    pending_changes: 0,
   },
 
   sanitize(raw) {

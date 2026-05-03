@@ -122,6 +122,7 @@ export async function handleSaveTemplate({ name, data, callback }) {
   try {
     const result = await window.api.templates.saveTemplate(name, data);
     if (result) {
+      EventBus.emit("changes:bump", {});
       EventBus.emit("status:update", {
         message: "status.template.save.success",
         languageKey: "status.template.save.success",
@@ -156,6 +157,7 @@ export async function handleDeleteTemplate({ name, callback }) {
   try {
     const result = await window.api.templates.deleteTemplate(name);
     if (result) {
+      EventBus.emit("changes:bump", {});
       const templateName = name.replace(/\.yaml$/, "");
       EventBus.emit("cache:delete", {
         storeName: "vfs",

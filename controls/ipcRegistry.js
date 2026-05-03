@@ -21,6 +21,7 @@ const packageJson = require("../package.json");
 const fileManager = require("./fileManager");
 const gitManager = require("./gitManager");
 const gigotManager = require("./gigotManager");
+const changes = require("./changes");
 const templateManager = require("./templateManager");
 const formManager = require("./formManager");
 const configManager = require("./configManager");
@@ -365,6 +366,18 @@ function registerIpcHandlers() {
   registerIpc("gigot-last-known-load", () => ({
     ok: true,
     data: gigotManager.getLastKnownLoad(),
+  }));
+  registerIpc("changes-bump", () => ({
+    ok: true,
+    data: { count: changes.bump() },
+  }));
+  registerIpc("changes-get", () => ({
+    ok: true,
+    data: { count: changes.get() },
+  }));
+  registerIpc("changes-reset", () => ({
+    ok: true,
+    data: { count: changes.reset() },
   }));
 
   // Templates

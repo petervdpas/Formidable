@@ -6,6 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const { error } = require("./nodeLogger");
+const changes = require("./changes");
 
 function ok(data) {
   const out = { ok: true, data };
@@ -664,6 +665,7 @@ async function sync(conn, contextFolder) {
 
   const pushedCount = pushRes.data?.pushed ?? 0;
   const pulledCount = pullRes.data?.files ?? 0;
+  changes.reset();
   return ok({
     version: pullRes.data?.version || pushRes.data?.version || "",
     pushed: pushedCount,
@@ -671,6 +673,7 @@ async function sync(conn, contextFolder) {
     noop: pushedCount === 0 && pulledCount === 0,
   });
 }
+
 
 module.exports = {
   ping,

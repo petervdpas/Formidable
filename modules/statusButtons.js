@@ -386,7 +386,7 @@ function createStatusGigotLoadButtonConfig(onClick) {
     iconClass: "fa fa-code-fork",
     titleKey: "status.buttonBar.tooltip.gigotLoad",
     ariaKey: "status.buttonBar.aria.gigotLoad",
-    className: "btn-gigotload is-success",
+    className: "btn-gigotload",
     onClick,
   });
 }
@@ -465,22 +465,46 @@ function installGigotLoadButton({ addStatusButton, EventBus, config }) {
     })
   );
 
-  function paint(level) {
+  let lastLevel = gigotHandler.getLastKnownLoad() || "low";
+  let lastCount = 0;
+
+  function paint() {
     if (!btn) return;
-    const lvl = GIGOT_LOAD_STATE[level] ? level : "low";
     btn.classList.remove("is-success", "is-warning", "is-danger");
-    btn.classList.add(GIGOT_LOAD_STATE[lvl]);
-    const labels = {
+    if (lastCount > 0) {
+      btn.classList.add(GIGOT_LOAD_STATE[lastLevel] || "is-success");
+    }
+    const lvlLabels = {
       low: t("status.buttonBar.tooltip.gigotLoad.low") || "GiGot: idle",
       medium: t("status.buttonBar.tooltip.gigotLoad.medium") || "GiGot: busy",
       high: t("status.buttonBar.tooltip.gigotLoad.high") || "GiGot: overloaded",
     };
-    btn.title = labels[lvl];
-    btn.setAttribute("aria-label", labels[lvl]);
+    const tip =
+      lastCount > 0
+        ? `${lvlLabels[lastLevel]} · ${lastCount} pending`
+        : lvlLabels[lastLevel];
+    btn.title = tip;
+    btn.setAttribute("aria-label", tip);
   }
 
-  paint(gigotHandler.getLastKnownLoad());
-  EventBus.on("gigot:load:changed", (payload) => paint(payload?.current));
+  (async () => {
+    try {
+      const res = await new Promise((r) =>
+        EventBus.emit("changes:get", { callback: r })
+      );
+      if (res?.ok) lastCount = res.data?.count || 0;
+    } catch {}
+    paint();
+  })();
+
+  EventBus.on("gigot:load:changed", (payload) => {
+    if (payload?.current) lastLevel = payload.current;
+    paint();
+  });
+  EventBus.on("changes:changed", (payload) => {
+    lastCount = payload?.count || 0;
+    paint();
+  });
   return btn;
 }
 

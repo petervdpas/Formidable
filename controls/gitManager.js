@@ -4,6 +4,7 @@ const fs = require("fs");
 const { exec } = require("child_process");
 const simpleGit = require("simple-git");
 const fileManager = require("./fileManager");
+const changes = require("./changes");
 const { log, warn, error } = require("./nodeLogger");
 
 const gitConfigCache = new Set();
@@ -307,6 +308,7 @@ async function commit(folderPath, message, { addAllBeforeCommit = true } = {}) {
       const git = await getGitInstance(root);
       if (addAllBeforeCommit) await git.add(".");
       const res = await git.commit(message);
+      changes.reset();
       return ok(res);
     });
   } catch (err) {
@@ -322,6 +324,7 @@ async function commitPaths(folderPath, message, paths = []) {
       const git = await getGitInstance(root);
       if (paths?.length) await git.add(paths);
       const res = await git.commit(message, paths || []);
+      changes.reset();
       return ok(res);
     });
   } catch (err) {

@@ -30,17 +30,15 @@
   "internal_server_port": 8383,
   "window_bounds": {
     "width": 1440,
-    "height": 864,
-    "x": 240,
-    "y": 139,
-    "maximized": false
+    "height": 864
   },
   "template_sidebar_width": 466,
   "storage_sidebar_width": 459,
   "status_buttons": {
     "reloader": true,
     "charpicker": true,
-    "gitquick": true
+    "gitquick": true,
+    "gigotload": false
   },
   "history": {
     "enabled": true,

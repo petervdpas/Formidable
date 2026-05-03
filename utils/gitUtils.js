@@ -400,6 +400,12 @@ export async function safeAutoSyncOnReload(cfg) {
   console.log("[Git][AutoSync] start", { use_git: cfg?.use_git, cfgPath });
 
   try {
+    // Bail silently when the active backend isn't git — no toast for
+    // "Git auto-sync is disabled" while the user is on gigot or
+    // local-only; that's not a git profile, so the message is noise.
+    if (cfg?.remote_backend && cfg.remote_backend !== "git") {
+      return { skipped: "not_git_backend" };
+    }
     if (!cfg?.use_git) {
       Toast.info("toast.git.autosync.disabled");
       return { skipped: "git_disabled" };
