@@ -333,7 +333,9 @@ function buildCommitMessage(conn, changes) {
   const count = changes.length;
   const header = `${who}: sync ${count} file${count === 1 ? "" : "s"}`;
   const shown = changes.slice(0, 20);
-  const body = shown.map((c) => `- ${c.path}`).join("\n");
+  const body = shown
+    .map((c) => `- ${c.op === "delete" ? "[delete] " : ""}${c.path}`)
+    .join("\n");
   const tail =
     changes.length > shown.length
       ? `\n…and ${changes.length - shown.length} more`
@@ -457,7 +459,8 @@ async function pushLocal(conn, contextFolder) {
   //    /tree once — this covers first-time sync against an existing
   //    repo where we shouldn't blindly re-push everything.
   let record = readTrackRecord(contextFolder);
-  if (!record.version) {
+  const wasFirstSync = !record.version;
+  if (wasFirstSync) {
     const treeRes = await tree(conn);
     if (treeRes.ok) {
       const seeded = emptyTrackRecord();
@@ -472,12 +475,23 @@ async function pushLocal(conn, contextFolder) {
     // 409 empty-repo → record stays empty → every local file counts.
   }
 
-  // 3. Diff local against the ledger.
+  // 3. Diff local against the ledger — both directions.
+  //    Puts: local files whose SHA differs from the ledger.
+  //    Deletes: managed paths the ledger remembers but no longer
+  //    exist on disk. Skipped on the first sync because the freshly
+  //    seeded ledger contains every server path, and any path we
+  //    don't have locally yet belongs to pullLocal — not a delete.
   const changedFiles = localFiles.filter(
     (f) => record.files[f.path] !== f.sha
   );
+  const localPaths = new Set(localFiles.map((f) => f.path));
+  const deletedPaths = wasFirstSync
+    ? []
+    : Object.keys(record.files).filter(
+        (p) => isFormidablePath(p) && !localPaths.has(p)
+      );
 
-  if (changedFiles.length === 0) {
+  if (changedFiles.length === 0 && deletedPaths.length === 0) {
     // Persist any seeding we did above so the next push skips /tree.
     record.lastSync = new Date().toISOString();
     try {
@@ -489,6 +503,7 @@ async function pushLocal(conn, contextFolder) {
       version: record.version || "",
       noop: true,
       pushed: 0,
+      deleted: 0,
       scanned: localFiles.length,
     });
   }
@@ -501,7 +516,10 @@ async function pushLocal(conn, contextFolder) {
     return fail("Remote repo has no HEAD (empty repo?)");
   }
 
-  const changes = changedFiles.map(fileToChange);
+  const changes = [
+    ...changedFiles.map(fileToChange),
+    ...deletedPaths.map((p) => ({ op: "delete", path: p })),
+  ];
   const commitRes = await commitChanges(conn, {
     parentVersion,
     changes,
@@ -533,6 +551,9 @@ async function pushLocal(conn, contextFolder) {
     for (const f of changedFiles) {
       record.files[f.path] = f.sha;
     }
+    for (const p of deletedPaths) {
+      delete record.files[p];
+    }
   }
   try {
     writeTrackRecord(contextFolder, record);
@@ -540,7 +561,12 @@ async function pushLocal(conn, contextFolder) {
     error("[GigotManager] writeTrackRecord failed:", err);
   }
 
-  return ok({ ...commitRes.data, pushed: changedFiles.length, noop: false });
+  return ok({
+    ...commitRes.data,
+    pushed: changedFiles.length,
+    deleted: deletedPaths.length,
+    noop: false,
+  });
 }
 
 // GET /api/repos/{name}/tree — recursive file listing at HEAD.
@@ -600,11 +626,36 @@ async function pullLocal(conn, contextFolder) {
   if (v) return fail(v);
   if (!contextFolder) return fail("Missing context folder");
 
+  // Snapshot the prior ledger before fetching — used to compute
+  // server-side deletes (managed paths the ledger remembers but the
+  // new tree no longer lists). Files that were never in the ledger
+  // (brand-new local work) are preserved by this gate.
+  const oldRecord = readTrackRecord(contextFolder);
+
   const treeRes = await tree(conn);
   if (!treeRes.ok) return treeRes;
 
   const allFiles = Array.isArray(treeRes.data?.files) ? treeRes.data.files : [];
   const formidableFiles = allFiles.filter((f) => isFormidablePath(f.path));
+  const newTreePaths = new Set(allFiles.map((f) => f.path));
+
+  // Apply server-side deletes locally. Best-effort: we log and
+  // continue on per-file errors so one stuck file doesn't abort the
+  // whole pull.
+  let deleted = 0;
+  for (const oldPath of Object.keys(oldRecord.files)) {
+    if (!isFormidablePath(oldPath)) continue;
+    if (newTreePaths.has(oldPath)) continue;
+    const abs = path.join(contextFolder, oldPath);
+    try {
+      if (fs.existsSync(abs)) {
+        fs.unlinkSync(abs);
+        deleted += 1;
+      }
+    } catch (err) {
+      error("[GigotManager] pullLocal delete failed:", oldPath, err);
+    }
+  }
 
   let written = 0;
   for (const entry of formidableFiles) {
@@ -642,6 +693,7 @@ async function pullLocal(conn, contextFolder) {
   return ok({
     version: treeRes.data?.version || "",
     files: written,
+    deleted,
   });
 }
 
@@ -664,13 +716,21 @@ async function sync(conn, contextFolder) {
   }
 
   const pushedCount = pushRes.data?.pushed ?? 0;
+  const pushedDeleted = pushRes.data?.deleted ?? 0;
   const pulledCount = pullRes.data?.files ?? 0;
+  const pulledDeleted = pullRes.data?.deleted ?? 0;
   changes.reset();
   return ok({
     version: pullRes.data?.version || pushRes.data?.version || "",
     pushed: pushedCount,
+    pushedDeleted,
     pulled: pulledCount,
-    noop: pushedCount === 0 && pulledCount === 0,
+    pulledDeleted,
+    noop:
+      pushedCount === 0 &&
+      pushedDeleted === 0 &&
+      pulledCount === 0 &&
+      pulledDeleted === 0,
   });
 }
 
