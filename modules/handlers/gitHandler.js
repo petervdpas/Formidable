@@ -101,7 +101,6 @@ export async function handleGitPush({ folderPath, callback }) {
 export async function handleGitCommit({ folderPath, message, callback }) {
   try {
     const res = await window.api.git.gitCommit(folderPath, message);
-    if (res?.ok) EventBus.emit("changes:changed", [{ count: 0 }]);
     pass(callback, res, null);
   } catch (err) {
     EventBus.emit("logging:error", [
@@ -201,7 +200,6 @@ export async function handleGitCommitPaths({
 }) {
   try {
     const res = await window.api.git.gitCommitPaths(folderPath, message, paths);
-    if (res?.ok) EventBus.emit("changes:changed", [{ count: 0 }]);
     pass(callback, res, null);
   } catch (err) {
     EventBus.emit("logging:error", [

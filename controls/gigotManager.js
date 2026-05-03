@@ -6,7 +6,6 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const { error } = require("./nodeLogger");
-const changes = require("./changes");
 const apiClient = require("./apiClient");
 const changeJournal = require("./changeJournal");
 
@@ -743,7 +742,6 @@ async function sync(conn, contextFolder) {
       pulled: pulledCount + pulledDeleted,
     });
   }
-  changes.reset();
   return ok({
     version,
     pushed: pushedCount,

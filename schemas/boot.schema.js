@@ -3,7 +3,6 @@
 module.exports = {
   defaults: {
     active_profile: "user.json",
-    pending_changes: 0,
   },
 
   sanitize(raw) {
@@ -15,6 +14,13 @@ module.exports = {
         changed = true;
         result[key] = this.defaults[key];
       }
+    }
+
+    // Drop the obsolete pending_changes field if present in older
+    // boot.json files — the journal+cursor pair has replaced it.
+    if (Object.prototype.hasOwnProperty.call(result, "pending_changes")) {
+      delete result.pending_changes;
+      changed = true;
     }
 
     return { boot: result, changed };

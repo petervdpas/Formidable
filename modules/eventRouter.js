@@ -14,7 +14,7 @@ import * as cacheHandler from "./handlers/cacheHandler.js";
 import * as vfsHandler from "./handlers/vfsHandler.js";
 import * as gitHandler from "./handlers/gitHandler.js";
 import * as gigotHandler from "./handlers/gigotHandler.js";
-import * as changeHandler from "./handlers/changeHandler.js";
+import * as journalHandler from "./handlers/journalHandler.js";
 import * as bootHandlers from "./handlers/bootHandlers.js";
 import * as configHandler from "./handlers/configHandler.js";
 import * as screenHandlers from "./handlers/screenHandlers.js";
@@ -580,9 +580,9 @@ export function initEventRouter() {
   EventBus.off("gigot:sync-local", gigotHandler.handleGigotSyncLocal);
   EventBus.off("gigot:log", gigotHandler.handleGigotLog);
   EventBus.off("gigot:last-known-load", gigotHandler.handleGigotLastKnownLoad);
-  EventBus.off("changes:bump", changeHandler.handleChangesBump);
-  EventBus.off("changes:get", changeHandler.handleChangesGet);
-  EventBus.off("changes:reset", changeHandler.handleChangesReset);
+  EventBus.off("journal:pending", journalHandler.handleJournalPending);
+  EventBus.off("journal:cursor", journalHandler.handleJournalCursor);
+  EventBus.off("journal:changed", journalHandler.handleJournalChanged);
 
   EventBus.on("gigot:ping", gigotHandler.handleGigotPing);
   EventBus.on("gigot:me", gigotHandler.handleGigotMe);
@@ -595,9 +595,9 @@ export function initEventRouter() {
   EventBus.on("gigot:sync-local", gigotHandler.handleGigotSyncLocal);
   EventBus.on("gigot:log", gigotHandler.handleGigotLog);
   EventBus.on("gigot:last-known-load", gigotHandler.handleGigotLastKnownLoad);
-  EventBus.on("changes:bump", changeHandler.handleChangesBump);
-  EventBus.on("changes:get", changeHandler.handleChangesGet);
-  EventBus.on("changes:reset", changeHandler.handleChangesReset);
+  EventBus.on("journal:pending", journalHandler.handleJournalPending);
+  EventBus.on("journal:cursor", journalHandler.handleJournalCursor);
+  EventBus.on("journal:changed", journalHandler.handleJournalChanged);
 
   // Cache events
   EventBus.off("cache:init", cacheHandler.initCache);

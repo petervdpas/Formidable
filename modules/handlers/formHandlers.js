@@ -440,7 +440,6 @@ export async function handleSaveForm(payload, respond) {
       datafile || result.path?.split(/[/\\]/).pop() || "unknown.json";
 
     if (result.success) {
-      EventBus.emit("changes:bump", {});
       // Soft signal for the active screen; do NOT re-render the whole form
       EventBus.emit("form:saved", {
         template: templateFilename || null,
@@ -507,7 +506,6 @@ export async function handleDeleteForm(
     );
 
     if (result) {
-      EventBus.emit("changes:bump", {});
       const snap = await EventBus.emitWithResponse("form:context:get");
       if (snap?.filename === datafile && snap?.template === templateFilename) {
         EventBus.emit("form:context:update", null);

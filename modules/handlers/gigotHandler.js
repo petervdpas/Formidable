@@ -30,9 +30,6 @@ async function run(where, callback, fn) {
     const res = await fn();
     logIfFailed(where, res);
     observeLoad(res);
-    if (res?.ok && where === "syncLocal") {
-      EventBus.emit("changes:changed", [{ count: 0 }]);
-    }
     callback?.(res);
   } catch (err) {
     const msg = String(err?.message || err);

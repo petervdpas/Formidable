@@ -4,7 +4,6 @@ const fs = require("fs");
 const { exec } = require("child_process");
 const simpleGit = require("simple-git");
 const fileManager = require("./fileManager");
-const changes = require("./changes");
 const changeJournal = require("./changeJournal");
 const { log, warn, error } = require("./nodeLogger");
 
@@ -309,7 +308,6 @@ async function commit(folderPath, message, { addAllBeforeCommit = true } = {}) {
       const git = await getGitInstance(root);
       if (addAllBeforeCommit) await git.add(".");
       const res = await git.commit(message);
-      changes.reset();
       return ok(res);
     });
   } catch (err) {
@@ -325,7 +323,6 @@ async function commitPaths(folderPath, message, paths = []) {
       const git = await getGitInstance(root);
       if (paths?.length) await git.add(paths);
       const res = await git.commit(message, paths || []);
-      changes.reset();
       return ok(res);
     });
   } catch (err) {
@@ -789,19 +786,17 @@ async function sync(folderPath, remote = "origin", branch = undefined) {
       } else {
         await git.push(remote, branch);
       }
-      // Mark the sync in the journal. HEAD is read post-push so the
-      // recorded version reflects what's actually on the remote.
-      // Best-effort — log but don't fail the sync if the marker
-      // append breaks for any reason.
+      // Mark the sync in the journal. HEAD is best-effort — even if
+      // revparse fails the marker still fires (with no version) so
+      // the journal at least records that a sync completed.
+      let version = "";
       try {
-        const head = await git.revparse(["HEAD"]);
-        changeJournal.recordSync({
-          backend: "git",
-          version: (head || "").trim(),
-        });
+        version = ((await git.revparse(["HEAD"])) || "").trim();
       } catch (e) {
-        warn("[GitManager] sync marker skipped:", e?.message || e);
+        warn("[GitManager] revparse failed:", e?.message || e);
       }
+      changeJournal.recordSync({ backend: "git", version });
+      log(`[GitManager] sync marker recorded (version=${version || "n/a"})`);
       return ok({ needsResolution: false });
     });
   } catch (err) {

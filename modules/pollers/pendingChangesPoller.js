@@ -1,25 +1,19 @@
 // modules/pollers/pendingChangesPoller.js
-// Orchestrator. Owns two responsibilities:
-//   1. Polls config/boot.json's pending_changes counter (its own
-//      tick) so getChanges() stays fresh for any UI subscriber.
-//   2. Registers the right backend-specific sibling poller
-//      (gitQuickStatusPoller OR gigotQuickStatusPoller) based on
-//      cfg.remote_backend, so only one of them runs at a time and
-//      neither boots when local-only.
-//
-// Not coupled to any specific status button — the count is generic
-// state that drives sibling poller decisions; siblings still gate
-// their own work on the count being non-zero, since there's no
-// actionable info to surface when nothing is pending.
+// Orchestrator. Polls journal:pending (count derived from journal
+// minus cursor), emits journal:changed when the value moves, and
+// registers the right backend-specific sibling poller based on
+// cfg.remote_backend. Sibling pollers gate themselves on
+// getLastKnownPending() so they skip work when nothing's pending.
 
 import { EventBus } from "../eventBus.js";
 import { reloadUserConfig } from "../../utils/configUtil.js";
 import { startGitQuickStatusPoller } from "./gitQuickStatusPoller.js";
 import { startGigotQuickStatusPoller } from "./gigotQuickStatusPoller.js";
 import { startGigotAutoSyncPoller } from "./gigotAutoSyncPoller.js";
+import { getLastKnownPending } from "../handlers/journalHandler.js";
 
 export async function startPendingChangesPoller() {
-  const POLLER_ID = "changes:counter";
+  const POLLER_ID = "journal:pending";
 
   EventBus.emit("tasks:unregister", POLLER_ID);
   EventBus.emit("tasks:register", {
@@ -32,9 +26,13 @@ export async function startPendingChangesPoller() {
     backoff: { strategy: "exponential", factor: 2, max: 120_000 },
     fn: async () => {
       try {
-        await new Promise((resolve) =>
-          EventBus.emit("changes:get", { callback: resolve })
+        const res = await new Promise((resolve) =>
+          EventBus.emit("journal:pending", { callback: resolve })
         );
+        const count = res?.ok ? res.data?.count ?? 0 : 0;
+        if (count !== getLastKnownPending()) {
+          EventBus.emit("journal:changed", [{ count }]);
+        }
       } catch {}
     },
   });

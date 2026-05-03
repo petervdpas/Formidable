@@ -2,10 +2,17 @@
 
 const fs = require("fs");
 const path = require("path");
-const { error } = require("./nodeLogger");
+const { warn, error } = require("./nodeLogger");
+const schema = require("../schemas/changes.schema");
 
 const JOURNAL_FILE = ".changes.log";
-const LOG_PATTERNS = ["*.log", "**/*.log"];
+const CURSOR_FILE = ".changes.cursor";
+const GITIGNORE_PATTERNS = [
+  "*.log",
+  "**/*.log",
+  ".changes.*",
+  "**/.changes.*",
+];
 
 let currentContextFolder = "";
 let currentBackend = "";
@@ -67,7 +74,7 @@ function ensureGitignorePatterns() {
     }
   }
   const present = new Set(body.split(/\r?\n/).map((l) => l.trim()));
-  const missing = LOG_PATTERNS.filter((p) => !present.has(p));
+  const missing = GITIGNORE_PATTERNS.filter((p) => !present.has(p));
   if (missing.length === 0) return;
   const sep = body.length === 0 || body.endsWith("\n") ? "" : "\n";
   try {
@@ -112,13 +119,90 @@ function recordOp(op, absPath, { bytes } = {}) {
 // last sync marker are still local. Append-only; never rewrites past
 // entries.
 function recordSync({ backend, version, pushed, pulled } = {}) {
-  if (!currentContextFolder) return;
-  if (!backend) return;
-  const entry = { ts: new Date().toISOString(), op: "sync", backend };
+  if (!currentContextFolder) {
+    warn("[ChangeJournal] recordSync skipped: no current context folder");
+    return;
+  }
+  if (!backend) {
+    warn("[ChangeJournal] recordSync skipped: no backend");
+    return;
+  }
+  const ts = new Date().toISOString();
+  const entry = { ts, op: "sync", backend };
   if (version) entry.version = version;
   if (typeof pushed === "number") entry.pushed = pushed;
   if (typeof pulled === "number") entry.pulled = pulled;
   appendEntry(entry);
+  updateCursor(backend, ts);
+}
+
+// Cursor file — tiny JSON keyed by backend, holds the ts of the
+// latest sync marker per backend. Derived state: rebuildable by
+// scanning the journal. Kept as a separate file so the "where did
+// I leave off?" lookup is O(1) and doesn't require parsing the log.
+// Compute pending changes since the last sync for the active backend.
+// Reads the journal, dedupes by path (latest op wins), skips sync
+// markers and baseline entries (the latter are "was here at init",
+// not user changes). Returns {count, paths:[{path, op}]} for pollers
+// + UI to consume. Local-only / no-context returns empty.
+function pending() {
+  if (!currentContextFolder) return { count: 0, paths: [] };
+  if (!currentBackend || currentBackend === "none") {
+    return { count: 0, paths: [] };
+  }
+  const journalPath = path.join(currentContextFolder, JOURNAL_FILE);
+  if (!fs.existsSync(journalPath)) return { count: 0, paths: [] };
+
+  const cursorTs = readCursor()[currentBackend] || "";
+  const pathOps = new Map();
+  let body;
+  try {
+    body = fs.readFileSync(journalPath, "utf-8");
+  } catch (err) {
+    warn("[ChangeJournal] pending read failed:", err?.message || err);
+    return { count: 0, paths: [] };
+  }
+  for (const line of body.split("\n")) {
+    const entry = schema.parseLine(line);
+    if (!entry) continue;
+    if (entry.ts <= cursorTs) continue;
+    if (entry.op === "sync" || entry.op === "baseline") continue;
+    pathOps.set(entry.path, entry.op);
+  }
+  return {
+    count: pathOps.size,
+    paths: Array.from(pathOps, ([path, op]) => ({ path, op })),
+  };
+}
+
+function readCursor() {
+  if (!currentContextFolder) return {};
+  const cursorPath = path.join(currentContextFolder, CURSOR_FILE);
+  if (!fs.existsSync(cursorPath)) return {};
+  let raw;
+  try {
+    const text = fs.readFileSync(cursorPath, "utf-8");
+    raw = JSON.parse(text);
+  } catch (err) {
+    warn("[ChangeJournal] cursor read failed:", err?.message || err);
+    return {};
+  }
+  const { cursor } = schema.sanitizeCursor(raw);
+  return cursor;
+}
+
+function updateCursor(backend, ts) {
+  if (!currentContextFolder) return;
+  const cursorPath = path.join(currentContextFolder, CURSOR_FILE);
+  const cursor = readCursor();
+  cursor[backend] = ts;
+  try {
+    const tmp = `${cursorPath}.tmp-${process.pid}-${Date.now()}`;
+    fs.writeFileSync(tmp, JSON.stringify(cursor) + "\n", "utf-8");
+    fs.renameSync(tmp, cursorPath);
+  } catch (err) {
+    error("[ChangeJournal] cursor write failed:", err);
+  }
 }
 
 function appendEntry(entry) {
@@ -189,4 +273,11 @@ function init() {
   }
 }
 
-module.exports = { configure, recordOp, recordSync, init };
+module.exports = {
+  configure,
+  recordOp,
+  recordSync,
+  readCursor,
+  pending,
+  init,
+};

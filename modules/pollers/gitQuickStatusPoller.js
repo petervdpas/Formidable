@@ -8,7 +8,7 @@ import {
   getStatusFresh,
   GitRules,
 } from "../../utils/gitUtils.js";
-import { getChanges } from "../handlers/changeHandler.js";
+import { getLastKnownPending } from "../handlers/journalHandler.js";
 
 const safe = (s) => String(s || "").replace(/[^a-z0-9:_-]/gi, "_");
 
@@ -137,10 +137,10 @@ export async function startGitQuickStatusPoller(
     args: { gitPath, sig: "" },
     backoff: { strategy: "exponential", factor: 2, max: 300_000 },
     fn: async (args, ctx) => {
-      // pendingChangesPoller keeps getChanges() fresh — when nothing
-      // is pending there's no actionable info this poller could
+      // pendingChangesPoller refreshes the journal-derived count;
+      // when it's zero there's no actionable info this poller could
       // surface, so skip the git-status round trip.
-      if (getChanges() === 0) return;
+      if (getLastKnownPending() === 0) return;
 
       const [progress, status] = await Promise.all([
         getProgressState(args.gitPath).catch(() => null),

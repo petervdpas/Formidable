@@ -9,7 +9,7 @@
 import { EventBus } from "../eventBus.js";
 import { reloadUserConfig } from "../../utils/configUtil.js";
 import { resolveGigotConn } from "../../utils/backendUtils.js";
-import { getChanges } from "../handlers/changeHandler.js";
+import { getLastKnownPending } from "../handlers/journalHandler.js";
 
 export async function startGigotQuickStatusPoller(
   buttonId = "status-gigotload-btn"
@@ -46,10 +46,10 @@ export async function startGigotQuickStatusPoller(
     condition: { type: "dom-exists", selector: btnSelector },
     backoff: { strategy: "exponential", factor: 2, max: 300_000 },
     fn: async () => {
-      // pendingChangesPoller keeps getChanges() fresh — if nothing
-      // is pending there's no actionable info to surface from a
+      // pendingChangesPoller refreshes the journal-derived count;
+      // when it's zero there's no actionable info to surface from a
       // server load probe, so skip the round trip.
-      if (getChanges() === 0) return;
+      if (getLastKnownPending() === 0) return;
       await pingOnce();
     },
   });

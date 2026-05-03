@@ -134,10 +134,9 @@ const api = {
     "gigot-log",
     "gigot-last-known-load",
   ]),
-  changes: buildGroup([
-    "changes-bump",
-    "changes-get",
-    "changes-reset",
+  journal: buildGroup([
+    "journal-pending",
+    "journal-cursor",
   ]),
   config: buildGroup([
     "switch-user-profile",

@@ -485,7 +485,7 @@ function installGigotLoadButton({ addStatusButton, EventBus, config }) {
   (async () => {
     try {
       const res = await new Promise((r) =>
-        EventBus.emit("changes:get", { callback: r })
+        EventBus.emit("journal:pending", { callback: r })
       );
       if (res?.ok) lastCount = res.data?.count || 0;
     } catch {}
@@ -496,7 +496,7 @@ function installGigotLoadButton({ addStatusButton, EventBus, config }) {
     if (payload?.current) lastLevel = payload.current;
     paint();
   });
-  EventBus.on("changes:changed", (payload) => {
+  EventBus.on("journal:changed", (payload) => {
     lastCount = payload?.count || 0;
     paint();
   });

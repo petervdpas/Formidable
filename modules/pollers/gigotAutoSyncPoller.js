@@ -29,6 +29,14 @@ export async function startGigotAutoSyncPoller() {
     backoff: { strategy: "exponential", factor: 2, max: 30 * 60 * 1000 },
     fn: async () => {
       try {
+        // Skip the round-trip when the journal says nothing has
+        // changed since the last sync — saves a push+pull per tick
+        // when the user is idle and avoids 12 noop toasts/hour.
+        const pendingRes = await new Promise((resolve) =>
+          EventBus.emit("journal:pending", { callback: resolve })
+        );
+        if (pendingRes?.ok && pendingRes.data?.count === 0) return;
+
         await new Promise((resolve) =>
           EventBus.emit("gigot:sync-local", {
             conn,
