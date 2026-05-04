@@ -13,8 +13,8 @@
   "enable_plugins": true,
   "context_mode": "storage",
   "context_folder": "./examples",
-  "selected_template": "addresses.yaml",
-  "selected_data_file": "abbey-road-studios.meta.json",
+  "selected_template": "recepten.yaml",
+  "selected_data_file": "groene-tapenade.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -31,12 +31,12 @@
   "window_bounds": {
     "width": 1448,
     "height": 864,
-    "x": 236,
-    "y": 124,
+    "x": 115,
+    "y": 275,
     "maximized": false
   },
   "template_sidebar_width": 466,
-  "storage_sidebar_width": 426,
+  "storage_sidebar_width": 399,
   "status_buttons": {
     "reloader": true,
     "charpicker": true,
