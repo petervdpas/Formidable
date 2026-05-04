@@ -234,6 +234,7 @@ async function push(
     return await withRepoLock(root, async () => {
       const git = await getGitInstance(root);
       const res = await git.push(remote, branch, opts);
+      await recordGitPushMarker(git, "push");
       return ok(res);
     });
   } catch (err) {
@@ -298,6 +299,21 @@ async function resetPaths(folderPath, paths = []) {
   } catch (err) {
     return fail(err);
   }
+}
+
+// Single funnel for "data is on the remote" — the journal cursor
+// only advances from one place per backend (the architectural rule).
+// Symmetric with gigot.sync(): both backends mark the journal at
+// the moment bytes leave the machine.
+async function recordGitPushMarker(git, label) {
+  let version = "";
+  try {
+    version = ((await git.revparse(["HEAD"])) || "").trim();
+  } catch (e) {
+    warn("[GitManager] revparse failed:", e?.message || e);
+  }
+  changeJournal.recordSync({ backend: "git", version });
+  log(`[GitManager] ${label} marker recorded (version=${version || "n/a"})`);
 }
 
 async function commit(folderPath, message, { addAllBeforeCommit = true } = {}) {
@@ -786,17 +802,7 @@ async function sync(folderPath, remote = "origin", branch = undefined) {
       } else {
         await git.push(remote, branch);
       }
-      // Mark the sync in the journal. HEAD is best-effort — even if
-      // revparse fails the marker still fires (with no version) so
-      // the journal at least records that a sync completed.
-      let version = "";
-      try {
-        version = ((await git.revparse(["HEAD"])) || "").trim();
-      } catch (e) {
-        warn("[GitManager] revparse failed:", e?.message || e);
-      }
-      changeJournal.recordSync({ backend: "git", version });
-      log(`[GitManager] sync marker recorded (version=${version || "n/a"})`);
+      await recordGitPushMarker(git, "sync");
       return ok({ needsResolution: false });
     });
   } catch (err) {

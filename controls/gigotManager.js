@@ -568,6 +568,18 @@ async function pushLocal(conn, contextFolder) {
     error("[GigotManager] writeTrackRecord failed:", err);
   }
 
+  // Single funnel for "data is on the gigot remote" — the journal
+  // cursor only advances from one place per backend (the
+  // architectural rule). sync() goes through pushLocal() so it
+  // gets covered for free; pullLocal/syncDestination/commitChanges
+  // are intentionally not callers (pull doesn't change outbound
+  // pending state, mirror destinations are server-side fan-out).
+  changeJournal.recordSync({
+    backend: "gigot",
+    version: commitRes.data?.version || "",
+    pushed: changedFiles.length + deletedPaths.length,
+  });
+
   return ok({
     ...commitRes.data,
     pushed: changedFiles.length,
@@ -727,21 +739,9 @@ async function sync(conn, contextFolder) {
   const pulledCount = pullRes.data?.files ?? 0;
   const pulledDeleted = pullRes.data?.deleted ?? 0;
   const version = pullRes.data?.version || pushRes.data?.version || "";
-  const isNoop =
-    pushedCount === 0 &&
-    pushedDeleted === 0 &&
-    pulledCount === 0 &&
-    pulledDeleted === 0;
-  // Only mark a sync in the journal when something actually moved.
-  // Noops would clutter the log with one entry per auto-poller tick.
-  if (!isNoop) {
-    changeJournal.recordSync({
-      backend: "gigot",
-      version,
-      pushed: pushedCount + pushedDeleted,
-      pulled: pulledCount + pulledDeleted,
-    });
-  }
+  // Journal marker is fired by pushLocal() when bytes actually
+  // leave for gigot. sync() doesn't fire its own — symmetric with
+  // git, where push() is the funnel and sync() rides through it.
   return ok({
     version,
     pushed: pushedCount,

@@ -14,7 +14,7 @@
   "context_mode": "storage",
   "context_folder": "./examples",
   "selected_template": "basic.yaml",
-  "selected_data_file": "sane-20250530.meta.json",
+  "selected_data_file": "test-20250629.meta.json",
   "author_name": "Utente Ribelle",
   "author_email": "regular@example.com",
   "language": "en",
@@ -31,8 +31,8 @@
   "window_bounds": {
     "width": 1448,
     "height": 864,
-    "x": 236,
-    "y": 124,
+    "x": 180,
+    "y": 357,
     "maximized": false
   },
   "template_sidebar_width": 466,
