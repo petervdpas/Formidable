@@ -21,6 +21,22 @@ function configure({ contextFolder, backend } = {}) {
   currentContextFolder = (contextFolder || "").trim();
   currentBackend = (backend || "").trim().toLowerCase();
   ensureGitignorePatterns();
+  ensureCursorFile();
+}
+
+// Create an empty cursor file the first time we see a context, so
+// the file exists alongside .changes.log from the start. Empty {}
+// = "no backend has synced yet" — readCursor() returns {} either
+// way, but having the file present is more honest about state.
+function ensureCursorFile() {
+  if (!currentContextFolder) return;
+  const cursorPath = path.join(currentContextFolder, CURSOR_FILE);
+  if (fs.existsSync(cursorPath)) return;
+  try {
+    fs.writeFileSync(cursorPath, "{}\n", "utf-8");
+  } catch (err) {
+    error("[ChangeJournal] cursor seed failed:", err);
+  }
 }
 
 // Walk up from startDir looking for a directory that contains a
