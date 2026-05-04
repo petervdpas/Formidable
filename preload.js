@@ -125,6 +125,7 @@ const api = {
     "gigot-ping",
     "gigot-me",
     "gigot-context",
+    "gigot-head",
     "gigot-formidable",
     "gigot-list-destinations",
     "gigot-sync-destination",

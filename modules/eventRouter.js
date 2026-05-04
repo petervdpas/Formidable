@@ -572,6 +572,7 @@ export function initEventRouter() {
   EventBus.off("gigot:ping", gigotHandler.handleGigotPing);
   EventBus.off("gigot:me", gigotHandler.handleGigotMe);
   EventBus.off("gigot:context", gigotHandler.handleGigotContext);
+  EventBus.off("gigot:head", gigotHandler.handleGigotHead);
   EventBus.off("gigot:formidable", gigotHandler.handleGigotFormidable);
   EventBus.off("gigot:list-destinations", gigotHandler.handleGigotListDestinations);
   EventBus.off("gigot:sync-destination", gigotHandler.handleGigotSyncDestination);
@@ -587,6 +588,7 @@ export function initEventRouter() {
   EventBus.on("gigot:ping", gigotHandler.handleGigotPing);
   EventBus.on("gigot:me", gigotHandler.handleGigotMe);
   EventBus.on("gigot:context", gigotHandler.handleGigotContext);
+  EventBus.on("gigot:head", gigotHandler.handleGigotHead);
   EventBus.on("gigot:formidable", gigotHandler.handleGigotFormidable);
   EventBus.on("gigot:list-destinations", gigotHandler.handleGigotListDestinations);
   EventBus.on("gigot:sync-destination", gigotHandler.handleGigotSyncDestination);

@@ -53,10 +53,12 @@ module.exports = {
     return this.sanitizeEntry(parsed);
   },
 
-  // Sanitize the cursor file payload. Drops unknown-backend keys
-  // and non-string values. Returns {cursor, changed} matching the
-  // boot/config schema convention so callers can detect drift and
-  // optionally rewrite the file.
+  // Sanitize the cursor file payload. Each backend entry is either a
+  // legacy string (just the sync ts) or the current shape {ts, version}.
+  // Both are normalised to {ts, version} so callers don't branch on
+  // shape; a legacy string migrates with version="" until the next sync
+  // refills it. Drops unknown-backend keys and unusable values.
+  // Returns {cursor, changed} so callers can detect drift and rewrite.
   sanitizeCursor(raw) {
     if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
       return { cursor: { ...this.cursorDefaults }, changed: true };
@@ -64,11 +66,26 @@ module.exports = {
     const cursor = {};
     let changed = false;
     for (const [k, v] of Object.entries(raw)) {
-      if (KNOWN_BACKENDS.has(k) && typeof v === "string" && v) {
-        cursor[k] = v;
-      } else {
+      if (!KNOWN_BACKENDS.has(k)) {
         changed = true;
+        continue;
       }
+      if (typeof v === "string" && v) {
+        cursor[k] = { ts: v, version: "" };
+        changed = true;
+        continue;
+      }
+      if (v && typeof v === "object" && !Array.isArray(v)) {
+        const ts = typeof v.ts === "string" ? v.ts : "";
+        const version = typeof v.version === "string" ? v.version : "";
+        if (!ts && !version) {
+          changed = true;
+          continue;
+        }
+        cursor[k] = { ts, version };
+        continue;
+      }
+      changed = true;
     }
     return { cursor, changed };
   },

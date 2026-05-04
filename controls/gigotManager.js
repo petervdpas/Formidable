@@ -709,8 +709,17 @@ async function pullLocal(conn, contextFolder) {
     error("[GigotManager] writeTrackRecord failed:", err);
   }
 
+  // Pull is inbound: it doesn't add a sync marker, but it does mean
+  // "local now matches the server's HEAD". Update the cursor's version
+  // pointer so the head-probe poller can short-circuit on the next
+  // tick when nothing has moved upstream.
+  const pulledVersion = treeRes.data?.version || "";
+  if (pulledVersion) {
+    changeJournal.recordRemoteSeen("gigot", pulledVersion);
+  }
+
   return ok({
-    version: treeRes.data?.version || "",
+    version: pulledVersion,
     files: written,
     deleted,
   });

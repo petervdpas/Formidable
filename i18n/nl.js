@@ -735,6 +735,8 @@ export default {
   "gigot.quick.open_full": "Open synchronisatie…",
   "toast.gigot.sync.complete": "Gesynchroniseerd met GiGot · ↑{0} ↓{1}",
   "toast.gigot.sync.uptodate": "Al synchroon met GiGot",
+  "toast.gigot.pull.changes": "Opgehaald van GiGot · ↓{0} bestanden, {1} verwijderd",
+  "toast.gigot.pull.uptodate": "Al synchroon met GiGot",
 
   "modal.profile.title": "Wissel gebruikersprofiel",
   "modal.profile.label.newProfile": "Nieuw profiel",

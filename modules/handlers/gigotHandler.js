@@ -50,6 +50,10 @@ export async function handleGigotContext({ conn, callback }) {
   await run("context", callback, () => window.api.gigot.gigotContext(conn));
 }
 
+export async function handleGigotHead({ conn, callback }) {
+  await run("head", callback, () => window.api.gigot.gigotHead(conn));
+}
+
 export async function handleGigotFormidable({ conn, callback }) {
   await run("formidable", callback, () =>
     window.api.gigot.gigotFormidable(conn)
@@ -74,10 +78,29 @@ export async function handleGigotPushLocal({ conn, contextFolder, callback }) {
   );
 }
 
-export async function handleGigotPullLocal({ conn, contextFolder, callback }) {
-  await run("pullLocal", callback, () =>
-    window.api.gigot.gigotPullLocal(conn, contextFolder)
-  );
+export async function handleGigotPullLocal({
+  conn,
+  contextFolder,
+  notify,
+  callback,
+}) {
+  await run("pullLocal", callback, async () => {
+    const res = await window.api.gigot.gigotPullLocal(conn, contextFolder);
+    if (notify) {
+      if (res?.ok) {
+        const files = res.data?.files ?? 0;
+        const deleted = res.data?.deleted ?? 0;
+        if (files === 0 && deleted === 0) {
+          Toast.success("toast.gigot.pull.uptodate");
+        } else {
+          Toast.success("toast.gigot.pull.changes", [files, deleted]);
+        }
+      } else if (res && res.ok === false) {
+        Toast.error(res.error || "unknown");
+      }
+    }
+    return res;
+  });
 }
 
 export async function handleGigotSyncLocal({

@@ -149,7 +149,19 @@ function recordSync({ backend, version, pushed, pulled } = {}) {
   if (typeof pushed === "number") entry.pushed = pushed;
   if (typeof pulled === "number") entry.pulled = pulled;
   appendEntry(entry);
-  updateCursor(backend, ts);
+  updateCursor(backend, { ts, version });
+}
+
+// Update the per-backend version pointer without advancing the sync
+// ts. Called after a successful pull — we now know the server's HEAD,
+// but no new sync marker is appended (the journal records *outbound*
+// state changes; pull is inbound). Keeping ts and version writers
+// distinct preserves the "one funnel per backend for sync markers"
+// rule while letting the head-probe poller compare cheaply.
+function recordRemoteSeen(backend, version) {
+  if (!currentContextFolder) return;
+  if (!backend || !version) return;
+  updateCursor(backend, { version });
 }
 
 // Cursor file — tiny JSON keyed by backend, holds the ts of the
@@ -169,7 +181,7 @@ function pending() {
   const journalPath = path.join(currentContextFolder, JOURNAL_FILE);
   if (!fs.existsSync(journalPath)) return { count: 0, paths: [] };
 
-  const cursorTs = readCursor()[currentBackend] || "";
+  const cursorTs = (readCursor()[currentBackend] || {}).ts || "";
   const pathOps = new Map();
   let body;
   try {
@@ -207,11 +219,19 @@ function readCursor() {
   return cursor;
 }
 
-function updateCursor(backend, ts) {
+// Merge-write the per-backend cursor entry. Caller passes only the
+// fields it owns (ts from sync, version from pull or sync), other
+// fields preserved. Atomic via tmp+rename.
+function updateCursor(backend, fields) {
   if (!currentContextFolder) return;
   const cursorPath = path.join(currentContextFolder, CURSOR_FILE);
   const cursor = readCursor();
-  cursor[backend] = ts;
+  const prev = cursor[backend] || { ts: "", version: "" };
+  cursor[backend] = {
+    ts: typeof fields.ts === "string" ? fields.ts : prev.ts,
+    version:
+      typeof fields.version === "string" ? fields.version : prev.version,
+  };
   try {
     const tmp = `${cursorPath}.tmp-${process.pid}-${Date.now()}`;
     fs.writeFileSync(tmp, JSON.stringify(cursor) + "\n", "utf-8");
@@ -293,6 +313,7 @@ module.exports = {
   configure,
   recordOp,
   recordSync,
+  recordRemoteSeen,
   readCursor,
   pending,
   init,

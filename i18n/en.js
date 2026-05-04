@@ -708,6 +708,8 @@ export default {
   "gigot.quick.open_full": "Open Sync…",
   "toast.gigot.sync.complete": "Synced with GiGot · ↑{0} ↓{1}",
   "toast.gigot.sync.uptodate": "Already in sync with GiGot",
+  "toast.gigot.pull.changes": "Pulled from GiGot · ↓{0} files, {1} deleted",
+  "toast.gigot.pull.uptodate": "Already in sync with GiGot",
 
   "modal.profile.title": "Switch User Profile",
   "modal.profile.label.newProfile": "New Profile",
