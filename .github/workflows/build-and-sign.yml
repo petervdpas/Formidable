@@ -1,9 +1,13 @@
-name: Build Formidable (Release)
+name: Build Formidable (Release) [DISABLED]
 
+# ─────────────────────────────────────────────────────────────────
+# DISABLED: this repository is archived. Development continues at
+# https://github.com/petervdpas/Formidable2
+# Triggers below are intentionally reduced to manual-only, and the
+# gate job is hard-disabled via `if: false`, so nothing runs.
+# ─────────────────────────────────────────────────────────────────
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -17,6 +21,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────
   check_version:
     name: Verify version bumped
+    if: false
     runs-on: ubuntu-latest
     outputs:
       bumped: ${{ steps.diff.outputs.bumped }}
